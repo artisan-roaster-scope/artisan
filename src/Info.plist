@@ -21,15 +21,21 @@
 				<string>application/pdf</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>PDF document</string>
+			<string>pdf</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>PDF</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSIsAppleDefaultForType</key>
+			<true/>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+			</array>
 			<key>NSDocumentClass</key>
-			<string>BrowserDocument</string>
+			<string>Document</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>

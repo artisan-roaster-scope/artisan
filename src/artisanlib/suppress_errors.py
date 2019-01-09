@@ -28,4 +28,16 @@ class suppress_stdout_stderr(object):
         os.dup2(self.save_fds[1],2)
         # Close all file descriptors
         for fd in self.null_fds + self.save_fds:
-            os.close(fd)    
+            os.close(fd)
+
+# with Python 3.5:
+#
+#from contextlib import contextmanager,redirect_stderr,redirect_stdout
+#from os import devnull
+#
+#@contextmanager
+#def suppress_stdout_stderr():
+#    """A context manager that redirects stdout and stderr to devnull"""
+#    with open(devnull, 'w') as fnull:
+#        with redirect_stderr(fnull) as err, redirect_stdout(fnull) as out:
+#            yield (err, out)

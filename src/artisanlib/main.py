@@ -6506,10 +6506,16 @@ class tgraphcanvas(FigureCanvas):
             
     def startPhidgetManager(self):
         if self.phidgetRemoteFlag:
-            self.addPhidgetServer()
+            try:
+                self.addPhidgetServer()
+            except:
+                pass
         if self.phidgetManager is None:
-            self.phidgetManager = PhidgetManager()
-            libtime.sleep(0.3)
+            try:
+                self.phidgetManager = PhidgetManager()
+                libtime.sleep(0.3)
+            except:
+                pass
     
     def stopPhidgetManager(self):
         if self.phidgetManager is not None:
@@ -51579,11 +51585,18 @@ def main():
                     aw.qmc.backgroundprofile = None
     except Exception:
         pass
-    if platf == 'Windows' and appFrozen():
-        try:
-            sys.stderr = sys.stdout
-        except:
-            pass
+    
+    try:
+        sys.stderr = object # this is needed to surpress the message on the ignored Exception
+                            # Phidget that is raised on starting the PhidgetManager without installed
+                            # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
+    except:
+        pass
+#    if platf == 'Windows' and appFrozen():
+#        try:
+#            sys.stderr = sys.stdout
+#        except:
+#            pass
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
