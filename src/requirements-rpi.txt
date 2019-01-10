@@ -1,4 +1,6 @@
-gevent==1.3.6
+# ensure that the selected version is on https://www.piwheels.org/ as binary package
+# for the builds Python version (3.6)
+gevent==1.3.5
 numpy==1.15.4
 scipy==1.1.0 # older scipy to speed up installation
 matplotlib==3.0.2
