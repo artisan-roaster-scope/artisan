@@ -29682,7 +29682,10 @@ class editGraphDlg(ArtisanDialog):
             self.plus_store_selected_label = sd["location_label"]
             cd = plus.stock.getCoffeeCoffeeDict(selected_coffee)
             self.plus_coffee_selected = cd["hr_id"]
-            self.plus_coffee_selected_label = cd["origin"] + " " + cd["label"]
+            origin = ""
+            if "origin" in cd:
+                origin = cd["origin"] + " "
+            self.plus_coffee_selected_label = origin + cd["label"]
             self.plus_blend_selected_label = None
             self.plus_blend_selected_spec = None
             self.plus_blend_selected_spec_labels = None
