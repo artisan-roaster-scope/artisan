@@ -15266,7 +15266,7 @@ class ApplicationWindow(QMainWindow):
                                     libtime.sleep(0.035)
                                     aw.fujipid.setpidPXR("d",kd)
                             else:
-                                aw.pidcontrol.confPID(kp,ki,kd,aw.pidcontrol.pOnE)                    
+                                aw.pidcontrol.confPID(kp,ki,kd,pOnE=aw.pidcontrol.pOnE)                    
                                 #aw.pidcontrol.setPID(kp,ki,kd) # we don't set the new values in the dialog
                 elif action == 12: # Fuji Command (currently only "write(<unitId>,<register>,<value>)" is supproted
                     if cmd_str:
