@@ -19353,12 +19353,6 @@ class ApplicationWindow(QMainWindow):
                     self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
                 if settings.contains("plus_email"):
                     self.plus_email = settings.value("plus_email",self.plus_email)
-                if self.plus_account is not None:
-                    try:
-                        import plus.controller
-                        plus.controller.start(aw)
-                    except:
-                        pass
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -20523,6 +20517,15 @@ class ApplicationWindow(QMainWindow):
                     aw.fullscreenAction.setChecked(True)
             
             QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash!?
+            
+            #PLUS-COMMENT
+            if not artisanviewerMode and self.plus_account is not None:
+                try:
+                    import plus.controller
+                    plus.controller.start(aw)
+                except:
+                    pass
+            #aw.updatePlusStatus()
                             
         except Exception as e:
             res = False
@@ -29093,8 +29096,8 @@ class editGraphDlg(ArtisanDialog):
                     self.plus_blend_selected_spec_labels = aw.qmc.plus_blend_spec_labels
             self.plus_amount_selected = None # holds the amount of the selected coffee/blend if known            
             plusCoffeeslabel = QLabel("<b>" + u(QApplication.translate("Label", "Stock",None)) + "</b>")
-            plusStoreslabel = QLabel("<b>" + u(QApplication.translate("Label", "Store",None)) + "</b>")
-            plusBlendslabel = QLabel("<b>" + u(QApplication.translate("Label", "Blend",None)) + "</b>")            
+            self.plusStoreslabel = QLabel("<b>" + u(QApplication.translate("Label", "Store",None)) + "</b>")
+            self.plusBlendslabel = QLabel("<b>" + u(QApplication.translate("Label", "Blend",None)) + "</b>")            
             self.plus_stores_combo = QComboBox() 
             self.plus_coffees_combo = QComboBox()
             self.plus_blends_combo = QComboBox()
@@ -29122,11 +29125,11 @@ class editGraphDlg(ArtisanDialog):
             plusLine = QHBoxLayout()
             plusLine.addWidget(self.plus_coffees_combo)
             plusLine.addSpacing(15)
-            plusLine.addWidget(plusBlendslabel)
+            plusLine.addWidget(self.plusBlendslabel)
             plusLine.addSpacing(5)
             plusLine.addWidget(self.plus_blends_combo)
             plusLine.addSpacing(15)
-            plusLine.addWidget(plusStoreslabel)
+            plusLine.addWidget(self.plusStoreslabel)
             plusLine.addSpacing(5)
             plusLine.addWidget(self.plus_stores_combo)
             textLayout.addWidget(self.plus_selected_line,4,1)
@@ -29439,7 +29442,18 @@ class editGraphDlg(ArtisanDialog):
             #---- Stores
             
             if storeIndex is None or storeIndex == -1:
-                self.plus_stores = plus.stock.getStores() 
+                self.plus_stores = plus.stock.getStores()
+                try:
+                    if len(self.plus_stores) == 1:
+                        self.plus_default_store = plus.stock.getStoreId(self.plus_stores[0])
+                    if len(self.plus_stores) < 2:
+                        self.plusStoreslabel.setVisible(False)
+                        self.plus_stores_combo.setVisible(False)
+                    else:
+                        self.plusStoreslabel.setVisible(True)
+                        self.plus_stores_combo.setVisible(True)
+                except:
+                    pass
                 self.plus_stores_combo.blockSignals(True)       
                 self.plus_stores_combo.clear()
                 self.plus_stores_combo.addItems([""] + plus.stock.getStoreLabels(self.plus_stores))
@@ -29508,7 +29522,14 @@ class editGraphDlg(ArtisanDialog):
             self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store)
             self.plus_blends_combo.blockSignals(True)  
             self.plus_blends_combo.clear()
-            self.plus_blends_combo.addItems([""] + plus.stock.getBlendLabels(self.plus_blends))  
+            self.plus_blends_combo.addItems([""] + plus.stock.getBlendLabels(self.plus_blends)) 
+            
+            if len(self.plus_blends) == 0:
+                self.plusBlendslabel.setVisible(False)
+                self.plus_blends_combo.setVisible(False)
+            else:
+                self.plusBlendslabel.setVisible(True)
+                self.plus_blends_combo.setVisible(True)
             
             p = None
             if self.plus_blend_selected_spec:
@@ -38940,7 +38961,6 @@ class serialport(object):
                 if ser is None:
                     ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,
                             remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-                    print(ser,port)
             if ser is not None:
                 aw.ser.PhidgetDigitalOut = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
                 for i in range(4):
@@ -39625,7 +39645,7 @@ class serialport(object):
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
                         raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None))
-                    elif result.startswith("#"):
+                    elif result.startswith("#"):             
                         #OK. NOW SET UNITS
 #                        self.SP.flushInput()
 #                        self.SP.flushOutput()
@@ -39651,6 +39671,7 @@ class serialport(object):
                             else:
                                 ### EVERYTHING OK  ###
                                 self.ArduinoIsInitialized = 1
+                        aw.sendmessage(QApplication.translate("Message","TC4 initialized",None))
                 #READ TEMPERATURE
                 command = "READ\n"  #Read command.
 #                self.SP.flushInput()
