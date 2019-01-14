@@ -75,7 +75,7 @@ def fetch():
         j = d.json()
         if "success" in j and j["success"] and "result" in j and j["result"]:
             stock = j["result"]
-            stock["retrieved"] = time.time() 
+            stock["retrieved"] = time.time()
             config.logger.debug("stock: -> retrieved")
             config.logger.debug("stock = %s"%stock)      
             controller.reconnected()
@@ -84,7 +84,7 @@ def fetch():
             return False
     except Exception as e:
         config.logger.error("stock: -> failure: %s",e)  
-        controller.disconnect(False)
+        #controller.disconnect(False) # don't disconnect on failure
         return False
     finally:
         if stock_semaphore.available() < 1:
