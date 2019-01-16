@@ -827,6 +827,8 @@ class tgraphcanvas(FigureCanvas):
         self.phidgetPort = 5661
         self.phidgetServerAdded = False # this should be set on PhidgetNetwork.addServer and cleared on PhidgetNetwork.removeServer
         self.phidgetManager = None
+        
+        self.probatManager = None
                 
         self.yoctoRemoteFlag = False
         self.yoctoServerID = "127.0.0.1"
@@ -942,9 +944,39 @@ class tgraphcanvas(FigureCanvas):
                        "+Program 910",              #89
                        "+Slider 01",                #90
                        "+Slider 23",                #91
+                       "Probat Middleware",                  #92
+                       "+Probat Middleware burner/drum",     #93
+                       "+Probat Middleware fan/pressure",    #94
                        ]
+
+        # ADD DEVICE:
+        # ids of (main) devices (without a + in front of their name string) 
+        # that do not communicate via any serial port thus do not need any serial port configuration
+        self.nonSerialDevices = [
+            27, # Program
+            29, # MODBUS
+            33, # MODBUS 34
+            34, # Phidget 1048 4xTC 01
+            37, # Phidget 1046 4xRTD 01
+            40, # Phidget IO 01
+            45, # Yocto Thermocouple
+            46, # Yocto PT100
+            47, # Phidget 1045 IR
+            52, # Phidget 1051 1xTC 01
+            58, # Phidget TMP1101 4xTC 01
+            61, # Phidget TMP1100 1xTC
+            62, # Phidget 1011 IO 01
+            63, # Phidget HUB0000 IO 01
+            68, # Phidget TMP1200 1xRTD
+            69, # Phidget IO Digital 01
+            73, # Phidget 1011 IO Digital 01
+            74, # Phidget HUB0000 IO Digital 01
+            79, # S7
+            83, # Aillio Bullet R1 BT/DT
+            92  # Probat Middleware
+        ]
                        
-    
+        # ADD DEVICE:
         # ids of devices temperature conversions should not be applied
         self.nonTempDevices = [
             22, # +PID SV/DUTY %
@@ -1793,6 +1825,15 @@ class tgraphcanvas(FigureCanvas):
         self.extraArduinoT4 = 0. # fan duty %
         self.extraArduinoT5 = 0. # SV
         self.extraArduinoT6 = 0. # TC4 internal ambient temperature
+        
+        # used by the ProbatMiddleware extra devices
+        # +ProbatMiddleware_burner_drum and
+        # +ProbatMidleware_fan_pressure
+        self.ProbatMiddleware_burner = -1
+        self.ProbatMiddleware_drum = -1
+        self.ProbatMiddleware_fan = -1
+        self.ProbatMiddleware_pressure = -1
+        
         
         #used by extra device +Program_34, +Program_56, +Program_78 and +Program_910 to pass values
         self.program_t3 = -1
@@ -36285,6 +36326,9 @@ class serialport(object):
                                    self.callprogram_910,      #89
                                    self.slider_01,            #90
                                    self.slider_23,            #91
+                                   self.probat_middleware,    #92
+                                   self.probat_middleware_burner_drum,  #93
+                                   self.probat_middleware_fan_pressure, #94
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -37044,6 +37088,61 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t1 = aw.qmc.extraArduinoT5
         t2 = aw.qmc.extraArduinoT6
+        return tx,t2,t1
+
+    def probat_middleware(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = -1
+        t2 = -1
+        self.ProbatMiddleware_burner = -1
+        self.ProbatMiddleware_drum = -1
+        self.ProbatMiddleware_fan = -1
+        self.ProbatMiddleware_pressure = -1
+        if aw.qmc.probatManager is None:
+            from artisanlib.probat import ProbatMiddleware
+            aw.qmc.probatManager = ProbatMiddleware()
+        if aw.qmc.probatManager is not None:
+            connected = aw.qmc.probatManager.isConnected()
+            if not connected:
+                connected = aw.qmc.probatManager.connect()
+                if connected:
+                    name = aw.qmc.probatManager.getRoasterName()
+                    if name is None:
+                        name = ""
+                    aw.sendmessage(QApplication.translate("Message","Probat Middleware roaster {} connected".format(name),None))
+            if connected:
+                url = aw.qmc.probatManager.getRoasterURL()
+                if url is not None:
+                    try:
+                        data = aw.qmc.probatManager.getJSON(url)
+                        roastData = data["roastingProcess"]
+                        if "productTemperature" in roastData:
+                            t1 = roastData["productTemperature"]
+                        if "exhaustTemperature" in roastData:
+                            t2 = roastData["exhaustTemperature"]
+                        if "underPressure" in roastData:
+                            aw.qmc.ProbatMiddleware_pressure = roastData["underPressure"]
+                        if "burnerCapacity" in roastData:
+                            aw.qmc.ProbatMiddleware_burner = roastData["burnerCapacity"]
+                        if "drumSpeed" in roastData:
+                            aw.qmc.ProbatMiddleware_drum = roastData["drumSpeed"]
+                        if "exhaustFanSpeed" in roastData:
+                            aw.qmc.ProbatMiddleware_fan = roastData["exhaustFanSpeed"]
+                    except Exception as e:
+                        aw.qmc.probatManager.disconnect()
+                        aw.sendmessage(QApplication.translate("Message","Probat Middleware disconnected",None))
+        return tx,t2,t1
+
+    def probat_middleware_burner_drum(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.qmc.ProbatMiddleware_burner
+        t2 = aw.qmc.ProbatMiddleware_drum
+        return tx,t2,t1
+
+    def probat_middleware_fan_pressure(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.qmc.ProbatMiddleware_fan
+        t2 = aw.qmc.ProbatMiddleware_pressure
         return tx,t2,t1
         
     def YOCTO_thermo(self):
@@ -41361,27 +41460,26 @@ class comportDlg(ArtisanDialog):
         buttonLayout.addWidget(cancelButton)
         buttonLayout.addWidget(okButton)
         #LAYOUT TAB 1
-        grid = QGridLayout()
-        grid.addWidget(comportlabel,0,0,Qt.AlignRight)
-        grid.addWidget(self.comportEdit,0,1)
-        grid.addWidget(baudratelabel,1,0,Qt.AlignRight)
-        grid.addWidget(self.baudrateComboBox,1,1)
-        grid.addWidget(bytesizelabel,2,0,Qt.AlignRight)
-        grid.addWidget(self.bytesizeComboBox,2,1)
-        grid.addWidget(paritylabel,3,0,Qt.AlignRight)
-        grid.addWidget(self.parityComboBox,3,1)
-        grid.addWidget(stopbitslabel,4,0,Qt.AlignRight)
-        grid.addWidget(self.stopbitsComboBox,4,1)
-        grid.addWidget(timeoutlabel,5,0,Qt.AlignRight)
-        grid.addWidget(self.timeoutEdit,5,1)
-        gridBoxLayout = QHBoxLayout()
-        gridBoxLayout.addLayout(grid)
-        gridBoxLayout.addStretch()
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
-        # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in aw.qmc.nonSerialDevices) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+            grid = QGridLayout()
+            grid.addWidget(comportlabel,0,0,Qt.AlignRight)
+            grid.addWidget(self.comportEdit,0,1)
+            grid.addWidget(baudratelabel,1,0,Qt.AlignRight)
+            grid.addWidget(self.baudrateComboBox,1,1)
+            grid.addWidget(bytesizelabel,2,0,Qt.AlignRight)
+            grid.addWidget(self.bytesizeComboBox,2,1)
+            grid.addWidget(paritylabel,3,0,Qt.AlignRight)
+            grid.addWidget(self.parityComboBox,3,1)
+            grid.addWidget(stopbitslabel,4,0,Qt.AlignRight)
+            grid.addWidget(self.stopbitsComboBox,4,1)
+            grid.addWidget(timeoutlabel,5,0,Qt.AlignRight)
+            grid.addWidget(self.timeoutEdit,5,1)
+            gridBoxLayout = QHBoxLayout()
+            gridBoxLayout.addLayout(grid)
+            gridBoxLayout.addStretch()
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -41908,8 +42006,7 @@ class comportDlg(ArtisanDialog):
                             devname = devicename
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
-                        # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in aw.qmc.nonSerialDevices) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -42000,8 +42097,7 @@ class comportDlg(ArtisanDialog):
         timeout = str(self.timeoutEdit.text())
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
-        # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in aw.qmc.nonSerialDevices) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -44119,11 +44215,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.device = 83
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                ####  DEVICE 48 is an external program 34
+                ####  DEVICE 88 and 89 are an external program 78 and 910
                 ##########################
                 ##########################
-                ####  DEVICE 49 is an external program 56
+                ####  DEVICE 90 and 91 are an slider 01 and slider 23
                 ##########################
+                ##########################
+                ####  DEVICE 92-94 and 91 are an Probat Middleware and have no serial setup
+                ##########################
+                elif meter == "Probat Middleware":
+                    aw.qmc.device = 92
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 
                 # ADD DEVICE:
 
@@ -44235,6 +44337,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 89
                 1, # 90
                 1, # 91
+                1, # 92
+                1, # 93
+                1, # 94
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -44351,8 +44456,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             self.accept()
             #if device is not None or not external-program (don't need serial settings config)
-            # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]):
+            if not(aw.qmc.device in aw.qmc.nonSerialDevices):
                 aw.setcommport()
             #self.close()
         except Exception as e:

@@ -52,6 +52,7 @@ roast_url        = api_base_url + "/aroast"
 
 # Connection configurations
 
+#verify_ssl       = False
 verify_ssl       = True
 connect_timeout  = 2 # in seconds
 read_timeout     = 5 # in seconds

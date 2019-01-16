@@ -207,7 +207,7 @@ def postData(url,data,authorized=True,compress=config.compress_posts):
 #    config.logger.debug("connection: -> data: %s)",data) # don't log POST data as it might contain credentials!
     jsondata = json.dumps(data).encode("utf8")
     config.logger.debug("connection: -> size %s",len(jsondata))
-    headers = getHeaders(authorized,decompress=False)
+    headers = getHeaders(authorized,decompress=compress)
     headers["Content-Type"] = "application/json"
     if compress and len(jsondata) > config.post_compression_threshold:        
         postdata = gzip.compress(jsondata)
@@ -226,7 +226,7 @@ def postData(url,data,authorized=True,compress=config.compress_posts):
         config.logger.debug("connection: -> session token outdated (404)")
         # we re-authentify by renewing the session token and try again
         if authentify():
-            headers = getHeaders(authorized,compress=compress) # recreate header with new token
+            headers = getHeaders(authorized,decompress=compress) # recreate header with new token
             r = requests.post(url,
                     headers = headers,
                     data    = postdata, 
