@@ -2781,7 +2781,7 @@ class tgraphcanvas(FigureCanvas):
                 elif redraw and force: # ensure that we at least redraw the canvas
                     self.updateBackground()
             elif redraw and force: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
-                    self.updateBackground()
+                self.updateBackground()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -4750,8 +4750,6 @@ class tgraphcanvas(FigureCanvas):
                     except:
                         pass
                     
-
-
                 if aw.qmc.flagstart:
                     self.ax.set_ylabel("")
                     self.ax.set_xlabel("")
@@ -5107,19 +5105,35 @@ class tgraphcanvas(FigureCanvas):
                             for i in range(len(self.backgroundEvents)):
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
+                                    pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
+                                    if self.clampEvents:
+                                        self.E1backgroundvalues.append(pos)
+                                    else:
+                                        self.E1backgroundvalues.append(self.eventpositionbars[min(110,pos)])
                                     E1b_last = i
                                 elif self.backgroundEtypes[i] == 1 and aw.qmc.showEtypes[1]:
                                     self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
+                                    pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
+                                    if self.clampEvents:
+                                        self.E2backgroundvalues.append(pos)
+                                    else:
+                                        self.E2backgroundvalues.append(self.eventpositionbars[min(110,pos)])
                                     E2b_last = i
                                 elif self.backgroundEtypes[i] == 2 and aw.qmc.showEtypes[2]:
                                     self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
+                                    pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
+                                    if self.clampEvents:
+                                        self.E3backgroundvalues.append(pos)
+                                    else:
+                                        self.E3backgroundvalues.append(self.eventpositionbars[min(110,pos)])
                                     E3b_last = i
                                 elif self.backgroundEtypes[i] == 3 and aw.qmc.showEtypes[3]:
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
+                                    pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
+                                    if self.clampEvents:
+                                        self.E4backgroundvalues.append(pos)
+                                    else:
+                                        self.E4backgroundvalues.append(self.eventpositionbars[min(110,pos)])
                                     E4b_last = i
 #                            every = None
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
@@ -19356,7 +19370,7 @@ class ApplicationWindow(QMainWindow):
     def settingsLoad(self, filename=None):
         res = False
         try: 
-            if filename:
+            if filename is not None:
                 settings = QSettings(filename,QSettings.IniFormat)
             else:
                 settings = QSettings()
@@ -19384,11 +19398,11 @@ class ApplicationWindow(QMainWindow):
                     self.settingspath = filename
                 settings.endGroup()
             
-            if settings.contains("fullscreen"):
+            if filename is None and settings.contains("fullscreen"):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-            if not artisanviewerMode and settings.contains("plus_account"):
+            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
                 self.plus_account = settings.value("plus_account",self.plus_account)
                 if settings.contains("plus_remember_credentials"):
                     self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
@@ -20117,7 +20131,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.beansize_min = toInt(settings.value("beansize_min",self.qmc.beansize_min))
             if settings.contains("beansize_max"):
                 self.qmc.beansize_max = toInt(settings.value("beansize_max",self.qmc.beansize_max))
-            if settings.contains("plus_default_store"):
+            if filename is None and settings.contains("plus_default_store"):
                 self.qmc.plus_default_store = toString(settings.value("plus_default_store",self.qmc.plus_default_store))
             settings.endGroup()
 
@@ -20552,7 +20566,7 @@ class ApplicationWindow(QMainWindow):
             
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             
-            if self.full_screen_mode_active:
+            if filename is None and self.full_screen_mode_active:
                 self.showFullScreen()
                 if platf != 'Darwin':
                     aw.fullscreenAction.setChecked(True)
@@ -20560,7 +20574,7 @@ class ApplicationWindow(QMainWindow):
             QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash!?
             
             #PLUS-COMMENT
-            if not artisanviewerMode and self.plus_account is not None:
+            if filename is None and not artisanviewerMode and self.plus_account is not None:
                 try:
                     import plus.controller
                     plus.controller.start(aw)
@@ -20878,13 +20892,15 @@ class ApplicationWindow(QMainWindow):
                 settings = QSettings(filename,QSettings.IniFormat)
             else:
                 settings = QSettings()
-            #save window geometry
-            settings.setValue("Geometry",self.saveGeometry())
-                
-            settings.setValue("fullscreen", (self.full_screen_mode_active or self.isFullScreen()))
-            settings.setValue("plus_account",self.plus_account)
-            settings.setValue("plus_remember_credentials",self.plus_remember_credentials)
-            settings.setValue("plus_email",self.plus_email)
+            #save window geometry if not in fullscreen mode
+            if filename is None or not (self.full_screen_mode_active or self.isFullScreen()):
+                settings.setValue("Geometry",self.saveGeometry())
+            
+            if filename is None:
+                settings.setValue("fullscreen", self.full_screen_mode_active or self.isFullScreen())
+                settings.setValue("plus_account",self.plus_account)
+                settings.setValue("plus_remember_credentials",self.plus_remember_credentials)
+                settings.setValue("plus_email",self.plus_email)
                 
             #on OS X we prevent the reopening of windows
             # as done by defaults write com.google.code.p.Artisan NSQuitAlwaysKeepsWindows -bool false
@@ -21281,7 +21297,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("beansize",self.qmc.beansize)
             settings.setValue("beansize_min",self.qmc.beansize_min)
             settings.setValue("beansize_max",self.qmc.beansize_max)
-            settings.setValue("plus_default_store",self.qmc.plus_default_store)
+            if filename is None:
+                settings.setValue("plus_default_store",self.qmc.plus_default_store)
             settings.endGroup()
             settings.beginGroup("XT")
             settings.setValue("color",self.qmc.backgroundxtcolor)
@@ -51707,8 +51724,11 @@ def main():
                 try:
                     aw.loadbackground(u(aw.lastLoadedBackground))
                     aw.qmc.background = True
-                    aw.qmc.timealign(redraw=True,recompute=True)
-                except:
+                    if not aw.lastLoadedProfile:
+                        aw.qmc.redraw()
+                    else:
+                        aw.qmc.timealign(redraw=True,recompute=True)
+                except Exception:
                     aw.qmc.background = False
                     aw.qmc.backgroundprofile = None
     except Exception:
