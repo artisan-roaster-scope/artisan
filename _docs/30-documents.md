@@ -30,3 +30,9 @@ toc: false
 
   - [Installing Phidget 1136 Differential Air Pressure Sensor in Artisan](https://wbcoffee.blogspot.com/2018/04/installing-phidget-1136-differential.html)
   - [Home Barista discussion thread](https://www.home-barista.com/home-roasting/help-setting-up-air-pressure-phidget-into-artisan-t51761.html)
+
+
+*  Amprobe Drivers
+
+  - For devices that use the FT232R UART driver protocol in Windows. [Driver Installation Instructions](https://www.usb-drivers.org/ft232r-usb-uart-driver.html)
+  - For Mac [Driver Installation](https://www.ftdichip.com/Support/Documents/InstallGuides/Mac_OS_X_Installation_Guide.pdf). The Ambrobe website lists only Windows drivers but this has been reported to work.  
