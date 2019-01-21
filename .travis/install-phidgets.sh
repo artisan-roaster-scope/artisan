@@ -15,7 +15,7 @@ if [ "$ARTISAN_OS" = "linux" ] || [ "$ARTISAN_OS" = "rpi" ]; then
 elif [ "$ARTISAN_OS" = "osx" ]; then
     curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/macos/Phidget${version}.dmg
     hdiutil attach Phidget${version}.dmg
-    sudo installer -pkg /Volumes/Phidgets${version}/Phidgets.pkg -target /
+    sudo installer -pkg /Volumes/Phidget${version}/Phidgets.pkg -target /
 fi
 curl -L -O https://www.phidgets.com/downloads/phidget${version}/libraries/any/Phidget${version}Python.zip
 unzip -q Phidget${version}Python.zip
