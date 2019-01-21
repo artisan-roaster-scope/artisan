@@ -10682,7 +10682,7 @@ class SampleThread(QThread):
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             left_index = min(len(aw.qmc.ctimex1),max(2,(aw.qmc.deltasamples + 1)))
-                            timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
+                            timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltasamples readings
                             aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                         # compute T2 RoR
                         if t2_final == -1:  # we repeat the last RoR if underlying temperature dropped
@@ -20888,7 +20888,7 @@ class ApplicationWindow(QMainWindow):
         #many applications (including the KDE applications) use INI text files
 
         try:
-            if filename:
+            if filename is not None and filename:
                 settings = QSettings(filename,QSettings.IniFormat)
             else:
                 settings = QSettings()
@@ -21522,11 +21522,11 @@ class ApplicationWindow(QMainWindow):
             
             settings.setValue("recentRoasts",self.recentRoasts)
             
-            if aw.curFile:
+            if aw.curFile and filename is None:
                 settings.setValue("lastLoadedProfile",aw.curFile)
             else:
                 settings.setValue("lastLoadedProfile","")
-            if aw.qmc.backgroundpath:
+            if aw.qmc.backgroundpath and filename is None:
                 settings.setValue("lastLoadedBackground",aw.qmc.backgroundpath)
             else:
                 settings.setValue("lastLoadedBackground","")
@@ -30293,11 +30293,13 @@ class editGraphDlg(ArtisanDialog):
             BT = QTableWidgetItem(fmtstr%aw.qmc.temp2[i])
             ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            if i > 0 and (aw.qmc.timex[i]-aw.qmc.timex[i-1]):
+            if i > 0 and (aw.qmc.timex[i]-aw.qmc.timex[i-1]) and aw.qmc.temp1[i] != -1 and aw.qmc.temp1[i-1] != -1:
                 deltaET = QTableWidgetItem("%.1f"%(60*(aw.qmc.temp1[i]-aw.qmc.temp1[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
-                deltaBT = QTableWidgetItem("%.1f"%(60*(aw.qmc.temp2[i]-aw.qmc.temp2[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
             else:
                 deltaET = QTableWidgetItem("--")
+            if i > 0 and (aw.qmc.timex[i]-aw.qmc.timex[i-1]) and aw.qmc.temp2[i] != -1 and aw.qmc.temp2[i-1] != -1:
+                deltaBT = QTableWidgetItem("%.1f"%(60*(aw.qmc.temp2[i]-aw.qmc.temp2[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
+            else:
                 deltaBT = QTableWidgetItem("--")
             deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)                    
