@@ -133,11 +133,13 @@ from Phidget22.DeviceID import DeviceID
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
 from Phidget22.Devices.HumiditySensor import HumiditySensor as PhidgetHumiditySensor
 from Phidget22.Devices.PressureSensor import PressureSensor as PhidgetPressureSensor
-from Phidget22.Devices.VoltageRatioInput import *  # @UnusedWildImport
-from Phidget22.Devices.VoltageInput import * # @UnusedWildImport
-from Phidget22.Devices.DigitalInput import * # @UnusedWildImport
-from Phidget22.Devices.DigitalOutput import * # @UnusedWildImport 
-from Phidget22.Devices.VoltageOutput import * # @UnusedWildImport
+from Phidget22.Devices.VoltageRatioInput import VoltageRatioInput  # @UnusedWildImport
+from Phidget22.Devices.VoltageInput import VoltageInput # @UnusedWildImport
+from Phidget22.Devices.DigitalInput import DigitalInput # @UnusedWildImport
+from Phidget22.Devices.DigitalOutput import DigitalOutput # @UnusedWildImport 
+from Phidget22.Devices.VoltageOutput import VoltageOutput # @UnusedWildImport
+from Phidget22.Devices.CurrentInput import CurrentInput # @UnusedWildImport
+from Phidget22.Devices.FrequencyCounter import FrequencyCounter # @UnusedWildImport
 
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
@@ -845,6 +847,11 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1018_changeTriggersValues = range(0,51,1)
         self.phidget1018_changeTriggersStrings = list(map(lambda x:u(x*10)+u("mV"),self.phidget1018_changeTriggersValues))
 
+        self.phidgetDAQ1400_powerSupplyStrings = ["--","12V","24V"]
+        self.phidgetDAQ1400_powerSupply = 1
+        self.phidgetDAQ1400_inputModeStrings = ["NPN","PNP"]
+        self.phidgetDAQ1400_inputMode = 0
+
         #menu of thermocouple devices
         #device with first letter + only shows in extra device tab
         #device with first letter - does not show in any tab (but its position in the list is important)
@@ -947,6 +954,10 @@ class tgraphcanvas(FigureCanvas):
                        "Probat Middleware",                  #92
                        "+Probat Middleware burner/drum",     #93
                        "+Probat Middleware fan/pressure",    #94
+                       "Phidget DAQ1400 Current",   #95
+                       "Phidget DAQ1400 Frequency", #96
+                       "Phidget DAQ1400 Digital",   #97
+                       "Phidget DAQ1400 Voltage",   #98
                        ]
 
         # ADD DEVICE:
@@ -955,7 +966,7 @@ class tgraphcanvas(FigureCanvas):
         self.nonSerialDevices = [
             27, # Program
             29, # MODBUS
-            33, # MODBUS 34
+            33, # MODBUS 34ADD DEVICE:
             34, # Phidget 1048 4xTC 01
             37, # Phidget 1046 4xRTD 01
             40, # Phidget IO 01
@@ -973,7 +984,11 @@ class tgraphcanvas(FigureCanvas):
             74, # Phidget HUB0000 IO Digital 01
             79, # S7
             83, # Aillio Bullet R1 BT/DT
-            92  # Probat Middleware
+            92, # Probat Middleware
+            95, # Phidget DAQ1400 Current
+            96, # Phidget DAQ1400 Frequency
+            97, # Phidget DAQ1400 Digital
+            98  # Phidget DAQ1400 Voltage
         ]
                        
         # ADD DEVICE:
@@ -1004,6 +1019,12 @@ class tgraphcanvas(FigureCanvas):
             87, # +Aillio Bullet R1 State
             90, # +Slider 01
             91, # +Slider 23
+            93, # +Probat Middleware burner/drum"
+            94, # +Probat Middleware fan/pressure"
+            95, # Phidget DAQ1400 Current
+            96, # Phidget DAQ1400 Frequency
+            97, # Phidget DAQ1400 Digital
+            98  # Phidget DAQ1400 Voltage
         ]
 
         #extra devices
@@ -19451,6 +19472,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidget1200_async = bool(toBool(settings.value("phidget1200_async",self.qmc.phidget1200_async)))
                 self.qmc.phidget1200_changeTrigger = aw.float2float(toFloat(settings.value("phidget1200_changeTrigger",self.qmc.phidget1200_changeTrigger)))
                 self.qmc.phidget1200_dataRate = toInt(settings.value("phidget1200_dataRate",self.qmc.phidget1200_dataRate))
+            if settings.contains("phidgetDAQ1400_powerSupply"):
+                self.qmc.phidgetDAQ1400_powerSupply = toInt(settings.value("phidgetDAQ1400_powerSupply",self.qmc.phidgetDAQ1400_powerSupply))
+                self.qmc.phidgetDAQ1400_inputMode = toInt(settings.value("phidgetDAQ1400_inputMode",self.qmc.phidgetDAQ1400_inputMode))
             if settings.contains("phidgetRemoteFlag"):
                 self.qmc.phidgetRemoteFlag = bool(toBool(settings.value("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)))
                 self.qmc.phidgetServerID = toString(settings.value("phidgetServerID",self.qmc.phidgetServerID))
@@ -20938,7 +20962,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidget1200_wire",self.qmc.phidget1200_wire)
             settings.setValue("phidget1200_async",self.qmc.phidget1200_async)
             settings.setValue("phidget1200_changeTrigger",self.qmc.phidget1200_changeTrigger)
-            settings.setValue("phidget1200_dataRate",self.qmc.phidget1200_dataRate) 
+            settings.setValue("phidget1200_dataRate",self.qmc.phidget1200_dataRate)
+            settings.setValue("phidgetDAQ1400_powerSupply",self.qmc.phidgetDAQ1400_powerSupply)
+            settings.setValue("phidgetDAQ1400_inputMode",self.qmc.phidgetDAQ1400_inputMode)
             settings.setValue("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)
             settings.setValue("phidgetServerID",self.qmc.phidgetServerID)
             settings.setValue("phidgetPassword",self.qmc.phidgetPassword)
@@ -36348,6 +36374,10 @@ class serialport(object):
                                    self.probat_middleware,    #92
                                    self.probat_middleware_burner_drum,  #93
                                    self.probat_middleware_fan_pressure, #94
+                                   self.PHIDGET_DAQ1400_CURRENT,   #95
+                                   self.PHIDGET_DAQ1400_FREQUENCY, #96 
+                                   self.PHIDGET_DAQ1400_DIGITAL,   #97 
+                                   self.PHIDGET_DAQ1400_VOLTAGE,   #98 
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -36741,93 +36771,77 @@ class serialport(object):
         
     def PHIDGET1011(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1011,0)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"voltage")
         if tx_async is not None:
             tx = tx_async
         return tx,v1,v2
                 
     def PHIDGET1018(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"voltage")
         if tx_async is not None:
             tx = tx_async
         return tx,v1,v2
 
     def PHIDGET1018_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"voltage")
         if tx_async is not None:
             tx = tx_async
         return tx,v1,v2
 
     def PHIDGET1018_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"voltage")
         if tx_async is not None:
             tx = tx_async
         return tx,v1,v2
 
     def PHIDGET1018_78(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"voltage")
         if tx_async is not None:
             tx = tx_async
         return tx,v1,v2
         
     def PHIDGET1011_D(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,True)
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"digital")
         return tx,v1,v2
         
     def PHIDGET1018_D(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,True)
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,True)
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,True)
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_78(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,True)
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"digital")
         return tx,v1,v2
         
     def PHIDGET_HUB0000_D(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,True)
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"digital")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_D_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,True)
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"digital")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_D_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,True)
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"digital")
         return tx,v1,v2        
 
     def PHIDGET_TMP1101(self):
@@ -36865,24 +36879,46 @@ class serialport(object):
         
     def PHIDGET_HUB0000(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"voltage")
         if tx_async is not None:
             tx = tx_async
         return tx,v1,v2
 
     def PHIDGET_HUB0000_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"voltage")
         if tx_async is not None:
             tx = tx_async
         return tx,v1,v2
 
     def PHIDGET_HUB0000_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"voltage")
         if tx_async is not None:
             tx = tx_async
-        return tx,v1,v2        
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1400_CURRENT(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"current")
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1400_FREQUENCY(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"frequency")
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1400_DIGITAL(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"digital")
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1400_VOLTAGE(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"voltage")
+        if tx_async is not None:
+            tx = tx_async
+        return tx,v1,v2
 
     def HOTTOP_BTET(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -39293,7 +39329,7 @@ class serialport(object):
         
 #---
 
-    def phidget1018SensorChanged(self,v,channel,idx):
+    def phidget1018SensorChanged(self,v,channel,idx,API):
         if self.PhidgetIO and len(self.PhidgetIO) > idx:
             prev_time = self.PhidgetIOasynctimes[idx]
             self.PhidgetIOasynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
@@ -39301,7 +39337,7 @@ class serialport(object):
                 self.PhidgetIOasynctimesAveraged[idx] = self.PhidgetIOasynctimes[idx]
             else:
                 self.PhidgetIOasynctimesAveraged[idx] = (prev_time + self.PhidgetIOasynctimes[idx]) / 2.0
-            if not aw.qmc.phidget1018_ratio[channel]:
+            if API == "current" or (API == "voltage" and not aw.qmc.phidget1018_ratio[channel]):
                 v = v * aw.qmc.phidget1018valueFactor
             if aw.qmc.phidget1018_async[channel]:
                 if self.PhidgetIOvalues[channel] != -1:
@@ -39309,20 +39345,29 @@ class serialport(object):
                 else:
                     self.PhidgetIOvalues[channel] = v
 
-    def phidget1018getSensorReading(self,i,idx,digital=False):
+    def phidget1018getSensorReading(self,i,idx,API="voltage"):
         if self.PhidgetIO and len(self.PhidgetIO) > idx: 
-            if not digital and aw.qmc.phidget1018_async[i]:            
+            if API != "digital" and aw.qmc.phidget1018_async[i]:            
                 if self.PhidgetIOvalues[i] == -1:
                     self.PhidgetIOasynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
                     self.PhidgetIOasynctimesAveraged[idx] = self.PhidgetIOasynctimes[idx]
-                    if aw.qmc.phidget1018_ratio[i]:
-                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltageRatio()
+                    if API == "current":
+                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getCurrent() * aw.qmc.phidget1018valueFactor
+                    elif API == "frequency":
+                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getFrequency()
                     else:
-                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
+                        if aw.qmc.phidget1018_ratio[i]:
+                            self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltageRatio()
+                        else:
+                            self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
                 return self.PhidgetIOvalues[i]
             else:
-                if digital:
+                if API == "digital":
                     v = self.PhidgetIOvalues[i] = int(self.PhidgetIO[idx].getState())
+                elif API == "current":
+                    v = self.PhidgetIO[idx].getCurrent() * aw.qmc.phidget1018valueFactor
+                elif API == "frequency":
+                    v = self.PhidgetIO[idx].getFrequency()
                 else:
                     if aw.qmc.phidget1018_ratio[i]:
                         v = self.PhidgetIO[idx].getVoltageRatio()
@@ -39332,7 +39377,7 @@ class serialport(object):
         else:
             return -1
 
-    def configure1018(self,deviceType,idx,digital=False):
+    def configure1018(self,deviceType,idx,API="voltage"):
         # set data rates of all active inputs to 4ms
         if self.PhidgetIO and len(self.PhidgetIO) > idx:
             # reset async values
@@ -39346,37 +39391,83 @@ class serialport(object):
                 self.PhidgetIO[idx].setDataInterval(aw.qmc.phidget1018_dataRates[channel])
             except Exception:
                 pass
-            if not digital:
+            # set the PowerSupply for the DAQ1400
+            if deviceType == DeviceID.PHIDID_DAQ1400:
+                try:
+                    from Phidget22.PowerSupply import PowerSupply
+                    power_idx = aw.qmc.phidgetDAQ1400_powerSupply
+                    if power_idx == 0:
+                        power = PowerSupply.POWER_SUPPLY_OFF
+                    elif power_idx == 1:
+                        power = PowerSupply.POWER_SUPPLY_12V
+                    elif power_idx == 2:
+                        power = PowerSupply.POWER_SUPPLY_24V
+                    self.PhidgetIO[idx].setPowerSupply(power)
+                except:
+                    pass
+            if API == "voltage":
                 if aw.qmc.phidget1018_async[channel]:
                     try:
-                        if aw.qmc.phidget1018_ratio[channel]:
-                            ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltageRatio()),self.PhidgetIO[idx].getMinVoltageRatio())
+                        if aw.qmc.phidget1018_ratio[channel] and deviceType != DeviceID.PHIDID_DAQ1400:
+                            ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltageRatioChangeTrigger()),self.PhidgetIO[idx].getMinVoltageRatioChangeTrigger())
                             self.PhidgetIO[idx].setVoltageRatioChangeTrigger(ct)
                         else:
-                            ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltage()),self.PhidgetIO[idx].getMinVoltage())
+                            ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltageChangeTrigger()),self.PhidgetIO[idx].getMinVoltageChangeTrigger())
                             self.PhidgetIO[idx].setVoltageChangeTrigger(ct)
-                    except PhidgetException:
+                    except:
                         pass
-                    if aw.qmc.phidget1018_ratio[channel]:                    
-                        self.PhidgetIO[idx].setOnVoltageRatioChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx))
+                    if aw.qmc.phidget1018_ratio[channel] and deviceType != DeviceID.PHIDID_DAQ1400:                    
+                        self.PhidgetIO[idx].setOnVoltageRatioChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx,API))
                     else:
-                        self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx))
+                        self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx,API))
                 else:
-                    if aw.qmc.phidget1018_ratio[channel]:
+                    if aw.qmc.phidget1018_ratio[channel] and deviceType != DeviceID.PHIDID_DAQ1400:
                         self.PhidgetIO[idx].setVoltageRatioChangeTrigger(0.0)
                     else:
                         self.PhidgetIO[idx].setVoltageChangeTrigger(0.0)
-                    if aw.qmc.phidget1018_ratio[channel]:
+                    if aw.qmc.phidget1018_ratio[channel] and deviceType != DeviceID.PHIDID_DAQ1400:
                         self.PhidgetIO[idx].setOnVoltageRatioChangeHandler(lambda *_:None) 
                     else:
                         self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda *_:None) 
+            elif API == "current":
+                if aw.qmc.phidget1018_async[channel]:
+                    ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxCurrentChangeTrigger()),self.PhidgetIO[idx].getMinCurrentChangeTrigger())
+                    self.PhidgetIO[idx].setCurrentChangeTrigger(ct)
+                    self.PhidgetIO[idx].setOnCurrentChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx,API))
+                else:
+                    self.PhidgetIO[idx].setCurrentChangeTrigger(0.0)
+                    self.PhidgetIO[idx].setOnCurrentChangeHandler(lambda *_:None)
+            elif API == "frequency":
+                if deviceType == DeviceID.PHIDID_DAQ1400:
+                    # set the InputMode for the DAQ1400
+                    self.setDAQ1400inputMode(idx)
+                if aw.qmc.phidget1018_async[channel]:
+                    self.PhidgetIO[idx].setOnFrequencyChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx,API))
+                else:
+                    self.PhidgetIO[idx].setOnFrequencyChangeHandler(lambda *_:None)
+            elif API == "digital":
+                if deviceType == DeviceID.PHIDID_DAQ1400:
+                    # set the InputMode for the DAQ1400
+                    self.setDAQ1400inputMode(idx)
             self.PhidgetIOvalues[channel] = -1
             self.PhidgetIOasynctimes[channel] = None
             self.PhidgetIOasynctimesAveraged[channel] = None
-
-    def phidget1018attached(self,serial,port,className,deviceType,idx,digital=False):
+            
+    def setDAQ1400inputMode(self,idx):
         try:
-            self.configure1018(deviceType,idx,digital)
+            from Phidget22.InputMode import InputMode
+            mode_idx = aw.qmc.phidgetDAQ1400_inputMode
+            if mode_idx == 0:
+                mode = InputMode.INPUT_MODE_NPN
+            elif mode_idx == 1:
+                mode = InputMode.INPUT_MODE_PNP
+            self.PhidgetIO[idx].setInputMode(mode)
+        except:
+            pass
+
+    def phidget1018attached(self,serial,port,className,deviceType,idx,API="voltage"):
+        try:
+            self.configure1018(deviceType,idx,API)
             if self.PhidgetIO is not None:
                 channel = self.PhidgetIO[idx].getChannel()
                 aw.qmc.phidgetManager.reserveSerialPort(serial,port,channel,className,deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
@@ -39387,6 +39478,8 @@ class serialport(object):
                         aw.sendmessage(QApplication.translate("Message","Phidget IO 6/6/6 attached",None))
                     elif deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
                         aw.sendmessage(QApplication.translate("Message","Phidget IO 8/8/8 attached",None))
+                    elif deviceType == DeviceID.PHIDID_DAQ1400:
+                        aw.sendmessage(QApplication.translate("Message","Phidget DAQ1400 attached",None))
                     else:
                         aw.sendmessage(QApplication.translate("Message","Phidget IO attached",None))
         except:
@@ -39404,6 +39497,8 @@ class serialport(object):
                         aw.sendmessage(QApplication.translate("Message","Phidget IO 6/6/6 detached",None))
                     elif deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
                         aw.sendmessage(QApplication.translate("Message","Phidget IO 8/8/8 detached",None))
+                    elif deviceType == DeviceID.PHIDID_DAQ1400:
+                        aw.sendmessage(QApplication.translate("Message","Phidget DAQ1400 detached",None))
                     else:
                         aw.sendmessage(QApplication.translate("Message","Phidget IO detached",None))
         except:
@@ -39414,14 +39509,18 @@ class serialport(object):
     #  - Phidget IO 8/8/8 (1010,1013,1018,1019,SBC): DeviceID.PHIDID_1010_1013_1018_1019
     #  - Phidget IO 6/6/6 (HUB0000): DeviceID.PHIDID_HUB0000
     #  - Phidget IO 2/2/2 (1011): DeviceID.PHIDID_1011
-    # if digital is set, the digital input states are returned instead of the analog input values
-    def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0, digital=False, retry=True):
+    # the API parameter is one of "voltage", "digital", "current", "frequency"
+    def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0, API="voltage", retry=True):
         try:
             if not self.PhidgetIO:
                 ser = None
                 port = None 
-                if digital:
+                if API == "digital":
                     tp = "PhidgetDigitalInput"
+                elif API == "current":
+                    tp = "PhidgetCurrentInput"
+                elif API == "frequency":
+                    tp = "PhidgetFrequencyCounter"
                 else:
                     if aw.qmc.phidget1018_ratio[mode*2]:
                         tp = "PhidgetVoltageRatioInput"
@@ -39441,8 +39540,12 @@ class serialport(object):
                     ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget(tp,deviceType,6,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
-                    if digital:
+                    if API == "digital":
                         self.PhidgetIO = [DigitalInput(),DigitalInput()]
+                    elif API == "current":
+                        self.PhidgetIO = [CurrentInput(),CurrentInput()]
+                    elif API == "frequency":
+                        self.PhidgetIO = [FrequencyCounter(),FrequencyCounter()]
                     else:
                         if aw.qmc.phidget1018_ratio[mode*2]:
                             ch1 = VoltageRatioInput()
@@ -39454,10 +39557,11 @@ class serialport(object):
                             ch2 = VoltageInput()
                         self.PhidgetIO = [ch1,ch2]
                     try: 
-                        self.PhidgetIO[0].setOnAttachHandler(lambda _:self.phidget1018attached(ser,port,tp,deviceType,0,digital))
+                        self.PhidgetIO[0].setOnAttachHandler(lambda _:self.phidget1018attached(ser,port,tp,deviceType,0,API))
                         self.PhidgetIO[0].setOnDetachHandler(lambda _:self.phidget1018detached(ser,port,tp,deviceType,0))
-                        self.PhidgetIO[1].setOnAttachHandler(lambda _:self.phidget1018attached(ser,port,tp,deviceType,1,digital))
-                        self.PhidgetIO[1].setOnDetachHandler(lambda _:self.phidget1018detached(ser,port,tp,deviceType,1))
+                        if deviceType != DeviceID.PHIDID_DAQ1400:
+                            self.PhidgetIO[1].setOnAttachHandler(lambda _:self.phidget1018attached(ser,port,tp,deviceType,1,API))
+                            self.PhidgetIO[1].setOnDetachHandler(lambda _:self.phidget1018detached(ser,port,tp,deviceType,1))
                         if deviceType in [DeviceID.PHIDID_HUB0000]:
                             # we are looking to attach a HUB port
                             self.PhidgetIO[0].setIsHubPortDevice(1)
@@ -39479,10 +39583,11 @@ class serialport(object):
                         except:
                             pass
                         self.PhidgetIO[1].setDeviceSerialNumber(ser)
-                        try:
-                            self.PhidgetIO[1].open() #.openWaitForAttachment(timeout)
-                        except:
-                            pass
+                        if deviceType != DeviceID.PHIDID_DAQ1400:
+                            try:
+                                self.PhidgetIO[1].open() #.openWaitForAttachment(timeout)
+                            except:
+                                pass
                         if aw.qmc.phidgetRemoteFlag:
                             libtime.sleep(.5)
                         else:
@@ -39501,14 +39606,25 @@ class serialport(object):
                         self.PhidgetIOvalues = [-1]*8
                         self.PhidgetIOasynctimes = [None]*8
                         self.PhidgetIOasynctimesAveraged = [None]*8
-            if self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
+            if deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO and self.PhidgetIO[0].getAttached():
+                probe = -1
+                try:
+                    probe = self.phidget1018getSensorReading(0,0,API)
+                except Exception:
+                    pass
+                async_time = self.PhidgetIOasynctimesAveraged[0]
+                # reset async timestamps for next sampling interval
+                self.PhidgetIOasynctimes[0] = None
+                self.PhidgetIOasynctimesAveraged[0] = None
+                return probe, -1, async_time
+            elif self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
                 probe1 = probe2 = -1
                 try:
-                    probe1 = self.phidget1018getSensorReading(mode*2,0,digital)
+                    probe1 = self.phidget1018getSensorReading(mode*2,0,API)
                 except Exception:
                     pass
                 try:
-                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,digital)
+                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,API)
                 except Exception:
                     pass
                 async_time = None
@@ -39533,7 +39649,7 @@ class serialport(object):
                 return probe1, probe2, async_time
             elif retry:
                 libtime.sleep(0.1)
-                self.PHIDGET1018values(deviceType,mode,digital,False)
+                self.PHIDGET1018values(deviceType,mode,API,False)
             else:
                 return -1,-1, None
         except Exception as ex:
@@ -42598,10 +42714,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1048VBox = QVBoxLayout()
         phidget1048VBox.addLayout(phidget1048HBox)
         phidget1048VBox.addStretch()
-        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","1048/1051/TMP1100/TMP1101 TC",None))
+        phidget1048GroupBox = QGroupBox("1048/1051/TMP1100/TMP1101 TC")
         phidget1048GroupBox.setLayout(phidget1048VBox)
-        phidget1048GroupBox.setContentsMargins(0,10,0,0)
+        phidget1048GroupBox.setContentsMargins(0,0,0,0)
         phidget1048HBox.setContentsMargins(0,0,0,0)
+        phidget1048VBox.setContentsMargins(0,0,0,0)
         
         # Phidget IR
         phidgetBox1045 = QGridLayout()
@@ -42666,7 +42783,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1045VBox.addLayout(phidgetBox1045)
         phidget1045VBox.addStretch()
         phidget1045VBox.addStretch()
-        phidget1045GroupBox = QGroupBox(QApplication.translate("GroupBox","1045 IR",None))
+        phidget1045GroupBox = QGroupBox("1045 IR")
         phidget1045GroupBox.setLayout(phidget1045VBox)
         phidget1045VBox.setContentsMargins(0,0,0,0) 
 
@@ -42764,10 +42881,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1046VBox = QVBoxLayout()
         phidget1046VBox.addLayout(phidget1046HBox)
         phidget1046VBox.addStretch()
-        phidget1046GroupBox = QGroupBox(QApplication.translate("GroupBox","1046 RTD",None))
+        phidget1046GroupBox = QGroupBox("1046 RTD")
         phidget1046GroupBox.setLayout(phidget1046VBox)
         phidget1046GroupBox.setContentsMargins(0,10,0,0)
         phidget1046HBox.setContentsMargins(0,0,0,0)
+        phidget1046VBox.setContentsMargins(0,0,0,0)
         
         
         # TMP1200 RTD
@@ -42864,17 +42982,60 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1200VBox.addLayout(phidget1200HBox)
         phidget1200VBox.addStretch()
         
-        phidget1200GroupBox = QGroupBox(QApplication.translate("GroupBox","TMP1200 RTD",None))
+        phidget1200GroupBox = QGroupBox("TMP1200 RTD")
+        phidget1200VBox.setContentsMargins(0,0,0,0)
         phidget1200HBox.setContentsMargins(0,0,0,0)
         phidget1200GroupBox.setLayout(phidget1200VBox)
         phidget1200GroupBox.setContentsMargins(0,10,0,0)
+        
+        # DAQ1400 VI
+        powerLabel = QLabel(QApplication.translate("Label","Power", None))
+        modeLabel = QLabel(QApplication.translate("Label","Mode", None))
+
+        self.powerCombo1400 = QComboBox()
+        self.powerCombo1400.setFocusPolicy(Qt.NoFocus)
+        self.powerCombo1400.addItems(aw.qmc.phidgetDAQ1400_powerSupplyStrings)
+        self.powerCombo1400.setCurrentIndex(aw.qmc.phidgetDAQ1400_powerSupply)
+        self.powerCombo1400.setMinimumContentsLength(3)
+        width = self.powerCombo1400.minimumSizeHint().width()
+        self.powerCombo1400.setMinimumWidth(width)
+
+        self.modeCombo1400 = QComboBox()
+        self.modeCombo1400.setFocusPolicy(Qt.NoFocus)
+        self.modeCombo1400.addItems(aw.qmc.phidgetDAQ1400_inputModeStrings)
+        self.modeCombo1400.setCurrentIndex(aw.qmc.phidgetDAQ1400_inputMode)
+        self.modeCombo1400.setMinimumContentsLength(3)
+        width = self.modeCombo1400.minimumSizeHint().width()
+        self.modeCombo1400.setMinimumWidth(width)
+
+        phidgetBox1400 = QGridLayout()
+        phidgetBox1400.addWidget(powerLabel,0,0,Qt.AlignRight)
+        phidgetBox1400.addWidget(self.powerCombo1400,0,1)
+        phidgetBox1400.addWidget(modeLabel,1,0,Qt.AlignRight)
+        phidgetBox1400.addWidget(self.modeCombo1400,1,1)
+
+        phidget1400HBox = QHBoxLayout()
+        phidget1400HBox.addLayout(phidgetBox1400)
+        phidget1400VBox = QVBoxLayout()
+        phidget1400VBox.addLayout(phidget1400HBox)
+        phidget1400VBox.addStretch()
+        
+        phidget1400GroupBox = QGroupBox("DAQ1400 VI")
+        phidget1400GroupBox.setLayout(phidget1400VBox)
+        phidget1400GroupBox.setContentsMargins(0,0,0,0)
+        phidget1400VBox.setContentsMargins(0,0,0,0)
+        phidget1400HBox.setContentsMargins(0,0,0,0)
 
         phdget10481045GroupBoxHBox = QHBoxLayout()
         phdget10481045GroupBoxHBox.addWidget(phidget1048GroupBox)
         phdget10481045GroupBoxHBox.addStretch()
         phdget10481045GroupBoxHBox.addWidget(phidget1200GroupBox)
         phdget10481045GroupBoxHBox.addStretch()
-        phdget10481045GroupBoxHBox.addWidget(phidget1046GroupBox) 
+        phdget10481045GroupBoxHBox.addWidget(phidget1400GroupBox)
+        phdget10481045GroupBoxHBox.addStretch()
+        phdget10481045GroupBoxHBox.addWidget(phidget1046GroupBox)
+        phdget10481045GroupBoxHBox.setContentsMargins(0,0,0,0)
+
 
         # Phidget IO 1018
         # per each of the 8-channels: raw flag / data rate popup / change trigger popup
@@ -42957,7 +43118,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetBox1018.addWidget(ratioLabel,5,0,Qt.AlignRight)
         phidget1018HBox = QVBoxLayout()
         phidget1018HBox.addLayout(phidgetBox1018)
-        phidget1018GroupBox = QGroupBox(QApplication.translate("GroupBox","1010/1011/1013/1018/1019/HUB0000/SBC IO",None))
+        phidget1018GroupBox = QGroupBox("1010/1011/1013/1018/1019/HUB0000/SBC IO")
         phidget1018GroupBox.setLayout(phidget1018HBox)
         phidget1018HBox.setContentsMargins(0,0,0,0)
         self.phidgetBoxRemoteFlag = QCheckBox()
@@ -44446,6 +44607,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.phidget1200_changeTrigger = aw.qmc.phidget1200_changeTriggersValues[self.changeTriggerCombo1200.currentIndex()]
             aw.qmc.phidget1200_dataRate = aw.qmc.phidget1200_dataRatesValues[self.rateCombo1200.currentIndex()]
             
+            aw.qmc.phidgetDAQ1400_powerSupply = self.powerCombo1400.currentIndex()
+            aw.qmc.phidgetDAQ1400_inputMode = self.modeCombo1400.currentIndex()
                       
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
             aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
