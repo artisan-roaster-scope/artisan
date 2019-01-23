@@ -4229,72 +4229,7 @@ class tgraphcanvas(FigureCanvas):
                 res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps
             return numpy.concatenate(([None]*(fromIndex),res.tolist(),[None]*(len(a)-toIndex))).tolist()
         else:
-            return b
-
-
-#    def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):  # default 'hanning'
-#        if len(a) > 1 and len(a) == len(b) and window_len>2:
-#            #pylint: disable=E1103
-#            # 1. truncate
-#            if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
-#                if toIndex==0: # no limit
-#                    toIndex=len(a)
-#            else: # smooth list on full length
-#                fromIndex = 0
-#                toIndex = len(a)
-#            a = numpy.array(a,dtype='float64')[fromIndex:toIndex]
-#            b = numpy.array(b,dtype='float64')[fromIndex:toIndex] 
-#            # 2. re-sample           
-#            if re_sample:
-#                if a_lin is None or len(a_lin) != len(a):
-#                    a_mod = numpy.linspace(a[0],a[-1],len(a))
-#                else:
-#                    a_mod = a_lin                   
-#                b = numpy.interp(a_mod, a, b) # resample data in a to linear spaced time                               
-#            else:
-#                a_mod = a
-#            # 3. filter spikes
-#            if aw.qmc.filterDropOuts:
-#                try:
-#                    b = self.medfilt(numpy.array(b),5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
-#                except:
-#                    pass
-#            # 4. smooth data
-#            if decay_smoothing:
-#                # decay smoothing
-#                if decay_weights is None:
-#                    decay_weights = numpy.arange(1,window_len+1)
-#                else:
-#                    window_len = len(decay_weights)
-#                # invariant: window_len = len(decay_weights)
-#                if decay_weights.sum() == 0:
-#                    res = b
-#                else:
-#                    res = []
-#                    # ignore -1 readings in averaging and ensure a good ramp
-#                    for i in range(len(b)):
-#                        seq = b[max(0,i-window_len + 1):i+1] 
-#                        # we need to surpress -1 drop out values from this
-#                        seq = list(filter(lambda item: item != -1,seq))
-#                        w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
-#                        if len(w) == 0:
-#                            res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
-#                        else:
-#                            res.append(numpy.average(seq,weights=w)) # works only if len(seq) = len(w) 
-#                    # postCond: len(res) = len(b)        
-#            else:
-#                # optimal smoothing (the default)
-#                win_len = max(0,window_len)
-#                if win_len != 1: # at the lowest level we turn smoothing completely off
-#                    res = self.smooth(a_mod,b,win_len,window)
-#                else:
-#                    res = b
-#            # 4. sample back
-#            if re_sample and back_sample:
-#                res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps
-#            return numpy.concatenate(([None]*(fromIndex),res.tolist(),[None]*(len(a)-toIndex))).tolist()
-#        else:
-#            return b            
+            return b          
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):                
         if aw.qmc.patheffects:
@@ -4701,7 +4636,15 @@ class tgraphcanvas(FigureCanvas):
         except: # set_in_layout not available in mpl<3.x
             pass
         if updatebackground:
-            self.updateBackground()    
+            self.updateBackground()
+
+    # resize the given list to the length ln by cutting away elements or padding with trailing -1 items
+    # used to resize temperature data to the length of the corresponding timex times
+    def resizeList(self,lst,ln):
+        if lst is None:
+            return None
+        else:
+            return (lst + [-1]*(ln-len(lst)))[:ln]
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
@@ -5236,8 +5179,8 @@ class tgraphcanvas(FigureCanvas):
                     timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
                 else:
                     timex_lin = None
-                temp1_nogaps = self.fill_gaps(self.temp1)
-                temp2_nogaps = self.fill_gaps(self.temp2)
+                temp1_nogaps = self.fill_gaps(self.resizeList(self.temp1,len(self.timex)))
+                temp2_nogaps = self.fill_gaps(self.resizeList(self.temp2,len(self.timex)))
                         
                 if smooth or len(self.stemp1) != len(self.timex):
                     if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon: # we don't smooth, but remove the dropouts
@@ -7128,7 +7071,7 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if aw.button_19.isFlat() and self.timeindex[1] > 0:
                         # undo wrongly set DRY
-                        st = self.stringfromseconds(self.timex[self.timeindex[1]]-start)
+                        st = self.stringfromseconds(self.timex[self.timeindex[1]]-start,False)
                         DE_str = aw.arabicReshape(QApplication.translate("Scope Annotation","DE {0}", None).format(st))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == DE_str:
                             self.l_annotations[-1].remove()
@@ -7149,7 +7092,7 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.phasesbuttonflag:
                             self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
                         #calculate time elapsed since charge time
-                        st = self.stringfromseconds(self.timex[self.timeindex[1]]-start)
+                        st = self.stringfromseconds(self.timex[self.timeindex[1]]-start,False)
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE {0}", None).format(st))
                         #anotate temperature
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
@@ -7168,7 +7111,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart:                
+        if self.flagstart:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.qmc.alignEvent in [1,7]:
@@ -7212,7 +7155,7 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if aw.button_3.isFlat() and self.timeindex[2] > 0:
                         # undo wrongly set FCs
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[2]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[2]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -7233,7 +7176,7 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.phasesbuttonflag:
                             self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
                         #calculate time elapsed since charge time
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[2]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[2]]-start,False)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         if self.timeindex[1]:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
@@ -7297,7 +7240,7 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if aw.button_4.isFlat() and self.timeindex[3] > 0:
                         # undo wrongly set FCe
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[3]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[3]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -7315,7 +7258,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 return
                         #calculate time elapsed since charge time
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[3]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[3]]-start,False)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
@@ -7374,7 +7317,7 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if aw.button_5.isFlat() and self.timeindex[4] > 0:
                         # undo wrongly set FCs
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[4]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[4]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -7391,7 +7334,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[4] = len(self.timex)-1
                             else:
                                 return
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[4]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[4]]-start,False)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         if self.timeindex[3]:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
@@ -7456,7 +7399,7 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if aw.button_6.isFlat() and self.timeindex[5] > 0:
                         # undo wrongly set FCs
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[5]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -7473,7 +7416,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[5] = len(self.timex)-1
                             else:
                                 return
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[5]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
@@ -7539,7 +7482,7 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if aw.button_9.isFlat() and self.timeindex[6] > 0:
                         # undo wrongly set FCs
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[6]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -7564,7 +7507,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[6] = len(self.timex)-1
                             else:
                                 return
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[6]]-start)))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         if self.timeindex[5]:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
@@ -10405,11 +10348,10 @@ class SampleThread(QThread):
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
-        try:
-            ##### lock resources  #########
-            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,350) # we try to catch a lock for 350ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
-            if gotlock:
-                
+        ##### (try to) lock resources  #########
+        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,350) # we try to catch a lock for 350ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        if gotlock:
+            try:
                 # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
                 local_flagstart = aw.qmc.flagstart
                 
@@ -10985,16 +10927,16 @@ class SampleThread(QThread):
                 #add to plot a vertical time line
                 if (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
                     aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
-        except Exception as e:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() {0}").format(str(e)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-            #update screen in main GUI thread
-            self.updategraphics.emit()   
+            except Exception as e:
+                #import traceback
+                #traceback.print_exc(file=sys.stdout)
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() {0}").format(str(e)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+                #update screen in main GUI thread
+                self.updategraphics.emit()
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
