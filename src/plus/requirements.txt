@@ -1,2 +1,0 @@
-keyring==13.2.1
-persist-queue==0.4.0
