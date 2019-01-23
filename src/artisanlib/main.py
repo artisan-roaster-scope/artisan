@@ -3152,11 +3152,11 @@ class tgraphcanvas(FigureCanvas):
                             if aw.qmc.backgroundPlaybackEvents and self.backgroundEtypes[i] < 4 and \
                                 (u(self.etypesf(self.backgroundEtypes[i]) == u(self.Betypesf(self.backgroundEtypes[i])))) and \
                                 aw.eventslidervisibilities[self.backgroundEtypes[i]]: #  and aw.eventslideractions[self.backgroundEtypes[i]]
-                                aw.qmc.replayedBackgroundEvents.append(i)
                                 slider_events[self.backgroundEtypes[i]] = self.eventsInternal2ExternalValue(self.backgroundEvalues[i]) # add to dict (later overwrite earlier slider moves!)
                                 # we move sliders only after processing all pending events (from the collected dict)
                                 #aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
-                                #aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event 
+                                #aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event
+                            aw.qmc.replayedBackgroundEvents.append(i) # in any case we mark this event as processed
 
                 # now move the sliders to the new values (if any)     
                 for k in slider_events.keys():
@@ -6980,7 +6980,8 @@ class tgraphcanvas(FigureCanvas):
                         tx = self.timex[self.timeindex[0]]
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                         self.l_annotations += self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
-                        # mark active slider values that are not zero                   
+                        # mark active slider values that are not zero 
+               
                         for slidernr in range(4):
                             if aw.eventslidervisibilities[slidernr]:
                                 # we record also for inactive sliders as some button press actions might have changed the event values also for those
@@ -6995,7 +6996,8 @@ class tgraphcanvas(FigureCanvas):
                                 if slidervalue != 0:
                                     value = aw.float2float((slidervalue + 10.0) / 10.0)
                                     # note that EventRecordAction avoids to generate events were type and value matches to the previously recorded one
-                                    aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
+                                    aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,takeLock=False)
+                                    # we don't take another lock in EventRecordAction as we already hold that lock!
                 except Exception:
                     pass
             else:
