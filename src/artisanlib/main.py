@@ -12418,7 +12418,8 @@ class ApplicationWindow(QMainWindow):
         self.etypeComboBox.setToolTip(QApplication.translate("Tooltip", "Type of event", None))
         self.etypeComboBox.addItems(self.qmc.etypes)
 
-        regexvalue = QRegExp(r"^100|\d?\d?$")
+        #regexvalue = QRegExp(r"^100|\d?\d?$") # allow event values 0-100 (%)
+        regexvalue = QRegExp(r"^[1-9][0-9]{1,3}$|^\d$") # allow event values 0-9999
         self.valueEdit = QLineEdit()
         self.valueEdit.setValidator(QRegExpValidator(regexvalue,self))
         self.valueEdit.setToolTip(QApplication.translate("Tooltip", "Value of event", None))
