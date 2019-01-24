@@ -52,7 +52,9 @@ def setAccount(account_id):
                 db[account_id] = new_nr
                 return new_nr
     except Exception as e:
-        config.logger.error("account: Exception in setAccount() %s",e)
+        import sys
+        _, _, exc_tb = sys.exc_info()
+        config.logger.error("account: Exception in setAccount() line %s: %s",exc_tb.tb_lineno,e)
         return None
     finally:
         if account_cache_semaphore.available() < 1:

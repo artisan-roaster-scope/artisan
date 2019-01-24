@@ -61,6 +61,7 @@ def getPath(uuid):
                 return None
     except Exception as e:
         config.logger.error("roast: Exception in getPath() %s",e)
+        return None
     finally:
         if register_semaphore.available() < 1:
             register_semaphore.release(1) 

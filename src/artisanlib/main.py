@@ -39456,7 +39456,7 @@ class serialport(object):
     # the API parameter is one of "voltage", "digital", "current", "frequency"
     def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0, API="voltage", retry=True):
         try:
-            if not self.PhidgetIO:
+            if self.PhidgetIO is None:
                 ser = None
                 port = None 
                 if API == "digital":
@@ -39550,7 +39550,7 @@ class serialport(object):
                         self.PhidgetIOvalues = [-1]*8
                         self.PhidgetIOasynctimes = [None]*8
                         self.PhidgetIOasynctimesAveraged = [None]*8
-            if deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO and self.PhidgetIO[0].getAttached():
+            if deviceType == DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and self.PhidgetIO[0].getAttached():
                 probe = -1
                 try:
                     probe = self.phidget1018getSensorReading(0,0,API)
@@ -39561,7 +39561,7 @@ class serialport(object):
                 self.PhidgetIOasynctimes[0] = None
                 self.PhidgetIOasynctimesAveraged[0] = None
                 return probe, -1, async_time
-            elif self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
+            elif deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
                 probe1 = probe2 = -1
                 try:
                     probe1 = self.phidget1018getSensorReading(mode*2,0,API)

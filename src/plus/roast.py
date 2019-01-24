@@ -175,6 +175,7 @@ def getRoast():
         import sys
         _, _, exc_tb = sys.exc_info()
         config.logger.error("roast: Exception in getRoast() line %s: %s",exc_tb.tb_lineno,e)
+        return {}
     return d
 
         
@@ -187,9 +188,9 @@ def getSyncRecord(r = None):
     try:
         config.logger.info("roast:getSyncRecord()")
         m = hashlib.sha256()
+        d = {}
         if r is None:
             r = getRoast()
-        d = {}
         attributes = [
             "roast_id",
             "location",

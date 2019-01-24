@@ -219,3 +219,4 @@ def updateSyncRecordHashAndSync():
         import sys
         _, _, exc_tb = sys.exc_info()
         config.logger.error("controller: Exception in updateSyncRecordHashAndSync() line %s: %s",exc_tb.tb_lineno,e)
+        return None

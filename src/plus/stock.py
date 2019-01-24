@@ -77,13 +77,19 @@ def fetch():
             stock = j["result"]
             stock["retrieved"] = time.time()
             config.logger.debug("stock: -> retrieved")
-            config.logger.debug("stock = %s"%stock)      
+            config.logger.debug("stock = %s"%stock)
             controller.reconnected()
             return True
         else:
             return False
     except Exception as e:
-        config.logger.error("stock: -> failure: %s",e)  
+        import sys
+        _, _, exc_tb = sys.exc_info()
+        config.logger.error("stock: -> failure line %s: %s",exc_tb.tb_lineno,e)
+#        import traceback
+#        tr=traceback.format_exc()
+#        aw = config.app_window
+#        aw.qmc.adderror(str(tr))
         #controller.disconnect(False) # don't disconnect on failure
         return False
     finally:
