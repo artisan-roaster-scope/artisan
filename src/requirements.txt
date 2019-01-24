@@ -3,7 +3,7 @@ pymodbus==1.5.2
 unidecode==1.0.23
 bottle==0.12.16
 qrcode==6.0
-urllib3==1.24.1
+#urllib3==1.24.1
 requests==2.21.0
 yoctopuce==1.10.33782
 pefile==2018.8.8

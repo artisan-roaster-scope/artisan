@@ -324,9 +324,7 @@ def toMap(x):
     return x
 def removeAll(l,s):
     for _ in range(l.count(s)):  # @UndefinedVariable
-        l.remove(s)
-def toByteArray(x):
-    return x        
+        l.remove(s) 
 
 platf = str(platform.system())
 
@@ -20511,17 +20509,19 @@ class ApplicationWindow(QMainWindow):
                     
             # set dpi
             if filename is not None and settings.contains("dpi"):
+                # if filename is None (ie. setting is not explicitly loaded from file, but from default location on app start),
+                # the dpi is set on creating the FigureCanvas
                 try:
                     aw.dpi = toInt(settings.value("dpi",aw.dpi))
                     if aw.dpi != aw.defaultdpi:
-                        aw.setdpi(aw.dpi,moveWindow=True) # with moveWindow=True, Mac builds fail on startup!
+                        aw.setdpi(aw.dpi,moveWindow=True)
                 except Exception as e:
                     pass
-            
+
             #restore geometry
             if settings.contains("Geometry"):
                 self.restoreGeometry(settings.value("Geometry"))
-            if filename: # only if an external settings file is loaded
+            if not filename: # only if an external settings file is loaded
                 FigureCanvas.updateGeometry(aw.stack)  #@UndefinedVariable
                 
             #update visibility of main event button, extra event buttons and 
@@ -20538,8 +20538,6 @@ class ApplicationWindow(QMainWindow):
                 self.showFullScreen()
                 if platf != 'Darwin':
                     aw.fullscreenAction.setChecked(True)
-            
-            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash!?
             
             #PLUS-COMMENT
             if filename is None and not artisanviewerMode and self.plus_account is not None:
@@ -29398,7 +29396,7 @@ class editGraphDlg(ArtisanDialog):
         
         settings = QSettings()
         if settings.contains("RoastGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("RoastGeometry")))
+            self.restoreGeometry(settings.value("RoastGeometry"))
         else:
             self.resize(self.minimumSizeHint())
         
@@ -31891,7 +31889,7 @@ class calculatorDlg(ArtisanDialog):
         
         settings = QSettings()
         if settings.contains("CalculatorGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("CalculatorGeometry")))
+            self.restoreGeometry(settings.value("CalculatorGeometry"))
             
         #RATE OF CHANGE
         self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile",None))
@@ -32174,7 +32172,7 @@ class EventsDlg(ArtisanDialog):
         self.setModal(True)
         settings = QSettings()
         if settings.contains("EventsGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("EventsGeometry")))
+            self.restoreGeometry(settings.value("EventsGeometry"))
         self.storeState()
         ## TAB 1
         self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button",None))
@@ -34771,7 +34769,7 @@ class flavorDlg(ArtisanDialog):
         
         settings = QSettings()
         if settings.contains("FlavorProperties"):
-            toByteArray(self.restoreGeometry(settings.value("FlavorProperties")))
+            self.restoreGeometry(settings.value("FlavorProperties"))
             
         defaultlabel = QLabel(QApplication.translate("Label","Default",None))
         self.defaultcombobox = QComboBox()
@@ -35017,7 +35015,7 @@ class backgroundDlg(ArtisanDialog):
         
         settings = QSettings()
         if settings.contains("BackgroundGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("BackgroundGeometry")))
+            self.restoreGeometry(settings.value("BackgroundGeometry"))
         
         #TAB 1
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
@@ -42383,7 +42381,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.setModal(True)
         settings = QSettings()
         if settings.contains("DeviceAssignmentGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("DeviceAssignmentGeometry")))
+            self.restoreGeometry(settings.value("DeviceAssignmentGeometry"))
             
         ################ TAB 1   WIDGETS
         #ETcurve
@@ -45327,7 +45325,7 @@ class LargeLCDs(ArtisanDialog):
         self.lcd3 = None # BT
         settings = QSettings()
         if settings.contains("LCDGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("LCDGeometry")))
+            self.restoreGeometry(settings.value("LCDGeometry"))
         self.resized = False # prevent first resizing event handling
         self.layoutNr = -1 # 0: landscape, 1: landscape tight, 2: portrait         
         self.chooseLayout(self.width(),self.height())
@@ -46084,7 +46082,7 @@ class AlarmDlg(ArtisanDialog):
         # restore window position
         settings = QSettings()
         if settings.contains("AlarmsGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("AlarmsGeometry")))
+            self.restoreGeometry(settings.value("AlarmsGeometry"))
         
         #table for alarms
         self.alarmtable = QTableWidget()
@@ -50563,7 +50561,7 @@ class PID_DlgControl(ArtisanDialog):
         
         settings = QSettings()
         if settings.contains("PIDGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("PIDGeometry")))
+            self.restoreGeometry(settings.value("PIDGeometry"))
         
         # PID tab
         tab1Layout = QVBoxLayout()
