@@ -144,7 +144,7 @@ CONF_MENU_POLISH = u("Polski") # Do not translate
 CONF_MENU_INDONESIAN = u("Indonesia") # Do not translate
 CONF_MENU_THAI = u("Thai") # Do not translate
 CONF_MENU_BRASIL = u("Portugu\u00EAs do Brasil") # Do not translate
-
+CONF_MENU_FARSI = u("\u0641\u0627\u0631\u0633\u06cc") # Do not translate
 
 #Toolkit menu
 TOOLKIT_MENU = QApplication.translate("Menu", "Tools", None)

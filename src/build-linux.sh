@@ -114,6 +114,7 @@ rm -f dist/libX11.so.6
 rm -f dist/libstdc++.so.6
 rm -f dist/libgio-2.0.so.0
 rm -f dist/libz.so.1
+rm -f dist/libglib-2.0.so.0 # removed for v1.6 and later
 
 rm -f libusb-1.0.so.0
 

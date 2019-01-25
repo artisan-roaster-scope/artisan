@@ -514,6 +514,7 @@ supported_languages = [
     "el",
     "en",
     "es",
+    "fa",
     "fi",
     "fr",
     "he",
@@ -11713,6 +11714,13 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.addAction(self.SpanishLanguage) 
         if locale == "es":
             self.SpanishLanguage.setChecked(True)
+
+        self.FarsiLanguage = QAction(UIconst.CONF_MENU_FARSI,self)
+        self.FarsiLanguage.setCheckable(True)
+        self.FarsiLanguage.triggered.connect(lambda _:self.changelocale("fa"))
+        self.languageMenu.addAction(self.FarsiLanguage)
+        if locale == "fa":
+            self.FarsiLanguage.setChecked(True)
 
         self.FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
         self.FinishLanguage.setCheckable(True)
@@ -51785,7 +51793,7 @@ def main():
     if sys.platform.startswith("darwin"):
         appnope.nope()
 
-    if locale == "ar":
+    if locale in ["ar","he","fa"]:
         QApplication.setLayoutDirection(Qt.RightToLeft)
     else:
         QApplication.setLayoutDirection(Qt.LeftToRight)
