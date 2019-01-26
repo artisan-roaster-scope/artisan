@@ -12970,7 +12970,7 @@ class ApplicationWindow(QMainWindow):
 
 #dave90  start...
     def createGradient(self,rgb, tint_factor=0.2, shade_factor=0.2):
-        res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] +");" 
+        res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] +");" 
         return res
             
     def createRGBGradient(self,rgb, tint_factor=0.3, shade_factor=0.3):
