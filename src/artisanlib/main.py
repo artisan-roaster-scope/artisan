@@ -39296,7 +39296,7 @@ class serialport(object):
                 else:
                     self.PhidgetIOvalues[channel] = v
 
-    def phidget1018getSensorReading(self,i,idx,API="voltage",deviceType):
+    def phidget1018getSensorReading(self,i,idx,deviceType,API="voltage"):
         if self.PhidgetIO and len(self.PhidgetIO) > idx: 
             if API != "digital" and aw.qmc.phidget1018_async[i]:            
                 if self.PhidgetIOvalues[i] == -1:
@@ -39560,7 +39560,7 @@ class serialport(object):
             if deviceType == DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and self.PhidgetIO[0].getAttached():
                 probe = -1
                 try:
-                    probe = self.phidget1018getSensorReading(0,0,API,deviceType)
+                    probe = self.phidget1018getSensorReading(0,0,deviceType,API)
                 except Exception:
                     pass
                 async_time = self.PhidgetIOasynctimesAveraged[0]
@@ -39571,11 +39571,11 @@ class serialport(object):
             elif deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
                 probe1 = probe2 = -1
                 try:
-                    probe1 = self.phidget1018getSensorReading(mode*2,0,API,deviceType)
+                    probe1 = self.phidget1018getSensorReading(mode*2,0,deviceType,API)
                 except Exception:
                     pass
                 try:
-                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,API,deviceType)
+                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,deviceType,API)
                 except Exception:
                     pass
                 async_time = None
