@@ -34,7 +34,7 @@ There are posts detailing many topics on the [Artisan Blog](http://artisan-roast
 
 ### Mailing List
 
-You can get support from the community and the developers by sending your questions and issues by email to the [User Mailing List](https://mailman.ghostdub.de/mailman/listinfo/artisan-user).
+You can get support from the community and the developers by sending your questions and issues by email to the [User Mailing List](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/).
 
 **Watch out!** 
 You need to be subscribed to this list to send and receive messages. Messages by non-subscribers are discarded automatically as are messages with large attachments (e.g. images).
