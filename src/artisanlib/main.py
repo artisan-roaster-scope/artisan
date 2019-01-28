@@ -39052,7 +39052,7 @@ class serialport(object):
     
              
 #--- Phidget Digital PWM Output (only one supported for now)
-#  only supporting 4 channel Phidget OUT1100 module
+#  only supporting 4 channel Phidget OUT1100, REL1000, REL1100, REL1101 module
 #  commands: out(n,v) and toggle(n) with n channel number and value v from [0-100]
 #    toggle switches between last value != 0 and 0
 
@@ -39296,7 +39296,7 @@ class serialport(object):
                 else:
                     self.PhidgetIOvalues[channel] = v
 
-    def phidget1018getSensorReading(self,i,idx,API="voltage"):
+    def phidget1018getSensorReading(self,i,idx,API="voltage",deviceType):
         if self.PhidgetIO and len(self.PhidgetIO) > idx: 
             if API != "digital" and aw.qmc.phidget1018_async[i]:            
                 if self.PhidgetIOvalues[i] == -1:
@@ -39307,7 +39307,7 @@ class serialport(object):
                     elif API == "frequency":
                         self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getFrequency()
                     else:
-                        if aw.qmc.phidget1018_ratio[i]:
+                        if aw.qmc.phidget1018_ratio[i] and deviceType != DeviceID.PHIDID_DAQ1400:
                             self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltageRatio()
                         else:
                             self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
@@ -39320,7 +39320,7 @@ class serialport(object):
                 elif API == "frequency":
                     v = self.PhidgetIO[idx].getFrequency()
                 else:
-                    if aw.qmc.phidget1018_ratio[i]:
+                    if aw.qmc.phidget1018_ratio[i] and deviceType != DeviceID.PHIDID_DAQ1400:
                         v = self.PhidgetIO[idx].getVoltageRatio()
                     else:
                         v = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
@@ -39351,7 +39351,7 @@ class serialport(object):
                         power = PowerSupply.POWER_SUPPLY_OFF
                     elif power_idx == 1:
                         power = PowerSupply.POWER_SUPPLY_12V
-                    elif power_idx == 2:
+                    else: # power_idx == 2:
                         power = PowerSupply.POWER_SUPPLY_24V
                     self.PhidgetIO[idx].setPowerSupply(power)
                 except:
@@ -39473,7 +39473,7 @@ class serialport(object):
                 elif API == "frequency":
                     tp = "PhidgetFrequencyCounter"
                 else:
-                    if aw.qmc.phidget1018_ratio[mode*2]:
+                    if aw.qmc.phidget1018_ratio[mode*2] and deviceType != DeviceID.PHIDID_DAQ1400:
                         tp = "PhidgetVoltageRatioInput"
                     else:
                         tp = "PhidgetVoltageInput"
@@ -39497,12 +39497,12 @@ class serialport(object):
                         self.PhidgetIO = [CurrentInput(),CurrentInput()]
                     elif API == "frequency":
                         self.PhidgetIO = [FrequencyCounter(),FrequencyCounter()]
-                    else:
-                        if aw.qmc.phidget1018_ratio[mode*2]:
+                    else: # voltage
+                        if aw.qmc.phidget1018_ratio[mode*2] and deviceType != DeviceID.PHIDID_DAQ1400:
                             ch1 = VoltageRatioInput()
                         else:
                             ch1 = VoltageInput()
-                        if aw.qmc.phidget1018_ratio[mode*2+1]:
+                        if aw.qmc.phidget1018_ratio[mode*2+1 and deviceType != DeviceID.PHIDID_DAQ1400]:
                             ch2 = VoltageRatioInput()
                         else:
                             ch2 = VoltageInput()
@@ -39560,7 +39560,7 @@ class serialport(object):
             if deviceType == DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and self.PhidgetIO[0].getAttached():
                 probe = -1
                 try:
-                    probe = self.phidget1018getSensorReading(0,0,API)
+                    probe = self.phidget1018getSensorReading(0,0,API,deviceType)
                 except Exception:
                     pass
                 async_time = self.PhidgetIOasynctimesAveraged[0]
@@ -39571,11 +39571,11 @@ class serialport(object):
             elif deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
                 probe1 = probe2 = -1
                 try:
-                    probe1 = self.phidget1018getSensorReading(mode*2,0,API)
+                    probe1 = self.phidget1018getSensorReading(mode*2,0,API,deviceType)
                 except Exception:
                     pass
                 try:
-                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,API)
+                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,API,deviceType)
                 except Exception:
                     pass
                 async_time = None
