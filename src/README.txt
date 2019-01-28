@@ -14,7 +14,7 @@ The home of its development is on GitHub were all source and binary files are av
 
 MAILING LIST
 
-<https://lists.mokelbu.de/listinfo/artisan-user>
+<https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/>
 
 
 ARTISAN BLOG
