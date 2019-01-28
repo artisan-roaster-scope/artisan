@@ -1,5 +1,12 @@
 language: python
 
+
+# safelist
+branches:
+  only:
+  - gh-pages
+  - master
+
 matrix:
   allow_failures:
     - env: ARTISAN_OS=rpi
