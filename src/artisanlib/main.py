@@ -4242,9 +4242,17 @@ class tgraphcanvas(FigureCanvas):
             fmtstr = "%.0f"        
         temp_anno = self.ax.annotate(fmtstr%(temp), xy=(x,y),xytext=(x+e,y + yup),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
+        try:
+            temp_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+        except: # mpl before v3.0 do not have this set_in_layout() function
+            pass
         #anotate time
         time_anno = self.ax.annotate(time_str,xy=(x,y),xytext=(x+e,y - ydown),
                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
+        try:
+            time_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+        except: # mpl before v3.0 do not have this set_in_layout() function
+            pass
         if aw.qmc.patheffects:
             rcParams['path.effects'] = []
         return [temp_anno, time_anno]
@@ -4422,11 +4430,6 @@ class tgraphcanvas(FigureCanvas):
                     endidx = self.ax.get_xlim()[1] # or timex[-1]
                     if timex[tidx] < endidx and self.watermarksflag:
                         self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None)#,lod=False)                        
-                try:
-                    for a in anno_artists:
-                        a.set_in_layout(False) # remove text annotations from tight_layout calculation
-                except: # mpl before v3.0 do not have this set_in_layout() function
-                    pass
                 aw.qmc.l_annotations = anno_artists
         except Exception as e:
 #            import traceback
@@ -5059,6 +5062,10 @@ class tgraphcanvas(FigureCanvas):
                                                     xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
                                                     fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
                                                     alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)
+                                try:
+                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                except: # mpl before v3.0 do not have this set_in_layout() function
+                                    pass
                                 self.l_background_annotations.append(anno)
                         #background events by value
                         if self.eventsGraphflag in [2,3,4]:
@@ -5264,7 +5271,7 @@ class tgraphcanvas(FigureCanvas):
                                         else:
                                             temps = self.stemp2
 #                                    fcolor=self.EvalueColor[self.specialeventstype[i]]
-                                    self.ax.annotate(firstletter + secondletter, 
+                                    anno = self.ax.annotate(firstletter + secondletter, 
                                                      xy=(self.timex[int(self.specialevents[i])], 
                                                      temps[int(self.specialevents[i])]),
                                                      xytext=(self.timex[int(self.specialevents[i])],row[firstletter]+2.5),
@@ -5276,6 +5283,10 @@ class tgraphcanvas(FigureCanvas):
                                                      arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
                                                      fontsize="xx-small",
                                                      fontproperties=fontprop_small)
+                                    try:
+                                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                    except: # mpl before v3.0 do not have this set_in_layout() function
+                                        pass
     
                     elif self.eventsGraphflag in [2,3,4]: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
                         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
@@ -5457,7 +5468,7 @@ class tgraphcanvas(FigureCanvas):
                                         boxcolor = self.palette["specialeventbox"]
                                         textcolor = self.palette["specialeventtext"]
                                     if self.eventsGraphflag in [0,3] or self.specialeventstype[i] > 3:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
                                                      xytext=(self.timex[int(self.specialevents[i])],temp+height),
                                                      alpha=0.9,
                                                      color=textcolor,
@@ -5467,8 +5478,12 @@ class tgraphcanvas(FigureCanvas):
                                                      fontproperties=fontprop_small,
                                                      path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                      )
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
                                     elif self.eventsGraphflag == 4:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
                                                      xytext=(self.timex[int(self.specialevents[i])],temp),
                                                      alpha=0.9,
                                                      color=textcolor,
@@ -5476,7 +5491,11 @@ class tgraphcanvas(FigureCanvas):
                                                      bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                                      fontproperties=fontprop_small,
                                                      path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
-                                                     )                            
+                                                     )
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass                          
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:            
@@ -7847,7 +7866,7 @@ class tgraphcanvas(FigureCanvas):
                                 fontprop_small.set_size("xx-small")
                                 # plot events on BT when showeventsonbt is true
                                 if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
-                                    self.ax.annotate(firstletter + secondletter, 
+                                    anno = self.ax.annotate(firstletter + secondletter, 
                                         xy=(self.timex[index], 
                                         self.temp1[index]),
                                         xytext=(self.timex[index],row[etype]),
@@ -7859,7 +7878,7 @@ class tgraphcanvas(FigureCanvas):
                                         fontsize="xx-small",
                                         fontproperties=fontprop_small)
                                 else:
-                                    self.ax.annotate(firstletter + secondletter, 
+                                    anno = self.ax.annotate(firstletter + secondletter, 
                                             xy=(self.timex[index], 
                                             self.temp2[index]),
                                             xytext=(self.timex[index],row[etype]),
@@ -7870,6 +7889,10 @@ class tgraphcanvas(FigureCanvas):
                                             arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
                                             fontsize="xx-small",
                                             fontproperties=fontprop_small)
+                                try:
+                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                except: # mpl before v3.0 do not have this set_in_layout() function
+                                    pass
                             elif self.eventsGraphflag in [2,3,4] and etype < 4:
                                 # update lines data using the lists with new data
                                 if etype == 0 and aw.qmc.showEtypes[0]:
@@ -7924,7 +7947,7 @@ class tgraphcanvas(FigureCanvas):
                                         boxcolor = self.palette["specialeventbox"]
                                         textcolor = self.palette["specialeventtext"]
                                     if self.eventsGraphflag in [0,3] or self.specialeventstype[-1] > 3:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                                          color=textcolor,
                                                          va="center", ha="center",
                                                          arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4,relpos=(0,0)),
@@ -7934,7 +7957,7 @@ class tgraphcanvas(FigureCanvas):
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          backgroundcolor=boxcolor)
                                     elif self.eventsGraphflag == 4:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
+                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
                                                          color=textcolor,
                                                          va="center", ha="center",
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
@@ -7942,6 +7965,11 @@ class tgraphcanvas(FigureCanvas):
                                                          fontproperties=aw.mpl_fontproperties,
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          backgroundcolor=boxcolor)
+                                    
+                                    try:
+                                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                    except: # mpl before v3.0 do not have this set_in_layout() function
+                                        pass
                                     
                         self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBacground() needed
                         temp = "%.1f "%self.temp2[i]            
@@ -8025,8 +8053,12 @@ class tgraphcanvas(FigureCanvas):
                                 temp = self.temp1[index]
                             else:
                                 temp = self.temp2[index]
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                            anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                              color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
+                            try:
+                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                pass
                         #if Event Type-Bars flag
                         if self.eventsGraphflag == 1:
                             if self.mode == "F":
@@ -8036,11 +8068,15 @@ class tgraphcanvas(FigureCanvas):
                             #some times ET is not drawn (ET = 0) when using device NONE
                             # plot events on BT when showeventsonbt is true
                             if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
+                                anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             else:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
+                                anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
+                            try:
+                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                pass
                         if self.eventsGraphflag in [2,3,4]:
                             # update lines data using the lists with new data
                             etype = self.specialeventstype[-1]
@@ -27136,7 +27172,11 @@ class HUDDlg(ArtisanDialog):
                     fsize = int(annvars[3])
                 except:
                     pass
-                aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
+                anno = aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
+                try:
+                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                except: # mpl before v3.0 do not have this set_in_layout() function
+                    pass
             else:
                 aw.qmc.plottermessage = QApplication.translate("Error Message","Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None)
         except Exception as e:
