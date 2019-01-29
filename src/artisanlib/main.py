@@ -6618,8 +6618,8 @@ class tgraphcanvas(FigureCanvas):
             if len(self.timex) == 1:
                 aw.qmc.clearMeasurements()
             aw.pidcontrol.pidOff()
-            if aw.qmc.device == 53:
-                aw.HottopControlOff()
+#            if aw.qmc.device == 53:
+#                aw.HottopControlOff()
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
             if aw.qmc.device == 0 and aw.fujipid.followBackground:
                 if aw.fujipid.sv and aw.fujipid.sv > 0:
@@ -24135,7 +24135,9 @@ class ApplicationWindow(QMainWindow):
     
     def HottopControlOn(self):
         if aw.superusermode: # Hottop control mode can for now activated only in super user mode
-            from artisanlib.hottop import takeHottopControl, setHottop
+            from artisanlib.hottop import takeHottopControl, setHottop, startHottop, isHottopLoopRunning
+            if not isHottopLoopRunning():
+                startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             res = takeHottopControl()
             if res:
                 setHottop(drum_motor=True)
@@ -38320,11 +38322,9 @@ class serialport(object):
         self.PhidgetIRSensor.setRTDWireSetup(PHIDGET_RTD_WIRE(aw.qmc.phidget1200_wire))        
         if aw.qmc.phidget1200_async:
             self.PhidgetIRSensor.setTemperatureChangeTrigger(aw.qmc.phidget1200_changeTrigger)
-        else:
-            self.PhidgetIRSensor.setTemperatureChangeTrigger(0)
-        if aw.qmc.phidget1200_async:
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
         else:
+            self.PhidgetIRSensor.setTemperatureChangeTrigger(0)
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda *_:None)
         # set rate
         try:
@@ -51325,12 +51325,14 @@ class PIDcontrol(object):
         # MODBUS hardware PID
         if (aw.pidcontrol.externalPIDControl() == 1 and aw.modbus.PID_OFF_action and aw.modbus.PID_OFF_action != ""):
             aw.eventaction(4,aw.modbus.PID_OFF_action)
-            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            if not aw.HottopControlActive:
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
             self.pidActive = False  
         # S7 hardware PID
         elif (aw.pidcontrol.externalPIDControl() == 2 and aw.s7.PID_OFF_action and aw.s7.PID_OFF_action != ""):
             aw.eventaction(15,aw.s7.PID_OFF_action)
-            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            if not aw.HottopControlActive:
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
             self.pidActive = False   
         # TC4 hardware PID
         elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
@@ -51346,14 +51348,16 @@ class PIDcontrol(object):
                 finally:
                     if aw.ser.COMsemaphore.available() < 1:
                         aw.ser.COMsemaphore.release(1)
-                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+                if not aw.HottopControlActive:
+                    aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
                 self.pidActive = False
         # software PID
         elif aw.qmc.Controlbuttonflag:
             aw.qmc.pid.setControl(lambda _: _)
             self.pidActive = False
             aw.qmc.pid.off()
-            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            if not aw.HottopControlActive:
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
 
     def sliderMinValueChanged(self,i):
         self.svSliderMin = i

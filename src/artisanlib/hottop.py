@@ -306,3 +306,7 @@ def stopHottop():
         process.terminate()
         process.join()
         process = None
+
+def isHottopLoopRunning():
+    global process
+    return bool(process)
