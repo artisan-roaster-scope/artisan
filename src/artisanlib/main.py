@@ -2408,97 +2408,99 @@ class tgraphcanvas(FigureCanvas):
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
     def updategraphics(self):
         try:
-            ## NOTE: locking the resource here seems to block the UI on replaying events and not locking seems not to harm
-#            #### lock shared resources #####
-#            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagon:
-                if len(self.timex):
-                    if self.LCDdecimalplaces:
-                        lcdformat = "%.1f"
-                    else:
-                        lcdformat = "%.0f"
-                    try: # if self.temp1 is None, which should never be the case, this fails
-                        if len(self.temp1) and -100 < self.temp1[-1] < 1000:
-                            aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
-                        elif self.LCDdecimalplaces and len(self.temp1) and -10000 < self.temp1[-1] < 100000:
-                            aw.lcd2.display("%.0f"%float(self.temp1[-1]))
+                #### lock shared resources #####
+                aw.qmc.samplingsemaphore.acquire(1)
+                try:
+                    if len(self.timex):
+                        if self.LCDdecimalplaces:
+                            lcdformat = "%.1f"
                         else:
-                            aw.lcd2.display("--")
-                    except:
-                        pass
-                    try:
-                        if len(self.temp2) and -100 < self.temp2[-1] < 1000:
-                            aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
-                        elif self.LCDdecimalplaces and len(self.temp2) and -10000 < self.temp2[-1] < 100000:
-                            aw.lcd3.display("%.0f"%float(self.temp2[-1]))
-                        else:
-                            aw.lcd3.display("--")
-                    except:
-                        pass
-                    try:
-                        if -100 < self.rateofchange1 < 1000:                    
-                            aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
-                        else:
-                            aw.lcd4.display("--")
-                        if -100 < self.rateofchange2 < 1000:
-                            aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
-                        else:
-                            aw.lcd5.display("--")
-                    except:
-                        pass
-                    try:                    
-                        if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
-                            aw.lcd6.display(lcdformat%self.currentpidsv)
-                            aw.lcd7.display(lcdformat%self.dutycycle)
-                    except:
-                        pass
-
-                    ndev = len(self.extradevices)
-                    for i in range(ndev):
-                        if i < aw.nLCDS:
-                            try:
-                                if self.extratemp1[i]:
-                                    fmt = lcdformat                                      
-                                    v = float(self.extratemp1[i][-1])
-                                    if (v.is_integer() and self.intChannel(i,0)):
-                                        fmt = "%.0f"  
-                                    if -100 < v < 1000:
-                                        aw.extraLCD1[i].display(fmt%v) # everything fits
-                                    elif self.LCDdecimalplaces and -10000 < v < 100000:
-                                        fmt = "%.0f"
-                                        aw.extraLCD1[i].display(fmt%v)
-                                    else:
-                                        aw.extraLCD1[i].display("--")
-                            except:
-                                pass
-                            try:
-                                if self.extratemp2[i]:
-                                    fmt = lcdformat
-                                    v = float(self.extratemp2[i][-1])
-                                    if (v.is_integer() and self.intChannel(i,1)):
-                                        fmt = "%.0f"  
-                                    if -100 < v < 1000:
-                                        aw.extraLCD2[i].display(fmt%v) # everything fits
-                                    elif self.LCDdecimalplaces and -10000 < v < 100000:
-                                        fmt = "%.0f"
-                                        aw.extraLCD2[i].display(fmt%v)
-                                    else:
-                                        aw.extraLCD2[i].display("--")
-                            except:
-                                pass
-                                    
-                    # update large LCDs (incl. Web LCDs)
-                    timestr = None
-                    if not self.flagstart:
-                        timestr = "00:00"
-                    digits = (1 if aw.qmc.LCDdecimalplaces else 0)
-                    btstr = str(aw.float2float(self.temp2[-1],digits))
-                    etstr = str(aw.float2float(self.temp1[-1],digits))
-                    if aw.WebLCDs:                       
-                        self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
-                    if aw.largeLCDs_dialog:
-                        self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
-                
+                            lcdformat = "%.0f"
+                        try: # if self.temp1 is None, which should never be the case, this fails
+                            if len(self.temp1) and -100 < self.temp1[-1] < 1000:
+                                aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
+                            elif self.LCDdecimalplaces and len(self.temp1) and -10000 < self.temp1[-1] < 100000:
+                                aw.lcd2.display("%.0f"%float(self.temp1[-1]))
+                            else:
+                                aw.lcd2.display("--")
+                        except:
+                            pass
+                        try:
+                            if len(self.temp2) and -100 < self.temp2[-1] < 1000:
+                                aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
+                            elif self.LCDdecimalplaces and len(self.temp2) and -10000 < self.temp2[-1] < 100000:
+                                aw.lcd3.display("%.0f"%float(self.temp2[-1]))
+                            else:
+                                aw.lcd3.display("--")
+                        except:
+                            pass
+                        try:
+                            if -100 < self.rateofchange1 < 1000:                    
+                                aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
+                            else:
+                                aw.lcd4.display("--")
+                            if -100 < self.rateofchange2 < 1000:
+                                aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
+                            else:
+                                aw.lcd5.display("--")
+                        except:
+                            pass
+                        try:                    
+                            if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
+                                aw.lcd6.display(lcdformat%self.currentpidsv)
+                                aw.lcd7.display(lcdformat%self.dutycycle)
+                        except:
+                            pass
+    
+                        ndev = len(self.extradevices)
+                        for i in range(ndev):
+                            if i < aw.nLCDS:
+                                try:
+                                    if self.extratemp1[i]:
+                                        fmt = lcdformat                                      
+                                        v = float(self.extratemp1[i][-1])
+                                        if (v.is_integer() and self.intChannel(i,0)):
+                                            fmt = "%.0f"  
+                                        if -100 < v < 1000:
+                                            aw.extraLCD1[i].display(fmt%v) # everything fits
+                                        elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                            fmt = "%.0f"
+                                            aw.extraLCD1[i].display(fmt%v)
+                                        else:
+                                            aw.extraLCD1[i].display("--")
+                                except:
+                                    pass
+                                try:
+                                    if self.extratemp2[i]:
+                                        fmt = lcdformat
+                                        v = float(self.extratemp2[i][-1])
+                                        if (v.is_integer() and self.intChannel(i,1)):
+                                            fmt = "%.0f"  
+                                        if -100 < v < 1000:
+                                            aw.extraLCD2[i].display(fmt%v) # everything fits
+                                        elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                            fmt = "%.0f"
+                                            aw.extraLCD2[i].display(fmt%v)
+                                        else:
+                                            aw.extraLCD2[i].display("--")
+                                except:
+                                    pass
+                                        
+                        # update large LCDs (incl. Web LCDs)
+                        timestr = None
+                        if not self.flagstart:
+                            timestr = "00:00"
+                        digits = (1 if aw.qmc.LCDdecimalplaces else 0)
+                        btstr = str(aw.float2float(self.temp2[-1],digits))
+                        etstr = str(aw.float2float(self.temp1[-1],digits))
+                        if aw.WebLCDs:                       
+                            self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
+                        if aw.largeLCDs_dialog:
+                            self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
+                finally:
+                    if aw.qmc.samplingsemaphore.available() < 1:
+                        aw.qmc.samplingsemaphore.release(1)
                     
                 #check setSV
                 if self.temporarysetsv is not None:
@@ -2673,9 +2675,9 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoFCsIdx != 0:
                         self.mark1Cstart()
                         self.autoFCsIdx = 0
-                    if self.autoDropIdx != 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
-                        self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
-                        self.autoDropIdx = 0
+                    if self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
+                        self.markDrop() # we do not reset the autoDropIdx here to avoid another trigger
+                        self.autoDropIdx = -1 # we set the autoDropIdx to a negative value to prevent further triggers after undo markDROP
                 
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
@@ -7514,7 +7516,8 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         self.incBatchCounter()
                         # generate UUID
-                        self.roastUUID = uuid.uuid4().hex
+                        if self.roastUUID is None: # there might be already one assigned by undo and redo the markDROP!
+                            self.roastUUID = uuid.uuid4().hex
                         if self.device != 18:
                             if self.autoDropIdx:
                                 self.timeindex[6] = self.autoDropIdx
@@ -7628,6 +7631,12 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.batchcounter -= 1 # we decrease the batch counter
             # set the batchcounter of the current profile
             aw.qmc.roastbatchnr = 0
+            if aw.qmc.lastroastepoch + 5400 < aw.qmc.roastepoch:
+                # reset the sequence counter
+                aw.qmc.batchsequence = 1
+            elif aw.qmc.batchsequence > 1:
+                aw.qmc.batchsequence -= 1
+            aw.qmc.roastbatchpos = 0
             # decr. the batchcounter of the loaded app settings
             if aw.settingspath and aw.settingspath != "":
                 try:
@@ -10974,6 +10983,7 @@ class SampleThread(QThread):
                     aw.qmc.samplingsemaphore.release(1)
                 #update screen in main GUI thread
                 self.updategraphics.emit()
+
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
@@ -18749,7 +18759,9 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["TP_ET"] = self.float2float(self.qmc.temp1[TP_time_idx])
                 computedProfile["TP_BT"] = self.float2float(self.qmc.temp2[TP_time_idx])
                 if self.qmc.timeindex[6]:
-                    computedProfile["MET"] = self.float2float(max(self.qmc.temp1[TP_time_idx:self.qmc.timeindex[6]]))
+                    relevant_ETs = self.qmc.temp1[TP_time_idx:self.qmc.timeindex[6]]
+                    if relevant_ETs: # relevant_ETs might be the empty list!
+                        computedProfile["MET"] = self.float2float(max(relevant_ETs))
             ######### DRY #########
             # calc DRY_time_idx (index of DRY; is None if unknown)
             if self.qmc.timeindex[1] and aw.qmc.phasesbuttonflag:
@@ -18829,7 +18841,8 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["dry_phase_ror"] = self.float2float(ror[0])
                 computedProfile["mid_phase_ror"] = self.float2float(ror[1])
                 computedProfile["finish_phase_ror"] = self.float2float(ror[2])
-                if "TP_BT" in computedProfile and "TP_time" in computedProfile and "DROP_BT" in computedProfile and "DROP_time" in computedProfile:
+                if "TP_BT" in computedProfile and "TP_time" in computedProfile and "DROP_BT" in computedProfile and "DROP_time" in computedProfile and \
+                    (computedProfile["DROP_time"]-computedProfile["TP_time"]) != 0:
                     computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
