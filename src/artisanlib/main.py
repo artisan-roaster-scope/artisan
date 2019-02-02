@@ -4600,13 +4600,13 @@ class tgraphcanvas(FigureCanvas):
         TP_Index = aw.findTP()
         if aw.qmc.AUCbaseFlag:
             _,_,_,idx = aw.ts()
-            idx = TP_Index + self.bisection(self.temp2[TP_Index:self.timeindex[6]],aw.qmc.temp2[idx])
+            idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.stemp2[idx])
         else:
-            idx = TP_Index + self.bisection(self.temp2[TP_Index:self.timeindex[6]],aw.qmc.AUCbase)
-        rtbt = aw.qmc.temp2[idx]
+            idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.AUCbase)
+        rtbt = aw.qmc.stemp2[idx]
                 
         ix = self.timex[idx:self.timeindex[6]+1]
-        iy = self.temp2[idx:self.timeindex[6]+1]
+        iy = self.stemp2[idx:self.timeindex[6]+1]
 
         # Create the shaded region
         from matplotlib.patches import Polygon
