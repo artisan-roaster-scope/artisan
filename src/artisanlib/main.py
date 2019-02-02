@@ -20605,6 +20605,8 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass
             #aw.updatePlusStatus()
+            
+            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
                             
         except Exception as e:
             res = False
