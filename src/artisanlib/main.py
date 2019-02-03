@@ -410,7 +410,7 @@ try:
     app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
     legacysettings = QSettings()
     app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
-    app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system        
+    app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system        
     newsettings = QSettings()
     
     settingsRelocated = False
@@ -429,7 +429,7 @@ try:
         app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
         legacysettings = QSettings()
         app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system        
+        app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system        
         newsettings = QSettings()
         for key in legacysettings.allKeys():
             newsettings.setValue(key,legacysettings.value(key))
@@ -440,7 +440,7 @@ except:
     
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system
     
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))

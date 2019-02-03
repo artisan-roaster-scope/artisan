@@ -135,7 +135,7 @@
 	<key>CFBundleIconFile</key>
 	<string>artisan.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.google.code.p.Artisan</string>
+	<string>org.artisan-scope.artisan</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -157,7 +157,7 @@
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.13</string>
+	<string>10.10</string>
 	<key>LSMultipleInstancesProhibited</key>
 	<string>false</string>
 	<key>LSPrefersPPC</key>
