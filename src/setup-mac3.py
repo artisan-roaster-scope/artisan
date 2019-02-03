@@ -125,11 +125,11 @@ if os.environ['ARTISAN_LEGACY_BUILD'] == "true":
 
 with open('Info.plist', 'r+b') as fp:
     plist = plistlib.load(fp)
-    plist['CFBundleDisplayName'] = 'Artisan'
-    plist['CFBundleGetInfoString'] = 'Artisan, Roast Logger'
-    plist['CFBundleIdentifier'] = 'com.google.code.p.Artisan'
+    plist['CFBundleDisplayName'] = 'artisan'
+    plist['CFBundleGetInfoString'] = 'artisan, roast logger'
+    plist['CFBundleIdentifier'] = 'org.artisan-scope.artisan'
     plist['CFBundleShortVersionString'] = VERSION
-    plist['CFBundleVersion'] = 'Artisan ' + VERSION
+    plist['CFBundleVersion'] = 'artisan ' + VERSION
     plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
     plist['LSMultipleInstancesProhibited'] = 'false'
     plist['LSPrefersPPC'] = False,
@@ -184,7 +184,7 @@ OPTIONS = {
     'plist'    : plist}
 
 setup(
-    name='Artisan',
+    name='artisan',
     version=VERSION,
     author='YOUcouldbeTOO',
     author_email='zaub.ERASE.org@yahoo.com',

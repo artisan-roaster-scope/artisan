@@ -404,7 +404,7 @@ app = Artisan(args)
 # no longer be read or saved.  At start-up, versions of Artisan before to v1.6.0 will no longer share settings with versions v1.6.0 and after. 
 # Settings can be shared among all versions of Artisan by explicitly saving and loading them using Help>Save/Load Settings.
 try:
-    app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
+    app.setApplicationName("artisan")                                       #needed by QSettings() to store windows geometry in operating system
 
     app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
     app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
@@ -423,7 +423,7 @@ try:
         legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
 
         # copy ArtisanViewer settings
-        app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
+        app.setApplicationName("artisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
 
         app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
         app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
@@ -11280,9 +11280,9 @@ class ApplicationWindow(QMainWindow):
         
         # set window title
         if artisanviewerMode:
-            self.windowTitle = "ArtisanViewer %s"%str(__version__)
+            self.windowTitle = "artisanViewer %s"%str(__version__)
         else:
-            self.windowTitle = "Artisan %s"%str(__version__)
+            self.windowTitle = "artisan %s"%str(__version__)
         self.setWindowTitle(self.windowTitle)
         # populate recent file menu
         for i in range(self.MaxRecentFiles):

@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key> NSHumanReadableCopyright </key>
-	<string>Artisan Scope, Roast Logger</string>
+	<string>artisan scope, roast logger</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
-	<string>Artisan</string>
+	<string>artisan</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -45,7 +45,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanProfile.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Profile</string>
+			<string>artisan profile</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSItemContentTypes</key>
@@ -63,7 +63,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanAlarms.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Alarms</string>
+			<string>artisan alarms</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSItemContentTypes</key>
@@ -81,7 +81,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanPalettes.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Palettes</string>
+			<string>artisan palettes</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSItemContentTypes</key>
@@ -99,7 +99,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanSettings.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Settings</string>
+			<string>artisan settings</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSItemContentTypes</key>
@@ -117,7 +117,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanWheel.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Wheel</string>
+			<string>artisan wheel</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSItemContentTypes</key>
@@ -129,17 +129,17 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>Artisan</string>
+	<string>artisan</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Artisan, Roast Logger</string>
+	<string>artisan, roast logger</string>
 	<key>CFBundleIconFile</key>
 	<string>artisan.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.google.code.p.Artisan</string>
+	<string>org.artisan-scope.artisan</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Artisan</string>
+	<string>artisan</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -147,7 +147,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>Artisan 1.6.0</string>
+	<string>artisan 1.6.0</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSArchitecturePriority</key>
