@@ -2,6 +2,18 @@
 # -*- coding: utf-8 -*-
 
 artisan_slider_style = """
+            QSlider::groove:vertical:focus {{
+                background: #888;
+                border: 0.5px solid #666;
+                width: 3px;
+                border-radius: 5px;
+            }}
+            QSlider::sub-page:vertical:focus {{
+                background: 888;
+                border: 0.5px solid #666;
+                width: 85px;
+                border-radius: 5px;
+            }}
             QSlider::groove:vertical {{
                 background: #ddd;
                 border: 0.5px solid #aaa;
