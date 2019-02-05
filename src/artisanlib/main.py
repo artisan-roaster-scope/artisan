@@ -1613,7 +1613,8 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveprefix = ""
         self.autosavepath = ""
         
-        self.autosavepdf = False # if true save PDF along alog files
+        self.autosaveimage = False # if true save an image along alog files
+        self.autosaveimageformat = "PDF" # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP
 
         #used to place correct height of text to avoid placing text over text (annotations)
         self.ystep_down = 0
@@ -2738,7 +2739,8 @@ class tgraphcanvas(FigureCanvas):
         if self.HUDflag:
             self.HUDflag = False
             aw.HUD.clear()
-            aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+#            aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+            aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
             aw.stack.setCurrentIndex(0)
             self.resetlines()
             aw.sendmessage(QApplication.translate("Message","HUD OFF", None))
@@ -2750,7 +2752,8 @@ class tgraphcanvas(FigureCanvas):
             img = self.grab()
             aw.HUD.setPixmap(img)
             self.HUDflag = True
-            aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
+#            aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
+            aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_ON"])
             aw.stack.setCurrentIndex(1)
             aw.sendmessage(QApplication.translate("Message","HUD ON", None))
 
@@ -4619,10 +4622,14 @@ class tgraphcanvas(FigureCanvas):
         self.ax.add_patch(poly)
 
     def setProfileTitle(self,title,updatebackground=False):
-        if self.roastbatchnr == 0:
+        if self.flagon and self.batchcounter != -1:
+            bnr = self.batchcounter + 1
+        else:
+            bnr = self.roastbatchnr
+        if bnr == 0:
             title = title
         else:
-            title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + title
+            title = self.roastbatchprefix + u(bnr) + u(" ") + title
 
         if self.background and self.titleB and len(self.titleB) > 10:
             stl = 33
@@ -6631,15 +6638,16 @@ class tgraphcanvas(FigureCanvas):
             # stop Recorder if still running
             recording = self.flagstart
             if recording:
-                self.OffRecorder()
+                self.OffRecorder(autosave=False) # we autosave after the monitor is turned off to get all the data in the generated PDF!
             self.flagon = False
             # now wait until the current sampling round is done
             while self.flagsampling:
                 libtime.sleep(0.02)
                 QApplication.processEvents()
-            # clear data from monitoring-only mode
-            if len(self.timex) == 1:
+            if len(self.timex) < 3:
+                # clear data from monitoring-only mode
                 aw.qmc.clearMeasurements()
+
             aw.pidcontrol.pidOff()
 #            if aw.qmc.device == 53:
 #                aw.HottopControlOff()
@@ -6680,7 +6688,14 @@ class tgraphcanvas(FigureCanvas):
             self.StopAsyncSamplingAction()
             aw.enableEditMenus()
             QApplication.processEvents()
-            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)            
+            if len(self.timex) > 2:
+                # we autosave after full redraw after OFF to have the optional generated PDF containing all information
+                if aw.qmc.autosaveflag and aw.qmc.autosavepath:
+                    try:
+                        aw.automaticsave()
+                    except:
+                        pass
             #appnope.nap()
             aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
             QApplication.processEvents()
@@ -6888,7 +6903,7 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    def OffRecorder(self):
+    def OffRecorder(self, autosave=True):
         try:
             aw.enableSaveActions()
             self.flagstart = False
@@ -6909,7 +6924,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.clusterEvents()
             except:
                 pass
-            if aw.qmc.autosaveflag and aw.qmc.autosavepath:
+            if autosave and aw.qmc.autosaveflag and aw.qmc.autosavepath:
                 try:
                     aw.automaticsave()
                 except:
@@ -11497,6 +11512,14 @@ class ApplicationWindow(QMainWindow):
         fileConvertPNGAction = QAction(QApplication.translate("Menu", "PNG...",None),self)
         fileConvertPNGAction.triggered.connect(self.fileConvertPNG)
         self.convMenu.addAction(fileConvertPNGAction)
+
+        fileConvertJPEGAction = QAction(QApplication.translate("Menu", "JPEG...",None),self)
+        fileConvertJPEGAction.triggered.connect(self.fileConvertJPEG)
+        self.convMenu.addAction(fileConvertJPEGAction)
+
+        fileConvertBMPAction = QAction(QApplication.translate("Menu", "BMP...",None),self)
+        fileConvertBMPAction.triggered.connect(self.fileConvertBMP)
+        self.convMenu.addAction(fileConvertBMPAction)
         
         fileConvertSVGAction = QAction(QApplication.translate("Menu", "SVG...",None),self)
         fileConvertSVGAction.triggered.connect(self.fileConvertSVG)
@@ -11538,6 +11561,14 @@ class ApplicationWindow(QMainWindow):
         CoffeeGeekAction = QAction("CoffeeGeek.com (500x?)...",self)
         CoffeeGeekAction.triggered.connect(lambda *_:self.resizeImg(500,1))
         self.saveGraphMenu.addAction(CoffeeGeekAction)
+        
+        JPEGAction = QAction("JPEG...",self)
+        JPEGAction.triggered.connect(lambda _ : self.resizeImg(0,1,"JPEG"))
+        self.saveGraphMenu.addAction(JPEGAction)
+        
+        BMPAction = QAction("BMP...",self)
+        BMPAction.triggered.connect(lambda _ : self.resizeImg(0,1,"BMP"))
+        self.saveGraphMenu.addAction(BMPAction)
         
         SVGAction = QAction("SVG...",self)
         SVGAction.triggered.connect(lambda _ : self.saveVectorGraph(extension=".svg"))
@@ -11677,6 +11708,7 @@ class ApplicationWindow(QMainWindow):
 
         self.alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
         self.alarmAction.triggered.connect(self.alarmconfig)
+        self.alarmAction.setShortcut("Ctrl+A")
         self.ConfMenu.addAction(self.alarmAction)
         
         self.ConfMenu.addSeparator()
@@ -12064,32 +12096,7 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(6)
 
-        if locale == "es":
-            self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
-                                     "STOP":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}",
-                                     "START":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}",
-                                     "OFF":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}",
-                                     "ON":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }",
-                                     "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                     "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                     "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                     "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                     "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "RESET":"QPushButton {font-size: 12pt; font-weight: bold; color: black; background-color: white }",
-                                     "HUD_OFF":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #b5baff  }",
-                                     "HUD_ON":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #60ffed   }",
-                                     "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
-                                     "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                     "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
-                                     "PIDactive":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
-                                     "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
-                                     "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
-                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
-                                     }
-        else:
-            self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
+        self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
                                      "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
                                      "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
                                      "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
@@ -12102,8 +12109,8 @@ class ApplicationWindow(QMainWindow):
                                      "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
                                      "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
                                      "RESET":"QPushButton {font-size: 14pt; font-weight: bold; color: black; background-color: white }",
-                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff  }",
-                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #60ffed   }",
+                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #bbbeec }",
+                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff }",
                                      "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
                                      "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
                                      "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
@@ -12112,6 +12119,13 @@ class ApplicationWindow(QMainWindow):
                                      "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
                                      "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
                                      }
+        if locale == "es":
+            # slightly smaller font size for Spanish
+            self.pushbuttonstyles["DISABLED"] = "QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}"
+            self.pushbuttonstyles["STOP"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
+            self.pushbuttonstyles["START"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}"
+            self.pushbuttonstyles["OFF"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
+            self.pushbuttonstyles["ON"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }"
 
         #create ON/OFF buttons
         self.button_1 = QPushButton(QApplication.translate("Button", "ON", None))
@@ -13167,20 +13181,25 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.plus_default_store is not None and self.qmc.plus_default_store != self.qmc.plus_store:
                 self.qmc.plus_default_store = None # we reset the defaultstore
         
+    # returns the list of recentRoasts with the first entry with the given title, weight and weightunit removed
+    def delRecentRoast(self,title,weightIn,weightUnit):
+        # check for duplications
+        entry_with_same_title = None
+        for i in range(len(self.recentRoasts)):
+            if self.recentRoasts[i]["title"] == title and self.recentRoasts[i]["weightIn"] == weightIn and self.recentRoasts[i]["weightUnit"] == weightUnit:
+                entry_with_same_title = i
+                break
+        if entry_with_same_title is not None:
+            # we remove the duplicate entry first
+            return self.recentRoasts[:entry_with_same_title] + self.recentRoasts[entry_with_same_title+1:]
+        else:
+            return self.recentRoasts
+
     # d is a recentRoast dict
     def addRecentRoast(self,d):
         try:
             # check for duplications
-            entry_with_same_title = None
-            for i in range(len(self.recentRoasts)):
-                if self.recentRoasts[i]["title"] == d["title"] and self.recentRoasts[i]["weightIn"] == d["weightIn"] and self.recentRoasts[i]["weightUnit"] == d["weightUnit"]:
-                    entry_with_same_title = i
-                    break
-            if entry_with_same_title is not None:
-                # we remove the duplicate entry first
-                rr = self.recentRoasts[:entry_with_same_title] + self.recentRoasts[entry_with_same_title+1:]
-            else:
-                rr = self.recentRoasts
+            rr = self.delRecentRoast(d["title"],d["weightIn"],d["weightUnit"])
             self.recentRoasts = [d] + rr[:self.maxRecentRoasts-1]
             self.updateNewMenuRecentRoasts()
         except Exception as e:
@@ -13188,7 +13207,6 @@ class ApplicationWindow(QMainWindow):
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),exc_tb.tb_lineno)
-        
         
     def recentRoastLabel(self,rr):
         res = rr["title"] + " (" + "%g" % rr["weightIn"] +rr["weightUnit"]+")"
@@ -16497,12 +16515,15 @@ class ApplicationWindow(QMainWindow):
                     self.setCurrentFile(filename)
                     self.qmc.safesaveflag = False
                     
-                    if self.qmc.autosavepdf:
+                    if self.qmc.autosaveimage and not aw.qmc.flagon:
                         if ".alog" in filename:
                             filename = filename[0:-5]
-                        self.saveVectorGraph(extension=".pdf",fname=filename)
-                        self.sendmessage(QApplication.translate("Message","PDF saved", None))    
-                    
+                        if self.qmc.autosaveimageformat == "PDF":
+                            self.saveVectorGraph(extension=".pdf",fname=filename) 
+                        elif self.qmc.autosaveimageformat == "SVG":
+                            self.saveVectorGraph(extension=".svg",fname=filename)
+                        else:
+                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename)                     
                     return filename
                 else:
                     self.sendmessage(QApplication.translate("Message","Autosave path does not exist. Autosave failed.", None))                    
@@ -19169,11 +19190,15 @@ class ApplicationWindow(QMainWindow):
                     self.sendmessage(QApplication.translate("Message","Profile saved", None))
                     aw.curFile = filename
                     self.qmc.safesaveflag = False
-                    if self.qmc.autosavepdf:
+                    if self.qmc.autosaveimage:
                         if ".alog" in filename:
                             filename = filename[0:-5]
-                        self.saveVectorGraph(extension=".pdf",fname=filename)
-                        self.sendmessage(QApplication.translate("Message","PDF saved", None))                    
+                        if self.qmc.autosaveimageformat == "PDF":
+                            self.saveVectorGraph(extension=".pdf",fname=filename)
+                        elif self.qmc.autosaveimageformat == "SVG":
+                            self.saveVectorGraph(extension=".svg",fname=filename)
+                        else:
+                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename)
                 else:
                     self.sendmessage(QApplication.translate("Message","Cancelled", None))
             else:
@@ -19258,8 +19283,22 @@ class ApplicationWindow(QMainWindow):
         self.fileConvert(".xml",self.exportPilot)
 
     def fileConvertPNG(self):
+        self.fileConvertBITMAP("PNG")
+
+    def fileConvertJPEG(self):
+        self.fileConvertBITMAP("JPEG")
+
+    def fileConvertBMP(self):
+        self.fileConvertBITMAP("BMP")
+
+    def fileConvertBITMAP(self,filetype="PNG"):
         files = self.ArtisanOpenFilesDialog(ext="*.alog")
         if files and len(files) > 0:
+            fileext = ".png"
+            if filetype == "JPEG":
+                fileext = ".jpg"
+            elif filetype == "BMP":
+                fileext = ".bmp"
             outdir = self.ArtisanExistingDirectoryDialog()
             progress = QProgressDialog(QApplication.translate("Message", "Converting...",None), None, 0, len(files), self)
             progress.setCancelButton(None)
@@ -19273,15 +19312,22 @@ class ApplicationWindow(QMainWindow):
                     progress.setValue(i)
                     QApplication.processEvents()
                     fname = u(QFileInfo(f).fileName())
-                    fconv = u(QDir(outdir).filePath(fname + u(".png")))
+                    fconv = u(QDir(outdir).filePath(fname + u(fileext)))
                     if not os.path.exists(fconv):
                         aw.qmc.reset(redraw=False,soundOn=False)
                         self.setProfile(f,self.deserialize(f),quiet=True)
                         self.qmc.redraw()
                         self.image = aw.qmc.grab()
-                        self.image.save(fconv,"PNG")
+                        if filetype in ["JPEG","BMP"]:
+                            # transparences are not supported by those file types and are rendered in black by default.
+                            white_img = QPixmap(self.image.size())
+                            white_img.fill() # fills by default with Qt.white
+                            painter = QPainter(white_img)
+                            painter.drawPixmap(0,0,self.image.width(),self.image.height(),self.image)
+                            self.image = white_img
+                        self.image.save(fconv,filetype)
                     else:
-                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(".png")))                        
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(fileext)))                        
                 except:
                     pass
                 i += 1
@@ -20447,7 +20493,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = toInt(settings.value("autosaveflag",self.qmc.autosaveflag))
             if settings.contains("autosavepdf"):
-                self.qmc.autosavepdf = bool(toBool(settings.value("autosavepdf",self.qmc.autosavepdf)))
+                self.qmc.autosaveimage = bool(toBool(settings.value("autosavepdf",self.qmc.autosaveimage)))
+            if settings.contains("autosaveimageformat"):
+                self.qmc.autosaveimageformat = toString(settings.value("autosaveimageformat",self.qmc.autosaveimageformat))
             if settings.contains("autosaveprefix"):
                 self.qmc.autosaveprefix = toString(settings.value("autosaveprefix",self.qmc.autosaveprefix))
             # WebLCDs            
@@ -21467,7 +21515,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("BTBflag",aw.qmc.backgroundBTcurve)
             settings.endGroup()
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
-            settings.setValue("autosavepdf",self.qmc.autosavepdf)
+            settings.setValue("autosavepdf",self.qmc.autosaveimage)
+            settings.setValue("autosaveimageformat",self.qmc.autosaveimageformat)
             settings.setValue("autosaveprefix",self.qmc.autosaveprefix)
             settings.beginGroup("WebLCDs")
             settings.setValue("active",self.WebLCDs)
@@ -25360,17 +25409,33 @@ class ApplicationWindow(QMainWindow):
             self.profilepath = monthpath
 
     #resizes and saves graph to a new width w 
-    def resizeImg(self,w,transformationmode):
-        try:                
-            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None),ext="*.png")
+    def resizeImg(self,w,transformationmode,filetype="PNG",fname=""):
+        try:
+            fileext = ".png"
+            if filetype == "JPEG":
+                fileext = ".jpg"
+            elif filetype == "BMP":
+                fileext = ".bmp"
+            if fname == "" or fname is None:
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as", None) + filetype,ext="*"+fileext)
+            else:
+                filename = fname
             if filename:                
                 self.image = aw.qmc.grab()                
                 if w != 0:
                     self.image = self.image.scaledToWidth(w,transformationmode)
                 
-                if ".png" not in filename:
-                    filename += ".png"
-                self.image.save(filename,"PNG")
+                if not filename.endswith(fileext):
+                    filename += fileext
+                    
+                if filetype in ["JPEG","BMP"]:
+                    # transparences are not supported by those file types and are rendered in black by default.
+                    white_img = QPixmap(self.image.size())
+                    white_img.fill() # fills by default with Qt.white
+                    painter = QPainter(white_img)
+                    painter.drawPixmap(0,0,self.image.width(),self.image.height(),self.image)
+                    self.image = white_img
+                self.image.save(filename,filetype)
                 
                 x = self.image.width()
                 y = self.image.height()
@@ -28908,6 +28973,12 @@ class editGraphDlg(ArtisanDialog):
         self.addRecentButton = QPushButton("+")
         self.addRecentButton.clicked.connect(lambda _:self.addRecentRoast())
         self.addRecentButton.setFocusPolicy(Qt.NoFocus)
+        
+        # delete from recent
+        self.delRecentButton = QPushButton("-")
+        self.delRecentButton.clicked.connect(lambda _:self.delRecentRoast())
+        self.delRecentButton.setFocusPolicy(Qt.NoFocus)
+
         self.recentRoastEnabled()
         
         #bean size
@@ -29154,6 +29225,7 @@ class editGraphDlg(ArtisanDialog):
         titleLine = QHBoxLayout()
         titleLine.addWidget(self.titleedit)
         titleLine.addWidget(self.addRecentButton)
+        titleLine.addWidget(self.delRecentButton)
         titleLine.addSpacing(2)
         titleLine.addWidget(self.titleShowAlwaysFlag) 
         
@@ -29918,7 +29990,6 @@ class editGraphDlg(ArtisanDialog):
                     self.plus_default_store = None # we reset the defaultstore                                    
                 # we now set the actual values from the stock
                 self.populatePlusCoffeeBlendCombos()
-
         self.recentRoastEnabled()
         
     def recentRoastEnabled(self):
@@ -29929,12 +30000,23 @@ class editGraphDlg(ArtisanDialog):
             if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
                 # enable "+" addRecentRoast button
                 self.addRecentButton.setEnabled(True)
+                self.delRecentButton.setEnabled(True)
             else:
                 self.addRecentButton.setEnabled(False)
+                self.delRecentButton.setEnabled(False)
         except:
             self.addRecentButton.setEnabled(False)
+            self.delRecentButton.setEnabled(False)
         
-    
+    def delRecentRoast(self):
+        try:
+            title = u(self.titleedit.currentText())
+            weightIn = float(str(self.weightinedit.text()))
+            weightUnit = u(self.unitsComboBox.currentText())
+            aw.recentRoasts = aw.delRecentRoast(title,weightIn,weightUnit)
+        except:
+            pass
+        
     def addRecentRoast(self):
         try:
             title = u(self.titleedit.currentText())
@@ -31336,10 +31418,14 @@ class autosaveDlg(ArtisanDialog):
         self.autocheckbox = QCheckBox()
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None))
         self.autocheckbox.setChecked(aw.qmc.autosaveflag)        
-        autopdflabel = QLabel(QApplication.translate("CheckBox","Save PDF also", None))
+        autopdflabel = QLabel(QApplication.translate("CheckBox","Save also", None))
         self.autopdfcheckbox = QCheckBox()
-        self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save PDF version alongside .alog profiles",None))
-        self.autopdfcheckbox.setChecked(aw.qmc.autosavepdf)        
+        self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save image alongside .alog profiles",None))
+        self.autopdfcheckbox.setChecked(aw.qmc.autosaveimage)
+        imageTypes = ["PDF", "SVG", "PNG", "JPEG", "BMP"]
+        self.imageTypesComboBox = QComboBox()
+        self.imageTypesComboBox.addItems(imageTypes)
+        self.imageTypesComboBox.setCurrentIndex(imageTypes.index(aw.qmc.autosaveimageformat))
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None)))
@@ -31361,11 +31447,12 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignRight)
         autolayout.addWidget(autochecklabel,0,1)
         autolayout.addWidget(prefixlabel,1,0)
-        autolayout.addWidget(self.prefixEdit,1,1)
+        autolayout.addWidget(self.prefixEdit,1,1,1,2)
         autolayout.addWidget(pathButton,2,0)
-        autolayout.addWidget(self.pathEdit,2,1)
+        autolayout.addWidget(self.pathEdit,2,1,1,2)
         autolayout.addWidget(self.autopdfcheckbox,3,0,Qt.AlignRight)
         autolayout.addWidget(autopdflabel,3,1)
+        autolayout.addWidget(self.imageTypesComboBox,3,2)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(autolayout)
         mainLayout.addStretch()
@@ -31387,7 +31474,8 @@ class autosaveDlg(ArtisanDialog):
             aw.qmc.autosaveflag = 0
             message = QApplication.translate("Message","Autosave OFF", None)
             aw.sendmessage(message)
-        aw.qmc.autosavepdf = self.autopdfcheckbox.isChecked()
+        aw.qmc.autosaveimage = self.autopdfcheckbox.isChecked()
+        aw.qmc.autosaveimageformat = self.imageTypesComboBox.currentText()
         self.close()
 
 ##########################################################################
@@ -43233,7 +43321,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.elevationSpinBox.setRange(0,3000)
         self.elevationSpinBox.setSingleStep(1)
         self.elevationSpinBox.setValue(aw.qmc.elevation)
-        self.elevationSpinBox.setSuffix(" m.a.s.l")
+        self.elevationSpinBox.setSuffix(" " + QApplication.translate("Label","MASL"))
         temperatureDeviceLabel = QLabel(QApplication.translate("Label","Temperature",None))
         humidityDeviceLabel = QLabel(QApplication.translate("Label","Humidity",None))
         pressureDeviceLabel = QLabel(QApplication.translate("Label","Pressure",None))
@@ -51392,7 +51480,7 @@ class PIDcontrol(object):
                 aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
             self.pidActive = False   
         # TC4 hardware PID
-        elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
+        elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag and aw.qmc.Controlbuttonflag: # ArduinoTC4 firmware PID
             if aw.ser.ArduinoIsInitialized:
                 try:
                     #### lock shared resources #####
