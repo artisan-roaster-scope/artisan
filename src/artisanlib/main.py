@@ -403,44 +403,46 @@ app = Artisan(args)
 # will be copied to the new settings location. Once settings exist under "Artisan-Scope" the legacy settings under "YourQuest" will
 # no longer be read or saved.  At start-up, versions of Artisan before to v1.6.0 will no longer share settings with versions v1.6.0 and after. 
 # Settings can be shared among all versions of Artisan by explicitly saving and loading them using Help>Save/Load Settings.
-try:
-    app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
-
-    app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
-    app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
-    legacysettings = QSettings()
-    app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
-    app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system        
-    newsettings = QSettings()
-    
-    settingsRelocated = False
-    # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied 
-    if not newsettings.contains("Mode") and legacysettings.contains("Mode") and not legacysettings.contains("_settingsCopied"): 
-        settingsRelocated = True
-        # copy Artisan settings
-        for key in legacysettings.allKeys():
-            newsettings.setValue(key,legacysettings.value(key))
-        legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
-
-        # copy ArtisanViewer settings
-        app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
-
-        app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
-        legacysettings = QSettings()
-        app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system        
-        newsettings = QSettings()
-        for key in legacysettings.allKeys():
-            newsettings.setValue(key,legacysettings.value(key))
-    del legacysettings   #free up memmory?
-    del newsettings      #free up memmory?
-except:
-    pass
+#try:
+#    app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
+#
+#    app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
+#    app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
+#    legacysettings = QSettings()
+#    app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
+#    app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system        
+#    newsettings = QSettings()
+#    
+#    settingsRelocated = False
+#    # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied 
+#    if not newsettings.contains("Mode") and legacysettings.contains("Mode") and not legacysettings.contains("_settingsCopied"): 
+#        settingsRelocated = True
+#        # copy Artisan settings
+#        for key in legacysettings.allKeys():
+#            newsettings.setValue(key,legacysettings.value(key))
+#        legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
+#
+#        # copy ArtisanViewer settings
+#        app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
+#
+#        app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
+#        app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
+#        legacysettings = QSettings()
+#        app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
+#        app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system        
+#        newsettings = QSettings()
+#        for key in legacysettings.allKeys():
+#            newsettings.setValue(key,legacysettings.value(key))
+#    del legacysettings   #free up memmory?
+#    del newsettings      #free up memmory?
+#except:
+#    pass
     
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system
+#app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
+#app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationName("YourQuest")                                   #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
     
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
@@ -4079,8 +4081,8 @@ class tgraphcanvas(FigureCanvas):
                     self.togglecrosslines()
                     
 #PLUS-COMMENT
-                if aw is not None and not artisanviewerMode:
-                    aw.updatePlusStatus()                                  
+#                if aw is not None and not artisanviewerMode:
+#                    aw.updatePlusStatus()                                  
                     
             except Exception as ex:
 #                import traceback
@@ -7552,17 +7554,17 @@ class tgraphcanvas(FigureCanvas):
 #                        except Exception:
 #                            pass
 #PLUS
-                        if aw.plus_account is not None:
-                            try:
-                                aw.updatePlusStatus()
-                            except:
-                                pass
-                                # add to out-queue
-                            try:
-                                import plus.queue
-                                plus.queue.addRoast()
-                            except:
-                                pass
+#                        if aw.plus_account is not None:
+#                            try:
+#                                aw.updatePlusStatus()
+#                            except:
+#                                pass
+#                                # add to out-queue
+#                            try:
+#                                import plus.queue
+#                                plus.queue.addRoast()
+#                            except:
+#                                pass
 
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
@@ -10125,7 +10127,7 @@ class VMToolbar(NavigationToolbar):
             self.toolitems = (
 
 #PLUS-COMMENT
-                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
+#                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
                 
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -10174,8 +10176,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-        if aw is not None and not artisanviewerMode:
-            aw.updatePlusStatus(self)
+#        if aw is not None and not artisanviewerMode:
+#            aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -10238,9 +10240,9 @@ class VMToolbar(NavigationToolbar):
         return QIcon(pm)
 
 #PLUS
-    def plus(self):
-        import plus.controller
-        plus.controller.toggle(aw)
+#    def plus(self):
+#        import plus.controller
+#        plus.controller.toggle(aw)
         
     def edit_parameters(self):
         try:
@@ -12941,20 +12943,20 @@ class ApplicationWindow(QMainWindow):
         # this variable is bound to the Roast Properties dialog if it is open, set to False to block opening the dialog or None otherwise
         self.editgraphdialog = None 
         
-        # provide information message to user about sharing settings at start-up
-        if settingsRelocated:
-            string =  QApplication.translate("Message","Welcome to version {0} of Artisan!", None).format(__version__) + "\n\n"
-            string += QApplication.translate("Message","This is a one time message to inform you about a change in Artisan.", None) + "\n\n"
-            string += QApplication.translate("Message","If you never run older versions of Artisan you can skip this message, the change does not affect you.", None) + "  "
-# message to long to fit the RPi 7" display
-#            string += QApplication.translate("Message","If you sometimes run older versions of Artisan this change may affect you.", None) + "\n\n"
-            string += QApplication.translate("Message","Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.", None) + "  "
-            string += QApplication.translate("Message","Beginning with release version v2.0, settings will not be automatically shared at start-up with versions before v2.0.", None) + "\n\n"  
-            string += QApplication.translate("Message","Do not worry, Artisan has already loaded your last used settings for you since this is the first time you opened this new version.", None) + "\n\n"
-#            string += QApplication.translate("Message","Artisan settings files (.aset) continue to be compatible between versions.", None) + "  "
-            string += QApplication.translate("Message","To share settings between this version and Artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
-            string += QApplication.translate("Message","Enjoy using Artisan, The Artisan Team", None)
-            QMessageBox.information(aw,QApplication.translate("Message","One time message about loading settings at start-up", None),string)
+#        # provide information message to user about sharing settings at start-up
+#        if settingsRelocated:
+#            string =  QApplication.translate("Message","Welcome to version {0} of Artisan!", None).format(__version__) + "\n\n"
+#            string += QApplication.translate("Message","This is a one time message to inform you about a change in Artisan.", None) + "\n\n"
+#            string += QApplication.translate("Message","If you never run older versions of Artisan you can skip this message, the change does not affect you.", None) + "  "
+## message to long to fit the RPi 7" display
+##            string += QApplication.translate("Message","If you sometimes run older versions of Artisan this change may affect you.", None) + "\n\n"
+#            string += QApplication.translate("Message","Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.", None) + "  "
+#            string += QApplication.translate("Message","Beginning with release version v2.0, settings will not be automatically shared at start-up with versions before v2.0.", None) + "\n\n"  
+#            string += QApplication.translate("Message","Do not worry, Artisan has already loaded your last used settings for you since this is the first time you opened this new version.", None) + "\n\n"
+##            string += QApplication.translate("Message","Artisan settings files (.aset) continue to be compatible between versions.", None) + "  "
+#            string += QApplication.translate("Message","To share settings between this version and Artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
+#            string += QApplication.translate("Message","Enjoy using Artisan, The Artisan Team", None)
+#            QMessageBox.information(aw,QApplication.translate("Message","One time message about loading settings at start-up", None),string)
 
         # provide information message to user about Artisan Viewer the first time it is started
         if artisanviewerFirstStart:
@@ -16819,13 +16821,13 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
 #PLUS-COMMENT          
-                if aw is not None and not artisanviewerMode:
-                    aw.updatePlusStatus()
-                    if aw.plus_account is not None:
-                        import plus.config
-                        if plus.config.uuid_tag in obj:
-                            import plus.sync                            
-                            QTimer.singleShot(100,lambda : plus.sync.sync())
+#                if aw is not None and not artisanviewerMode:
+#                    aw.updatePlusStatus()
+#                    if aw.plus_account is not None:
+#                        import plus.config
+#                        if plus.config.uuid_tag in obj:
+#                            import plus.sync                            
+#                            QTimer.singleShot(100,lambda : plus.sync.sync())
                                     
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -19155,12 +19157,12 @@ class ApplicationWindow(QMainWindow):
                 if pf:
 
 #PLUS-COMMENT  
-                    if not artisanviewerMode and aw.plus_account is not None:
-                        import plus.controller
-                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-                        if sync_record_hash is not None:
-                            # we add the hash over the sync record to be able to detect offline changes
-                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+#                    if not artisanviewerMode and aw.plus_account is not None:
+#                        import plus.controller
+#                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+#                        if sync_record_hash is not None:
+#                            # we add the hash over the sync record to be able to detect offline changes
+#                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
 
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
@@ -19423,12 +19425,12 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
-                self.plus_account = settings.value("plus_account",self.plus_account)
-                if settings.contains("plus_remember_credentials"):
-                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
-                if settings.contains("plus_email"):
-                    self.plus_email = settings.value("plus_email",self.plus_email)
+#            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
+#                self.plus_account = settings.value("plus_account",self.plus_account)
+#                if settings.contains("plus_remember_credentials"):
+#                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+#                if settings.contains("plus_email"):
+#                    self.plus_email = settings.value("plus_email",self.plus_email)
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -20597,14 +20599,14 @@ class ApplicationWindow(QMainWindow):
                 if platf != 'Darwin':
                     aw.fullscreenAction.setChecked(True)
             
-            #PLUS-COMMENT
-            if filename is None and not artisanviewerMode and self.plus_account is not None:
-                try:
-                    import plus.controller
-                    plus.controller.start(aw)
-                except:
-                    pass
-            #aw.updatePlusStatus()
+#PLUS-COMMENT
+#            if filename is None and not artisanviewerMode and self.plus_account is not None:
+#                try:
+#                    import plus.controller
+#                    plus.controller.start(aw)
+#                except:
+#                    pass
+#            #aw.updatePlusStatus()
             
             QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
                             
