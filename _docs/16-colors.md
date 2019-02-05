@@ -10,8 +10,6 @@ toc: false
 
 Menu>Config>Colors
 
-New color themes and color management options are available in 1.3.  
-
 Almost every color used in Artisan can now be configured.  All these colors are saved in themes.  If your foreground and background colors are too similar you will get a message to check them out.  
 
 Also new are enhanced dialogs that display the chosen colors within the dialog. See the buttons example on the [events](https://artisan-scope.org/docs/events/) page.

@@ -12,7 +12,7 @@ Menu>Confg> Sampling Interval
 
 ![probes meter app](/assets/images/gsg/probes meter app.png)
 
-The default for sampling is set to 3s.  For a Phidget device one second is possible, and Artisan 1.3 goes down to .5s.  Oversampling will take two readings per interval and average them.
+The default for sampling is set to 3s.  For a Phidget device one second is possible, and Artisan goes down to .5s.  Oversampling will take two readings per interval and average them.
 
 If you go below a 3s interval you will get a popup warning ![interval warning](/assets/images/gsg/sampling interval warning.png)
 

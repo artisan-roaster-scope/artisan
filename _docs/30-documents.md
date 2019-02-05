@@ -26,7 +26,7 @@ toc: false
   - [Using Phidget Network Server](https://wbcoffee.blogspot.tw/2018/03/using-phidgets-network-server.html)
 
 
-* Measuring Air pressure in Artisan
+*  Measuring Air pressure in Artisan
 
   - [Installing Phidget 1136 Differential Air Pressure Sensor in Artisan](https://wbcoffee.blogspot.com/2018/04/installing-phidget-1136-differential.html)
   - [Home Barista discussion thread](https://www.home-barista.com/home-roasting/help-setting-up-air-pressure-phidget-into-artisan-t51761.html)
