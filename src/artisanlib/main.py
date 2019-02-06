@@ -23437,13 +23437,21 @@ class ApplicationWindow(QMainWindow):
             for i in range(len(self.qmc.specialevents)):
                 temps = ""
                 if self.qmc.mode == "F":
-                    temps += "%.1fF"%self.qmc.temp2[sevents[i][0]] + " / " + "%.1fF"%self.qmc.temp1[sevents[i][0]]
+                    formatString = "%.1fF"
                 else:
-                    temps += "%.1f&deg;C"%self.qmc.temp2[sevents[i][0]] + " / " "%.1f&deg;C"%self.qmc.temp1[sevents[i][0]]
+                    formatString = "%.1f&deg;C"
+                if self.qmc.temp1[sevents[i][0]] == -1 and self.qmc.temp2[sevents[i][0]] == -1:
+                    temps += " -- "
+                elif self.qmc.temp1[sevents[i][0]] == -1:
+                    temps += formatString%self.qmc.temp2[sevents[i][0]]
+                elif self.qmc.temp2[sevents[i][0]] == -1:
+                    temps += formatString%self.qmc.temp1[sevents[i][0]]
+                else:
+                    temps += formatString%self.qmc.temp2[sevents[i][0]] + " / " + formatString%self.qmc.temp1[sevents[i][0]]
                 html += ("<tr>"+
                      "\n<td>" + str(i+1) + "</td><td>" +
                      self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i][0]] - start)) +
-                     "</td><td>at " + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
+                     "</td><td align='right'>" + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
             html += '</table>\n</center>'
         return u(html)
 
