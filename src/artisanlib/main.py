@@ -399,17 +399,17 @@ if platf == 'Windows':
         pass
 app = Artisan(args)
 
-# On the first run if there are legacy settings under "YourQuest" but no new settings under "Artisan-Scope" then the legacy settings 
-# will be copied to the new settings location. Once settings exist under "Artisan-Scope" the legacy settings under "YourQuest" will
-# no longer be read or saved.  At start-up, versions of Artisan before to v1.6.0 will no longer share settings with versions v1.6.0 and after. 
-# Settings can be shared among all versions of Artisan by explicitly saving and loading them using Help>Save/Load Settings.
+# On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings 
+# will be copied to the new settings location. Once settings exist under "artisan-scope" the legacy settings under "YourQuest" will
+# no longer be read or saved.  At start-up, versions of artisan before to v1.6.0 will no longer share settings with versions v1.6.0 and after. 
+# Settings can be shared among all versions of artisan by explicitly saving and loading them using Help>Save/Load Settings.
 try:
     app.setApplicationName("artisan")                                       #needed by QSettings() to store windows geometry in operating system
 
     app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
     app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
     legacysettings = QSettings()
-    app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
+    app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
     app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system        
     newsettings = QSettings()
     
@@ -417,18 +417,18 @@ try:
     # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied 
     if not newsettings.contains("Mode") and legacysettings.contains("Mode") and not legacysettings.contains("_settingsCopied"): 
         settingsRelocated = True
-        # copy Artisan settings
+        # copy artisan settings
         for key in legacysettings.allKeys():
             newsettings.setValue(key,legacysettings.value(key))
         legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
 
-        # copy ArtisanViewer settings
+        # copy artisanViewer settings
         app.setApplicationName("artisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
 
         app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
         app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
         legacysettings = QSettings()
-        app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
+        app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
         app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system        
         newsettings = QSettings()
         for key in legacysettings.allKeys():
@@ -438,8 +438,8 @@ try:
 except:
     pass
     
-app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
+app.setApplicationName("artisan")                                       #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system
     
 if platf == 'Windows':
@@ -2900,7 +2900,7 @@ class tgraphcanvas(FigureCanvas):
                     f = u("file:///") + u(QApplication.applicationDirPath()) + "/" + u(fname)
                     res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
                 else:
-                    # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
+                    # MacOS X: script is expected to sit next to the artisan.app or being specified with its full path
                     # Linux: script is expected to sit next to the artisan binary or being specified with its full path
                     #
                     # to get the effect of speaking alarms a text containing the following two lines called "say.sh" could do
@@ -6273,7 +6273,7 @@ class tgraphcanvas(FigureCanvas):
         #load selected dictionary
         if color == 1:
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
-            fname = os.path.join(aw.getResourcePath(),"Themes","Artisan","Default.athm")
+            fname = os.path.join(aw.getResourcePath(),"Themes","artisan","Default.athm")
             if os.path.isfile(fname) and not self.flagon:
                 aw.loadSettings(fn=fname,remember=False,reset=False)
                 aw.sendmessage(QApplication.translate("Message","Colors set to Default Theme", None))
@@ -11130,7 +11130,7 @@ class ApplicationWindow(QMainWindow):
         self.userprofilepath = self.profilepath
 
         self.printer = QPrinter(QPrinter.HighResolution)
-        self.printer.setCreator("Artisan")
+        self.printer.setCreator("artisan")
 
         self.main_widget = QWidget(self)
         #set a minimum size (main window can be bigger but never smaller)
@@ -11339,11 +11339,11 @@ class ApplicationWindow(QMainWindow):
 
         self.importMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_IMPORT)
 
-        fileImportCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
+        fileImportCSVAction = QAction(QApplication.translate("Menu", "artisan CSV...",None),self)
         fileImportCSVAction.triggered.connect(self.fileImportCSV)
         self.importMenu.addAction(fileImportCSVAction)
 
-        fileImportJSONAction = QAction(QApplication.translate("Menu", "Artisan JSON...",None),self)
+        fileImportJSONAction = QAction(QApplication.translate("Menu", "artisan JSON...",None),self)
         fileImportJSONAction.triggered.connect(self.fileImportJSON)
         self.importMenu.addAction(fileImportJSONAction)
         
@@ -11390,11 +11390,11 @@ class ApplicationWindow(QMainWindow):
 
         self.exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_EXPORT)
 
-        fileExportCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
+        fileExportCSVAction = QAction(QApplication.translate("Menu", "artisan CSV...",None),self)
         fileExportCSVAction.triggered.connect(self.fileExportCSV)
         self.exportMenu.addAction(fileExportCSVAction)
 
-        fileExportJSONAction = QAction(QApplication.translate("Menu", "Artisan JSON...",None),self)
+        fileExportJSONAction = QAction(QApplication.translate("Menu", "artisan JSON...",None),self)
         fileExportJSONAction.triggered.connect(self.fileExportJSON)
         self.exportMenu.addAction(fileExportJSONAction)
         
@@ -11433,11 +11433,11 @@ class ApplicationWindow(QMainWindow):
         
         self.convMenu.addSeparator()
 
-        fileConvertCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
+        fileConvertCSVAction = QAction(QApplication.translate("Menu", "artisan CSV...",None),self)
         fileConvertCSVAction.triggered.connect(self.fileConvertCSV)
         self.convMenu.addAction(fileConvertCSVAction)
 
-        fileConvertJSONAction = QAction(QApplication.translate("Menu", "Artisan JSON...",None),self)
+        fileConvertJSONAction = QAction(QApplication.translate("Menu", "artisan JSON...",None),self)
         fileConvertJSONAction.triggered.connect(self.fileConvertJSON)
         self.convMenu.addAction(fileConvertJSONAction)
         
@@ -12934,31 +12934,31 @@ class ApplicationWindow(QMainWindow):
         
         # provide information message to user about sharing settings at start-up
         if settingsRelocated:
-            string =  QApplication.translate("Message","Welcome to version {0} of Artisan!", None).format(__version__) + "\n\n"
-            string += QApplication.translate("Message","This is a one time message to inform you about a change in Artisan.", None) + "\n\n"
-            string += QApplication.translate("Message","If you never run older versions of Artisan you can skip this message, the change does not affect you.", None) + "  "
+            string =  QApplication.translate("Message","Welcome to version {0} of artisan!", None).format(__version__) + "\n\n"
+            string += QApplication.translate("Message","This is a one time message to inform you about a change in artisan.", None) + "\n\n"
+            string += QApplication.translate("Message","If you never run older versions of artisan you can skip this message, the change does not affect you.", None) + "  "
 # message to long to fit the RPi 7" display
-#            string += QApplication.translate("Message","If you sometimes run older versions of Artisan this change may affect you.", None) + "\n\n"
-            string += QApplication.translate("Message","Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.", None) + "  "
+#            string += QApplication.translate("Message","If you sometimes run older versions of artisan this change may affect you.", None) + "\n\n"
+            string += QApplication.translate("Message","artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start artisan.", None) + "  "
             string += QApplication.translate("Message","Beginning with release version v2.0, settings will not be automatically shared at start-up with versions before v2.0.", None) + "\n\n"  
-            string += QApplication.translate("Message","Do not worry, Artisan has already loaded your last used settings for you since this is the first time you opened this new version.", None) + "\n\n"
-#            string += QApplication.translate("Message","Artisan settings files (.aset) continue to be compatible between versions.", None) + "  "
-            string += QApplication.translate("Message","To share settings between this version and Artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
-            string += QApplication.translate("Message","Enjoy using Artisan, The Artisan Team", None)
+            string += QApplication.translate("Message","Do not worry, artisan has already loaded your last used settings for you since this is the first time you opened this new version.", None) + "\n\n"
+#            string += QApplication.translate("Message","artisan settings files (.aset) continue to be compatible between versions.", None) + "  "
+            string += QApplication.translate("Message","To share settings between this version and artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
+            string += QApplication.translate("Message","Enjoy using artisan, The artisan team", None)
             QMessageBox.information(aw,QApplication.translate("Message","One time message about loading settings at start-up", None),string)
 
-        # provide information message to user about Artisan Viewer the first time it is started
+        # provide information message to user about artisanViewer the first time it is started
         if artisanviewerFirstStart:
-            string =  QApplication.translate("Message","Welcome to the Artisan Viewer!", None).format(__version__) + "\n\n"
-            string += QApplication.translate("Message","This is a one time message to introduce you to the Artisan Viewer.", None) + "\n\n"
-            string += QApplication.translate("Message","The Artisan Viewer opens whenever a copy of Artisan is already running.", None) + "  "
-            string += QApplication.translate("Message","Only one instance of Artisan able to record profiles may be open.", None) + "  "
-            string += QApplication.translate("Message","Multiple instances of Artisan Viewer can be open at the same time.", None) + "\n\n"  
-            string += QApplication.translate("Message","Artisan Viewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start Artisan Viewer.", None) + "\n\n"
-            string += QApplication.translate("Message","Caution, the only way to share settings between Artisan and Artisan Viewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
-            string += QApplication.translate("Message","Enjoy using Artisan Viewer,", None) +"\n"
-            string += QApplication.translate("Message","The Artisan Team", None)
-            QMessageBox.information(aw,QApplication.translate("Message","One time message about Artisan Viewer", None),string)
+            string =  QApplication.translate("Message","Welcome to the artisanViewer!", None).format(__version__) + "\n\n"
+            string += QApplication.translate("Message","This is a one time message to introduce you to the artisanViewer.", None) + "\n\n"
+            string += QApplication.translate("Message","The artisanViewer opens whenever a copy of artisan is already running.", None) + "  "
+            string += QApplication.translate("Message","Only one instance of artisan able to record profiles may be open.", None) + "  "
+            string += QApplication.translate("Message","Multiple instances of artisanViewer can be open at the same time.", None) + "\n\n"  
+            string += QApplication.translate("Message","artisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start artisanViewer.", None) + "\n\n"
+            string += QApplication.translate("Message","Caution, the only way to share settings between artisan and artisanViewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
+            string += QApplication.translate("Message","Enjoy using artisanViewer,", None) +"\n"
+            string += QApplication.translate("Message","The artisan team", None)
+            QMessageBox.information(aw,QApplication.translate("Message","One time message about artisanViewer", None),string)
             settings.setValue("Mode",self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
 
         # we connect the signals
@@ -13331,7 +13331,7 @@ class ApplicationWindow(QMainWindow):
                 aw.loadSettings(fn=action.data(),remember=False)
                 aw.establish_etypes()
                 aw.qmc.machinesetup = action.text()
-                aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(action.text()))
+                aw.sendmessage(QApplication.translate("Message","artisan configured for {0}",None).format(action.text()))
                 if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
                     host,res = QInputDialog.getText(self,
                         QApplication.translate("Message", "Machine",None),
@@ -13391,7 +13391,7 @@ class ApplicationWindow(QMainWindow):
     def populateThemeMenu(self):
         self.themeMenu.clear()
         self.populateListMenu("Themes",".athm",self.openThemeSettings,self.themeMenu, False, True)
-        submenu = self.themeMenu.addMenu("User")
+        submenu = self.themeMenu.addMenu("user")
         for i in range(self.MaxRecentFiles):
             submenu.addAction(self.recentThemeActs[i])
 
@@ -15488,7 +15488,7 @@ class ApplicationWindow(QMainWindow):
                 
                 
     def calc_env(self):
-        # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
+        # we try to set the users standard environment, replacing the one pointing to the restrictive python build in artisan
         my_env = os.environ.copy()
         try:
             for v in ['PYTHONHOME','PYTHONPATH','LD_LIBRARY_PATH']:
@@ -15501,8 +15501,8 @@ class ApplicationWindow(QMainWindow):
                     proc = subprocess.Popen(command, stdout = subprocess.PIPE)
                     for line in proc.stdout:
                         (key, _, value) = line.partition("=")
-                        # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
-                        if not ((key in ['PYTHONHOME','PYTHONPATH']) and (("Artisan.app" in value) or "artisan" in value)):
+                        # don't copy PYTHONHOME nor PYTHONPATH if it points to the artisan.app
+                        if not ((key in ['PYTHONHOME','PYTHONPATH']) and (("artisan.app" in value) or "artisan" in value)):
                             my_env[key] = value
                     proc.communicate()
                 except:
@@ -15677,9 +15677,9 @@ class ApplicationWindow(QMainWindow):
 
     def resetApplication(self):
         if artisanviewerMode:
-            string = QApplication.translate("Message","Do you want to reset all settings?<br> ArtisanViewer has to be restarted!", None)
+            string = QApplication.translate("Message","Do you want to reset all settings?<br>artisanViewer has to be restarted!", None)
         else:
-            string = QApplication.translate("Message","Do you want to reset all settings?<br> Artisan has to be restarted!", None)
+            string = QApplication.translate("Message","Do you want to reset all settings?<br>artisan has to be restarted!", None)
         reply = QMessageBox.warning(aw,QApplication.translate("Message","Factory Reset", None),string,
                             QMessageBox.Cancel | QMessageBox.Reset)
         if reply == QMessageBox.Reset :
@@ -17223,7 +17223,7 @@ class ApplicationWindow(QMainWindow):
             if COOL > 0:
                 self.qmc.timeindex[7] = self.time2index(COOL)
             self.qmc.endofx = self.qmc.timex[-1]
-            self.sendmessage(QApplication.translate("Message","Artisan CSV file loaded successfully", None))
+            self.sendmessage(QApplication.translate("Message","artisan CSV file loaded successfully", None))
             self.qmc.safesaveflag = True            
             aw.autoAdjustAxis()
             self.qmc.redraw()
@@ -17330,7 +17330,7 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             pass
 
-    #Write readings to Artisan JSON file
+    #Write readings to artisan JSON file
     def exportJSON(self,filename):
         try:
             outfile = open(filename, 'w')
@@ -17885,7 +17885,7 @@ class ApplicationWindow(QMainWindow):
         if error_msg: 
             aw.qmc.adderror(QApplication.translate("Error Message","Roastlogger log file exception: " + error_msg,None))
 
-    #Write readings to Artisan csv file
+    #Write readings to artisan csv file
     def exportCSV(self,filename):
         try:
             if len(self.qmc.timex) > 0:
@@ -17996,7 +17996,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportCSV() {0}").format(str(ex)),exc_tb.tb_lineno)
             return False
 
-    #Write readings to Artisan Excel file
+    #Write readings to artisan Excel file
     def exportExcel(self,filename):
         try:
             if len(self.qmc.timex) > 0:
@@ -18762,7 +18762,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     return res
 
-    # returns data that is computed by Artisan out of raw profile data using some formulas 
+    # returns data that is computed by artisan out of raw profile data using some formulas 
     # and displayed to users e.g. as part of the Report to users and stored along profiles to be used by external programs
     # in case a value cannot be computed the corresponding entry is missing in the resulting dict
     def computedProfileInformation(self):
@@ -21751,7 +21751,7 @@ class ApplicationWindow(QMainWindow):
             return
         if self.printer is None:
             self.printer = QPrinter(QPrinter.HighResolution)
-            self.printer.setCreator("Artisan")
+            self.printer.setCreator("artisan")
         form = QPrintDialog(self.printer, self)
         if form.exec_():
             painter = QPainter(self.printer)
@@ -23945,9 +23945,9 @@ class ApplicationWindow(QMainWindow):
         if __build__ != "0":
             build = " build " + __build__
         if artisanviewerMode:
-            name = "ArtisanViewer"
+            name = "artisanViewer"
         else:
-            name = "Artisan"
+            name = "artisan"
         box.about(self,
                 QApplication.translate("About", "About",None),
                 u("""<h2>{0} {1}{16} ({2})</h2>
@@ -23985,8 +23985,8 @@ class ApplicationWindow(QMainWindow):
     def applicationscreenshot(self):
         imag = self.grab()
         fmt = 'png'
-        initialPath = QDir.currentPath() + "/ArtisanScreenshot." + fmt
-        fileName = u(QFileDialog.getSaveFileName(self, "Artisan ScreenShot",
+        initialPath = QDir.currentPath() + "/artisan-creenshot." + fmt
+        fileName = u(QFileDialog.getSaveFileName(self, "artisan ScreenShot",
                 initialPath,
                 "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0])
         if fileName:
@@ -24483,7 +24483,7 @@ class ApplicationWindow(QMainWindow):
     def saveSettings_theme(self):
         path = QDir()
         path.setPath(self.getDefaultPath())
-        path.setPath(os.path.join(self.getResourcePath(),"Themes","User"))
+        path.setPath(os.path.join(self.getResourcePath(),"Themes","user"))
         fname = path.absoluteFilePath(QApplication.translate("Message","artisan-theme", None))
         filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Theme",None), path=fname, ext="*.athm")
         if filename:
@@ -25257,7 +25257,7 @@ class ApplicationWindow(QMainWindow):
                 for i in range(1,6):
                     try:
                         idx = obj[labels[i-1]]
-                        # RoastTime seems to interpret all index values 1 based, while Artisan takes the 0 based approach. We substruct 1
+                        # RoastTime seems to interpret all index values 1 based, while artisan takes the 0 based approach. We substruct 1
                         if idx > 1:
                             aw.qmc.timeindex[i] = idx - 1
                     except:
@@ -31203,7 +31203,7 @@ class platformDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(platformDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Platform", None))
+        self.setWindowTitle(QApplication.translate("Form Caption","artisan Platform", None))
         platformdic = {}
         platformdic["Architecture"] = str(platform.architecture())
         platformdic["Machine"] = str(platform.machine())
@@ -34878,7 +34878,7 @@ class flavorDlg(ArtisanDialog):
             
         defaultlabel = QLabel(QApplication.translate("Label","Default",None))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","WCRC","*CUSTOM*"])
+        self.defaultcombobox.addItems(["","artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","WCRC","*CUSTOM*"])
         self.defaultcombobox.setCurrentIndex(0)
         self.lastcomboboxIndex = 0
         self.defaultcombobox.currentIndexChanged.connect(self.setdefault)
@@ -35050,7 +35050,7 @@ class flavorDlg(ArtisanDialog):
             # store the current labels as *CUSTOM*
             aw.qmc.customflavorlabels = aw.qmc.flavorlabels
         dindex =  self.defaultcombobox.currentIndex()
-        #["","Artisan","SCCA","CQI","SweetMarias","C","E","coffeegeek","Intelligentsia","WCRC"]
+        #["","artisan","SCCA","CQI","SweetMarias","C","E","coffeegeek","Intelligentsia","WCRC"]
         if dindex > 0 or dindex < 11:
             aw.qmc.flavorstartangle = 90
         if dindex == 1:
@@ -36535,7 +36535,7 @@ class serialport(object):
         elif (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or \
                 (aw.qmc.device == 53) or \
                 (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl()):
-                # TC4, HOTTOP or MODBUS with Artisan Software PID
+                # TC4, HOTTOP or MODBUS with artisan Software PID
             return aw.qmc.timeclock.elapsed()/1000., min(100,max(-100,aw.qmc.pid.getDuty())), aw.qmc.pid.target
         else:
             if aw.pidcontrol.sv is not None:
@@ -36649,7 +36649,7 @@ class serialport(object):
     def callprogram(self):
         try:
 #            output = os.popen(aw.ser.externalprogram,"r").readline()
-            # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
+            # we try to set the users standard environment, replacing the one pointing to the restrictive python build in artisan
             my_env = aw.calc_env()
         
             # hide the console window on Windows 
@@ -47194,7 +47194,7 @@ class PXRpidDlgControl(ArtisanDialog):
         PointButtonBT.setFocusPolicy(Qt.NoFocus)
         PointButtonET.setMaximumWidth(250)
         PointButtonBT.setMaximumWidth(250)
-        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
+        pointlabel = QLabel(QApplication.translate("Label","artisan uses 1 decimal point",None))
         PointButtonET.clicked.connect(lambda _: self.setpoint("ET"))
         PointButtonBT.clicked.connect(lambda _: self.setpoint("BT"))
         
@@ -48269,11 +48269,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
         PointButtonBT.setFocusPolicy(Qt.NoFocus)
         timeunitsbutton = QPushButton(QApplication.translate("Button","Set ET PID to MM:SS time units",None))
         timeunitsbutton.setFocusPolicy(Qt.NoFocus)
-        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
+        pointlabel = QLabel(QApplication.translate("Label","artisan uses 1 decimal point",None))
         if aw.ser.controlETpid[0] == 0:
-            timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None))
+            timelabel = QLabel(QApplication.translate("Label","artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None))
         else:
-            timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXF uses MINUTES:SECONDS units in Ramp/Soaks",None))        
+            timelabel = QLabel(QApplication.translate("Label","artisan Fuji PXF uses MINUTES:SECONDS units in Ramp/Soaks",None))        
         PointButtonET.clicked.connect(lambda _: self.setpoint("ET"))
         PointButtonBT.clicked.connect(lambda _: self.setpoint("BT"))
         timeunitsbutton.clicked.connect(lambda _:self.settimeunits())
@@ -51849,7 +51849,7 @@ sys.excepthook = excepthook
 
 
 # the following avoids the "No document could be created" dialog and the Console message
-# "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
+# "The artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
 if sys.platform.startswith("darwin"):
     from Cocoa import NSDocument  # @UnresolvedImport
     class Document(NSDocument):
@@ -51871,7 +51871,7 @@ def main():
     artisanviewerFirstStart = False
     if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
         artisanviewerMode = True
-        app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
+        app.setApplicationName("artisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
         viewersettings = QSettings()
         if not viewersettings.contains("Mode"):
             artisanviewerFirstStart = True
