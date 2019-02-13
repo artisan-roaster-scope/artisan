@@ -2260,7 +2260,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
 
-#PLUS:
+#PLUS
             elif not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==1 and event.dblclick==True and \
                     event.x < event.y and aw.plus_account is not None and aw.qmc.roastUUID is not None:
                 import plus.util
@@ -2701,9 +2701,7 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)            
-#        finally:
-#            if aw.qmc.samplingsemaphore.available() < 1:
-#                aw.qmc.samplingsemaphore.release(1)
+
 
     def updateLCDtime(self):
         if self.flagon and self.flagstart:
@@ -3866,11 +3864,13 @@ class tgraphcanvas(FigureCanvas):
         else:
             if soundOn:
                 aw.soundpop()
-            try:
                 
+            try:
                 # the RESET button action needs to be fired outside of the sempaphore to avoid lockups
                 aw.eventactionx(aw.qmc.xextrabuttonactions[0],aw.qmc.xextrabuttonactionstrings[0])
-
+            except:
+                pass
+            try:
                 #### lock shared resources #####
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagon:
@@ -6448,9 +6448,13 @@ class tgraphcanvas(FigureCanvas):
                     ha = "left"
                 else:
                     ha = "right"
-                self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
+                anno = self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
                                     fontproperties=fontprop_small,
                                     xytext=(angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
+                try:
+                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                except: # mpl before v3.0 do not have this set_in_layout() function
+                    pass                                    
     
             score = 0.
             for i in range(nflavors):
@@ -7017,6 +7021,10 @@ class tgraphcanvas(FigureCanvas):
                         tx = self.timex[self.timeindex[0]]
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                         self.l_annotations += self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass                        
                         # mark active slider values that are not zero 
                
                         for slidernr in range(4):
@@ -7081,6 +7089,10 @@ class tgraphcanvas(FigureCanvas):
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
                     self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down)
+                    try:
+                        self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                    except: # mpl before v3.0 do not have this set_in_layout() function
+                        pass
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
                     st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
@@ -7137,6 +7149,10 @@ class tgraphcanvas(FigureCanvas):
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[1]
@@ -7222,6 +7238,10 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass  
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[2]
@@ -7301,6 +7321,10 @@ class tgraphcanvas(FigureCanvas):
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass  
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -7380,6 +7404,10 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass  
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -7459,6 +7487,10 @@ class tgraphcanvas(FigureCanvas):
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -7560,6 +7592,10 @@ class tgraphcanvas(FigureCanvas):
                         elif self.timeindex[1]:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         # this might block:
@@ -7569,17 +7605,17 @@ class tgraphcanvas(FigureCanvas):
 #                        except Exception:
 #                            pass
 #PLUS
-#                        if aw.plus_account is not None:
-#                            try:
-#                                aw.updatePlusStatus()
-#                            except:
-#                                pass
-#                                # add to out-queue
-#                            try:
-#                                import plus.queue
-#                                plus.queue.addRoast()
-#                            except:
-#                                pass
+                        if aw.plus_account is not None:
+                            try:
+                                aw.updatePlusStatus()
+                            except:
+                                pass
+                                # add to out-queue
+                            try:
+                                import plus.queue
+                                plus.queue.addRoast()
+                            except:
+                                pass
 
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
@@ -7745,6 +7781,10 @@ class tgraphcanvas(FigureCanvas):
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -9942,12 +9982,16 @@ class tgraphcanvas(FigureCanvas):
                     bar[z].set_url(str(z) + "-" + str(count))
                     fontprop = aw.mpl_fontproperties.copy()
                     fontprop.set_size(self.wheeltextsize[z])
-                    self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
+                    anno = self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
                         rotation=textangles[z][count],
                         horizontalalignment='center',
                         verticalalignment="center",
                         color=aw.qmc.wheeltextcolor,
                         fontproperties=fontprop)
+                    try:
+                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                    except: # mpl before v3.0 do not have this set_in_layout() function
+                        pass                          
                     count += 1
             self.fig.canvas.draw()
 
@@ -10255,9 +10299,9 @@ class VMToolbar(NavigationToolbar):
         return QIcon(pm)
 
 #PLUS
-#    def plus(self):
-#        import plus.controller
-#        plus.controller.toggle(aw)
+    def plus(self):
+        import plus.controller
+        plus.controller.toggle(aw)
         
     def edit_parameters(self):
         try:
@@ -11100,7 +11144,7 @@ class EventActionThread(QThread):
 class ApplicationWindow(QMainWindow):
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
-#PLUS:
+#PLUS
     updatePlusStatusSignal = pyqtSignal() # can be called from another thread or a QTimer to trigger to update the plus icon status
     setTitleSignal = pyqtSignal(str,bool) # can be called from another thread or a QTimer to set the profile title in the main GUI thread
     sendmessageSignal = pyqtSignal(str)
@@ -11109,7 +11153,7 @@ class ApplicationWindow(QMainWindow):
     
         self.superusermode = False
         
-#PLUS:        
+#PLUS
         self.plus_account = None # if set to a login string, Artisan plus features are enabled
         self.plus_remember_credentials = True # store plus account credentials in systems keychain
         self.plus_email = None # if self.plus_remember_credentials is ticked, we remember here the login to be pre-set as plus_account in the dialog
@@ -12990,7 +13034,7 @@ class ApplicationWindow(QMainWindow):
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
         self.setTitleSignal.connect(self.qmc.setProfileTitle)
         self.sendmessageSignal.connect(self.sendmessage)
-#PLUS:
+#PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatus)
 
     
@@ -13010,7 +13054,7 @@ class ApplicationWindow(QMainWindow):
         else: # we reset the tare value
             self.channel_tare_values[n] = 0
     
-#PLUS:    
+#PLUS
     def updatePlusStatus(self,ntb=None):
         if ntb is None:
             ntb = self.ntb
@@ -29283,7 +29327,7 @@ class editGraphDlg(ArtisanDialog):
             label_font = self.plus_selected_line.font()
             label_font.setPointSize(label_font.pointSize() -2)
             self.plus_selected_line.setFont(label_font)
-            self.populatePlusCoffeeBlendCombos()                    
+            self.populatePlusCoffeeBlendCombos()
             # layouting
             self.plus_coffees_combo.setMinimumContentsLength(15)
             self.plus_blends_combo.setMinimumContentsLength(10)
@@ -29552,7 +29596,7 @@ class editGraphDlg(ArtisanDialog):
         try:
             if aw.plus_account is not None:
                 import plus.stock
-                plus.stock.update()                
+                plus.stock.update()
                 QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
         except:
             pass
@@ -30196,6 +30240,13 @@ class editGraphDlg(ArtisanDialog):
                 if wi != 0.0:
                     le.setText("%g" % aw.float2float(aw.convertWeight(wi,o,i),4))
         self.calculated_density()
+#PLUS
+        try:
+            # weight unit changed, we update the coffee/blend lists in plus mode
+            if aw.plus_account is not None:
+                self.populatePlusCoffeeBlendCombos(self.plus_stores_combo.currentIndex())
+        except:
+            pass
 
     def changeVolumeUnit(self,i):
         o = aw.qmc.volume_units.index(aw.qmc.volume[2]) # previous unit index
@@ -30818,13 +30869,6 @@ class editGraphDlg(ArtisanDialog):
             self.calculateddensitylabel.setText("")
             self.tab1aLayout.removeWidget(self.calculateddensitylabel)
         self.calculated_organic_loss()
-#PLUS
-        try:
-            # weight unit changed, we update the coffee/blend lists in plus mode
-            if aw.plus_account is not None:
-                self.populatePlusCoffeeBlendCombos(self.plus_stores_combo.currentIndex())
-        except:
-            pass
             
     def calc_organic_loss(self):
         wloss = 0. # weight (moisture + organic)

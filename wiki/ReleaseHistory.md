@@ -2,6 +2,68 @@ Detailed Release History
 ========================
 
 ----
+v1.6.1
+------------------
+
+ * New Features
+   - adds focus indicator to event sliders
+   - extends the import alarms action to load alarms also from .alog profiles besides 
+  dedicated Artisan alarm files (.alrm)
+   - hide/show curves via click to corresponding entry in the legend
+   - adds IO Command state feedback by mfurlotti ([PR #284](../../../pull/284))
+   - adds support for more digital output Phidgets [REL1000](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=966), [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720) and the first 4 channels of [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721) ([Issue #286](../../../issues/286))
+   - adds support for the Phidget [DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961) (current/frequency/digital/voltage input)
+   - adds support for the Probat Middleware
+   - adds CMD-A keyboard shortcut to open alarms dialog
+   - adds JPEG and BMP support (export/convert)
+   - adds selection of autosave image type
+   - adds batch number to title already during recording
+   - adds a button to remove recent roast entries
+   - adds Brazilian portuguese (as spoken in Brazil)
+ * Changes
+   - improved Phidgets tab rendering
+   - store reference to profile instead of background with recent roasts
+   - faster draggable legend using bit blit on Mac OS X
+   - improved timestamping for async Phidgets mode
+   - updated default RoR limits (0-20C and 0-35F)
+   - faster attach of Phidget devices
+   - extends the range of allowed event values in the mini editor from 0-100 to 0-9999
+   - allow to control Hottop 2k+ while not logging
+   - udated French translations (thanks Nico!)
+ * Fixes
+   - fixes feature interaction between NewRoast and AlwaysOn that caused a hang ([Issue 275](../../../issues/275))
+   - fixes sliders single step action
+   - fixes the air and drum speed slider synchronization in the Probatone 7" setup
+   - translates 1045 ambient readings correctly to Fahrenheit in Fahrenheit mode
+   - improve accuracy of MET marker location
+   - improved stability of Phidget Ambient Sensor attach
+   - channel selection fix for Phidget OUT1002 by Mike
+   - fixes various issues with the Cupping Dialog ([Issue #280](../../../issues/280))
+   - fixes issue that event type is not retained
+   - clears row selections on opening Roast Properties to have the "Create Alarm" action work on all events
+   - fixed display when auto axis is checked and events annotations is unchecked
+   - fixed a bug in RoR computation of the Ranking Report
+   - fixes call program to split commands containing quotes correctly ([Issue #287](../../../issues/287))
+   - fixes an issue with plotter on creation of extra devices where time information was missing
+   - fixes the p-i-d command for the TC4 that got broken in v1.5
+   - fixes the initialization of the Artisan internal PID ([Issue #310](../../../issues/310))
+   - adds missing redraw if only background is automatically reloaded on app start
+   - removes clamping of custom events on drawing a background profile with snap events is ticked ([Issue #296](../../../issues/296))
+   - fixes an internal resource management issue that led to redraw issues or even hangs on slow machines ([Issue #298](../../../issues/298))
+   - fixes an issue that prevented event replay after background events of a type without an active slider ([Issue #302](../../../issues/302))
+   - fixes an interaction between autoDROP and manual DROP
+   - ensures that profiles saved as PDF on autosave at the end of a roast contain the phases bar
+   - fixes HUD button styles
+   - fixes alignment of AUC shading when Smooth Curves value is large and Optimal Smoothing is not checked
+   - fixes an issue on CHARGE on newer Aillio R1 firmware versions ([Issue #297](../../../issues/297))
+
+----
+v1.6.0
+------------------
+
+never released
+
+----
 v1.5.0 (17.10.2018)
 ------------------
 
