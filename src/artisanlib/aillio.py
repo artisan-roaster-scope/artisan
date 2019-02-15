@@ -318,7 +318,7 @@ class AillioR1:
 
         state = state[64:]
         self.coil_fan2 = round(unpack('i', state[32:36])[0], 1)
-        self.pht = unpack('B', state[40:41])[0]
+        self.pht = unpack('H', state[40:42])[0]
         self.__dbg('pre-heat temperature: ' + str(self.pht))
         if self.r1state == self.AILLIO_STATE_OFF:
             self.state_str = "off"
