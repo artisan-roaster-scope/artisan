@@ -1,0 +1,89 @@
+[General]
+Delay=1000
+Oversampling=true
+
+[RoC]
+DeltaBT=true
+DeltaBTlcd=true
+DeltaET=true
+DeltaETlcd=true
+
+[Device]
+Controlbuttonflag=true
+id=99
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200, 9600
+extrabytesize=8, 8, 8, 8
+extracomport=COM1, COM1, COM1, COM1
+extraparity=E, E, E, E
+extrastopbits=1, 1, 1, 1
+extratimeout=1, 1, 1, 0.5
+
+[ExtraDev]
+extraCurveVisibility1=false, false, false, false, true, true, true, true, true, true
+extraCurveVisibility2=false, false, false, false, true, true, true, true, true, true
+extraLCDvisibility1=false, true, true, false, false, false, false, false, false, false
+extraLCDvisibility2=false, false, true, true, false, false, false, false, false, false
+extradevicecolor1=black, black, black, black
+extradevicecolor2=black, black, black, black
+extradevices=84, 85, 86, 87
+extramathexpression1=, , , 
+extramathexpression2=, , , 
+extraname1={3}, BT RoR, Voltage, State
+extraname2={0}, {1}, Exhaust, Fan RPM
+
+[RoastProperties]
+roastertype=Aillio Bullet R1
+
+[events]
+etypes=Fan, Drum, Damper, Heater, --
+
+[ExtraEventButtons]
+buttonlistmaxlen=11
+extraeventstypes=4, 5, 5, 8, 8
+extraeventsvalues=1, 2, -2, 2, -2
+extraeventsactionstrings=PRS, , , , 
+extraeventsactions=19, 17, 17, 16, 16
+extraeventsdescriptions=PRS button, , , , 
+extraeventsvisibility=1, 1, 1, 1, 1
+extraeventslabels=PRS, Fan +1, Fan -1, Heater +1, Heater -1
+extraeventbuttoncolor=yellow, yellow, yellow, yellow, yellow
+extraeventbuttontextcolor=black, black, black, black, black
+extraeventsbuttonsflag=1
+
+[Sliders]
+slidervisibilities=1, 1, 0, 1
+slideractions=14, 15, 0, 13
+slidercommands=, , , 
+slideroffsets=0, 0, 0, 0
+sliderfactors=1, 1, 1, 1
+slidermin=10, 10, 0, 0
+slidermax=120, 90, 100, 90
+eventslidersflag=1
+eventslidercoarse=1, 1, 0, 1
+
+[Quantifiers]
+quantifieractive=1, 1, 0, 1
+quantifiersource=3, 5, 0, 2
+quantifiermin=10, 10, 0, 0
+quantifiermax=120, 90, 100, 90
+quantifiercoarse=1, 1, 0, 1
+clusterEventsFlag=false
+
+[Alarms]
+alarm_popup_timout=10
+alarmaction=16, 13, 14, 14
+alarmbeep=0, 0, 0, 0
+alarmcond=1, 1, 1, 0
+alarmflag=1, 1, 1, 1
+alarmguard=-1, -1, -1, -1
+alarmnegguard=-1, -1, -1, -1
+alarmoffset=0, 0, 0, 0
+alarmsfile=
+alarmsource=8, 8, 8, 8
+alarmstrings=Charge state, Drop state, Cool state, Cool state (alt)
+alarmtemperature=4, 6, 8, 1
+alarmtime=-1, 0, 6, 6
+loadAlarmsFromProfile=false
+
