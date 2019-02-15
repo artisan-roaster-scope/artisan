@@ -959,6 +959,7 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget DAQ1400 Frequency", #96
                        "Phidget DAQ1400 Digital",   #97
                        "Phidget DAQ1400 Voltage",   #98
+                       "Aillio Bullet R1 IBTS/BT",  #99
                        ]
 
         # ADD DEVICE:
@@ -989,7 +990,8 @@ class tgraphcanvas(FigureCanvas):
             95, # Phidget DAQ1400 Current
             96, # Phidget DAQ1400 Frequency
             97, # Phidget DAQ1400 Digital
-            98  # Phidget DAQ1400 Voltage
+            98, # Phidget DAQ1400 Voltage
+            99  # Aillio Bullet R1 IBTS/BT
         ]
                        
         # ADD DEVICE:
@@ -36527,7 +36529,8 @@ class serialport(object):
                                    self.PHIDGET_DAQ1400_CURRENT,   #95
                                    self.PHIDGET_DAQ1400_FREQUENCY, #96 
                                    self.PHIDGET_DAQ1400_DIGITAL,   #97 
-                                   self.PHIDGET_DAQ1400_VOLTAGE,   #98 
+                                   self.PHIDGET_DAQ1400_VOLTAGE,   #98
+                                   self.R1_BTIBTS,            # 99
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -37131,6 +37134,12 @@ class serialport(object):
             error = QApplication.translate("Error Message", "Aillio R1: " + str(exception), None)
             aw.qmc.adderror(error)
         return tx, aw.qmc.R1_DT, aw.qmc.R1_BT
+
+    def R1_BTIBTS(self):
+        self.R1_DTBT()
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        # DT is being used as IBTS.
+        return tx, aw.qmc.R1_BT, aw.qmc.R1_DT
 
     def R1_DRUM_BTROR(self):
         tx = aw.qmc.R1_TX
@@ -44554,7 +44563,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 elif meter == "Probat Middleware":
                     aw.qmc.device = 92
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
-                
+                elif meter == "Aillio Bullet R1 IBTS/DT":
+                    aw.qmc.device = 99
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 # ADD DEVICE:
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -44668,6 +44679,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 92
                 1, # 93
                 1, # 94
+                1, # 99
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
