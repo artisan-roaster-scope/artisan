@@ -2,6 +2,9 @@
 Delay=1000
 Oversampling=true
 
+[Style]
+ETname=DT
+
 [Device]
 Controlbuttonflag=true
 id=83
