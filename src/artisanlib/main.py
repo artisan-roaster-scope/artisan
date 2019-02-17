@@ -5596,17 +5596,17 @@ class tgraphcanvas(FigureCanvas):
     
                 if aw.qmc.ETcurve:
                     self.handles.append(self.l_temp1)
-                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None)))
+                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", aw.ETname, None)))
                 if aw.qmc.BTcurve:
                     self.handles.append(self.l_temp2)
-                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None)))
+                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", aw.BTname, None)))
     
                 if self.DeltaETflag: 
                     self.handles.append(self.l_delta1)
-                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "ET", None)))
+                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", aw.ETname, None)))
                 if self.DeltaBTflag:
                     self.handles.append(self.l_delta2)
-                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "BT", None)))
+                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", aw.BTname, None)))
     
                 nrdevices = len(self.extradevices)
                 
@@ -20206,6 +20206,18 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.graphstyle = toInt(settings.value("graphstyle",self.qmc.graphstyle))
             if settings.contains("graphfont"):
                 self.qmc.graphfont = toInt(settings.value("graphfont",self.qmc.graphfont))
+            if settings.contains("ETname"):
+                self.ETname = settings.value("ETname")
+                self.label2.setText("<big><b>" + u(QApplication.translate("Label", self.ETname,None)) + "</b></big>")
+                self.label4.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", self.ETname,None)) + "</b></big>")
+            else:
+                self.ETname = "ET"
+            if settings.contains("BTname"):
+                self.BTname = settings.value("BTname")
+                self.label3.setText("<big><b>" + u(QApplication.translate("Label", self.BTname,None)) + "</b></big>")
+                self.label5.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", self.BTname,None)) + "</b></big>")
+            else:
+                self.BTname = "BT"
             settings.endGroup()
             settings.beginGroup("Sound")
             self.soundflag = toInt(settings.value("Beep",self.soundflag))
@@ -21397,6 +21409,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("patheffects",self.qmc.patheffects)
             settings.setValue("graphstyle",self.qmc.graphstyle)
             settings.setValue("graphfont",self.qmc.graphfont)
+            settings.setValue("ETname", self.ETname)
+            settings.setValue("BTname", self.BTname)
             settings.endGroup()
             settings.beginGroup("Sound")
             settings.setValue("Beep",self.soundflag)
@@ -26966,10 +26980,27 @@ class HUDDlg(ArtisanDialog):
         WebLCDsLayoutVLayout.addLayout(WebLCDsLayoutHLayout)
         WebLCDsGroupWidget = QGroupBox(QApplication.translate("GroupBox","WebLCDs",None))
         WebLCDsGroupWidget.setLayout(WebLCDsLayoutVLayout)
+
+        # Renaming BT and ET
+        self.renameETLabel = QLabel(QApplication.translate("Label", "ET", None))
+        self.renameETLine = QLineEdit(aw.ETname)
+        self.renameETLine.editingFinished.connect(lambda :self.renameET())
+        self.renameBTLabel = QLabel(QApplication.translate("Label", "BT", None))
+        self.renameBTLine = QLineEdit(aw.BTname)
+        self.renameBTLine.editingFinished.connect(lambda :self.renameBT())
+        renameLayout = QHBoxLayout()
+        renameLayout.addWidget(self.renameETLabel)
+        renameLayout.addWidget(self.renameETLine)
+        renameLayout.addStretch()
+        renameLayout.addWidget(self.renameBTLabel)
+        renameLayout.addWidget(self.renameBTLine)
+        renameGroupWidget = QGroupBox(QApplication.translate("GroupBox", "Rename ET and BT",None))
+        renameGroupWidget.setLayout(renameLayout)
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(appearanceGroupWidget)
         tab5Layout.addWidget(resolutionGroupWidget)
         tab5Layout.addWidget(WebLCDsGroupWidget)
+        tab5Layout.addWidget(renameGroupWidget)
         tab5Layout.addStretch()
 
         ############################  TABS LAYOUT
@@ -27019,7 +27050,22 @@ class HUDDlg(ArtisanDialog):
         self.polyfitdeg.valueChanged.connect(lambda _:self.polyfitcurveschanged(3))
         self.c1ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(4))
         self.c2ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(5))      
-            
+
+
+    def renameBT(self):
+        aw.BTname = str(self.renameBTLine.text()).strip()
+        if aw.BTname == "":
+            aw.BTname = "BT"
+        aw.label3.setText("<big><b>" + u(QApplication.translate("Label", aw.BTname,None)) + "</b></big>")
+        aw.label5.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", aw.BTname,None)) + "</b></big>")
+
+    def renameET(self):
+        aw.ETname = str(self.renameETLine.text()).strip()
+        if aw.ETname == "":
+            aw.ETname = "ET"
+        aw.label2.setText("<big><b>" + u(QApplication.translate("Label", aw.ETname,None)) + "</b></big>")
+        aw.label4.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", aw.ETname,None)) + "</b></big>")
+
     def toggleWebLCDsAlerts(self):
         aw.WebLCDsAlerts = not aw.WebLCDsAlerts
         
