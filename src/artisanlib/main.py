@@ -785,8 +785,8 @@ class tgraphcanvas(FigureCanvas):
         
         # Phidget variables
         
-        self.phidget_dataRatesStrings = ["64ms","128ms","256ms","512ms","768ms","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
-        self.phidget_dataRatesValues = [64,128,256,512,768,1024] # 8,16,32,64,128,
+        self.phidget_dataRatesStrings = ["32ms","64ms","128ms","256ms","512ms","768ms","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
+        self.phidget_dataRatesValues = [32,64,128,256,512,768,1024] # 8,16,32,64,128,
         
         # probe type values (along the Phidgets21 lib): k-type => 1, j-type => 2, e-type => 3, t-type => 4
         # Artisan will keep on using the Phidgets21 mapping
@@ -794,7 +794,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1048_async = [False]*4
         self.phidget1048_changeTriggers = [0.2]*4
         self.phidget1048_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
-        self.phidget1048_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1048_changeTriggersValues))
+        self.phidget1048_changeTriggersStrings = list(map(lambda x:'{0:.1f}C'.format(x),self.phidget1048_changeTriggersValues))
         self.phidget1048_dataRate = 256 # in ms; (Phidgets default 8ms, 16ms if wireless is active on v21 API, 256ms on v22 API)
 
         self.phidget1045_async = False
@@ -2602,9 +2602,15 @@ class tgraphcanvas(FigureCanvas):
 #                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
                                     # draw delta lines
                                     if self.DeltaETflag and self.l_delta1 is not None:
-                                        aw.qmc.ax.draw_artist(self.l_delta1)
+                                        try:
+                                            aw.qmc.ax.draw_artist(self.l_delta1)
+                                        except:
+                                            pass
                                     if self.DeltaBTflag and self.l_delta2 is not None:
-                                        aw.qmc.ax.draw_artist(self.l_delta2)
+                                        try:
+                                            aw.qmc.ax.draw_artist(self.l_delta2)
+                                        except:
+                                            pass
                                     # draw extra curves
                                     xtra_dev_lines1 = 0
                                     xtra_dev_lines2 = 0
@@ -6629,9 +6635,9 @@ class tgraphcanvas(FigureCanvas):
             self.block_update = False # unblock the updating of the bitblit canvas            
             aw.showLCDs() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
-            QApplication.processEvents()
+#            QApplication.processEvents()
             self.StartAsyncSamplingAction()
-            QApplication.processEvents()
+#            QApplication.processEvents()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -6666,7 +6672,7 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     aw.fujipid.sv = 0
             self.disconnectProbes()
-            QApplication.processEvents()
+#            QApplication.processEvents()
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.button_7.setEnabled(True)
@@ -6693,7 +6699,7 @@ class tgraphcanvas(FigureCanvas):
             aw.pidcontrol.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
             aw.enableEditMenus()
-            QApplication.processEvents()
+#            QApplication.processEvents()
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)            
             if len(self.timex) > 2:
                 # we autosave after full redraw after OFF to have the optional generated PDF containing all information
@@ -6704,7 +6710,7 @@ class tgraphcanvas(FigureCanvas):
                         pass
             #appnope.nap()
             aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
-            QApplication.processEvents()
+#            QApplication.processEvents()
             if recording and self.flagKeepON:
                 self.OnMonitor()
             self.stopPhidgetManager()
@@ -6761,10 +6767,9 @@ class tgraphcanvas(FigureCanvas):
                     ser.PhidgetTemperatureSensor[1].close()
             except Exception:
                 pass
-            ser.Phidget1048values = [-1]*4
+            ser.Phidget1048values = [[],[],[],[]]
+            ser.Phidget1048lastvalues = [-1]*4
             ser.PhidgetTemperatureSensor = None
-            ser.Phidget1048asynctimes = [None]*4
-            ser.Phidget1048asynctimesAveraged = [None]*4
         if ser.PhidgetIRSensor:
             try:
                 if ser.PhidgetIRSensor.getAttached():
@@ -6775,10 +6780,9 @@ class tgraphcanvas(FigureCanvas):
             except Exception:
                 pass
             ser.PhidgetIRSensor = None
-            ser.Phidget1045value = -1
+            ser.Phidget1045values = [] # async values of the one channel
+            ser.Phidget1045lastvalue = -1
             ser.PhidgetIRSensorIC = None
-            ser.Phidget1045asynctime = None
-            ser.Phidget1045asynctimeAveraged = None
         if ser.PhidgetBridgeSensor:
             try:
                 if ser.PhidgetBridgeSensor[0].getAttached():
@@ -6787,10 +6791,9 @@ class tgraphcanvas(FigureCanvas):
                     ser.PhidgetBridgeSensor[1].close()
             except Exception:
                 pass
-            ser.Phidget1046values = [-1]*4
+            ser.Phidget1046values = [[],[],[],[]]
+            ser.Phidget1046lastvalues = [-1]*4
             ser.PhidgetBridgeSensor = None
-            ser.Phidget1046asynctimes = [None]*4
-            ser.Phidget1046asynctimesAveraged = [None]*4
         if ser.PhidgetIO:
             try:
                 if ser.PhidgetIO[0].getAttached():
@@ -6800,9 +6803,8 @@ class tgraphcanvas(FigureCanvas):
             except Exception:
                 pass
             ser.PhidgetIO = None
-            ser.PhidgetIOvalues = [-1]*8
-            ser.PhidgetIOasynctimes = [None]*8
-            ser.PhidgetIOasynctimesAveraged = [None]*8
+            ser.PhidgetIOvalues = [[],[],[],[],[],[],[],[]]
+            ser.PhidgetIOlastvalues = [-1]*8
         if ser.YOCTOsensor:
             try:
                 from yoctopuce.yocto_api import YAPI
@@ -10576,9 +10578,9 @@ class SampleThread(QThread):
                         # and only half of the sampling interval is gone
                         if (sampling_interval - gone) > etbt_time and gone < (sampling_interval / 2.0):
                             # place the second ET/BT sampling in the middle of the sampling interval
-                            #stime = (sampling_interval / 2.0) - gone # placing the second sample in the middle blocks too long!
-#                            stime = max(0,0.1 - gone) # we want the second main sample minimally 100ms after the first
-#                            libtime.sleep(stime)
+                            stime = max(0.3,(sampling_interval / 4.0) - gone) # placing the second sample in the middle blocks too long!
+#                            stime = max(0,0.3 - gone) # we want the second main sample minimally 100ms after the first
+                            libtime.sleep(stime)
                             timeBeforeETBT2 = libtime.perf_counter() # the time before sending the 2nd request to the main device
                             tx_2,t1_2,t2_2 = self.sample_main_device()
                             timeAfterETBT2 = libtime.perf_counter() # the time after sending the 2nd request to the main device
@@ -11064,14 +11066,18 @@ class SampleThread(QThread):
         self.afterTP = False
         if not aw.qmc.flagon:
             return
+            
         try:
             # initialize digitizer
             aw.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
-            max_delay = aw.qmc.delay
+
+            interval = aw.qmc.delay/1000.
+            next_tx = libtime.perf_counter()+interval
             while True:
                 if aw.qmc.flagon:
-                    start = libtime.perf_counter()
+                    
+#                    print(datetime.datetime.now()) # use this to check for drifts
                     
                     #collect information
                     aw.qmc.flagsampling = True # we signal that we are sampling
@@ -11079,12 +11085,11 @@ class SampleThread(QThread):
                     aw.qmc.flagsampling = False # we signal that we are done with sampling
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)                    
-                    now = libtime.perf_counter()                
-                    dt = max(0.1,min(max_delay,aw.qmc.delay) / 1000. - now + start) # min of 0.1sec to allow for refresh the display  
-                    #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     if aw.qmc.flagon:
-                        libtime.sleep(dt)
+                        next_tx += interval
+                        now = libtime.perf_counter()
+                        libtime.sleep(max(0.1,next_tx - now))
                 else:
                     aw.qmc.flagsampling = False # we signal that we are done with sampling
                     try:
@@ -11119,7 +11124,7 @@ class Athreadserver(QWidget):
 
         #connect graphics to GUI thread
         sthread.updategraphics.connect(aw.qmc.updategraphics)
-        sthread.start()
+        sthread.start(QThread.TimeCriticalPriority) # QThread.HighPriority, QThread.HighestPriority
         sthread.wait(300)    #needed in some Win OS
 
 
@@ -36362,26 +36367,26 @@ class serialport(object):
         ##### SPECIAL METER FLAGS ########
         #stores the Phidget 1048 TemperatureSensor object (None if not initialized)
         self.PhidgetTemperatureSensor = None # either None or a list containing one PhidgetTemperatureSensor() object per channel
-        self.Phidget1048values = [-1]*4 # the values gathered by registered change triggers
-        self.Phidget1048asynctimes = [None]*4 # the time a temp value was async received
-        self.Phidget1048asynctimesAveraged = [None]*4 # the time between Phidget1048asynctime and the last received value
+        self.Phidget1048values = [[],[],[],[]] # the values for each of the 4 channels gathered by registered change triggers in the last period
+        self.Phidget1048lastvalues = [-1]*4 # the last async values returned
+        self.Phidget1048semaphores = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
         # list of (serial,port) tuples filled on attaching the corresponding main device and consumed on attaching the other channel pairs
         #stores the Phidget 1045 TemperatureSensor object (None if not initialized)
         self.PhidgetIRSensor = None
         self.PhidgetIRSensorIC = None
-        self.Phidget1045value = -1
-        self.Phidget1045asynctime = None # the time a temp value was async received
-        self.Phidget1045asynctimeAveraged = None # the time between Phidget1045asynctime and the last received value
+        self.Phidget1045values = [] # async values of the one channel
+        self.Phidget1045lastvalue = -1
+        self.Phidget1045semaphore = QSemaphore(1) # semaphore protecting the access to self.Phidget1045values per channel        
         #stores the Phidget BridgeSensor object (None if not initialized)
         self.PhidgetBridgeSensor = None
-        self.Phidget1046values = [-1]*4 # the values gathered by registered change triggers
-        self.Phidget1046asynctimes = [None]*4 # the time a temp value was async received
-        self.Phidget1046asynctimesAveraged = [None]*4 # the time between Phidget1046asynctime and the last received value
+        self.Phidget1046values = [[],[],[],[]] # the values for each of the 4 channels gathered by registered change triggers in the last period
+        self.Phidget1046lastvalues = [-1]*4 # the last async values returned
+        self.Phidget1046semaphores = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1046values per channel
         #stores the Phidget IO object (None if not initialized)
         self.PhidgetIO = None
-        self.PhidgetIOvalues = [-1]*8 # the values gathered by registered change triggers
-        self.PhidgetIOasynctimes = [None]*8 # the time a temp value was async received
-        self.PhidgetIOasynctimesAveraged = [None]*8 # the time between PhidgetIOasynctime and the last received value
+        self.PhidgetIOvalues = [[],[],[],[],[],[],[],[]] # the values gathered by registered change triggers
+        self.PhidgetIOlastvalues = [-1]*8 # the values gathered by registered change triggers
+        self.PhidgetIOsemaphores = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
         #stores the Phidget Digital Output PMW objects (None if not initialized)      
         self.PhidgetDigitalOut = None
         self.PhidgetDigitalOutLastPWM = [0]*4 # 0-100
@@ -36877,178 +36882,142 @@ class serialport(object):
         
     def PHIDGET1045(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_1045)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_1045)
         return tx,a,t
 
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,0)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,0)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
 
     def PHIDGET1048_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,1)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,1)
         return tx,t1,t2
 
     def PHIDGET1048_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,_ = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,2)
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,2)
         return tx,t1,t2
 
     def PHIDGET1046(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1046temperature(0)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1046temperature(0)
         return tx,t1,t2
 
     def PHIDGET1046_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1046temperature(1)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1046temperature(1)
         return tx,t1,t2
         
     def PHIDGET1051(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_1051)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_1051)
         return tx,a,t
         
     def PHIDGET1011(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"voltage")
         return tx,v1,v2
                 
     def PHIDGET1018(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"voltage")
         return tx,v1,v2
 
     def PHIDGET1018_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"voltage")
         return tx,v1,v2
 
     def PHIDGET1018_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"voltage")
         return tx,v1,v2
 
     def PHIDGET1018_78(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"voltage")
         return tx,v1,v2
         
     def PHIDGET1011_D(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"digital")
         return tx,v1,v2
         
     def PHIDGET1018_D(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_78(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"digital")
         return tx,v1,v2
         
     def PHIDGET_HUB0000_D(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"digital")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_D_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"digital")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_D_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"digital")
         return tx,v1,v2        
 
     def PHIDGET_TMP1101(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,0)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,0)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
         
     def PHIDGET_TMP1101_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,1)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,1)
         return tx,t1,t2
             
     def PHIDGET_TMP1101_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,_ = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,2)
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,2)
         return tx,t1,t2
 
     def PHIDGET_TMP1100(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1100)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1100)
         return tx,a,t
 
     def PHIDGET_TMP1200(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
         return tx,a,t
         
     def PHIDGET_HUB0000(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1  = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"voltage")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"voltage")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"voltage")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_CURRENT(self):
@@ -37058,19 +37027,17 @@ class serialport(object):
 
     def PHIDGET_DAQ1400_FREQUENCY(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"frequency")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"frequency")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_DIGITAL(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"digital")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_VOLTAGE(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"voltage")
         return tx,v1,v2
 
     def HOTTOP_BTET(self):
@@ -38462,24 +38429,20 @@ class serialport(object):
 #---
 
     def phidget1045TemperatureChanged(self,_,t):
-        prev_time = self.Phidget1045asynctime
-        self.Phidget1045asynctime = aw.qmc.timeclock.elapsed()/1000.
-        if prev_time is None:
-            self.Phidget1045asynctimeAveraged = self.Phidget1045asynctime
-        else:
-            self.Phidget1045asynctimeAveraged = (prev_time + self.Phidget1045asynctime) / 2.0
-        if self.Phidget1045value != -1:
-            self.Phidget1045value = (self.Phidget1045value + t)/2.0
-        else:
-            self.Phidget1045value = t
+        try:
+            #### lock shared resources #####
+            self.Phidget1045semaphore.acquire(1)
+            self.Phidget1045values.append(t)
+        finally:
+            if self.Phidget1045semaphore.available() < 1:
+                self.Phidget1045semaphore.release(1)
             
     def phidget1045temp(self,temp,ambient):
         return (temp - ambient) * aw.qmc.phidget1045_emissivity + ambient
 
     def configure1045(self):
-        self.Phidget1045value = -1
-        self.Phidget1045asynctime = None
-        self.Phidget1045asynctimeAveraged = None
+        self.Phidget1045values = []
+        self.Phidget1045lastvalue = -1
         if self.PhidgetIRSensor is not None:
             try:
                 if aw.qmc.phidget1045_async:
@@ -38502,9 +38465,8 @@ class serialport(object):
                 pass
             
     def configureOneTC(self):
-        self.Phidget1045value = -1
-        self.Phidget1045asynctime = None
-        self.Phidget1045asynctimeAveraged = None
+        self.Phidget1045values = []
+        self.Phidget1045lastvalue = -1
         self.PhidgetIRSensor.setThermocoupleType(PHIDGET_THERMOCOUPLE_TYPE(aw.qmc.phidget1048_types[0]))
         if aw.qmc.phidget1048_async[0]:
             self.PhidgetIRSensor.setTemperatureChangeTrigger(aw.qmc.phidget1048_changeTriggers[0])
@@ -38521,9 +38483,8 @@ class serialport(object):
             pass
             
     def configureOneRTD(self):
-        self.Phidget1045value = -1
-        self.Phidget1045asynctime = None
-        self.Phidget1045asynctimeAveraged = None
+        self.Phidget1045values = []
+        self.Phidget1045lastvalue = -1
         self.PhidgetIRSensor.setRTDType(PHIDGET_RTD_TYPE(aw.qmc.phidget1200_formula))
         self.PhidgetIRSensor.setRTDWireSetup(PHIDGET_RTD_WIRE(aw.qmc.phidget1200_wire))        
         if aw.qmc.phidget1200_async:
@@ -38626,9 +38587,8 @@ class serialport(object):
                         except Exception:
                             pass
                         self.PhidgetIRSensor = None
-                        self.Phidget1045value = -1
-                        self.Phidget1045asynctime = None
-                        self.Phidget1045asynctimeAveraged = None
+                        self.Phidget1045values = []
+                        self.Phidget1045lastvalue = -1
                         self.PhidgetIRSensorIC = None
             if self.PhidgetIRSensor and self.PhidgetIRSensor.getAttached():
                 res = -1
@@ -38637,11 +38597,25 @@ class serialport(object):
                     if (deviceType == DeviceID.PHIDID_1045 and aw.qmc.phidget1045_async) or \
                         (deviceType in [DeviceID.PHIDID_1051,DeviceID.PHIDID_TMP1100] and aw.qmc.phidget1048_async[0]) or \
                         (deviceType == DeviceID.PHIDID_TMP1200 and aw.qmc.phidget1200_async):
-                        if self.Phidget1045value == -1:
-                            self.Phidget1045asynctime = aw.qmc.timeclock.elapsed()/1000.
-                            self.Phidget1045asynctimeAveraged = self.Phidget1045asynctime
-                            self.Phidget1045value = self.PhidgetIRSensor.getTemperature()
-                        probe = self.Phidget1045value
+                        async_res = None
+                        try:
+                            #### lock shared resources #####
+                            self.Phidget1045semaphore.acquire(1)
+                            if len(self.Phidget1045values) > 0:
+                                async_res = numpy.average(self.Phidget1045values)
+#                            print(round((aw.qmc.delay/aw.qmc.phidget1045_dataRate)/2), len(self.Phidget1045values))
+#                            self.Phidget1045values = []
+                            self.Phidget1045values = self.Phidget1045values[-round((aw.qmc.delay/aw.qmc.phidget1045_dataRate)):]
+                        except:
+                            self.Phidget1045values = []
+                        finally:
+                            if self.Phidget1045semaphore.available() < 1:
+                                self.Phidget1045semaphore.release(1)
+                        if async_res is None:
+                            probe = self.Phidget1045lastvalue
+                        else:
+                            self.Phidget1045lastvalue = async_res
+                            probe = async_res
                     else:
                         probe = self.PhidgetIRSensor.getTemperature()
                     if aw.qmc.mode == "F":
@@ -38659,20 +38633,17 @@ class serialport(object):
                 if deviceType == DeviceID.PHIDID_TMP1200:
                     ambient = res
                 if ambient == -1:
-                    return -1,-1,None
+                    return -1,-1
                 else:
                     if deviceType == DeviceID.PHIDID_1045:
-                        return self.phidget1045temp(res,ambient),ambient,self.Phidget1045asynctimeAveraged
+                        return self.phidget1045temp(res,ambient),ambient
                     else:
-                        return res,ambient,self.Phidget1045asynctimeAveraged
-                # reset async timestamps for next sampling interval
-                self.Phidget1045asynctime = None
-                self.Phidget1045asynctimeAveraged = None
+                        return res,ambient
             elif retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1045temperature(deviceType,retry=False)
             else:
-                return -1,-1,None
+                return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -38684,40 +38655,54 @@ class serialport(object):
             except Exception:
                 pass
             self.PhidgetIRSensor = None
-            self.Phidget1045value = -1
-            self.Phidget1045asynctime = None
-            self.Phidget1045asynctimeAveraged = None            
+            self.Phidget1045values = []  
+            self.Phidget1045lastvalue = -1      
             self.PhidgetIRSensorIC = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return -1,-1,None
+            return -1,-1
 
 #----
 
-    
-    
-    def phidget1048TemperatureChanged(self,t,idx):
-        if self.PhidgetTemperatureSensor and len(self.PhidgetTemperatureSensor) > idx:
-            prev_time = self.Phidget1048asynctimes[idx]
-            self.Phidget1048asynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-            if prev_time is None:
-                self.Phidget1048asynctimesAveraged[idx] = self.Phidget1048asynctimes[idx]
-            else:
-                self.Phidget1048asynctimesAveraged[idx] = (prev_time + self.Phidget1048asynctimes[idx]) / 2.0
-            channel = self.PhidgetTemperatureSensor[idx].getChannel()
-            if aw.qmc.phidget1048_async[channel]:
-                if self.Phidget1048values[channel] != -1:
-                    self.Phidget1048values[channel] = (self.Phidget1048values[channel] + t)/2.0
-                else:
-                    self.Phidget1048values[channel] = t
+    def phidget1048TemperatureChanged(self,t,channel):
+        try:
+            #### lock shared resources #####
+            self.Phidget1048semaphores[channel].acquire(1)
+            self.Phidget1048values[channel].append(t)
+        finally:
+            if self.Phidget1048semaphores[channel].available() < 1:
+                self.Phidget1048semaphores[channel].release(1)
 
-    def phidget1048getSensorReading(self,i,idx):
-        if aw.qmc.phidget1048_async[i]:
-            if self.Phidget1048values[i] == -1:
-                self.Phidget1048asynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-                self.Phidget1048asynctimesAveraged[idx] = self.Phidget1048asynctimes[idx]
-                self.Phidget1048values[i] = self.PhidgetTemperatureSensor[idx].getTemperature()
-            return self.Phidget1048values[i]
+    def phidget1048getSensorReading(self,channel,idx):
+        if aw.qmc.phidget1048_async[channel]:
+            res = None
+            try:
+                #### lock shared resources #####
+                self.Phidget1048semaphores[channel].acquire(1)
+                if len(self.Phidget1048values[channel]) > 0:
+                    res = numpy.average(self.Phidget1048values[channel])
+                    
+#                    data = self.Phidget1048values[channel]
+#                    data_mean, data_std = numpy.mean(data), numpy.std(data)
+#                    if data_std > 0:
+#                        cut_off = data_std * 1.8
+#                        lower, upper = data_mean - cut_off, data_mean + cut_off
+#                        outliers_removed = [x for x in data if x > lower and x < upper]
+#                    else:
+#                        outliers_removed = data
+#                    res = numpy.average(outliers_removed)
+
+                    self.Phidget1048values[channel] = self.Phidget1048values[channel][-round((aw.qmc.delay/aw.qmc.phidget1048_dataRate)):]                
+            except Exception as e:
+                self.Phidget1048values[channel] = []
+            finally:
+                if self.Phidget1048semaphores[channel].available() < 1:
+                    self.Phidget1048semaphores[channel].release(1)
+            if res is None:
+                return self.Phidget1048lastvalues[channel] # return the previous result
+            else:
+                self.Phidget1048lastvalues[channel] = res
+                return res
         else:
             return self.PhidgetTemperatureSensor[idx].getTemperature()
     
@@ -38738,15 +38723,14 @@ class serialport(object):
                 try:
                     if aw.qmc.phidget1048_async[channel]:
                         self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(aw.qmc.phidget1048_changeTriggers[channel])
-                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda _,t: self.phidget1048TemperatureChanged(t,idx))
+                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda _,t: self.phidget1048TemperatureChanged(t,channel))
                     else:
                         self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(0)
                         self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda *_:None)
                 except:
                     pass
-                self.Phidget1048values[channel] = -1
-                self.Phidget1048asynctimes[idx] = None
-                self.Phidget1048asynctimesAveraged[idx] = None
+                self.Phidget1048values[channel] = []
+                self.Phidget1048lastvalues[channel] = -1
 
     def phidget1048attached(self,serial,port,deviceType,idx):
         try:
@@ -38835,9 +38819,8 @@ class serialport(object):
                                 self.PhidgetTemperatureSensor[1].close()
                         except Exception:
                             pass
-                        self.Phidget1048values = [-1]*4
-                        self.Phidget1048asynctimes = [None]*4
-                        self.Phidget1048asynctimesAveraged = [None]*4
+                        self.Phidget1048values = [[],[],[],[]]
+                        self.Phidget1048lastvalues = [-1]*4
                         self.PhidgetTemperatureSensor = None
             if self.PhidgetTemperatureSensor and ((mode == 2) or (len(self.PhidgetTemperatureSensor)>1 and self.PhidgetTemperatureSensor[0].getAttached() and self.PhidgetTemperatureSensor[1].getAttached())):
                 # now just harvest both temps (or one in case type is 2)
@@ -38855,41 +38838,22 @@ class serialport(object):
                             probe2 = aw.qmc.fromCtoF(probe2)
                     except Exception:
                         pass
-                    async_time = None
-                    try:
-                        tx_avg_1 = self.Phidget1048asynctimesAveraged[mode*2]
-                        tx_avg_2 = self.Phidget1048asynctimesAveraged[mode*2 + 1]
-                        if tx_avg_1 is None and tx_avg_2 is not None:
-                            async_time = tx_avg_2
-                        elif tx_avg_1 is not None and tx_avg_2 is None:
-                            async_time = tx_avg_1
-                        elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 > tx_avg_2:
-                            async_time = tx_avg_1
-                        elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 <= tx_avg_2:
-                            async_time = tx_avg_2
-                    except Exception:
-                        pass
-                    # reset async timestamps for next sampling interval
-                    self.Phidget1048asynctimes[mode*2] = None
-                    self.Phidget1048asynctimes[mode*2 + 1] = None
-                    self.Phidget1048asynctimesAveraged[mode*2] = None
-                    self.Phidget1048asynctimesAveraged[mode*2 + 1] = None
-                    return probe1, probe2, async_time
+                    return probe1, probe2
                 elif mode == 2:
                     try:
                         at = self.PhidgetTemperatureSensor[0].getTemperature()
                         if aw.qmc.mode == "F":
                             at = aw.qmc.fromCtoF(at)
-                        return at,-1,None
+                        return at,-1
                     except Exception:
-                        return -1,-1,None
+                        return -1,-1
                 else:
-                    return -1,-1,None
+                    return -1,-1
             elif retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1048temperature(deviceType,mode,False)
             else:
-                return -1,-1,None
+                return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -38900,13 +38864,12 @@ class serialport(object):
                     self.PhidgetTemperatureSensor[1].close()
             except Exception:
                 pass
-            self.Phidget1048values = [-1]*4
-            self.Phidget1048asynctimes = [None]*4
-            self.Phidget1048asynctimesAveraged = [None]*4
+            self.Phidget1048values = [[],[],[],[]]
+            self.Phidget1048lastvalues = [-1]*4
             self.PhidgetTemperatureSensor = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return -1,-1,None
+            return -1,-1
 
 #--- code for the Phidgets 1046
 
@@ -38946,23 +38909,17 @@ class serialport(object):
 #        bvf = bv / (1000 - bv)
 #        return 4750.3 * bvf * bvf + 4615.6 * bvf - 242.615                
 
-    def phidget1046TemperatureChanged(self,v,idx):
-        if self.PhidgetBridgeSensor and len(self.PhidgetBridgeSensor) > idx:
-            prev_time = self.Phidget1046asynctimes[idx]
-            self.Phidget1046asynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-            if prev_time is None:
-                self.Phidget1046asynctimesAveraged[idx] = self.Phidget1046asynctimes[idx]
-            else:
-                self.Phidget1046asynctimesAveraged[idx] = (prev_time + self.Phidget1046asynctimes[idx]) / 2.0
-            channel = self.PhidgetBridgeSensor[idx].getChannel()
-            if self.phidget1046_async[channel]:        
-                temp = self.bridgeValue2Temperature(channel,v)
-                if aw.qmc.mode == "F":
-                    temp = aw.qmc.fromCtoF(temp)
-                if self.Phidget1046values[channel] != -1:
-                    self.Phidget1046values[channel] = (self.Phidget1046values[channel] + temp)/2.0
-                else:
-                    self.Phidget1046values[channel] = temp
+    def phidget1046TemperatureChanged(self,v,channel):
+        try:
+            #### lock shared resources #####
+            self.Phidget1046semaphores[channel].acquire(1)
+            temp = self.bridgeValue2Temperature(channel,v)
+            if aw.qmc.mode == "F":
+                temp = aw.qmc.fromCtoF(temp)
+            self.Phidget1046values[channel].append(temp)
+        finally:
+            if self.Phidget1046semaphores[channel].available() < 1:
+                self.Phidget1046semaphores[channel].release(1)
 
     def bridgeValue2Temperature(self,i,bv):
         v = -1
@@ -38994,15 +38951,27 @@ class serialport(object):
             v = -1
         return v
                         
-    def phidget1046getSensorReading(self,i,idx):
-        if aw.qmc.phidget1046_async[i]:
-            if self.Phidget1046values[i] == -1:
-                self.Phidget1046asynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-                self.Phidget1046asynctimesAveraged[idx] = self.Phidget1046asynctimes[idx]
-                self.Phidget1046values[i] = self.phidget1046getTemperature(i,idx)               
-            return self.Phidget1046values[i]
+    def phidget1046getSensorReading(self,channel,idx):
+        if aw.qmc.phidget1046_async[channel]:
+            res = None
+            try:
+                #### lock shared resources #####
+                self.Phidget1046semaphores[channel].acquire(1)
+                if len(self.Phidget1046values[channel]) > 0:
+                    res = numpy.average(self.Phidget1046values[channel])
+                    self.Phidget1046values[channel] = []
+            except Exception as e:
+                self.Phidget1046values[channel] = []
+            finally:
+                if self.Phidget1046semaphores[channel].available() < 1:
+                    self.Phidget1046semaphores[channel].release(1)
+            if res is None:
+                return self.Phidget1046lastvalues[channel]
+            else:
+                self.Phidget1046lastvalues[channel] = res
+                return res
         else:
-            return self.phidget1046getTemperature(i,idx)
+            return self.phidget1046getTemperature(channel,idx)
 
     def configure1046(self,idx):
         if self.PhidgetBridgeSensor and len(self.PhidgetBridgeSensor) > idx:
@@ -39029,20 +38998,18 @@ class serialport(object):
                 except Exception:
                     pass
                 if aw.qmc.phidget1046_async[channel]:
-                    self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda _,v:self.phidget1046TemperatureChanged(v,idx))
+                    self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda _,v:self.phidget1046TemperatureChanged(v,channel))
                 else:
                     self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda *_:None)
                 # reset async value
                 self.Phidget1046values[channel] = -1
-                self.Phidget1046asynctimes[idx] = None
-                self.Phidget1046asynctimesAveraged[idx] = None
 
     def phidget1046attached(self,serial,port,deviceType,idx):
         try:
             self.configure1046(idx)
             if self.PhidgetBridgeSensor is not None:
                 channel = self.PhidgetBridgeSensor[idx].getChannel()
-                aw.qmc.phidgetManager.reserveSerialPort(serial,port,channel,"VoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                aw.qmc.phidgetManager.reserveSerialPort(serial,port,channel,"PhidgetVoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if channel == 0:
                     aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None))
         except:
@@ -39052,7 +39019,7 @@ class serialport(object):
         try:
             if self.PhidgetBridgeSensor is not None:
                 channel = self.PhidgetBridgeSensor[idx].getChannel()
-                aw.qmc.phidgetManager.releaseSerialPort(serial,port,channel,"VoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                aw.qmc.phidgetManager.releaseSerialPort(serial,port,channel,"PhidgetVoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if channel == 0:
                     aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input detached",None))
         except:
@@ -39066,11 +39033,11 @@ class serialport(object):
                 port = None 
                 if mode == 0:
                     # we scan for available main device
-                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,0,
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageRatioInput',DeviceID.PHIDID_1046,0,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
                 elif mode == 1:
-                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,2,
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageRatioInput',DeviceID.PHIDID_1046,2,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
                     self.PhidgetBridgeSensor = [VoltageRatioInput(),VoltageRatioInput()]
@@ -39108,10 +39075,9 @@ class serialport(object):
                                 self.PhidgetBridgeSensor[1].close()
                         except Exception:
                             pass
-                        self.Phidget1046values = [-1]*4
+                        self.Phidget1046values = [[],[],[],[]]
+                        self.Phidget1046lastvalues = [-1]*4
                         self.PhidgetBridgeSensor = None
-                        self.Phidget1046asynctimes = [None]*4
-                        self.Phidget1046asynctimesAveraged = [None]*4
             if self.PhidgetBridgeSensor and len(self.PhidgetBridgeSensor) == 2 and self.PhidgetBridgeSensor[0].getAttached() and self.PhidgetBridgeSensor[1].getAttached():
                 if mode in [0,1]:
                     probe1 = probe2 = -1
@@ -39123,33 +39089,14 @@ class serialport(object):
                         probe2 = self.phidget1046getSensorReading(mode*2+1,1)
                     except Exception:
                         pass
-                    async_time = None
-                    try:
-                        tx_avg_1 = self.Phidget1046asynctimesAveraged[mode*2]
-                        tx_avg_2 = self.Phidget1046asynctimesAveraged[mode*2 + 1]
-                        if tx_avg_1 is None and tx_avg_2 is not None:
-                            async_time = tx_avg_2
-                        elif tx_avg_1 is not None and tx_avg_2 is None:
-                            async_time = tx_avg_1
-                        elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 > tx_avg_2:
-                            async_time = tx_avg_1
-                        elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 <= tx_avg_2:
-                            async_time = tx_avg_2
-                    except Exception:
-                        pass
-                    # reset async timestamps for next sampling interval
-                    self.Phidget1046asynctimes[mode*2] = None
-                    self.Phidget1046asynctimes[mode*2 + 1] = None
-                    self.Phidget1046asynctimesAveraged[mode*2] = None
-                    self.Phidget1046asynctimesAveraged[mode*2 + 1] = None
-                    return probe1, probe2, async_time
+                    return probe1, probe2
                 else:
-                    return -1,-1,None
+                    return -1,-1
             elif retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1046temperature(mode,False)                
             else:
-                return -1,-1,None
+                return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -39160,13 +39107,12 @@ class serialport(object):
                     self.PhidgetBridgeSensor[1].close()
             except Exception:
                 pass
-            self.Phidget1046values = [-1]*4
+            self.Phidget1046values = [[],[],[],[]]
+            self.Phidget1046lastvalues = [-1]*4
             self.PhidgetBridgeSensor = None
-            self.Phidget1046asynctimes = [None]*4
-            self.Phidget1046asynctimesAveraged = [None]*4
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1046temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return -1,-1,None
+            return -1,-1
 
 #--- Phidget IO Binay Output (only one device supported for now)
 #  only supporting (trying to attach in this order)
@@ -39488,36 +39434,36 @@ class serialport(object):
 
     def phidget1018SensorChanged(self,v,channel,idx,API):
         if self.PhidgetIO and len(self.PhidgetIO) > idx:
-            prev_time = self.PhidgetIOasynctimes[idx]
-            self.PhidgetIOasynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-            if prev_time is None:
-                self.PhidgetIOasynctimesAveraged[idx] = self.PhidgetIOasynctimes[idx]
-            else:
-                self.PhidgetIOasynctimesAveraged[idx] = (prev_time + self.PhidgetIOasynctimes[idx]) / 2.0
             if API == "current" or (API == "voltage" and not aw.qmc.phidget1018_ratio[channel]):
                 v = v * aw.qmc.phidget1018valueFactor
-            if aw.qmc.phidget1018_async[channel]:
-                if self.PhidgetIOvalues[channel] != -1:
-                    self.PhidgetIOvalues[channel] = (self.PhidgetIOvalues[channel] + v)/2.0
-                else:
-                    self.PhidgetIOvalues[channel] = v
+            try:
+                #### lock shared resources #####
+                self.PhidgetIOsemaphores[channel].acquire(1)
+                self.PhidgetIOvalues[channel].append(v)
+            finally:
+                if self.PhidgetIOsemaphores[channel].available() < 1:
+                    self.PhidgetIOsemaphores[channel].release(1)
 
     def phidget1018getSensorReading(self,i,idx,deviceType,API="voltage"):
         if self.PhidgetIO and len(self.PhidgetIO) > idx: 
-            if API != "digital" and aw.qmc.phidget1018_async[i]:            
-                if self.PhidgetIOvalues[i] == -1:
-                    self.PhidgetIOasynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-                    self.PhidgetIOasynctimesAveraged[idx] = self.PhidgetIOasynctimes[idx]
-                    if API == "current":
-                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getCurrent() * aw.qmc.phidget1018valueFactor
-                    elif API == "frequency":
-                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getFrequency()
-                    else:
-                        if aw.qmc.phidget1018_ratio[i] and deviceType != DeviceID.PHIDID_DAQ1400:
-                            self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltageRatio()
-                        else:
-                            self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
-                return self.PhidgetIOvalues[i]
+            if API != "digital" and aw.qmc.phidget1018_async[i]:
+                res = None
+                try:
+                    #### lock shared resources #####
+                    self.PhidgetIOsemaphores[i].acquire(1)
+                    if len(self.PhidgetIOvalues[i]) > 0:
+                        res = numpy.average(self.PhidgetIOvalues[i])
+                        self.PhidgetIOvalues[i] = self.PhidgetIOvalues[i][-round((aw.qmc.delay/aw.qmc.phidget1018_dataRates[i])):] 
+                except Exception as e:
+                    self.PhidgetIOvalues[i] = []
+                finally:
+                    if self.PhidgetIOsemaphores[i].available() < 1:
+                        self.PhidgetIOsemaphores[i].release(1)
+                if res is None:
+                    return self.PhidgetIOlastvalues[i] # return the previous result
+                else:
+                    self.PhidgetIOlastvalues[i] = res
+                    return res
             else:
                 if API == "digital":
                     v = self.PhidgetIOvalues[i] = int(self.PhidgetIO[idx].getState())
@@ -39606,9 +39552,8 @@ class serialport(object):
                 if deviceType == DeviceID.PHIDID_DAQ1400:
                     # set the InputMode for the DAQ1400
                     self.setDAQ1400inputMode(idx)
-            self.PhidgetIOvalues[channel] = -1
-            self.PhidgetIOasynctimes[channel] = None
-            self.PhidgetIOasynctimesAveraged[channel] = None
+            self.PhidgetIOvalues[channel] = [[],[],[],[],[],[],[],[]]
+            self.PhidgetIOlastvalues = [-1]*8
             
     def setDAQ1400inputMode(self,idx):
         try:
@@ -39760,20 +39705,15 @@ class serialport(object):
                         except Exception:
                             pass
                         self.PhidgetIO = None
-                        self.PhidgetIOvalues = [-1]*8
-                        self.PhidgetIOasynctimes = [None]*8
-                        self.PhidgetIOasynctimesAveraged = [None]*8
+                        self.PhidgetIOvalues = [[],[],[],[],[],[],[],[]]
+                        self.PhidgetIOlastvalues = [-1]*8
             if deviceType == DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and self.PhidgetIO[0].getAttached():
                 probe = -1
                 try:
                     probe = self.phidget1018getSensorReading(0,0,deviceType,API)
                 except Exception:
                     pass
-                async_time = self.PhidgetIOasynctimesAveraged[0]
-                # reset async timestamps for next sampling interval
-                self.PhidgetIOasynctimes[0] = None
-                self.PhidgetIOasynctimesAveraged[0] = None
-                return probe, -1, async_time
+                return probe, -1
             elif deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
                 probe1 = probe2 = -1
                 try:
@@ -39784,31 +39724,12 @@ class serialport(object):
                     probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,deviceType,API)
                 except Exception:
                     pass
-                async_time = None
-                try:
-                    tx_avg_1 = self.PhidgetIOasynctimesAveraged[mode*2]
-                    tx_avg_2 = self.PhidgetIOasynctimesAveraged[mode*2 + 1]
-                    if tx_avg_1 is None and tx_avg_2 is not None:
-                        async_time = tx_avg_2
-                    elif tx_avg_1 is not None and tx_avg_2 is None:
-                        async_time = tx_avg_1
-                    elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 > tx_avg_2:
-                        async_time = tx_avg_1
-                    elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 <= tx_avg_2:
-                        async_time = tx_avg_2
-                except Exception:
-                    pass
-                # reset async timestamps for next sampling interval
-                self.PhidgetIOasynctimes[mode*2] = None
-                self.PhidgetIOasynctimes[mode*2 + 1] = None
-                self.PhidgetIOasynctimesAveraged[mode*2] = None
-                self.PhidgetIOasynctimesAveraged[mode*2 + 1] = None
-                return probe1, probe2, async_time
+                return probe1, probe2
             elif retry:
                 libtime.sleep(0.1)
                 self.PHIDGET1018values(deviceType,mode,API,False)
             else:
-                return -1,-1, None
+                return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -39820,12 +39741,11 @@ class serialport(object):
             except Exception:
                 pass
             self.PhidgetIO = None
-            self.PhidgetIOvalues = [-1]*8
-            self.PhidgetIOasynctimes = [None]*8
-            self.PhidgetIOasynctimesAveraged = [None]*8
+            self.PhidgetIOlastvalues = [[],[],[],[],[],[],[],[]] 
+            self.PhidgetIOlastvalues = [-1]*8
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1018values() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return -1,-1, None
+            return -1,-1
 
 #---
 
@@ -42655,6 +42575,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     break 
         self.sorted_devices = sorted(dev)        
         self.devicetypeComboBox = QComboBox()
+#        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+#        self.devicetypeComboBox.view().setTextElideMode(Qt.ElideNone);
+        w=self.devicetypeComboBox.fontMetrics().boundingRect("Test").width()
+        self.devicetypeComboBox.setMinimumContentsLength(w);
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(aw.ser.externalprogram)
         self.outprogramedit = QLineEdit(aw.ser.externaloutprogram)
@@ -42801,7 +42725,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
             
-            changeTriggersCombo.setMinimumContentsLength(1)
+            changeTriggersCombo.setMinimumContentsLength(3)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)

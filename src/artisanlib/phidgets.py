@@ -200,10 +200,11 @@ class PhidgetManager():
             if self.managersemaphore.available() < 1:
                 self.managersemaphore.release(1)
                 
-#    def list(self,items):
+#    def print_list(self,items):
 #        for k,v in items:
 #            print(v,k.getDeviceSerialNumber(),k.getDeviceClass(),k.getDeviceClassName(),k.getDeviceName(),k.getDeviceSKU(),k.getChannelClassName(),k.getDeviceID(),k.getIsHubPortDevice(),"port: ",k.getHubPort(),"ch: ", k.getChannel(), "local: ", k.getIsLocal())
-#    def list2(self,items):
+#
+#    def print_list2(self,items):
 #        for k in items:
 #            print(k.getDeviceSerialNumber(),k.getChannelClassName(),k.getDeviceID(),k.getIsHubPortDevice(),"port: ", k.getHubPort(),"ch: ",k.getChannel(), "local: ", k.getIsLocal())
 
@@ -221,14 +222,14 @@ class PhidgetManager():
                 hub = 1
             else:
                 hub = 0
-#            self.list(self.attachedPhidgetChannels.items())
+#            self.print_list(self.attachedPhidgetChannels.items())
             # get list of all matching phidget channels
             matching_channels = [k for k, v in self.attachedPhidgetChannels.items() if v and \
                 (hub or (k.getDeviceID() == device_id)) and \
                 ((remote and not remoteOnly) or (not remote and k.getIsLocal()) or (remote and remoteOnly and not k.getIsLocal())) and \
                 k.getChannelClassName() == phidget_class_name and \
                 (channel is None or (not hub and channel == k.getChannel()) or (hub and k.getIsHubPortDevice() and k.getHubPort() == channel))]
-#            self.list2(matching_channels)
+#            self.print_list2(matching_channels)
             # sort by serial number (local first)
             matching_channels.sort(key=lambda x:x.getDeviceSerialNumber())
             # return smallest / first item
