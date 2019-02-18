@@ -4092,8 +4092,8 @@ class tgraphcanvas(FigureCanvas):
                     self.togglecrosslines()
                     
 #PLUS-COMMENT
-#                if aw is not None and not artisanviewerMode:
-#                    aw.updatePlusStatus()                                  
+                if aw is not None and not artisanviewerMode:
+                    aw.updatePlusStatus()                                  
                     
             except Exception as ex:
 #                import traceback
@@ -10190,7 +10190,7 @@ class VMToolbar(NavigationToolbar):
             self.toolitems = (
 
 #PLUS-COMMENT
-#                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
+                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
                 
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -10239,8 +10239,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-#        if aw is not None and not artisanviewerMode:
-#            aw.updatePlusStatus(self)
+        if aw is not None and not artisanviewerMode:
+            aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -16893,13 +16893,13 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
 #PLUS-COMMENT          
-#                if aw is not None and not artisanviewerMode:
-#                    aw.updatePlusStatus()
-#                    if aw.plus_account is not None:
-#                        import plus.config
-#                        if plus.config.uuid_tag in obj:
-#                            import plus.sync                            
-#                            QTimer.singleShot(100,lambda : plus.sync.sync())
+                if aw is not None and not artisanviewerMode:
+                    aw.updatePlusStatus()
+                    if aw.plus_account is not None:
+                        import plus.config
+                        if plus.config.uuid_tag in obj:
+                            import plus.sync                            
+                            QTimer.singleShot(100,lambda : plus.sync.sync())
                                     
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -19229,12 +19229,12 @@ class ApplicationWindow(QMainWindow):
                 if pf:
 
 #PLUS-COMMENT  
-#                    if not artisanviewerMode and aw.plus_account is not None:
-#                        import plus.controller
-#                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-#                        if sync_record_hash is not None:
-#                            # we add the hash over the sync record to be able to detect offline changes
-#                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+                    if not artisanviewerMode and aw.plus_account is not None:
+                        import plus.controller
+                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                        if sync_record_hash is not None:
+                            # we add the hash over the sync record to be able to detect offline changes
+                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
 
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
@@ -19522,12 +19522,12 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-#            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
-#                self.plus_account = settings.value("plus_account",self.plus_account)
-#                if settings.contains("plus_remember_credentials"):
-#                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
-#                if settings.contains("plus_email"):
-#                    self.plus_email = settings.value("plus_email",self.plus_email)
+            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
+                self.plus_account = settings.value("plus_account",self.plus_account)
+                if settings.contains("plus_remember_credentials"):
+                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+                if settings.contains("plus_email"):
+                    self.plus_email = settings.value("plus_email",self.plus_email)
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -20711,13 +20711,13 @@ class ApplicationWindow(QMainWindow):
                     aw.fullscreenAction.setChecked(True)
             
 #PLUS-COMMENT
-#            if filename is None and not artisanviewerMode and self.plus_account is not None:
-#                try:
-#                    import plus.controller
-#                    plus.controller.start(aw)
-#                except:
-#                    pass
-#            #aw.updatePlusStatus()
+            if filename is None and not artisanviewerMode and self.plus_account is not None:
+                try:
+                    import plus.controller
+                    plus.controller.start(aw)
+                except:
+                    pass
+            #aw.updatePlusStatus()
             
             QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
                             
@@ -38731,9 +38731,11 @@ class serialport(object):
 #                    data = self.Phidget1048values[channel]
 #                    data_mean, data_std = numpy.mean(data), numpy.std(data)
 #                    if data_std > 0:
-#                        cut_off = data_std * 1.8
+#                        cut_off = data_std * 0.9
 #                        lower, upper = data_mean - cut_off, data_mean + cut_off
 #                        outliers_removed = [x for x in data if x > lower and x < upper]
+#                        if len(outliers_removed) < 3:
+#                            outliers_removed = data
 #                    else:
 #                        outliers_removed = data
 #                    res = numpy.average(outliers_removed)
