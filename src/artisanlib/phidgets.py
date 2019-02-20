@@ -222,14 +222,18 @@ class PhidgetManager():
                 hub = 1
             else:
                 hub = 0
+
 #            self.print_list(self.attachedPhidgetChannels.items())
+
             # get list of all matching phidget channels
             matching_channels = [k for k, v in self.attachedPhidgetChannels.items() if v and \
                 (hub or (k.getDeviceID() == device_id)) and \
                 ((remote and not remoteOnly) or (not remote and k.getIsLocal()) or (remote and remoteOnly and not k.getIsLocal())) and \
                 k.getChannelClassName() == phidget_class_name and \
                 (channel is None or (not hub and channel == k.getChannel()) or (hub and k.getIsHubPortDevice() and k.getHubPort() == channel))]
+
 #            self.print_list2(matching_channels)
+
             # sort by serial number (local first)
             matching_channels.sort(key=lambda x:x.getDeviceSerialNumber())
             # return smallest / first item

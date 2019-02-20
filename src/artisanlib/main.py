@@ -39053,7 +39053,8 @@ class serialport(object):
                 else:
                     self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda *_:None)
                 # reset async value
-                self.Phidget1046values[channel] = -1
+                self.Phidget1046values[channel] = []
+                self.Phidget1046lastvalues[channel] = -1
 
     def phidget1046attached(self,serial,port,deviceType,idx):
         try:
