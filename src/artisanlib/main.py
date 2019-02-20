@@ -1560,7 +1560,7 @@ class tgraphcanvas(FigureCanvas):
         self.ylimit_C_default = 250
         self.ylimit_min_C_default = 0
         self.ygrid_C_default = 25
-        self.zlimit_C_default = 20
+        self.zlimit_C_default = 25
         self.zlimit_min_C_default = 0
         self.zgrid_C_default = 5
         
@@ -20721,7 +20721,8 @@ class ApplicationWindow(QMainWindow):
                     pass
             #aw.updatePlusStatus()
             
-            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
+#            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
+            # but with this one in place, the window size is not properly set (just the position!?)
                             
         except Exception as e:
             res = False
