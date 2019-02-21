@@ -38964,8 +38964,8 @@ class serialport(object):
         try:
             #### lock shared resources #####
             self.Phidget1046semaphores[channel].acquire(1)
-            temp = self.bridgeValue2Temperature(channel,v)
-            if aw.qmc.mode == "F":
+            temp = self.bridgeValue2Temperature(channel,v*1000) # Note in Phidgets API v22 this factor 1000 has to be added
+            if aw.qmc.mode == "F" and aw.qmc.phidget1046_formula[i] != 2:
                 temp = aw.qmc.fromCtoF(temp)
             self.Phidget1046values[channel].append(temp)
         finally:
