@@ -20,6 +20,7 @@ v1.6.1
    - adds batch number to title already during recording
    - adds a button to remove recent roast entries
    - adds Brazilian portuguese (as spoken in Brazil)
+   - adds the possibility to rename ET/BT curves and LCDs on the graph
  * Changes
    - improved Phidgets tab rendering
    - store reference to profile instead of background with recent roasts
@@ -56,6 +57,7 @@ v1.6.1
    - fixes HUD button styles
    - fixes alignment of AUC shading when Smooth Curves value is large and Optimal Smoothing is not checked
    - fixes an issue on CHARGE on newer Aillio R1 firmware versions ([Issue #297](../../../issues/297))
+   - fixes Phidgets 1046 async mode
 
 ----
 v1.6.0
