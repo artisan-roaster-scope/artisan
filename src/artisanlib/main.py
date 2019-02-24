@@ -6586,6 +6586,11 @@ class tgraphcanvas(FigureCanvas):
             self.phidgetServerAdded = False
             
     def startPhidgetManager(self):
+        # this is needed to surpress the message on the ignored Exception
+        #                            # Phidget that is raised on starting the PhidgetManager without installed
+        #                            # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
+        _stderr = sys.stderr
+        sys.stderr = object
         if self.phidgetRemoteFlag:
             try:
                 self.addPhidgetServer()
@@ -6597,6 +6602,7 @@ class tgraphcanvas(FigureCanvas):
                 libtime.sleep(0.3)
             except:
                 pass
+        sys.stderr = _stderr
     
     def stopPhidgetManager(self):
         if self.phidgetManager is not None:
@@ -20761,10 +20767,6 @@ class ApplicationWindow(QMainWindow):
     def startWebLCDs(self,force=False):
         try:
             if not self.WebLCDs or force:
-                sys.stderr = sys.stdout # re-created the sys.stderr that was set before to object
-                from bottle import default_app, request, abort, route, template, static_file, get, TEMPLATE_PATH
-                sys.stderr = object # hide PhidgetManager errors
-
                 from artisanlib.weblcds import startWeb
                 res = startWeb(
                     self.WebLCDsPort,
@@ -20788,8 +20790,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 return False
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
             self.stopWebLCDs()
@@ -52111,14 +52113,7 @@ def main():
                     aw.qmc.backgroundprofile = None
     except Exception:
         pass
-    
-    try:
-        # HACK: not that this is extremly hacky and makes some libs failing to load like bottle
-        sys.stderr = object # this is needed to surpress the message on the ignored Exception
-                            # Phidget that is raised on starting the PhidgetManager without installed
-                            # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
-    except:
-        pass
+
 #    if platf == 'Windows' and appFrozen():
 #        try:
 #            sys.stderr = sys.stdout
