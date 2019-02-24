@@ -19406,12 +19406,14 @@ class ApplicationWindow(QMainWindow):
                             painter = QPainter(white_img)
                             painter.drawPixmap(0,0,self.image.width(),self.image.height(),self.image)
                             self.image = white_img
+                            del painter
                         self.image.save(fconv,filetype)
                     else:
                         aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(fileext)))                        
                 except:
                     pass
                 i += 1
+                aw.qmc.safesaveflag = False
                 aw.qmc.reset(soundOn=False)
             aw.qmc.roastpropertiesflag = flag_temp
             progress.cancel()
