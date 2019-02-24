@@ -21,6 +21,7 @@ v1.6.1
    - adds a button to remove recent roast entries
    - adds Brazilian portuguese (as spoken in Brazil)
    - adds the possibility to rename ET/BT curves and LCDs on the graph
+   - adds to flags to show/hide time/temp grids
  * Changes
    - improved Phidgets tab rendering
    - store reference to profile instead of background with recent roasts

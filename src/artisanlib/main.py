@@ -1564,6 +1564,9 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit_min_C_default = 0
         self.zgrid_C_default = 5
         
+        self.temp_grid = True
+        self.time_grid = True
+        
         # maximum accepted min/max settings for y and z axis
         self.zlimit_max = 500
         self.zlimit_min_max = -500
@@ -1634,7 +1637,15 @@ class tgraphcanvas(FigureCanvas):
         self.ax.set_autoscale_on(False)
 
         #set grid + axle labels + title
-        self.ax.grid(True,color=self.palette["grid"],linestyle = self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
+        grid_axis = None
+        if self.temp_grid and self.time_grid:
+            grid_axis = 'both'
+        elif self.temp_grid:
+            grid_axis = 'y'
+        elif self.time_grid:
+            grid_axis = 'x'
+        if grid_axis is not None:
+            self.ax.grid(True,axis=grid_axis,color=self.palette["grid"],linestyle = self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
 
         #change label colors
         for label in self.ax.yaxis.get_ticklabels():
@@ -4711,7 +4722,17 @@ class tgraphcanvas(FigureCanvas):
                 fontprop_medium.set_size("medium")
                 fontprop_large = aw.mpl_fontproperties.copy()
                 fontprop_large.set_size("large")
-                self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
+                
+                grid_axis = None
+                if self.temp_grid and self.time_grid:
+                    grid_axis = 'both'
+                elif self.temp_grid:
+                    grid_axis = 'y'
+                elif self.time_grid:
+                    grid_axis = 'x'
+                if grid_axis is not None:
+                    self.ax.grid(True,axis=grid_axis,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
+                
                 if aw.qmc.flagstart and not aw.qmc.title_show_always:
                     self.setProfileTitle("")
                     st_artist = self.fig.suptitle("")
@@ -10865,7 +10886,8 @@ class SampleThread(QThread):
                         elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                             tp = aw.findTP()
                             try:
-                                if aw.qmc.temp2[tp] != -1: # only mark TP if not an error value!
+                                if ((aw.qmc.mode == "C" and aw.qmc.temp2[tp] > 50 and aw.qmc.temp2[tp] < 150) or \
+                                    (aw.qmc.mode == "F" and aw.qmc.temp2[tp] > 100 and aw.qmc.temp2[tp] < 300)): # only mark TP if not an error value!
                                     aw.qmc.autoTPIdx = 1
                                     aw.qmc.TPalarmtimeindex = tp
                             except:
@@ -19136,9 +19158,9 @@ class ApplicationWindow(QMainWindow):
             profile["etypes"] = [encodeLocal(et) for et in self.qmc.etypes]
             profile["roastingnotes"] = encodeLocal(self.qmc.roastingnotes)
             profile["cuppingnotes"] = encodeLocal(self.qmc.cuppingnotes)
-            profile["timex"] = [self.float2float(x,8) for x in self.qmc.timex]
-            profile["temp1"] = [self.float2float(x,6) for x in self.qmc.temp1]
-            profile["temp2"] = [self.float2float(x,6) for x in self.qmc.temp2]
+            profile["timex"] = [self.float2float(x,10) for x in self.qmc.timex]
+            profile["temp1"] = [self.float2float(x,8) for x in self.qmc.temp1]
+            profile["temp2"] = [self.float2float(x,8) for x in self.qmc.temp2]
             profile["phases"] = self.qmc.phases
             profile["zmax"] = int(self.qmc.zlimit)
             profile["zmin"] = int(self.qmc.zlimit_min)
@@ -20253,6 +20275,10 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("chargemintime"):
                 self.qmc.chargemintime = toInt(settings.value("chargemintime",self.qmc.chargemintime))
             self.qmc.legendloc = toInt(settings.value("legendloc",self.qmc.legendloc))
+            if settings.contains("temp_grid"):
+                self.qmc.temp_grid = bool(toBool(settings.value("temp_grid",self.qmc.temp_grid)))
+            if settings.contains("time_grid"):
+                self.qmc.time_grid = bool(toBool(settings.value("time_grid",self.qmc.time_grid)))
             settings.endGroup()
             
             settings.beginGroup("RoastProperties")
@@ -20735,6 +20761,10 @@ class ApplicationWindow(QMainWindow):
     def startWebLCDs(self,force=False):
         try:
             if not self.WebLCDs or force:
+                sys.stderr = sys.stdout # re-created the sys.stderr that was set before to object
+                from bottle import default_app, request, abort, route, template, static_file, get, TEMPLATE_PATH
+                sys.stderr = object # hide PhidgetManager errors
+
                 from artisanlib.weblcds import startWeb
                 res = startWeb(
                     self.WebLCDsPort,
@@ -20758,8 +20788,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 return False
         except Exception as e:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
             self.stopWebLCDs()
@@ -21433,6 +21463,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("locktimex_end",self.qmc.locktimex_end)
             settings.setValue("legendloc",self.qmc.legendloc)
             settings.setValue("chargemintime",self.qmc.chargemintime)
+            settings.setValue("temp_grid",self.qmc.temp_grid)
+            settings.setValue("time_grid",self.qmc.time_grid)
             settings.endGroup()
             settings.beginGroup("RoastProperties")
             settings.setValue("drumspeed",self.qmc.drumspeed)
@@ -31801,6 +31833,14 @@ class WindowsDlg(ArtisanDialog):
         except Exception:
             self.xaxislencombobox.setCurrentIndex(0)
         self.xaxislencombobox.currentIndexChanged.connect(self.xaxislenloc)
+        self.timeGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Time",None))
+        self.timeGridCheckBox.setChecked(aw.qmc.time_grid)
+        self.timeGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show time grid", None))
+        self.timeGridCheckBox.setFocusPolicy(Qt.NoFocus)
+        self.tempGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Temp",None))
+        self.tempGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show temperature grid", None))
+        self.tempGridCheckBox.setChecked(aw.qmc.temp_grid)
+        self.tempGridCheckBox.setFocusPolicy(Qt.NoFocus)
         ygridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.ygridSpinBox = QSpinBox()
         self.ygridSpinBox.setRange(10,500)
@@ -31921,6 +31961,8 @@ class WindowsDlg(ArtisanDialog):
         graphgridlayout.addWidget(self.gridstylecombobox,1,1,Qt.AlignLeft)
         graphgridlayout.addWidget(gridthicknesslabel,1,2,Qt.AlignRight)
         graphgridlayout.addWidget(self.gridwidthSpinBox,1,3,Qt.AlignLeft)
+        graphgridlayout.addWidget(self.timeGridCheckBox,2,0,Qt.AlignLeft)
+        graphgridlayout.addWidget(self.tempGridCheckBox,2,1,Qt.AlignLeft)
         graphgridlayout.addWidget(gridalphalabel,2,2,Qt.AlignRight)
         graphgridlayout.addWidget(self.gridalphaSpinBox,2,3,Qt.AlignLeft)
         xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None))
@@ -32056,6 +32098,8 @@ class WindowsDlg(ArtisanDialog):
     # exit dialog with OK
     def updatewindow(self):
         limits_changed = False
+        aw.qmc.time_grid = self.timeGridCheckBox.isChecked()
+        aw.qmc.temp_grid = self.tempGridCheckBox.isChecked()
         try:
             yl = int(str(self.ylimitEdit.text()))
             yl_min = int(str(self.ylimitEdit_min.text()))
@@ -38652,8 +38696,6 @@ class serialport(object):
                             self.Phidget1045semaphore.acquire(1)
                             if len(self.Phidget1045values) > 0:
                                 async_res = numpy.average(self.Phidget1045values)
-#                            print(round((aw.qmc.delay/aw.qmc.phidget1045_dataRate)/2), len(self.Phidget1045values))
-#                            self.Phidget1045values = []
                             self.Phidget1045values = self.Phidget1045values[-round((aw.qmc.delay/aw.qmc.phidget1045_dataRate)):]
                         except:
                             self.Phidget1045values = []
@@ -38661,7 +38703,11 @@ class serialport(object):
                             if self.Phidget1045semaphore.available() < 1:
                                 self.Phidget1045semaphore.release(1)
                         if async_res is None:
-                            probe = self.Phidget1045lastvalue
+                            if self.Phidget1045lastvalue == -1: # there is no last value yet, we take a sync value
+                                probe = self.PhidgetIRSensor.getTemperature()
+                                self.Phidget1045lastvalue = self.PhidgetIRSensor.getTemperature()
+                            else:
+                                probe = self.Phidget1045lastvalue
                         else:
                             self.Phidget1045lastvalue = async_res
                             probe = async_res
@@ -38750,7 +38796,12 @@ class serialport(object):
                 if self.Phidget1048semaphores[channel].available() < 1:
                     self.Phidget1048semaphores[channel].release(1)
             if res is None:
-                return self.Phidget1048lastvalues[channel] # return the previous result
+                if self.Phidget1048lastvalues[channel] == -1: # there is no last value yet, we take a sync value
+                    res = self.PhidgetTemperatureSensor[idx].getTemperature()
+                    self.Phidget1048lastvalues[channel] = res
+                    return res
+                else:
+                	return self.Phidget1048lastvalues[channel] # return the previous result
             else:
                 self.Phidget1048lastvalues[channel] = res
                 return res
@@ -39017,7 +39068,12 @@ class serialport(object):
                 if self.Phidget1046semaphores[channel].available() < 1:
                     self.Phidget1046semaphores[channel].release(1)
             if res is None:
-                return self.Phidget1046lastvalues[channel]
+                if self.Phidget1046lastvalues[channel] == -1: # there is no last value yet, we take a sync value
+                    res = self.phidget1046getTemperature(channel,idx)
+                    self.Phidget1046lastvalues[channel] = res
+                    return res
+                else:
+                    return self.Phidget1046lastvalues[channel]
             else:
                 self.Phidget1046lastvalues[channel] = res
                 return res
@@ -39512,7 +39568,20 @@ class serialport(object):
                     if self.PhidgetIOsemaphores[i].available() < 1:
                         self.PhidgetIOsemaphores[i].release(1)
                 if res is None:
-                    return self.PhidgetIOlastvalues[i] # return the previous result
+                    if self.PhidgetIOlastvalues[i] == -1: # there is no last value yet, we take a sync value
+                        if API == "current":
+                            res = self.PhidgetIO[idx].getCurrent() * aw.qmc.phidget1018valueFactor
+                        elif API == "frequency":
+                            res = self.PhidgetIO[idx].getFrequency()
+                        else:
+                            if aw.qmc.phidget1018_ratio[i] and deviceType != DeviceID.PHIDID_DAQ1400:
+                                res = self.PhidgetIO[idx].getVoltageRatio()
+                            else:
+                                res = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
+                        self.PhidgetIOlastvalues[i] = res
+                        return res
+                    else:
+                        return self.PhidgetIOlastvalues[i] # return the previous result
                 else:
                     self.PhidgetIOlastvalues[i] = res
                     return res
@@ -42628,9 +42697,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.sorted_devices = sorted(dev)        
         self.devicetypeComboBox = QComboBox()
 #        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-#        self.devicetypeComboBox.view().setTextElideMode(Qt.ElideNone);
-        w=self.devicetypeComboBox.fontMetrics().boundingRect("Test").width()
-        self.devicetypeComboBox.setMinimumContentsLength(w);
+#        self.devicetypeComboBox.view().setTextElideMode(Qt.ElideNone)
+        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; withou long items get cutted in the popup
+        #  note the -7 as the width of the popup is too large if given the correct maximum characters
+        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(aw.ser.externalprogram)
         self.outprogramedit = QLineEdit(aw.ser.externaloutprogram)
@@ -43335,6 +43405,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.temperatureDeviceCombo = QComboBox()
         self.temperatureDeviceCombo.setFocusPolicy(Qt.NoFocus)
         self.temperatureDeviceCombo.addItems(aw.qmc.temperaturedevicefunctionlist)
+        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; withou long items get cutted in the popup
+        #  note the -7 as the width of the popup is too large if given the correct maximum characters
+        self.temperatureDeviceCombo.setMinimumContentsLength(max(22,len(max(aw.qmc.temperaturedevicefunctionlist, key=len)) - 7)) # expects # characters, but is to wide
         try:
             self.temperatureDeviceCombo.setCurrentIndex(aw.qmc.ambient_temperature_device)
         except:
@@ -52040,6 +52113,7 @@ def main():
         pass
     
     try:
+        # HACK: not that this is extremly hacky and makes some libs failing to load like bottle
         sys.stderr = object # this is needed to surpress the message on the ignored Exception
                             # Phidget that is raised on starting the PhidgetManager without installed
                             # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
