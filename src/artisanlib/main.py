@@ -41000,61 +41000,81 @@ class designerconfigDlg(ArtisanDialog):
             return 1
         if self.Edit0bt.text() != self.Edit0btcopy:
             aw.qmc.temp2[aw.qmc.timeindex[0]] = float(str(self.Edit0bt.text()))
+            self.Edit0btcopy = self.Edit0bt.text()
         if self.Edit0et.text() != self.Edit0etcopy:
             aw.qmc.temp1[aw.qmc.timeindex[0]] = float(str(self.Edit0et.text()))
+            self.Edit0etcopy = self.Edit0et.text()
         if self.dryend.isChecked():
             if self.Edit1.text() != self.Edit1copy:
                 if aw.qmc.stringtoseconds(str(self.Edit1.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit1.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[1]] = timez
+                    self.Edit1copy = self.Edit1.text()
             if self.Edit1bt.text() != self.Edit1btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[1]] = float(str(self.Edit1bt.text()))
+                self.Edit1btcopy = self.Edit1bt.text()
             if self.Edit1et.text() != self.Edit1etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[1]] = float(str(self.Edit1et.text()))
+                self.Edit1etcopy = self.Edit1et.text()
         if self.fcs.isChecked():
             if self.Edit2.text() != self.Edit2copy:
                 if aw.qmc.stringtoseconds(str(self.Edit2.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit2.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[2]] = timez
+                    self.Edit2copy = self.Edit2.text()
             if self.Edit2bt.text() != self.Edit2btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[2]] = float(str(self.Edit2bt.text()))
+                self.Edit2btcopy = self.Edit2bt.text()
             if self.Edit2et.text() != self.Edit2etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[2]] = float(str(self.Edit2et.text()))
+                self.Edit2etcopy = self.Edit2et.text()
         if self.fce.isChecked():
             if self.Edit3.text() != self.Edit3copy:
                 if aw.qmc.stringtoseconds(str(self.Edit3.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit3.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[3]] = timez
+                    self.Edit3copy = self.Edit3.text()
             if self.Edit3bt.text() != self.Edit3btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[3]] = float(str(self.Edit3bt.text()))
+                self.Edit3btcopy = self.Edit3bt.text()
             if self.Edit3et.text() != self.Edit3etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[3]] = float(str(self.Edit3et.text()))
+                self.Edit3etcopy = self.Edit3et.text()
         if self.scs.isChecked():
             if self.Edit4.text() != self.Edit4copy:
                 if aw.qmc.stringtoseconds(str(self.Edit4.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit4.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[4]] = timez
+                    self.Edit4copy = self.Edit4.text()
             if self.Edit4bt.text() != self.Edit4btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[4]] = float(str(self.Edit4bt.text()))
+                self.Edit4btcopy = self.Edit4bt.text()
             if self.Edit4et.text() != self.Edit4etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[4]] = float(str(self.Edit4et.text()))
+                self.Edit4etcopy = self.Edit4et.text()
         if self.sce.isChecked():
             if self.Edit5.text() != self.Edit5copy:
                 if aw.qmc.stringtoseconds(str(self.Edit5.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit5.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[5]] = timez
+                    self.Edit5copy = self.Edit5.text()
             if self.Edit5bt.text() != self.Edit5btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[5]] = float(str(self.Edit5bt.text()))
+                self.Edit5btcopy = self.Edit5bt.text()
             if self.Edit5et.text() != self.Edit5etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[5]] = float(str(self.Edit5et.text()))
+                self.Edit5etcopy = self.Edit5et.text()
         if self.Edit6.text() != self.Edit6copy:
             if aw.qmc.stringtoseconds(str(self.Edit6.text())):
                 timez = aw.qmc.stringtoseconds(str(self.Edit6.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                 aw.qmc.timex[aw.qmc.timeindex[6]] = timez
+                self.Edit6copy = self.Edit6.text()
         if self.Edit6bt.text() != self.Edit6btcopy:
             aw.qmc.temp2[aw.qmc.timeindex[6]] = float(str(self.Edit6bt.text()))
+            self.Edit6btcopy = self.Edit6bt.text()
         if self.Edit6et.text() != self.Edit6etcopy:
             aw.qmc.temp1[aw.qmc.timeindex[6]] = float(str(self.Edit6et.text()))
+            self.Edit6etcopy = self.Edit6et.text()
         for i in range(1,6): #1-5
             aw.qmc.designertimeinit[i] = aw.qmc.timex[aw.qmc.timeindex[i]]
         aw.qmc.xaxistosm(redraw=False)
@@ -47213,7 +47233,10 @@ class AlarmDlg(ArtisanDialog):
                 # remember the columnwidth
                 for i in range(len(aw.qmc.alarmtablecolumnwidths)):
                     try:
-                        self.alarmtable.setColumnWidth(i,aw.qmc.alarmtablecolumnwidths[i])
+                        w = aw.qmc.alarmtablecolumnwidths[i]
+                        if i == 6:
+                            w = max(80,w)
+                        self.alarmtable.setColumnWidth(i,w)
                     except:
                         pass
                 self.markNotEnabledAlarmRows()
