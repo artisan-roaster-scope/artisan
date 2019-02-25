@@ -51675,10 +51675,10 @@ class PIDcontrol(object):
                 if aw.pidcontrol.pidNegativeTarget:
                     slidernr = aw.pidcontrol.pidNegativeTarget - 1
                     if aw.pidcontrol.invertControl:
-                        vn = 0 - v
+                        vp = 0 - v
                     else:
                         vp = v
-                    vn = min(0,max(-100,int(vn)))
+                    vn = min(0,max(-100,int(vp)))
                     # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range
                     cool = int(round(numpy.interp(vn,[-100,0],[aw.eventslidermax[slidernr],aw.eventslidermin[slidernr]])))
                     aw.qmc.temporarymovenegativeslider = (slidernr,cool)
