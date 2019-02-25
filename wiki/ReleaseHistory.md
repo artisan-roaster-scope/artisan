@@ -13,6 +13,7 @@ v1.6.1
    - adds IO Command state feedback by mfurlotti ([PR #284](../../../pull/284))
    - adds support for more digital output Phidgets [REL1000](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=966), [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720) and the first 4 channels of [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721) ([Issue #286](../../../issues/286))
    - adds support for the Phidget [DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961) (current/frequency/digital/voltage input)
+   - adds support for the Yocotopuce IR module
    - adds support for the Probat Middleware
    - adds CMD-A keyboard shortcut to open alarms dialog
    - adds JPEG and BMP support (export/convert)
