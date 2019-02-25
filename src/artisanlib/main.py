@@ -37595,9 +37595,14 @@ class serialport(object):
         try:
             self.YOCTOimportLIB() # first via import the lib
             from yoctopuce.yocto_temperature import YTemperature
-            TEMPsensor = YTemperature.FirstTemperature()
-            if TEMPsensor.isOnline():
-                return TEMPsensor.get_currentValue()
+            METEOsensor = self.getNextYOCTOsensorOfType(3,[],YTemperature.FirstTemperature())
+            if METEOsensor is not None and METEOsensor.isOnline():
+                serial = METEOsensor.get_module().get_serialNumber()
+                tempCh = YTemperature.FindTemperature(serial + '.temperature')
+                if tempCh.isOnline():
+                    return tempCh.get_currentValue()
+                else:
+                    return None
             else:
                 return None
         except:
@@ -39968,7 +39973,11 @@ class serialport(object):
 
 #---
 
-    # given the YOCTOsensor, return the first of the given mode (mode=0 => Yocto-Thermocouple; mode=1 => Yocto-Pt100)
+    # given the YOCTOsensor, return the first of the given mode
+    #   mode=0 => Yocto-Thermocouple
+    #   mode=1 => Yocto-Pt100
+    #   mode=2 => Yocto-IR
+    #   mode=3 => Yocto-METEO
     # that is not in the list of already connected ones
     def getNextYOCTOsensorOfType(self,mode,connected_yoctos,YOCTOsensor):
         from yoctopuce.yocto_temperature import YTemperature
@@ -39976,7 +39985,8 @@ class serialport(object):
             productName = YOCTOsensor.get_module().get_productName()
             if not (YOCTOsensor.get_module().get_serialNumber() in connected_yoctos) and  \
                 ((mode == 0 and productName == "Yocto-Thermocouple") or (mode == 1 and productName == "Yocto-PT100") or \
-                 (mode == 2 and productName == "Yocto-Temperature-IR")):
+                 (mode == 2 and productName == "Yocto-Temperature-IR") or \
+                 (mode == 3 and productName.startswith("Yocto-Meteo"))):
                 return YOCTOsensor
             else:
                 return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.nextTemperature(YOCTOsensor))
