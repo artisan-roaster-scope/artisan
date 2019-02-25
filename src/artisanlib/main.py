@@ -1534,6 +1534,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmbeep = []    # 0 = OFF; 1 = ON flags
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program (comments after # are ignored)
         self.alarmtablecolumnwidths = []
+        self.silent_alarms = False # if this is true (can be set via a Artisan Command button action "alarm(1)", alarms are triggered, but actions are not fired
 
         self.loadalarmsfromprofile = False # if set, alarms are loaded from profile
         self.loadalarmsfrombackground = False # if set, alarms are loaded from background profiles
@@ -2909,183 +2910,184 @@ class tgraphcanvas(FigureCanvas):
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = aw.qmc.timeclock.elapsed()/1000.    #turn off flag as it has been read
         aw.sendmessage(QApplication.translate("Message","Alarm {0} triggered", None).format(alarmnumber + 1))
-        if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
-            QApplication.beep()
-        try:
-            if self.alarmaction[alarmnumber] == 0:
-                # alarm popup message
-                #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber])
-                # alarm popup message with 10sec timeout
-                amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=aw.qmc.alarm_popup_timout)
-                amb.show()
-                #send alarm also to connected WebLCDs clients
-                if aw.WebLCDs and aw.WebLCDsAlerts:
-                    aw.qmc.updateWebLCDs(alertText=u(self.alarmstrings[alarmnumber]),alertTimeout=10)
-            elif self.alarmaction[alarmnumber] == 1:
-                # alarm call program
-                fname = u(self.alarmstrings[alarmnumber].split('#')[0])
-# take care, the QDir().current() directory changes with loads and saves                
-#                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
-                if False and platf == 'Windows': # this Windows version fails on commands with arguments
-                    f = u("file:///") + u(QApplication.applicationDirPath()) + "/" + u(fname)
-                    res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
-                else:
-                    # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
-                    # Linux: script is expected to sit next to the artisan binary or being specified with its full path
-                    #
-                    # to get the effect of speaking alarms a text containing the following two lines called "say.sh" could do
-                    #                #!/bin/sh
-                    #                say "Hello" &
-                    # don't forget to do
-                    #                # cd 
-                    #                # chmod +x say.sh
-                    #
-                    # alternatively use "say $@ &" as command and send text strings along
-                    # Voices:
-                    #  -v Alex (male english)
-                    #  -v Viki (female english)
-                    #  -v Victoria (female english)
-                    #  -v Yannick (male german)
-                    #  -v Anna (female german)
-                    #  -v Paolo (male italian)
-                    #  -v Silvia (female italian)
-                    aw.call_prog_with_args(fname)
-                    res = True
-                if res:
-                    aw.sendmessage(QApplication.translate("Message","Alarm is calling: {0}",None).format(fname))
-                else:
-                    aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on {0}",None).format(f))
-            elif self.alarmaction[alarmnumber] == 2:
-                # alarm event button
-                button_number = None
-                text = self.alarmstrings[alarmnumber].split('#')[0]
-                bnrs = text.split(',')
-                for bnr in bnrs:
-                    try:
-                        button_number = int(str(bnr.strip())) - 1 # the event buttons presented to the user are numbered from 1 on
-                    except Exception:
-                        aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(u(self.alarmstrings[alarmnumber])))
-                    if button_number is not None:
-                        if button_number > -1 and button_number < len(aw.buttonlist):
-                            aw.recordextraevent(button_number)
-            elif self.alarmaction[alarmnumber] in [3,4,5,6]:
-                # alarm slider 1-4
-                slidernr = None
-                try:
-                    text = self.alarmstrings[alarmnumber].split('#')[0].strip()
-                    if self.alarmaction[alarmnumber] == 3:
-                        slidernr = 0
-                    elif self.alarmaction[alarmnumber] == 4:
-                        slidernr = 1
-                    elif self.alarmaction[alarmnumber] == 5:
-                        slidernr = 2
-                    elif self.alarmaction[alarmnumber] == 6:
-                        slidernr = 3
-                    if slidernr is not None:
-                        slidervalue = max(aw.eventslidermin[slidernr],min(aw.eventslidermax[slidernr],int(str(text))))
-                        aw.moveslider(slidernr,slidervalue)
-                        # we set the last value to be used for relative +- button action as base
-                        aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
-                        if aw.qmc.flagstart:
-                            value = aw.float2float((slidervalue + 10.0) / 10.0)
-                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber,slidernr)))
-                        aw.fireslideraction(slidernr)
-                except Exception as e:
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
-                    aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(u(self.alarmstrings[alarmnumber])))
-                    
-            elif self.alarmaction[alarmnumber] == 7:
-                # START
-                if aw.button_2.isEnabled():
-                    aw.qmc.ToggleRecorder()
-            elif self.alarmaction[alarmnumber] == 8:
-                # DRY
-                #if aw.button_19.isEnabled():
-                #    aw.qmc.markDryEnd()
-                aw.qmc.autoDryIdx = len(aw.qmc.timex)
-            elif self.alarmaction[alarmnumber] == 9:
-                # FCs
-                #if aw.button_3.isEnabled():
-                #    aw.qmc.mark1Cstart()
-                aw.qmc.autoFCsIdx = len(aw.qmc.timex)
-            elif self.alarmaction[alarmnumber] == 10:
-                # FCe
-                if aw.button_4.isEnabled():
-                    aw.qmc.mark1Cend()
-            elif self.alarmaction[alarmnumber] == 11:
-                # SCs
-                if aw.button_5.isEnabled():
-                    aw.qmc.mark2Cstart()
-            elif self.alarmaction[alarmnumber] == 12:
-                # SCe
-                if aw.button_6.isEnabled():
-                    aw.qmc.mark2Cend()
-            elif self.alarmaction[alarmnumber] == 13:
-                # DROP
-                #if aw.button_9.isEnabled():
-                #    aw.qmc.markDrop()
-                aw.qmc.autoDropIdx = len(aw.qmc.timex)
-            elif self.alarmaction[alarmnumber] == 14:
-                # COOL
-                if aw.button_20.isEnabled():
-                    aw.qmc.markCoolEnd()
-            elif self.alarmaction[alarmnumber] == 15:
-                # OFF
-                if aw.button_1.isEnabled():
-                    aw.qmc.ToggleMonitor()
-            elif self.alarmaction[alarmnumber] == 16:
-                # CHARGE
-                aw.qmc.autoChargeIdx = len(aw.qmc.timex)
-            elif self.alarmaction[alarmnumber] == 17 and aw.qmc.Controlbuttonflag:
-                # RampSoak ON
-                if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
-                    aw.fujipid.setrampsoak(1)
-                elif aw.pidcontrol: # internal or external MODBUS PID control
-                    aw.pidcontrol.svMode = 1
-                    aw.pidcontrol.pidOn()
-            elif self.alarmaction[alarmnumber] == 18 and aw.qmc.Controlbuttonflag:
-                # RampSoak OFF
-                if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
-                    aw.fujipid.setrampsoak(0)
-                elif aw.pidcontrol:  # internal or external MODBUS PID control
-                    aw.pidcontrol.svMode = 0
-                    aw.pidcontrol.pidOff()
-            elif self.alarmaction[alarmnumber] == 19 and aw.qmc.Controlbuttonflag:
-                # PID ON
-                if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
-                    aw.fujipid.setONOFFstandby(0)
-                elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
-                    aw.pidcontrol.pidOn()
-            elif self.alarmaction[alarmnumber] == 20 and aw.qmc.Controlbuttonflag:
-                # PID OFF
-                if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
-                    aw.fujipid.setONOFFstandby(1)
-                elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
-                    aw.pidcontrol.pidOff()
-            elif self.alarmaction[alarmnumber] == 21:
-                # SV slider alarm
-                try:
+        if not self.silent_alarms:
+            if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
+                QApplication.beep()
+            try:
+                if self.alarmaction[alarmnumber] == 0:
+                    # alarm popup message
+                    #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber])
+                    # alarm popup message with 10sec timeout
+                    amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=aw.qmc.alarm_popup_timout)
+                    amb.show()
+                    #send alarm also to connected WebLCDs clients
+                    if aw.WebLCDs and aw.WebLCDsAlerts:
+                        aw.qmc.updateWebLCDs(alertText=u(self.alarmstrings[alarmnumber]),alertTimeout=10)
+                elif self.alarmaction[alarmnumber] == 1:
+                    # alarm call program
+                    fname = u(self.alarmstrings[alarmnumber].split('#')[0])
+    # take care, the QDir().current() directory changes with loads and saves                
+    #                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
+                    if False and platf == 'Windows': # this Windows version fails on commands with arguments
+                        f = u("file:///") + u(QApplication.applicationDirPath()) + "/" + u(fname)
+                        res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
+                    else:
+                        # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
+                        # Linux: script is expected to sit next to the artisan binary or being specified with its full path
+                        #
+                        # to get the effect of speaking alarms a text containing the following two lines called "say.sh" could do
+                        #                #!/bin/sh
+                        #                say "Hello" &
+                        # don't forget to do
+                        #                # cd 
+                        #                # chmod +x say.sh
+                        #
+                        # alternatively use "say $@ &" as command and send text strings along
+                        # Voices:
+                        #  -v Alex (male english)
+                        #  -v Viki (female english)
+                        #  -v Victoria (female english)
+                        #  -v Yannick (male german)
+                        #  -v Anna (female german)
+                        #  -v Paolo (male italian)
+                        #  -v Silvia (female italian)
+                        aw.call_prog_with_args(fname)
+                        res = True
+                    if res:
+                        aw.sendmessage(QApplication.translate("Message","Alarm is calling: {0}",None).format(fname))
+                    else:
+                        aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on {0}",None).format(f))
+                elif self.alarmaction[alarmnumber] == 2:
+                    # alarm event button
+                    button_number = None
                     text = self.alarmstrings[alarmnumber].split('#')[0]
-                    sv = float(str(text))
-                    if aw.qmc.device == 0:
-                        if sv is not None and sv != aw.fujipid.sv:
-                            sv = max(0,sv) # we don't send SV < 0
-                            #aw.qmc.temporarysetsv = sv
-                            aw.fujipid.setsv(sv,silent=True)
-                    elif aw.pidcontrol.pidActive:
-                        if sv is not None and sv != aw.pidcontrol.sv:
-                            sv = max(0,sv) # we don't send SV < 0
-                            #aw.qmc.temporarysetsv = sv
-                            aw.pidcontrol.setSV(sv,init=False)
-                except Exception as e:
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
-                    aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(u(self.alarmstrings[alarmnumber])))
-
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
+                    bnrs = text.split(',')
+                    for bnr in bnrs:
+                        try:
+                            button_number = int(str(bnr.strip())) - 1 # the event buttons presented to the user are numbered from 1 on
+                        except Exception:
+                            aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(u(self.alarmstrings[alarmnumber])))
+                        if button_number is not None:
+                            if button_number > -1 and button_number < len(aw.buttonlist):
+                                aw.recordextraevent(button_number)
+                elif self.alarmaction[alarmnumber] in [3,4,5,6]:
+                    # alarm slider 1-4
+                    slidernr = None
+                    try:
+                        text = self.alarmstrings[alarmnumber].split('#')[0].strip()
+                        if self.alarmaction[alarmnumber] == 3:
+                            slidernr = 0
+                        elif self.alarmaction[alarmnumber] == 4:
+                            slidernr = 1
+                        elif self.alarmaction[alarmnumber] == 5:
+                            slidernr = 2
+                        elif self.alarmaction[alarmnumber] == 6:
+                            slidernr = 3
+                        if slidernr is not None:
+                            slidervalue = max(aw.eventslidermin[slidernr],min(aw.eventslidermax[slidernr],int(str(text))))
+                            aw.moveslider(slidernr,slidervalue)
+                            # we set the last value to be used for relative +- button action as base
+                            aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
+                            if aw.qmc.flagstart:
+                                value = aw.float2float((slidervalue + 10.0) / 10.0)
+                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber,slidernr)))
+                            aw.fireslideraction(slidernr)
+                    except Exception as e:
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(u(self.alarmstrings[alarmnumber])))
+                        
+                elif self.alarmaction[alarmnumber] == 7:
+                    # START
+                    if aw.button_2.isEnabled():
+                        aw.qmc.ToggleRecorder()
+                elif self.alarmaction[alarmnumber] == 8:
+                    # DRY
+                    #if aw.button_19.isEnabled():
+                    #    aw.qmc.markDryEnd()
+                    aw.qmc.autoDryIdx = len(aw.qmc.timex)
+                elif self.alarmaction[alarmnumber] == 9:
+                    # FCs
+                    #if aw.button_3.isEnabled():
+                    #    aw.qmc.mark1Cstart()
+                    aw.qmc.autoFCsIdx = len(aw.qmc.timex)
+                elif self.alarmaction[alarmnumber] == 10:
+                    # FCe
+                    if aw.button_4.isEnabled():
+                        aw.qmc.mark1Cend()
+                elif self.alarmaction[alarmnumber] == 11:
+                    # SCs
+                    if aw.button_5.isEnabled():
+                        aw.qmc.mark2Cstart()
+                elif self.alarmaction[alarmnumber] == 12:
+                    # SCe
+                    if aw.button_6.isEnabled():
+                        aw.qmc.mark2Cend()
+                elif self.alarmaction[alarmnumber] == 13:
+                    # DROP
+                    #if aw.button_9.isEnabled():
+                    #    aw.qmc.markDrop()
+                    aw.qmc.autoDropIdx = len(aw.qmc.timex)
+                elif self.alarmaction[alarmnumber] == 14:
+                    # COOL
+                    if aw.button_20.isEnabled():
+                        aw.qmc.markCoolEnd()
+                elif self.alarmaction[alarmnumber] == 15:
+                    # OFF
+                    if aw.button_1.isEnabled():
+                        aw.qmc.ToggleMonitor()
+                elif self.alarmaction[alarmnumber] == 16:
+                    # CHARGE
+                    aw.qmc.autoChargeIdx = len(aw.qmc.timex)
+                elif self.alarmaction[alarmnumber] == 17 and aw.qmc.Controlbuttonflag:
+                    # RampSoak ON
+                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                        aw.fujipid.setrampsoak(1)
+                    elif aw.pidcontrol: # internal or external MODBUS PID control
+                        aw.pidcontrol.svMode = 1
+                        aw.pidcontrol.pidOn()
+                elif self.alarmaction[alarmnumber] == 18 and aw.qmc.Controlbuttonflag:
+                    # RampSoak OFF
+                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                        aw.fujipid.setrampsoak(0)
+                    elif aw.pidcontrol:  # internal or external MODBUS PID control
+                        aw.pidcontrol.svMode = 0
+                        aw.pidcontrol.pidOff()
+                elif self.alarmaction[alarmnumber] == 19 and aw.qmc.Controlbuttonflag:
+                    # PID ON
+                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                        aw.fujipid.setONOFFstandby(0)
+                    elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
+                        aw.pidcontrol.pidOn()
+                elif self.alarmaction[alarmnumber] == 20 and aw.qmc.Controlbuttonflag:
+                    # PID OFF
+                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                        aw.fujipid.setONOFFstandby(1)
+                    elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
+                        aw.pidcontrol.pidOff()
+                elif self.alarmaction[alarmnumber] == 21:
+                    # SV slider alarm
+                    try:
+                        text = self.alarmstrings[alarmnumber].split('#')[0]
+                        sv = float(str(text))
+                        if aw.qmc.device == 0:
+                            if sv is not None and sv != aw.fujipid.sv:
+                                sv = max(0,sv) # we don't send SV < 0
+                                #aw.qmc.temporarysetsv = sv
+                                aw.fujipid.setsv(sv,silent=True)
+                        elif aw.pidcontrol.pidActive:
+                            if sv is not None and sv != aw.pidcontrol.sv:
+                                sv = max(0,sv) # we don't send SV < 0
+                                #aw.qmc.temporarysetsv = sv
+                                aw.pidcontrol.setSV(sv,init=False)
+                    except Exception as e:
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(u(self.alarmstrings[alarmnumber])))
+    
+            except Exception as ex:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     # called only after CHARGE
     def playbackdrop(self):
@@ -15134,7 +15136,8 @@ class ApplicationWindow(QMainWindow):
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
-    #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command
+    #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command;
+    #         20= Artisan Command
     def eventaction(self,action,cmd):
         if action:
             if action == 3: # multiple event actions, we cannot run in parallel as it crashs!
@@ -15594,7 +15597,24 @@ class ApplicationWindow(QMainWindow):
                 elif action == 19:
                     if cmd_str == "PRS":
                         self.ser.R1.prs()
-
+                elif action == 20: # Artisan Command
+                    # alarms(<bool>)
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:
+                            cs = c.strip()
+                            if cs.startswith("alarms(") and cs.endswith(")"):
+                                try:
+                                    value = cs[len("alarms("):-1]
+                                    if value.lower() in ("yes", "true", "t", "1"):
+                                        print("turn alarms loud")
+                                        aw.qmc.silent_alarms = False
+                                        aw.sendmessage(QApplication.translate("Message","Alarms on", None))
+                                    else:
+                                        aw.qmc.silent_alarms = True
+                                        aw.sendmessage(QApplication.translate("Message","Alarms off", None))
+                                except Exception:
+                                    pass
             except Exception:
                 pass
                 
@@ -33245,7 +33265,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Aillio R1 Heater",None),
                        QApplication.translate("ComboBox", "Aillio R1 Fan",None),
                        QApplication.translate("ComboBox", "Aillio R1 Drum",None),
-                       QApplication.translate("ComboBox", "Aillio R1 Command",None)]
+                       QApplication.translate("ComboBox", "Aillio R1 Command",None),
+                       QApplication.translate("ComboBox", "Artisan Command",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -34124,7 +34145,8 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","Aillio R1 Heater",None),
                                      QApplication.translate("ComboBox","Aillio R1 Fan",None),
                                      QApplication.translate("ComboBox","Aillio R1 Drum",None),
-                                     QApplication.translate("ComboBox","Aillio R1 Command",None)])
+                                     QApplication.translate("ComboBox","Aillio R1 Command",None),
+                                     QApplication.translate("ComboBox","Artisan Command",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1
