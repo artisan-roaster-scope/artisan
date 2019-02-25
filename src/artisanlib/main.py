@@ -1133,14 +1133,17 @@ class tgraphcanvas(FigureCanvas):
         self.temperaturedevicefunctionlist = [
             "",                #0
             "Phidget HUM1000", #1
+            "Yocto Meteo",     #2
         ]
         self.humiditydevicefunctionlist = [
             "",                #0
             "Phidget HUM1000", #1
+            "Yocto Meteo",     #2
         ]
         self.pressuredevicefunctionlist = [
             "",                #0
             "Phidget PRE1000", #1
+            "Yocto Meteo",     #2
         ]
         
         self.moisture_greens = 0.
@@ -6748,30 +6751,51 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    def getAmbientData(self):        
+    def getAmbientData(self):
+        humidity = None
+        temp = None # assumed to be gathered in C (not F!)
+        pressure = None 
+
+        #--- humidity
         if self.ambient_humidity_device == 1: # Phidget HUM1000
             humidity = aw.ser.PhidgetHUM1000humidity()
-            if humidity is not None:
-                self.ambient_humidity = aw.float2float(humidity,1)
-                aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
+        elif self.ambient_humidity_device == 2: # Yocto Meteo
+            humidity = aw.ser.YoctoMeteoHUM()
+
+        #--- temperature
         if self.ambient_temperature_device == 1: # Phidget HUM1000
             temp = aw.ser.PhidgetHUM1000temperature()
-            if temp is not None:
-                if self.mode == "F":
-                    temp = self.fromCtoF(temp)
-                self.ambientTemp = aw.float2float(temp,1)
-                aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
+        elif self.ambient_temperature_device == 2: # Yocto Meteo
+            temp = aw.ser.YoctoMeteoTEMP()
+
+        #--- pressure
         if self.ambient_pressure_device == 1: # Phidget PRE1000
             pressure = aw.ser.PhidgetPRE1000pressure()
             if pressure is not None:
-                if self.ambientTemp == 0:
-                    t = 23 # we just assume 23C room temperature if no ambient temperature is given
-                else:
-                    t = self.ambientTemp
-                if self.mode == "F":
-                    t = self.fromFtoC(t)
-                self.ambient_pressure = aw.float2float(self.barometricPressure(pressure*10,t,self.elevation),1)
-                aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa", None).format(self.ambient_pressure))
+                pressure = pressure * 10 # convert to hPa/mbar
+        elif self.ambient_pressure_device == 2: # Yocto Meteo
+            pressure = aw.ser.YoctoMeteoPRESS()
+            
+        # calc final values
+        if pressure is not None:
+            if temp is None:
+                t = 23 # we just assume 23C room temperature if no ambient temperature is given
+            else:
+                t = temp
+            pressure = self.barometricPressure(pressure,t,self.elevation)
+
+        # set and report
+        if humidity is not None:
+            self.ambient_humidity = aw.float2float(humidity,1)
+            aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
+        if temp is not None:
+            if self.mode == "F":
+                temp = self.fromCtoF(temp)
+            self.ambientTemp = aw.float2float(temp,1)
+            aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
+        if pressure is not None:
+            self.ambient_pressure = aw.float2float(pressure,1)
+            aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa", None).format(self.ambient_pressure))
       
     # computes the barometric pressure from 
     #   aap:  atmospheric pressure in hPa
@@ -19633,6 +19657,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("yoctoRemoteFlag"):
                 self.qmc.yoctoRemoteFlag = bool(toBool(settings.value("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)))
                 self.qmc.yoctoServerID = toString(settings.value("yoctoServerID",self.qmc.yoctoServerID))
+            if settings.contains("YOCTO_emissivity"):
+                self.qmc.YOCTO_emissivity = toDouble(settings.value("YOCTO_emissivity",self.qmc.YOCTO_emissivity))
             if settings.contains("ambient_temperature_device"):
                 self.qmc.ambient_temperature_device = toInt(settings.value("ambient_temperature_device",self.qmc.ambient_temperature_device))
                 self.qmc.ambient_humidity_device = toInt(settings.value("ambient_humidity_device",self.qmc.ambient_humidity_device))
@@ -21144,6 +21170,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Controlbuttonflag",self.qmc.Controlbuttonflag)
             settings.setValue("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)
             settings.setValue("yoctoServerID",self.qmc.yoctoServerID)
+            settings.setValue("YOCTO_emissivity",self.qmc.YOCTO_emissivity)
             settings.setValue("ambient_temperature_device",self.qmc.ambient_temperature_device)
             settings.setValue("ambient_humidity_device",self.qmc.ambient_humidity_device)
             settings.setValue("ambient_pressure_device",self.qmc.ambient_pressure_device)
@@ -37549,7 +37576,46 @@ class serialport(object):
             ### not finished
         else:
             return tx, 0., float(val)   #send a 0. as second reading because the meter only returns one reading
+
+    # connects to a Yocto Meteo, returns current humidity value
+    def YoctoMeteoHUM(self):
+        try:
+            self.YOCTOimportLIB() # first via import the lib
+            from yoctopuce.yocto_humidity import YHumidity
+            HUMsensor = YHumidity.FirstHumidity()
+            if HUMsensor.isOnline():
+                return HUMsensor.get_currentValue()
+            else:
+                return None
+        except:
+            return None
             
+    # connects to a Yocto Meteo, returns current temperature value
+    def YoctoMeteoTEMP(self):
+        try:
+            self.YOCTOimportLIB() # first via import the lib
+            from yoctopuce.yocto_temperature import YTemperature
+            TEMPsensor = YTemperature.FirstTemperature()
+            if TEMPsensor.isOnline():
+                return TEMPsensor.get_currentValue()
+            else:
+                return None
+        except:
+            return None
+            
+    # connects to a Yocto Meteo, returns current pressure value
+    def YoctoMeteoPRESS(self):
+        try:
+            self.YOCTOimportLIB() # first via import the lib
+            from yoctopuce.yocto_pressure import YPressure
+            PRESSsensor = YPressure.FirstPressure()
+            if PRESSsensor.isOnline():
+                return PRESSsensor.get_currentValue()
+            else:
+                return None
+        except:
+            return None
+
     # connects to a Phidgets HUM1000, returns current temperature value and disconnects
     def PhidgetHUM1000temperature(self):
         try:
@@ -39916,48 +39982,52 @@ class serialport(object):
                 return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.nextTemperature(YOCTOsensor))
         else:
             return None
+            
+    def YOCTOimportLIB(self):
+        # import Yoctopuce Python library (installed form PyPI)
+        from yoctopuce.yocto_api import YAPI, YRefParam
+        errmsg=YRefParam()
+        #aw.sendmessage(str(errmsg))
+        ## WINDOWS/Linux DLL HACK BEGIN
+        arch = platform.architecture()[0]
+        machine = platform.machine()
+        libpath = os.path.dirname(sys.executable)
+        if platf == 'Windows' and appFrozen():
+            if arch == '32bit':
+                YAPI._yApiCLibFile = libpath + "\\lib\\yapi.dll"
+            else:
+                YAPI._yApiCLibFile = libpath + "\\lib\\yapi64.dll"
+            YAPI._yApiCLibFileFallback = libpath + "\\lib\\yapi.dll"
+        elif platf == "Linux" and appFrozen():
+            if machine.find("arm") >= 0: # Raspberry
+                YAPI._yApiCLibFile = libpath + "/libyapi-armhf.so"
+                YAPI._yApiCLibFileFallback = libpath + "/libyapi-armel.so"
+            elif machine.find("mips") >= 0:
+                YAPI._yApiCLibFile = libpath + "/libyapi-mips.so"
+                YAPI._yApiCLibFileFallback = ""
+            elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
+                YAPI._yApiCLibFile = libpath + "/libyapi-i386.so"
+                YAPI._yApiCLibFileFallback = libpath + "/libyapi-amd64.so"  # just in case
+            elif machine == 'x86_64':
+                YAPI._yApiCLibFile = libpath + "/libyapi-amd64.so"
+                YAPI._yApiCLibFileFallback = libpath + "/libyapi-i386.so"  # just in case
+        ## WINDOWS/Linux DLL HACK END
+        try:
+            if aw.qmc.yoctoRemoteFlag:
+                YAPI.RegisterHub(aw.qmc.yoctoServerID)
+            else:
+                YAPI.RegisterHub("usb", errmsg)
+        except Exception as e:
+            aw.sendmessage(str(e))
 
     # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe; mode = 2 for IR sensor
     def YOCTOtemperatures(self,mode=0):
         try: 
             if not self.YOCTOsensor:
-                # import Yoctopuce Python library (installed form PyPI)
-                from yoctopuce.yocto_api import YAPI, YRefParam
-                from yoctopuce.yocto_temperature import YTemperature
-                errmsg=YRefParam()
-#                aw.sendmessage(str(errmsg))
-                ## WINDOWS/Linux DLL HACK BEGIN
-                arch = platform.architecture()[0]
-                machine = platform.machine()
-                libpath = os.path.dirname(sys.executable)
-                if platf == 'Windows' and appFrozen():
-                    if arch == '32bit':
-                        YAPI._yApiCLibFile = libpath + "\\lib\\yapi.dll"
-                    else:
-                        YAPI._yApiCLibFile = libpath + "\\lib\\yapi64.dll"
-                    YAPI._yApiCLibFileFallback = libpath + "\\lib\\yapi.dll"
-                elif platf == "Linux" and appFrozen():
-                    if machine.find("arm") >= 0: # Raspberry
-                        YAPI._yApiCLibFile = libpath + "/libyapi-armhf.so"
-                        YAPI._yApiCLibFileFallback = libpath + "/libyapi-armel.so"
-                    elif machine.find("mips") >= 0:
-                        YAPI._yApiCLibFile = libpath + "/libyapi-mips.so"
-                        YAPI._yApiCLibFileFallback = ""
-                    elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
-                        YAPI._yApiCLibFile = libpath + "/libyapi-i386.so"
-                        YAPI._yApiCLibFileFallback = libpath + "/libyapi-amd64.so"  # just in case
-                    elif machine == 'x86_64':
-                        YAPI._yApiCLibFile = libpath + "/libyapi-amd64.so"
-                        YAPI._yApiCLibFileFallback = libpath + "/libyapi-i386.so"  # just in case                
-                ## WINDOWS/Linux DLL HACK END
+                self.YOCTOimportLIB()
                 try:
-                    if aw.qmc.yoctoRemoteFlag:
-                        YAPI.RegisterHub(aw.qmc.yoctoServerID)
-                    else:
-                        YAPI.RegisterHub("usb", errmsg)
-                except Exception as e:
-                    aw.sendmessage(str(e))
-                try:
+                    from yoctopuce.yocto_api import YAPI
+                    from yoctopuce.yocto_temperature import YTemperature
                     # already connected YOCTOsensors?
                     if not aw.ser.YOCTOsensor:
                         connected_yoctos = []
@@ -43431,6 +43501,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.yoctoBoxRemoteFlag.setChecked(aw.qmc.yoctoRemoteFlag)
         yoctoServerIdLabel = QLabel(QApplication.translate("Label","VirtualHub", None))
         self.yoctoServerId = QLineEdit(aw.qmc.yoctoServerID)
+        YoctoEmissivityLabel = QLabel(QApplication.translate("Label","Emissivity", None))
+        self.yoctoEmissivitySpinBox = QDoubleSpinBox()
+        self.yoctoEmissivitySpinBox.setAlignment(Qt.AlignRight)
+        self.yoctoEmissivitySpinBox.setRange(0.,1.)
+        self.yoctoEmissivitySpinBox.setSingleStep(.1) 
+        self.yoctoEmissivitySpinBox.setValue(aw.qmc.YOCTO_emissivity) 
         yoctoServerBox = QHBoxLayout()
         yoctoServerBox.addWidget(yoctoServerIdLabel)
         yoctoServerBox.addSpacing(10)
@@ -43444,8 +43520,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
         yoctoNetworkGrid.setSpacing(20)
         yoctoNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None))
         yoctoNetworkGroupBox.setLayout(yoctoNetworkGrid)
+        yoctoIRGrid = QGridLayout()
+        yoctoIRGrid.addWidget(YoctoEmissivityLabel,0,0)
+        yoctoIRGrid.addWidget(self.yoctoEmissivitySpinBox,0,1)
+        yoctoIRHorizontalLayout = QHBoxLayout()
+        yoctoIRHorizontalLayout.addLayout(yoctoIRGrid)
+        yoctoIRHorizontalLayout.addStretch()
+        yoctoIRGroupBox = QGroupBox(QApplication.translate("GroupBox","IR",None))
+        yoctoIRGroupBox.setLayout(yoctoIRHorizontalLayout)
         yoctoVBox = QVBoxLayout()
         yoctoVBox.addWidget(yoctoNetworkGroupBox)
+        yoctoVBox.addWidget(yoctoIRGroupBox)
         yoctoVBox.addStretch()
         yoctoVBox.setSpacing(5)
         yoctoVBox.setContentsMargins(0,0,0,0)  
@@ -44867,6 +44952,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             # Yotopuce configurations
             aw.qmc.yoctoRemoteFlag = self.yoctoBoxRemoteFlag.isChecked()
             aw.qmc.yoctoServerID = u(self.yoctoServerId.text())
+            aw.qmc.YOCTO_emissivity = self.yoctoEmissivitySpinBox.value()
             
             # Ambient confifgurations
             aw.qmc.ambient_temperature_device = self.temperatureDeviceCombo.currentIndex()
