@@ -60,6 +60,7 @@ v1.6.1
    - fixes alignment of AUC shading when Smooth Curves value is large and Optimal Smoothing is not checked
    - fixes an issue on CHARGE on newer Aillio R1 firmware versions ([Issue #297](../../../issues/297))
    - fixes Phidgets 1046 async mode
+   - fixes the broken negative target slider (PID) ([Issue #314](../../../issues/314))
 
 ----
 v1.6.0
