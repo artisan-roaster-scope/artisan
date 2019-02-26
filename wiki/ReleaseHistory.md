@@ -38,7 +38,7 @@ v1.6.1
    - fixes sliders single step action
    - fixes the air and drum speed slider synchronization in the Probatone 7" setup
    - translates 1045 ambient readings correctly to Fahrenheit in Fahrenheit mode
-   - improve accuracy of MET marker location
+   - improved accuracy of MET marker location
    - improved stability of Phidget Ambient Sensor attach
    - channel selection fix for Phidget OUT1002 by Mike
    - fixes various issues with the Cupping Dialog ([Issue #280](../../../issues/280))
@@ -61,6 +61,7 @@ v1.6.1
    - fixes an issue on CHARGE on newer Aillio R1 firmware versions ([Issue #297](../../../issues/297))
    - fixes Phidgets 1046 async mode
    - fixes the broken negative target slider (PID) ([Issue #314](../../../issues/314))
+   - moves the connected to modbus message from errors to messages
 
 ----
 v1.6.0
