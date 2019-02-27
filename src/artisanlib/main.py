@@ -1171,7 +1171,7 @@ class tgraphcanvas(FigureCanvas):
         self.scorching_flag = False
         self.divots_flag = False
 
-        #list to store the time of each reading. Most IMPORTANT variable.
+        #list to store the time in seconds of each reading. Most IMPORTANT variable.
         self.timex = []
 
         self.smooth_curves_on_recording = False # by default we do not smooth curves during recording
@@ -10920,9 +10920,9 @@ class SampleThread(QThread):
                                 # we found a BT break at the current index minus b
                                 aw.qmc.autoChargeIdx = length_of_qmc_timex - b
                         # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
-                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():
-                            tp = aw.findTP()
+                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():                            
                             try:
+                                tp = aw.findTP()
                                 if ((aw.qmc.mode == "C" and aw.qmc.temp2[tp] > 50 and aw.qmc.temp2[tp] < 150) or \
                                     (aw.qmc.mode == "F" and aw.qmc.temp2[tp] > 100 and aw.qmc.temp2[tp] < 300)): # only mark TP if not an error value!
                                     aw.qmc.autoTPIdx = 1
@@ -11111,10 +11111,12 @@ class SampleThread(QThread):
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
+        seconds_since_CHARGE = int(aw.qmc.timex[-1]-aw.qmc.timex[aw.qmc.timeindex[0]])
         # if v[-1] is the current temperature then check if
+        #   we are 20sec after CHARGE
         #   len(BT) > 4
         # BT[-5] <= BT[-4] abd BT[-5] <= BT[-3] and BT[-5] <= BT[-2] and BT[-5] <= BT[-1] and BT[-5] < BT[-1]
-        if not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-4]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-5] < aw.qmc.temp2[-1]):
+        if seconds_since_CHARGE > 20 and not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-4]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-5] < aw.qmc.temp2[-1]):
             self.afterTP = True
         return self.afterTP
 
@@ -15607,7 +15609,6 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     value = cs[len("alarms("):-1]
                                     if value.lower() in ("yes", "true", "t", "1"):
-                                        print("turn alarms loud")
                                         aw.qmc.silent_alarms = False
                                         aw.sendmessage(QApplication.translate("Message","Alarms on", None))
                                     else:
@@ -38814,7 +38815,13 @@ class serialport(object):
                             self.Phidget1045semaphore.acquire(1)
                             if len(self.Phidget1045values) > 0:
                                 async_res = numpy.average(self.Phidget1045values)
-                            self.Phidget1045values = self.Phidget1045values[-round((aw.qmc.delay/aw.qmc.phidget1045_dataRate)):]
+                                if deviceType == DeviceID.PHIDID_1045:
+                                    rate = aw.qmc.phidget1045_dataRate
+                                elif deviceType == DeviceID.PHIDID_TMP1200:
+                                    rate = aw.qmc.phidget1200_dataRate
+                                else:
+                                    rate = aw.qmc.phidget1048_dataRate
+                                self.Phidget1045values = self.Phidget1045values[-round((aw.qmc.delay/rate)):]
                         except:
                             self.Phidget1045values = []
                         finally:
@@ -39186,7 +39193,7 @@ class serialport(object):
                 self.Phidget1046semaphores[channel].acquire(1)
                 if len(self.Phidget1046values[channel]) > 0:
                     res = numpy.average(self.Phidget1046values[channel])
-                    self.Phidget1046values[channel] = []
+                    self.Phidget1046values[channel] = self.Phidget1046values[channel][-round((aw.qmc.delay/aw.qmc.phidget1046_dataRate)):] 
             except Exception as e:
                 self.Phidget1046values[channel] = []
             finally:
