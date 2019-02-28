@@ -26308,9 +26308,9 @@ class SamplingDlg(ArtisanDialog):
         cancelButton.clicked.connect(lambda _:self.close())
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.close())
-        closeAction.setShortcut(QKeySequence.Close)
-        cancelButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
         cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.ok()) 
         okButton.setAutoDefault(True)
@@ -26520,9 +26520,9 @@ class HUDDlg(ArtisanDialog):
         cancelButton.clicked.connect(lambda _:self.close())
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.close())
-        closeAction.setShortcut(QKeySequence.Close)
-        cancelButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
         cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.updatetargets())
         okButton.setAutoDefault(True)
@@ -29392,9 +29392,9 @@ class editGraphDlg(ArtisanDialog):
         # add standard Mac OS X shortcut CMD-. to close this dialog
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.cancel_dialog())
-        closeAction.setShortcut(QKeySequence.Close)
-        cancelButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.cancel_dialog())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
         
         # container tare
         self.tareComboBox = QComboBox()
@@ -31696,9 +31696,9 @@ class autosaveDlg(ArtisanDialog):
         cancelButton.clicked.connect(lambda _:self.close())
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.close())
-        closeAction.setShortcut(QKeySequence.Close)
-        cancelButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
         cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.autoChanged())
         okButton.setAutoDefault(True)
@@ -31786,9 +31786,9 @@ class batchDlg(ArtisanDialog):
         cancelButton.clicked.connect(lambda _:self.close())
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.close())
-        closeAction.setShortcut(QKeySequence.Close)
-        cancelButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
         cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.batchChanged())
         okButton.setAutoDefault(True)
@@ -32024,9 +32024,9 @@ class WindowsDlg(ArtisanDialog):
         cancelButton.clicked.connect(lambda _:self.close())
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.close())
-        closeAction.setShortcut(QKeySequence.Close)
-        cancelButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
         cancelButton.setAutoDefault(False)        
         okButton.clicked.connect(lambda _:self.updatewindow())
         okButton.setAutoDefault(True)
@@ -32906,9 +32906,9 @@ class EventsDlg(ArtisanDialog):
         self.okButton.setFocusPolicy(Qt.StrongFocus)
         closeButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.restoreState())
-        closeAction.setShortcut(QKeySequence.Close)
-        closeButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.restoreState())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        closeButton.addActions([cancelAction])
         closeButton.setAutoDefault(False)
         ###  TAB 2
         #number of buttons per row
@@ -34979,9 +34979,9 @@ class phasesGraphDlg(ArtisanDialog):
         setDefaultButton.clicked.connect(lambda _:self.setdefault())
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.close())
-        closeAction.setShortcut(QKeySequence.Close)
-        cancelButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
         cancelButton.setAutoDefault(False)
         
         phaseLayout = QGridLayout()
@@ -35518,9 +35518,9 @@ class backgroundDlg(ArtisanDialog):
         # add standard Mac OS X shortcut CMD-. to close this dialog
         okButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.accept())
-        closeAction.setShortcut(QKeySequence.Close)
-        okButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.accept())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        okButton.addActions([cancelAction])
         
         alignButton = QPushButton(QApplication.translate("Button","Align", None))
         alignButton.setFocusPolicy(Qt.NoFocus)
@@ -42078,9 +42078,9 @@ class comportDlg(ArtisanDialog):
         okButton.setFocusPolicy(Qt.StrongFocus)
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.reject())
-        closeAction.setShortcut(QKeySequence.Close)
-        cancelButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.reject())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
         cancelButton.setAutoDefault(False)
         #button layout
         buttonLayout = QHBoxLayout()
@@ -43098,9 +43098,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         okButton.setFocusPolicy(Qt.StrongFocus)
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        closeAction = QAction(self, triggered=lambda _:self.cancelEvent())
-        closeAction.setShortcut(QKeySequence.Close)
-        cancelButton.addActions([closeAction])
+        cancelAction = QAction(self, triggered=lambda _:self.cancelEvent())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
         cancelButton.setAutoDefault(False)
         cancelButton.clicked.connect(lambda _:self.cancelEvent())
         labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None))

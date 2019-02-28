@@ -33,6 +33,8 @@ v1.6.1
    - extends the range of allowed event values in the mini editor from 0-100 to 0-9999
    - allow to control Hottop 2k+ while not logging
    - udated French translations (thanks Nico!)
+   - adds 0.05C and 0.02C Phidget Change Triggers
+   - adds default focus to OK button and assigns CMD-W and CMD-. shortcuts to the Cancel button of most dialogs ([Issue 321](../../../issues/321))
  * Fixes
    - fixes feature interaction between NewRoast and AlwaysOn that caused a hang ([Issue 275](../../../issues/275))
    - fixes sliders single step action
