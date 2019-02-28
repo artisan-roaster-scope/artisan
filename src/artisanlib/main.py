@@ -795,12 +795,22 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1048_changeTriggers = [0.2]*4
         self.phidget1048_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1048_changeTriggersStrings = list(map(lambda x:'{0:.1f}C'.format(x),self.phidget1048_changeTriggersValues))
+        # add 0.02C and 0.05C change triggers
+        self.phidget1048_changeTriggersValues.insert(1,0.05)
+        self.phidget1048_changeTriggersValues.insert(1,0.02)
+        self.phidget1048_changeTriggersStrings.insert(1,"0.05C")
+        self.phidget1048_changeTriggersStrings.insert(1,"0.02C")
         self.phidget1048_dataRate = 256 # in ms; (Phidgets default 8ms, 16ms if wireless is active on v21 API, 256ms on v22 API)
 
         self.phidget1045_async = False
         self.phidget1045_changeTrigger = 0.2
         self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1045_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1045_changeTriggersValues))
+        # add 0.02C and 0.05C change triggers
+        self.phidget1045_changeTriggersValues.insert(1,0.05)
+        self.phidget1045_changeTriggersValues.insert(1,0.02)
+        self.phidget1045_changeTriggersStrings.insert(1,"0.05C")
+        self.phidget1045_changeTriggersStrings.insert(1,"0.02C")
         self.phidget1045_emissivity = 1.0
         self.phidget1045_dataRate = 256
         
@@ -812,6 +822,11 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_changeTrigger = 0.2
         self.phidget1200_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1200_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1200_changeTriggersValues))
+        # add 0.02C and 0.05C change triggers
+        self.phidget1200_changeTriggersValues.insert(1,0.05)
+        self.phidget1200_changeTriggersValues.insert(1,0.02)
+        self.phidget1200_changeTriggersStrings.insert(1,"0.05C")
+        self.phidget1200_changeTriggersStrings.insert(1,"0.02C")
         self.phidget1200_dataRate = 250
         self.phidget1200_dataRatesStrings = ["250ms","500ms","750ms","1s"]
         self.phidget1200_dataRatesValues = [250,500,700,1024]
@@ -5558,6 +5573,9 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             RoR_start = -1
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
+                        
+#                        print("BT RoR mean:",numpy.mean(self.delta2))
+#                        print("BT RoR std:",numpy.std(self.delta2))
                                                     
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
@@ -26288,7 +26306,15 @@ class SamplingDlg(ArtisanDialog):
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.close())
+        closeAction.setShortcut(QKeySequence.Close)
+        cancelButton.addActions([closeAction])
+        cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.ok()) 
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         
         flagLayout = QHBoxLayout()
         flagLayout.addStretch()
@@ -26306,7 +26332,8 @@ class SamplingDlg(ArtisanDialog):
         layout.addStretch()
         layout.addLayout(buttonsLayout)
         layout.setSizeConstraint(QLayout.SetFixedSize)
-        self.setLayout(layout)         
+        self.setLayout(layout) 
+        okButton.setFocus()        
         
     def closeEvent(self,_):
         self.close()
@@ -26491,7 +26518,15 @@ class HUDDlg(ArtisanDialog):
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.close())
+        closeAction.setShortcut(QKeySequence.Close)
+        cancelButton.addActions([closeAction])
+        cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.updatetargets())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         hudLayout = QGridLayout()
         hudLayout.addWidget(BTLabel,0,0)
         hudLayout.addWidget(self.BTlineEdit,0,1)
@@ -27147,7 +27182,7 @@ class HUDDlg(ArtisanDialog):
         self.polyfitdeg.valueChanged.connect(lambda _:self.polyfitcurveschanged(3))
         self.c1ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(4))
         self.c2ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(5))      
-
+        okButton.setFocus()
 
     def renameBT(self):
         aw.BTname = str(self.renameBTLine.text()).strip()
@@ -28831,6 +28866,7 @@ class editGraphDlg(ArtisanDialog):
         chargelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         chargelabel.setStyleSheet("background-color:'#f07800';")
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
+        self.chargeedit.setFocusPolicy(Qt.NoFocus)
         self.chargeedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.chargeeditcopy = aw.qmc.stringfromseconds(0)
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
@@ -28868,6 +28904,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t2 = 0
         self.dryedit = QLineEdit(aw.qmc.stringfromseconds(t2))
+        self.dryedit.setFocusPolicy(Qt.NoFocus)
         self.dryedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dryeditcopy = aw.qmc.stringfromseconds(t2)
         self.dryedit.setValidator(QRegExpValidator(regextime,self))
@@ -28882,6 +28919,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t3 = 0
         self.Cstartedit = QLineEdit(aw.qmc.stringfromseconds(t3))
+        self.Cstartedit.setFocusPolicy(Qt.NoFocus)
         self.Cstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cstarteditcopy = aw.qmc.stringfromseconds(t3)
         self.Cstartedit.setValidator(QRegExpValidator(regextime,self))
@@ -28897,6 +28935,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t4 = 0
         self.Cendedit = QLineEdit(aw.qmc.stringfromseconds(t4))
+        self.Cendedit.setFocusPolicy(Qt.NoFocus)
         self.Cendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cendeditcopy = aw.qmc.stringfromseconds(t4)
         self.Cendedit.setValidator(QRegExpValidator(regextime,self))
@@ -28911,6 +28950,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t5 = 0
         self.CCstartedit = QLineEdit(aw.qmc.stringfromseconds(t5))
+        self.CCstartedit.setFocusPolicy(Qt.NoFocus)
         self.CCstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCstarteditcopy = aw.qmc.stringfromseconds(t5)
         self.CCstartedit.setValidator(QRegExpValidator(regextime,self))
@@ -28925,6 +28965,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t6 = 0
         self.CCendedit = QLineEdit(aw.qmc.stringfromseconds(t6))
+        self.CCendedit.setFocusPolicy(Qt.NoFocus)
         self.CCendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCendeditcopy = aw.qmc.stringfromseconds(t6)
         self.CCendedit.setValidator(QRegExpValidator(regextime,self))
@@ -28939,6 +28980,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t7 = 0
         self.dropedit = QLineEdit(aw.qmc.stringfromseconds(t7))
+        self.dropedit.setFocusPolicy(Qt.NoFocus)
         self.dropedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dropeditcopy = aw.qmc.stringfromseconds(t7)
         self.dropedit.setValidator(QRegExpValidator(regextime,self))
@@ -28954,6 +28996,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t8 = 0
         self.cooledit = QLineEdit(aw.qmc.stringfromseconds(t8))
+        self.cooledit.setFocusPolicy(Qt.NoFocus)
         self.cooledit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.cooleditcopy = aw.qmc.stringfromseconds(t8)
         self.cooledit.setValidator(QRegExpValidator(regextime,self))
@@ -29023,6 +29066,7 @@ class editGraphDlg(ArtisanDialog):
         date = aw.qmc.roastdate.date().toString()
         date += ", " + u(aw.qmc.roastdate.time().toString()[:-3])
         dateedit = QLineEdit(date)
+        dateedit.setFocusPolicy(Qt.NoFocus)
         dateedit.setReadOnly(True)
         dateedit.setStyleSheet("background-color:'lightgrey'")
         #Batch
@@ -29056,6 +29100,7 @@ class editGraphDlg(ArtisanDialog):
             batchedit = QLineEdit(batch)
             batchedit.setReadOnly(True)
             batchedit.setStyleSheet("background-color:'lightgrey'")
+            batchedit.setFocusPolicy(Qt.NoFocus)
             
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
@@ -29337,10 +29382,19 @@ class editGraphDlg(ArtisanDialog):
         saveButton.setMinimumSize(saveButton.minimumSizeHint()) 
         #Cancel Button
         cancelButton = QPushButton(QApplication.translate("Button", "Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.cancel_dialog())
         cancelButton.setMaximumSize(cancelButton.sizeHint())
         cancelButton.setMinimumSize(cancelButton.minimumSize())
+        cancelButton.setAutoDefault(False)
+        cancelButton.setFocusPolicy(Qt.StrongFocus)
+        saveButton.setAutoDefault(True)
+        saveButton.setFocusPolicy(Qt.StrongFocus)
+        # add standard Mac OS X shortcut CMD-. to close this dialog
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.cancel_dialog())
+        closeAction.setShortcut(QKeySequence.Close)
+        cancelButton.addActions([closeAction])
         
         # container tare
         self.tareComboBox = QComboBox()
@@ -29732,7 +29786,9 @@ class editGraphDlg(ArtisanDialog):
         totallayout.setSpacing(0)
         self.volume_percent()
         self.setLayout(totallayout)
+
         self.titleedit.setFocus()
+
         
         self.updateTemplateLine()
         
@@ -31613,7 +31669,7 @@ class autosaveDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(autosaveDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Keyboard Autosave [a]", None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Autosave", None))
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None))
         autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]", None))
@@ -31633,13 +31689,20 @@ class autosaveDlg(ArtisanDialog):
         prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None)))
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel", None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
         pathButton = QPushButton(QApplication.translate("Button","Path", None))
         pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(u(aw.qmc.autosavepath))
         self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None))
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.close())
+        closeAction.setShortcut(QKeySequence.Close)
+        cancelButton.addActions([closeAction])
+        cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.autoChanged())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         pathButton.clicked.connect(lambda _:self.getpath())
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -31660,6 +31723,7 @@ class autosaveDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        okButton.setFocus()
 
     def getpath(self):
         filename = aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Path", None))
@@ -31720,7 +31784,15 @@ class batchDlg(ArtisanDialog):
         cancelButton = QPushButton(QApplication.translate("Button","Cancel", None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.close())
+        closeAction.setShortcut(QKeySequence.Close)
+        cancelButton.addActions([closeAction])
+        cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.batchChanged())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         self.batchcheckbox.stateChanged.connect(lambda _:self.toggleCounterFlag())
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -31738,6 +31810,7 @@ class batchDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        okButton.setFocus()
 
     def toggleCounterFlag(self):
         if self.batchcheckbox.isChecked():
@@ -31949,7 +32022,15 @@ class WindowsDlg(ArtisanDialog):
         resetButton = QPushButton(QApplication.translate("Button","Defaults",None))
         resetButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.close())
+        closeAction.setShortcut(QKeySequence.Close)
+        cancelButton.addActions([closeAction])
+        cancelButton.setAutoDefault(False)        
         okButton.clicked.connect(lambda _:self.updatewindow())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         resetButton.clicked.connect(lambda _:self.reset())
         
         hline = QFrame()
@@ -31985,9 +32066,6 @@ class WindowsDlg(ArtisanDialog):
         xlayout.addLayout(xlayout2) 
         xlayout.addWidget(hline)
         xlayout.addLayout(xlayout3)
-        
-        
-        
         ylayout = QGridLayout()
         ylayout.addWidget(ylimitLabel_min,0,0,Qt.AlignRight)
         ylayout.addWidget(self.ylimitEdit_min,0,1)
@@ -32059,6 +32137,7 @@ class WindowsDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        okButton.setFocus()
         
         if aw.qmc.locktimex:
             self.disableXAxisControls()
@@ -32823,6 +32902,14 @@ class EventsDlg(ArtisanDialog):
         closeButton.clicked.connect(lambda _:self.restoreState())
         self.okButton.clicked.connect(lambda _:self.updatetypes())
         defaultButton.clicked.connect(lambda _:self.settypedefault())
+        self.okButton.setAutoDefault(True)
+        self.okButton.setFocusPolicy(Qt.StrongFocus)
+        closeButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.restoreState())
+        closeAction.setShortcut(QKeySequence.Close)
+        closeButton.addActions([closeAction])
+        closeButton.setAutoDefault(False)
         ###  TAB 2
         #number of buttons per row
         self.nbuttonslabel = QLabel(QApplication.translate("Label","Max buttons per row", None))
@@ -33675,6 +33762,7 @@ class EventsDlg(ArtisanDialog):
         mainLayout.setContentsMargins(5, 15, 5, 5)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        self.okButton.setFocus()
         
     def selectionChanged(self):
         selected = self.eventbuttontable.selectedRanges()
@@ -34880,13 +34968,21 @@ class phasesGraphDlg(ArtisanDialog):
         self.autoDRYflag.stateChanged.connect(self.autoDRYflagChanged)
         self.autoFCsFlag.stateChanged.connect(self.autoFCsFlagChanged)
         okButton = QPushButton(QApplication.translate("Button","OK",None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))        
         setDefaultButton = QPushButton(QApplication.translate("Button","Default Temperatures",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         setDefaultButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.cancel())
         okButton.clicked.connect(lambda _:self.updatephases())
         setDefaultButton.clicked.connect(lambda _:self.setdefault())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.close())
+        closeAction.setShortcut(QKeySequence.Close)
+        cancelButton.addActions([closeAction])
+        cancelButton.setAutoDefault(False)
         
         phaseLayout = QGridLayout()
         phaseLayout.addWidget(minf,0,1,Qt.AlignHCenter|Qt.AlignBottom)
@@ -34979,6 +35075,7 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
         self.getphases()
+        okButton.setFocus()
 
 #    def lcdmodeFlagDryChanged(self,value):
 #        aw.qmc.phasesLCDmode_all[0] = bool(value)
@@ -35393,6 +35490,7 @@ class backgroundDlg(ArtisanDialog):
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
         self.pathedit.setReadOnly(True)
+        self.pathedit.setFocusPolicy(Qt.NoFocus)
         self.filename = ""
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Show", None))
         self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Annotations", None))
@@ -35415,6 +35513,15 @@ class backgroundDlg(ArtisanDialog):
         delButton = QPushButton(QApplication.translate("Button","Delete", None))
         delButton.setFocusPolicy(Qt.NoFocus)
         okButton = QPushButton(QApplication.translate("Button","OK", None))
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
+        # add standard Mac OS X shortcut CMD-. to close this dialog
+        okButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.accept())
+        closeAction.setShortcut(QKeySequence.Close)
+        okButton.addActions([closeAction])
+        
         alignButton = QPushButton(QApplication.translate("Button","Align", None))
         alignButton.setFocusPolicy(Qt.NoFocus)
         self.alignComboBox = QComboBox()
@@ -35604,6 +35711,7 @@ class backgroundDlg(ArtisanDialog):
         mainLayout.addLayout(buttonLayout)
         mainLayout.setContentsMargins(5, 10, 5, 5) # left, top, right, bottom 
         self.setLayout(mainLayout)
+        okButton.setFocus()
         
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):
@@ -36082,6 +36190,8 @@ class StatisticsDlg(ArtisanDialog):
         okButton = QPushButton(QApplication.translate("Button","OK",None))
         resetButton = QPushButton(QApplication.translate("Button","Defaults",None))
         okButton.clicked.connect(lambda _:self.accept())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         resetButton.clicked.connect(lambda _:self.initialsettings())
         flagsLayout = QGridLayout()
         flagsLayout.addWidget(self.timez,0,0)
@@ -36189,6 +36299,7 @@ class StatisticsDlg(ArtisanDialog):
         mainLayout.addLayout(buttonsLayout)
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
+        okButton.setFocus()
 
     def AUCLCFflagChanged(self,_):
         aw.qmc.AUClcdFlag = not aw.qmc.AUClcdFlag
@@ -41963,6 +42074,14 @@ class comportDlg(ArtisanDialog):
         cancelButton.setFocusPolicy(Qt.NoFocus)
         okButton.clicked.connect(lambda _:self.accept())
         cancelButton.clicked.connect(lambda _:self.reject())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.reject())
+        closeAction.setShortcut(QKeySequence.Close)
+        cancelButton.addActions([closeAction])
+        cancelButton.setAutoDefault(False)
         #button layout
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(helpButton)
@@ -42438,6 +42557,7 @@ class comportDlg(ArtisanDialog):
         Mlayout.addLayout(buttonLayout)
         Mlayout.setContentsMargins(2,5,2,5)
         self.setLayout(Mlayout)
+        okButton.setFocus()
         
     def colorDeviceIndexChanged(self,i):
         try:
@@ -42974,6 +43094,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         okButton.clicked.connect(lambda _:self.okEvent())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        closeAction = QAction(self, triggered=lambda _:self.cancelEvent())
+        closeAction.setShortcut(QKeySequence.Close)
+        cancelButton.addActions([closeAction])
+        cancelButton.setAutoDefault(False)
         cancelButton.clicked.connect(lambda _:self.cancelEvent())
         labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None))
         labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None))
@@ -43024,7 +43152,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
             
-            changeTriggersCombo.setMinimumContentsLength(3)
+            changeTriggersCombo.setMinimumContentsLength(4)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)
@@ -43114,7 +43242,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             pass
             
         #self.changeTriggerCombos1045.setMaximumSize(65,100)
-        self.changeTriggerCombos1045.setMinimumContentsLength(1)
+        self.changeTriggerCombos1045.setMinimumContentsLength(4)
         self.changeTriggerCombos1045.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength) 
         
         phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,1)
@@ -43281,10 +43409,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.formulaCombo1200.setCurrentIndex(aw.qmc.phidget1200_formula)
         except Exception:
             pass                                   
-        self.formulaCombo1200.setMinimumContentsLength(3)
+        self.formulaCombo1200.setMinimumContentsLength(5)
         width = self.formulaCombo1200.minimumSizeHint().width()
         self.formulaCombo1200.setMinimumWidth(width)
-#        self.formulaCombo1200.setMaximumWidth(width)   
+#        self.formulaCombo1200.setMaximumWidth(width)
         
         self.wireCombo1200 = QComboBox()
         self.wireCombo1200.setFocusPolicy(Qt.NoFocus)
@@ -43296,7 +43424,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.wireCombo1200.setCurrentIndex(aw.qmc.phidget1200_wire)
         except Exception:
             pass                                   
-        self.wireCombo1200.setMinimumContentsLength(3)
+        self.wireCombo1200.setMinimumContentsLength(5)
         width = self.wireCombo1200.minimumSizeHint().width()
         self.wireCombo1200.setMinimumWidth(width)
 #        self.wireCombo1200.setMaximumWidth(width)
@@ -43316,7 +43444,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.changeTriggerCombo1200.setCurrentIndex(aw.qmc.phidget1200_changeTriggersValues.index(aw.qmc.phidget1200_changeTrigger))
         except Exception:
             pass
-        self.changeTriggerCombo1200.setMinimumContentsLength(3)
+        self.changeTriggerCombo1200.setMinimumContentsLength(4)
         width = self.changeTriggerCombo1200.minimumSizeHint().width()
         self.changeTriggerCombo1200.setMinimumWidth(width)
 #        self.changeTriggerCombo1200.setMaximumWidth(width) 
@@ -43803,6 +43931,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         #Mlayout.setContentsMargins(0,0,0,0)
         Mlayout.setContentsMargins(10,10,10,10)
         self.setLayout(Mlayout)
+        okButton.setFocus()
         
     def changeOutprogramFlag(self):
         aw.ser.externaloutprogramFlag = not aw.ser.externaloutprogramFlag
@@ -45549,8 +45678,9 @@ class graphColorDlg(ArtisanDialog):
 
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         okButton.clicked.connect(lambda _:self.accept())
+#        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
 #        okButton.setFocus()
-#        okButton.setFocusPolicy(Qt.ClickFocus)
         
         defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
         defaultsButton.setFocusPolicy(Qt.NoFocus)
@@ -46612,6 +46742,8 @@ class AlarmDlg(ArtisanDialog):
         exportButton.setMinimumWidth(80)
         exportButton.setFocusPolicy(Qt.NoFocus)
         okButton = QPushButton(QApplication.translate("Button","OK",None))
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         okButton.clicked.connect(lambda _:self.closealarms())
         helpButton = QPushButton(QApplication.translate("Button","Help",None))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
@@ -46676,6 +46808,7 @@ class AlarmDlg(ArtisanDialog):
         mainlayout.addLayout(buttonlayout)
         mainlayout.addLayout(okbuttonlayout)
         self.setLayout(mainlayout)
+        okButton.setFocus()
         
     def selectionChanged(self):
         selected = self.alarmtable.selectedRanges()
