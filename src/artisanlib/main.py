@@ -138,6 +138,7 @@ from Phidget22.Devices.VoltageInput import VoltageInput # @UnusedWildImport
 from Phidget22.Devices.DigitalInput import DigitalInput # @UnusedWildImport
 from Phidget22.Devices.DigitalOutput import DigitalOutput # @UnusedWildImport 
 from Phidget22.Devices.VoltageOutput import VoltageOutput # @UnusedWildImport
+from Phidget22.Devices.RCServo import RCServo # @UnusedWildImport
 from Phidget22.Devices.CurrentInput import CurrentInput # @UnusedWildImport
 from Phidget22.Devices.FrequencyCounter import FrequencyCounter # @UnusedWildImport
 
@@ -854,6 +855,8 @@ class tgraphcanvas(FigureCanvas):
         self.YOCTOchan1Unit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
         self.YOCTOchan2Unit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
         self.YOCTO_emissivity = 1.0
+        self.YOCTO_async = [False]*2
+        self.YOCTO_dataRate = 256 # in ms
         
         self.phidget1018valueFactor = 1000 # we map the 0-5V voltage returned by the Phidgets22 API to mV (0-5000)
         self.phidget1018_async = [False]*8
@@ -6882,12 +6885,17 @@ class tgraphcanvas(FigureCanvas):
             ser.PhidgetIOlastvalues = [-1]*8
         if ser.YOCTOsensor:
             try:
-                from yoctopuce.yocto_api import YAPI
-                YAPI.FreeAPI()
                 ser.YOCTOsensor = None
                 ser.YOCTOchan1 = None
                 ser.YOCTOchan2 = None
                 ser.YOCTOtempIRavg = None
+                if ser.YOCTOthread is not None:
+                    ser.YOCTOthread.join()
+                    ser.YOCTOthread = None
+                ser.YOCTOvalues = [[],[]]
+                ser.YOCTOlastvalues = [-1]*2
+                from yoctopuce.yocto_api import YAPI
+                YAPI.FreeAPI()
             except Exception:
                 pass
 
@@ -6900,6 +6908,8 @@ class tgraphcanvas(FigureCanvas):
         aw.ser.phidgetBinaryOUTclose()
         # close Phidget Analog Outputs
         aw.ser.phidgetVOUTclose()
+        # close Phidget RC Servos
+        aw.ser.phidgetRCclose()
         
         
     def disconnectProbes(self):
@@ -15007,14 +15017,17 @@ class ApplicationWindow(QMainWindow):
             # before adaption:
                 # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command), =4 (Call Program [with argument])
                 #  =5 (Hottop Heater), =6 (Hottop Fan), =7 (Hottop Command), =8 (Fuji Command), =9 (PWM Command), =10 (VOUT Command)
-                #  =11 (IO C
-                action = (action+2 if action > 1 else action)
+                #  =11 (IO Command), =12 (S7 Command), =13 (Aillio R1 Heater Command), =14 (Aillio R1 Fan Command), =15 (Aillio R1 Drum Command)
+                #  =16 (Artisan Command), 17= (RC Command)
+                action = (action+2 if action > 1 else action) # skipping (2 Call Program and 3 Multiple Event)
                 if action > 5:
                     action = action + 1 # skip the 6:IO Command
                     if action > 10 and action < 15:
                         action = action + 1 # skip the 11 p-i-d action
                         if action == 15:
                             action = 6 # map IO Command back
+                    if action > 18:
+                        action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
                 value = (self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]
                 if action != 14: # only for VOUT Commands we keep the floats
@@ -15155,9 +15168,9 @@ class ApplicationWindow(QMainWindow):
                     
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
-    #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
+    #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Command; 11= p-i-d; 12= Fuji Command;
     #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command;
-    #         20= Artisan Command
+    #         20= Artisan Command; 21= RC Command
     def eventaction(self,action,cmd):
         if action:
             if action == 3: # multiple event actions, we cannot run in parallel as it crashs!
@@ -15632,6 +15645,75 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         aw.qmc.silent_alarms = True
                                         aw.sendmessage(QApplication.translate("Message","Alarms off", None))
+                                except Exception:
+                                    pass
+                elif action == 21: # RC Command
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:
+                            cs = c.strip()
+                            # pulse(ch,min,max) # sets min/max pulse width
+                            if cs.startswith("pulse(") and len(cs) > 11:
+                                try:
+                                    channel,min_pulse,max_pulse = cs[len("pulse("):-1].split(',')
+                                    aw.ser.phidgetRCpulse(int(channel),int(min_pulse),int(max_pulse))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("pos(") and len(cs) > 9:
+                                # pos(ch,min,max) # sets min/max position
+                                try:
+                                    channel,min_pos,max_pos = cs[len("pos("):-1].split(',')
+                                    aw.ser.phidgetRCpos(int(channel),float(min_pos),float(max_pos))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("engaged(") and len(cs) > 11:
+                                # enable(ch,state) # engage channel
+                                try:
+                                    channel,state = cs[len("engaged("):-1].split(',')
+                                    aw.ser.phidgetRCengaged(int(channel),bool(int(state)))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("set(") and len(cs) > 7:
+                                # set(ch,pos) # set position
+                                try:
+                                    channel,pos = cs[len("set("):-1].split(',')
+                                    aw.ser.phidgetRCset(int(channel),float(pos))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("ramp(") and len(cs) > 8:
+                                # ramp(ch,state) # set speed ramping state per channel
+                                try:
+                                    channel,state = cs[len("ramp("):-1].split(',')
+                                    aw.ser.phidgetRCspeedRamping(int(channel),bool(int(state)))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("volt(") and len(cs) > 8:
+                                # volt(ch,pos) # sets voltage
+                                try:
+                                    channel,volt = cs[len("volt("):-1].split(',')
+                                    aw.ser.phidgetRCvoltage(int(channel),float(volt))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("accel(") and len(cs) > 9:
+                                # accel(ch,accel) # sets acceleration
+                                try:
+                                    channel,accel = cs[len("accel("):-1].split(',')
+                                    aw.ser.phidgetRCaccel(int(channel),float(accel))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("veloc(") and len(cs) > 9:
+                                # veloc(ch,veloc) # sets velocity
+                                try:
+                                    channel,veloc = cs[len("veloc("):-1].split(',')
+                                    aw.ser.phidgetRCveloc(int(channel),float(veloc))
+                                except Exception:
+                                    pass
+                            elif cs.startswith('sleep'): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
                                 except Exception:
                                     pass
             except Exception:
@@ -19698,6 +19780,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.yoctoServerID = toString(settings.value("yoctoServerID",self.qmc.yoctoServerID))
             if settings.contains("YOCTO_emissivity"):
                 self.qmc.YOCTO_emissivity = toDouble(settings.value("YOCTO_emissivity",self.qmc.YOCTO_emissivity))
+            if settings.contains("YOCTO_async"):
+                self.qmc.YOCTO_async = [bool(toBool(x)) for x in toList(settings.value("YOCTO_async",self.qmc.YOCTO_async))]
+            if settings.contains("YOCTO_dataRate"):
+                self.qmc.YOCTO_dataRate = toInt(settings.value("YOCTO_dataRate",self.qmc.YOCTO_dataRate))
             if settings.contains("ambient_temperature_device"):
                 self.qmc.ambient_temperature_device = toInt(settings.value("ambient_temperature_device",self.qmc.ambient_temperature_device))
                 self.qmc.ambient_humidity_device = toInt(settings.value("ambient_humidity_device",self.qmc.ambient_humidity_device))
@@ -21210,6 +21296,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)
             settings.setValue("yoctoServerID",self.qmc.yoctoServerID)
             settings.setValue("YOCTO_emissivity",self.qmc.YOCTO_emissivity)
+            settings.setValue("YOCTO_async",self.qmc.YOCTO_async)
+            settings.setValue("YOCTO_dataRate",self.qmc.YOCTO_dataRate)
             settings.setValue("ambient_temperature_device",self.qmc.ambient_temperature_device)
             settings.setValue("ambient_humidity_device",self.qmc.ambient_humidity_device)
             settings.setValue("ambient_pressure_device",self.qmc.ambient_pressure_device)
@@ -33031,7 +33119,9 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "S7 Command",None),
                        QApplication.translate("ComboBox", "Aillio R1 Heater",None),
                        QApplication.translate("ComboBox", "Aillio R1 Fan",None),
-                       QApplication.translate("ComboBox", "Aillio R1 Drum",None)]
+                       QApplication.translate("ComboBox", "Aillio R1 Drum",None),
+                       QApplication.translate("ComboBox", "Artisan Command",None),
+                       QApplication.translate("ComboBox", "RC Command",None)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -33354,7 +33444,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Aillio R1 Fan",None),
                        QApplication.translate("ComboBox", "Aillio R1 Drum",None),
                        QApplication.translate("ComboBox", "Aillio R1 Command",None),
-                       QApplication.translate("ComboBox", "Artisan Command",None)]
+                       QApplication.translate("ComboBox", "Artisan Command",None),
+                       QApplication.translate("ComboBox", "RC Command",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -34235,7 +34326,8 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","Aillio R1 Fan",None),
                                      QApplication.translate("ComboBox","Aillio R1 Drum",None),
                                      QApplication.translate("ComboBox","Aillio R1 Command",None),
-                                     QApplication.translate("ComboBox","Artisan Command",None)])
+                                     QApplication.translate("ComboBox","Artisan Command",None),
+                                     QApplication.translate("ComboBox","RC Command",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1
@@ -36610,6 +36702,26 @@ class colorport(extraserialport):
 
 
 ###########################################################################################
+##################### YOCTO ASYNC THREAD ##################################################
+###########################################################################################
+
+class YoctoThread(threading.Thread):
+    def __init__(self):
+        self._stopevent = threading.Event()
+        threading.Thread.__init__(self)
+    
+    def run(self):
+        from yoctopuce.yocto_api import YAPI, YRefParam
+        errmsg = YRefParam()
+        while not self._stopevent.isSet():
+            YAPI.UpdateDeviceList(errmsg)  # traps plug/unplug events
+            YAPI.Sleep(500, errmsg)  # traps others events
+
+    def join(self, timeout=None):
+        self._stopevent.set()
+        threading.Thread.join(self, timeout)
+
+###########################################################################################
 ##################### SERIAL PORT #########################################################
 ###########################################################################################
 
@@ -36665,6 +36777,7 @@ class serialport(object):
         self.PhidgetDigitalOutLastToggleHub = [None]*6 # if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
         self.PhidgetAnalogOut = None
         self.PhidgetAnalogOutHub = None
+        self.PhidgetRCServo = None
         #store the Phidget IO Binary Output objects
         self.PhidgetBinaryOut = None # if attached, it contains a list of th 8 attached output channel objects
         #Yoctopuce channels
@@ -36672,6 +36785,12 @@ class serialport(object):
         self.YOCTOchan1 = None
         self.YOCTOchan2 = None
         self.YOCTOtempIRavg = None # averages IR module temperature channel to eliminate noise
+
+        self.YOCTOvalues = [[],[]] # the values for each of the 2 channels gathered by registered change triggers in the last period
+        self.YOCTOlastvalues = [-1]*2 # the last async values returned
+        self.YOCTOsemaphores = [QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to YOCTO per channel
+        self.YOCTOthread = None
+
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid = "X"
         #MS6514 variables
@@ -39780,6 +39899,120 @@ class serialport(object):
                     pass
             aw.ser.PhidgetAnalogOut = None
 
+
+#--- Phidget RC (only one supported for now)
+#  supporting up to 16 channels like those of the RCC1000
+#  commands: 
+#     pulse(ch,min,max) # sets min/max pulse width
+#     pos(ch,min,max) # sets min/max position
+#     enable(ch,state) # enables channel
+#     set(ch,pos) # sets position
+#     move(ch,pos) # sets position, enables servo, disables servo once target position is reached
+
+    def phidgetRCattach(self,channel):
+        if not aw.ser.PhidgetRCServo:
+            aw.qmc.startPhidgetManager()
+            # try to attach an Phidget RCC1000 module
+            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_RCC1000,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+            ports = 16
+            # try to attach an Phidget RC 1061 module
+            if ser is None:
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1061,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                ports = 8
+            # try to attach an Phidget RC 1066 module
+            if ser is None:
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1066,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                ports = 1
+            if ser is not None:
+                aw.ser.PhidgetRCServo = []
+                for i in range(ports):
+                    rcservo = RCServo()
+                    aw.ser.PhidgetRCServo.append(rcservo)
+                    if port is not None:
+                        rcservo.setHubPort(port)
+                    rcservo.setDeviceSerialNumber(ser)
+                    rcservo.setChannel(i)
+                    if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
+                        rcservo.setIsRemote(True)
+                        rcservo.setIsLocal(False)
+        try:
+            if not aw.ser.PhidgetRCServo[channel].getAttached():
+                aw.ser.PhidgetRCServo[channel].openWaitForAttachment(1000)
+        except:
+            pass
+
+    # sets min/max pulse width
+    def phidgetRCpulse(self,channel,min_pulse,max_pulse):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setMinPulseWidth(min_pulse)
+            aw.ser.PhidgetRCServo[channel].setMaxPulseWidth(max_pulse)
+
+    # sets min/max position
+    def phidgetRCpos(self,channel,min_pos,max_pos):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setMinPosition(min_pos)
+            aw.ser.PhidgetRCServo[channel].setMaxPosition(max_pos)
+
+    # engage channel
+    def phidgetRCengaged(self,channel,state):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setEngaged(state)
+
+    # sets position
+    def phidgetRCset(self,channel,position):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setTargetPosition(position)
+
+    # set speed rampling state per channel
+    def phidgetRCspeedRamping(self,channel,state):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setSpeedRampingState(state)
+
+    # set voltage per channel
+    def phidgetRCvoltage(self,channel,volt):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            from Phidget22.RCServoVoltage import RCServoVoltage
+            if volt>6:
+                # set to 7.4V
+                v = RCServoVoltage.RCSERVO_VOLTAGE_7_4V
+            elif volt < 6:
+                # set to 5V
+                v = RCServoVoltage.RCSERVO_VOLTAGE_5V
+            else:
+                # set to 6V
+                v = RCServoVoltage.RCSERVO_VOLTAGE_6V
+            aw.ser.PhidgetRCServo[channel].setVoltage(v)
+            
+    # sets acceleration
+    def phidgetRCaccel(self,channel,accel):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setAcceleration(accel)
+            
+    # sets velocity
+    def phidgetRCveloc(self,channel,veloc):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setVelocityLimit(veloc)
+
+    def phidgetRCclose(self):
+        if aw.ser.PhidgetRCServo:
+            for i in range(len(aw.ser.PhidgetRCServo)):
+                try:
+                    aw.ser.PhidgetRCServo[i].setEngaged(False)
+                    aw.ser.PhidgetRCServo[i].close()
+                except Exception:
+                    pass
+            aw.ser.PhidgetRCServo = None
         
 #---
 
@@ -40138,6 +40371,7 @@ class serialport(object):
         from yoctopuce.yocto_api import YAPI, YRefParam
         errmsg=YRefParam()
         #aw.sendmessage(str(errmsg))
+        YAPI.DisableExceptions
         ## WINDOWS/Linux DLL HACK BEGIN
         arch = platform.architecture()[0]
         machine = platform.machine()
@@ -40170,6 +40404,15 @@ class serialport(object):
         except Exception as e:
             aw.sendmessage(str(e))
 
+    def yoctoTimedCallback(self,_, measure,channel):
+        try:
+            #### lock shared resources #####
+            self.YOCTOsemaphores[channel].acquire(1)
+            self.YOCTOvalues[channel].append(measure.get_averageValue())
+        finally:
+            if self.YOCTOsemaphores[channel].available() < 1:
+                self.YOCTOsemaphores[channel].release(1)
+    
     # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe; mode = 2 for IR sensor
     def YOCTOtemperatures(self,mode=0):
         try: 
@@ -40178,6 +40421,7 @@ class serialport(object):
                 try:
                     from yoctopuce.yocto_api import YAPI
                     from yoctopuce.yocto_temperature import YTemperature
+                    YAPI.DisableExceptions
                     # already connected YOCTOsensors?
                     if not aw.ser.YOCTOsensor:
                         connected_yoctos = []
@@ -40218,7 +40462,21 @@ class serialport(object):
                             else:
                                 aw.qmc.YOCTOchan2Unit = "C"
                         except:
-                            pass                   
+                            pass
+                        if aw.qmc.YOCTO_async[0]:
+                            self.YOCTOchan1.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms 
+                            self.YOCTOchan1.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,0))
+                        else:
+                            self.YOCTOchan1.registerTimedReportCallback(lambda *_:None)
+                        if aw.qmc.YOCTO_async[1]:
+                            self.YOCTOchan2.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms
+                            self.YOCTOchan2.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,1))
+                        else:
+                            self.YOCTOchan2.registerTimedReportCallback(lambda *_:None)
+                        if aw.qmc.YOCTO_async[0] or aw.qmc.YOCTO_async[1]:
+                            if self.YOCTOthread is None:
+                                self.YOCTOthread = YoctoThread()
+                            self.YOCTOthread.start()
                     elif mode == 1 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None))  
                         # increase the resolution
@@ -40235,16 +40493,40 @@ class serialport(object):
                             else:
                                 aw.qmc.YOCTOchanUnit = "C"
                         except:
-                            pass   
-                    
+                            pass
+                        if aw.qmc.YOCTO_async[0]:
+                            self.YOCTOsensor.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms 
+                            self.YOCTOsensor.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,0))
+                            if self.YOCTOthread is None:
+                                self.YOCTOthread = YoctoThread()
+                            self.YOCTOthread.start()
                 except:
-                    pass
+                    if self.YOCTOthread is not None:
+                        self.YOCTOthread.join()
+                        self.YOCTOthread = None
             probe1 = -1
             probe2 = -1
             if mode in [0,2]:
                 try:
-                    if self.YOCTOchan1 and self.YOCTOchan1.isOnline():
+                    if aw.qmc.YOCTO_async[0]:
+                        try:
+                            #### lock shared resources #####
+                            self.YOCTOsemaphores[0].acquire(1)
+                            if len(self.YOCTOvalues[0]) > 0:
+                                probe1 = numpy.average(self.YOCTOvalues[0])
+                                self.YOCTOvalues[0] = self.YOCTOvalues[0][-round((aw.qmc.delay/aw.qmc.YOCTO_dataRate)):]
+                        except:
+                            self.YOCTOvalues[0] = []
+                        finally:
+                            if self.YOCTOsemaphores[0].available() < 1:
+                                self.YOCTOsemaphores[0].release(1)
+                        if probe1 == -1:
+                            probe1 = self.YOCTOlastvalues[0]
+                        else:
+                            self.YOCTOlastvalues[0] = probe1
+                    if probe1 == -1 and self.YOCTOchan1 and self.YOCTOchan1.isOnline():
                         probe1 = self.YOCTOchan1.get_currentValue()
+                    if probe1 != -1:
                         if mode == 2:
                             # we average this module temperature channel for the IR module to remove noise
                             if self.YOCTOtempIRavg is None:
@@ -40260,8 +40542,25 @@ class serialport(object):
                 except:
                     pass
                 try:
-                    if self.YOCTOchan2 and self.YOCTOchan2.isOnline():
+                    if aw.qmc.YOCTO_async[1]:
+                        try:
+                            #### lock shared resources #####
+                            self.YOCTOsemaphores[1].acquire(1)
+                            if len(self.YOCTOvalues[1]) > 0:
+                                probe2 = numpy.average(self.YOCTOvalues[1])
+                                self.YOCTOvalues[1] = self.YOCTOvalues[1][-round((aw.qmc.delay/aw.qmc.YOCTO_dataRate)):]
+                        except:
+                            self.YOCTOvalues[1] = []
+                        finally:
+                            if self.YOCTOsemaphores[1].available() < 1:
+                                self.YOCTOsemaphores[1].release(1)
+                        if probe2 == -1:
+                            probe2 = self.YOCTOlastvalues[1]
+                        else:
+                            self.YOCTOlastvalues[1] = probe2
+                    if probe2 == -1 and self.YOCTOchan2 and self.YOCTOchan2.isOnline():
                         probe2 = self.YOCTOchan2.get_currentValue()
+                    if probe2 != -1:
                         # convert temperature scale
                         if aw.qmc.YOCTOchan2Unit == "C" and aw.qmc.mode == "F":
                             probe2 = aw.qmc.fromCtoF(probe2)
@@ -40271,8 +40570,25 @@ class serialport(object):
                     pass
             elif mode == 1:
                 try:
-                    if self.YOCTOsensor and self.YOCTOsensor.isOnline():
+                    if aw.qmc.YOCTO_async[0]:
+                        try:
+                            #### lock shared resources #####
+                            self.YOCTOsemaphores[0].acquire(1)
+                            if len(self.YOCTOvalues[0]) > 0:
+                                probe1 = numpy.average(self.YOCTOvalues[0])
+                                self.YOCTOvalues[0] = self.YOCTOvalues[0][-round((aw.qmc.delay/aw.qmc.YOCTO_dataRate)):]
+                        except:
+                            self.YOCTOvalues[0] = []
+                        finally:
+                            if self.YOCTOsemaphores[0].available() < 1:
+                                self.YOCTOsemaphores[0].release(1)
+                        if probe1 == -1:
+                            probe1 = self.YOCTOlastvalues[0]
+                        else:
+                            self.YOCTOlastvalues[0] = probe1
+                    if probe1 == -1 and self.YOCTOsensor and self.YOCTOsensor.isOnline():
                         probe1 = self.YOCTOsensor.get_currentValue()
+                    if probe1 != -1:
                         # convert temperature scale
                         if aw.qmc.YOCTOchanUnit == "C" and aw.qmc.mode == "F":
                             probe1 = aw.qmc.fromCtoF(probe1)
@@ -40281,18 +40597,23 @@ class serialport(object):
                 except Exception:
                     pass
             # apply the emissivity to the IR value
-            if mode == 2:
+            if mode == 2 and probe1 != -1 and probe2 != -1:
                 probe2 = self.IRtemp(aw.qmc.YOCTO_emissivity,probe2,probe1)
             return probe1, probe2
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             try:
-                YAPI.FreeAPI()
+                if self.YOCTOthread is not None:
+                    self.YOCTOthread.join()
+                    self.YOCTOthread = None
                 self.YOCTOsensor = None
                 self.YOCTOchan1 = None
                 self.YOCTOchan2 = None
                 self.YOCOTtempIRavg = None
+                self.YOCTOvalues = [[],[]]
+                self.YOCTOlastvalues = [-1]*2
+                YAPI.FreeAPI()
             except Exception:
                 pass
             _, _, exc_tb = sys.exc_info()
@@ -43713,11 +44034,41 @@ class DeviceAssignmentDlg(ArtisanDialog):
         yoctoIRHorizontalLayout = QHBoxLayout()
         yoctoIRHorizontalLayout.addLayout(yoctoIRGrid)
         yoctoIRHorizontalLayout.addStretch()
+        self.yoctoDataRateCombo = QComboBox()
+        self.yoctoDataRateCombo.setFocusPolicy(Qt.NoFocus)
+        model = self.yoctoDataRateCombo.model()
+        dataRateItems = self.createItems(aw.qmc.phidget_dataRatesStrings)
+        for item in dataRateItems:
+                model.appendRow(item)
+        try:
+            self.yoctoDataRateCombo.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.YOCTO_dataRate))
+        except Exception:
+            pass
+        self.yoctoDataRateCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.yoctoDataRateCombo.setMinimumContentsLength(5)
+        width = self.yoctoDataRateCombo.minimumSizeHint().width()
+        self.yoctoDataRateCombo.setMinimumWidth(width)
+        self.yoctoAyncChan1Flag = QCheckBox(QApplication.translate("Label","Channel 1", None))
+        self.yoctoAyncChan1Flag.setFocusPolicy(Qt.NoFocus)
+        self.yoctoAyncChan1Flag.setChecked(aw.qmc.YOCTO_async[0])
+        self.yoctoAyncChan2Flag = QCheckBox(QApplication.translate("Label","Channel 2", None))
+        self.yoctoAyncChan2Flag.setFocusPolicy(Qt.NoFocus)
+        self.yoctoAyncChan2Flag.setChecked(aw.qmc.YOCTO_async[1])
+        yoctoAsyncGrid = QGridLayout()
+        yoctoAsyncGrid.addWidget(self.yoctoDataRateCombo,0,0)
+        yoctoAsyncGrid.addWidget(self.yoctoAyncChan1Flag,0,1)
+        yoctoAsyncGrid.addWidget(self.yoctoAyncChan2Flag,0,2)
+        yoctoAsyncHorizontalLayout = QHBoxLayout()
+        yoctoAsyncHorizontalLayout.addLayout(yoctoAsyncGrid)
+        yoctoAsyncHorizontalLayout.addStretch()
+        yoctoAsyncGroupBox = QGroupBox(QApplication.translate("GroupBox","Async",None))
+        yoctoAsyncGroupBox.setLayout(yoctoAsyncHorizontalLayout)
         yoctoIRGroupBox = QGroupBox(QApplication.translate("GroupBox","IR",None))
         yoctoIRGroupBox.setLayout(yoctoIRHorizontalLayout)
         yoctoVBox = QVBoxLayout()
         yoctoVBox.addWidget(yoctoNetworkGroupBox)
         yoctoVBox.addWidget(yoctoIRGroupBox)
+        yoctoVBox.addWidget(yoctoAsyncGroupBox)
         yoctoVBox.addStretch()
         yoctoVBox.setSpacing(5)
         yoctoVBox.setContentsMargins(0,0,0,0)  
@@ -45141,6 +45492,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.yoctoRemoteFlag = self.yoctoBoxRemoteFlag.isChecked()
             aw.qmc.yoctoServerID = u(self.yoctoServerId.text())
             aw.qmc.YOCTO_emissivity = self.yoctoEmissivitySpinBox.value()
+            aw.qmc.YOCTO_async[0] = self.yoctoAyncChan1Flag.isChecked()
+            aw.qmc.YOCTO_async[1] = self.yoctoAyncChan2Flag.isChecked()
+            aw.qmc.YOCTO_dataRate = aw.qmc.phidget_dataRatesValues[self.yoctoDataRateCombo.currentIndex()]
             
             # Ambient confifgurations
             aw.qmc.ambient_temperature_device = self.temperatureDeviceCombo.currentIndex()
