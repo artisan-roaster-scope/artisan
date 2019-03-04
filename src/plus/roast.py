@@ -75,6 +75,15 @@ def getTemplate(bp):
                 except:
                     pass  
         
+        if "density_roasted" in bp:
+            if bp["density_roasted"][0]:
+                try:
+                    n = util.limitnum(0,1000,bp["density_roasted"][0])
+                    if n is not None:
+                        d["density_roasted"] = util.float2floatMin(n,1)
+                except:
+                    pass
+
         util.add2dict(bp,config.uuid_tag,d,"id")            
         util.addNum2dict(bp,"moisture_roasted",d,"moisture",0,100,1)            
         util.addString2dict(bp,"title",d,"label",255)
@@ -201,6 +210,7 @@ def getSyncRecord(r = None):
             "end_weight",
             "volume_in",
             "volume_out",
+            "density_roasted",
             "batch_number",
             "batch_prefix",
             "batch_pos", 

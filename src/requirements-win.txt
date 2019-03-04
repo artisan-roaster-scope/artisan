@@ -3,6 +3,6 @@ gevent-websocket==0.10.1
 numpy==1.15.4
 matplotlib==3.0.3
 scipy==1.2.0
-PyQt5==5.12
+PyQt5==5.11.3 # 5.12 builds depends on OpenGL
 pyinstaller==3.4
 pywin32==224

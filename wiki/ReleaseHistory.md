@@ -13,9 +13,11 @@ v1.6.1
    - adds IO Command state feedback by mfurlotti ([PR #284](../../../pull/284))
    - adds support for more digital output Phidgets [REL1000](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=966), [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720) and the first 4 channels of [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721) ([Issue #286](../../../issues/286))
    - adds support for the Phidget [DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961) (current/frequency/digital/voltage input)
+   - adds support for the Phidget RC Servo API supporting the servo controllers [Phidget RCC 1000](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1015) (16x VINT, ext. powered), [Phidget 1061](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1032) (8x USB, ext. powered), and [Phidget 1066](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1044) (1x USB powered) together with a wide range of servo motors from Phidgets (like the [Phidget 3540 10cm Linear Actor](https://www.phidgets.com/?tier=3&catid=25&pcid=22&prodid=406)) or other sources
    - adds support for the [Yocotopuce Meteo](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-meteo-v2) ambient sensors
    - adds support for the (upcomming) [Yocotopuce](http://www.yoctopuce.com/EN/products/category/usb-environmental-sensors) IR module
    - adds support for the [Probat Roaster Middleware](https://www.probat.com/en/products/shoproaster/produkte/roasters/probatone-series/)
+   - adds 2in1 variant of Sedona Elite machine configuration
    - adds CMD-A keyboard shortcut to open alarms dialog
    - adds JPEG and BMP support (export/convert)
    - adds selection of autosave image type
@@ -24,6 +26,8 @@ v1.6.1
    - adds Brazilian portuguese (as spoken in Brazil)
    - adds the possibility to rename ET/BT curves and LCDs on the graph
    - adds flags to show/hide time/temp grids
+   - adds the Yocto async mode
+   - adds roasted coffee density field and density loss calculation to Roast Properties
  * Changes
    - improved Phidgets tab rendering
    - store reference to profile instead of background with recent roasts
@@ -35,6 +39,7 @@ v1.6.1
    - udated French translations (thanks Nico!)
    - adds 0.05C and 0.02C Phidget Change Triggers
    - adds default focus to OK button and assigns CMD-W and CMD-. shortcuts to the Cancel button of most dialogs ([Issue 321](../../../issues/321))
+   - improved Roast Properties dialog layout
  * Fixes
    - fixes feature interaction between NewRoast and AlwaysOn that caused a hang ([Issue 275](../../../issues/275))
    - fixes sliders single step action

@@ -1392,7 +1392,12 @@ class tgraphcanvas(FigureCanvas):
         self.volume = [0,0,self.volume_units[0]]
         
         #[0]probe weight, [1]weight unit, [2]probe volume, [3]volume unit
-        self.density = [0.,self.weight_units[0],1.,self.volume_units[0]]
+#        self.density = [0.,self.weight_units[0],1.,self.volume_units[0]]
+        self.density = [0.,"g",1.,"l"]
+        # density weight and volume units are not to be used any longer and assumed to be fixed to g/l
+        # thus also probe volume is not used anymore, and only self.density[0] holds the green been density in g/l
+        
+        self.density_roasted = [0.,"g",1.,"l"] # this holds the roasted beans density in g/l
         
         
         if platform.system() == 'Darwin':
@@ -1401,7 +1406,9 @@ class tgraphcanvas(FigureCanvas):
                 if not QSettings().value('AppleMetricUnits'):
                     self.weight = [0,0,self.weight_units[2]]
                     self.volume = [0,0,self.volume_units[1]]
-                    self.density = [0.,self.weight_units[2],1.,self.volume_units[1]]
+                    #self.density = [0.,self.weight_units[2],1.,self.volume_units[1]]
+                    self.density = [0.,"g",1.,"l"] # now fixed to g/l
+                    self.density_roasted = [0.,"g",1.,"l"] # now fixed to g/l
             except:
                 pass
         
@@ -3970,7 +3977,8 @@ class tgraphcanvas(FigureCanvas):
                     self.plus_blend_spec = None
                     self.weight = [0,0,self.weight[2]]
                     self.volume = [0,0,self.volume[2]]
-                    self.density = [0,self.density[1],0,self.density[3]]
+                    self.density = [0,self.density[1],1,self.density[3]]
+                    self.density_roasted = [0,self.density_roasted[1],1,self.density_roasted[3]]
                     self.ambientTemp = 0.
                     self.ambient_humidity = 0.
                     self.ambient_pressure = 0.
@@ -13135,6 +13143,11 @@ class ApplicationWindow(QMainWindow):
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatus)
 
+    # this is important to have . as decimal separator independent of the systems locale
+    def createCLocaleDoubleValidator(self,bot,top,dec,w):
+        validator = QDoubleValidator(bot,top,dec,w)
+        validator.setLocale(QLocale.c())
+        return validator
     
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
     def setTare(self,n):
@@ -13492,7 +13505,7 @@ class ApplicationWindow(QMainWindow):
                         aw.s7.host = host
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                elif aw.qmc.device in [0,19,53] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Hottop or MODBUS serial
+                elif aw.qmc.device in [0,9,19,53] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop or MODBUS serial
                     import serial.tools.list_ports
                     comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                     if platf == 'Darwin':
@@ -15422,7 +15435,14 @@ class ApplicationWindow(QMainWindow):
                                     self.setExtraEventButtonStyle(b, style="pressed")
                                 else:
                                     self.setExtraEventButtonStyle(b, style="normal")
-
+                            elif cs_a[0] == "sleep" and cs_len == 1: # in seconds
+                                try:
+                                    t = eval(cs_a[1])
+                                    if isinstance(t,float) or isinstance(t,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(t)
+                                except Exception:
+                                    pass
                             else:
                                 #print("no match for command [%s], continue" % (cs_a[0]))
                                 aw.sendmessage(QApplication.translate("Message","No match for command [%s], continuing" % (cs_a[0]), None))
@@ -15481,6 +15501,14 @@ class ApplicationWindow(QMainWindow):
                                         setHottop(cooling_motor=True)
                                     else:
                                         setHottop(cooling_motor=False)
+                                except Exception:
+                                    pass
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
                                 except Exception:
                                     pass
                 elif action == 11: # p-i-d, expects 3 float numbers separated by semicolon
@@ -15575,6 +15603,11 @@ class ApplicationWindow(QMainWindow):
                                 elif cs.startswith('pulsehub(') and len(cs)>12 and len(cs)<17:
                                     c,t = cs[9:-1].split(',')
                                     aw.ser.phidgetOUTpulsePWMhub(int(c),int(t))
+                                elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
                             except Exception:
                                 pass
                 elif action == 14: # VOUT Command (currently only "out(<channel>,<value>)" with <value> a float
@@ -15582,12 +15615,20 @@ class ApplicationWindow(QMainWindow):
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
-                            try:
-                                if cs.startswith('out(') and len(cs)>7:
+                            if cs.startswith('out(') and len(cs)>7:
+                                try:
                                     c,v = cs[4:-1].split(',')
                                     aw.ser.phidgetVOUTsetVOUT(int(c),float(v))
-                            except Exception:
-                                pass
+                                except Exception:
+                                    pass
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
+                                except Exception:
+                                    pass
                 elif action == 15: # S7 Command
                     # getDBint(<dbnumber>,<start>)
                     # getDBfloat(<dbnumber>,<start>)
@@ -15621,6 +15662,14 @@ class ApplicationWindow(QMainWindow):
                                     aw.s7.lastReadResult = aw.s7.writeFloat(5,int(dbnr),int(s))
                                 except Exception:
                                     pass
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
+                                except Exception:
+                                    pass
                 elif action == 16:
                     self.ser.R1.set_heater(int(cmd)/10)
                 elif action == 17:
@@ -15645,6 +15694,14 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         aw.qmc.silent_alarms = True
                                         aw.sendmessage(QApplication.translate("Message","Alarms off", None))
+                                except Exception:
+                                    pass
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
                                 except Exception:
                                     pass
                 elif action == 21: # RC Command
@@ -18667,7 +18724,11 @@ class ApplicationWindow(QMainWindow):
             if "density" in profile:
                 self.qmc.density = [profile["density"][0],d(profile["density"][1]),profile["density"][2],d(profile["density"][3])]
             else:
-                self.qmc.density = [0,"g",0,"l"]
+                self.qmc.density = [0,"g",1,"l"]
+            if "density_roasted" in profile:
+                self.qmc.density_roasted = [profile["density_roasted"][0],d(profile["density_roasted"][1]),profile["density_roasted"][2],d(profile["density_roasted"][3])]
+            else:
+                self.qmc.density_roasted = [0,"g",1,"l"]
             if "roastertype" in profile:
                 self.qmc.roastertype = d(profile["roastertype"])
             else:
@@ -19262,6 +19323,7 @@ class ApplicationWindow(QMainWindow):
             profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocal(self.qmc.weight[2])]
             profile["volume"] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocal(self.qmc.volume[2])]
             profile["density"] = [self.qmc.density[0],encodeLocal(self.qmc.density[1]),self.qmc.density[2],encodeLocal(self.qmc.density[3])]
+            profile["density_roasted"] = [self.qmc.density_roasted[0],encodeLocal(self.qmc.density_roasted[1]),self.qmc.density_roasted[2],encodeLocal(self.qmc.density_roasted[3])]
             profile["roastertype"] = encodeLocal(self.qmc.roastertype)
             profile["machinesetup"] = encodeLocal(self.qmc.machinesetup)
             profile["operator"] = encodeLocal(self.qmc.operator)
@@ -19996,8 +20058,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("weight"):
                 self.qmc.weight[2] = s2a(toString(settings.value("weight",self.qmc.weight[2])))
                 self.qmc.volume[2] = s2a(toString(settings.value("volume",self.qmc.volume[2])))
-                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
-                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
+# density units are now fixed to g/l
+#                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
+#                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
             if settings.contains("volumeCalcUnit"):
                 self.qmc.volumeCalcUnit = toInt(settings.value("volumeCalcUnit",int(self.qmc.volumeCalcUnit)))
             settings.endGroup()
@@ -20452,7 +20515,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("machinesetup"):
                 self.qmc.machinesetup = toString(settings.value("machinesetup",self.qmc.machinesetup))
             self.qmc.drumspeed = toString(settings.value("drumspeed",self.qmc.drumspeed))
-            self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2]))
+#            self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2])) # fixed to 1l now
             if settings.contains("beansize"):
                 self.qmc.beansize = toDouble(settings.value("beansize",self.qmc.beansize))
             if settings.contains("beansize_min"):
@@ -21635,7 +21698,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("operator",self.qmc.operator)
             settings.setValue("roastertype",self.qmc.roastertype)
             settings.setValue("machinesetup",self.qmc.machinesetup)
-            settings.setValue("densitySampleVolume",self.qmc.density[2])
+#            settings.setValue("densitySampleVolume",self.qmc.density[2]) # fixed to 1l now
             settings.setValue("beansize",self.qmc.beansize)
             settings.setValue("beansize_min",self.qmc.beansize_min)
             settings.setValue("beansize_max",self.qmc.beansize_max)
@@ -28420,7 +28483,7 @@ class volumeCalculatorDlg(ArtisanDialog):
                     
     def widgetWeight(self,widget):
         if widget.text() != "":
-            c = widget.text().toFloat()[0]
+            c = float(widget.text())
         else:
             c = 0.
         v = aw.float2float(self.retrieveWeight(c))
@@ -28916,10 +28979,8 @@ class editGraphDlg(ArtisanDialog):
 
         # we remember user modifications to revert to them on deselecting a plus element
         self.modified_beans = aw.qmc.beans
-        self.modified_density_weight_text = str(aw.qmc.density[0])
-        self.modified_density_weight_unit_idx = aw.qmc.weight_units.index(aw.qmc.density[1])
-        self.modified_density_volume_text = str(aw.qmc.density[2])
-        self.modified_density_volume_unit_idx = aw.qmc.volume_units.index(aw.qmc.density[3])
+        self.modified_density_in_text = str(aw.float2float(aw.qmc.density[0]))
+        self.modified_volume_in_text = str(aw.float2float(aw.qmc.volume[0]))
         self.modified_beansize_min_text = str(aw.qmc.beansize_min)
         self.modified_beansize_max_text = str(aw.qmc.beansize_max)
         self.modified_moisture_greens_text = str(aw.qmc.moisture_greens)
@@ -28927,9 +28988,13 @@ class editGraphDlg(ArtisanDialog):
         # remember parameters set by plus_coffee/plus_blend on entering the dialog to enable a Cancel action
         self.org_beans = aw.qmc.beans
         self.org_density = aw.qmc.density
+        self.org_density_roasted = aw.qmc.density_roasted
         self.org_beansize_min = aw.qmc.beansize_min
         self.org_beansize_max = aw.qmc.beansize_max
         self.org_moisture_greens = aw.qmc.moisture_greens
+        
+        self.org_weight = aw.qmc.weight[:]
+        self.org_volume = aw.qmc.volume[:]
         
         # other parameters remembered for Cancel operation        
         self.org_specialevents = aw.qmc.specialevents
@@ -28983,7 +29048,7 @@ class editGraphDlg(ArtisanDialog):
                 charge_str = aw.qmc.stringfromseconds(time_diff)
             if self.drop_idx != 0 and self.drop_idx != aw.qmc.timeindex[6]:
                 drop_str = aw.qmc.stringfromseconds(int(aw.qmc.timex[self.drop_idx]-aw.qmc.timex[aw.qmc.timeindex[0]]))
-        self.chargeestimate = QLabel(charge_str)
+#        self.chargeestimate = QLabel(charge_str)
         drylabel = QLabel("<b>" + u(QApplication.translate("Label", "DRY END",None)) + "</b>")
         drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
@@ -29101,7 +29166,6 @@ class editGraphDlg(ArtisanDialog):
         #table for showing events
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
-#        self.createEventTable() # now called on tab switch
         self.clusterEventsButton = QPushButton(QApplication.translate("Button", "Cluster",None))
         self.clusterEventsButton.setFocusPolicy(Qt.NoFocus)
         self.clusterEventsButton.setMaximumSize(self.clusterEventsButton.sizeHint())
@@ -29209,29 +29273,30 @@ class editGraphDlg(ArtisanDialog):
         self.drumspeed.setAlignment(Qt.AlignCenter)
         #weight
         weightlabel = QLabel("<b>" + u(QApplication.translate("Label", "Weight",None)) + "</b>")
-        weightinlabel = QLabel(QApplication.translate("Label", " in",None))
-        weightoutlabel = QLabel(QApplication.translate("Label", " out",None))
+        green_label = QLabel("<b>" + QApplication.translate("Label", "Green",None) + "</b>")
+        roasted_label = QLabel("<b>" + QApplication.translate("Label", "Roasted",None) + "</b>")
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
-        self.weightinedit.setValidator(QDoubleValidator(0., 999999., 5, self.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
+        self.weightinedit.setValidator(aw.createCLocaleDoubleValidator(0., 999999., 5, self.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightinedit.setMinimumWidth(70)
         self.weightinedit.setMaximumWidth(70)
         self.weightinedit.setAlignment(Qt.AlignRight)
         self.weightoutedit = QLineEdit(outw)
-        self.weightoutedit.setValidator(QDoubleValidator(0., 999999., 5, self.weightoutedit))  # the max limit has to be high enough otherwise the connected signals are not send!
+        self.weightoutedit.setValidator(aw.createCLocaleDoubleValidator(0., 999999., 5, self.weightoutedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightoutedit.setMinimumWidth(70)
         self.weightoutedit.setMaximumWidth(70)
         self.weightoutedit.setAlignment(Qt.AlignRight)
-        self.weightpercentlabel = QLabel(QApplication.translate("Label", " %",None))
-        self.weightpercentlabel.setMinimumWidth(45)
-        self.weightpercentlabel.setMaximumWidth(45)
+        self.weightpercentlabel = QLabel(QApplication.translate("Label", "",None))
+        self.weightpercentlabel.setMinimumWidth(55)
+        self.weightpercentlabel.setMaximumWidth(55)
+        self.weightpercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.roastdegreelabel = QLabel("")
         self.roastdegreelabel.setMinimumWidth(80)
         self.roastdegreelabel.setMaximumWidth(80)
         self.percent()
-        self.weightoutedit.editingFinished.connect(self.weightouteditChanged)
         self.weightinedit.editingFinished.connect(self.weightineditChanged)
+        self.weightoutedit.editingFinished.connect(self.weightouteditChanged)
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
@@ -29240,23 +29305,22 @@ class editGraphDlg(ArtisanDialog):
         self.unitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeWeightUnit(i))
         #volume
         volumelabel = QLabel("<b>" + u(QApplication.translate("Label", "Volume",None)) + "</b>")
-        volumeinlabel = QLabel(QApplication.translate("Label", " in",None))
-        volumeoutlabel = QLabel(QApplication.translate("Label", " out",None))
-        inv = str(aw.qmc.volume[0])
-        outv = str(aw.qmc.volume[1])
+        inv = str(aw.float2float(aw.qmc.volume[0]))
+        outv = str(aw.float2float(aw.qmc.volume[1]))
         self.volumeinedit = QLineEdit(inv)
-        self.volumeinedit.setValidator(QDoubleValidator(0., 99999., 5, self.volumeinedit)) # the max limit has to be high enough otherwise the connected signals are not send!
+        self.volumeinedit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 5, self.volumeinedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeinedit.setMinimumWidth(70)
         self.volumeinedit.setMaximumWidth(70)
         self.volumeinedit.setAlignment(Qt.AlignRight)
         self.volumeoutedit = QLineEdit(outv)
-        self.volumeoutedit.setValidator(QDoubleValidator(0., 99999., 5, self.volumeoutedit)) # the max limit has to be high enough otherwise the connected signals are not send!
+        self.volumeoutedit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 5, self.volumeoutedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeoutedit.setMinimumWidth(70)
         self.volumeoutedit.setMaximumWidth(70)
         self.volumeoutedit.setAlignment(Qt.AlignRight)
         self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None))
-        self.volumepercentlabel.setMinimumWidth(45)
-        self.volumepercentlabel.setMaximumWidth(45)
+        self.volumepercentlabel.setMinimumWidth(55)
+        self.volumepercentlabel.setMaximumWidth(55)
+        self.volumepercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.volumeoutedit.editingFinished.connect(self.volume_percent)
         self.volumeinedit.editingFinished.connect(self.volume_percent)
         self.volumeUnitsComboBox = QComboBox()
@@ -29265,38 +29329,31 @@ class editGraphDlg(ArtisanDialog):
         self.volumeUnitsComboBox.addItems(aw.qmc.volume_units)
         self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(aw.qmc.volume[2]))
         self.volumeUnitsComboBox.currentIndexChanged.connect(lambda i=self.volumeUnitsComboBox.currentIndex() :self.changeVolumeUnit(i))
-        self.calculateddensitylabel = QLabel("")
         self.unitsComboBox.currentIndexChanged.connect(self.calculated_density)
         #density
         bean_density_label = QLabel("<b>" + u(QApplication.translate("Label", "Density",None)) + "</b>")
-        self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
-        self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 99999., 5,self.bean_density_weight_edit))
-        self.bean_density_weight_edit.setMinimumWidth(60)
-        self.bean_density_weight_edit.setMaximumWidth(60)
-        self.bean_density_weight_edit.setAlignment(Qt.AlignRight)
-        self.bean_density_weightUnitsComboBox = QComboBox()
-        self.bean_density_weightUnitsComboBox.setMaximumWidth(60)
-        self.bean_density_weightUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_weightUnitsComboBox.addItems(aw.qmc.weight_units)
-        self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(aw.qmc.density[1]))
-        bean_density_per_label = QLabel(QApplication.translate("Label", "per",None))
-        self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
-        self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 99999., 5,self.bean_density_volume_edit))
-        self.bean_density_volume_edit.setMinimumWidth(60)
-        self.bean_density_volume_edit.setMaximumWidth(60)
-        self.bean_density_volume_edit.setAlignment(Qt.AlignRight)
-        self.bean_density_volumeUnitsComboBox = QComboBox()
-        self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
-        self.bean_density_volumeUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_volumeUnitsComboBox.addItems(aw.qmc.volume_units)
-        self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(aw.qmc.density[3]))
-        self.standarddensitylabel = QLabel("")
-        self.standarddensitylabel.setMinimumWidth(50)
-        self.standard_density()
-        self.bean_density_volume_edit.editingFinished.connect(self.density_volume_editing_finished)
-        self.bean_density_weight_edit.editingFinished.connect(self.density_weight_editing_finished)
-        self.bean_density_weightUnitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeDensityWeightUnit(i))
-        self.bean_density_volumeUnitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeDensityVolumeUnit(i))
+        density_unit_label = QLabel("g/l")
+        self.bean_density_in_edit = QLineEdit(str(aw.qmc.density[0]))
+        self.bean_density_in_edit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 5,self.bean_density_in_edit))
+        self.bean_density_in_edit.setMinimumWidth(70)
+        self.bean_density_in_edit.setMaximumWidth(70)
+        self.bean_density_in_edit.setAlignment(Qt.AlignRight)
+        self.bean_density_out_edit = QLineEdit(str(aw.qmc.density_roasted[0]))
+        self.bean_density_out_edit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 5,self.bean_density_out_edit))
+        self.bean_density_out_edit.setMinimumWidth(70)
+        self.bean_density_out_edit.setMaximumWidth(70)
+        self.bean_density_out_edit.setAlignment(Qt.AlignRight)
+        self.bean_density_in_edit.editingFinished.connect(self.density_in_editing_finished)
+        self.bean_density_out_edit.editingFinished.connect(self.density_out_editing_finished)
+        self.densitypercentlabel = QLabel(QApplication.translate("Label", "",None))
+        self.densitypercentlabel.setMinimumWidth(55)
+        self.densitypercentlabel.setMaximumWidth(55)
+        self.densitypercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        
+        self.organicpercentlabel = QLabel(QApplication.translate("Label", "",None))
+        self.organicpercentlabel.setMinimumWidth(55)
+        self.organicpercentlabel.setMaximumWidth(55)
+        self.organicpercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         # volume calc button
         volumeCalcButton = QPushButton(QApplication.translate("Button", "calc",None))
@@ -29333,17 +29390,18 @@ class editGraphDlg(ArtisanDialog):
         self.bean_size_max_edit.setAlignment(Qt.AlignRight)
         bean_size_unit_label = QLabel(QApplication.translate("Label", "18/64\u2033",None))
         #bean color
-        whole_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Whole Color",None)) + "</b>")
+        color_label = QLabel("<b>" + u(QApplication.translate("Label", "Color",None)) + "</b>")
+        whole_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Whole",None)) + "</b>")
         self.whole_color_edit = QLineEdit(str(aw.qmc.whole_color))
         self.whole_color_edit.setValidator(QIntValidator(0, 1000, self.whole_color_edit))
-        self.whole_color_edit.setMinimumWidth(45)
-        self.whole_color_edit.setMaximumWidth(45)
+        self.whole_color_edit.setMinimumWidth(70)
+        self.whole_color_edit.setMaximumWidth(70)
         self.whole_color_edit.setAlignment(Qt.AlignRight)
-        ground_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Ground Color",None)) + "</b>")
+        ground_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Ground",None)) + "</b>")
         self.ground_color_edit = QLineEdit(str(aw.qmc.ground_color))
         self.ground_color_edit.setValidator(QIntValidator(0, 1000, self.ground_color_edit))
-        self.ground_color_edit.setMinimumWidth(45)
-        self.ground_color_edit.setMaximumWidth(45)
+        self.ground_color_edit.setMinimumWidth(70)
+        self.ground_color_edit.setMaximumWidth(70)
         self.ground_color_edit.setAlignment(Qt.AlignRight)
         self.bean_size_min_edit.setAlignment(Qt.AlignRight)
         self.bean_size_max_edit.setAlignment(Qt.AlignRight)
@@ -29355,21 +29413,18 @@ class editGraphDlg(ArtisanDialog):
         greens_temp_unit_label = QLabel(aw.qmc.mode)
         self.greens_temp_edit = QLineEdit()
         self.greens_temp_edit.setText(str(aw.qmc.greens_temp))
-        self.greens_temp_edit.setMaximumWidth(50)
-        self.greens_temp_edit.setValidator(QDoubleValidator(0., 100., 2, self.greens_temp_edit))
+        self.greens_temp_edit.setMaximumWidth(60)
+        self.greens_temp_edit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 2, self.greens_temp_edit))
         self.greens_temp_edit.setAlignment(Qt.AlignRight)
         greens_temp = QHBoxLayout()
-        greens_temp.addWidget(self.greens_temp_edit)
-        greens_temp.addWidget(greens_temp_unit_label)
         greens_temp.addStretch()        
         #Moisture Greens
-        moisture_greens_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Greens",None)) + "</b>")
+        moisture_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture",None)) + "</b>")
         moisture_greens_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.moisture_greens_edit = QLineEdit()
-        self.moisture_greens_edit.editingFinished.connect(self.moistureGreensEdited)
         self.moisture_greens_edit.setText(str(aw.qmc.moisture_greens))
-        self.moisture_greens_edit.setMaximumWidth(50)
-        self.moisture_greens_edit.setValidator(QDoubleValidator(0., 100., 2, self.moisture_greens_edit))
+        self.moisture_greens_edit.setMaximumWidth(70)
+        self.moisture_greens_edit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 2, self.moisture_greens_edit))
         self.moisture_greens_edit.setAlignment(Qt.AlignRight)                
         #Moisture Roasted
         #bag humidity
@@ -29377,14 +29432,18 @@ class editGraphDlg(ArtisanDialog):
         moisture_roasted_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.moisture_roasted_edit = QLineEdit()
         self.moisture_roasted_edit.setText(str(aw.qmc.moisture_roasted))
-        self.moisture_roasted_edit.setMaximumWidth(50)
-        self.moisture_roasted_edit.setValidator(QDoubleValidator(0., 100., 2, self.moisture_roasted_edit))
+        self.moisture_roasted_edit.setMaximumWidth(70)
+        self.moisture_roasted_edit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 2, self.moisture_roasted_edit))
         self.moisture_roasted_edit.setAlignment(Qt.AlignRight)
-        self.moisture_greens_edit.editingFinished.connect(self.calculated_organic_loss)        
-        self.moisture_roasted_edit.editingFinished.connect(self.calculated_organic_loss)
+        self.moisturepercentlabel = QLabel(QApplication.translate("Label", "",None))
+        self.moisturepercentlabel.setMinimumWidth(55)
+        self.moisturepercentlabel.setMaximumWidth(55)
+        self.moisturepercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.moisture_greens_edit.editingFinished.connect(self.moistureEdited)
+        self.moisture_roasted_edit.editingFinished.connect(self.moistureEdited)
+
         moisture_roasted = QHBoxLayout()
         moisture_roasted.addWidget(moisture_roasted_label)
-        moisture_roasted.addWidget(self.moisture_roasted_edit)
         moisture_roasted.addWidget(moisture_roasted_unit_label)
         moisture_roasted.addStretch()
         #Ambient temperature (uses display mode as unit (F or C)
@@ -29395,20 +29454,20 @@ class editGraphDlg(ArtisanDialog):
         self.ambient_humidity_edit.setText(str(aw.qmc.ambient_humidity))
         self.ambient_humidity_edit.setMinimumWidth(50)
         self.ambient_humidity_edit.setMaximumWidth(50)
-        self.ambient_humidity_edit.setValidator(QDoubleValidator(0., 100., 2, self.ambient_humidity_edit))  
+        self.ambient_humidity_edit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 2, self.ambient_humidity_edit))  
         self.ambient_humidity_edit.setAlignment(Qt.AlignRight) 
         self.ambientedit = QLineEdit()
         self.ambientedit.setText(str(aw.qmc.ambientTemp))
         self.ambientedit.setMinimumWidth(40)
         self.ambientedit.setMaximumWidth(40)
-        self.ambientedit.setValidator(QDoubleValidator(-40., 200., 2, self.ambientedit))  
+        self.ambientedit.setValidator(aw.createCLocaleDoubleValidator(-40., 200., 2, self.ambientedit))  
         self.ambientedit.setAlignment(Qt.AlignRight)        
         pressureunitslabel = QLabel("hPa")
         self.pressureedit = QLineEdit()
         self.pressureedit.setText(str(aw.qmc.ambient_pressure))
         self.pressureedit.setMinimumWidth(55)
         self.pressureedit.setMaximumWidth(55)
-        self.pressureedit.setValidator(QDoubleValidator(0, 1200, 1, self.pressureedit))  
+        self.pressureedit.setValidator(aw.createCLocaleDoubleValidator(0, 1200, 1, self.pressureedit))  
         self.pressureedit.setAlignment(Qt.AlignRight)                
         ambient = QHBoxLayout()
         ambient.addWidget(self.ambientedit)
@@ -29417,7 +29476,7 @@ class editGraphDlg(ArtisanDialog):
         ambient.addWidget(self.pressureedit)
         ambient.addWidget(pressureunitslabel)
         ambient.addStretch()
-        self.calculateorganiclosslabel = QLabel("")
+        self.organiclosslabel = QLabel()
         # NOTES
         roastertypelabel = QLabel()
         roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Machine",None)) + "</b>")
@@ -29509,10 +29568,12 @@ class editGraphDlg(ArtisanDialog):
         # scan whole button
         scanWholeButton = QPushButton(QApplication.translate("Button", "scan",None))
         scanWholeButton.clicked.connect(lambda _:self.scanWholeColor())
+        scanWholeButton.setMinimumWidth(80)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         scanWholeButton.setFocusPolicy(Qt.NoFocus)
         # scan ground button
         scanGroundButton = QPushButton(QApplication.translate("Button", "scan",None))
+        scanGroundButton.setMinimumWidth(80)
         scanGroundButton.clicked.connect(lambda _:self.scanGroundColor())
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         scanGroundButton.setFocusPolicy(Qt.NoFocus)
@@ -29552,7 +29613,8 @@ class editGraphDlg(ArtisanDialog):
             calc_dropstr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
             aw.sendmessage(QApplication.translate("Message","The recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})", None).format(drop_str, calc_dropstr))
         textLayout = QGridLayout()
-        textLayout.setSpacing(1)
+        textLayout.setHorizontalSpacing(3)
+        textLayout.setVerticalSpacing(2)
         textLayout.setContentsMargins(0,0,0,0)
         textLayout.addWidget(datelabel1,0,0)
         datebatch = QHBoxLayout()
@@ -29665,111 +29727,92 @@ class editGraphDlg(ArtisanDialog):
         roasteroperator.addWidget(drumspeedlabel)
         roasteroperator.addSpacing(5)
         roasteroperator.addWidget(self.drumspeed,stretch=1)
-        textLayout.addLayout(roasteroperator,5+textLayoutPlusOffset,1)        
-        weightLayout = QHBoxLayout()
-        weightLayout.setSpacing(0)
-        weightLayout.addWidget(weightlabel)
-        weightLayout.addSpacing(18)
-        weightLayout.addWidget(self.unitsComboBox)
-        weightLayout.addSpacing(15)
-        weightLayout.addWidget(self.weightinedit)
-        weightLayout.addSpacing(1)
-        weightLayout.addWidget(weightinlabel)
-        weightLayout.addSpacing(15)
-        weightLayout.addWidget(self.weightoutedit)
-        weightLayout.addSpacing(1)
-        weightLayout.addWidget(weightoutlabel)
-        weightLayout.addSpacing(15)
-        weightLayout.addWidget(self.weightpercentlabel)
-        weightLayout.addStretch()  
+        textLayout.addLayout(roasteroperator,5+textLayoutPlusOffset,1)
+        
+        beanSizeLayout = QHBoxLayout()
+        beanSizeLayout.addStretch()
+        beanSizeLayout.addWidget(self.bean_size_min_edit)
+        beanSizeLayout.addWidget(bean_size_sep_label)
+        beanSizeLayout.addWidget(self.bean_size_max_edit)
+        
+        propGrid = QGridLayout()
+        propGrid.setContentsMargins(0,0,0,0)
+        propGrid.setHorizontalSpacing(3)
+        propGrid.setVerticalSpacing(0)
+        propGrid.addWidget(green_label,0,1,Qt.AlignCenter | Qt.AlignBottom)
+        propGrid.addWidget(roasted_label,0,2,Qt.AlignCenter | Qt.AlignBottom)
+        propGrid.addWidget(self.organicpercentlabel,0,4,Qt.AlignRight)
+        propGrid.addWidget(self.organiclosslabel,0,6,1,3,Qt.AlignLeft)
+        
+        propGrid.addWidget(weightlabel,1,0)
+        propGrid.addWidget(self.weightinedit,1,1,Qt.AlignRight)
+        propGrid.addWidget(self.weightoutedit,1,2,Qt.AlignRight)
+        propGrid.addWidget(self.unitsComboBox,1,3)
+        propGrid.addWidget(self.weightpercentlabel,1,4,Qt.AlignRight)
+        
+        propGrid.setColumnStretch(5,10)
+        
         if aw.scale.device is not None and aw.scale.device != "" and aw.scale.device != "None":
-            weightLayout.addWidget(self.tareComboBox)
-            weightLayout.addSpacing(10)
-            weightLayout.addWidget(inButton) 
-            weightLayout.addSpacing(10)
-            weightLayout.addWidget(outButton)
-        volumeLayout = QHBoxLayout()
-        volumeLayout.setSpacing(0)
-        volumeLayout.addWidget(volumelabel)
-        volumeLayout.addSpacing(14)
-        volumeLayout.addWidget(self.volumeUnitsComboBox)
-        volumeLayout.addSpacing(15)
-        volumeLayout.addWidget(self.volumeinedit)
-        volumeLayout.addSpacing(1)
-        volumeLayout.addWidget(volumeinlabel)
-        volumeLayout.addSpacing(15)
-        volumeLayout.addWidget(self.volumeoutedit)
-        volumeLayout.addSpacing(1)
-        volumeLayout.addWidget(volumeoutlabel)
-        volumeLayout.addSpacing(15)
-        volumeLayout.addWidget(self.volumepercentlabel)
-        volumeLayout.addStretch()
-        volumeLayout.addWidget(volumeCalcButton)
+            propGrid.addWidget(self.tareComboBox,1,7)
+            propGrid.addWidget(inButton,1,8)
+            propGrid.addWidget(outButton,1,9)
         
-        densityLayout = QHBoxLayout()
-        densityLayout.setContentsMargins(0,0,0,0)
-        densityLayout.setSpacing(0)
-        densityLayout.addWidget(bean_density_label)        
-        densityLayout.addSpacing(13)
-        densityLayout.addWidget(self.bean_density_weightUnitsComboBox)
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(self.bean_density_weight_edit)
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(bean_density_per_label)
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(self.bean_density_volumeUnitsComboBox)
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(self.bean_density_volume_edit)
-        densityLayout.addSpacing(20)
-        densityLayout.addWidget(self.standarddensitylabel)
-        densityLayout.addStretch()        
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(bean_size_label)
-        densityLayout.addSpacing(10)
-        densityLayout.addWidget(self.bean_size_min_edit)
-        densityLayout.addWidget(bean_size_sep_label)
-        densityLayout.addWidget(self.bean_size_max_edit)
-        densityLayout.addSpacing(5)
-        densityLayout.addWidget(bean_size_unit_label)
-
-        weightLayout.setContentsMargins(0,0,0,0)
-        volumeLayout.setContentsMargins(0,0,0,0)
-        densityLayout.setContentsMargins(0,0,0,0)
+        propGrid.addWidget(volumelabel,2,0)
+        propGrid.addWidget(self.volumeinedit,2,1,Qt.AlignRight)
+        propGrid.addWidget(self.volumeoutedit,2,2,Qt.AlignRight)
+        propGrid.addWidget(self.volumeUnitsComboBox,2,3)
+        propGrid.addWidget(self.volumepercentlabel,2,4,Qt.AlignRight)
+        propGrid.addWidget(volumeCalcButton,2,9)
         
-        colorLayout = QHBoxLayout()
-        colorLayout.setSpacing(0)
-        colorLayout.addWidget(whole_color_label)
-        colorLayout.addSpacing(15)
-        colorLayout.addWidget(self.whole_color_edit)
+        propGrid.setRowMinimumHeight(3,self.volumeUnitsComboBox.minimumSizeHint().height())
+        propGrid.addWidget(bean_density_label,3,0)
+        propGrid.addWidget(self.bean_density_in_edit,3,1,Qt.AlignRight)
+        propGrid.addWidget(self.bean_density_out_edit,3,2,Qt.AlignRight)
+        propGrid.addWidget(density_unit_label,3,3,Qt.AlignCenter)
+        propGrid.addWidget(self.densitypercentlabel,3,4,Qt.AlignRight)
+        
+        propGrid.addWidget(bean_size_label,3,7)
+        propGrid.addLayout(beanSizeLayout,3,8,Qt.AlignRight)
+        propGrid.addWidget(bean_size_unit_label,3,9,Qt.AlignCenter)
+        
+        propGrid.addWidget(moisture_label,4,0)
+        propGrid.addWidget(self.moisture_greens_edit,4,1,Qt.AlignRight)
+        propGrid.addWidget(self.moisture_roasted_edit,4,2,Qt.AlignRight)
+        propGrid.addWidget(moisture_greens_unit_label,4,3,Qt.AlignCenter)
+        propGrid.addWidget(self.moisturepercentlabel,4,4,Qt.AlignRight)
+        propGrid.addWidget(greens_temp_label,4,7)
+        propGrid.addWidget(self.greens_temp_edit,4,8,Qt.AlignRight)
+        propGrid.addWidget(greens_temp_unit_label,4,9,Qt.AlignCenter)
+        
+        propGrid.setRowMinimumHeight(7,30)
+        propGrid.addWidget(whole_color_label,7,1,Qt.AlignCenter | Qt.AlignBottom)
+        propGrid.addWidget(ground_color_label,7,2,Qt.AlignCenter | Qt.AlignBottom)
+        
+        propGrid.addWidget(color_label,8,0)
+        propGrid.addWidget(self.whole_color_edit,8,1,Qt.AlignRight)
+        propGrid.addWidget(self.ground_color_edit,8,2,Qt.AlignRight)
+        propGrid.addWidget(self.colorSystemComboBox,8,3,1, 2)
+                
+        if aw.color.device is not None and aw.color.device != "" and aw.color.device not in ["None","Tiny Tonino", "Classic Tonino"]:
+            propGrid.addWidget(scanWholeButton,8,6)
         if aw.color.device is not None and aw.color.device != "" and aw.color.device != "None":
-            colorLayout.addSpacing(5)
-            colorLayout.addWidget(scanWholeButton)
-        colorLayout.addSpacing(25)
-        colorLayout.addWidget(ground_color_label)
-        colorLayout.addSpacing(15)
-        colorLayout.addWidget(self.ground_color_edit)
-        if aw.color.device is not None and aw.color.device != "" and aw.color.device != "None":
-            colorLayout.addSpacing(5)
-            colorLayout.addWidget(scanGroundButton)
-        colorLayout.addStretch()
-        colorLayout.addWidget(self.colorSystemComboBox)        
-        humidityGrid = QGridLayout()
-        humidityGrid.addWidget(moisture_greens_label,0,0)
-        humidityGrid.addWidget(self.moisture_greens_edit,0,1)
-        humidityGrid.addWidget(moisture_greens_unit_label,0,2)
-        humidityGrid.addLayout(moisture_roasted,0,5)
-        humidityGrid.addWidget(greens_temp_label,0,9)
-        humidityGrid.addLayout(greens_temp,0,10)
-        humidityGrid.addWidget(ambientSourceLabel,0,11,Qt.AlignRight)
-        humidityGrid.addWidget(ambientlabel,2,0)
-        humidityGrid.addWidget(self.ambient_humidity_edit,2,1)
-        humidityGrid.addWidget(ambient_humidity_unit_label,2,2)
-        humidityGrid.addLayout(ambient,2,5)
-        humidityGrid.addWidget(updateAmbientTemp,2,10)
-        humidityGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignRight)
-        humidityGrid.setColumnMinimumWidth(3, 11)
-        humidityGrid.setColumnMinimumWidth(5, 11)
-        humidityGrid.setColumnMinimumWidth(8, 11)
+            propGrid.addWidget(scanGroundButton,8,7)
+            
+        propGrid.addWidget(ambientSourceLabel,8,8,1,2,Qt.AlignRight | Qt.AlignBottom)
+        
+        ambientGrid = QGridLayout()
+        ambientGrid.setContentsMargins(0,0,0,0)
+        ambientGrid.setHorizontalSpacing(3)
+        ambientGrid.setVerticalSpacing(0)
+        ambientGrid.addWidget(ambientlabel,2,0)
+        ambientGrid.addWidget(self.ambient_humidity_edit,2,1)
+        ambientGrid.addWidget(ambient_humidity_unit_label,2,2)
+        ambientGrid.addLayout(ambient,2,5)
+        ambientGrid.addWidget(updateAmbientTemp,2,10)
+        ambientGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignRight)
+        ambientGrid.setColumnMinimumWidth(3, 11)
+        ambientGrid.setColumnMinimumWidth(5, 11)
+        ambientGrid.setColumnMinimumWidth(8, 11)
         roastFlagsLayout = QHBoxLayout()
         roastFlagsGrid = QGridLayout()
         roastFlagsGrid.addWidget(self.lowFC,0,0)
@@ -29805,9 +29848,8 @@ class editGraphDlg(ArtisanDialog):
         timeLayoutBox.addStretch()
         mainLayout = QVBoxLayout()
         mainLayout.setContentsMargins(3, 3, 3, 3)
-        mainLayout.addStretch()
-        mainLayout.addLayout(timeLayoutBox)
-        mainLayout.addStretch()
+#        mainLayout.addLayout(timeLayoutBox)
+#        mainLayout.addStretch()
         eventbuttonLayout = QHBoxLayout()
         eventbuttonLayout.addWidget(self.createalarmTableButton)
         eventbuttonLayout.addStretch()
@@ -29820,29 +29862,32 @@ class editGraphDlg(ArtisanDialog):
         eventbuttonLayout.addWidget(self.neweventTableButton)
         #tab 1
         self.tab1aLayout = QVBoxLayout()
-        self.tab1aLayout.setContentsMargins(0,5,0,0)
+        self.tab1aLayout.setContentsMargins(0,0,0,0)
         self.tab1aLayout.setSpacing(0)
-        self.tab1aLayout.addLayout(mainLayout)
-        self.tab1aLayout.addStretch()
+#        self.tab1aLayout.addLayout(mainLayout)
+#        self.tab1aLayout.addStretch()
         self.tab1aLayout.addLayout(textLayout)
         self.tab1aLayout.addStretch()
-        self.tab1aLayout.addLayout(weightLayout)
-        self.tab1aLayout.addLayout(volumeLayout)
-        self.tab1aLayout.addLayout(densityLayout)
-        self.tab1aLayout.addLayout(colorLayout)
-        self.tab1aLayout.addLayout(humidityGrid)
+        self.tab1aLayout.setSpacing(8)
+        self.tab1aLayout.addLayout(propGrid)
+        self.tab1aLayout.addLayout(ambientGrid)
         tab1Layout = QVBoxLayout()
-        tab1Layout.addStretch()
+#        tab1Layout.addStretch()
         tab1Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         tab1Layout.addLayout(self.tab1aLayout)
+        tab1Layout.setSpacing(0)
         tab1Layout.addStretch()
-        self.calculated_density()
+        # set volume from density if given
+        self.density_in_editing_finished()
+        self.density_out_editing_finished()
+        # set density from volume if given
         #tab 2
         tab2Layout = QVBoxLayout()
         tab2Layout.addLayout(anotationLayout)
         tab2Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         #tab3 events
         tab3Layout = QVBoxLayout()
+        tab3Layout.addLayout(timeLayoutBox)
         tab3Layout.addWidget(self.eventtable)
         tab3Layout.addLayout(eventbuttonLayout)
         tab3Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
@@ -29936,9 +29981,10 @@ class editGraphDlg(ArtisanDialog):
         
     def beanSizeMaxEdited(self):
         self.modified_beansize_max_text = self.bean_size_max_edit.text()
-        
-    def moistureGreensEdited(self):
+
+    def moistureEdited(self):
         self.modified_moisture_greens_text = self.moisture_greens_edit.text()
+        self.calculated_organic_loss()
         
     def plus_popups_set_enabled(self,b):
         self.plus_stores_combo.setEnabled(b)
@@ -30078,14 +30124,12 @@ class editGraphDlg(ArtisanDialog):
         else:
             self.beansedit.setStyleSheet(background_white_style)
         if b:
-            self.bean_density_weight_edit.setStyleSheet(qlineedit_marked_style)
-            self.bean_density_volume_edit.setStyleSheet(qlineedit_marked_style)
+            self.bean_density_in_edit.setStyleSheet(qlineedit_marked_style)
             self.bean_size_min_edit.setStyleSheet(qlineedit_marked_style)
             self.bean_size_max_edit.setStyleSheet(qlineedit_marked_style)
             self.moisture_greens_edit.setStyleSheet(qlineedit_marked_style)
         else:
-            self.bean_density_weight_edit.setStyleSheet(background_white_style)
-            self.bean_density_volume_edit.setStyleSheet(background_white_style)
+            self.bean_density_in_edit.setStyleSheet(background_white_style)
             self.bean_size_min_edit.setStyleSheet(background_white_style)
             self.bean_size_max_edit.setStyleSheet(background_white_style)
             self.moisture_greens_edit.setStyleSheet(background_white_style)
@@ -30141,19 +30185,11 @@ class editGraphDlg(ArtisanDialog):
             self.moisture_greens_edit.setText(str(cd["moisture"]))
         else:
             self.moisture_greens_edit.setText(str(0))
+        self.density_in_editing_finished()
         if "density" in cd:
-            keep_modified_weight_unit = self.modified_density_weight_unit_idx
-            self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index("g"))            
-            self.modified_density_weight_unit_idx = keep_modified_weight_unit
-                        
-            keep_modified_volume_unit = self.modified_density_volume_unit_idx
-            self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index("l"))          
-            self.modified_density_volume_unit_idx = keep_modified_volume_unit
-            
-            self.bean_density_weight_edit.setText(str(cd["density"]))
-            self.bean_density_volume_edit.setText(str(1.0)) 
+            self.bean_density_in_edit.setText(str(cd["density"]))
         else:
-            self.bean_density_weight_edit.setText(str(0)) 
+            self.bean_density_in_edit.setText(str(0)) 
         if "screen_size" in cd:
             screen = cd["screen_size"]
             if "min" in screen:
@@ -30167,20 +30203,18 @@ class editGraphDlg(ArtisanDialog):
         else:
             self.bean_size_min_edit.setText("0")
             self.bean_size_max_edit.setText("0")
-        self.standard_density()
         self.updateTitle(prev_coffee_label,prev_blend_label)
         self.markPlusCoffeeFields(True)
+        self.density_in_editing_finished()
+        self.moistureEdited()
         
     def defaultCoffeeData(self):
         if self.modified_beans is None:
             self.beansedit.clear()
         else:
             self.beansedit.setPlainText(u(self.modified_beans))
-        self.bean_density_weight_edit.setText(self.modified_density_weight_text)
-        self.bean_density_volume_edit.setText(self.modified_density_volume_text)
-        self.bean_density_weightUnitsComboBox.setCurrentIndex(self.modified_density_weight_unit_idx)
-        self.bean_density_volumeUnitsComboBox.setCurrentIndex(self.modified_density_volume_unit_idx)                    
-        self.standard_density()
+        self.bean_density_in_edit.setText(self.modified_density_in_text)
+        self.volumeinedit.setText(self.modified_volume_in_text)
         self.bean_size_min_edit.setText(self.modified_beansize_min_text)
         self.bean_size_max_edit.setText(self.modified_beansize_max_text)
         self.moisture_greens_edit.setText(self.modified_moisture_greens_text)
@@ -30283,10 +30317,8 @@ class editGraphDlg(ArtisanDialog):
             self.volumeinedit.setText("%g" % rr["volumeIn"])
             self.volumeoutedit.setText("%g" % rr["volumeOut"])
             self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
-            self.bean_density_weight_edit.setText(str(rr["densityWeight"]))
-            self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["densityWeightUnit"]))
-            self.bean_density_volume_edit.setText(str(rr["densityVolume"]))
-            self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["densityVolumeUnit"]))
+            self.bean_density_in_edit.setText(str(rr["densityWeight"]))
+            self.bean_density_out_edit.setText(str(rr["densityVolume"]))
             self.moisture_greens_edit.setText(str(rr["moistureGreen"]))
             self.moisture_roasted_edit.setText(str(rr["moistureRoasted"]))
             self.whole_color_edit.setText(str(rr["wholeColor"]))
@@ -30315,6 +30347,7 @@ class editGraphDlg(ArtisanDialog):
                 self.template_batchnr = None
                 self.template_batchprefix = None
             self.updateTemplateLine()
+            self.percent()
                 
             
 #PLUS            
@@ -30384,16 +30417,14 @@ class editGraphDlg(ArtisanDialog):
                 else:
                     volumeIn = 0.0
                 volumeUnit = u(self.volumeUnitsComboBox.currentText())
-                if self.bean_density_weight_edit.text() != "":
-                    densityWeight = float(str(self.bean_density_weight_edit.text()))
+                if self.bean_density_in_edit.text() != "":
+                    densityWeight = float(str(self.bean_density_in_edit.text()))
                 else:
                     densityWeight = 0.0
-                densityWeightUnit = u(self.bean_density_weightUnitsComboBox.currentText())
-                if self.bean_density_volume_edit.text() != "":
-                    densityVolume = float(str(self.bean_density_volume_edit.text()))
+                if self.bean_density_out_edit.text() != "":
+                    densityVolume = float(str(self.bean_density_out_edit.text()))
                 else:
                     densityVolume = 0.0
-                densityVolumeUnit = u(self.bean_density_volumeUnitsComboBox.currentText())
                 if self.bean_size_min_edit.text() != "":
                     beanSize_min = float(str(self.bean_size_min_edit.text()))
                 else:
@@ -30429,9 +30460,9 @@ class editGraphDlg(ArtisanDialog):
                     volumeOut,
                     volumeUnit,
                     densityWeight,
-                    densityWeightUnit,
+                    "g",
                     densityVolume,
-                    densityVolumeUnit, 
+                    "l", 
                     beanSize_min,
                     beanSize_max,
                     moistureGreen,
@@ -30466,6 +30497,16 @@ class editGraphDlg(ArtisanDialog):
         settings.setValue("RoastGeometry",self.saveGeometry())
 
     def cancel_dialog(self):
+        aw.qmc.beans = self.org_beans
+        aw.qmc.density = self.org_density
+        aw.qmc.density_roasted = self.org_density_roasted
+        aw.qmc.beansize_min = self.org_beansize_min
+        aw.qmc.beansize_max = self.org_beansize_max
+        aw.qmc.moisture_greens = self.org_moisture_greens
+        
+        aw.qmc.weight = self.org_weight
+        aw.qmc.volume = self.org_volume
+        
         aw.qmc.specialevents = self.org_specialevents
         aw.qmc.specialeventstype = self.org_specialeventstype
         aw.qmc.specialeventsStrings = self.org_specialeventsStrings
@@ -30492,30 +30533,26 @@ class editGraphDlg(ArtisanDialog):
                 self.inWeight()
             elif self.weightoutedit.hasFocus():
                 self.outWeight()
-        elif key == 16777220 and self.volumeinedit.hasFocus() and (str(self.volumeinedit.text()) == "" or float(self.volumeinedit.text().replace(",",".")) == 0.):
-            try:
-                dw = float(str(self.bean_density_weight_edit.text()))
-                dv = float(str(self.bean_density_volume_edit.text()))                    
-                if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None) :
-                    dw = dw * 1000.0
-                if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None) :
-                    dv = dv / 1000.0
-                d = dw / dv
-                w = self.weightinedit.text()
-                if d and d != "" and w and w != "":
-                    # calculate in-volume from density and weight
-                    d = float(d)
-                    w = float(w)
-                    if self.unitsComboBox.currentIndex() == 1:
-                        w = w * 1000.0
-                    res = self.calc_volume(d,w)
-                    if self.volumeUnitsComboBox.currentIndex() == 1:
-                        res = res / 1000.0
-                        self.volumeinedit.setText("%g" % aw.float2float(res,4))
-                    else:
-                        self.volumeinedit.setText("%g" % aw.float2float(res))
-            except Exception:
-                pass
+#        elif key == 16777220 and self.volumeinedit.hasFocus() and (str(self.volumeinedit.text()) == "" or float(self.volumeinedit.text().replace(",",".")) == 0.):
+#            try:
+#                dw = float(str(self.bean_density_in_edit.text()))
+#                dv = float(str(self.bean_density_out_edit.text()))                    
+#                d = dw / dv
+#                w = self.weightinedit.text()
+#                if d and d != "" and w and w != "":
+#                    # calculate in-volume from density and weight
+#                    d = float(d)
+#                    w = float(w)
+#                    if self.unitsComboBox.currentIndex() == 1:
+#                        w = w * 1000.0
+#                    res = self.calc_volume(d,w)
+#                    if self.volumeUnitsComboBox.currentIndex() == 1:
+#                        res = res / 1000.0
+#                        self.volumeinedit.setText("%g" % aw.float2float(res,4))
+#                    else:
+#                        self.volumeinedit.setText("%g" % aw.float2float(res))
+#            except Exception:
+#                pass
                         
     def tareChanged(self,i):
         if i == 0 and self.tarePopupEnabled:
@@ -30532,7 +30569,16 @@ class editGraphDlg(ArtisanDialog):
             if le.text() and le.text() != "":
                 wi = float(le.text())
                 if wi != 0.0:
-                    le.setText("%g" % aw.float2float(aw.convertWeight(wi,o,i),4))
+                    converted = aw.convertWeight(wi,o,i)
+                    if converted >= 1000:
+                        d = 1
+                    elif converted >= 100:
+                        d = 2
+                    elif converted >= 10:
+                        d = 3
+                    else:
+                        d = 4
+                    le.setText("%g" % aw.float2float(converted,d))
         self.calculated_density()
 #PLUS
         try:
@@ -30549,26 +30595,17 @@ class editGraphDlg(ArtisanDialog):
             if le.text() and le.text() != "":
                 wi = float(le.text())
                 if wi != 0.0:
-                    le.setText(str(aw.float2float(aw.convertVolume(wi,o,i),4)))
+                    converted = aw.convertVolume(wi,o,i)
+                    if converted >= 1000:
+                        d = 1
+                    elif converted >= 100:
+                        d = 2
+                    elif converted >= 10:
+                        d = 3
+                    else:
+                        d = 4
+                    le.setText(str(aw.float2float(converted,d)))
         self.calculated_density()
-        
-    def changeDensityWeightUnit(self,i):
-        self.modified_density_weight_unit_idx = i
-        o = aw.qmc.weight_units.index(aw.qmc.density[1]) # previous unit index        
-        aw.qmc.density[1] = u(self.bean_density_weightUnitsComboBox.currentText())
-        if self.bean_density_weight_edit.text() and self.bean_density_weight_edit.text() != "":
-            wi = float(self.bean_density_weight_edit.text())
-            if wi != 0.0:
-                self.bean_density_weight_edit.setText(str(aw.float2float(aw.convertWeight(wi,o,i),4)))
-
-    def changeDensityVolumeUnit(self,i):
-        self.modified_density_volume_unit_idx = i
-        o = aw.qmc.volume_units.index(aw.qmc.density[3]) # previous unit index        
-        aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
-        if self.bean_density_volume_edit.text() and self.bean_density_volume_edit.text() != "":
-            wi = float(self.bean_density_volume_edit.text())
-            if wi != 0.0:
-                self.bean_density_volume_edit.setText(str(aw.float2float(aw.convertVolume(wi,o,i),4)))
 
     def tabSwitched(self,i):
         if i == 3:
@@ -30636,15 +30673,12 @@ class editGraphDlg(ArtisanDialog):
             weightout = float(self.weightoutedit.text())
         except Exception:
             pass
-        if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None):
-            k = 1000.
-        else:
-            k = 1.
-        if weightin:
+        k = 1.
+        if weightin is not None:
             weightin = weightin * k
         else:
             weightin = None
-        if weightout:
+        if weightout is not None:
             weightout = weightout * k
         else:
             weightout = None
@@ -30676,10 +30710,10 @@ class editGraphDlg(ArtisanDialog):
             pass
         previous_out = aw.qmc.weight[1]
         aw.retrieveWeightOut(tare)
-        if tare != 0 and previous_out == aw.qmc.weight[1] and self.weightoutedit.text() != "" and self.weightoutedit.text().toFloat()[0] != 0.0:
+        if tare != 0 and previous_out == aw.qmc.weight[1] and self.weightoutedit.text() != "" and float(self.weightoutedit.text()) != 0.0:
             # no value received from scale:
             # we reduce the tare from the outWeight
-            text_out = self.weightoutedit.text().toFloat()[0]
+            text_out = float(self.weightoutedit.text())
             # convert to 'g'
             text_out = aw.convertWeight(text_out,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
             # substract tare
@@ -30698,10 +30732,10 @@ class editGraphDlg(ArtisanDialog):
             pass
         previous_in = aw.qmc.weight[0]
         aw.retrieveWeightIn(tare)
-        if tare != 0 and previous_in == aw.qmc.weight[0] and self.weightinedit.text() != "" and self.weightinedit.text().toFloat()[0] != 0.0:
+        if tare != 0 and previous_in == aw.qmc.weight[0] and self.weightinedit.text() != "" and float(self.weightinedit.text()) != 0.0:
             # no value received from scale:
             # we reduce the tare from the inWeight
-            text_in = self.weightinedit.text().toFloat()[0]
+            text_in = float(self.weightinedit.text())
             # convert to 'g'
             text_in = aw.convertWeight(text_in,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
             # substract tare
@@ -30856,7 +30890,6 @@ class editGraphDlg(ArtisanDialog):
         
         self.eventtable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-#        regexvalue = QRegExp(r"^100|\d?\d?$")
         self.eventtable.setShowGrid(True) 
         etypes = aw.qmc.getetypes()
         #populate table
@@ -30886,7 +30919,6 @@ class editGraphDlg(ArtisanDialog):
             
             valueEdit = QLineEdit()
             valueEdit.setAlignment(Qt.AlignRight)
-#            valueEdit.setValidator(QRegExpValidator(regexvalue,self))
             valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[i]))
             
             timeline = QLineEdit()
@@ -31099,6 +31131,32 @@ class editGraphDlg(ArtisanDialog):
         if aw.plus_account is not None:
             self.checkWeightIn()
         
+    def density_percent(self):
+        percent = 0.
+        try:
+            if self.bean_density_out_edit.text() != "" and float(str(self.bean_density_out_edit.text())) != 0.0:
+                percent = aw.weight_loss(float(str(self.bean_density_in_edit.text())),float(str(self.bean_density_out_edit.text())))
+        except Exception:
+            pass
+        if percent == 0:
+            self.densitypercentlabel.setText("")
+        else:
+            percentstring =  "-%.1f" %(percent) + "%"
+            self.densitypercentlabel.setText(u(percentstring))    #density percent loss
+        
+    def moisture_percent(self):
+        percent = 0.
+        try:
+            if self.moisture_roasted_edit.text() != "" and float(str(self.moisture_roasted_edit.text())) != 0.0:
+                percent = float(str(self.moisture_greens_edit.text())) - float(str(self.moisture_roasted_edit.text()))
+        except Exception:
+            pass
+        if percent == 0:
+            self.moisturepercentlabel.setText("")
+        else:
+            percentstring =  "-%.1f" %(percent) + "%"
+            self.moisturepercentlabel.setText(u(percentstring))    #density percent loss
+                
     def percent(self):
         percent = 0.
         try:
@@ -31106,26 +31164,28 @@ class editGraphDlg(ArtisanDialog):
                 percent = aw.weight_loss(float(str(self.weightinedit.text())),float(str(self.weightoutedit.text())))
         except Exception:
             pass
-        percentstring =  "%.1f" %(percent) + "%"
-        self.weightpercentlabel.setText(u(percentstring))    #weight percent loss
-# do not disclose this roast degree resulting from an oversimplified calculation
-#        roastdegreestring = ""
-#        if percent > 0.:
-#            roastdegreestring = aw.roast_degree(percent)
-#        self.roastdegreelabel.setText(u(roastdegreestring))
+        if percent > 0:
+            percentstring =  "-%.1f" %(percent) + "%"
+            self.weightpercentlabel.setText(u(percentstring))    #weight percent loss
+        else:
+            self.weightpercentlabel.setText("")
 
     def volume_percent(self):
+        self.modified_volume_in_text = str(self.volumeinedit.text())
         percent = 0.
         try:
             if self.volumeoutedit.text() != "" and float(str(self.volumeoutedit.text())) != 0.0:
                 percent = aw.volume_increase(float(str(self.volumeinedit.text()).replace(",",".")),float(str(self.volumeoutedit.text().replace(",","."))))
         except Exception:
             pass
-        percentstring =  "%.1f" %(percent) + "%"
-        self.volumepercentlabel.setText(u(percentstring))    #volume percent gain
+        if percent == 0:
+            self.volumepercentlabel.setText("")
+        else:
+            percentstring =  "%.1f" %(percent) + "%"
+            self.volumepercentlabel.setText(u(percentstring))    #volume percent gain
         self.calculated_density()
         
-    # calculates density in g/l
+    # calculates density in g/l from weightin/weightout and volumein/volumeout
     def calc_density(self):
         din = dout = 0.0
         try:
@@ -31149,19 +31209,13 @@ class editGraphDlg(ArtisanDialog):
 
     def calculated_density(self):
         din, dout = self.calc_density()
-        if din > 0. and dout > 0.:
-            self.calculateddensitylabel.setText(QApplication.translate("Label","Density in: {0} g/l   =>   Density out: {1} g/l", None).format("%.1f"%din,"%.1f"%dout))
-            self.tab1aLayout.insertWidget(6,self.calculateddensitylabel)
+        if din > 0.:
             # set also the green density if not yet set
-            if (str(self.bean_density_weight_edit.text()) == "" or float(str(self.bean_density_weight_edit.text())) == 0.) and \
-                (str(self.bean_density_volume_edit.text()) == "" or float(str(self.bean_density_volume_edit.text())) in [0.,1.]):
-                self.bean_density_weightUnitsComboBox.setCurrentIndex(0) # "g"
-                self.bean_density_volumeUnitsComboBox.setCurrentIndex(0) # "l"
-                self.bean_density_weight_edit.setText(str(aw.float2float(din)))
-                self.bean_density_volume_edit.setText("1.0")
-        else:
-            self.calculateddensitylabel.setText("")
-            self.tab1aLayout.removeWidget(self.calculateddensitylabel)
+            self.bean_density_in_edit.setText(str(aw.float2float(din)))
+        if  dout > 0.:
+            # set also the roasted density if not yet set
+            self.bean_density_out_edit.setText(str(aw.float2float(dout)))
+        self.density_percent()
         self.calculated_organic_loss()
             
     def calc_organic_loss(self):
@@ -31169,56 +31223,63 @@ class editGraphDlg(ArtisanDialog):
         mloss = 0. # moisture
         try:
             if self.weightpercentlabel.text() and self.weightpercentlabel.text() != "":
-                wloss = float(self.weightpercentlabel.text().split("%")[0])
+                wloss = abs(float(self.weightpercentlabel.text().split("%")[0]))
         except Exception:
             pass
         try:
-            if self.moisture_greens_edit.text() and self.moisture_greens_edit.text() != "" and self.moisture_roasted_edit.text() and self.moisture_roasted_edit.text() != "":
-                m_in = float(self.moisture_greens_edit.text())
-                m_out = float(self.moisture_roasted_edit.text())
-                if m_in > 0 and m_out > 0:
-                    mloss = m_in - m_out
+            if self.moisturepercentlabel.text() and self.moisturepercentlabel.text() != "":
+                mloss = abs(float(self.moisturepercentlabel.text().split("%")[0]))
         except Exception:
             pass
         if mloss != 0. and wloss != 0.:
-            return mloss, wloss - mloss
+            return mloss, aw.float2float(max(min(wloss - mloss,100),0))
         else:
             return 0., 0.
 
     def calculated_organic_loss(self):
+        self.moisture_percent()
         mloss, oloss = self.calc_organic_loss()
         if oloss > 0. and mloss > 0.:
-            self.calculateorganiclosslabel.setText(QApplication.translate("Label","Moisture loss: {0}%    Organic loss: {1}%", None).format("%.1f"%mloss,"%.1f"%oloss))
-#            self.tab1bLayout.addWidget(self.calculateorganiclosslabel)
-            self.tab1aLayout.addWidget(self.calculateorganiclosslabel)
+            self.organiclosslabel.setText(QApplication.translate("Label", "organic loss",None))
+            self.organicpercentlabel.setText("-{}%".format(oloss))
         else:
-            self.calculateorganiclosslabel.setText("")
-#            self.tab1bLayout.removeWidget(self.calculateorganiclosslabel)
-            self.tab1aLayout.removeWidget(self.calculateorganiclosslabel)
+            self.organiclosslabel.setText("")
+            self.organicpercentlabel.setText("")
 
-    def density_volume_editing_finished(self):
-        self.modified_density_volume_text = str(self.bean_density_volume_edit.text())
-        self.standard_density()
-            
-    def density_weight_editing_finished(self):
-        self.modified_density_weight_text = str(self.bean_density_weight_edit.text())
-        self.standard_density()
-    
-    def standard_density(self):
-        if self.bean_density_volume_edit.text() != "" and \
-            float(str(self.bean_density_volume_edit.text())) != 0.0 and  \
-            self.bean_density_weight_edit.text() != "" and \
-            float(str(self.bean_density_weight_edit.text())) != 0.0 and \
-            not (float(str(self.bean_density_volume_edit.text())) == 1. and  
-            self.bean_density_volumeUnitsComboBox.currentIndex() == 1 and 
-            self.bean_density_weightUnitsComboBox.currentIndex() == 0):
-            volume = float(str(self.bean_density_volume_edit.text()))
-            weight = float(str(self.bean_density_weight_edit.text()))
-            volume = aw.convertVolume(volume,self.bean_density_volumeUnitsComboBox.currentIndex(),0)
-            weight = aw.convertWeight(weight,self.bean_density_weightUnitsComboBox.currentIndex(),0)            
-            self.standarddensitylabel.setText(QApplication.translate("Label","({0}g/l)", None).format(aw.float2float(weight / volume,0)))
-        else:
-            self.standarddensitylabel.setText("")
+    def density_in_editing_finished(self):
+        self.modified_density_in_text = str(self.bean_density_in_edit.text())
+        # if density-in and weight-in is given, we re-calc volume-in:
+        if self.bean_density_in_edit.text() != "" and self.weightinedit.text() != "":
+            density_in = float(str(self.bean_density_in_edit.text()))
+            weight_in = float(str(self.weightinedit.text()))
+            if density_in != 0 and weight_in != 0:
+                weight_in = aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),aw.qmc.weight_units.index("g"))
+                volume_in = weight_in / density_in # in g/l
+                # convert to selected volume unit
+                volume_in = aw.convertVolume(volume_in,aw.qmc.volume_units.index("l"),self.volumeUnitsComboBox.currentIndex())
+                self.volumeinedit.setText(str(aw.float2float(volume_in)))
+                self.volume_percent()
+        
+    def density_out_editing_finished(self):
+        # if density-out and weight-out is given, we re-calc volume-out:
+        if self.bean_density_out_edit.text() != "" and self.weightoutedit.text() != "":
+            density_out = float(str(self.bean_density_out_edit.text()))
+            weight_out = float(str(self.weightoutedit.text()))
+            if density_out != 0 and weight_out != 0:
+                weight_out = aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),aw.qmc.weight_units.index("g"))
+                volume_out = weight_out / density_out # in g/l
+                # convert to selected volume unit
+                volume_out = aw.convertVolume(volume_out,aw.qmc.volume_units.index("l"),self.volumeUnitsComboBox.currentIndex())
+                if volume_out >= 1000:
+                    d = 1
+                elif volume_out >= 100:
+                    d = 2
+                elif volume_out >= 10:
+                    d = 3
+                else:
+                    d = 4
+                self.volumeoutedit.setText(str(aw.float2float(volume_out,d)))
+                self.volume_percent()
                 
     def accept(self):
         #check for graph
@@ -31353,15 +31414,19 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.volume[2] = u(self.volumeUnitsComboBox.currentText())
         #update density
         try:
-            aw.qmc.density[0] = float(str(self.bean_density_weight_edit.text()).replace(",","."))
+            aw.qmc.density[0] = float(str(self.bean_density_in_edit.text()).replace(",","."))
         except Exception:
             aw.qmc.density[0] = 0
-        aw.qmc.density[1] = u(self.bean_density_weightUnitsComboBox.currentText())
+        aw.qmc.density[1] = "g"
+        aw.qmc.density[2] = 1
+        aw.qmc.density[3] = "l"
         try:
-            aw.qmc.density[2] = float(str(self.bean_density_volume_edit.text()).replace(",","."))
+            aw.qmc.density_roasted[0] = float(str(self.bean_density_out_edit.text()).replace(",","."))
         except Exception:
-            aw.qmc.density[2] = 0
-        aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
+            aw.qmc.density_roasted[0] = 0
+        aw.qmc.density_roasted[1] = "g"
+        aw.qmc.density_roasted[2] = 1
+        aw.qmc.density_roasted[3] = "l"
         #update bean size
 #        try:
 #            aw.qmc.beansize = float(str(self.bean_size_edit.text()))
@@ -32456,8 +32521,8 @@ class calculatorDlg(ArtisanDialog):
         clabel = QLabel(QApplication.translate("Label", "Celsius",None))
         self.faEdit = QLineEdit()
         self.ceEdit = QLineEdit()
-        self.faEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.faEdit))
-        self.ceEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.ceEdit))
+        self.faEdit.setValidator(aw.createCLocaleDoubleValidator(-999., 9999., 2, self.faEdit))
+        self.ceEdit.setValidator(aw.createCLocaleDoubleValidator(-999., 9999., 2, self.ceEdit))
         self.faEdit.editingFinished.connect(lambda :self.convertTemp("FtoC"))
         self.ceEdit.editingFinished.connect(lambda :self.convertTemp("CtoF"))
         #WEIGHT CONVERSION
@@ -32476,8 +32541,8 @@ class calculatorDlg(ArtisanDialog):
         self.WoutEdit.setMaximumWidth(70)
         #self.WinEdit.setMinimumWidth(60)
         #self.WoutEdit.setMinimumWidth(60)
-        self.WinEdit.setValidator(QDoubleValidator(0., 99999., 5, self.WinEdit))
-        self.WoutEdit.setValidator(QDoubleValidator(0., 99999., 5, self.WoutEdit))
+        self.WinEdit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 5, self.WinEdit))
+        self.WoutEdit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 5, self.WoutEdit))
         self.WinEdit.editingFinished.connect(lambda :self.convertWeight("ItoO"))
         self.WoutEdit.editingFinished.connect(lambda :self.convertWeight("OtoI"))
         #VOLUME CONVERSION
@@ -32502,8 +32567,8 @@ class calculatorDlg(ArtisanDialog):
         self.VoutEdit.setMaximumWidth(70)
         #self.VinEdit.setMinimumWidth(60)
         #self.VoutEdit.setMinimumWidth(60)
-        self.VinEdit.setValidator(QDoubleValidator(0., 99999., 5, self.VinEdit))
-        self.VoutEdit.setValidator(QDoubleValidator(0., 99999., 5, self.VoutEdit))
+        self.VinEdit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 5, self.VinEdit))
+        self.VoutEdit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 5, self.VoutEdit))
         self.VinEdit.editingFinished.connect(lambda :self.convertVolume("ItoO"))
         self.VoutEdit.editingFinished.connect(lambda :self.convertVolume("OtoI"))
         #EXTRACTION YIELD
@@ -32516,9 +32581,9 @@ class calculatorDlg(ArtisanDialog):
         self.tdsEdit = QLineEdit()
         self.yieldEdit = QLineEdit()
         self.yieldEdit.setReadOnly(True)
-        self.groundsEdit.setValidator(QDoubleValidator(1., 999., 2, self.groundsEdit))
-        self.coffeeEdit.setValidator(QDoubleValidator(1., 999., 2, self.coffeeEdit))
-        self.tdsEdit.setValidator(QDoubleValidator(0., 100., 2, self.tdsEdit))
+        self.groundsEdit.setValidator(aw.createCLocaleDoubleValidator(1., 999., 2, self.groundsEdit))
+        self.coffeeEdit.setValidator(aw.createCLocaleDoubleValidator(1., 999., 2, self.coffeeEdit))
+        self.tdsEdit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 2, self.tdsEdit))
         for e in [self.groundsEdit, self.coffeeEdit, self.tdsEdit]:
             e.editingFinished.connect(self.calculateYield)
         #LAYOUTS
@@ -41297,7 +41362,7 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4etcopy = self.Edit4et.text()
         self.Edit5etcopy = self.Edit5et.text()
         self.Edit6etcopy = self.Edit6et.text()
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]?(:[0-5][0-9])?$")
+        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.Edit0.setValidator(QRegExpValidator(regextime,self))
         self.Edit1.setValidator(QRegExpValidator(regextime,self))
         self.Edit2.setValidator(QRegExpValidator(regextime,self))
@@ -41320,6 +41385,20 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4et.setValidator(QRegExpValidator(regextemp,self))
         self.Edit5et.setValidator(QRegExpValidator(regextemp,self))
         self.Edit6et.setValidator(QRegExpValidator(regextemp,self))
+#        self.Edit0bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit0bt))
+#        self.Edit1bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit1bt))
+#        self.Edit2bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit2bt))
+#        self.Edit3bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit3bt))
+#        self.Edit4bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit4bt))
+#        self.Edit5bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit5bt))
+#        self.Edit6bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit6bt))
+#        self.Edit0et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit0et))
+#        self.Edit1et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit1et))
+#        self.Edit2et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit2et))
+#        self.Edit3et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit3et))
+#        self.Edit4et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit4et))
+#        self.Edit5et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit5et))
+#        self.Edit6et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit6et))
         curvinesslabel = QLabel(QApplication.translate("Label", "Curviness",None))
         etcurviness = QLabel(QApplication.translate("Label", "ET",None))
         btcurviness = QLabel(QApplication.translate("Label", "BT",None))
@@ -41569,7 +41648,7 @@ class designerconfigDlg(ArtisanDialog):
         strings.append(self.Edit5.text())
         strings.append(self.Edit6.text())
         for i in range(len(strings)):
-            if len(str(strings[i])) < 4:
+            if len(str(strings[i])) < 5:
                 return i
         else:
             return 1000
@@ -41902,7 +41981,7 @@ class comportDlg(ArtisanDialog):
         self.stopbitsComboBox.setCurrentIndex(aw.ser.stopbits-1)
         timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
-        self.timeoutEdit.setValidator(QDoubleValidator(0,5,1,self.timeoutEdit))
+        self.timeoutEdit.setValidator(aw.createCLocaleDoubleValidator(0,5,1,self.timeoutEdit))
         etbt_help_label = QLabel(QApplication.translate("Label", "Settings for non-Modbus devices",None) + "<br>")
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
         self.serialtable = QTableWidget()
@@ -41941,7 +42020,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_stopbitsComboBox.setCurrentIndex(aw.modbus.stopbits - 1)
         modbus_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.modbus_timeoutEdit = QLineEdit(str(aw.modbus.timeout))
-        self.modbus_timeoutEdit.setValidator(QDoubleValidator(0,5,1,self.modbus_timeoutEdit))
+        self.modbus_timeoutEdit.setValidator(aw.createCLocaleDoubleValidator(0,5,1,self.modbus_timeoutEdit))
 
         modbus_function_codes = ["1","2","3","4"]
         modbus_modes = ["", "C","F"]
@@ -42345,7 +42424,7 @@ class comportDlg(ArtisanDialog):
         self.scale_stopbitsComboBox.setCurrentIndex(aw.scale.stopbits - 1)
         scale_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.scale_timeoutEdit = QLineEdit(str(aw.scale.timeout))
-        self.scale_timeoutEdit.setValidator(QDoubleValidator(0,5,1,self.scale_timeoutEdit))
+        self.scale_timeoutEdit.setValidator(aw.createCLocaleDoubleValidator(0,5,1,self.scale_timeoutEdit))
         ##########################    TAB 5 WIDGETS   COLOR
         color_devicelabel = QLabel(QApplication.translate("Label", "Device", None))
         self.color_deviceEdit = QComboBox()
@@ -42389,7 +42468,7 @@ class comportDlg(ArtisanDialog):
         self.color_stopbitsComboBox.setCurrentIndex(aw.color.stopbits - 1)
         color_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.color_timeoutEdit = QLineEdit(str(aw.color.timeout))
-        self.color_timeoutEdit.setValidator(QDoubleValidator(0,5,1,self.color_timeoutEdit))
+        self.color_timeoutEdit.setValidator(aw.createCLocaleDoubleValidator(0,5,1,self.color_timeoutEdit))
         #### dialog buttons
         okButton = QPushButton(QApplication.translate("Button","OK",None))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
@@ -47632,7 +47711,7 @@ class AlarmDlg(ArtisanDialog):
         tempedit.setAlignment(Qt.AlignRight)
         tempedit.setMaximumWidth(130)
 #        tempedit.setValidator(QIntValidator(0, 999,tempedit))
-        tempedit.setValidator(QDoubleValidator(0., 999.9,1,tempedit))
+        tempedit.setValidator(aw.createCLocaleDoubleValidator(0., 999.9,1,tempedit))
         #action
         actionComboBox = MyQComboBox()
         actionComboBox.addItems(["",
@@ -48002,7 +48081,7 @@ class PXRpidDlgControl(ArtisanDialog):
                             + QApplication.translate("Label", "After <u>writing</u> an adjustment,<br>never power down the pid<br>for the next 5 seconds <br>or the pid may never recover.",None) + "<br>"
                             + QApplication.translate("Label", "Read operations manual",None) + "</CENTER>")
         self.svedit = QLineEdit()
-        self.svedit.setValidator(QDoubleValidator(0., 999., 1, self.svedit))
+        self.svedit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.svedit))
         #TAB 3
         button_p = QPushButton(QApplication.translate("Button","Set p",None))
         button_p.setFocusPolicy(Qt.NoFocus)
@@ -48019,9 +48098,9 @@ class PXRpidDlgControl(ArtisanDialog):
         self.pedit.setMaximumWidth(60)
         self.iedit.setMaximumWidth(60)
         self.dedit.setMaximumWidth(60)
-        self.pedit.setValidator(QDoubleValidator(0., 999., 1, self.pedit))
+        self.pedit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.pedit))
         self.iedit.setValidator(QIntValidator(0, 3200, self.iedit))
-        self.dedit.setValidator(QDoubleValidator(0., 999.0, 1, self.dedit))
+        self.dedit.setValidator(aw.createCLocaleDoubleValidator(0., 999.0, 1, self.dedit))
         button_autotuneON = QPushButton(QApplication.translate("Button","Autotune ON",None))
         button_autotuneON.setFocusPolicy(Qt.NoFocus)
         button_autotuneOFF = QPushButton(QApplication.translate("Button","Autotune OFF",None))
@@ -48641,7 +48720,7 @@ class PXRpidDlgControl(ArtisanDialog):
             soakkey = "segment" + str(i+1) + "soak"
             
             svedit = QLineEdit(str(aw.fujipid.PXR[svkey][0]))
-            svedit.setValidator(QDoubleValidator(0., 999., 1, svedit))
+            svedit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, svedit))
             rampedit = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXR[rampkey][0])))
             rampedit.setValidator(QRegExpValidator(regextime,self))
             soakedit  = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXR[soakkey][0])))
@@ -48890,13 +48969,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.sv5edit.setMaximumWidth(80)
         self.sv6edit.setMaximumWidth(80)
         self.sv7edit.setMaximumWidth(80)
-        self.sv1edit.setValidator(QDoubleValidator(0., 999., 1, self.sv1edit))
-        self.sv2edit.setValidator(QDoubleValidator(0., 999., 1, self.sv2edit))
-        self.sv3edit.setValidator(QDoubleValidator(0., 999., 1, self.sv3edit))
-        self.sv4edit.setValidator(QDoubleValidator(0., 999., 1, self.sv4edit))
-        self.sv5edit.setValidator(QDoubleValidator(0., 999., 1, self.sv5edit))
-        self.sv6edit.setValidator(QDoubleValidator(0., 999., 1, self.sv6edit))
-        self.sv7edit.setValidator(QDoubleValidator(0., 999., 1, self.sv7edit))
+        self.sv1edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv1edit))
+        self.sv2edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv2edit))
+        self.sv3edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv3edit))
+        self.sv4edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv4edit))
+        self.sv5edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv5edit))
+        self.sv6edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv6edit))
+        self.sv7edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv7edit))
         self.radiosv1 = QRadioButton()
         self.radiosv2 = QRadioButton()
         self.radiosv3 = QRadioButton()
@@ -49030,13 +49109,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.d6edit.setMaximumSize(50, 42)
         self.d7edit.setMaximumSize(50, 42)
         #p = 0-999.9
-        self.p1edit.setValidator(QDoubleValidator(0., 999., 1, self.p1edit))
-        self.p2edit.setValidator(QDoubleValidator(0., 999., 1, self.p2edit))
-        self.p3edit.setValidator(QDoubleValidator(0., 999., 1, self.p3edit))
-        self.p4edit.setValidator(QDoubleValidator(0., 999., 1, self.p4edit))
-        self.p5edit.setValidator(QDoubleValidator(0., 999., 1, self.p5edit))
-        self.p6edit.setValidator(QDoubleValidator(0., 999., 1, self.p6edit))
-        self.p7edit.setValidator(QDoubleValidator(0., 999., 1, self.p7edit))
+        self.p1edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p1edit))
+        self.p2edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p2edit))
+        self.p3edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p3edit))
+        self.p4edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p4edit))
+        self.p5edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p5edit))
+        self.p6edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p6edit))
+        self.p7edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p7edit))
         #i are int 0-3200
         self.i1edit.setValidator(QIntValidator(0, 3200, self.i1edit))
         self.i2edit.setValidator(QIntValidator(0, 3200, self.i2edit))
@@ -49046,13 +49125,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.i6edit.setValidator(QIntValidator(0, 3200, self.i6edit))
         self.i7edit.setValidator(QIntValidator(0, 3200, self.i7edit))
         #d 0-999.9
-        self.d1edit.setValidator(QDoubleValidator(0., 999., 1, self.d1edit))
-        self.d2edit.setValidator(QDoubleValidator(0., 999., 1, self.d2edit))
-        self.d3edit.setValidator(QDoubleValidator(0., 999., 1, self.d3edit))
-        self.d4edit.setValidator(QDoubleValidator(0., 999., 1, self.d4edit))
-        self.d5edit.setValidator(QDoubleValidator(0., 999., 1, self.d5edit))
-        self.d6edit.setValidator(QDoubleValidator(0., 999., 1, self.d6edit))
-        self.d7edit.setValidator(QDoubleValidator(0., 999., 1, self.d7edit))
+        self.d1edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d1edit))
+        self.d2edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d2edit))
+        self.d3edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d3edit))
+        self.d4edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d4edit))
+        self.d5edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d5edit))
+        self.d6edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d6edit))
+        self.d7edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d7edit))
         pid1button = QPushButton(QApplication.translate("Button","pid 1",None))
         pid1button.setFocusPolicy(Qt.NoFocus)
         pid2button = QPushButton(QApplication.translate("Button","pid 2",None))
@@ -50476,7 +50555,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             rampkey = "segment" + str(i+1) + "ramp"
             soakkey = "segment" + str(i+1) + "soak"
             svedit = QLineEdit(str(aw.fujipid.PXG4[svkey][0]))
-            svedit.setValidator(QDoubleValidator(0., 999., 1, svedit))
+            svedit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, svedit))
             rampedit = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4[rampkey][0])))
             rampedit.setValidator(QRegExpValidator(regextime,self))    
             soakedit  = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4[soakkey][0])))
@@ -52065,7 +52144,7 @@ class DTApidDlgControl(ArtisanDialog):
         self.status.showMessage(QApplication.translate("StatusBar","Work in Progress",None),5000)
         svlabel = QLabel(QApplication.translate("Label", "SV", None))
         self.svedit = QLineEdit(str(aw.dtapid.dtamem["sv"][0]))
-        self.svedit.setValidator(QDoubleValidator(0., 999.,1, self.svedit))
+        self.svedit.setValidator(aw.createCLocaleDoubleValidator(0., 999.,1, self.svedit))
         readsvbutton = QPushButton(QApplication.translate("Button","Read", None))
         writesvbutton = QPushButton(QApplication.translate("Button","Write", None))
         readsvbutton.clicked.connect(lambda _:self.readsv())
