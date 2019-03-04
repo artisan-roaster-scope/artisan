@@ -13,5 +13,4 @@ macholib==1.11
 python-snap7==0.10
 pyusb==1.0.2
 setuptools==40.6.3
-keyring==18.0.0
 persist-queue==0.4.2

@@ -7,3 +7,4 @@ matplotlib==3.0.3
 PyQt5==5.11.3 # 5.12 builds depends on OpenGL
 pyinstaller==3.4
 pywin32==224
+keyring==18.0.0
