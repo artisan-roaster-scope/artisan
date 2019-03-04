@@ -29742,7 +29742,7 @@ class editGraphDlg(ArtisanDialog):
         propGrid.addWidget(green_label,0,1,Qt.AlignCenter | Qt.AlignBottom)
         propGrid.addWidget(roasted_label,0,2,Qt.AlignCenter | Qt.AlignBottom)
         propGrid.addWidget(self.organicpercentlabel,0,4,Qt.AlignRight)
-        propGrid.addWidget(self.organiclosslabel,0,6,1,3,Qt.AlignLeft)
+        propGrid.addWidget(self.organiclosslabel,0,5,1,3,Qt.AlignLeft)
         
         propGrid.addWidget(weightlabel,1,0)
         propGrid.addWidget(self.weightinedit,1,1,Qt.AlignRight)
