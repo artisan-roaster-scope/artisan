@@ -28369,7 +28369,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         if self.scale_connected:
             volumeInVLayout.addLayout(inButtonLayout)
         
-        volumeInGroupLayout = QGroupBox(QApplication.translate("Label","in", None))
+        volumeInGroupLayout = QGroupBox(QApplication.translate("Label","Green", None))
         volumeInGroupLayout.setLayout(volumeInVLayout)
         if weightIn is None:
             volumeInGroupLayout.setDisabled(True)
@@ -28438,7 +28438,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         if self.scale_connected:
             volumeOutVLayout.addLayout(outButtonLayout)
         
-        volumeOutGroupLayout = QGroupBox(QApplication.translate("Label","out", None))
+        volumeOutGroupLayout = QGroupBox(QApplication.translate("Label","Roasted", None))
         volumeOutGroupLayout.setLayout(volumeOutVLayout)
         if weightOut is None:
             volumeOutGroupLayout.setDisabled(True)

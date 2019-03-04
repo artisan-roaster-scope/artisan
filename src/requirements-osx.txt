@@ -2,10 +2,11 @@ appnope==0.1.0
 pyobjc-core==5.1.2
 pyobjc-framework-Cocoa==5.1.2
 py2app==0.18
-gevent==1.3.7
+gevent==1.4.0
 gevent-websocket==0.10.1
-numpy==1.15.4
-scipy==1.2.0
+numpy==1.16.2
+colorspacious==1.1.2
+scipy==1.2.1
 matplotlib==3.0.3
 #sip==4.19.8
 #PyQt5-sip==4.19.13

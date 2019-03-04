@@ -1,8 +1,9 @@
-gevent==1.3.7
+gevent==1.4.0
 gevent-websocket==0.10.1
-numpy==1.15.4
+numpy==1.16.2
+colorspacious==1.1.2
+scipy==1.2.1
 matplotlib==3.0.3
-scipy==1.2.0
 PyQt5==5.11.3 # 5.12 builds depends on OpenGL
 pyinstaller==3.4
 pywin32==224
