@@ -58,22 +58,23 @@ def getTemplate(bp):
                         d["end_weight"] = util.float2floatMin(w,3) # in kg
                 except:
                     pass
-                
-        if "volume" in bp:
-            if bp["volume"][0]:
-                try:
-                    v = util.limitnum(0,65534,aw.convertWeight(bp["volume"][0],aw.qmc.volume_units.index(bp["volume"][2]),aw.qmc.volume_units.index("l")))
-                    if v is not None:
-                        d["volume_in"] = util.float2floatMin(v,3) # in liter
-                except:
-                    pass
-            if bp["volume"][1]:
-                try:
-                    v = util.limitnum(0,65534,aw.convertWeight(bp["volume"][1],aw.qmc.volume_units.index(bp["volume"][2]),aw.qmc.volume_units.index("l")))
-                    if v is not None:
-                        d["volume_out"] = util.float2floatMin(v,3) # in liter
-                except:
-                    pass  
+
+# volume is not longer synced, but rather computed from weight and density
+#        if "volume" in bp:
+#            if bp["volume"][0]:
+#                try:
+#                    v = util.limitnum(0,65534,aw.convertWeight(bp["volume"][0],aw.qmc.volume_units.index(bp["volume"][2]),aw.qmc.volume_units.index("l")))
+#                    if v is not None:
+#                        d["volume_in"] = util.float2floatMin(v,3) # in liter
+#                except:
+#                    pass
+#            if bp["volume"][1]:
+#                try:
+#                    v = util.limitnum(0,65534,aw.convertWeight(bp["volume"][1],aw.qmc.volume_units.index(bp["volume"][2]),aw.qmc.volume_units.index("l")))
+#                    if v is not None:
+#                        d["volume_out"] = util.float2floatMin(v,3) # in liter
+#                except:
+#                    pass  
         
         if "density_roasted" in bp:
             if bp["density_roasted"][0]:
@@ -208,8 +209,8 @@ def getSyncRecord(r = None):
             "label",
             "amount",
             "end_weight",
-            "volume_in",
-            "volume_out",
+#            "volume_in",
+#            "volume_out",
             "density_roasted",
             "batch_number",
             "batch_prefix",

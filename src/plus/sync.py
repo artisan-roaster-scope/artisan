@@ -257,16 +257,16 @@ def applyServerUpdates(data):
         if "notes" in data and data["notes"] != aw.qmc.roastingnotes:
             aw.qmc.roastingnotes = data["notes"]
             dirty = True
-        if "volume_in" in data and data["volume_in"] is not None:
-            v = aw.convertVolume(data["volume_in"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
-            if w != aw.qmc.volume[0]:
-                aw.qmc.volume[0] = v
-                dirty = True
-        if "volume_out" in data and data["volume_out"] is not None:
-            v = aw.convertVolume(data["volume_out"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
-            if w != aw.qmc.volume[1]:
-                aw.qmc.volume[1] = v
-                dirty = True            
+#        if "volume_in" in data and data["volume_in"] is not None:
+#            v = aw.convertVolume(data["volume_in"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
+#            if w != aw.qmc.volume[0]:
+#                aw.qmc.volume[0] = v
+#                dirty = True
+#        if "volume_out" in data and data["volume_out"] is not None:
+#            v = aw.convertVolume(data["volume_out"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
+#            if w != aw.qmc.volume[1]:
+#                aw.qmc.volume[1] = v
+#                dirty = True            
     except Exception as e:
         config.logger.error("sync: Exception in applyServerUpdates() %s",e)
     finally: 

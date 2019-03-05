@@ -6012,7 +6012,8 @@ class tgraphcanvas(FigureCanvas):
                 rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=QColor(aw.qmc.palette["background"]).lighter(150).name(),fill=True,alpha=0.8,zorder=10)
                 self.ax.add_patch(rect)
                 
-                self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,zorder=11,path_effects=[])
+                text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,zorder=11,path_effects=[])
+                text.set_in_layout(False)
                 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -8509,12 +8510,16 @@ class tgraphcanvas(FigureCanvas):
                 if self.statisticsflags[0]:
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
-                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    text.set_in_layout(False)
                     if self.timeindex[2]: # only if FCs exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text.set_in_layout(False)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text.set_in_layout(False)
                     if self.timeindex[7]: # only if COOL exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+coolphasetime/2.,statisticsupper,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+coolphasetime/2.,statisticsupper,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text.set_in_layout(False)
 
                 if self.statisticsflags[2]:
                     (st1,st2,st3,st4) = aw.defect_estimation()
@@ -8555,12 +8560,16 @@ class tgraphcanvas(FigureCanvas):
                     #Write flavor estimation
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
-                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    text.set_in_layout(False)
                     if self.timeindex[2]: # only if FCs exists
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text.set_in_layout(False)
+                        text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text.set_in_layout(False)
                     if self.timeindex[7]: # only if COOL exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text.set_in_layout(False)
             self.writecharacteristics(TP_index,LP)
         except Exception as ex:
             #import traceback
@@ -18717,10 +18726,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.weight = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
             else:
                 self.qmc.weight = [0,0,"g"]
-            if "volume" in profile:
-                self.qmc.volume = profile["volume"]
-            else:
-                self.qmc.volume = [0,0,"l"]
+#            if "volume" in profile:
+#                self.qmc.volume = profile["volume"]
+#            else:
+#                self.qmc.volume = [0,0,"l"]
             if "density" in profile:
                 self.qmc.density = [profile["density"][0],d(profile["density"][1]),profile["density"][2],d(profile["density"][3])]
             else:
@@ -19321,7 +19330,8 @@ class ApplicationWindow(QMainWindow):
                         
             profile["beans"] = encodeLocal(self.qmc.beans)
             profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocal(self.qmc.weight[2])]
-            profile["volume"] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocal(self.qmc.volume[2])]
+# volume is no longer stored and rather computed from density and weight on load
+#            profile["volume"] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocal(self.qmc.volume[2])]
             profile["density"] = [self.qmc.density[0],encodeLocal(self.qmc.density[1]),self.qmc.density[2],encodeLocal(self.qmc.density[3])]
             profile["density_roasted"] = [self.qmc.density_roasted[0],encodeLocal(self.qmc.density_roasted[1]),self.qmc.density_roasted[2],encodeLocal(self.qmc.density_roasted[3])]
             profile["roastertype"] = encodeLocal(self.qmc.roastertype)
@@ -28975,8 +28985,8 @@ class editGraphDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))        
-
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))  
+        
         # we remember user modifications to revert to them on deselecting a plus element
         self.modified_beans = aw.qmc.beans
         self.modified_density_in_text = str(aw.float2float(aw.qmc.density[0]))
@@ -29220,7 +29230,10 @@ class editGraphDlg(ArtisanDialog):
         dateedit = QLineEdit(date)
         dateedit.setFocusPolicy(Qt.NoFocus)
         dateedit.setReadOnly(True)
-        dateedit.setStyleSheet("background-color:'lightgrey'")
+        if sys.platform.startswith("darwin"):
+            dateedit.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+        else:
+            dateedit.setStyleSheet("background-color:'lightgrey'")
         #Batch
         batchlabel = QLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
         if aw.superusermode and aw.qmc.batchcounter > -1:
@@ -29251,7 +29264,10 @@ class editGraphDlg(ArtisanDialog):
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + roastpos + u(" ")
             batchedit = QLineEdit(batch)
             batchedit.setReadOnly(True)
-            batchedit.setStyleSheet("background-color:'lightgrey'")
+            if sys.platform.startswith("darwin"):
+                batchedit.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+            else:
+                batchedit.setStyleSheet("background-color:'lightgrey'")
             batchedit.setFocusPolicy(Qt.NoFocus)
             
         #Beans
@@ -29457,10 +29473,10 @@ class editGraphDlg(ArtisanDialog):
         self.ambient_humidity_edit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 2, self.ambient_humidity_edit))  
         self.ambient_humidity_edit.setAlignment(Qt.AlignRight) 
         self.ambientedit = QLineEdit()
-        self.ambientedit.setText(str(aw.qmc.ambientTemp))
+        self.ambientedit.setText(str(aw.float2float(aw.qmc.ambientTemp)))
         self.ambientedit.setMinimumWidth(40)
         self.ambientedit.setMaximumWidth(40)
-        self.ambientedit.setValidator(aw.createCLocaleDoubleValidator(-40., 200., 2, self.ambientedit))  
+        self.ambientedit.setValidator(aw.createCLocaleDoubleValidator(-40., 200., 1, self.ambientedit))  
         self.ambientedit.setAlignment(Qt.AlignRight)        
         pressureunitslabel = QLabel("hPa")
         self.pressureedit = QLineEdit()
@@ -30123,12 +30139,14 @@ class editGraphDlg(ArtisanDialog):
         else:
             self.beansedit.setStyleSheet("")
         # for QLineEdit
-        qlineedit_marked_style = "QLineEdit { border: 0.5px solid gray; background-color: #e4f3f8; selection-background-color: darkgray; }"
+        if sys.platform.startswith("darwin"):
+            # since Qt5.11 the background color of QLineEdits only changes if also the broder is set
+            qlineedit_marked_style = "QLineEdit { border: 0.5px solid lightgrey; background-color: #e4f3f8; selection-background-color: darkgray; }"
+        else:
+            qlineedit_marked_style = "QLineEdit { background-color: #e4f3f8; selection-background-color: darkgray; }"
         background_white_style = "" 
         if b:
             self.bean_density_in_edit.setStyleSheet(qlineedit_marked_style)
-#            self.bean_density_in_edit.setAttribute(Qt.WA_StyledBackground)
-#            self.bean_density_in_edit.setAutoFillBackground(True)
             self.bean_size_min_edit.setStyleSheet(qlineedit_marked_style)
             self.bean_size_max_edit.setStyleSheet(qlineedit_marked_style)
             self.moisture_greens_edit.setStyleSheet(qlineedit_marked_style)
