@@ -30117,14 +30117,18 @@ class editGraphDlg(ArtisanDialog):
             self.plus_popups_set_enabled(True)
 
     def markPlusCoffeeFields(self,b):
-        qlineedit_marked_style = "QLineEdit { border: 0px solid gray; background: #e4f3f8; selection-background-color: darkgray; }"
-        background_white_style = "QTextEdit { background-color: white; }" 
+        # for QTextEdit
         if b:
-            self.beansedit.setStyleSheet("QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray; border: 0px solid gray; }")
+            self.beansedit.setStyleSheet("QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray;  }")
         else:
-            self.beansedit.setStyleSheet(background_white_style)
+            self.beansedit.setStyleSheet("")
+        # for QLineEdit
+        qlineedit_marked_style = "QLineEdit { border: 0.5px solid gray; background-color: #e4f3f8; selection-background-color: darkgray; }"
+        background_white_style = "" 
         if b:
             self.bean_density_in_edit.setStyleSheet(qlineedit_marked_style)
+#            self.bean_density_in_edit.setAttribute(Qt.WA_StyledBackground)
+#            self.bean_density_in_edit.setAutoFillBackground(True)
             self.bean_size_min_edit.setStyleSheet(qlineedit_marked_style)
             self.bean_size_max_edit.setStyleSheet(qlineedit_marked_style)
             self.moisture_greens_edit.setStyleSheet(qlineedit_marked_style)
@@ -30137,9 +30141,9 @@ class editGraphDlg(ArtisanDialog):
         
     def markPlusBlendFields(self,b):
         if b:
-            self.beansedit.setStyleSheet("QTextEdit { background-color : #e4f3f8; }")
+            self.beansedit.setStyleSheet("QTextEdit { background-color : #e4f3f8;  selection-background-color: darkgray; }")
         else:
-            self.beansedit.setStyleSheet("QTextEdit { background-color : white; }")
+            self.beansedit.setStyleSheet("")
         
     def updateTitle(self,prev_coffee_label,prev_blend_label):
         titles_to_be_overwritten = [ "", QApplication.translate("Scope Title", "Roaster Scope",None) ]
