@@ -20970,7 +20970,7 @@ class ApplicationWindow(QMainWindow):
 #            if filename is None and not artisanviewerMode and self.plus_account is not None:
 #                try:
 #                    import plus.controller
-#                    plus.controller.start(aw)
+#                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
 #                except:
 #                    pass
 #            #aw.updatePlusStatus()
@@ -29486,12 +29486,12 @@ class editGraphDlg(ArtisanDialog):
         drumspeedlabel.setText("<b> " + u(QApplication.translate("Label", "Drum Speed",None)) + "</b>")
         roastinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Roasting Notes",None)) + "</b>")
         self.roastingeditor = QTextEdit()
-        self.roastingeditor.setMaximumHeight(125)
+#        self.roastingeditor.setMaximumHeight(125)
         if aw.qmc.roastingnotes is not None:
             self.roastingeditor.setPlainText(u(aw.qmc.roastingnotes))
         cuppinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Cupping Notes",None)) + "</b>")
         self.cuppingeditor =  QTextEdit()
-        self.cuppingeditor.setMaximumHeight(125)
+#        self.cuppingeditor.setMaximumHeight(125)
         if aw.qmc.cuppingnotes is not None:
             self.cuppingeditor.setPlainText(u(aw.qmc.cuppingnotes))
         # Flags
