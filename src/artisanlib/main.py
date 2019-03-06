@@ -585,7 +585,10 @@ class AmbientThread(QThread):
 
     def run(self):
         libtime.sleep(2.5) # wait a moment after ON until all other devices are attached
-        aw.qmc.getAmbientData()
+        try:
+            aw.qmc.getAmbientData()
+        except:
+            pass
         
         
 #######################################################################################
@@ -2101,7 +2104,10 @@ class tgraphcanvas(FigureCanvas):
             res = aw.qmc.ambientTempSourceAvg()
             if res is not None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
                 aw.qmc.ambientTemp = aw.float2float(float(res))
-        aw.qmc.getAmbientData()
+        try:
+            aw.qmc.getAmbientData()
+        except:
+            pass
 
     # eventsvalues maps the given internal event value v to an external event int value as displayed to the user as special event value
     # v is expected to be float value of range [-11.0,11.0]
@@ -4679,7 +4685,7 @@ class tgraphcanvas(FigureCanvas):
             bnr = self.batchcounter + 1
         else:
             bnr = self.roastbatchnr
-        if bnr == 0:
+        if bnr == 0 or title == "":
             title = title
         else:
             title = self.roastbatchprefix + u(bnr) + u(" ") + title
@@ -5802,7 +5808,7 @@ class tgraphcanvas(FigureCanvas):
                                                 label=aw.arabicReshape(QApplication.translate("Label", "AUCguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
-                if aw.qmc.flagstart and aw.qmc.showtimeguide or aw.qmc.device == 18:
+                if aw.qmc.showtimeguide or aw.qmc.device == 18:
                     self.l_timeline, = self.ax.plot([], [],color = self.palette["timeguide"],
                                                 label=aw.arabicReshape(QApplication.translate("Label", "TIMEguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
@@ -6815,16 +6821,18 @@ class tgraphcanvas(FigureCanvas):
             else:
                 t = temp
             pressure = self.barometricPressure(pressure,t,self.elevation)
-
+            
         # set and report
         if humidity is not None:
             self.ambient_humidity = aw.float2float(humidity,1)
             aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
+            
         if temp is not None:
             if self.mode == "F":
                 temp = self.fromCtoF(temp)
             self.ambientTemp = aw.float2float(temp,1)
             aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
+            
         if pressure is not None:
             self.ambient_pressure = aw.float2float(pressure,1)
             aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa", None).format(self.ambient_pressure))
@@ -8511,15 +8519,27 @@ class tgraphcanvas(FigureCanvas):
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
                     text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
-                    text.set_in_layout(False)
+                    try:
+                        text.set_in_layout(False)
+                    except:
+                        pass
                     if self.timeindex[2]: # only if FCs exists
                         text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        text.set_in_layout(False)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
                         text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        text.set_in_layout(False)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
                     if self.timeindex[7]: # only if COOL exists
                         text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+coolphasetime/2.,statisticsupper,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        text.set_in_layout(False)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
 
                 if self.statisticsflags[2]:
                     (st1,st2,st3,st4) = aw.defect_estimation()
@@ -8561,15 +8581,27 @@ class tgraphcanvas(FigureCanvas):
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
                     text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
-                    text.set_in_layout(False)
+                    try:
+                        text.set_in_layout(False)
+                    except:
+                        pass
                     if self.timeindex[2]: # only if FCs exists
                         text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        text.set_in_layout(False)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
                         text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        text.set_in_layout(False)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
                     if self.timeindex[7]: # only if COOL exists
                         text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        text.set_in_layout(False)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
             self.writecharacteristics(TP_index,LP)
         except Exception as ex:
             #import traceback
@@ -11140,7 +11172,7 @@ class SampleThread(QThread):
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
                 #add to plot a vertical time line
-                if (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
+                if aw.qmc.flagstart and (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
                     aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
             except Exception as e:
                 #import traceback
@@ -11260,8 +11292,7 @@ class ApplicationWindow(QMainWindow):
 #PLUS
     updatePlusStatusSignal = pyqtSignal() # can be called from another thread or a QTimer to trigger to update the plus icon status
     setTitleSignal = pyqtSignal(str,bool) # can be called from another thread or a QTimer to set the profile title in the main GUI thread
-    sendmessageSignal = pyqtSignal(str)
-
+    sendmessageSignal = pyqtSignal(str,bool,str)
     def __init__(self, parent = None):
     
         self.superusermode = False
@@ -16005,14 +16036,15 @@ class ApplicationWindow(QMainWindow):
             QTimer.singleShot(2,lambda : self.sendmessage_internal(message,append,style))
         else:
             # we are not running in the main thread thus we CANNOT call sendmessage_internal via a QTimer
-            self.sendmessage_internal(message,append,style,repaint=False)
+            aw.sendmessageSignal.emit(message,append,style) # we emit a signal to the main thread to resend this message and then process it via the QTimer
+            #self.sendmessage_internal(message,append,style,repaint=False)
             # if this is executed via a QTimer we receive "QObject::startTimer: Timers can only be used with threads started with QThread"
         
     def sendmessage_internal(self,message,append=True,style=None,repaint=True):
         try:
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
-            if style:
+            if style is not None:
                 aw.messagelabel.setStyleSheet(style)
             else:
                 aw.messagelabel.setStyleSheet("background-color:'transparent'; color: " + aw.qmc.palette["messages"] + ";")
@@ -16026,6 +16058,8 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(message)
             if repaint: # if repaint is executed in the main thread we receive "QWidget::repaint: Recursive repaint detected"
                 self.messagelabel.repaint()
+        except:
+            pass
         finally:
             if aw.qmc.messagesemaphore.available() < 1:
                 aw.qmc.messagesemaphore.release(1)
@@ -30519,6 +30553,10 @@ class editGraphDlg(ArtisanDialog):
         settings.setValue("RoastGeometry",self.saveGeometry())
 
     def cancel_dialog(self):
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("RoastGeometry",self.saveGeometry())
+        
         aw.qmc.beans = self.org_beans
         aw.qmc.density = self.org_density
         aw.qmc.density_roasted = self.org_density_roasted
@@ -52856,7 +52894,7 @@ def main():
     artisanviewerFirstStart = False
     if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
         artisanviewerMode = True
-        app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
+        app.setApplicationName("ArtisanViewer")     #needed by QSettings() to store windows geometry in operating system
         viewersettings = QSettings()
         if not viewersettings.contains("Mode"):
             artisanviewerFirstStart = True
