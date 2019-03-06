@@ -366,7 +366,7 @@ def getCoffeeStore(coffeeId,storeId):
     try:
         coffee = [c for c in stock["coffees"] if c["hr_id"] == coffeeId][0]
         return [(coffee,s) for s in coffee["stock"] if s["location_hr_id"] == storeId][0]
-    except:
+    except: # we end up here if there is no stock available
         return None, None
 
 #================== 
@@ -411,7 +411,8 @@ def blend2beans(blend,weight_unit_idx,weightIn = 0):
     except:
         pass
     return res
-    
+
+# this one extends the blend dict by moisture, density and screensize min/max, if it can be computed from its components
 def getBlends(weight_unit_idx,store=None):
     global stock
     config.logger.debug("stock:getBlends(%s,%s)",weight_unit_idx,store)
@@ -428,10 +429,20 @@ def getBlends(weight_unit_idx,store=None):
                     coffeeLabels = {}
                     if "ingredients" in blend: 
                         amount = None
+                        moisture = [] # for each ingredients we list its moisture*ratio, if the moisture is known
+                        density = []  # for each ingredients we list its density*ratio, if the density is known
+                        screen = []   # for each ingredients we list the screen_size tuple {'min':x,'max':y}
                         for i in blend["ingredients"]:
                             coffee = i["coffee"]
                             ratio = i["ratio"]
                             cd, sd = getCoffeeStore(coffee,s) # if no stock of this coffee is available this returns None
+                            if ratio > 0:
+                                if "moisture" in cd and cd["moisture"] is not None and cd["moisture"] > 0:
+                                    moisture.append(cd["moisture"]*ratio)
+                                if "density" in cd and cd["density"] is not None and cd["density"] > 0:
+                                    density.append(cd["density"]*ratio)
+                                if "screen_size" in cd and cd["screen_size"] is not None and len(cd["screen_size"]) > 0:
+                                    screen.append(cd["screen_size"])
                             i["label"] = cd["label"] # add label of coffee to ingredient
                             stock_amount = sd["amount"]   # if sd is None, this fails
                             if location_label == "":
@@ -442,6 +453,25 @@ def getBlends(weight_unit_idx,store=None):
                             else:
                                 amount = a
                             coffeeLabels[coffee] = coffee2beans([coffee,[cd,sd]])
+                        # only if the moisture of all components is known, we can estimate the moisture of this blend
+                        if len(blend["ingredients"]) == len(moisture):
+                            blend["moisture"] = config.app_window.float2float(sum(moisture),1)
+                        # only if the density of all components is known, we can estimate the density of this blend
+                        if len(blend["ingredients"]) == len(density):
+                            blend["density"] = config.app_window.float2float(sum(density),1)
+                        if len(blend["ingredients"]) == len(screen):
+                            sizes = []
+                            for sc in screen:
+                                if "min" in sc:
+                                    sizes.append(sc["min"])
+                                if "max" in sc:
+                                    sizes.append(sc["max"])
+                            if len(sizes) > 0:
+                                min_size = min(sizes)
+                                max_size = max(sizes)
+                                blend["screen_min"] = min_size
+                                if max_size != min_size:
+                                    blend["screen_max"] = max_size
                         if amount and amount > 0: # TODO: check here with machines capacity                    
                             # add location only if this coffee is available in several locations
                             if store:
@@ -450,7 +480,7 @@ def getBlends(weight_unit_idx,store=None):
                                 loc = location_label + ", "
                             label = blend["label"] + " (" + loc + renderAmount(amount,target_unit_idx=weight_unit_idx) + ")"
                             res[label] = [blend,sd,amount,coffeeLabels]
-                except:
+                except: # we end up here if a coffee is out of stock and thus cd and sd are None
                     pass
         return sorted(res.items(), key=lambda x: x[0])
     else:

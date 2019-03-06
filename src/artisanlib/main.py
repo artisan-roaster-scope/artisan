@@ -30156,7 +30156,7 @@ class editGraphDlg(ArtisanDialog):
                     # if roast is not yet complete we unblock the signals before changing the index to get the blend data be filled in
                     self.plus_blends_combo.blockSignals(False)
                     self.plus_blends_combo.setCurrentIndex(p+1)  
-                self.markPlusBlendFields(True)
+                self.markPlusCoffeeFields(True)
                 
             self.updatePlusSelectedLine() 
         except:
@@ -30189,13 +30189,6 @@ class editGraphDlg(ArtisanDialog):
             self.bean_size_min_edit.setStyleSheet(background_white_style)
             self.bean_size_max_edit.setStyleSheet(background_white_style)
             self.moisture_greens_edit.setStyleSheet(background_white_style)
-            
-        
-    def markPlusBlendFields(self,b):
-        if b:
-            self.beansedit.setStyleSheet("QTextEdit { background-color : #e4f3f8;  selection-background-color: darkgray; }")
-        else:
-            self.beansedit.setStyleSheet("")
         
     def updateTitle(self,prev_coffee_label,prev_blend_label):
         titles_to_be_overwritten = [ "", QApplication.translate("Scope Title", "Roaster Scope",None) ]
@@ -30226,43 +30219,72 @@ class editGraphDlg(ArtisanDialog):
             self.beansedit.clear()
             for l in blend_lines:
                 self.beansedit.append(l)
+            keep_modified_moisture = self.modified_moisture_greens_text
+            keep_modified_density = self.modified_density_in_text
+            blend_dict = plus.stock.getBlendBlendDict(blend)
+            if "moisture" in blend_dict:
+                self.moisture_greens_edit.setText(str(blend_dict["moisture"]))
+            else:
+                self.moisture_greens_edit.setText(str(0.0))
+            if "density" in blend_dict:
+                self.bean_density_in_edit.setText(str(blend_dict["density"]))
+            else:
+                self.bean_density_in_edit.setText(str(0.0))
+            if "screen_min" in blend_dict:
+                self.bean_size_min_edit.setText(str(blend_dict["screen_min"]))
+            else:
+                self.bean_size_min_edit.setText("0")
+            if "screen_max" in blend_dict:
+                self.bean_size_max_edit.setText(str(blend_dict["screen_max"]))
+            else:
+                self.bean_size_max_edit.setText("0")
             # check if title should be changed (if still default, or equal to the previous selection:
             self.updateTitle(prev_coffee_label,prev_blend_label)
-            self.markPlusBlendFields(True)
+            self.markPlusCoffeeFields(True)
+            self.density_in_editing_finished()
+            self.moistureEdited()
+            self.modified_density_in_text = keep_modified_density
+            self.modified_moisture_greens_text = keep_modified_moisture
         except:
             pass
         
     # if current title is equal to default title or prev_coffee/blend_label, we set title from selected label
     def fillCoffeeData(self,coffee,prev_coffee_label,prev_blend_label):
         import plus.stock
-        cd = plus.stock.getCoffeeCoffeeDict(coffee)
-        self.beansedit.setPlainText(plus.stock.coffee2beans(coffee))
-        if "moisture" in cd:
-            self.moisture_greens_edit.setText(str(cd["moisture"]))
-        else:
-            self.moisture_greens_edit.setText(str(0))
-        self.density_in_editing_finished()
-        if "density" in cd:
-            self.bean_density_in_edit.setText(str(cd["density"]))
-        else:
-            self.bean_density_in_edit.setText(str(0)) 
-        if "screen_size" in cd:
-            screen = cd["screen_size"]
-            if "min" in screen:
-                self.bean_size_min_edit.setText(str(screen["min"]))
+        try:
+            cd = plus.stock.getCoffeeCoffeeDict(coffee)
+            self.beansedit.setPlainText(plus.stock.coffee2beans(coffee))
+            keep_modified_moisture = self.modified_moisture_greens_text
+            keep_modified_density = self.modified_density_in_text
+            if "moisture" in cd:
+                self.moisture_greens_edit.setText(str(cd["moisture"]))
+            else:
+                self.moisture_greens_edit.setText(str(0.0))
+            if "density" in cd:
+                self.bean_density_in_edit.setText(str(cd["density"]))
+            else:
+                self.bean_density_in_edit.setText(str(0.0)) 
+            if "screen_size" in cd:
+                screen = cd["screen_size"]
+                if "min" in screen:
+                    self.bean_size_min_edit.setText(str(screen["min"]))
+                else:
+                    self.bean_size_min_edit.setText("0")
+                if "max" in screen:
+                    self.bean_size_max_edit.setText(str(screen["max"]))
+                else:
+                    self.bean_size_max_edit.setText("0")
             else:
                 self.bean_size_min_edit.setText("0")
-            if "max" in screen:
-                self.bean_size_max_edit.setText(str(screen["max"]))
-            else:
                 self.bean_size_max_edit.setText("0")
-        else:
-            self.bean_size_min_edit.setText("0")
-            self.bean_size_max_edit.setText("0")
-        self.updateTitle(prev_coffee_label,prev_blend_label)
-        self.markPlusCoffeeFields(True)
-        self.density_in_editing_finished()
-        self.moistureEdited()
+            self.updateTitle(prev_coffee_label,prev_blend_label)
+            self.markPlusCoffeeFields(True)
+            self.density_in_editing_finished()
+            self.moistureEdited()
+            self.modified_density_in_text = keep_modified_density
+            self.modified_moisture_greens_text = keep_modified_moisture
+        except:
+            pass
         
     def defaultCoffeeData(self):
         if self.modified_beans is None:
@@ -30275,6 +30297,8 @@ class editGraphDlg(ArtisanDialog):
         self.bean_size_max_edit.setText(self.modified_beansize_max_text)
         self.moisture_greens_edit.setText(self.modified_moisture_greens_text)
         self.markPlusCoffeeFields(False)
+        self.density_in_editing_finished()
+        self.moistureEdited()
                     
     def storeSelectionChanged(self,n):
         if n != -1:
@@ -30338,7 +30362,7 @@ class editGraphDlg(ArtisanDialog):
             # reset coffee and set new blend
             self.plus_coffees_combo.setCurrentIndex(0)
             selected_blend = self.plus_blends[n-1]
-            bsd = plus.stock.getBlendStockDict(selected_blend)      
+            bsd = plus.stock.getBlendStockDict(selected_blend)
             self.plus_store_selected = bsd["location_hr_id"]    
             self.plus_store_selected_label = bsd["location_label"]
             bd = plus.stock.getBlendBlendDict(selected_blend)
@@ -30665,7 +30689,7 @@ class editGraphDlg(ArtisanDialog):
                     else:
                         d = 4
                     le.setText(str(aw.float2float(converted,d)))
-        self.calculated_density()
+#        self.calculated_density() # if just the unit changes, the density will not change as it is fixed now
 
     def tabSwitched(self,i):
         if i == 3:
@@ -31166,6 +31190,7 @@ class editGraphDlg(ArtisanDialog):
     def weightouteditChanged(self):
         self.percent()
         self.calculated_density()
+        self.density_out_editing_finished() # recalc volume_out
 
     def checkWeightIn(self):
         enough = True        
@@ -31187,6 +31212,9 @@ class editGraphDlg(ArtisanDialog):
     def weightineditChanged(self):
         self.percent()
         self.calculated_density()
+        keep_modified_density = self.modified_density_in_text
+        self.density_in_editing_finished() # recalc volume_in
+        self.modified_density_in_text = keep_modified_density
         self.recentRoastEnabled()
         if aw.plus_account is not None:
             self.checkWeightIn()
@@ -31317,8 +31345,18 @@ class editGraphDlg(ArtisanDialog):
                 volume_in = weight_in / density_in # in g/l
                 # convert to selected volume unit
                 volume_in = aw.convertVolume(volume_in,aw.qmc.volume_units.index("l"),self.volumeUnitsComboBox.currentIndex())
-                self.volumeinedit.setText(str(aw.float2float(volume_in)))
-                self.volume_percent()
+            else:
+                volume_in = 0
+            if volume_in >= 1000:
+                d = 1
+            elif volume_in >= 100:
+                d = 2
+            elif volume_in >= 10:
+                d = 3
+            else:
+                d = 4
+            self.volumeinedit.setText(str(aw.float2float(volume_in,d)))
+            self.volume_percent()
         
     def density_out_editing_finished(self):
         # if density-out and weight-out is given, we re-calc volume-out:
@@ -31330,16 +31368,18 @@ class editGraphDlg(ArtisanDialog):
                 volume_out = weight_out / density_out # in g/l
                 # convert to selected volume unit
                 volume_out = aw.convertVolume(volume_out,aw.qmc.volume_units.index("l"),self.volumeUnitsComboBox.currentIndex())
-                if volume_out >= 1000:
-                    d = 1
-                elif volume_out >= 100:
-                    d = 2
-                elif volume_out >= 10:
-                    d = 3
-                else:
-                    d = 4
-                self.volumeoutedit.setText(str(aw.float2float(volume_out,d)))
-                self.volume_percent()
+            else:
+                volume_out = 0
+            if volume_out >= 1000:
+                d = 1
+            elif volume_out >= 100:
+                d = 2
+            elif volume_out >= 10:
+                d = 3
+            else:
+                d = 4
+            self.volumeoutedit.setText(str(aw.float2float(volume_out,d)))
+            self.volume_percent()
                 
     def accept(self):
         #check for graph
