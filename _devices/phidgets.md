@@ -75,6 +75,10 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 * [Phidget OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712) (VINT): 1x 12bit isolated voltage out
 * [Phidget OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713) (VINT): 1x 16bit isolated voltage out
 * [Phidget OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714) (VINT): 4x digital PWM out
+* [REL1000](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=966) (VINT): 4x digital out relays
+* [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720) (VINT): 4x digital out 8A SSRs
+* [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721) (VINT): 16x PWM-enabled SSRs (only first 4 channels supported)
+* [Phidget DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961) (VINT): 1x versatile input (frequency, current, voltage, digital)
 * [Phidget 1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2) (USB): 4x 12bit analog out
 * [Phidget 1011](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=4) (USB): 2x analog/digital in, 2x digital out
 * [Phidget 1014](https://www.phidgets.com/?tier=3&prodid=9) (USB): 4x digital out
@@ -83,6 +87,11 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 
 Each output action supports a number of different commands specified in the `Documentation` field. See the post [More Phidgets!](https://artisan-roasterscope.blogspot.it/2017/12/more-phidgets.html) for details.
 
+## RC Servo Controllers
+
+* [Phidget RCC 1000](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1015) (16x VINT, ext. powered)
+* [Phidget 1061](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1032) (8x USB, ext. powered)
+* [Phidget 1066](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1044) (1x USB powered) 
 
 ## Ambient Sensors
 
