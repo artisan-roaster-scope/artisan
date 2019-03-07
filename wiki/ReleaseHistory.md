@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v1.6.1
+v1.6.1 (10.03.2019)
 ------------------
 
  * New Features
@@ -28,6 +28,7 @@ v1.6.1
    - adds flags to show/hide time/temp grids
    - adds the Yocto async mode
    - adds roasted coffee density field and density loss calculation to Roast Properties
+   - [Aillio R1](https://aillio.com/) v2 firmware incl. the new [IBTS IR sensor](https://medium.com/@aillio/the-start-of-something-39aa01d08fa9)
  * Changes
    - improved Phidgets tab rendering
    - store reference to profile instead of background with recent roasts

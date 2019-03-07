@@ -143,11 +143,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.6.0</string>
+	<string>1.6.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>Artisan 1.6.0</string>
+	<string>Artisan 1.6.1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSArchitecturePriority</key>
@@ -157,7 +157,7 @@
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.10</string>
+	<string>10.13</string>
 	<key>LSMultipleInstancesProhibited</key>
 	<string>false</string>
 	<key>LSPrefersPPC</key>
