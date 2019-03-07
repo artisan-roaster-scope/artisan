@@ -4143,8 +4143,8 @@ class tgraphcanvas(FigureCanvas):
                     self.togglecrosslines()
                     
 #PLUS-COMMENT
-#                if aw is not None and not artisanviewerMode:
-#                    aw.updatePlusStatus()                                  
+                if aw is not None and not artisanviewerMode:
+                    aw.updatePlusStatus()                                  
                     
             except Exception as ex:
 #                import traceback
@@ -10325,7 +10325,7 @@ class VMToolbar(NavigationToolbar):
             self.toolitems = (
 
 #PLUS-COMMENT
-#                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
+                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
                 
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -10374,8 +10374,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-#        if aw is not None and not artisanviewerMode:
-#            aw.updatePlusStatus(self)
+        if aw is not None and not artisanviewerMode:
+            aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -17173,13 +17173,13 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
 #PLUS-COMMENT          
-#                if aw is not None and not artisanviewerMode:
-#                    aw.updatePlusStatus()
-#                    if aw.plus_account is not None:
-#                        import plus.config
-#                        if plus.config.uuid_tag in obj:
-#                            import plus.sync                            
-#                            QTimer.singleShot(100,lambda : plus.sync.sync())
+                if aw is not None and not artisanviewerMode:
+                    aw.updatePlusStatus()
+                    if aw.plus_account is not None:
+                        import plus.config
+                        if plus.config.uuid_tag in obj:
+                            import plus.sync                            
+                            QTimer.singleShot(100,lambda : plus.sync.sync())
                                     
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -19515,12 +19515,12 @@ class ApplicationWindow(QMainWindow):
                 if pf:
 
 #PLUS-COMMENT  
-#                    if not artisanviewerMode and aw.plus_account is not None:
-#                        import plus.controller
-#                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-#                        if sync_record_hash is not None:
-#                            # we add the hash over the sync record to be able to detect offline changes
-#                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+                    if not artisanviewerMode and aw.plus_account is not None:
+                        import plus.controller
+                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                        if sync_record_hash is not None:
+                            # we add the hash over the sync record to be able to detect offline changes
+                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
 
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
@@ -19811,12 +19811,12 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-#            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
-#                self.plus_account = settings.value("plus_account",self.plus_account)
-#                if settings.contains("plus_remember_credentials"):
-#                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
-#                if settings.contains("plus_email"):
-#                    self.plus_email = settings.value("plus_email",self.plus_email)
+            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
+                self.plus_account = settings.value("plus_account",self.plus_account)
+                if settings.contains("plus_remember_credentials"):
+                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+                if settings.contains("plus_email"):
+                    self.plus_email = settings.value("plus_email",self.plus_email)
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -21011,13 +21011,13 @@ class ApplicationWindow(QMainWindow):
                     aw.fullscreenAction.setChecked(True)
             
 #PLUS-COMMENT
-#            if filename is None and not artisanviewerMode and self.plus_account is not None:
-#                try:
-#                    import plus.controller
-#                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
-#                except:
-#                    pass
-#            #aw.updatePlusStatus()
+            if filename is None and not artisanviewerMode and self.plus_account is not None:
+                try:
+                    import plus.controller
+                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
+                except:
+                    pass
+            #aw.updatePlusStatus()
             
 #            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
             # but with this one in place, the window size is not properly set (just the position!?)
@@ -28368,6 +28368,10 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeinweight.setAlignment(Qt.AlignRight)
         self.coffeeinweight.setReadOnly(True)
         self.coffeeinweight.setFocusPolicy(Qt.NoFocus)
+        if sys.platform.startswith("darwin"):
+            self.coffeeinweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+        else:
+            self.coffeeinweight.setStyleSheet("background-color:'lightgrey'")
         coffeeinweightUnit = QLabel(aw.qmc.weight_units[weightunit])
         
         coffeeinvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None)) + "</b>")
@@ -28436,6 +28440,10 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeoutweight.setMaximumWidth(60)
         self.coffeeoutweight.setAlignment(Qt.AlignRight)
         self.coffeeoutweight.setReadOnly(True)
+        if sys.platform.startswith("darwin"):
+            self.coffeeoutweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+        else:
+            self.coffeeoutweight.setStyleSheet("background-color:'lightgrey'")
         self.coffeeoutweight.setFocusPolicy(Qt.NoFocus)
         coffeeoutweightUnit = QLabel(aw.qmc.weight_units[weightunit])
 
@@ -28494,10 +28502,20 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.unitvolumeEdit.editingFinished.connect(self.resetVolume)
 
         okButton = QPushButton(QApplication.translate("Button","OK",None))
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
+        cancelButton.setFocusPolicy(Qt.StrongFocus)
+        cancelButton.setAutoDefault(False)
         cancelButton.clicked.connect(lambda _:self.close())
         okButton.clicked.connect(lambda _:self.updateVolumes())
+        # add standard Mac OS X shortcut CMD-. to close this dialog
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.cancel_dialog())
+        cancelAction.setShortcut(QKeySequence.Cancel)
+        cancelButton.addActions([cancelAction])
+        
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -30037,9 +30055,12 @@ class editGraphDlg(ArtisanDialog):
         self.calculated_organic_loss()
         
     def plus_popups_set_enabled(self,b):
-        self.plus_stores_combo.setEnabled(b)
-        self.plus_coffees_combo.setEnabled(b)
-        self.plus_blends_combo.setEnabled(b)        
+        try:
+            self.plus_stores_combo.setEnabled(b)
+            self.plus_coffees_combo.setEnabled(b)
+            self.plus_blends_combo.setEnabled(b)
+        except:
+            pass
 
     # storeIndex is the index of the selected entry in the popup
     def populatePlusCoffeeBlendCombos(self,storeIndex=None):
@@ -31277,19 +31298,23 @@ class editGraphDlg(ArtisanDialog):
     def calc_density(self):
         din = dout = 0.0
         try:
-            if self.volumeinedit.text() != "" and self.volumeoutedit.text() != "" and self.weightinedit.text() != "" and self.weightoutedit.text() != "":
+            if self.volumeinedit.text() != "" and self.weightinedit.text() != "":
                 volumein = float(str(self.volumeinedit.text()).replace(",","."))
-                volumeout = float(str(self.volumeoutedit.text()).replace(",","."))
                 weightin = float(str(self.weightinedit.text()).replace(",","."))
-                weightout = float(str(self.weightoutedit.text()).replace(",","."))
-                if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
+                if volumein != 0.0 and weightin != 0.0:
                     vol_idx = aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
                     volumein = aw.convertVolume(volumein,vol_idx,0)
-                    volumeout = aw.convertVolume(volumeout,vol_idx,0)
                     weight_idx = aw.qmc.weight_units.index(self.unitsComboBox.currentText())
                     weightin = aw.convertWeight(weightin,weight_idx,0)
-                    weightout = aw.convertWeight(weightout,weight_idx,0)
                     din = (weightin / volumein) 
+            if self.volumeoutedit.text() != ""  and self.weightoutedit.text() != "":
+                volumeout = float(str(self.volumeoutedit.text()).replace(",","."))
+                weightout = float(str(self.weightoutedit.text()).replace(",","."))
+                if volumeout != 0.0 and weightout != 0.0:
+                    vol_idx = aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
+                    volumeout = aw.convertVolume(volumeout,vol_idx,0)
+                    weight_idx = aw.qmc.weight_units.index(self.unitsComboBox.currentText())
+                    weightout = aw.convertWeight(weightout,weight_idx,0)
                     dout = (weightout / volumeout)
         except:
             pass

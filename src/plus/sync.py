@@ -257,6 +257,9 @@ def applyServerUpdates(data):
         if "notes" in data and data["notes"] != aw.qmc.roastingnotes:
             aw.qmc.roastingnotes = data["notes"]
             dirty = True
+        if "density_roasted" in data and data["density_roasted"] != aw.qmc.density_roasted[0]:
+            aw.qmc.density_roasted[0] = data["density_roasted"]
+            dirty = True   
 #        if "volume_in" in data and data["volume_in"] is not None:
 #            v = aw.convertVolume(data["volume_in"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
 #            if w != aw.qmc.volume[0]:
