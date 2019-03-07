@@ -2,7 +2,7 @@
 layout: single
 permalink: /devices/yoctopuce/
 title: "Yoctopuce"
-excerpt: "PT100/Thermocouple"
+excerpt: "PT100/Thermocouple/IR/Meteo"
 header:
   overlay_image: /assets/images/yoctopuce-logo.png
   image: /assets/images/yoctopuce-logo.png
@@ -24,3 +24,13 @@ The Yocto Thermocouple offers two TC inputs supporting  J, K, E, N, R, S and T t
 The Yocto-PT100 can be used with PT100 probes using 2, 3 or 4 wires. The type of connection is setup in software. To reach the highest precision, a 4-wires probe should be used. 3-wires probes are reasonably precise and not too much affected by wire lengths, contrarily to 2-wires probes which are the least precise and very sensitive to wire length. 
 
 The Yocto-PT100 features a built-in galvanic isolation between the USB control part and the PT100 measure circuit. It is therefore possible to use non-isolated PT100 probes, which are often more reactive and less expensive.
+
+
+## [Yocotopuce](http://www.yoctopuce.com/EN/products/category/usb-environmental-sensors) IR module
+
+not yet released
+
+
+## [Yocotopuce Meteo](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-meteo-v2)
+
+The Yocto Meteo board adds ambient data (temperature, pressure and humidity) automatically to each roast profile. Set the correct MASL for your location under menu Config >> Device, Ambient tab and select this sensor from the popups.

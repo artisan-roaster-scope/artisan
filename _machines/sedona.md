@@ -9,7 +9,7 @@ header:
   teaser: assets/images/sedona.jpg
 ---
 * __Producer:__ [Buckeye Coffee Roasters Co. LCC](http://www.buckeyecoffee.com), USA
-* __Machines:__ all models with Fuji PIDs
+* __Machines:__ all models with Fuji PIDs or the 2in1 system (via Bluetooth or USB)
 * __Connection:__ MODBUS RTU; requires the installation of a serial driver
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
 

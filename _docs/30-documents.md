@@ -19,6 +19,7 @@ toc: false
 
 *  [Using a Raspberry Pi to control my Hottop Roaster with Artisan Software](https://dew-itwebservices.com.au/using-a-raspberry-pi-to-control-my-hottop-roaster-with-artisan-software/) by [David Williams](https://dew-itwebservices.com.au/author/davidfw1960/)
 *  [How to Make an Arduino Controlled Coffee Roaster](https://medium.com/@lukasgrasse/how-to-make-an-arduino-controlled-coffee-roaster-f6a3334fd7d5) by [Lukas Grasse](https://medium.com/@lukasgrasse?source=user_popover)
+*  [Huky 500 Automation](https://github.com/phischmi/HukyAutomation)
 
 * Artisan on Raspberry Pi 3 and Zero using Phidgets by Tsai Sam
   - [Install Phidgets22 Drivers on Raspberry Pi 3 and Zero](https://wbcoffee.blogspot.de/2018/03/install-phidgets22-drivers-on-raspberry.html)
@@ -26,6 +27,9 @@ toc: false
   - [Using Phidget Network Server](https://wbcoffee.blogspot.tw/2018/03/using-phidgets-network-server.html)
 
 
+* Measuring Air pressure in Artisan
+   - [Installing Phidget 1136 Differential Air Pressure Sensor in Artisan](https://wbcoffee.blogspot.com/2018/04/installing-phidget-1136-differential.html)
+   - [Home Barista discussion thread](https://www.home-barista.com/home-roasting/help-setting-up-air-pressure-phidget-into-artisan-t51761.html)
 *  Measuring Air pressure in Artisan
 
   - [Installing Phidget 1136 Differential Air Pressure Sensor in Artisan](https://wbcoffee.blogspot.com/2018/04/installing-phidget-1136-differential.html)
@@ -33,6 +37,5 @@ toc: false
 
 
 *  Amprobe Drivers
-
-  - For devices that use the FT232R UART driver protocol in Windows. [Driver Installation Instructions](https://www.usb-drivers.org/ft232r-usb-uart-driver.html)
-  - For Mac all currently supported OS X versions come with an Apple driver for FTDI devices and installing an additional driver could cause conflicts.  
+   - For devices that use the FT232R UART driver protocol in Windows. [Driver Installation Instructions](https://www.usb-drivers.org/ft232r-usb-uart-driver.html)
+   - For Mac all currently supported OS X versions come with an Apple driver for FTDI devices and installing an additional driver could cause conflicts.  
