@@ -4143,8 +4143,8 @@ class tgraphcanvas(FigureCanvas):
                     self.togglecrosslines()
                     
 #PLUS-COMMENT
-#                if aw is not None and not artisanviewerMode:
-#                    aw.updatePlusStatus()                                  
+                if aw is not None and not artisanviewerMode:
+                    aw.updatePlusStatus()                                  
                     
             except Exception as ex:
 #                import traceback
@@ -10325,7 +10325,7 @@ class VMToolbar(NavigationToolbar):
             self.toolitems = (
 
 #PLUS-COMMENT
-#                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
+                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
                 
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -10374,8 +10374,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-#        if aw is not None and not artisanviewerMode:
-#            aw.updatePlusStatus(self)
+        if aw is not None and not artisanviewerMode:
+            aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -17199,13 +17199,13 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
 #PLUS-COMMENT          
-#                if aw is not None and not artisanviewerMode:
-#                    aw.updatePlusStatus()
-#                    if aw.plus_account is not None:
-#                        import plus.config
-#                        if plus.config.uuid_tag in obj:
-#                            import plus.sync                            
-#                            QTimer.singleShot(100,lambda : plus.sync.sync())
+                if aw is not None and not artisanviewerMode:
+                    aw.updatePlusStatus()
+                    if aw.plus_account is not None:
+                        import plus.config
+                        if plus.config.uuid_tag in obj:
+                            import plus.sync                            
+                            QTimer.singleShot(100,lambda : plus.sync.sync())
                                     
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -18786,10 +18786,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.weight = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
             else:
                 self.qmc.weight = [0,0,"g"]
-#            if "volume" in profile:
-#                self.qmc.volume = profile["volume"]
-#            else:
-#                self.qmc.volume = [0,0,"l"]
+            if "volume" in profile:
+                self.qmc.volume = profile["volume"]
+            else:
+                self.qmc.volume = [0,0,"l"]
             if "density" in profile:
                 self.qmc.density = [profile["density"][0],d(profile["density"][1]),profile["density"][2],d(profile["density"][3])]
             else:
@@ -19407,8 +19407,7 @@ class ApplicationWindow(QMainWindow):
                         
             profile["beans"] = encodeLocal(self.qmc.beans)
             profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocal(self.qmc.weight[2])]
-# volume is no longer stored and rather computed from density and weight on load
-#            profile["volume"] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocal(self.qmc.volume[2])]
+            profile["volume"] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocal(self.qmc.volume[2])]
             profile["density"] = [self.qmc.density[0],encodeLocal(self.qmc.density[1]),self.qmc.density[2],encodeLocal(self.qmc.density[3])]
             profile["density_roasted"] = [self.qmc.density_roasted[0],encodeLocal(self.qmc.density_roasted[1]),self.qmc.density_roasted[2],encodeLocal(self.qmc.density_roasted[3])]
             profile["roastertype"] = encodeLocal(self.qmc.roastertype)
@@ -19558,12 +19557,12 @@ class ApplicationWindow(QMainWindow):
                 if pf:
 
 #PLUS-COMMENT  
-#                    if not artisanviewerMode and aw.plus_account is not None:
-#                        import plus.controller
-#                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-#                        if sync_record_hash is not None:
-#                            # we add the hash over the sync record to be able to detect offline changes
-#                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+                    if not artisanviewerMode and aw.plus_account is not None:
+                        import plus.controller
+                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                        if sync_record_hash is not None:
+                            # we add the hash over the sync record to be able to detect offline changes
+                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
 
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
@@ -19854,12 +19853,12 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-#            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
-#                self.plus_account = settings.value("plus_account",self.plus_account)
-#                if settings.contains("plus_remember_credentials"):
-#                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
-#                if settings.contains("plus_email"):
-#                    self.plus_email = settings.value("plus_email",self.plus_email)
+            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
+                self.plus_account = settings.value("plus_account",self.plus_account)
+                if settings.contains("plus_remember_credentials"):
+                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+                if settings.contains("plus_email"):
+                    self.plus_email = settings.value("plus_email",self.plus_email)
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -21054,13 +21053,13 @@ class ApplicationWindow(QMainWindow):
                     aw.fullscreenAction.setChecked(True)
             
 #PLUS-COMMENT
-#            if filename is None and not artisanviewerMode and self.plus_account is not None:
-#                try:
-#                    import plus.controller
-#                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
-#                except:
-#                    pass
-#            #aw.updatePlusStatus()
+            if filename is None and not artisanviewerMode and self.plus_account is not None:
+                try:
+                    import plus.controller
+                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
+                except:
+                    pass
+            #aw.updatePlusStatus()
             
 #            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
             # but with this one in place, the window size is not properly set (just the position!?)
@@ -29415,9 +29414,11 @@ class editGraphDlg(ArtisanDialog):
         self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(aw.qmc.weight[2]))
         self.unitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeWeightUnit(i))
         #volume
+        print("volume",aw.qmc.volume)
         volumelabel = QLabel("<b>" + u(QApplication.translate("Label", "Volume",None)) + "</b>")
         inv = "%g" %  aw.float2floatWeightVolume(aw.qmc.volume[0])
         outv = "%g" % aw.float2floatWeightVolume(aw.qmc.volume[1])
+        print("outv",outv)
         self.volumeinedit = QLineEdit(inv)
         self.volumeinedit.setValidator(aw.createCLocaleDoubleValidator(0., 999999., 4, self.volumeinedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeinedit.setMinimumWidth(70)
