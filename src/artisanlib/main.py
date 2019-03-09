@@ -29308,7 +29308,8 @@ class editGraphDlg(ArtisanDialog):
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
         self.titleedit = RoastsComboBox(selection = aw.qmc.title)
-        self.titleedit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.titleedit.setMinimumWidth(100)
+        self.titleedit.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed)
         self.titleedit.activated.connect(self.recentRoastActivated)
         self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
         self.titleedit.setStyleSheet(
