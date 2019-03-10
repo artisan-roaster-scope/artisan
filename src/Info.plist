@@ -2,41 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key> NSHumanReadableCopyright </key>
-	<string>Artisan Scope, Roast Logger</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
 	<string>Artisan</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>pdf</string>
-				<string>PDF</string>
-			</array>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>application/pdf</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>pdf</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>PDF</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSIsAppleDefaultForType</key>
-			<true/>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>com.adobe.pdf</string>
-			</array>
-			<key>NSDocumentClass</key>
-			<string>Document</string>
-		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
@@ -71,7 +42,7 @@
 				<string>public.plain-text</string>
 			</array>
 			<key>NSDocumentClass</key>
-			<string>AlarmConfigurations</string>
+			<string>Document</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -89,7 +60,7 @@
 				<string>public.plain-text</string>
 			</array>
 			<key>NSDocumentClass</key>
-			<string>PaletteConfigurations</string>
+			<string>Document</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -107,7 +78,7 @@
 				<string>public.plain-text</string>
 			</array>
 			<key>NSDocumentClass</key>
-			<string>PaletteConfigurations</string>
+			<string>Document</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -125,7 +96,7 @@
 				<string>public.plain-text</string>
 			</array>
 			<key>NSDocumentClass</key>
-			<string>PaletteConfigurations</string>
+			<string>Document</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>

@@ -28567,7 +28567,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         # add standard Mac OS X shortcut CMD-. to close this dialog
         cancelButton.setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.cancel_dialog())
+        cancelAction = QAction(self, triggered=lambda _:self.close())
         try:
             cancelAction.setShortcut(QKeySequence.Cancel)
         except:
