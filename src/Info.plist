@@ -19,10 +19,8 @@
 			<string>Artisan Profile</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>public.plain-text</string>
-			</array>
+			<key>LSTypeIsPackage</key>
+			<false/>
 			<key>NSDocumentClass</key>
 			<string>Document</string>
 		</dict>
@@ -37,12 +35,10 @@
 			<string>Artisan Alarms</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>public.plain-text</string>
-			</array>
+			<key>LSTypeIsPackage</key>
+			<false/>
 			<key>NSDocumentClass</key>
-			<string>Document</string>
+			<string>AlarmConfigurations</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -55,12 +51,10 @@
 			<string>Artisan Palettes</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>public.plain-text</string>
-			</array>
+			<key>LSTypeIsPackage</key>
+			<false/>
 			<key>NSDocumentClass</key>
-			<string>Document</string>
+			<string>PaletteConfigurations</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -73,12 +67,10 @@
 			<string>Artisan Settings</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>public.plain-text</string>
-			</array>
+			<key>LSTypeIsPackage</key>
+			<false/>
 			<key>NSDocumentClass</key>
-			<string>Document</string>
+			<string>SettingsDocument</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -91,12 +83,26 @@
 			<string>Artisan Wheel</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>public.plain-text</string>
-			</array>
+			<key>LSTypeIsPackage</key>
+			<false/>
 			<key>NSDocumentClass</key>
-			<string>Document</string>
+			<string>WheelConfigurations</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>athm</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>artisanTheme.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Artisan Theme</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ThemeConfigurations</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>

@@ -3848,8 +3848,7 @@ class tgraphcanvas(FigureCanvas):
             reply = QMessageBox.warning(aw,QApplication.translate("Message","Profile unsaved", None),string,
                                 QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
             if reply == QMessageBox.Save:
-                aw.fileSave(aw.curFile)  #if accepted, makes safesaveflag = False
-                return True
+                return aw.fileSave(aw.curFile)  #if accepted, makes safesaveflag = False
             elif reply == QMessageBox.Discard:
                 self.safesaveflag = False
                 return True
@@ -19546,6 +19545,7 @@ class ApplicationWindow(QMainWindow):
             return None
 
     #saves recorded profile in hard drive. Called from file menu 
+    # returns True if file was saved successfully
     def fileSave(self,fname):
         try:
             filename = fname
@@ -19585,13 +19585,17 @@ class ApplicationWindow(QMainWindow):
                             self.saveVectorGraph(extension=".svg",fname=filename)
                         else:
                             self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename)
+                    return True
                 else:
                     self.sendmessage(QApplication.translate("Message","Cancelled", None))
+                    return False
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
+                return False
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " filesave(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            return False
 
     def fileExport(self,msg,ext,dumper):
         try:
