@@ -128,7 +128,7 @@ with open('Info.plist', 'r+b') as fp:
     plist = plistlib.load(fp)
     plist['CFBundleDisplayName'] = 'Artisan'
     plist['CFBundleGetInfoString'] = 'Artisan, Roast Logger'
-    plist['CFBundleIdentifier'] = 'org.artisan-scope.artisan'
+    plist['CFBundleIdentifier'] = 'com.google.code.p.Artisan'
     plist['CFBundleShortVersionString'] = VERSION
     plist['CFBundleVersion'] = 'Artisan ' + VERSION
     plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
