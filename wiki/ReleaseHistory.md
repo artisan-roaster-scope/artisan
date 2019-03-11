@@ -70,6 +70,8 @@ v1.6.1 (10.03.2019)
    - fixes Phidgets 1046 async mode
    - fixes the broken negative target slider (PID) ([Issue #314](../../../issues/314))
    - moves the connected to modbus message from errors to messages
+   - fixes an issue on older Qt/PyQt version not supporting certain keyboard shortcuts ([Issue #326](../../../issues/326))
+   - fixes a logical issue on Artisan discarding profiles when it should not do so ([Issue #329](../../../issues/329))
 
 ----
 v1.6.0
