@@ -17,6 +17,10 @@ header:
   - control of fan, heater and drum speed
   - support for the new [IBTS IR sensor](https://medium.com/@aillio/the-start-of-something-39aa01d08fa9) and newer models version 1.5 and 2, and firmware versions, has been added in Artisan v1.6.1
 
+**Watch out!** 
+To connect successfully, Artisan requires the **[Aillio USB Drivers (For Legacy Version Only)](https://aillio.com/?page_id=18556)** (under Downloads) to be installed.
+{: .notice--primary}
+
 **Watch out!** For best performance, please start monitoring the
 roaster before pre-heating.  Artisan doesn't monitor unsafe
 temperatures, so you should never leave the roaster alone.
