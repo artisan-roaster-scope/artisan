@@ -1,0 +1,16 @@
+[General]
+Delay=3000
+
+[Device]
+id=9
+
+[RoastProperties]
+roastertype=Sedona Elite 2in1
+
+[SerialPort]
+baudrate=9600
+bytesize=8
+comport=COM3
+parity=N
+stopbits=1
+timeout=1

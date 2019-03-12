@@ -1,3 +1,24 @@
+artisan (1.6.1-0) precise; urgency=low
+  * new upstream release
+  * changes since 1.5.0:
+   - adds support for Sedona Elite 2in1
+   - adds support for Probat Roaster Middleware
+   - adds support for Aillio R1 v2 firmware incl. IBTS IR
+   - adds support for Phidgets REL100, REL1100, REL1101, DAQ1400 and the ServoAPI
+   - adds support for Yoctopuce Meteo and IR
+   - bug fixes
+ --  <marko.luther@gmx.net>  Sun, 10 Mar 2019 19:32:14 +0200
+
+artisan (1.5.0-0) precise; urgency=low
+  * new upstream release
+  * changes since 1.4.0:
+   - adds ArtisanViewer mode
+   - add Phidgets IO VoltageRatio
+   - adds Program 78 and Program 910 devices
+   - adds support for manual Besca roasting machines
+   - bug fixes
+ --  <marko.luther@gmx.net>  Wed, 17 Oct 2018 19:32:14 +0200
+
 artisan (1.4.0-0) precise; urgency=low
   * new upstream release
   * changes since 1.3.1:

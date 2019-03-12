@@ -2,6 +2,84 @@ Detailed Release History
 ========================
 
 ----
+v1.6.1 (10.03.2019)
+------------------
+
+ * New Features
+   - adds focus indicator to event sliders
+   - extends the import alarms action to load alarms also from .alog profiles besides 
+  dedicated Artisan alarm files (.alrm)
+   - hide/show curves via click to corresponding entry in the legend
+   - adds IO Command state feedback by mfurlotti ([PR #284](../../../pull/284))
+   - adds support for more digital output Phidgets [REL1000](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=966), [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720) and the first 4 channels of [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721) ([Issue #286](../../../issues/286))
+   - adds support for the Phidget [DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961) (current/frequency/digital/voltage input)
+   - adds support for the Phidget RC Servo API supporting the servo controllers [Phidget RCC 1000](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1015) (16x VINT, ext. powered), [Phidget 1061](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1032) (8x USB, ext. powered), and [Phidget 1066](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1044) (1x USB powered) together with a wide range of servo motors from Phidgets (like the [Phidget 3540 10cm Linear Actor](https://www.phidgets.com/?tier=3&catid=25&pcid=22&prodid=406)) or other sources
+   - adds support for the [Yocotopuce Meteo](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-meteo-v2) ambient sensors
+   - adds support for the (upcomming) [Yocotopuce](http://www.yoctopuce.com/EN/products/category/usb-environmental-sensors) IR module
+   - adds support for the [Probat Roaster Middleware](https://www.probat.com/en/products/shoproaster/produkte/roasters/probatone-series/)
+   - adds 2in1 variant of Sedona Elite machine configuration
+   - adds CMD-A keyboard shortcut to open alarms dialog
+   - adds JPEG and BMP support (export/convert)
+   - adds selection of autosave image type
+   - adds batch number to title already during recording
+   - adds a button to remove recent roast entries
+   - adds Brazilian portuguese (as spoken in Brazil)
+   - adds the possibility to rename ET/BT curves and LCDs on the graph
+   - adds flags to show/hide time/temp grids
+   - adds the Yocto async mode
+   - adds roasted coffee density field and density loss calculation to Roast Properties
+   - adds support for the [Aillio R1](https://aillio.com/) v1.5 and v2 firmware and new [IBTS IR sensor](https://medium.com/@aillio/the-start-of-something-39aa01d08fa9)
+ * Changes
+   - improved Phidgets tab rendering
+   - store reference to profile instead of background with recent roasts
+   - faster draggable legend using bit blit on Mac OS X
+   - updated default RoR limits (now 0-25C and 0-45F)
+   - faster attach of Phidget devices
+   - extends the range of allowed event values in the mini editor from 0-100 to 0-9999
+   - allow to control Hottop 2k+ while not logging
+   - udated French translations (thanks Nico!)
+   - adds 0.05C and 0.02C Phidget Change Triggers
+   - adds default focus to OK button and assigns CMD-W and CMD-. shortcuts to the Cancel button of most dialogs ([Issue 321](../../../issues/321))
+   - improved Roast Properties dialog layout
+ * Fixes
+   - fixes feature interaction between NewRoast and AlwaysOn that caused a hang ([Issue 275](../../../issues/275))
+   - fixes sliders single step action
+   - fixes the air and drum speed slider synchronization in the Probatone 7" setup
+   - translates 1045 ambient readings correctly to Fahrenheit in Fahrenheit mode
+   - improved accuracy of MET marker location
+   - improved stability of Phidget Ambient Sensor attach
+   - channel selection fix for Phidget OUT1002 by Mike
+   - fixes various issues with the Cupping Dialog ([Issue #280](../../../issues/280))
+   - fixes issue that event type is not retained
+   - clears row selections on opening Roast Properties to have the "Create Alarm" action work on all events
+   - fixed display when auto axis is checked and events annotations is unchecked
+   - fixed a bug in RoR computation of the Ranking Report
+   - fixes call program to split commands containing quotes correctly ([Issue #287](../../../issues/287))
+   - fixes an issue with plotter on creation of extra devices where time information was missing
+   - fixes the p-i-d command for the TC4 that got broken in v1.5
+   - fixes the initialization of the Artisan internal PID ([Issue #310](../../../issues/310))
+   - adds missing redraw if only background is automatically reloaded on app start
+   - removes clamping of custom events on drawing a background profile with snap events is ticked ([Issue #296](../../../issues/296))
+   - fixes an internal resource management issue that led to redraw issues or even hangs on slow machines ([Issue #298](../../../issues/298))
+   - fixes an issue that prevented event replay after background events of a type without an active slider ([Issue #302](../../../issues/302))
+   - fixes an interaction between autoDROP and manual DROP
+   - ensures that profiles saved as PDF on autosave at the end of a roast contain the phases bar
+   - fixes HUD button styles
+   - fixes alignment of AUC shading when Smooth Curves value is large and Optimal Smoothing is not checked
+   - fixes an issue on CHARGE on newer Aillio R1 firmware versions ([Issue #297](../../../issues/297))
+   - fixes Phidgets 1046 async mode
+   - fixes the broken negative target slider (PID) ([Issue #314](../../../issues/314))
+   - moves the connected to modbus message from errors to messages
+   - fixes an issue on older Qt/PyQt version not supporting certain keyboard shortcuts ([Issue #326](../../../issues/326))
+   - fixes a logical issue on Artisan discarding profiles when it should not do so ([Issue #329](../../../issues/329))
+
+----
+v1.6.0
+------------------
+
+never released
+
+----
 v1.5.0 (17.10.2018)
 ------------------
 

@@ -176,10 +176,13 @@ class PID(object):
     def init(self):
         self.errSum = 0.0
         self.lastError = 0.0
+        self.lastInput = 0.0
         self.lastTime = None
         self.lastDerr = 0.0
         self.Pterm = 0.0
-        if self.lastOutput != None:
+        self.input_decay_weights = None
+        self.previous_inputs = []
+        if False: # self.lastOutput != None:
             self.Iterm = self.lastOutput
         else:
             self.Iterm = 0.0

@@ -9,7 +9,7 @@ readBTpid=1, 1
 showFujiLCDs=false
 
 [RoastProperties]
-roastertype=Phoenix Roaster
+roastertype=Sedona Elite
 
 [SerialPort]
 baudrate=9600

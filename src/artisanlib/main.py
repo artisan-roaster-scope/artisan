@@ -138,6 +138,7 @@ from Phidget22.Devices.VoltageInput import VoltageInput # @UnusedWildImport
 from Phidget22.Devices.DigitalInput import DigitalInput # @UnusedWildImport
 from Phidget22.Devices.DigitalOutput import DigitalOutput # @UnusedWildImport 
 from Phidget22.Devices.VoltageOutput import VoltageOutput # @UnusedWildImport
+from Phidget22.Devices.RCServo import RCServo # @UnusedWildImport
 from Phidget22.Devices.CurrentInput import CurrentInput # @UnusedWildImport
 from Phidget22.Devices.FrequencyCounter import FrequencyCounter # @UnusedWildImport
 
@@ -401,46 +402,48 @@ app = Artisan(args)
 
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings 
 # will be copied to the new settings location. Once settings exist under "artisan-scope" the legacy settings under "YourQuest" will
-# no longer be read or saved.  At start-up, versions of artisan before to v1.6.0 will no longer share settings with versions v1.6.0 and after. 
-# Settings can be shared among all versions of artisan by explicitly saving and loading them using Help>Save/Load Settings.
-try:
-    app.setApplicationName("artisan")                                       #needed by QSettings() to store windows geometry in operating system
-
-    app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
-    app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
-    legacysettings = QSettings()
-    app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
-    app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system        
-    newsettings = QSettings()
+# no longer be read or saved.  At start-up, versions of Artisan before to v1.6.0 will no longer share settings with versions v1.6.0 and after. 
+# Settings can be shared among all versions of Artisan by explicitly saving and loading them using Help>Save/Load Settings.
+#try:
+#    app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
+#
+#    app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
+#    app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
+#    legacysettings = QSettings()
+#    app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
+#    app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system        
+#    newsettings = QSettings()
+#    
+#    settingsRelocated = False
+#    # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied 
+#    if not newsettings.contains("Mode") and legacysettings.contains("Mode") and not legacysettings.contains("_settingsCopied"): 
+#        settingsRelocated = True
+#        # copy Artisan settings
+#        for key in legacysettings.allKeys():
+#            newsettings.setValue(key,legacysettings.value(key))
+#        legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
+#
+#        # copy ArtisanViewer settings
+#        app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
+#
+#        app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
+#        app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
+#        legacysettings = QSettings()
+#        app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
+#        app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system        
+#        newsettings = QSettings()
+#        for key in legacysettings.allKeys():
+#            newsettings.setValue(key,legacysettings.value(key))
+#    del legacysettings   #free up memmory?
+#    del newsettings      #free up memmory?
+#except:
+#    pass
     
-    settingsRelocated = False
-    # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied 
-    if not newsettings.contains("Mode") and legacysettings.contains("Mode") and not legacysettings.contains("_settingsCopied"): 
-        settingsRelocated = True
-        # copy artisan settings
-        for key in legacysettings.allKeys():
-            newsettings.setValue(key,legacysettings.value(key))
-        legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
-
-        # copy artisanViewer settings
-        app.setApplicationName("artisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
-
-        app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
-        legacysettings = QSettings()
-        app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system        
-        newsettings = QSettings()
-        for key in legacysettings.allKeys():
-            newsettings.setValue(key,legacysettings.value(key))
-    del legacysettings   #free up memmory?
-    del newsettings      #free up memmory?
-except:
-    pass
-    
-app.setApplicationName("artisan")                                       #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system
+app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
+#app.setOrganizationName("artisan-scope")                                #needed by QSettings() to store windows geometry in operating system
+#app.setOrganizationDomain("artisan-scope.org")                          #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationName("YourQuest")                                   #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
     
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
@@ -582,7 +585,10 @@ class AmbientThread(QThread):
 
     def run(self):
         libtime.sleep(2.5) # wait a moment after ON until all other devices are attached
-        aw.qmc.getAmbientData()
+        try:
+            aw.qmc.getAmbientData()
+        except:
+            pass
         
         
 #######################################################################################
@@ -783,8 +789,8 @@ class tgraphcanvas(FigureCanvas):
         
         # Phidget variables
         
-        self.phidget_dataRatesStrings = ["64ms","128ms","256ms","512ms","768ms","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
-        self.phidget_dataRatesValues = [64,128,256,512,768,1024] # 8,16,32,64,128,
+        self.phidget_dataRatesStrings = ["32ms","64ms","128ms","256ms","512ms","768ms","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
+        self.phidget_dataRatesValues = [32,64,128,256,512,768,1024] # 8,16,32,64,128,
         
         # probe type values (along the Phidgets21 lib): k-type => 1, j-type => 2, e-type => 3, t-type => 4
         # Artisan will keep on using the Phidgets21 mapping
@@ -792,13 +798,23 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1048_async = [False]*4
         self.phidget1048_changeTriggers = [0.2]*4
         self.phidget1048_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
-        self.phidget1048_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1048_changeTriggersValues))
+        self.phidget1048_changeTriggersStrings = list(map(lambda x:'{0:.1f}C'.format(x),self.phidget1048_changeTriggersValues))
+        # add 0.02C and 0.05C change triggers
+        self.phidget1048_changeTriggersValues.insert(1,0.05)
+        self.phidget1048_changeTriggersValues.insert(1,0.02)
+        self.phidget1048_changeTriggersStrings.insert(1,"0.05C")
+        self.phidget1048_changeTriggersStrings.insert(1,"0.02C")
         self.phidget1048_dataRate = 256 # in ms; (Phidgets default 8ms, 16ms if wireless is active on v21 API, 256ms on v22 API)
 
         self.phidget1045_async = False
         self.phidget1045_changeTrigger = 0.2
         self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1045_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1045_changeTriggersValues))
+        # add 0.02C and 0.05C change triggers
+        self.phidget1045_changeTriggersValues.insert(1,0.05)
+        self.phidget1045_changeTriggersValues.insert(1,0.02)
+        self.phidget1045_changeTriggersStrings.insert(1,"0.05C")
+        self.phidget1045_changeTriggersStrings.insert(1,"0.02C")
         self.phidget1045_emissivity = 1.0
         self.phidget1045_dataRate = 256
         
@@ -810,6 +826,11 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_changeTrigger = 0.2
         self.phidget1200_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1200_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1200_changeTriggersValues))
+        # add 0.02C and 0.05C change triggers
+        self.phidget1200_changeTriggersValues.insert(1,0.05)
+        self.phidget1200_changeTriggersValues.insert(1,0.02)
+        self.phidget1200_changeTriggersStrings.insert(1,"0.05C")
+        self.phidget1200_changeTriggersStrings.insert(1,"0.02C")
         self.phidget1200_dataRate = 250
         self.phidget1200_dataRatesStrings = ["250ms","500ms","750ms","1s"]
         self.phidget1200_dataRatesValues = [250,500,700,1024]
@@ -836,6 +857,9 @@ class tgraphcanvas(FigureCanvas):
         self.YOCTOchanUnit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
         self.YOCTOchan1Unit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
         self.YOCTOchan2Unit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
+        self.YOCTO_emissivity = 1.0
+        self.YOCTO_async = [False]*2
+        self.YOCTO_dataRate = 256 # in ms
         
         self.phidget1018valueFactor = 1000 # we map the 0-5V voltage returned by the Phidgets22 API to mV (0-5000)
         self.phidget1018_async = [False]*8
@@ -957,6 +981,8 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget DAQ1400 Frequency", #96
                        "Phidget DAQ1400 Digital",   #97
                        "Phidget DAQ1400 Voltage",   #98
+                       "Aillio Bullet R1 IBTS/BT",  #99
+                       "Yocto IR",                  #100
                        ]
 
         # ADD DEVICE:
@@ -965,7 +991,7 @@ class tgraphcanvas(FigureCanvas):
         self.nonSerialDevices = [
             27, # Program
             29, # MODBUS
-            33, # MODBUS 34ADD DEVICE:
+            33, # MODBUS 34
             34, # Phidget 1048 4xTC 01
             37, # Phidget 1046 4xRTD 01
             40, # Phidget IO 01
@@ -987,7 +1013,9 @@ class tgraphcanvas(FigureCanvas):
             95, # Phidget DAQ1400 Current
             96, # Phidget DAQ1400 Frequency
             97, # Phidget DAQ1400 Digital
-            98  # Phidget DAQ1400 Voltage
+            98, # Phidget DAQ1400 Voltage
+            99,  # Aillio Bullet R1 IBTS/BT
+            100  # Yocto IR
         ]
                        
         # ADD DEVICE:
@@ -1126,14 +1154,17 @@ class tgraphcanvas(FigureCanvas):
         self.temperaturedevicefunctionlist = [
             "",                #0
             "Phidget HUM1000", #1
+            "Yocto Meteo",     #2
         ]
         self.humiditydevicefunctionlist = [
             "",                #0
             "Phidget HUM1000", #1
+            "Yocto Meteo",     #2
         ]
         self.pressuredevicefunctionlist = [
             "",                #0
             "Phidget PRE1000", #1
+            "Yocto Meteo",     #2
         ]
         
         self.moisture_greens = 0.
@@ -1161,7 +1192,7 @@ class tgraphcanvas(FigureCanvas):
         self.scorching_flag = False
         self.divots_flag = False
 
-        #list to store the time of each reading. Most IMPORTANT variable.
+        #list to store the time in seconds of each reading. Most IMPORTANT variable.
         self.timex = []
 
         self.smooth_curves_on_recording = False # by default we do not smooth curves during recording
@@ -1364,7 +1395,12 @@ class tgraphcanvas(FigureCanvas):
         self.volume = [0,0,self.volume_units[0]]
         
         #[0]probe weight, [1]weight unit, [2]probe volume, [3]volume unit
-        self.density = [0.,self.weight_units[0],1.,self.volume_units[0]]
+#        self.density = [0.,self.weight_units[0],1.,self.volume_units[0]]
+        self.density = [0,"g",1.,"l"]
+        # density weight and volume units are not to be used any longer and assumed to be fixed to g/l
+        # thus also probe volume is not used anymore, and only self.density[0] holds the green been density in g/l
+        
+        self.density_roasted = [0,"g",1.,"l"] # this holds the roasted beans density in g/l
         
         
         if platform.system() == 'Darwin':
@@ -1373,7 +1409,9 @@ class tgraphcanvas(FigureCanvas):
                 if not QSettings().value('AppleMetricUnits'):
                     self.weight = [0,0,self.weight_units[2]]
                     self.volume = [0,0,self.volume_units[1]]
-                    self.density = [0.,self.weight_units[2],1.,self.volume_units[1]]
+                    #self.density = [0.,self.weight_units[2],1.,self.volume_units[1]]
+                    self.density = [0.,"g",1.,"l"] # now fixed to g/l
+                    self.density_roasted = [0.,"g",1.,"l"] # now fixed to g/l
             except:
                 pass
         
@@ -1524,6 +1562,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmbeep = []    # 0 = OFF; 1 = ON flags
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program (comments after # are ignored)
         self.alarmtablecolumnwidths = []
+        self.silent_alarms = False # if this is true (can be set via a Artisan Command button action "alarm(1)", alarms are triggered, but actions are not fired
 
         self.loadalarmsfromprofile = False # if set, alarms are loaded from profile
         self.loadalarmsfrombackground = False # if set, alarms are loaded from background profiles
@@ -1549,16 +1588,19 @@ class tgraphcanvas(FigureCanvas):
         self.ylimit_F_default = 500
         self.ylimit_min_F_default = 100
         self.ygrid_F_default = 50
-        self.zlimit_F_default = 30
+        self.zlimit_F_default = 45
         self.zlimit_min_F_default = 0
         self.zgrid_F_default = 10
         
         self.ylimit_C_default = 250
         self.ylimit_min_C_default = 0
         self.ygrid_C_default = 25
-        self.zlimit_C_default = 20
+        self.zlimit_C_default = 25
         self.zlimit_min_C_default = 0
         self.zgrid_C_default = 5
+        
+        self.temp_grid = True
+        self.time_grid = True
         
         # maximum accepted min/max settings for y and z axis
         self.zlimit_max = 500
@@ -1611,7 +1653,8 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveprefix = ""
         self.autosavepath = ""
         
-        self.autosavepdf = False # if true save PDF along alog files
+        self.autosaveimage = False # if true save an image along alog files
+        self.autosaveimageformat = "PDF" # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP
 
         #used to place correct height of text to avoid placing text over text (annotations)
         self.ystep_down = 0
@@ -1629,7 +1672,15 @@ class tgraphcanvas(FigureCanvas):
         self.ax.set_autoscale_on(False)
 
         #set grid + axle labels + title
-        self.ax.grid(True,color=self.palette["grid"],linestyle = self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
+        grid_axis = None
+        if self.temp_grid and self.time_grid:
+            grid_axis = 'both'
+        elif self.temp_grid:
+            grid_axis = 'y'
+        elif self.time_grid:
+            grid_axis = 'x'
+        if grid_axis is not None:
+            self.ax.grid(True,axis=grid_axis,color=self.palette["grid"],linestyle = self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
 
         #change label colors
         for label in self.ax.yaxis.get_ticklabels():
@@ -2053,7 +2104,10 @@ class tgraphcanvas(FigureCanvas):
             res = aw.qmc.ambientTempSourceAvg()
             if res is not None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
                 aw.qmc.ambientTemp = aw.float2float(float(res))
-        aw.qmc.getAmbientData()
+        try:
+            aw.qmc.getAmbientData()
+        except:
+            pass
 
     # eventsvalues maps the given internal event value v to an external event int value as displayed to the user as special event value
     # v is expected to be float value of range [-11.0,11.0]
@@ -2257,7 +2311,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
 
-#PLUS:
+#PLUS
             elif not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==1 and event.dblclick==True and \
                     event.x < event.y and aw.plus_account is not None and aw.qmc.roastUUID is not None:
                 import plus.util
@@ -2408,97 +2462,99 @@ class tgraphcanvas(FigureCanvas):
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
     def updategraphics(self):
         try:
-            ## NOTE: locking the resource here seems to block the UI on replaying events and not locking seems not to harm
-#            #### lock shared resources #####
-#            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagon:
-                if len(self.timex):
-                    if self.LCDdecimalplaces:
-                        lcdformat = "%.1f"
-                    else:
-                        lcdformat = "%.0f"
-                    try: # if self.temp1 is None, which should never be the case, this fails
-                        if len(self.temp1) and -100 < self.temp1[-1] < 1000:
-                            aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
-                        elif self.LCDdecimalplaces and len(self.temp1) and -10000 < self.temp1[-1] < 100000:
-                            aw.lcd2.display("%.0f"%float(self.temp1[-1]))
+                #### lock shared resources #####
+                aw.qmc.samplingsemaphore.acquire(1)
+                try:
+                    if len(self.timex):
+                        if self.LCDdecimalplaces:
+                            lcdformat = "%.1f"
                         else:
-                            aw.lcd2.display("--")
-                    except:
-                        pass
-                    try:
-                        if len(self.temp2) and -100 < self.temp2[-1] < 1000:
-                            aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
-                        elif self.LCDdecimalplaces and len(self.temp2) and -10000 < self.temp2[-1] < 100000:
-                            aw.lcd3.display("%.0f"%float(self.temp2[-1]))
-                        else:
-                            aw.lcd3.display("--")
-                    except:
-                        pass
-                    try:
-                        if -100 < self.rateofchange1 < 1000:                    
-                            aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
-                        else:
-                            aw.lcd4.display("--")
-                        if -100 < self.rateofchange2 < 1000:
-                            aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
-                        else:
-                            aw.lcd5.display("--")
-                    except:
-                        pass
-                    try:                    
-                        if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
-                            aw.lcd6.display(lcdformat%self.currentpidsv)
-                            aw.lcd7.display(lcdformat%self.dutycycle)
-                    except:
-                        pass
-
-                    ndev = len(self.extradevices)
-                    for i in range(ndev):
-                        if i < aw.nLCDS:
-                            try:
-                                if self.extratemp1[i]:
-                                    fmt = lcdformat                                      
-                                    v = float(self.extratemp1[i][-1])
-                                    if (v.is_integer() and self.intChannel(i,0)):
-                                        fmt = "%.0f"  
-                                    if -100 < v < 1000:
-                                        aw.extraLCD1[i].display(fmt%v) # everything fits
-                                    elif self.LCDdecimalplaces and -10000 < v < 100000:
-                                        fmt = "%.0f"
-                                        aw.extraLCD1[i].display(fmt%v)
-                                    else:
-                                        aw.extraLCD1[i].display("--")
-                            except:
-                                pass
-                            try:
-                                if self.extratemp2[i]:
-                                    fmt = lcdformat
-                                    v = float(self.extratemp2[i][-1])
-                                    if (v.is_integer() and self.intChannel(i,1)):
-                                        fmt = "%.0f"  
-                                    if -100 < v < 1000:
-                                        aw.extraLCD2[i].display(fmt%v) # everything fits
-                                    elif self.LCDdecimalplaces and -10000 < v < 100000:
-                                        fmt = "%.0f"
-                                        aw.extraLCD2[i].display(fmt%v)
-                                    else:
-                                        aw.extraLCD2[i].display("--")
-                            except:
-                                pass
-                                    
-                    # update large LCDs (incl. Web LCDs)
-                    timestr = None
-                    if not self.flagstart:
-                        timestr = "00:00"
-                    digits = (1 if aw.qmc.LCDdecimalplaces else 0)
-                    btstr = str(aw.float2float(self.temp2[-1],digits))
-                    etstr = str(aw.float2float(self.temp1[-1],digits))
-                    if aw.WebLCDs:                       
-                        self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
-                    if aw.largeLCDs_dialog:
-                        self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
-                
+                            lcdformat = "%.0f"
+                        try: # if self.temp1 is None, which should never be the case, this fails
+                            if len(self.temp1) and -100 < self.temp1[-1] < 1000:
+                                aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
+                            elif self.LCDdecimalplaces and len(self.temp1) and -10000 < self.temp1[-1] < 100000:
+                                aw.lcd2.display("%.0f"%float(self.temp1[-1]))
+                            else:
+                                aw.lcd2.display("--")
+                        except:
+                            pass
+                        try:
+                            if len(self.temp2) and -100 < self.temp2[-1] < 1000:
+                                aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
+                            elif self.LCDdecimalplaces and len(self.temp2) and -10000 < self.temp2[-1] < 100000:
+                                aw.lcd3.display("%.0f"%float(self.temp2[-1]))
+                            else:
+                                aw.lcd3.display("--")
+                        except:
+                            pass
+                        try:
+                            if -100 < self.rateofchange1 < 1000:                    
+                                aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
+                            else:
+                                aw.lcd4.display("--")
+                            if -100 < self.rateofchange2 < 1000:
+                                aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
+                            else:
+                                aw.lcd5.display("--")
+                        except:
+                            pass
+                        try:                    
+                            if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
+                                aw.lcd6.display(lcdformat%self.currentpidsv)
+                                aw.lcd7.display(lcdformat%self.dutycycle)
+                        except:
+                            pass
+    
+                        ndev = len(self.extradevices)
+                        for i in range(ndev):
+                            if i < aw.nLCDS:
+                                try:
+                                    if self.extratemp1[i]:
+                                        fmt = lcdformat                                      
+                                        v = float(self.extratemp1[i][-1])
+                                        if (v.is_integer() and self.intChannel(i,0)):
+                                            fmt = "%.0f"  
+                                        if -100 < v < 1000:
+                                            aw.extraLCD1[i].display(fmt%v) # everything fits
+                                        elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                            fmt = "%.0f"
+                                            aw.extraLCD1[i].display(fmt%v)
+                                        else:
+                                            aw.extraLCD1[i].display("--")
+                                except:
+                                    pass
+                                try:
+                                    if self.extratemp2[i]:
+                                        fmt = lcdformat
+                                        v = float(self.extratemp2[i][-1])
+                                        if (v.is_integer() and self.intChannel(i,1)):
+                                            fmt = "%.0f"  
+                                        if -100 < v < 1000:
+                                            aw.extraLCD2[i].display(fmt%v) # everything fits
+                                        elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                            fmt = "%.0f"
+                                            aw.extraLCD2[i].display(fmt%v)
+                                        else:
+                                            aw.extraLCD2[i].display("--")
+                                except:
+                                    pass
+                                        
+                        # update large LCDs (incl. Web LCDs)
+                        timestr = None
+                        if not self.flagstart:
+                            timestr = "00:00"
+                        digits = (1 if aw.qmc.LCDdecimalplaces else 0)
+                        btstr = str(aw.float2float(self.temp2[-1],digits))
+                        etstr = str(aw.float2float(self.temp1[-1],digits))
+                        if aw.WebLCDs:                       
+                            self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
+                        if aw.largeLCDs_dialog:
+                            self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
+                finally:
+                    if aw.qmc.samplingsemaphore.available() < 1:
+                        aw.qmc.samplingsemaphore.release(1)
                     
                 #check setSV
                 if self.temporarysetsv is not None:
@@ -2595,9 +2651,15 @@ class tgraphcanvas(FigureCanvas):
 #                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
                                     # draw delta lines
                                     if self.DeltaETflag and self.l_delta1 is not None:
-                                        aw.qmc.ax.draw_artist(self.l_delta1)
+                                        try:
+                                            aw.qmc.ax.draw_artist(self.l_delta1)
+                                        except:
+                                            pass
                                     if self.DeltaBTflag and self.l_delta2 is not None:
-                                        aw.qmc.ax.draw_artist(self.l_delta2)
+                                        try:
+                                            aw.qmc.ax.draw_artist(self.l_delta2)
+                                        except:
+                                            pass
                                     # draw extra curves
                                     xtra_dev_lines1 = 0
                                     xtra_dev_lines2 = 0
@@ -2673,9 +2735,9 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoFCsIdx != 0:
                         self.mark1Cstart()
                         self.autoFCsIdx = 0
-                    if self.autoDropIdx != 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
-                        self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
-                        self.autoDropIdx = 0
+                    if self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
+                        self.markDrop() # we do not reset the autoDropIdx here to avoid another trigger
+                        self.autoDropIdx = -1 # we set the autoDropIdx to a negative value to prevent further triggers after undo markDROP
                 
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
@@ -2696,9 +2758,7 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)            
-#        finally:
-#            if aw.qmc.samplingsemaphore.available() < 1:
-#                aw.qmc.samplingsemaphore.release(1)
+
 
     def updateLCDtime(self):
         if self.flagon and self.flagstart:
@@ -2734,7 +2794,8 @@ class tgraphcanvas(FigureCanvas):
         if self.HUDflag:
             self.HUDflag = False
             aw.HUD.clear()
-            aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+#            aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+            aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
             aw.stack.setCurrentIndex(0)
             self.resetlines()
             aw.sendmessage(QApplication.translate("Message","HUD OFF", None))
@@ -2746,7 +2807,8 @@ class tgraphcanvas(FigureCanvas):
             img = self.grab()
             aw.HUD.setPixmap(img)
             self.HUDflag = True
-            aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
+#            aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
+            aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_ON"])
             aw.stack.setCurrentIndex(1)
             aw.sendmessage(QApplication.translate("Message","HUD ON", None))
 
@@ -2879,183 +2941,184 @@ class tgraphcanvas(FigureCanvas):
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = aw.qmc.timeclock.elapsed()/1000.    #turn off flag as it has been read
         aw.sendmessage(QApplication.translate("Message","Alarm {0} triggered", None).format(alarmnumber + 1))
-        if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
-            QApplication.beep()
-        try:
-            if self.alarmaction[alarmnumber] == 0:
-                # alarm popup message
-                #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber])
-                # alarm popup message with 10sec timeout
-                amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=aw.qmc.alarm_popup_timout)
-                amb.show()
-                #send alarm also to connected WebLCDs clients
-                if aw.WebLCDs and aw.WebLCDsAlerts:
-                    aw.qmc.updateWebLCDs(alertText=u(self.alarmstrings[alarmnumber]),alertTimeout=10)
-            elif self.alarmaction[alarmnumber] == 1:
-                # alarm call program
-                fname = u(self.alarmstrings[alarmnumber].split('#')[0])
-# take care, the QDir().current() directory changes with loads and saves                
-#                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
-                if False and platf == 'Windows': # this Windows version fails on commands with arguments
-                    f = u("file:///") + u(QApplication.applicationDirPath()) + "/" + u(fname)
-                    res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
-                else:
-                    # MacOS X: script is expected to sit next to the artisan.app or being specified with its full path
-                    # Linux: script is expected to sit next to the artisan binary or being specified with its full path
-                    #
-                    # to get the effect of speaking alarms a text containing the following two lines called "say.sh" could do
-                    #                #!/bin/sh
-                    #                say "Hello" &
-                    # don't forget to do
-                    #                # cd 
-                    #                # chmod +x say.sh
-                    #
-                    # alternatively use "say $@ &" as command and send text strings along
-                    # Voices:
-                    #  -v Alex (male english)
-                    #  -v Viki (female english)
-                    #  -v Victoria (female english)
-                    #  -v Yannick (male german)
-                    #  -v Anna (female german)
-                    #  -v Paolo (male italian)
-                    #  -v Silvia (female italian)
-                    aw.call_prog_with_args(fname)
-                    res = True
-                if res:
-                    aw.sendmessage(QApplication.translate("Message","Alarm is calling: {0}",None).format(fname))
-                else:
-                    aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on {0}",None).format(f))
-            elif self.alarmaction[alarmnumber] == 2:
-                # alarm event button
-                button_number = None
-                text = self.alarmstrings[alarmnumber].split('#')[0]
-                bnrs = text.split(',')
-                for bnr in bnrs:
-                    try:
-                        button_number = int(str(bnr.strip())) - 1 # the event buttons presented to the user are numbered from 1 on
-                    except Exception:
-                        aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(u(self.alarmstrings[alarmnumber])))
-                    if button_number is not None:
-                        if button_number > -1 and button_number < len(aw.buttonlist):
-                            aw.recordextraevent(button_number)
-            elif self.alarmaction[alarmnumber] in [3,4,5,6]:
-                # alarm slider 1-4
-                slidernr = None
-                try:
-                    text = self.alarmstrings[alarmnumber].split('#')[0].strip()
-                    if self.alarmaction[alarmnumber] == 3:
-                        slidernr = 0
-                    elif self.alarmaction[alarmnumber] == 4:
-                        slidernr = 1
-                    elif self.alarmaction[alarmnumber] == 5:
-                        slidernr = 2
-                    elif self.alarmaction[alarmnumber] == 6:
-                        slidernr = 3
-                    if slidernr is not None:
-                        slidervalue = max(aw.eventslidermin[slidernr],min(aw.eventslidermax[slidernr],int(str(text))))
-                        aw.moveslider(slidernr,slidervalue)
-                        # we set the last value to be used for relative +- button action as base
-                        aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
-                        if aw.qmc.flagstart:
-                            value = aw.float2float((slidervalue + 10.0) / 10.0)
-                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber,slidernr)))
-                        aw.fireslideraction(slidernr)
-                except Exception as e:
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
-                    aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(u(self.alarmstrings[alarmnumber])))
-                    
-            elif self.alarmaction[alarmnumber] == 7:
-                # START
-                if aw.button_2.isEnabled():
-                    aw.qmc.ToggleRecorder()
-            elif self.alarmaction[alarmnumber] == 8:
-                # DRY
-                #if aw.button_19.isEnabled():
-                #    aw.qmc.markDryEnd()
-                aw.qmc.autoDryIdx = len(aw.qmc.timex)
-            elif self.alarmaction[alarmnumber] == 9:
-                # FCs
-                #if aw.button_3.isEnabled():
-                #    aw.qmc.mark1Cstart()
-                aw.qmc.autoFCsIdx = len(aw.qmc.timex)
-            elif self.alarmaction[alarmnumber] == 10:
-                # FCe
-                if aw.button_4.isEnabled():
-                    aw.qmc.mark1Cend()
-            elif self.alarmaction[alarmnumber] == 11:
-                # SCs
-                if aw.button_5.isEnabled():
-                    aw.qmc.mark2Cstart()
-            elif self.alarmaction[alarmnumber] == 12:
-                # SCe
-                if aw.button_6.isEnabled():
-                    aw.qmc.mark2Cend()
-            elif self.alarmaction[alarmnumber] == 13:
-                # DROP
-                #if aw.button_9.isEnabled():
-                #    aw.qmc.markDrop()
-                aw.qmc.autoDropIdx = len(aw.qmc.timex)
-            elif self.alarmaction[alarmnumber] == 14:
-                # COOL
-                if aw.button_20.isEnabled():
-                    aw.qmc.markCoolEnd()
-            elif self.alarmaction[alarmnumber] == 15:
-                # OFF
-                if aw.button_1.isEnabled():
-                    aw.qmc.ToggleMonitor()
-            elif self.alarmaction[alarmnumber] == 16:
-                # CHARGE
-                aw.qmc.autoChargeIdx = len(aw.qmc.timex)
-            elif self.alarmaction[alarmnumber] == 17 and aw.qmc.Controlbuttonflag:
-                # RampSoak ON
-                if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
-                    aw.fujipid.setrampsoak(1)
-                elif aw.pidcontrol: # internal or external MODBUS PID control
-                    aw.pidcontrol.svMode = 1
-                    aw.pidcontrol.pidOn()
-            elif self.alarmaction[alarmnumber] == 18 and aw.qmc.Controlbuttonflag:
-                # RampSoak OFF
-                if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
-                    aw.fujipid.setrampsoak(0)
-                elif aw.pidcontrol:  # internal or external MODBUS PID control
-                    aw.pidcontrol.svMode = 0
-                    aw.pidcontrol.pidOff()
-            elif self.alarmaction[alarmnumber] == 19 and aw.qmc.Controlbuttonflag:
-                # PID ON
-                if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
-                    aw.fujipid.setONOFFstandby(0)
-                elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
-                    aw.pidcontrol.pidOn()
-            elif self.alarmaction[alarmnumber] == 20 and aw.qmc.Controlbuttonflag:
-                # PID OFF
-                if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
-                    aw.fujipid.setONOFFstandby(1)
-                elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
-                    aw.pidcontrol.pidOff()
-            elif self.alarmaction[alarmnumber] == 21:
-                # SV slider alarm
-                try:
+        if not self.silent_alarms:
+            if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
+                QApplication.beep()
+            try:
+                if self.alarmaction[alarmnumber] == 0:
+                    # alarm popup message
+                    #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber])
+                    # alarm popup message with 10sec timeout
+                    amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=aw.qmc.alarm_popup_timout)
+                    amb.show()
+                    #send alarm also to connected WebLCDs clients
+                    if aw.WebLCDs and aw.WebLCDsAlerts:
+                        aw.qmc.updateWebLCDs(alertText=u(self.alarmstrings[alarmnumber]),alertTimeout=10)
+                elif self.alarmaction[alarmnumber] == 1:
+                    # alarm call program
+                    fname = u(self.alarmstrings[alarmnumber].split('#')[0])
+    # take care, the QDir().current() directory changes with loads and saves                
+    #                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
+                    if False and platf == 'Windows': # this Windows version fails on commands with arguments
+                        f = u("file:///") + u(QApplication.applicationDirPath()) + "/" + u(fname)
+                        res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
+                    else:
+                        # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
+                        # Linux: script is expected to sit next to the artisan binary or being specified with its full path
+                        #
+                        # to get the effect of speaking alarms a text containing the following two lines called "say.sh" could do
+                        #                #!/bin/sh
+                        #                say "Hello" &
+                        # don't forget to do
+                        #                # cd 
+                        #                # chmod +x say.sh
+                        #
+                        # alternatively use "say $@ &" as command and send text strings along
+                        # Voices:
+                        #  -v Alex (male english)
+                        #  -v Viki (female english)
+                        #  -v Victoria (female english)
+                        #  -v Yannick (male german)
+                        #  -v Anna (female german)
+                        #  -v Paolo (male italian)
+                        #  -v Silvia (female italian)
+                        aw.call_prog_with_args(fname)
+                        res = True
+                    if res:
+                        aw.sendmessage(QApplication.translate("Message","Alarm is calling: {0}",None).format(fname))
+                    else:
+                        aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on {0}",None).format(f))
+                elif self.alarmaction[alarmnumber] == 2:
+                    # alarm event button
+                    button_number = None
                     text = self.alarmstrings[alarmnumber].split('#')[0]
-                    sv = float(str(text))
-                    if aw.qmc.device == 0:
-                        if sv is not None and sv != aw.fujipid.sv:
-                            sv = max(0,sv) # we don't send SV < 0
-                            #aw.qmc.temporarysetsv = sv
-                            aw.fujipid.setsv(sv,silent=True)
-                    elif aw.pidcontrol.pidActive:
-                        if sv is not None and sv != aw.pidcontrol.sv:
-                            sv = max(0,sv) # we don't send SV < 0
-                            #aw.qmc.temporarysetsv = sv
-                            aw.pidcontrol.setSV(sv,init=False)
-                except Exception as e:
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
-                    aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(u(self.alarmstrings[alarmnumber])))
-
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
+                    bnrs = text.split(',')
+                    for bnr in bnrs:
+                        try:
+                            button_number = int(str(bnr.strip())) - 1 # the event buttons presented to the user are numbered from 1 on
+                        except Exception:
+                            aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(u(self.alarmstrings[alarmnumber])))
+                        if button_number is not None:
+                            if button_number > -1 and button_number < len(aw.buttonlist):
+                                aw.recordextraevent(button_number)
+                elif self.alarmaction[alarmnumber] in [3,4,5,6]:
+                    # alarm slider 1-4
+                    slidernr = None
+                    try:
+                        text = self.alarmstrings[alarmnumber].split('#')[0].strip()
+                        if self.alarmaction[alarmnumber] == 3:
+                            slidernr = 0
+                        elif self.alarmaction[alarmnumber] == 4:
+                            slidernr = 1
+                        elif self.alarmaction[alarmnumber] == 5:
+                            slidernr = 2
+                        elif self.alarmaction[alarmnumber] == 6:
+                            slidernr = 3
+                        if slidernr is not None:
+                            slidervalue = max(aw.eventslidermin[slidernr],min(aw.eventslidermax[slidernr],int(str(text))))
+                            aw.moveslider(slidernr,slidervalue)
+                            # we set the last value to be used for relative +- button action as base
+                            aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
+                            if aw.qmc.flagstart:
+                                value = aw.float2float((slidervalue + 10.0) / 10.0)
+                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber,slidernr)))
+                            aw.fireslideraction(slidernr)
+                    except Exception as e:
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(u(self.alarmstrings[alarmnumber])))
+                        
+                elif self.alarmaction[alarmnumber] == 7:
+                    # START
+                    if aw.button_2.isEnabled():
+                        aw.qmc.ToggleRecorder()
+                elif self.alarmaction[alarmnumber] == 8:
+                    # DRY
+                    #if aw.button_19.isEnabled():
+                    #    aw.qmc.markDryEnd()
+                    aw.qmc.autoDryIdx = len(aw.qmc.timex)
+                elif self.alarmaction[alarmnumber] == 9:
+                    # FCs
+                    #if aw.button_3.isEnabled():
+                    #    aw.qmc.mark1Cstart()
+                    aw.qmc.autoFCsIdx = len(aw.qmc.timex)
+                elif self.alarmaction[alarmnumber] == 10:
+                    # FCe
+                    if aw.button_4.isEnabled():
+                        aw.qmc.mark1Cend()
+                elif self.alarmaction[alarmnumber] == 11:
+                    # SCs
+                    if aw.button_5.isEnabled():
+                        aw.qmc.mark2Cstart()
+                elif self.alarmaction[alarmnumber] == 12:
+                    # SCe
+                    if aw.button_6.isEnabled():
+                        aw.qmc.mark2Cend()
+                elif self.alarmaction[alarmnumber] == 13:
+                    # DROP
+                    #if aw.button_9.isEnabled():
+                    #    aw.qmc.markDrop()
+                    aw.qmc.autoDropIdx = len(aw.qmc.timex)
+                elif self.alarmaction[alarmnumber] == 14:
+                    # COOL
+                    if aw.button_20.isEnabled():
+                        aw.qmc.markCoolEnd()
+                elif self.alarmaction[alarmnumber] == 15:
+                    # OFF
+                    if aw.button_1.isEnabled():
+                        aw.qmc.ToggleMonitor()
+                elif self.alarmaction[alarmnumber] == 16:
+                    # CHARGE
+                    aw.qmc.autoChargeIdx = len(aw.qmc.timex)
+                elif self.alarmaction[alarmnumber] == 17 and aw.qmc.Controlbuttonflag:
+                    # RampSoak ON
+                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                        aw.fujipid.setrampsoak(1)
+                    elif aw.pidcontrol: # internal or external MODBUS PID control
+                        aw.pidcontrol.svMode = 1
+                        aw.pidcontrol.pidOn()
+                elif self.alarmaction[alarmnumber] == 18 and aw.qmc.Controlbuttonflag:
+                    # RampSoak OFF
+                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                        aw.fujipid.setrampsoak(0)
+                    elif aw.pidcontrol:  # internal or external MODBUS PID control
+                        aw.pidcontrol.svMode = 0
+                        aw.pidcontrol.pidOff()
+                elif self.alarmaction[alarmnumber] == 19 and aw.qmc.Controlbuttonflag:
+                    # PID ON
+                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                        aw.fujipid.setONOFFstandby(0)
+                    elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
+                        aw.pidcontrol.pidOn()
+                elif self.alarmaction[alarmnumber] == 20 and aw.qmc.Controlbuttonflag:
+                    # PID OFF
+                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                        aw.fujipid.setONOFFstandby(1)
+                    elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
+                        aw.pidcontrol.pidOff()
+                elif self.alarmaction[alarmnumber] == 21:
+                    # SV slider alarm
+                    try:
+                        text = self.alarmstrings[alarmnumber].split('#')[0]
+                        sv = float(str(text))
+                        if aw.qmc.device == 0:
+                            if sv is not None and sv != aw.fujipid.sv:
+                                sv = max(0,sv) # we don't send SV < 0
+                                #aw.qmc.temporarysetsv = sv
+                                aw.fujipid.setsv(sv,silent=True)
+                        elif aw.pidcontrol.pidActive:
+                            if sv is not None and sv != aw.pidcontrol.sv:
+                                sv = max(0,sv) # we don't send SV < 0
+                                #aw.qmc.temporarysetsv = sv
+                                aw.pidcontrol.setSV(sv,init=False)
+                    except Exception as e:
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(u(self.alarmstrings[alarmnumber])))
+    
+            except Exception as ex:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     # called only after CHARGE
     def playbackdrop(self):
@@ -3785,8 +3848,7 @@ class tgraphcanvas(FigureCanvas):
             reply = QMessageBox.warning(aw,QApplication.translate("Message","Profile unsaved", None),string,
                                 QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
             if reply == QMessageBox.Save:
-                aw.fileSave(aw.curFile)  #if accepted, makes safesaveflag = False
-                return True
+                return aw.fileSave(aw.curFile)  #if accepted, makes safesaveflag = False
             elif reply == QMessageBox.Discard:
                 self.safesaveflag = False
                 return True
@@ -3859,11 +3921,13 @@ class tgraphcanvas(FigureCanvas):
         else:
             if soundOn:
                 aw.soundpop()
-            try:
                 
+            try:
                 # the RESET button action needs to be fired outside of the sempaphore to avoid lockups
                 aw.eventactionx(aw.qmc.xextrabuttonactions[0],aw.qmc.xextrabuttonactionstrings[0])
-
+            except:
+                pass
+            try:
                 #### lock shared resources #####
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagon:
@@ -3918,7 +3982,8 @@ class tgraphcanvas(FigureCanvas):
                     self.plus_blend_spec = None
                     self.weight = [0,0,self.weight[2]]
                     self.volume = [0,0,self.volume[2]]
-                    self.density = [0,self.density[1],0,self.density[3]]
+                    self.density = [0,self.density[1],1,self.density[3]]
+                    self.density_roasted = [0,self.density_roasted[1],1,self.density_roasted[3]]
                     self.ambientTemp = 0.
                     self.ambient_humidity = 0.
                     self.ambient_pressure = 0.
@@ -4246,9 +4311,17 @@ class tgraphcanvas(FigureCanvas):
             fmtstr = "%.0f"        
         temp_anno = self.ax.annotate(fmtstr%(temp), xy=(x,y),xytext=(x+e,y + yup),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
+        try:
+            temp_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+        except: # mpl before v3.0 do not have this set_in_layout() function
+            pass
         #anotate time
         time_anno = self.ax.annotate(time_str,xy=(x,y),xytext=(x+e,y - ydown),
                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
+        try:
+            time_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+        except: # mpl before v3.0 do not have this set_in_layout() function
+            pass
         if aw.qmc.patheffects:
             rcParams['path.effects'] = []
         return [temp_anno, time_anno]
@@ -4426,11 +4499,6 @@ class tgraphcanvas(FigureCanvas):
                     endidx = self.ax.get_xlim()[1] # or timex[-1]
                     if timex[tidx] < endidx and self.watermarksflag:
                         self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None)#,lod=False)                        
-                try:
-                    for a in anno_artists:
-                        a.set_in_layout(False) # remove text annotations from tight_layout calculation
-                except: # mpl before v3.0 do not have this set_in_layout() function
-                    pass
                 aw.qmc.l_annotations = anno_artists
         except Exception as e:
 #            import traceback
@@ -4599,13 +4667,13 @@ class tgraphcanvas(FigureCanvas):
         TP_Index = aw.findTP()
         if aw.qmc.AUCbaseFlag:
             _,_,_,idx = aw.ts()
-            idx = TP_Index + self.bisection(self.temp2[TP_Index:self.timeindex[6]],aw.qmc.temp2[idx])
+            idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.stemp2[idx])
         else:
-            idx = TP_Index + self.bisection(self.temp2[TP_Index:self.timeindex[6]],aw.qmc.AUCbase)
-        rtbt = aw.qmc.temp2[idx]
+            idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.AUCbase)
+        rtbt = aw.qmc.stemp2[idx]
                 
         ix = self.timex[idx:self.timeindex[6]+1]
-        iy = self.temp2[idx:self.timeindex[6]+1]
+        iy = self.stemp2[idx:self.timeindex[6]+1]
 
         # Create the shaded region
         from matplotlib.patches import Polygon
@@ -4616,10 +4684,14 @@ class tgraphcanvas(FigureCanvas):
         self.ax.add_patch(poly)
 
     def setProfileTitle(self,title,updatebackground=False):
-        if self.roastbatchnr == 0:
+        if self.flagon and self.batchcounter != -1:
+            bnr = self.batchcounter + 1
+        else:
+            bnr = self.roastbatchnr
+        if bnr == 0 or title == "":
             title = title
         else:
-            title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + title
+            title = self.roastbatchprefix + u(bnr) + u(" ") + title
 
         if self.background and self.titleB and len(self.titleB) > 10:
             stl = 33
@@ -4693,7 +4765,17 @@ class tgraphcanvas(FigureCanvas):
                 fontprop_medium.set_size("medium")
                 fontprop_large = aw.mpl_fontproperties.copy()
                 fontprop_large.set_size("large")
-                self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
+                
+                grid_axis = None
+                if self.temp_grid and self.time_grid:
+                    grid_axis = 'both'
+                elif self.temp_grid:
+                    grid_axis = 'y'
+                elif self.time_grid:
+                    grid_axis = 'x'
+                if grid_axis is not None:
+                    self.ax.grid(True,axis=grid_axis,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
+                
                 if aw.qmc.flagstart and not aw.qmc.title_show_always:
                     self.setProfileTitle("")
                     st_artist = self.fig.suptitle("")
@@ -5063,6 +5145,10 @@ class tgraphcanvas(FigureCanvas):
                                                     xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
                                                     fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
                                                     alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)
+                                try:
+                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                except: # mpl before v3.0 do not have this set_in_layout() function
+                                    pass
                                 self.l_background_annotations.append(anno)
                         #background events by value
                         if self.eventsGraphflag in [2,3,4]:
@@ -5268,7 +5354,7 @@ class tgraphcanvas(FigureCanvas):
                                         else:
                                             temps = self.stemp2
 #                                    fcolor=self.EvalueColor[self.specialeventstype[i]]
-                                    self.ax.annotate(firstletter + secondletter, 
+                                    anno = self.ax.annotate(firstletter + secondletter, 
                                                      xy=(self.timex[int(self.specialevents[i])], 
                                                      temps[int(self.specialevents[i])]),
                                                      xytext=(self.timex[int(self.specialevents[i])],row[firstletter]+2.5),
@@ -5280,6 +5366,10 @@ class tgraphcanvas(FigureCanvas):
                                                      arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
                                                      fontsize="xx-small",
                                                      fontproperties=fontprop_small)
+                                    try:
+                                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                    except: # mpl before v3.0 do not have this set_in_layout() function
+                                        pass
     
                     elif self.eventsGraphflag in [2,3,4]: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
                         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
@@ -5461,7 +5551,7 @@ class tgraphcanvas(FigureCanvas):
                                         boxcolor = self.palette["specialeventbox"]
                                         textcolor = self.palette["specialeventtext"]
                                     if self.eventsGraphflag in [0,3] or self.specialeventstype[i] > 3:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
                                                      xytext=(self.timex[int(self.specialevents[i])],temp+height),
                                                      alpha=0.9,
                                                      color=textcolor,
@@ -5471,8 +5561,12 @@ class tgraphcanvas(FigureCanvas):
                                                      fontproperties=fontprop_small,
                                                      path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                      )
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
                                     elif self.eventsGraphflag == 4:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
                                                      xytext=(self.timex[int(self.specialevents[i])],temp),
                                                      alpha=0.9,
                                                      color=textcolor,
@@ -5480,7 +5574,11 @@ class tgraphcanvas(FigureCanvas):
                                                      bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                                      fontproperties=fontprop_small,
                                                      path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
-                                                     )                            
+                                                     )
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass                          
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:            
@@ -5495,6 +5593,9 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             RoR_start = -1
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
+                        
+#                        print("BT RoR mean:",numpy.mean(self.delta2))
+#                        print("BT RoR std:",numpy.std(self.delta2))
                                                     
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
@@ -5562,17 +5663,17 @@ class tgraphcanvas(FigureCanvas):
     
                 if aw.qmc.ETcurve:
                     self.handles.append(self.l_temp1)
-                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None)))
+                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", aw.ETname, None)))
                 if aw.qmc.BTcurve:
                     self.handles.append(self.l_temp2)
-                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None)))
+                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", aw.BTname, None)))
     
                 if self.DeltaETflag: 
                     self.handles.append(self.l_delta1)
-                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "ET", None)))
+                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", aw.ETname, None)))
                 if self.DeltaBTflag:
                     self.handles.append(self.l_delta2)
-                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "BT", None)))
+                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", aw.BTname, None)))
     
                 nrdevices = len(self.extradevices)
                 
@@ -5710,7 +5811,7 @@ class tgraphcanvas(FigureCanvas):
                                                 label=aw.arabicReshape(QApplication.translate("Label", "AUCguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
-                if aw.qmc.flagstart and aw.qmc.showtimeguide or aw.qmc.device == 18:
+                if aw.qmc.showtimeguide or aw.qmc.device == 18:
                     self.l_timeline, = self.ax.plot([], [],color = self.palette["timeguide"],
                                                 label=aw.arabicReshape(QApplication.translate("Label", "TIMEguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
@@ -5920,7 +6021,8 @@ class tgraphcanvas(FigureCanvas):
                 rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=QColor(aw.qmc.palette["background"]).lighter(150).name(),fill=True,alpha=0.8,zorder=10)
                 self.ax.add_patch(rect)
                 
-                self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,zorder=11,path_effects=[])
+                text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,zorder=11,path_effects=[])
+                text.set_in_layout(False)
                 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -6422,9 +6524,13 @@ class tgraphcanvas(FigureCanvas):
                     ha = "left"
                 else:
                     ha = "right"
-                self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
+                anno = self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
                                     fontproperties=fontprop_small,
                                     xytext=(angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
+                try:
+                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                except: # mpl before v3.0 do not have this set_in_layout() function
+                    pass                                    
     
             score = 0.
             for i in range(nflavors):
@@ -6527,6 +6633,11 @@ class tgraphcanvas(FigureCanvas):
             self.phidgetServerAdded = False
             
     def startPhidgetManager(self):
+        # this is needed to surpress the message on the ignored Exception
+        #                            # Phidget that is raised on starting the PhidgetManager without installed
+        #                            # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
+        _stderr = sys.stderr
+        sys.stderr = object
         if self.phidgetRemoteFlag:
             try:
                 self.addPhidgetServer()
@@ -6538,6 +6649,7 @@ class tgraphcanvas(FigureCanvas):
                 libtime.sleep(0.3)
             except:
                 pass
+        sys.stderr = _stderr
     
     def stopPhidgetManager(self):
         if self.phidgetManager is not None:
@@ -6600,9 +6712,9 @@ class tgraphcanvas(FigureCanvas):
             self.block_update = False # unblock the updating of the bitblit canvas            
             aw.showLCDs() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
-            QApplication.processEvents()
+#            QApplication.processEvents()
             self.StartAsyncSamplingAction()
-            QApplication.processEvents()
+#            QApplication.processEvents()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -6615,18 +6727,19 @@ class tgraphcanvas(FigureCanvas):
             # stop Recorder if still running
             recording = self.flagstart
             if recording:
-                self.OffRecorder()
+                self.OffRecorder(autosave=False) # we autosave after the monitor is turned off to get all the data in the generated PDF!
             self.flagon = False
             # now wait until the current sampling round is done
             while self.flagsampling:
                 libtime.sleep(0.02)
                 QApplication.processEvents()
-            # clear data from monitoring-only mode
-            if len(self.timex) == 1:
+            if len(self.timex) < 3:
+                # clear data from monitoring-only mode
                 aw.qmc.clearMeasurements()
+
             aw.pidcontrol.pidOff()
-            if aw.qmc.device == 53:
-                aw.HottopControlOff()
+#            if aw.qmc.device == 53:
+#                aw.HottopControlOff()
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
             if aw.qmc.device == 0 and aw.fujipid.followBackground:
                 if aw.fujipid.sv and aw.fujipid.sv > 0:
@@ -6636,7 +6749,7 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     aw.fujipid.sv = 0
             self.disconnectProbes()
-            QApplication.processEvents()
+#            QApplication.processEvents()
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.button_7.setEnabled(True)
@@ -6663,11 +6776,18 @@ class tgraphcanvas(FigureCanvas):
             aw.pidcontrol.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
             aw.enableEditMenus()
-            QApplication.processEvents()
-            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+#            QApplication.processEvents()
+            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)            
+            if len(self.timex) > 2:
+                # we autosave after full redraw after OFF to have the optional generated PDF containing all information
+                if aw.qmc.autosaveflag and aw.qmc.autosavepath:
+                    try:
+                        aw.automaticsave()
+                    except:
+                        pass
             #appnope.nap()
             aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
-            QApplication.processEvents()
+#            QApplication.processEvents()
             if recording and self.flagKeepON:
                 self.OnMonitor()
             self.stopPhidgetManager()
@@ -6675,30 +6795,53 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    def getAmbientData(self):        
+    def getAmbientData(self):
+        humidity = None
+        temp = None # assumed to be gathered in C (not F!)
+        pressure = None 
+
+        #--- humidity
         if self.ambient_humidity_device == 1: # Phidget HUM1000
             humidity = aw.ser.PhidgetHUM1000humidity()
-            if humidity is not None:
-                self.ambient_humidity = aw.float2float(humidity,1)
-                aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
+        elif self.ambient_humidity_device == 2: # Yocto Meteo
+            humidity = aw.ser.YoctoMeteoHUM()
+
+        #--- temperature
         if self.ambient_temperature_device == 1: # Phidget HUM1000
             temp = aw.ser.PhidgetHUM1000temperature()
-            if temp is not None:
-                if self.mode == "F":
-                    temp = self.fromCtoF(temp)
-                self.ambientTemp = aw.float2float(temp,1)
-                aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
+        elif self.ambient_temperature_device == 2: # Yocto Meteo
+            temp = aw.ser.YoctoMeteoTEMP()
+
+        #--- pressure
         if self.ambient_pressure_device == 1: # Phidget PRE1000
             pressure = aw.ser.PhidgetPRE1000pressure()
             if pressure is not None:
-                if self.ambientTemp == 0:
-                    t = 23 # we just assume 23C room temperature if no ambient temperature is given
-                else:
-                    t = self.ambientTemp
-                if self.mode == "F":
-                    t = self.fromFtoC(t)
-                self.ambient_pressure = aw.float2float(self.barometricPressure(pressure*10,t,self.elevation),1)
-                aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa", None).format(self.ambient_pressure))
+                pressure = pressure * 10 # convert to hPa/mbar
+        elif self.ambient_pressure_device == 2: # Yocto Meteo
+            pressure = aw.ser.YoctoMeteoPRESS()
+            
+        # calc final values
+        if pressure is not None:
+            if temp is None:
+                t = 23 # we just assume 23C room temperature if no ambient temperature is given
+            else:
+                t = temp
+            pressure = self.barometricPressure(pressure,t,self.elevation)
+            
+        # set and report
+        if humidity is not None:
+            self.ambient_humidity = aw.float2float(humidity,1)
+            aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
+            
+        if temp is not None:
+            if self.mode == "F":
+                temp = self.fromCtoF(temp)
+            self.ambientTemp = aw.float2float(temp,1)
+            aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
+            
+        if pressure is not None:
+            self.ambient_pressure = aw.float2float(pressure,1)
+            aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa", None).format(self.ambient_pressure))
       
     # computes the barometric pressure from 
     #   aap:  atmospheric pressure in hPa
@@ -6724,10 +6867,9 @@ class tgraphcanvas(FigureCanvas):
                     ser.PhidgetTemperatureSensor[1].close()
             except Exception:
                 pass
-            ser.Phidget1048values = [-1]*4
+            ser.Phidget1048values = [[],[],[],[]]
+            ser.Phidget1048lastvalues = [-1]*4
             ser.PhidgetTemperatureSensor = None
-            ser.Phidget1048asynctimes = [None]*4
-            ser.Phidget1048asynctimesAveraged = [None]*4
         if ser.PhidgetIRSensor:
             try:
                 if ser.PhidgetIRSensor.getAttached():
@@ -6738,10 +6880,10 @@ class tgraphcanvas(FigureCanvas):
             except Exception:
                 pass
             ser.PhidgetIRSensor = None
-            ser.Phidget1045value = -1
+            ser.Phidget1045values = [] # async values of the one channel
+            ser.Phidget1045lastvalue = -1
+            ser.Phidget1045tempIRavg = None
             ser.PhidgetIRSensorIC = None
-            ser.Phidget1045asynctime = None
-            ser.Phidget1045asynctimeAveraged = None
         if ser.PhidgetBridgeSensor:
             try:
                 if ser.PhidgetBridgeSensor[0].getAttached():
@@ -6750,10 +6892,9 @@ class tgraphcanvas(FigureCanvas):
                     ser.PhidgetBridgeSensor[1].close()
             except Exception:
                 pass
-            ser.Phidget1046values = [-1]*4
+            ser.Phidget1046values = [[],[],[],[]]
+            ser.Phidget1046lastvalues = [-1]*4
             ser.PhidgetBridgeSensor = None
-            ser.Phidget1046asynctimes = [None]*4
-            ser.Phidget1046asynctimesAveraged = [None]*4
         if ser.PhidgetIO:
             try:
                 if ser.PhidgetIO[0].getAttached():
@@ -6763,16 +6904,21 @@ class tgraphcanvas(FigureCanvas):
             except Exception:
                 pass
             ser.PhidgetIO = None
-            ser.PhidgetIOvalues = [-1]*8
-            ser.PhidgetIOasynctimes = [None]*8
-            ser.PhidgetIOasynctimesAveraged = [None]*8
+            ser.PhidgetIOvalues = [[],[],[],[],[],[],[],[]]
+            ser.PhidgetIOlastvalues = [-1]*8
         if ser.YOCTOsensor:
             try:
-                from yoctopuce.yocto_api import YAPI
-                YAPI.FreeAPI()
                 ser.YOCTOsensor = None
                 ser.YOCTOchan1 = None
                 ser.YOCTOchan2 = None
+                ser.YOCTOtempIRavg = None
+                if ser.YOCTOthread is not None:
+                    ser.YOCTOthread.join()
+                    ser.YOCTOthread = None
+                ser.YOCTOvalues = [[],[]]
+                ser.YOCTOlastvalues = [-1]*2
+                from yoctopuce.yocto_api import YAPI
+                YAPI.FreeAPI()
             except Exception:
                 pass
 
@@ -6785,6 +6931,8 @@ class tgraphcanvas(FigureCanvas):
         aw.ser.phidgetBinaryOUTclose()
         # close Phidget Analog Outputs
         aw.ser.phidgetVOUTclose()
+        # close Phidget RC Servos
+        aw.ser.phidgetRCclose()
         
         
     def disconnectProbes(self):
@@ -6872,7 +7020,7 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    def OffRecorder(self):
+    def OffRecorder(self, autosave=True):
         try:
             aw.enableSaveActions()
             self.flagstart = False
@@ -6893,7 +7041,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.clusterEvents()
             except:
                 pass
-            if aw.qmc.autosaveflag and aw.qmc.autosavepath:
+            if autosave and aw.qmc.autosaveflag and aw.qmc.autosavepath:
                 try:
                     aw.automaticsave()
                 except:
@@ -6986,6 +7134,10 @@ class tgraphcanvas(FigureCanvas):
                         tx = self.timex[self.timeindex[0]]
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                         self.l_annotations += self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass                        
                         # mark active slider values that are not zero 
                
                         for slidernr in range(4):
@@ -7050,6 +7202,10 @@ class tgraphcanvas(FigureCanvas):
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
                     self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down)
+                    try:
+                        self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                    except: # mpl before v3.0 do not have this set_in_layout() function
+                        pass
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
                     st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
@@ -7106,6 +7262,10 @@ class tgraphcanvas(FigureCanvas):
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[1]
@@ -7191,6 +7351,10 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass  
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[2]
@@ -7270,6 +7434,10 @@ class tgraphcanvas(FigureCanvas):
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass  
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -7349,6 +7517,10 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass  
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -7428,6 +7600,10 @@ class tgraphcanvas(FigureCanvas):
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -7502,7 +7678,8 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         self.incBatchCounter()
                         # generate UUID
-                        self.roastUUID = uuid.uuid4().hex
+                        if self.roastUUID is None: # there might be already one assigned by undo and redo the markDROP!
+                            self.roastUUID = uuid.uuid4().hex
                         if self.device != 18:
                             if self.autoDropIdx:
                                 self.timeindex[6] = self.autoDropIdx
@@ -7528,6 +7705,10 @@ class tgraphcanvas(FigureCanvas):
                         elif self.timeindex[1]:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         # this might block:
@@ -7616,6 +7797,12 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.batchcounter -= 1 # we decrease the batch counter
             # set the batchcounter of the current profile
             aw.qmc.roastbatchnr = 0
+            if aw.qmc.lastroastepoch + 5400 < aw.qmc.roastepoch:
+                # reset the sequence counter
+                aw.qmc.batchsequence = 1
+            elif aw.qmc.batchsequence > 1:
+                aw.qmc.batchsequence -= 1
+            aw.qmc.roastbatchpos = 0
             # decr. the batchcounter of the loaded app settings
             if aw.settingspath and aw.settingspath != "":
                 try:
@@ -7707,6 +7894,10 @@ class tgraphcanvas(FigureCanvas):
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
+                        try:
+                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+                        except: # mpl before v3.0 do not have this set_in_layout() function
+                            pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -7854,7 +8045,7 @@ class tgraphcanvas(FigureCanvas):
                                 fontprop_small.set_size("xx-small")
                                 # plot events on BT when showeventsonbt is true
                                 if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
-                                    self.ax.annotate(firstletter + secondletter, 
+                                    anno = self.ax.annotate(firstletter + secondletter, 
                                         xy=(self.timex[index], 
                                         self.temp1[index]),
                                         xytext=(self.timex[index],row[etype]),
@@ -7866,7 +8057,7 @@ class tgraphcanvas(FigureCanvas):
                                         fontsize="xx-small",
                                         fontproperties=fontprop_small)
                                 else:
-                                    self.ax.annotate(firstletter + secondletter, 
+                                    anno = self.ax.annotate(firstletter + secondletter, 
                                             xy=(self.timex[index], 
                                             self.temp2[index]),
                                             xytext=(self.timex[index],row[etype]),
@@ -7877,6 +8068,10 @@ class tgraphcanvas(FigureCanvas):
                                             arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
                                             fontsize="xx-small",
                                             fontproperties=fontprop_small)
+                                try:
+                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                except: # mpl before v3.0 do not have this set_in_layout() function
+                                    pass
                             elif self.eventsGraphflag in [2,3,4] and etype < 4:
                                 # update lines data using the lists with new data
                                 if etype == 0 and aw.qmc.showEtypes[0]:
@@ -7931,7 +8126,7 @@ class tgraphcanvas(FigureCanvas):
                                         boxcolor = self.palette["specialeventbox"]
                                         textcolor = self.palette["specialeventtext"]
                                     if self.eventsGraphflag in [0,3] or self.specialeventstype[-1] > 3:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                                          color=textcolor,
                                                          va="center", ha="center",
                                                          arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4,relpos=(0,0)),
@@ -7941,7 +8136,7 @@ class tgraphcanvas(FigureCanvas):
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          backgroundcolor=boxcolor)
                                     elif self.eventsGraphflag == 4:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
+                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
                                                          color=textcolor,
                                                          va="center", ha="center",
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
@@ -7949,6 +8144,11 @@ class tgraphcanvas(FigureCanvas):
                                                          fontproperties=aw.mpl_fontproperties,
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          backgroundcolor=boxcolor)
+                                    
+                                    try:
+                                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                    except: # mpl before v3.0 do not have this set_in_layout() function
+                                        pass
                                     
                         self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBacground() needed
                         temp = "%.1f "%self.temp2[i]            
@@ -8032,8 +8232,12 @@ class tgraphcanvas(FigureCanvas):
                                 temp = self.temp1[index]
                             else:
                                 temp = self.temp2[index]
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                            anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                              color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
+                            try:
+                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                pass
                         #if Event Type-Bars flag
                         if self.eventsGraphflag == 1:
                             if self.mode == "F":
@@ -8043,11 +8247,15 @@ class tgraphcanvas(FigureCanvas):
                             #some times ET is not drawn (ET = 0) when using device NONE
                             # plot events on BT when showeventsonbt is true
                             if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
+                                anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             else:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
+                                anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
+                            try:
+                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                pass
                         if self.eventsGraphflag in [2,3,4]:
                             # update lines data using the lists with new data
                             etype = self.specialeventstype[-1]
@@ -8316,12 +8524,28 @@ class tgraphcanvas(FigureCanvas):
                 if self.statisticsflags[0]:
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
-                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    try:
+                        text.set_in_layout(False)
+                    except:
+                        pass
                     if self.timeindex[2]: # only if FCs exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
                     if self.timeindex[7]: # only if COOL exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+coolphasetime/2.,statisticsupper,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+coolphasetime/2.,statisticsupper,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
 
                 if self.statisticsflags[2]:
                     (st1,st2,st3,st4) = aw.defect_estimation()
@@ -8362,12 +8586,28 @@ class tgraphcanvas(FigureCanvas):
                     #Write flavor estimation
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
-                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    try:
+                        text.set_in_layout(False)
+                    except:
+                        pass
                     if self.timeindex[2]: # only if FCs exists
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
+                        text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
                     if self.timeindex[7]: # only if COOL exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        try:
+                            text.set_in_layout(False)
+                        except:
+                            pass
             self.writecharacteristics(TP_index,LP)
         except Exception as ex:
             #import traceback
@@ -9887,12 +10127,16 @@ class tgraphcanvas(FigureCanvas):
                     bar[z].set_url(str(z) + "-" + str(count))
                     fontprop = aw.mpl_fontproperties.copy()
                     fontprop.set_size(self.wheeltextsize[z])
-                    self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
+                    anno = self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
                         rotation=textangles[z][count],
                         horizontalalignment='center',
                         verticalalignment="center",
                         color=aw.qmc.wheeltextcolor,
                         fontproperties=fontprop)
+                    try:
+                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                    except: # mpl before v3.0 do not have this set_in_layout() function
+                        pass                          
                     count += 1
             self.fig.canvas.draw()
 
@@ -10475,9 +10719,9 @@ class SampleThread(QThread):
                         # and only half of the sampling interval is gone
                         if (sampling_interval - gone) > etbt_time and gone < (sampling_interval / 2.0):
                             # place the second ET/BT sampling in the middle of the sampling interval
-                            #stime = (sampling_interval / 2.0) - gone # placing the second sample in the middle blocks too long!
-#                            stime = max(0,0.1 - gone) # we want the second main sample minimally 100ms after the first
-#                            libtime.sleep(stime)
+                            stime = max(0.3,(sampling_interval / 4.0) - gone) # placing the second sample in the middle blocks too long!
+#                            stime = max(0,0.3 - gone) # we want the second main sample minimally 100ms after the first
+                            libtime.sleep(stime)
                             timeBeforeETBT2 = libtime.perf_counter() # the time before sending the 2nd request to the main device
                             tx_2,t1_2,t2_2 = self.sample_main_device()
                             timeAfterETBT2 = libtime.perf_counter() # the time after sending the 2nd request to the main device
@@ -10759,12 +11003,20 @@ class SampleThread(QThread):
                                 # we found a BT break at the current index minus b
                                 aw.qmc.autoChargeIdx = length_of_qmc_timex - b
                         # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
-                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():
-                            tp = aw.findTP()
+                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():                            
                             try:
-                                if aw.qmc.temp2[tp] != -1: # only mark TP if not an error value!
+                                tp = aw.findTP()
+                                if ((aw.qmc.mode == "C" and aw.qmc.temp2[tp] > 50 and aw.qmc.temp2[tp] < 150) or \
+                                    (aw.qmc.mode == "F" and aw.qmc.temp2[tp] > 100 and aw.qmc.temp2[tp] < 300)): # only mark TP if not an error value!
                                     aw.qmc.autoTPIdx = 1
                                     aw.qmc.TPalarmtimeindex = tp
+                            except:
+                                pass
+                            try:
+                                # if 2:30min into the roast and TPalarmtimeindex alarmindex not yet set,
+                                # we place the TPalarmtimeindex at the current index to enable in airoasters without TP the autoDRY and autoFCs functions and activate the TP Phases LCDs
+                                if aw.qmc.TPalarmtimeindex is None and ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 150):
+                                    aw.qmc.TPalarmtimeindex = length_of_qmc_timex - 1
                             except:
                                 pass
                         # autodetect DROP event
@@ -10933,7 +11185,7 @@ class SampleThread(QThread):
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
                 #add to plot a vertical time line
-                if (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
+                if aw.qmc.flagstart and (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
                     aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
             except Exception as e:
                 #import traceback
@@ -10946,12 +11198,15 @@ class SampleThread(QThread):
                 #update screen in main GUI thread
                 self.updategraphics.emit()
 
+
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
+        seconds_since_CHARGE = int(aw.qmc.timex[-1]-aw.qmc.timex[aw.qmc.timeindex[0]])
         # if v[-1] is the current temperature then check if
+        #   we are 20sec after CHARGE
         #   len(BT) > 4
         # BT[-5] <= BT[-4] abd BT[-5] <= BT[-3] and BT[-5] <= BT[-2] and BT[-5] <= BT[-1] and BT[-5] < BT[-1]
-        if not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-4]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-5] < aw.qmc.temp2[-1]):
+        if seconds_since_CHARGE > 20 and not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-4]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-5] < aw.qmc.temp2[-1]):
             self.afterTP = True
         return self.afterTP
 
@@ -10962,14 +11217,18 @@ class SampleThread(QThread):
         self.afterTP = False
         if not aw.qmc.flagon:
             return
+            
         try:
             # initialize digitizer
             aw.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
-            max_delay = aw.qmc.delay
+
+            interval = aw.qmc.delay/1000.
+            next_tx = libtime.perf_counter()+interval
             while True:
                 if aw.qmc.flagon:
-                    start = libtime.perf_counter()
+                    
+#                    print(datetime.datetime.now()) # use this to check for drifts
                     
                     #collect information
                     aw.qmc.flagsampling = True # we signal that we are sampling
@@ -10977,12 +11236,11 @@ class SampleThread(QThread):
                     aw.qmc.flagsampling = False # we signal that we are done with sampling
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)                    
-                    now = libtime.perf_counter()                
-                    dt = max(0.1,min(max_delay,aw.qmc.delay) / 1000. - now + start) # min of 0.1sec to allow for refresh the display  
-                    #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     if aw.qmc.flagon:
-                        libtime.sleep(dt)
+                        next_tx += interval
+                        now = libtime.perf_counter()
+                        libtime.sleep(max(0.1,next_tx - now))
                 else:
                     aw.qmc.flagsampling = False # we signal that we are done with sampling
                     try:
@@ -11017,7 +11275,7 @@ class Athreadserver(QWidget):
 
         #connect graphics to GUI thread
         sthread.updategraphics.connect(aw.qmc.updategraphics)
-        sthread.start()
+        sthread.start(QThread.TimeCriticalPriority) # QThread.HighPriority, QThread.HighestPriority
         sthread.wait(300)    #needed in some Win OS
 
 
@@ -11044,16 +11302,15 @@ class EventActionThread(QThread):
 class ApplicationWindow(QMainWindow):
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
-#PLUS:
+#PLUS
     updatePlusStatusSignal = pyqtSignal() # can be called from another thread or a QTimer to trigger to update the plus icon status
     setTitleSignal = pyqtSignal(str,bool) # can be called from another thread or a QTimer to set the profile title in the main GUI thread
-    sendmessageSignal = pyqtSignal(str)
-
+    sendmessageSignal = pyqtSignal(str,bool,str)
     def __init__(self, parent = None):
     
         self.superusermode = False
         
-#PLUS:        
+#PLUS
         self.plus_account = None # if set to a login string, Artisan plus features are enabled
         self.plus_remember_credentials = True # store plus account credentials in systems keychain
         self.plus_email = None # if self.plus_remember_credentials is ticked, we remember here the login to be pre-set as plus_account in the dialog
@@ -11456,6 +11713,14 @@ class ApplicationWindow(QMainWindow):
         fileConvertPNGAction = QAction(QApplication.translate("Menu", "PNG...",None),self)
         fileConvertPNGAction.triggered.connect(self.fileConvertPNG)
         self.convMenu.addAction(fileConvertPNGAction)
+
+        fileConvertJPEGAction = QAction(QApplication.translate("Menu", "JPEG...",None),self)
+        fileConvertJPEGAction.triggered.connect(self.fileConvertJPEG)
+        self.convMenu.addAction(fileConvertJPEGAction)
+
+        fileConvertBMPAction = QAction(QApplication.translate("Menu", "BMP...",None),self)
+        fileConvertBMPAction.triggered.connect(self.fileConvertBMP)
+        self.convMenu.addAction(fileConvertBMPAction)
         
         fileConvertSVGAction = QAction(QApplication.translate("Menu", "SVG...",None),self)
         fileConvertSVGAction.triggered.connect(self.fileConvertSVG)
@@ -11497,6 +11762,14 @@ class ApplicationWindow(QMainWindow):
         CoffeeGeekAction = QAction("CoffeeGeek.com (500x?)...",self)
         CoffeeGeekAction.triggered.connect(lambda *_:self.resizeImg(500,1))
         self.saveGraphMenu.addAction(CoffeeGeekAction)
+        
+        JPEGAction = QAction("JPEG...",self)
+        JPEGAction.triggered.connect(lambda _ : self.resizeImg(0,1,"JPEG"))
+        self.saveGraphMenu.addAction(JPEGAction)
+        
+        BMPAction = QAction("BMP...",self)
+        BMPAction.triggered.connect(lambda _ : self.resizeImg(0,1,"BMP"))
+        self.saveGraphMenu.addAction(BMPAction)
         
         SVGAction = QAction("SVG...",self)
         SVGAction.triggered.connect(lambda _ : self.saveVectorGraph(extension=".svg"))
@@ -11636,6 +11909,7 @@ class ApplicationWindow(QMainWindow):
 
         self.alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
         self.alarmAction.triggered.connect(self.alarmconfig)
+        self.alarmAction.setShortcut("Ctrl+A")
         self.ConfMenu.addAction(self.alarmAction)
         
         self.ConfMenu.addSeparator()
@@ -12023,12 +12297,11 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(6)
 
-        if locale == "es":
-            self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
-                                     "STOP":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}",
-                                     "START":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}",
-                                     "OFF":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}",
-                                     "ON":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }",
+        self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
+                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
+                                     "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
+                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
+                                     "ON":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red }",
                                      "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
                                      "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
                                      "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
@@ -12036,9 +12309,9 @@ class ApplicationWindow(QMainWindow):
                                      "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
                                      "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
                                      "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "RESET":"QPushButton {font-size: 12pt; font-weight: bold; color: black; background-color: white }",
-                                     "HUD_OFF":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #b5baff  }",
-                                     "HUD_ON":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #60ffed   }",
+                                     "RESET":"QPushButton {font-size: 14pt; font-weight: bold; color: black; background-color: white }",
+                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #bbbeec }",
+                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff }",
                                      "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
                                      "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
                                      "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
@@ -12047,60 +12320,13 @@ class ApplicationWindow(QMainWindow):
                                      "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
                                      "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
                                      }
-        else:
-#dave90  start...
-#            self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
-#                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
-#                                     "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
-#                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
-#                                     "ON":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red }",
-#                                     "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-#                                     "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-#                                     "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-#                                     "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-#                                     "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-#                                     "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-#                                     "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-#                                     "RESET":"QPushButton {font-size: 14pt; font-weight: bold; color: black; background-color: white }",
-#                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff  }",
-#                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #60ffed   }",
-#                                     "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
-#                                     "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-#                                     "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
-#                                     "PIDactive":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
-#                                     "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
-#                                     "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
-#                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
-#                                     }
-
-            buttonstyle = "border-style:solid; border-radius:6;border-color:grey; border-width:1;" # modernize
-            #buttonstyle = ""  #un-comment to show how any border stuff is not compatible with setFlat()
-            buttonwidth_1 = "min-width:100px;"
-            buttonwidth_2 = "min-width:75px;"
-            self.pushbuttonstyles = {"DISABLED": "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: normal; color: darkgrey; background:" + self.createGradient('lightgrey') +"}",
-                                     "STOP":     "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#00CC66') +"}",  # 00fc7c, 00CC66, 7CEA9C, 4CB944, 06D6A0
-                                     "START":    "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#ff3d00') +"}",
-                                     "OFF":      "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#00eC66') +"}",  #<- changed slightly.  needs to match STOP color
-                                     "ON":       "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#ff3d00') +"}",
-                                     "COOL END": "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                     "DRY END":  "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                     "CHARGE":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('#f07800') +"}",
-                                     "FC START": "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                     "FC END":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                     "SC START": "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                     "SC END":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                     "RESET":    "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: black;    background:" + self.createGradient('white') +"}",
-                                     "HUD_OFF":  "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#b5baff') +"}",
-                                     "HUD_ON":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#60ffed') +"}",
-                                     "EVENT":    "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: black;    background:" + self.createGradient('yellow') +"}",
-                                     "DROP":     "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('#f07800') +"}",
-                                     "PID":      "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 12pt; font-weight: bold;   color: white;    background:" + self.createGradient('#92C3FF') +"}",
-                                     "PIDactive":"QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 12pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#6D4824') +"}",
-                                     "SV +":     "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('#ffaaff') +"}",
-                                     "SV -":     "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('lightblue') +"}",
-                                     "SELECTED": "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 11pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#6D4824') +"}"  #keyboard moves
-                                     }
-#dave90  ...end 
+        if locale == "es":
+            # slightly smaller font size for Spanish
+            self.pushbuttonstyles["DISABLED"] = "QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}"
+            self.pushbuttonstyles["STOP"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
+            self.pushbuttonstyles["START"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}"
+            self.pushbuttonstyles["OFF"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
+            self.pushbuttonstyles["ON"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }"
 
         #create ON/OFF buttons
         self.button_1 = QPushButton(QApplication.translate("Button", "ON", None))
@@ -12543,6 +12769,8 @@ class ApplicationWindow(QMainWindow):
         self.serial_dlg = None # bound to the serial message window if open, update by updategraphics
         self.message_dlg = None # bound to the serial message window if open, update by updategraphics
 
+        self.ETname = QApplication.translate("Label", "ET",None)
+        self.BTname = QApplication.translate("Label", "BT",None)
 
         ####################   APPLICATION WINDOW (AW) LAYOUT  ##############################################
 
@@ -12932,42 +13160,47 @@ class ApplicationWindow(QMainWindow):
         # this variable is bound to the Roast Properties dialog if it is open, set to False to block opening the dialog or None otherwise
         self.editgraphdialog = None 
         
-        # provide information message to user about sharing settings at start-up
-        if settingsRelocated:
-            string =  QApplication.translate("Message","Welcome to version {0} of artisan!", None).format(__version__) + "\n\n"
-            string += QApplication.translate("Message","This is a one time message to inform you about a change in artisan.", None) + "\n\n"
-            string += QApplication.translate("Message","If you never run older versions of artisan you can skip this message, the change does not affect you.", None) + "  "
-# message to long to fit the RPi 7" display
-#            string += QApplication.translate("Message","If you sometimes run older versions of artisan this change may affect you.", None) + "\n\n"
-            string += QApplication.translate("Message","artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start artisan.", None) + "  "
-            string += QApplication.translate("Message","Beginning with release version v2.0, settings will not be automatically shared at start-up with versions before v2.0.", None) + "\n\n"  
-            string += QApplication.translate("Message","Do not worry, artisan has already loaded your last used settings for you since this is the first time you opened this new version.", None) + "\n\n"
-#            string += QApplication.translate("Message","artisan settings files (.aset) continue to be compatible between versions.", None) + "  "
-            string += QApplication.translate("Message","To share settings between this version and artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
-            string += QApplication.translate("Message","Enjoy using artisan, The artisan team", None)
-            QMessageBox.information(aw,QApplication.translate("Message","One time message about loading settings at start-up", None),string)
+#        # provide information message to user about sharing settings at start-up
+#        if settingsRelocated:
+#            string =  QApplication.translate("Message","Welcome to version {0} of Artisan!", None).format(__version__) + "\n\n"
+#            string += QApplication.translate("Message","This is a one time message to inform you about a change in Artisan.", None) + "\n\n"
+#            string += QApplication.translate("Message","If you never run older versions of Artisan you can skip this message, the change does not affect you.", None) + "  "
+## message to long to fit the RPi 7" display
+##            string += QApplication.translate("Message","If you sometimes run older versions of Artisan this change may affect you.", None) + "\n\n"
+#            string += QApplication.translate("Message","Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.", None) + "  "
+#            string += QApplication.translate("Message","Beginning with release version v2.0, settings will not be automatically shared at start-up with versions before v2.0.", None) + "\n\n"  
+#            string += QApplication.translate("Message","Do not worry, Artisan has already loaded your last used settings for you since this is the first time you opened this new version.", None) + "\n\n"
+##            string += QApplication.translate("Message","Artisan settings files (.aset) continue to be compatible between versions.", None) + "  "
+#            string += QApplication.translate("Message","To share settings between this version and Artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
+#            string += QApplication.translate("Message","Enjoy using Artisan, The Artisan Team", None)
+#            QMessageBox.information(aw,QApplication.translate("Message","One time message about loading settings at start-up", None),string)
 
-        # provide information message to user about artisanViewer the first time it is started
+        # provide information message to user about ArtisanViewer the first time it is started
         if artisanviewerFirstStart:
-            string =  QApplication.translate("Message","Welcome to the artisanViewer!", None).format(__version__) + "\n\n"
-            string += QApplication.translate("Message","This is a one time message to introduce you to the artisanViewer.", None) + "\n\n"
-            string += QApplication.translate("Message","The artisanViewer opens whenever a copy of artisan is already running.", None) + "  "
-            string += QApplication.translate("Message","Only one instance of artisan able to record profiles may be open.", None) + "  "
-            string += QApplication.translate("Message","Multiple instances of artisanViewer can be open at the same time.", None) + "\n\n"  
-            string += QApplication.translate("Message","artisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start artisanViewer.", None) + "\n\n"
-            string += QApplication.translate("Message","Caution, the only way to share settings between artisan and artisanViewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
-            string += QApplication.translate("Message","Enjoy using artisanViewer,", None) +"\n"
-            string += QApplication.translate("Message","The artisan team", None)
-            QMessageBox.information(aw,QApplication.translate("Message","One time message about artisanViewer", None),string)
+            string =  QApplication.translate("Message","Welcome to the ArtisanViewer!", None).format(__version__) + "\n\n"
+            string += QApplication.translate("Message","This is a one time message to introduce you to the ArtisanViewer.", None) + "\n\n"
+            string += QApplication.translate("Message","The ArtisanViewer opens whenever a copy of Artisan is already running.", None) + "  "
+            string += QApplication.translate("Message","Only one instance of Artisan able to record profiles may be open.", None) + "  "
+            string += QApplication.translate("Message","Multiple instances of ArtisanViewer can be open at the same time.", None) + "\n\n"  
+            string += QApplication.translate("Message","ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.", None) + "\n\n"
+            string += QApplication.translate("Message","Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
+            string += QApplication.translate("Message","Enjoy using ArtisanViewer,", None) +"\n"
+            string += QApplication.translate("Message","The Artisan Team", None)
+            QMessageBox.information(aw,QApplication.translate("Message","One time message about ArtisanViewer", None),string)
             settings.setValue("Mode",self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
 
         # we connect the signals
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
         self.setTitleSignal.connect(self.qmc.setProfileTitle)
         self.sendmessageSignal.connect(self.sendmessage)
-#PLUS:
+#PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatus)
 
+    # this is important to have . as decimal separator independent of the systems locale
+    def createCLocaleDoubleValidator(self,bot,top,dec,w):
+        validator = QDoubleValidator(bot,top,dec,w)
+        validator.setLocale(QLocale.c())
+        return validator
 #dave90  start...
     def createGradient(self,rgb, tint_factor=0.2, shade_factor=0.2):
         res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] +");" 
@@ -12996,6 +13229,32 @@ class ApplicationWindow(QMainWindow):
         return lighter_rgb,darker_rgb          
 #dave90  ...end    
     
+    # for use in widgets that expects a double via a aw.createCLocalDoubleValidator that accepts both,
+    # one dot and several commas. If there is no dot, the last comma is interpreted as decimal separator and the others removed
+    # if there is a dot, the last one is used as a decimal separator and all other comma and dots are removed
+    def comma2dot(self,s):
+        s = s.strip()
+        last_dot = s.rfind('.')
+        if last_dot > -1:
+            if last_dot + 1 == len(s):
+                # this is just a trailing dot, we remove this and all other dots and commas
+                return s.replace(',','').replace('.','')
+            else:
+                # we just keep this one and remove all other comma and dots
+                return s[:last_dot].replace(',','').replace('.','') + s[last_dot:].replace(',','')
+        else:
+            # there is no dot in the string
+            last_pos = s.rfind(',')
+            if last_pos > -1:
+                if last_pos + 1 == len(s):
+                    # this is just a trailing comma, we remove this and all other dots and commas
+                    return s.replace(',','').replace('.','')
+                else:
+                    # we turn the last comma into a dot and remove all others
+                    return s[:last_pos].replace(',','') + '.' + s[last_pos+1:]
+            else:
+                return s
+    
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
     def setTare(self,n):
         if self.qmc.flagon: # we set the tare value
@@ -13012,7 +13271,7 @@ class ApplicationWindow(QMainWindow):
         else: # we reset the tare value
             self.channel_tare_values[n] = 0
     
-#PLUS:    
+#PLUS
     def updatePlusStatus(self,ntb=None):
         if ntb is None:
             ntb = self.ntb
@@ -13183,20 +13442,25 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.plus_default_store is not None and self.qmc.plus_default_store != self.qmc.plus_store:
                 self.qmc.plus_default_store = None # we reset the defaultstore
         
+    # returns the list of recentRoasts with the first entry with the given title, weight and weightunit removed
+    def delRecentRoast(self,title,weightIn,weightUnit):
+        # check for duplications
+        entry_with_same_title = None
+        for i in range(len(self.recentRoasts)):
+            if self.recentRoasts[i]["title"] == title and self.recentRoasts[i]["weightIn"] == weightIn and self.recentRoasts[i]["weightUnit"] == weightUnit:
+                entry_with_same_title = i
+                break
+        if entry_with_same_title is not None:
+            # we remove the duplicate entry first
+            return self.recentRoasts[:entry_with_same_title] + self.recentRoasts[entry_with_same_title+1:]
+        else:
+            return self.recentRoasts
+
     # d is a recentRoast dict
     def addRecentRoast(self,d):
         try:
             # check for duplications
-            entry_with_same_title = None
-            for i in range(len(self.recentRoasts)):
-                if self.recentRoasts[i]["title"] == d["title"] and self.recentRoasts[i]["weightIn"] == d["weightIn"] and self.recentRoasts[i]["weightUnit"] == d["weightUnit"]:
-                    entry_with_same_title = i
-                    break
-            if entry_with_same_title is not None:
-                # we remove the duplicate entry first
-                rr = self.recentRoasts[:entry_with_same_title] + self.recentRoasts[entry_with_same_title+1:]
-            else:
-                rr = self.recentRoasts
+            rr = self.delRecentRoast(d["title"],d["weightIn"],d["weightUnit"])
             self.recentRoasts = [d] + rr[:self.maxRecentRoasts-1]
             self.updateNewMenuRecentRoasts()
         except Exception as e:
@@ -13204,7 +13468,6 @@ class ApplicationWindow(QMainWindow):
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),exc_tb.tb_lineno)
-        
         
     def recentRoastLabel(self,rr):
         res = rr["title"] + " (" + "%g" % rr["weightIn"] +rr["weightUnit"]+")"
@@ -13348,7 +13611,7 @@ class ApplicationWindow(QMainWindow):
                         aw.s7.host = host
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                elif aw.qmc.device in [0,19,53] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Hottop or MODBUS serial
+                elif aw.qmc.device in [0,9,19,53] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop or MODBUS serial
                     import serial.tools.list_ports
                     comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                     if platf == 'Darwin':
@@ -14873,14 +15136,17 @@ class ApplicationWindow(QMainWindow):
             # before adaption:
                 # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command), =4 (Call Program [with argument])
                 #  =5 (Hottop Heater), =6 (Hottop Fan), =7 (Hottop Command), =8 (Fuji Command), =9 (PWM Command), =10 (VOUT Command)
-                #  =11 (IO C
-                action = (action+2 if action > 1 else action)
+                #  =11 (IO Command), =12 (S7 Command), =13 (Aillio R1 Heater Command), =14 (Aillio R1 Fan Command), =15 (Aillio R1 Drum Command)
+                #  =16 (Artisan Command), 17= (RC Command)
+                action = (action+2 if action > 1 else action) # skipping (2 Call Program and 3 Multiple Event)
                 if action > 5:
                     action = action + 1 # skip the 6:IO Command
                     if action > 10 and action < 15:
                         action = action + 1 # skip the 11 p-i-d action
                         if action == 15:
                             action = 6 # map IO Command back
+                    if action > 18:
+                        action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
                 value = (self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]
                 if action != 14: # only for VOUT Commands we keep the floats
@@ -15021,8 +15287,9 @@ class ApplicationWindow(QMainWindow):
                     
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
-    #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
-    #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command
+    #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Command; 11= p-i-d; 12= Fuji Command;
+    #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command;
+    #         20= Artisan Command; 21= RC Command
     def eventaction(self,action,cmd):
         if action:
             if action == 3: # multiple event actions, we cannot run in parallel as it crashs!
@@ -15274,7 +15541,14 @@ class ApplicationWindow(QMainWindow):
                                     self.setExtraEventButtonStyle(b, style="pressed")
                                 else:
                                     self.setExtraEventButtonStyle(b, style="normal")
-
+                            elif cs_a[0] == "sleep" and cs_len == 1: # in seconds
+                                try:
+                                    t = eval(cs_a[1])
+                                    if isinstance(t,float) or isinstance(t,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(t)
+                                except Exception:
+                                    pass
                             else:
                                 #print("no match for command [%s], continue" % (cs_a[0]))
                                 aw.sendmessage(QApplication.translate("Message","No match for command [%s], continuing" % (cs_a[0]), None))
@@ -15333,6 +15607,14 @@ class ApplicationWindow(QMainWindow):
                                         setHottop(cooling_motor=True)
                                     else:
                                         setHottop(cooling_motor=False)
+                                except Exception:
+                                    pass
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
                                 except Exception:
                                     pass
                 elif action == 11: # p-i-d, expects 3 float numbers separated by semicolon
@@ -15427,6 +15709,11 @@ class ApplicationWindow(QMainWindow):
                                 elif cs.startswith('pulsehub(') and len(cs)>12 and len(cs)<17:
                                     c,t = cs[9:-1].split(',')
                                     aw.ser.phidgetOUTpulsePWMhub(int(c),int(t))
+                                elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
                             except Exception:
                                 pass
                 elif action == 14: # VOUT Command (currently only "out(<channel>,<value>)" with <value> a float
@@ -15434,12 +15721,20 @@ class ApplicationWindow(QMainWindow):
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
-                            try:
-                                if cs.startswith('out(') and len(cs)>7:
+                            if cs.startswith('out(') and len(cs)>7:
+                                try:
                                     c,v = cs[4:-1].split(',')
                                     aw.ser.phidgetVOUTsetVOUT(int(c),float(v))
-                            except Exception:
-                                pass
+                                except Exception:
+                                    pass
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
+                                except Exception:
+                                    pass
                 elif action == 15: # S7 Command
                     # getDBint(<dbnumber>,<start>)
                     # getDBfloat(<dbnumber>,<start>)
@@ -15473,6 +15768,14 @@ class ApplicationWindow(QMainWindow):
                                     aw.s7.lastReadResult = aw.s7.writeFloat(5,int(dbnr),int(s))
                                 except Exception:
                                     pass
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
+                                except Exception:
+                                    pass
                 elif action == 16:
                     self.ser.R1.set_heater(int(cmd)/10)
                 elif action == 17:
@@ -15482,7 +15785,100 @@ class ApplicationWindow(QMainWindow):
                 elif action == 19:
                     if cmd_str == "PRS":
                         self.ser.R1.prs()
-
+                elif action == 20: # Artisan Command
+                    # alarms(<bool>)
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:
+                            cs = c.strip()
+                            if cs.startswith("alarms(") and cs.endswith(")"):
+                                try:
+                                    value = cs[len("alarms("):-1]
+                                    if value.lower() in ("yes", "true", "t", "1"):
+                                        aw.qmc.silent_alarms = False
+                                        aw.sendmessage(QApplication.translate("Message","Alarms on", None))
+                                    else:
+                                        aw.qmc.silent_alarms = True
+                                        aw.sendmessage(QApplication.translate("Message","Alarms off", None))
+                                except Exception:
+                                    pass
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
+                                except Exception:
+                                    pass
+                elif action == 21: # RC Command
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:
+                            cs = c.strip()
+                            # pulse(ch,min,max) # sets min/max pulse width
+                            if cs.startswith("pulse(") and len(cs) > 11:
+                                try:
+                                    channel,min_pulse,max_pulse = cs[len("pulse("):-1].split(',')
+                                    aw.ser.phidgetRCpulse(int(channel),int(min_pulse),int(max_pulse))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("pos(") and len(cs) > 9:
+                                # pos(ch,min,max) # sets min/max position
+                                try:
+                                    channel,min_pos,max_pos = cs[len("pos("):-1].split(',')
+                                    aw.ser.phidgetRCpos(int(channel),float(min_pos),float(max_pos))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("engaged(") and len(cs) > 11:
+                                # enable(ch,state) # engage channel
+                                try:
+                                    channel,state = cs[len("engaged("):-1].split(',')
+                                    aw.ser.phidgetRCengaged(int(channel),bool(int(state)))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("set(") and len(cs) > 7:
+                                # set(ch,pos) # set position
+                                try:
+                                    channel,pos = cs[len("set("):-1].split(',')
+                                    aw.ser.phidgetRCset(int(channel),float(pos))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("ramp(") and len(cs) > 8:
+                                # ramp(ch,state) # set speed ramping state per channel
+                                try:
+                                    channel,state = cs[len("ramp("):-1].split(',')
+                                    aw.ser.phidgetRCspeedRamping(int(channel),bool(int(state)))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("volt(") and len(cs) > 8:
+                                # volt(ch,pos) # sets voltage
+                                try:
+                                    channel,volt = cs[len("volt("):-1].split(',')
+                                    aw.ser.phidgetRCvoltage(int(channel),float(volt))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("accel(") and len(cs) > 9:
+                                # accel(ch,accel) # sets acceleration
+                                try:
+                                    channel,accel = cs[len("accel("):-1].split(',')
+                                    aw.ser.phidgetRCaccel(int(channel),float(accel))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("veloc(") and len(cs) > 9:
+                                # veloc(ch,veloc) # sets velocity
+                                try:
+                                    channel,veloc = cs[len("veloc("):-1].split(',')
+                                    aw.ser.phidgetRCveloc(int(channel),float(veloc))
+                                except Exception:
+                                    pass
+                            elif cs.startswith('sleep'): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
+                                except Exception:
+                                    pass
             except Exception:
                 pass
                 
@@ -15714,14 +16110,15 @@ class ApplicationWindow(QMainWindow):
             QTimer.singleShot(2,lambda : self.sendmessage_internal(message,append,style))
         else:
             # we are not running in the main thread thus we CANNOT call sendmessage_internal via a QTimer
-            self.sendmessage_internal(message,append,style,repaint=False)
+            aw.sendmessageSignal.emit(message,append,style) # we emit a signal to the main thread to resend this message and then process it via the QTimer
+            #self.sendmessage_internal(message,append,style,repaint=False)
             # if this is executed via a QTimer we receive "QObject::startTimer: Timers can only be used with threads started with QThread"
         
     def sendmessage_internal(self,message,append=True,style=None,repaint=True):
         try:
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
-            if style:
+            if style is not None:
                 aw.messagelabel.setStyleSheet(style)
             else:
                 aw.messagelabel.setStyleSheet("background-color:'transparent'; color: " + aw.qmc.palette["messages"] + ";")
@@ -15735,6 +16132,8 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(message)
             if repaint: # if repaint is executed in the main thread we receive "QWidget::repaint: Recursive repaint detected"
                 self.messagelabel.repaint()
+        except:
+            pass
         finally:
             if aw.qmc.messagesemaphore.available() < 1:
                 aw.qmc.messagesemaphore.release(1)
@@ -16527,12 +16926,15 @@ class ApplicationWindow(QMainWindow):
                     self.setCurrentFile(filename)
                     self.qmc.safesaveflag = False
                     
-                    if self.qmc.autosavepdf:
+                    if self.qmc.autosaveimage and not aw.qmc.flagon:
                         if ".alog" in filename:
                             filename = filename[0:-5]
-                        self.saveVectorGraph(extension=".pdf",fname=filename)
-                        self.sendmessage(QApplication.translate("Message","PDF saved", None))    
-                    
+                        if self.qmc.autosaveimageformat == "PDF":
+                            self.saveVectorGraph(extension=".pdf",fname=filename) 
+                        elif self.qmc.autosaveimageformat == "SVG":
+                            self.saveVectorGraph(extension=".svg",fname=filename)
+                        else:
+                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename)                     
                     return filename
                 else:
                     self.sendmessage(QApplication.translate("Message","Autosave path does not exist. Autosave failed.", None))                    
@@ -18445,7 +18847,11 @@ class ApplicationWindow(QMainWindow):
             if "density" in profile:
                 self.qmc.density = [profile["density"][0],d(profile["density"][1]),profile["density"][2],d(profile["density"][3])]
             else:
-                self.qmc.density = [0,"g",0,"l"]
+                self.qmc.density = [0,"g",1,"l"]
+            if "density_roasted" in profile:
+                self.qmc.density_roasted = [profile["density_roasted"][0],d(profile["density_roasted"][1]),profile["density_roasted"][2],d(profile["density_roasted"][3])]
+            else:
+                self.qmc.density_roasted = [0,"g",1,"l"]
             if "roastertype" in profile:
                 self.qmc.roastertype = d(profile["roastertype"])
             else:
@@ -18745,6 +19151,23 @@ class ApplicationWindow(QMainWindow):
             QMessageBox.information(aw,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
             return False
 
+
+     
+            
+    def weightVolumeDigits(self,v):
+        if v >= 1000:
+            return 1
+        elif v >= 100:
+            return 2
+        elif v >= 10:
+            return 3
+        else:
+            return 4
+            
+    def float2floatWeightVolume(self,v):
+        d = self.weightVolumeDigits(v)
+        return self.float2float(v,d)
+    
     # the int n specifies the number of digits
     def float2float(self,f,n=1):
         if f is None:
@@ -18791,7 +19214,9 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["TP_ET"] = self.float2float(self.qmc.temp1[TP_time_idx])
                 computedProfile["TP_BT"] = self.float2float(self.qmc.temp2[TP_time_idx])
                 if self.qmc.timeindex[6]:
-                    computedProfile["MET"] = self.float2float(max(self.qmc.temp1[TP_time_idx:self.qmc.timeindex[6]]))
+                    relevant_ETs = self.qmc.temp1[TP_time_idx:self.qmc.timeindex[6]]
+                    if relevant_ETs: # relevant_ETs might be the empty list!
+                        computedProfile["MET"] = self.float2float(max(relevant_ETs))
             ######### DRY #########
             # calc DRY_time_idx (index of DRY; is None if unknown)
             if self.qmc.timeindex[1] and aw.qmc.phasesbuttonflag:
@@ -18871,7 +19296,8 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["dry_phase_ror"] = self.float2float(ror[0])
                 computedProfile["mid_phase_ror"] = self.float2float(ror[1])
                 computedProfile["finish_phase_ror"] = self.float2float(ror[2])
-                if "TP_BT" in computedProfile and "TP_time" in computedProfile and "DROP_BT" in computedProfile and "DROP_time" in computedProfile:
+                if "TP_BT" in computedProfile and "TP_time" in computedProfile and "DROP_BT" in computedProfile and "DROP_time" in computedProfile and \
+                    (computedProfile["DROP_time"]-computedProfile["TP_time"]) != 0:
                     computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -19037,6 +19463,7 @@ class ApplicationWindow(QMainWindow):
             profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocal(self.qmc.weight[2])]
             profile["volume"] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocal(self.qmc.volume[2])]
             profile["density"] = [self.qmc.density[0],encodeLocal(self.qmc.density[1]),self.qmc.density[2],encodeLocal(self.qmc.density[3])]
+            profile["density_roasted"] = [self.qmc.density_roasted[0],encodeLocal(self.qmc.density_roasted[1]),self.qmc.density_roasted[2],encodeLocal(self.qmc.density_roasted[3])]
             profile["roastertype"] = encodeLocal(self.qmc.roastertype)
             profile["machinesetup"] = encodeLocal(self.qmc.machinesetup)
             profile["operator"] = encodeLocal(self.qmc.operator)
@@ -19089,9 +19516,9 @@ class ApplicationWindow(QMainWindow):
             profile["etypes"] = [encodeLocal(et) for et in self.qmc.etypes]
             profile["roastingnotes"] = encodeLocal(self.qmc.roastingnotes)
             profile["cuppingnotes"] = encodeLocal(self.qmc.cuppingnotes)
-            profile["timex"] = [self.float2float(x,8) for x in self.qmc.timex]
-            profile["temp1"] = [self.float2float(x,6) for x in self.qmc.temp1]
-            profile["temp2"] = [self.float2float(x,6) for x in self.qmc.temp2]
+            profile["timex"] = [self.float2float(x,10) for x in self.qmc.timex]
+            profile["temp1"] = [self.float2float(x,8) for x in self.qmc.temp1]
+            profile["temp2"] = [self.float2float(x,8) for x in self.qmc.temp2]
             profile["phases"] = self.qmc.phases
             profile["zmax"] = int(self.qmc.zlimit)
             profile["zmin"] = int(self.qmc.zlimit_min)
@@ -19166,6 +19593,7 @@ class ApplicationWindow(QMainWindow):
             return None
 
     #saves recorded profile in hard drive. Called from file menu 
+    # returns True if file was saved successfully
     def fileSave(self,fname):
         try:
             filename = fname
@@ -19196,18 +19624,26 @@ class ApplicationWindow(QMainWindow):
                     self.sendmessage(QApplication.translate("Message","Profile saved", None))
                     aw.curFile = filename
                     self.qmc.safesaveflag = False
-                    if self.qmc.autosavepdf:
+                    if self.qmc.autosaveimage:
                         if ".alog" in filename:
                             filename = filename[0:-5]
-                        self.saveVectorGraph(extension=".pdf",fname=filename)
-                        self.sendmessage(QApplication.translate("Message","PDF saved", None))                    
+                        if self.qmc.autosaveimageformat == "PDF":
+                            self.saveVectorGraph(extension=".pdf",fname=filename)
+                        elif self.qmc.autosaveimageformat == "SVG":
+                            self.saveVectorGraph(extension=".svg",fname=filename)
+                        else:
+                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename)
+                    return True
                 else:
                     self.sendmessage(QApplication.translate("Message","Cancelled", None))
+                    return False
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None))
+                return False
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " filesave(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            return False
 
     def fileExport(self,msg,ext,dumper):
         try:
@@ -19285,8 +19721,22 @@ class ApplicationWindow(QMainWindow):
         self.fileConvert(".xml",self.exportPilot)
 
     def fileConvertPNG(self):
+        self.fileConvertBITMAP("PNG")
+
+    def fileConvertJPEG(self):
+        self.fileConvertBITMAP("JPEG")
+
+    def fileConvertBMP(self):
+        self.fileConvertBITMAP("BMP")
+
+    def fileConvertBITMAP(self,filetype="PNG"):
         files = self.ArtisanOpenFilesDialog(ext="*.alog")
         if files and len(files) > 0:
+            fileext = ".png"
+            if filetype == "JPEG":
+                fileext = ".jpg"
+            elif filetype == "BMP":
+                fileext = ".bmp"
             outdir = self.ArtisanExistingDirectoryDialog()
             progress = QProgressDialog(QApplication.translate("Message", "Converting...",None), None, 0, len(files), self)
             progress.setCancelButton(None)
@@ -19300,18 +19750,28 @@ class ApplicationWindow(QMainWindow):
                     progress.setValue(i)
                     QApplication.processEvents()
                     fname = u(QFileInfo(f).fileName())
-                    fconv = u(QDir(outdir).filePath(fname + u(".png")))
+                    fconv = u(QDir(outdir).filePath(fname + u(fileext)))
                     if not os.path.exists(fconv):
                         aw.qmc.reset(redraw=False,soundOn=False)
                         self.setProfile(f,self.deserialize(f),quiet=True)
                         self.qmc.redraw()
                         self.image = aw.qmc.grab()
-                        self.image.save(fconv,"PNG")
+                        if filetype in ["JPEG","BMP"]:
+                            # transparences are not supported by those file types and are rendered in black by default.
+                            white_img = QPixmap(self.image.size())
+                            white_img.fill() # fills by default with Qt.white
+                            painter = QPainter(white_img)
+                            painter.drawPixmap(0,0,self.image.width(),self.image.height(),self.image)
+                            self.image = white_img
+                            painter.end()
+                            del painter
+                        self.image.save(fconv,filetype)
                     else:
-                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(".png")))                        
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(fileext)))                        
                 except:
                     pass
                 i += 1
+                aw.qmc.safesaveflag = False
                 aw.qmc.reset(soundOn=False)
             aw.qmc.roastpropertiesflag = flag_temp
             progress.cancel()
@@ -19525,6 +19985,12 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("yoctoRemoteFlag"):
                 self.qmc.yoctoRemoteFlag = bool(toBool(settings.value("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)))
                 self.qmc.yoctoServerID = toString(settings.value("yoctoServerID",self.qmc.yoctoServerID))
+            if settings.contains("YOCTO_emissivity"):
+                self.qmc.YOCTO_emissivity = toDouble(settings.value("YOCTO_emissivity",self.qmc.YOCTO_emissivity))
+            if settings.contains("YOCTO_async"):
+                self.qmc.YOCTO_async = [bool(toBool(x)) for x in toList(settings.value("YOCTO_async",self.qmc.YOCTO_async))]
+            if settings.contains("YOCTO_dataRate"):
+                self.qmc.YOCTO_dataRate = toInt(settings.value("YOCTO_dataRate",self.qmc.YOCTO_dataRate))
             if settings.contains("ambient_temperature_device"):
                 self.qmc.ambient_temperature_device = toInt(settings.value("ambient_temperature_device",self.qmc.ambient_temperature_device))
                 self.qmc.ambient_humidity_device = toInt(settings.value("ambient_humidity_device",self.qmc.ambient_humidity_device))
@@ -19746,8 +20212,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("weight"):
                 self.qmc.weight[2] = s2a(toString(settings.value("weight",self.qmc.weight[2])))
                 self.qmc.volume[2] = s2a(toString(settings.value("volume",self.qmc.volume[2])))
-                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
-                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
+# density units are now fixed to g/l
+#                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
+#                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
             if settings.contains("volumeCalcUnit"):
                 self.qmc.volumeCalcUnit = toInt(settings.value("volumeCalcUnit",int(self.qmc.volumeCalcUnit)))
             settings.endGroup()
@@ -20145,6 +20612,18 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.graphstyle = toInt(settings.value("graphstyle",self.qmc.graphstyle))
             if settings.contains("graphfont"):
                 self.qmc.graphfont = toInt(settings.value("graphfont",self.qmc.graphfont))
+            if settings.contains("ETname"):
+                self.ETname = settings.value("ETname")
+                self.label2.setText("<big><b>" + u(QApplication.translate("Label", self.ETname,None)) + "</b></big>")
+                self.label4.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", self.ETname,None)) + "</b></big>")
+            else:
+                self.ETname = "ET"
+            if settings.contains("BTname"):
+                self.BTname = settings.value("BTname")
+                self.label3.setText("<big><b>" + u(QApplication.translate("Label", self.BTname,None)) + "</b></big>")
+                self.label5.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", self.BTname,None)) + "</b></big>")
+            else:
+                self.BTname = "BT"
             settings.endGroup()
             settings.beginGroup("Sound")
             self.soundflag = toInt(settings.value("Beep",self.soundflag))
@@ -20178,6 +20657,10 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("chargemintime"):
                 self.qmc.chargemintime = toInt(settings.value("chargemintime",self.qmc.chargemintime))
             self.qmc.legendloc = toInt(settings.value("legendloc",self.qmc.legendloc))
+            if settings.contains("temp_grid"):
+                self.qmc.temp_grid = bool(toBool(settings.value("temp_grid",self.qmc.temp_grid)))
+            if settings.contains("time_grid"):
+                self.qmc.time_grid = bool(toBool(settings.value("time_grid",self.qmc.time_grid)))
             settings.endGroup()
             
             settings.beginGroup("RoastProperties")
@@ -20186,7 +20669,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("machinesetup"):
                 self.qmc.machinesetup = toString(settings.value("machinesetup",self.qmc.machinesetup))
             self.qmc.drumspeed = toString(settings.value("drumspeed",self.qmc.drumspeed))
-            self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2]))
+#            self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2])) # fixed to 1l now
             if settings.contains("beansize"):
                 self.qmc.beansize = toDouble(settings.value("beansize",self.qmc.beansize))
             if settings.contains("beansize_min"):
@@ -20483,7 +20966,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = toInt(settings.value("autosaveflag",self.qmc.autosaveflag))
             if settings.contains("autosavepdf"):
-                self.qmc.autosavepdf = bool(toBool(settings.value("autosavepdf",self.qmc.autosavepdf)))
+                self.qmc.autosaveimage = bool(toBool(settings.value("autosavepdf",self.qmc.autosaveimage)))
+            if settings.contains("autosaveimageformat"):
+                self.qmc.autosaveimageformat = toString(settings.value("autosaveimageformat",self.qmc.autosaveimageformat))
             if settings.contains("autosaveprefix"):
                 self.qmc.autosaveprefix = toString(settings.value("autosaveprefix",self.qmc.autosaveprefix))
             # WebLCDs            
@@ -20635,14 +21120,17 @@ class ApplicationWindow(QMainWindow):
                 if platf != 'Darwin':
                     aw.fullscreenAction.setChecked(True)
             
-            #PLUS-COMMENT
+#PLUS-COMMENT
             if filename is None and not artisanviewerMode and self.plus_account is not None:
                 try:
                     import plus.controller
-                    plus.controller.start(aw)
+                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
                 except:
                     pass
             #aw.updatePlusStatus()
+            
+#            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
+            # but with this one in place, the window size is not properly set (just the position!?)
                             
         except Exception as e:
             res = False
@@ -21024,6 +21512,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Controlbuttonflag",self.qmc.Controlbuttonflag)
             settings.setValue("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)
             settings.setValue("yoctoServerID",self.qmc.yoctoServerID)
+            settings.setValue("YOCTO_emissivity",self.qmc.YOCTO_emissivity)
+            settings.setValue("YOCTO_async",self.qmc.YOCTO_async)
+            settings.setValue("YOCTO_dataRate",self.qmc.YOCTO_dataRate)
             settings.setValue("ambient_temperature_device",self.qmc.ambient_temperature_device)
             settings.setValue("ambient_humidity_device",self.qmc.ambient_humidity_device)
             settings.setValue("ambient_pressure_device",self.qmc.ambient_pressure_device)
@@ -21332,6 +21823,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("patheffects",self.qmc.patheffects)
             settings.setValue("graphstyle",self.qmc.graphstyle)
             settings.setValue("graphfont",self.qmc.graphfont)
+            settings.setValue("ETname", self.ETname)
+            settings.setValue("BTname", self.BTname)
             settings.endGroup()
             settings.beginGroup("Sound")
             settings.setValue("Beep",self.soundflag)
@@ -21351,13 +21844,15 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("locktimex_end",self.qmc.locktimex_end)
             settings.setValue("legendloc",self.qmc.legendloc)
             settings.setValue("chargemintime",self.qmc.chargemintime)
+            settings.setValue("temp_grid",self.qmc.temp_grid)
+            settings.setValue("time_grid",self.qmc.time_grid)
             settings.endGroup()
             settings.beginGroup("RoastProperties")
             settings.setValue("drumspeed",self.qmc.drumspeed)
             settings.setValue("operator",self.qmc.operator)
             settings.setValue("roastertype",self.qmc.roastertype)
             settings.setValue("machinesetup",self.qmc.machinesetup)
-            settings.setValue("densitySampleVolume",self.qmc.density[2])
+#            settings.setValue("densitySampleVolume",self.qmc.density[2]) # fixed to 1l now
             settings.setValue("beansize",self.qmc.beansize)
             settings.setValue("beansize_min",self.qmc.beansize_min)
             settings.setValue("beansize_max",self.qmc.beansize_max)
@@ -21501,7 +21996,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("BTBflag",aw.qmc.backgroundBTcurve)
             settings.endGroup()
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
-            settings.setValue("autosavepdf",self.qmc.autosavepdf)
+            settings.setValue("autosavepdf",self.qmc.autosaveimage)
+            settings.setValue("autosaveimageformat",self.qmc.autosaveimageformat)
             settings.setValue("autosaveprefix",self.qmc.autosaveprefix)
             settings.beginGroup("WebLCDs")
             settings.setValue("active",self.WebLCDs)
@@ -21764,6 +22260,8 @@ class ApplicationWindow(QMainWindow):
                 painter.drawPixmap(0,0,image)
             else:
                 painter.drawImage(0, 0, image)
+            painter.end()
+            del painter
                 
     # takes a production data generated by profileProductionData(profile) and extracts the following as keyed string values in a dict:
     #  . "id"
@@ -23422,13 +23920,21 @@ class ApplicationWindow(QMainWindow):
             for i in range(len(self.qmc.specialevents)):
                 temps = ""
                 if self.qmc.mode == "F":
-                    temps += "%.1fF"%self.qmc.temp2[sevents[i][0]] + " / " + "%.1fF"%self.qmc.temp1[sevents[i][0]]
+                    formatString = "%.1fF"
                 else:
-                    temps += "%.1f&deg;C"%self.qmc.temp2[sevents[i][0]] + " / " "%.1f&deg;C"%self.qmc.temp1[sevents[i][0]]
+                    formatString = "%.1f&deg;C"
+                if self.qmc.temp1[sevents[i][0]] == -1 and self.qmc.temp2[sevents[i][0]] == -1:
+                    temps += " -- "
+                elif self.qmc.temp1[sevents[i][0]] == -1:
+                    temps += formatString%self.qmc.temp2[sevents[i][0]]
+                elif self.qmc.temp2[sevents[i][0]] == -1:
+                    temps += formatString%self.qmc.temp1[sevents[i][0]]
+                else:
+                    temps += formatString%self.qmc.temp2[sevents[i][0]] + " / " + formatString%self.qmc.temp1[sevents[i][0]]
                 html += ("<tr>"+
                      "\n<td>" + str(i+1) + "</td><td>" +
                      self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i][0]] - start)) +
-                     "</td><td>at " + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
+                     "</td><td align='right'>" + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
             html += '</table>\n</center>'
         return u(html)
 
@@ -24054,7 +24560,7 @@ class ApplicationWindow(QMainWindow):
             self.ser.bytesize = int(str(dialog.bytesizeComboBox.currentText()))
             self.ser.stopbits = int(str(dialog.stopbitsComboBox.currentText()))
             self.ser.parity = str(dialog.parityComboBox.currentText())
-            self.ser.timeout = aw.float2float(toFloat(str(dialog.timeoutEdit.text())))
+            self.ser.timeout = aw.float2float(toFloat(aw.comma2dot(str(dialog.timeoutEdit.text()))))
             # set modbus port
             self.modbus.comport = str(dialog.modbus_comportEdit.getSelection())
             self.modbus.baudrate = int(str(dialog.modbus_baudrateComboBox.currentText()))              #int changes QString to int
@@ -24194,7 +24700,7 @@ class ApplicationWindow(QMainWindow):
             self.scale.bytesize = int(str(dialog.scale_bytesizeComboBox.currentText()))
             self.scale.stopbits = int(str(dialog.scale_stopbitsComboBox.currentText()))
             self.scale.parity = str(dialog.scale_parityComboBox.currentText())
-            self.scale.timeout = aw.float2float(toFloat(str(dialog.scale_timeoutEdit.text())))
+            self.scale.timeout = aw.float2float(toFloat(aw.comma2dot(str(dialog.scale_timeoutEdit.text()))))
             # set color port
             self.color.device = str(dialog.color_deviceEdit.currentText())                #unicode() changes QString to a python string
             self.color.comport = str(dialog.color_comportEdit.getSelection())
@@ -24202,7 +24708,7 @@ class ApplicationWindow(QMainWindow):
             self.color.bytesize = int(str(dialog.color_bytesizeComboBox.currentText()))
             self.color.stopbits = int(str(dialog.color_stopbitsComboBox.currentText()))
             self.color.parity = str(dialog.color_parityComboBox.currentText())
-            self.color.timeout = aw.float2float(toFloat(str(dialog.color_timeoutEdit.text())))
+            self.color.timeout = aw.float2float(toFloat(aw.comma2dot(str(dialog.color_timeoutEdit.text()))))
             dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
 
     def toggleHottopControl(self):
@@ -24222,7 +24728,9 @@ class ApplicationWindow(QMainWindow):
     
     def HottopControlOn(self):
         if aw.superusermode: # Hottop control mode can for now activated only in super user mode
-            from artisanlib.hottop import takeHottopControl, setHottop
+            from artisanlib.hottop import takeHottopControl, setHottop, startHottop, isHottopLoopRunning
+            if not isHottopLoopRunning():
+                startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             res = takeHottopControl()
             if res:
                 setHottop(drum_motor=True)
@@ -25392,17 +25900,35 @@ class ApplicationWindow(QMainWindow):
             self.profilepath = monthpath
 
     #resizes and saves graph to a new width w 
-    def resizeImg(self,w,transformationmode):
-        try:                
-            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None),ext="*.png")
+    def resizeImg(self,w,transformationmode,filetype="PNG",fname=""):
+        try:
+            fileext = ".png"
+            if filetype == "JPEG":
+                fileext = ".jpg"
+            elif filetype == "BMP":
+                fileext = ".bmp"
+            if fname == "" or fname is None:
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as", None) + filetype,ext="*"+fileext)
+            else:
+                filename = fname
             if filename:                
                 self.image = aw.qmc.grab()                
                 if w != 0:
                     self.image = self.image.scaledToWidth(w,transformationmode)
                 
-                if ".png" not in filename:
-                    filename += ".png"
-                self.image.save(filename,"PNG")
+                if not filename.endswith(fileext):
+                    filename += fileext
+                    
+                if filetype in ["JPEG","BMP"]:
+                    # transparences are not supported by those file types and are rendered in black by default.
+                    white_img = QPixmap(self.image.size())
+                    white_img.fill() # fills by default with Qt.white
+                    painter = QPainter(white_img)
+                    painter.drawPixmap(0,0,self.image.width(),self.image.height(),self.image)
+                    self.image = white_img
+                    painter.end()
+                    del painter
+                self.image.save(filename,filetype)
                 
                 x = self.image.width()
                 y = self.image.height()
@@ -26089,7 +26615,18 @@ class SamplingDlg(ArtisanDialog):
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
+        cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.ok()) 
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         
         flagLayout = QHBoxLayout()
         flagLayout.addStretch()
@@ -26107,7 +26644,8 @@ class SamplingDlg(ArtisanDialog):
         layout.addStretch()
         layout.addLayout(buttonsLayout)
         layout.setSizeConstraint(QLayout.SetFixedSize)
-        self.setLayout(layout)         
+        self.setLayout(layout) 
+        okButton.setFocus()        
         
     def closeEvent(self,_):
         self.close()
@@ -26292,7 +26830,18 @@ class HUDDlg(ArtisanDialog):
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
+        cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.updatetargets())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         hudLayout = QGridLayout()
         hudLayout.addWidget(BTLabel,0,0)
         hudLayout.addWidget(self.BTlineEdit,0,1)
@@ -26878,10 +27427,27 @@ class HUDDlg(ArtisanDialog):
         WebLCDsLayoutVLayout.addLayout(WebLCDsLayoutHLayout)
         WebLCDsGroupWidget = QGroupBox(QApplication.translate("GroupBox","WebLCDs",None))
         WebLCDsGroupWidget.setLayout(WebLCDsLayoutVLayout)
+
+        # Renaming BT and ET
+        self.renameETLabel = QLabel(QApplication.translate("Label", "ET", None))
+        self.renameETLine = QLineEdit(aw.ETname)
+        self.renameETLine.editingFinished.connect(lambda :self.renameET())
+        self.renameBTLabel = QLabel(QApplication.translate("Label", "BT", None))
+        self.renameBTLine = QLineEdit(aw.BTname)
+        self.renameBTLine.editingFinished.connect(lambda :self.renameBT())
+        renameLayout = QHBoxLayout()
+        renameLayout.addWidget(self.renameETLabel)
+        renameLayout.addWidget(self.renameETLine)
+        renameLayout.addStretch()
+        renameLayout.addWidget(self.renameBTLabel)
+        renameLayout.addWidget(self.renameBTLine)
+        renameGroupWidget = QGroupBox(QApplication.translate("GroupBox", "Rename ET and BT",None))
+        renameGroupWidget.setLayout(renameLayout)
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(appearanceGroupWidget)
         tab5Layout.addWidget(resolutionGroupWidget)
         tab5Layout.addWidget(WebLCDsGroupWidget)
+        tab5Layout.addWidget(renameGroupWidget)
         tab5Layout.addStretch()
 
         ############################  TABS LAYOUT
@@ -26931,7 +27497,22 @@ class HUDDlg(ArtisanDialog):
         self.polyfitdeg.valueChanged.connect(lambda _:self.polyfitcurveschanged(3))
         self.c1ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(4))
         self.c2ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(5))      
-            
+        okButton.setFocus()
+
+    def renameBT(self):
+        aw.BTname = str(self.renameBTLine.text()).strip()
+        if aw.BTname == "":
+            aw.BTname = "BT"
+        aw.label3.setText("<big><b>" + u(QApplication.translate("Label", aw.BTname,None)) + "</b></big>")
+        aw.label5.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", aw.BTname,None)) + "</b></big>")
+
+    def renameET(self):
+        aw.ETname = str(self.renameETLine.text()).strip()
+        if aw.ETname == "":
+            aw.ETname = "ET"
+        aw.label2.setText("<big><b>" + u(QApplication.translate("Label", aw.ETname,None)) + "</b></big>")
+        aw.label4.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", aw.ETname,None)) + "</b></big>")
+
     def toggleWebLCDsAlerts(self):
         aw.WebLCDsAlerts = not aw.WebLCDsAlerts
         
@@ -27225,7 +27806,11 @@ class HUDDlg(ArtisanDialog):
                     fsize = int(annvars[3])
                 except:
                     pass
-                aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
+                anno = aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
+                try:
+                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                except: # mpl before v3.0 do not have this set_in_layout() function
+                    pass
             else:
                 aw.qmc.plottermessage = QApplication.translate("Error Message","Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None)
         except Exception as e:
@@ -27863,8 +28448,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         
         # Unit Group
         unitvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit", None)) + "</b>")
-        self.unitvolumeEdit = QLineEdit(str(aw.qmc.volumeCalcUnit))
-        self.unitvolumeEdit.setValidator(QIntValidator(0, 9999,self.unitvolumeEdit))
+        self.unitvolumeEdit = QLineEdit("%g" % aw.qmc.volumeCalcUnit)
+        self.unitvolumeEdit.setValidator(QIntValidator(0, 99999,self.unitvolumeEdit))
         self.unitvolumeEdit.setMinimumWidth(70)
         self.unitvolumeEdit.setMaximumWidth(70)
         self.unitvolumeEdit.setAlignment(Qt.AlignRight)
@@ -27897,12 +28482,16 @@ class volumeCalculatorDlg(ArtisanDialog):
         coffeeinweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Weight", None)) + "</b>")
         self.coffeeinweight = QLineEdit()
         if self.weightIn:
-            self.coffeeinweight.setText(str(aw.float2float(self.weightIn)))
+            self.coffeeinweight.setText("%g" % aw.float2floatWeightVolume(self.weightIn))
         self.coffeeinweight.setMinimumWidth(70)
         self.coffeeinweight.setMaximumWidth(70)
         self.coffeeinweight.setAlignment(Qt.AlignRight)
         self.coffeeinweight.setReadOnly(True)
         self.coffeeinweight.setFocusPolicy(Qt.NoFocus)
+        if sys.platform.startswith("darwin"):
+            self.coffeeinweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+        else:
+            self.coffeeinweight.setStyleSheet("background-color:'lightgrey'")
         coffeeinweightUnit = QLabel(aw.qmc.weight_units[weightunit])
         
         coffeeinvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None)) + "</b>")
@@ -27948,7 +28537,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         if self.scale_connected:
             volumeInVLayout.addLayout(inButtonLayout)
         
-        volumeInGroupLayout = QGroupBox(QApplication.translate("Label","in", None))
+        volumeInGroupLayout = QGroupBox(QApplication.translate("Label","Green", None))
         volumeInGroupLayout.setLayout(volumeInVLayout)
         if weightIn is None:
             volumeInGroupLayout.setDisabled(True)
@@ -27966,11 +28555,15 @@ class volumeCalculatorDlg(ArtisanDialog):
         coffeeoutweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Weight", None)) + "</b>")
         self.coffeeoutweight = QLineEdit()
         if self.weightOut:
-            self.coffeeoutweight.setText(str(aw.float2float(self.weightOut)))        
+            self.coffeeoutweight.setText("%g" % aw.float2floatWeightVolume(self.weightOut))
         self.coffeeoutweight.setMinimumWidth(60)
         self.coffeeoutweight.setMaximumWidth(60)
         self.coffeeoutweight.setAlignment(Qt.AlignRight)
         self.coffeeoutweight.setReadOnly(True)
+        if sys.platform.startswith("darwin"):
+            self.coffeeoutweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+        else:
+            self.coffeeoutweight.setStyleSheet("background-color:'lightgrey'")
         self.coffeeoutweight.setFocusPolicy(Qt.NoFocus)
         coffeeoutweightUnit = QLabel(aw.qmc.weight_units[weightunit])
 
@@ -28017,7 +28610,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         if self.scale_connected:
             volumeOutVLayout.addLayout(outButtonLayout)
         
-        volumeOutGroupLayout = QGroupBox(QApplication.translate("Label","out", None))
+        volumeOutGroupLayout = QGroupBox(QApplication.translate("Label","Roasted", None))
         volumeOutGroupLayout.setLayout(volumeOutVLayout)
         if weightOut is None:
             volumeOutGroupLayout.setDisabled(True)
@@ -28029,10 +28622,23 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.unitvolumeEdit.editingFinished.connect(self.resetVolume)
 
         okButton = QPushButton(QApplication.translate("Button","OK",None))
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
+        cancelButton.setFocusPolicy(Qt.StrongFocus)
+        cancelButton.setAutoDefault(False)
         cancelButton.clicked.connect(lambda _:self.close())
         okButton.clicked.connect(lambda _:self.updateVolumes())
+        # add standard Mac OS X shortcut CMD-. to close this dialog
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
+        
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -28062,11 +28668,11 @@ class volumeCalculatorDlg(ArtisanDialog):
                     
     def widgetWeight(self,widget):
         if widget.text() != "":
-            c = widget.text().toFloat()[0]
+            c = float(widget.text())
         else:
             c = 0.
-        v = aw.float2float(self.retrieveWeight(c))
-        widget.setText(str(v))
+        v = aw.float2floatWeightVolume(self.retrieveWeight(c))
+        widget.setText("%g" % v)
         
     def unitWeight(self):
         self.widgetWeight(self.unitvolumeEdit)
@@ -28099,8 +28705,8 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeinvolume.setText("")
                 self.inVolume = None
             else:
-                self.inVolume = aw.convertVolume(aw.convertWeight(self.weightIn,self.weightunit,0) * float(str(self.unitvolumeEdit.text())) / float(str(self.coffeeinweightEdit.text())),5,self.volumeunit)
-                self.coffeeinvolume.setText(str(aw.float2float(self.inVolume)))
+                self.inVolume = aw.convertVolume(aw.convertWeight(self.weightIn,self.weightunit,0) * float(aw.comma2dot(str(self.unitvolumeEdit.text()))) / float(aw.comma2dot(str(self.coffeeinweightEdit.text()))),5,self.volumeunit)
+                self.coffeeinvolume.setText("%g" % aw.float2floatWeightVolume(self.inVolume))
         except Exception:
             pass
 
@@ -28111,30 +28717,30 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeoutvolume.setText("")
                 self.outVolume = None
             else:
-                self.outVolume = aw.convertVolume(aw.convertWeight(self.weightOut,self.weightunit,0) * float(str(self.unitvolumeEdit.text())) / float(str(self.coffeeoutweightEdit.text())),5,self.volumeunit)
-                self.coffeeoutvolume.setText(str(aw.float2float(self.outVolume)))
+                self.outVolume = aw.convertVolume(aw.convertWeight(self.weightOut,self.weightunit,0) * float(aw.comma2dot(str(self.unitvolumeEdit.text()))) / float(aw.comma2dot(str(self.coffeeoutweightEdit.text()))),5,self.volumeunit)
+                self.coffeeoutvolume.setText("%g" % aw.float2floatWeightVolume(self.outVolume))
         except Exception:
             pass
 
     def updateVolumes(self):
         if self.inVolume and self.inVolume != "":
             if self.volumeunit == 0:
-                self.inlineedit.setText(str(aw.float2float(self.inVolume,4)))
+                self.inlineedit.setText("%g" % aw.float2floatWeightVolume(self.inVolume))
             else:
-                self.inlineedit.setText(str(aw.float2float(self.inVolume)))
+                self.inlineedit.setText("%g" % aw.float2floatWeightVolume(self.inVolume))
         if self.outVolume and self.outVolume != "":
             if self.volumeunit == 0:
-                self.outlineedit.setText(str(aw.float2float(self.outVolume,4)))
+                self.outlineedit.setText("%g" % aw.float2floatWeightVolume(self.outVolume))
             else:
-                self.outlineedit.setText(str(aw.float2float(self.outVolume)))
+                self.outlineedit.setText("%g" % aw.float2floatWeightVolume(self.outVolume))
         self.parent_dialog.volume_percent()
         self.closeEvent(None)
         
     def closeEvent(self,_):
         if self.unitvolumeEdit.text() and self.unitvolumeEdit.text() != "":
             aw.qmc.volumeCalcUnit = int(round(float(self.unitvolumeEdit.text())))
-            aw.qmc.volumeCalcWeightInStr = str(self.coffeeinweightEdit.text())
-            aw.qmc.volumeCalcWeightOutStr = str(self.coffeeoutweightEdit.text())
+            aw.qmc.volumeCalcWeightInStr = aw.comma2dot(str(self.coffeeinweightEdit.text()))
+            aw.qmc.volumeCalcWeightOutStr = aw.comma2dot(str(self.coffeeoutweightEdit.text()))
             self.parent_dialog.calculated_density()
         self.accept()
 
@@ -28554,14 +29160,12 @@ class editGraphDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))        
-
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))  
+        
         # we remember user modifications to revert to them on deselecting a plus element
         self.modified_beans = aw.qmc.beans
-        self.modified_density_weight_text = str(aw.qmc.density[0])
-        self.modified_density_weight_unit_idx = aw.qmc.weight_units.index(aw.qmc.density[1])
-        self.modified_density_volume_text = str(aw.qmc.density[2])
-        self.modified_density_volume_unit_idx = aw.qmc.volume_units.index(aw.qmc.density[3])
+        self.modified_density_in_text = str(aw.float2float(aw.qmc.density[0]))
+        self.modified_volume_in_text = str(aw.float2float(aw.qmc.volume[0]))
         self.modified_beansize_min_text = str(aw.qmc.beansize_min)
         self.modified_beansize_max_text = str(aw.qmc.beansize_max)
         self.modified_moisture_greens_text = str(aw.qmc.moisture_greens)
@@ -28569,9 +29173,13 @@ class editGraphDlg(ArtisanDialog):
         # remember parameters set by plus_coffee/plus_blend on entering the dialog to enable a Cancel action
         self.org_beans = aw.qmc.beans
         self.org_density = aw.qmc.density
+        self.org_density_roasted = aw.qmc.density_roasted
         self.org_beansize_min = aw.qmc.beansize_min
         self.org_beansize_max = aw.qmc.beansize_max
         self.org_moisture_greens = aw.qmc.moisture_greens
+        
+        self.org_weight = aw.qmc.weight[:]
+        self.org_volume = aw.qmc.volume[:]
         
         # other parameters remembered for Cancel operation        
         self.org_specialevents = aw.qmc.specialevents
@@ -28596,6 +29204,7 @@ class editGraphDlg(ArtisanDialog):
         chargelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         chargelabel.setStyleSheet("background-color:'#f07800';")
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
+        self.chargeedit.setFocusPolicy(Qt.NoFocus)
         self.chargeedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.chargeeditcopy = aw.qmc.stringfromseconds(0)
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
@@ -28624,7 +29233,7 @@ class editGraphDlg(ArtisanDialog):
                 charge_str = aw.qmc.stringfromseconds(time_diff)
             if self.drop_idx != 0 and self.drop_idx != aw.qmc.timeindex[6]:
                 drop_str = aw.qmc.stringfromseconds(int(aw.qmc.timex[self.drop_idx]-aw.qmc.timex[aw.qmc.timeindex[0]]))
-        self.chargeestimate = QLabel(charge_str)
+#        self.chargeestimate = QLabel(charge_str)
         drylabel = QLabel("<b>" + u(QApplication.translate("Label", "DRY END",None)) + "</b>")
         drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
@@ -28633,6 +29242,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t2 = 0
         self.dryedit = QLineEdit(aw.qmc.stringfromseconds(t2))
+        self.dryedit.setFocusPolicy(Qt.NoFocus)
         self.dryedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dryeditcopy = aw.qmc.stringfromseconds(t2)
         self.dryedit.setValidator(QRegExpValidator(regextime,self))
@@ -28647,6 +29257,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t3 = 0
         self.Cstartedit = QLineEdit(aw.qmc.stringfromseconds(t3))
+        self.Cstartedit.setFocusPolicy(Qt.NoFocus)
         self.Cstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cstarteditcopy = aw.qmc.stringfromseconds(t3)
         self.Cstartedit.setValidator(QRegExpValidator(regextime,self))
@@ -28662,6 +29273,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t4 = 0
         self.Cendedit = QLineEdit(aw.qmc.stringfromseconds(t4))
+        self.Cendedit.setFocusPolicy(Qt.NoFocus)
         self.Cendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cendeditcopy = aw.qmc.stringfromseconds(t4)
         self.Cendedit.setValidator(QRegExpValidator(regextime,self))
@@ -28676,6 +29288,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t5 = 0
         self.CCstartedit = QLineEdit(aw.qmc.stringfromseconds(t5))
+        self.CCstartedit.setFocusPolicy(Qt.NoFocus)
         self.CCstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCstarteditcopy = aw.qmc.stringfromseconds(t5)
         self.CCstartedit.setValidator(QRegExpValidator(regextime,self))
@@ -28690,6 +29303,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t6 = 0
         self.CCendedit = QLineEdit(aw.qmc.stringfromseconds(t6))
+        self.CCendedit.setFocusPolicy(Qt.NoFocus)
         self.CCendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCendeditcopy = aw.qmc.stringfromseconds(t6)
         self.CCendedit.setValidator(QRegExpValidator(regextime,self))
@@ -28704,6 +29318,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t7 = 0
         self.dropedit = QLineEdit(aw.qmc.stringfromseconds(t7))
+        self.dropedit.setFocusPolicy(Qt.NoFocus)
         self.dropedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dropeditcopy = aw.qmc.stringfromseconds(t7)
         self.dropedit.setValidator(QRegExpValidator(regextime,self))
@@ -28719,6 +29334,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t8 = 0
         self.cooledit = QLineEdit(aw.qmc.stringfromseconds(t8))
+        self.cooledit.setFocusPolicy(Qt.NoFocus)
         self.cooledit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.cooleditcopy = aw.qmc.stringfromseconds(t8)
         self.cooledit.setValidator(QRegExpValidator(regextime,self))
@@ -28735,7 +29351,6 @@ class editGraphDlg(ArtisanDialog):
         #table for showing events
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
-#        self.createEventTable() # now called on tab switch
         self.clusterEventsButton = QPushButton(QApplication.translate("Button", "Cluster",None))
         self.clusterEventsButton.setFocusPolicy(Qt.NoFocus)
         self.clusterEventsButton.setMaximumSize(self.clusterEventsButton.sizeHint())
@@ -28774,7 +29389,8 @@ class editGraphDlg(ArtisanDialog):
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
         self.titleedit = RoastsComboBox(selection = aw.qmc.title)
-        self.titleedit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.titleedit.setMinimumWidth(100)
+        self.titleedit.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed)
         self.titleedit.activated.connect(self.recentRoastActivated)
         self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
         self.titleedit.setStyleSheet(
@@ -28788,8 +29404,12 @@ class editGraphDlg(ArtisanDialog):
         date = aw.qmc.roastdate.date().toString()
         date += ", " + u(aw.qmc.roastdate.time().toString()[:-3])
         dateedit = QLineEdit(date)
+        dateedit.setFocusPolicy(Qt.NoFocus)
         dateedit.setReadOnly(True)
-        dateedit.setStyleSheet("background-color:'lightgrey'")
+        if sys.platform.startswith("darwin"):
+            dateedit.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+        else:
+            dateedit.setStyleSheet("background-color:'lightgrey'")
         #Batch
         batchlabel = QLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
         if aw.superusermode and aw.qmc.batchcounter > -1:
@@ -28820,7 +29440,11 @@ class editGraphDlg(ArtisanDialog):
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + roastpos + u(" ")
             batchedit = QLineEdit(batch)
             batchedit.setReadOnly(True)
-            batchedit.setStyleSheet("background-color:'lightgrey'")
+            if sys.platform.startswith("darwin"):
+                batchedit.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+            else:
+                batchedit.setStyleSheet("background-color:'lightgrey'")
+            batchedit.setFocusPolicy(Qt.NoFocus)
             
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
@@ -28841,29 +29465,30 @@ class editGraphDlg(ArtisanDialog):
         self.drumspeed.setAlignment(Qt.AlignCenter)
         #weight
         weightlabel = QLabel("<b>" + u(QApplication.translate("Label", "Weight",None)) + "</b>")
-        weightinlabel = QLabel(QApplication.translate("Label", " in",None))
-        weightoutlabel = QLabel(QApplication.translate("Label", " out",None))
-        inw = str(aw.qmc.weight[0])
-        outw = str(aw.qmc.weight[1])
+        green_label = QLabel("<b>" + QApplication.translate("Label", "Green",None) + "</b>")
+        roasted_label = QLabel("<b>" + QApplication.translate("Label", "Roasted",None) + "</b>")
+        inw = "%g" % aw.float2floatWeightVolume(aw.qmc.weight[0])
+        outw = "%g" % aw.float2floatWeightVolume(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
-        self.weightinedit.setValidator(QDoubleValidator(0., 999999., 5, self.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
+        self.weightinedit.setValidator(aw.createCLocaleDoubleValidator(0., 9999999., 4, self.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightinedit.setMinimumWidth(70)
         self.weightinedit.setMaximumWidth(70)
         self.weightinedit.setAlignment(Qt.AlignRight)
         self.weightoutedit = QLineEdit(outw)
-        self.weightoutedit.setValidator(QDoubleValidator(0., 999999., 5, self.weightoutedit))  # the max limit has to be high enough otherwise the connected signals are not send!
+        self.weightoutedit.setValidator(aw.createCLocaleDoubleValidator(0., 9999999., 4, self.weightoutedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightoutedit.setMinimumWidth(70)
         self.weightoutedit.setMaximumWidth(70)
         self.weightoutedit.setAlignment(Qt.AlignRight)
-        self.weightpercentlabel = QLabel(QApplication.translate("Label", " %",None))
-        self.weightpercentlabel.setMinimumWidth(45)
-        self.weightpercentlabel.setMaximumWidth(45)
+        self.weightpercentlabel = QLabel(QApplication.translate("Label", "",None))
+        self.weightpercentlabel.setMinimumWidth(55)
+        self.weightpercentlabel.setMaximumWidth(55)
+        self.weightpercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.roastdegreelabel = QLabel("")
         self.roastdegreelabel.setMinimumWidth(80)
         self.roastdegreelabel.setMaximumWidth(80)
         self.percent()
-        self.weightoutedit.editingFinished.connect(self.weightouteditChanged)
         self.weightinedit.editingFinished.connect(self.weightineditChanged)
+        self.weightoutedit.editingFinished.connect(self.weightouteditChanged)
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
@@ -28872,23 +29497,22 @@ class editGraphDlg(ArtisanDialog):
         self.unitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeWeightUnit(i))
         #volume
         volumelabel = QLabel("<b>" + u(QApplication.translate("Label", "Volume",None)) + "</b>")
-        volumeinlabel = QLabel(QApplication.translate("Label", " in",None))
-        volumeoutlabel = QLabel(QApplication.translate("Label", " out",None))
-        inv = str(aw.qmc.volume[0])
-        outv = str(aw.qmc.volume[1])
+        inv = "%g" %  aw.float2floatWeightVolume(aw.qmc.volume[0])
+        outv = "%g" % aw.float2floatWeightVolume(aw.qmc.volume[1])
         self.volumeinedit = QLineEdit(inv)
-        self.volumeinedit.setValidator(QDoubleValidator(0., 99999., 5, self.volumeinedit)) # the max limit has to be high enough otherwise the connected signals are not send!
+        self.volumeinedit.setValidator(aw.createCLocaleDoubleValidator(0., 999999., 4, self.volumeinedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeinedit.setMinimumWidth(70)
         self.volumeinedit.setMaximumWidth(70)
         self.volumeinedit.setAlignment(Qt.AlignRight)
         self.volumeoutedit = QLineEdit(outv)
-        self.volumeoutedit.setValidator(QDoubleValidator(0., 99999., 5, self.volumeoutedit)) # the max limit has to be high enough otherwise the connected signals are not send!
+        self.volumeoutedit.setValidator(aw.createCLocaleDoubleValidator(0., 999999., 4, self.volumeoutedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeoutedit.setMinimumWidth(70)
         self.volumeoutedit.setMaximumWidth(70)
         self.volumeoutedit.setAlignment(Qt.AlignRight)
         self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None))
-        self.volumepercentlabel.setMinimumWidth(45)
-        self.volumepercentlabel.setMaximumWidth(45)
+        self.volumepercentlabel.setMinimumWidth(55)
+        self.volumepercentlabel.setMaximumWidth(55)
+        self.volumepercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.volumeoutedit.editingFinished.connect(self.volume_percent)
         self.volumeinedit.editingFinished.connect(self.volume_percent)
         self.volumeUnitsComboBox = QComboBox()
@@ -28897,38 +29521,31 @@ class editGraphDlg(ArtisanDialog):
         self.volumeUnitsComboBox.addItems(aw.qmc.volume_units)
         self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(aw.qmc.volume[2]))
         self.volumeUnitsComboBox.currentIndexChanged.connect(lambda i=self.volumeUnitsComboBox.currentIndex() :self.changeVolumeUnit(i))
-        self.calculateddensitylabel = QLabel("")
         self.unitsComboBox.currentIndexChanged.connect(self.calculated_density)
         #density
         bean_density_label = QLabel("<b>" + u(QApplication.translate("Label", "Density",None)) + "</b>")
-        self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
-        self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 99999., 5,self.bean_density_weight_edit))
-        self.bean_density_weight_edit.setMinimumWidth(60)
-        self.bean_density_weight_edit.setMaximumWidth(60)
-        self.bean_density_weight_edit.setAlignment(Qt.AlignRight)
-        self.bean_density_weightUnitsComboBox = QComboBox()
-        self.bean_density_weightUnitsComboBox.setMaximumWidth(60)
-        self.bean_density_weightUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_weightUnitsComboBox.addItems(aw.qmc.weight_units)
-        self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(aw.qmc.density[1]))
-        bean_density_per_label = QLabel(QApplication.translate("Label", "per",None))
-        self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
-        self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 99999., 5,self.bean_density_volume_edit))
-        self.bean_density_volume_edit.setMinimumWidth(60)
-        self.bean_density_volume_edit.setMaximumWidth(60)
-        self.bean_density_volume_edit.setAlignment(Qt.AlignRight)
-        self.bean_density_volumeUnitsComboBox = QComboBox()
-        self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
-        self.bean_density_volumeUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_volumeUnitsComboBox.addItems(aw.qmc.volume_units)
-        self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(aw.qmc.density[3]))
-        self.standarddensitylabel = QLabel("")
-        self.standarddensitylabel.setMinimumWidth(50)
-        self.standard_density()
-        self.bean_density_volume_edit.editingFinished.connect(self.density_volume_editing_finished)
-        self.bean_density_weight_edit.editingFinished.connect(self.density_weight_editing_finished)
-        self.bean_density_weightUnitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeDensityWeightUnit(i))
-        self.bean_density_volumeUnitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeDensityVolumeUnit(i))
+        density_unit_label = QLabel("g/l")
+        self.bean_density_in_edit = QLineEdit("%g" % aw.float2float(aw.qmc.density[0]))
+        self.bean_density_in_edit.setValidator(aw.createCLocaleDoubleValidator(0., 999999., 1,self.bean_density_in_edit))
+        self.bean_density_in_edit.setMinimumWidth(70)
+        self.bean_density_in_edit.setMaximumWidth(70)
+        self.bean_density_in_edit.setAlignment(Qt.AlignRight)
+        self.bean_density_out_edit = QLineEdit("%g" % aw.float2float(aw.qmc.density_roasted[0]))
+        self.bean_density_out_edit.setValidator(aw.createCLocaleDoubleValidator(0., 999999., 1,self.bean_density_out_edit))
+        self.bean_density_out_edit.setMinimumWidth(70)
+        self.bean_density_out_edit.setMaximumWidth(70)
+        self.bean_density_out_edit.setAlignment(Qt.AlignRight)
+        self.bean_density_in_edit.editingFinished.connect(self.density_in_editing_finished)
+        self.bean_density_out_edit.editingFinished.connect(self.density_out_editing_finished)
+        self.densitypercentlabel = QLabel(QApplication.translate("Label", "",None))
+        self.densitypercentlabel.setMinimumWidth(55)
+        self.densitypercentlabel.setMaximumWidth(55)
+        self.densitypercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        
+        self.organicpercentlabel = QLabel(QApplication.translate("Label", "",None))
+        self.organicpercentlabel.setMinimumWidth(55)
+        self.organicpercentlabel.setMaximumWidth(55)
+        self.organicpercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         # volume calc button
         volumeCalcButton = QPushButton(QApplication.translate("Button", "calc",None))
@@ -28940,36 +29557,43 @@ class editGraphDlg(ArtisanDialog):
         self.addRecentButton = QPushButton("+")
         self.addRecentButton.clicked.connect(lambda _:self.addRecentRoast())
         self.addRecentButton.setFocusPolicy(Qt.NoFocus)
+        
+        # delete from recent
+        self.delRecentButton = QPushButton("-")
+        self.delRecentButton.clicked.connect(lambda _:self.delRecentRoast())
+        self.delRecentButton.setFocusPolicy(Qt.NoFocus)
+
         self.recentRoastEnabled()
         
         #bean size
         bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Screen",None)) + "</b>")
         self.bean_size_min_edit = QLineEdit(str(int(round(aw.qmc.beansize_min))))
         self.bean_size_min_edit.editingFinished.connect(self.beanSizeMinEdited)
-        self.bean_size_min_edit.setValidator(QIntValidator(0,25,self.bean_size_min_edit))
+        self.bean_size_min_edit.setValidator(QIntValidator(0,50,self.bean_size_min_edit))
         self.bean_size_min_edit.setMinimumWidth(25)
         self.bean_size_min_edit.setMaximumWidth(25)
         self.bean_size_min_edit.setAlignment(Qt.AlignRight)
         bean_size_sep_label = QLabel("/")
         self.bean_size_max_edit = QLineEdit(str(int(round(aw.qmc.beansize_max))))
         self.bean_size_max_edit.editingFinished.connect(self.beanSizeMaxEdited)
-        self.bean_size_max_edit.setValidator(QIntValidator(0,25,self.bean_size_max_edit))
+        self.bean_size_max_edit.setValidator(QIntValidator(0,50,self.bean_size_max_edit))
         self.bean_size_max_edit.setMinimumWidth(25)
         self.bean_size_max_edit.setMaximumWidth(25)
         self.bean_size_max_edit.setAlignment(Qt.AlignRight)
         bean_size_unit_label = QLabel(QApplication.translate("Label", "18/64\u2033",None))
         #bean color
-        whole_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Whole Color",None)) + "</b>")
+        color_label = QLabel("<b>" + u(QApplication.translate("Label", "Color",None)) + "</b>")
+        whole_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Whole",None)) + "</b>")
         self.whole_color_edit = QLineEdit(str(aw.qmc.whole_color))
         self.whole_color_edit.setValidator(QIntValidator(0, 1000, self.whole_color_edit))
-        self.whole_color_edit.setMinimumWidth(45)
-        self.whole_color_edit.setMaximumWidth(45)
+        self.whole_color_edit.setMinimumWidth(70)
+        self.whole_color_edit.setMaximumWidth(70)
         self.whole_color_edit.setAlignment(Qt.AlignRight)
-        ground_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Ground Color",None)) + "</b>")
+        ground_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Ground",None)) + "</b>")
         self.ground_color_edit = QLineEdit(str(aw.qmc.ground_color))
         self.ground_color_edit.setValidator(QIntValidator(0, 1000, self.ground_color_edit))
-        self.ground_color_edit.setMinimumWidth(45)
-        self.ground_color_edit.setMaximumWidth(45)
+        self.ground_color_edit.setMinimumWidth(70)
+        self.ground_color_edit.setMaximumWidth(70)
         self.ground_color_edit.setAlignment(Qt.AlignRight)
         self.bean_size_min_edit.setAlignment(Qt.AlignRight)
         self.bean_size_max_edit.setAlignment(Qt.AlignRight)
@@ -28980,62 +29604,67 @@ class editGraphDlg(ArtisanDialog):
         greens_temp_label = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
         greens_temp_unit_label = QLabel(aw.qmc.mode)
         self.greens_temp_edit = QLineEdit()
-        self.greens_temp_edit.setText(str(aw.qmc.greens_temp))
-        self.greens_temp_edit.setMaximumWidth(50)
-        self.greens_temp_edit.setValidator(QDoubleValidator(0., 100., 2, self.greens_temp_edit))
+        self.greens_temp_edit.setText("%g" % aw.float2float(aw.qmc.greens_temp))
+        self.greens_temp_edit.setMaximumWidth(60)
+        self.greens_temp_edit.setValidator(aw.createCLocaleDoubleValidator(-9999., 999999., 1, self.greens_temp_edit)) # range to 1000 needed to trigger editing_finished on input "12,2"
         self.greens_temp_edit.setAlignment(Qt.AlignRight)
+        self.greens_temp_edit.editingFinished.connect(self.greens_temp_editing_finished)
         greens_temp = QHBoxLayout()
-        greens_temp.addWidget(self.greens_temp_edit)
-        greens_temp.addWidget(greens_temp_unit_label)
         greens_temp.addStretch()        
         #Moisture Greens
-        moisture_greens_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Greens",None)) + "</b>")
+        moisture_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture",None)) + "</b>")
         moisture_greens_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.moisture_greens_edit = QLineEdit()
-        self.moisture_greens_edit.editingFinished.connect(self.moistureGreensEdited)
-        self.moisture_greens_edit.setText(str(aw.qmc.moisture_greens))
-        self.moisture_greens_edit.setMaximumWidth(50)
-        self.moisture_greens_edit.setValidator(QDoubleValidator(0., 100., 2, self.moisture_greens_edit))
+        self.moisture_greens_edit.setText("%g" % aw.float2float(aw.qmc.moisture_greens))
+        self.moisture_greens_edit.setMaximumWidth(70)
+        self.moisture_greens_edit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 1, self.moisture_greens_edit))
         self.moisture_greens_edit.setAlignment(Qt.AlignRight)                
         #Moisture Roasted
         #bag humidity
         moisture_roasted_label = QLabel("<b>" + u(QApplication.translate("Label", "Roasted",None)) + "</b>")
         moisture_roasted_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.moisture_roasted_edit = QLineEdit()
-        self.moisture_roasted_edit.setText(str(aw.qmc.moisture_roasted))
-        self.moisture_roasted_edit.setMaximumWidth(50)
-        self.moisture_roasted_edit.setValidator(QDoubleValidator(0., 100., 2, self.moisture_roasted_edit))
+        self.moisture_roasted_edit.setText("%g" % aw.float2float(aw.qmc.moisture_roasted))
+        self.moisture_roasted_edit.setMaximumWidth(70)
+        self.moisture_roasted_edit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 1, self.moisture_roasted_edit))
         self.moisture_roasted_edit.setAlignment(Qt.AlignRight)
-        self.moisture_greens_edit.editingFinished.connect(self.calculated_organic_loss)        
-        self.moisture_roasted_edit.editingFinished.connect(self.calculated_organic_loss)
+        self.moisturepercentlabel = QLabel(QApplication.translate("Label", "",None))
+        self.moisturepercentlabel.setMinimumWidth(55)
+        self.moisturepercentlabel.setMaximumWidth(55)
+        self.moisturepercentlabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.moisture_greens_edit.editingFinished.connect(self.moistureEdited)
+        self.moisture_roasted_edit.editingFinished.connect(self.moistureEdited)
+
         moisture_roasted = QHBoxLayout()
         moisture_roasted.addWidget(moisture_roasted_label)
-        moisture_roasted.addWidget(self.moisture_roasted_edit)
         moisture_roasted.addWidget(moisture_roasted_unit_label)
         moisture_roasted.addStretch()
         #Ambient temperature (uses display mode as unit (F or C)
         ambientlabel = QLabel("<b>" + u(QApplication.translate("Label", "Ambient Conditions",None)) + "</b>")
-        ambientunitslabel = QLabel(aw.qmc.mode)
+        ambientunitslabel = QLabel(" " + aw.qmc.mode)
         ambient_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.ambient_humidity_edit = QLineEdit()
-        self.ambient_humidity_edit.setText(str(aw.qmc.ambient_humidity))
+        self.ambient_humidity_edit.setText("%g" % aw.float2float(aw.qmc.ambient_humidity))
         self.ambient_humidity_edit.setMinimumWidth(50)
         self.ambient_humidity_edit.setMaximumWidth(50)
-        self.ambient_humidity_edit.setValidator(QDoubleValidator(0., 100., 2, self.ambient_humidity_edit))  
-        self.ambient_humidity_edit.setAlignment(Qt.AlignRight) 
+        self.ambient_humidity_edit.setValidator(aw.createCLocaleDoubleValidator(0., 9999999., 1, self.ambient_humidity_edit))  
+        self.ambient_humidity_edit.setAlignment(Qt.AlignRight)
+        self.ambient_humidity_edit.editingFinished.connect(self.ambient_humidity_editing_finished)
         self.ambientedit = QLineEdit()
-        self.ambientedit.setText(str(aw.qmc.ambientTemp))
-        self.ambientedit.setMinimumWidth(40)
-        self.ambientedit.setMaximumWidth(40)
-        self.ambientedit.setValidator(QDoubleValidator(-40., 200., 2, self.ambientedit))  
-        self.ambientedit.setAlignment(Qt.AlignRight)        
-        pressureunitslabel = QLabel("hPa")
+        self.ambientedit.setText("%g" % aw.float2float(aw.qmc.ambientTemp))
+        self.ambientedit.setMinimumWidth(50)
+        self.ambientedit.setMaximumWidth(50)
+        self.ambientedit.setValidator(aw.createCLocaleDoubleValidator(-9999., 9999999., 1, self.ambientedit))  # larger range needed to triger editing_finished
+        self.ambientedit.setAlignment(Qt.AlignRight)
+        self.ambientedit.editingFinished.connect(self.ambientedit_editing_finished)
+        pressureunitslabel = QLabel(" " + "hPa")
         self.pressureedit = QLineEdit()
-        self.pressureedit.setText(str(aw.qmc.ambient_pressure))
+        self.pressureedit.setText("%g" % aw.float2float(aw.qmc.ambient_pressure))
         self.pressureedit.setMinimumWidth(55)
         self.pressureedit.setMaximumWidth(55)
-        self.pressureedit.setValidator(QDoubleValidator(0, 1200, 1, self.pressureedit))  
-        self.pressureedit.setAlignment(Qt.AlignRight)                
+        self.pressureedit.setValidator(aw.createCLocaleDoubleValidator(0, 9999999., 1, self.pressureedit))  
+        self.pressureedit.setAlignment(Qt.AlignRight)
+        self.pressureedit.editingFinished.connect(self.pressureedit_editing_finished)           
         ambient = QHBoxLayout()
         ambient.addWidget(self.ambientedit)
         ambient.addWidget(ambientunitslabel)
@@ -29043,7 +29672,7 @@ class editGraphDlg(ArtisanDialog):
         ambient.addWidget(self.pressureedit)
         ambient.addWidget(pressureunitslabel)
         ambient.addStretch()
-        self.calculateorganiclosslabel = QLabel("")
+        self.organiclosslabel = QLabel()
         # NOTES
         roastertypelabel = QLabel()
         roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Machine",None)) + "</b>")
@@ -29053,12 +29682,12 @@ class editGraphDlg(ArtisanDialog):
         drumspeedlabel.setText("<b> " + u(QApplication.translate("Label", "Drum Speed",None)) + "</b>")
         roastinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Roasting Notes",None)) + "</b>")
         self.roastingeditor = QTextEdit()
-        self.roastingeditor.setMaximumHeight(125)
+#        self.roastingeditor.setMaximumHeight(125)
         if aw.qmc.roastingnotes is not None:
             self.roastingeditor.setPlainText(u(aw.qmc.roastingnotes))
         cuppinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Cupping Notes",None)) + "</b>")
         self.cuppingeditor =  QTextEdit()
-        self.cuppingeditor.setMaximumHeight(125)
+#        self.cuppingeditor.setMaximumHeight(125)
         if aw.qmc.cuppingnotes is not None:
             self.cuppingeditor.setPlainText(u(aw.qmc.cuppingnotes))
         # Flags
@@ -29096,10 +29725,22 @@ class editGraphDlg(ArtisanDialog):
         saveButton.setMinimumSize(saveButton.minimumSizeHint()) 
         #Cancel Button
         cancelButton = QPushButton(QApplication.translate("Button", "Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.cancel_dialog())
         cancelButton.setMaximumSize(cancelButton.sizeHint())
         cancelButton.setMinimumSize(cancelButton.minimumSize())
+        cancelButton.setAutoDefault(False)
+        cancelButton.setFocusPolicy(Qt.StrongFocus)
+        saveButton.setAutoDefault(True)
+        saveButton.setFocusPolicy(Qt.StrongFocus)
+        # add standard Mac OS X shortcut CMD-. to close this dialog
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.cancel_dialog())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
         
         # container tare
         self.tareComboBox = QComboBox()
@@ -29126,10 +29767,12 @@ class editGraphDlg(ArtisanDialog):
         # scan whole button
         scanWholeButton = QPushButton(QApplication.translate("Button", "scan",None))
         scanWholeButton.clicked.connect(lambda _:self.scanWholeColor())
+        scanWholeButton.setMinimumWidth(80)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         scanWholeButton.setFocusPolicy(Qt.NoFocus)
         # scan ground button
         scanGroundButton = QPushButton(QApplication.translate("Button", "scan",None))
+        scanGroundButton.setMinimumWidth(80)
         scanGroundButton.clicked.connect(lambda _:self.scanGroundColor())
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         scanGroundButton.setFocusPolicy(Qt.NoFocus)
@@ -29169,7 +29812,8 @@ class editGraphDlg(ArtisanDialog):
             calc_dropstr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
             aw.sendmessage(QApplication.translate("Message","The recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})", None).format(drop_str, calc_dropstr))
         textLayout = QGridLayout()
-        textLayout.setSpacing(1)
+        textLayout.setHorizontalSpacing(3)
+        textLayout.setVerticalSpacing(2)
         textLayout.setContentsMargins(0,0,0,0)
         textLayout.addWidget(datelabel1,0,0)
         datebatch = QHBoxLayout()
@@ -29186,6 +29830,7 @@ class editGraphDlg(ArtisanDialog):
         titleLine = QHBoxLayout()
         titleLine.addWidget(self.titleedit)
         titleLine.addWidget(self.addRecentButton)
+        titleLine.addWidget(self.delRecentButton)
         titleLine.addSpacing(2)
         titleLine.addWidget(self.titleShowAlwaysFlag) 
         
@@ -29235,7 +29880,7 @@ class editGraphDlg(ArtisanDialog):
             label_font = self.plus_selected_line.font()
             label_font.setPointSize(label_font.pointSize() -2)
             self.plus_selected_line.setFont(label_font)
-            self.populatePlusCoffeeBlendCombos()                    
+            self.populatePlusCoffeeBlendCombos()
             # layouting
             self.plus_coffees_combo.setMinimumContentsLength(15)
             self.plus_blends_combo.setMinimumContentsLength(10)
@@ -29281,111 +29926,92 @@ class editGraphDlg(ArtisanDialog):
         roasteroperator.addWidget(drumspeedlabel)
         roasteroperator.addSpacing(5)
         roasteroperator.addWidget(self.drumspeed,stretch=1)
-        textLayout.addLayout(roasteroperator,5+textLayoutPlusOffset,1)        
-        weightLayout = QHBoxLayout()
-        weightLayout.setSpacing(0)
-        weightLayout.addWidget(weightlabel)
-        weightLayout.addSpacing(18)
-        weightLayout.addWidget(self.unitsComboBox)
-        weightLayout.addSpacing(15)
-        weightLayout.addWidget(self.weightinedit)
-        weightLayout.addSpacing(1)
-        weightLayout.addWidget(weightinlabel)
-        weightLayout.addSpacing(15)
-        weightLayout.addWidget(self.weightoutedit)
-        weightLayout.addSpacing(1)
-        weightLayout.addWidget(weightoutlabel)
-        weightLayout.addSpacing(15)
-        weightLayout.addWidget(self.weightpercentlabel)
-        weightLayout.addStretch()  
+        textLayout.addLayout(roasteroperator,5+textLayoutPlusOffset,1)
+        
+        beanSizeLayout = QHBoxLayout()
+        beanSizeLayout.addStretch()
+        beanSizeLayout.addWidget(self.bean_size_min_edit)
+        beanSizeLayout.addWidget(bean_size_sep_label)
+        beanSizeLayout.addWidget(self.bean_size_max_edit)
+        
+        propGrid = QGridLayout()
+        propGrid.setContentsMargins(0,0,0,0)
+        propGrid.setHorizontalSpacing(3)
+        propGrid.setVerticalSpacing(0)
+        propGrid.addWidget(green_label,0,1,Qt.AlignCenter | Qt.AlignBottom)
+        propGrid.addWidget(roasted_label,0,2,Qt.AlignCenter | Qt.AlignBottom)
+        propGrid.addWidget(self.organicpercentlabel,0,4,Qt.AlignRight)
+        propGrid.addWidget(self.organiclosslabel,0,5,1,3,Qt.AlignLeft)
+        
+        propGrid.addWidget(weightlabel,1,0)
+        propGrid.addWidget(self.weightinedit,1,1,Qt.AlignRight)
+        propGrid.addWidget(self.weightoutedit,1,2,Qt.AlignRight)
+        propGrid.addWidget(self.unitsComboBox,1,3)
+        propGrid.addWidget(self.weightpercentlabel,1,4,Qt.AlignRight)
+        
+        propGrid.setColumnStretch(5,10)
+        
         if aw.scale.device is not None and aw.scale.device != "" and aw.scale.device != "None":
-            weightLayout.addWidget(self.tareComboBox)
-            weightLayout.addSpacing(10)
-            weightLayout.addWidget(inButton) 
-            weightLayout.addSpacing(10)
-            weightLayout.addWidget(outButton)
-        volumeLayout = QHBoxLayout()
-        volumeLayout.setSpacing(0)
-        volumeLayout.addWidget(volumelabel)
-        volumeLayout.addSpacing(14)
-        volumeLayout.addWidget(self.volumeUnitsComboBox)
-        volumeLayout.addSpacing(15)
-        volumeLayout.addWidget(self.volumeinedit)
-        volumeLayout.addSpacing(1)
-        volumeLayout.addWidget(volumeinlabel)
-        volumeLayout.addSpacing(15)
-        volumeLayout.addWidget(self.volumeoutedit)
-        volumeLayout.addSpacing(1)
-        volumeLayout.addWidget(volumeoutlabel)
-        volumeLayout.addSpacing(15)
-        volumeLayout.addWidget(self.volumepercentlabel)
-        volumeLayout.addStretch()
-        volumeLayout.addWidget(volumeCalcButton)
+            propGrid.addWidget(self.tareComboBox,1,7)
+            propGrid.addWidget(inButton,1,8)
+            propGrid.addWidget(outButton,1,9)
         
-        densityLayout = QHBoxLayout()
-        densityLayout.setContentsMargins(0,0,0,0)
-        densityLayout.setSpacing(0)
-        densityLayout.addWidget(bean_density_label)        
-        densityLayout.addSpacing(13)
-        densityLayout.addWidget(self.bean_density_weightUnitsComboBox)
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(self.bean_density_weight_edit)
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(bean_density_per_label)
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(self.bean_density_volumeUnitsComboBox)
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(self.bean_density_volume_edit)
-        densityLayout.addSpacing(20)
-        densityLayout.addWidget(self.standarddensitylabel)
-        densityLayout.addStretch()        
-        densityLayout.addSpacing(15)
-        densityLayout.addWidget(bean_size_label)
-        densityLayout.addSpacing(10)
-        densityLayout.addWidget(self.bean_size_min_edit)
-        densityLayout.addWidget(bean_size_sep_label)
-        densityLayout.addWidget(self.bean_size_max_edit)
-        densityLayout.addSpacing(5)
-        densityLayout.addWidget(bean_size_unit_label)
-
-        weightLayout.setContentsMargins(0,0,0,0)
-        volumeLayout.setContentsMargins(0,0,0,0)
-        densityLayout.setContentsMargins(0,0,0,0)
+        propGrid.addWidget(volumelabel,2,0)
+        propGrid.addWidget(self.volumeinedit,2,1,Qt.AlignRight)
+        propGrid.addWidget(self.volumeoutedit,2,2,Qt.AlignRight)
+        propGrid.addWidget(self.volumeUnitsComboBox,2,3)
+        propGrid.addWidget(self.volumepercentlabel,2,4,Qt.AlignRight)
+        propGrid.addWidget(volumeCalcButton,2,9)
         
-        colorLayout = QHBoxLayout()
-        colorLayout.setSpacing(0)
-        colorLayout.addWidget(whole_color_label)
-        colorLayout.addSpacing(15)
-        colorLayout.addWidget(self.whole_color_edit)
+        propGrid.setRowMinimumHeight(3,self.volumeUnitsComboBox.minimumSizeHint().height())
+        propGrid.addWidget(bean_density_label,3,0)
+        propGrid.addWidget(self.bean_density_in_edit,3,1,Qt.AlignRight)
+        propGrid.addWidget(self.bean_density_out_edit,3,2,Qt.AlignRight)
+        propGrid.addWidget(density_unit_label,3,3,Qt.AlignCenter)
+        propGrid.addWidget(self.densitypercentlabel,3,4,Qt.AlignRight)
+        
+        propGrid.addWidget(bean_size_label,3,7)
+        propGrid.addLayout(beanSizeLayout,3,8,Qt.AlignRight)
+        propGrid.addWidget(bean_size_unit_label,3,9,Qt.AlignCenter)
+        
+        propGrid.addWidget(moisture_label,4,0)
+        propGrid.addWidget(self.moisture_greens_edit,4,1,Qt.AlignRight)
+        propGrid.addWidget(self.moisture_roasted_edit,4,2,Qt.AlignRight)
+        propGrid.addWidget(moisture_greens_unit_label,4,3,Qt.AlignCenter)
+        propGrid.addWidget(self.moisturepercentlabel,4,4,Qt.AlignRight)
+        propGrid.addWidget(greens_temp_label,4,7)
+        propGrid.addWidget(self.greens_temp_edit,4,8,Qt.AlignRight)
+        propGrid.addWidget(greens_temp_unit_label,4,9,Qt.AlignCenter)
+        
+        propGrid.setRowMinimumHeight(7,30)
+        propGrid.addWidget(whole_color_label,7,1,Qt.AlignCenter | Qt.AlignBottom)
+        propGrid.addWidget(ground_color_label,7,2,Qt.AlignCenter | Qt.AlignBottom)
+        
+        propGrid.addWidget(color_label,8,0)
+        propGrid.addWidget(self.whole_color_edit,8,1,Qt.AlignRight)
+        propGrid.addWidget(self.ground_color_edit,8,2,Qt.AlignRight)
+        propGrid.addWidget(self.colorSystemComboBox,8,3,1, 2)
+                
+        if aw.color.device is not None and aw.color.device != "" and aw.color.device not in ["None","Tiny Tonino", "Classic Tonino"]:
+            propGrid.addWidget(scanWholeButton,8,6)
         if aw.color.device is not None and aw.color.device != "" and aw.color.device != "None":
-            colorLayout.addSpacing(5)
-            colorLayout.addWidget(scanWholeButton)
-        colorLayout.addSpacing(25)
-        colorLayout.addWidget(ground_color_label)
-        colorLayout.addSpacing(15)
-        colorLayout.addWidget(self.ground_color_edit)
-        if aw.color.device is not None and aw.color.device != "" and aw.color.device != "None":
-            colorLayout.addSpacing(5)
-            colorLayout.addWidget(scanGroundButton)
-        colorLayout.addStretch()
-        colorLayout.addWidget(self.colorSystemComboBox)        
-        humidityGrid = QGridLayout()
-        humidityGrid.addWidget(moisture_greens_label,0,0)
-        humidityGrid.addWidget(self.moisture_greens_edit,0,1)
-        humidityGrid.addWidget(moisture_greens_unit_label,0,2)
-        humidityGrid.addLayout(moisture_roasted,0,5)
-        humidityGrid.addWidget(greens_temp_label,0,9)
-        humidityGrid.addLayout(greens_temp,0,10)
-        humidityGrid.addWidget(ambientSourceLabel,0,11,Qt.AlignRight)
-        humidityGrid.addWidget(ambientlabel,2,0)
-        humidityGrid.addWidget(self.ambient_humidity_edit,2,1)
-        humidityGrid.addWidget(ambient_humidity_unit_label,2,2)
-        humidityGrid.addLayout(ambient,2,5)
-        humidityGrid.addWidget(updateAmbientTemp,2,10)
-        humidityGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignRight)
-        humidityGrid.setColumnMinimumWidth(3, 11)
-        humidityGrid.setColumnMinimumWidth(5, 11)
-        humidityGrid.setColumnMinimumWidth(8, 11)
+            propGrid.addWidget(scanGroundButton,8,7)
+            
+        propGrid.addWidget(ambientSourceLabel,8,8,1,2,Qt.AlignRight | Qt.AlignBottom)
+        
+        ambientGrid = QGridLayout()
+        ambientGrid.setContentsMargins(0,0,0,0)
+        ambientGrid.setHorizontalSpacing(3)
+        ambientGrid.setVerticalSpacing(0)
+        ambientGrid.addWidget(ambientlabel,2,0)
+        ambientGrid.addWidget(self.ambient_humidity_edit,2,1)
+        ambientGrid.addWidget(ambient_humidity_unit_label,2,2)
+        ambientGrid.addLayout(ambient,2,5)
+        ambientGrid.addWidget(updateAmbientTemp,2,10)
+        ambientGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignRight)
+        ambientGrid.setColumnMinimumWidth(3, 11)
+        ambientGrid.setColumnMinimumWidth(5, 11)
+        ambientGrid.setColumnMinimumWidth(8, 11)
         roastFlagsLayout = QHBoxLayout()
         roastFlagsGrid = QGridLayout()
         roastFlagsGrid.addWidget(self.lowFC,0,0)
@@ -29421,9 +30047,8 @@ class editGraphDlg(ArtisanDialog):
         timeLayoutBox.addStretch()
         mainLayout = QVBoxLayout()
         mainLayout.setContentsMargins(3, 3, 3, 3)
-        mainLayout.addStretch()
-        mainLayout.addLayout(timeLayoutBox)
-        mainLayout.addStretch()
+#        mainLayout.addLayout(timeLayoutBox)
+#        mainLayout.addStretch()
         eventbuttonLayout = QHBoxLayout()
         eventbuttonLayout.addWidget(self.createalarmTableButton)
         eventbuttonLayout.addStretch()
@@ -29436,29 +30061,32 @@ class editGraphDlg(ArtisanDialog):
         eventbuttonLayout.addWidget(self.neweventTableButton)
         #tab 1
         self.tab1aLayout = QVBoxLayout()
-        self.tab1aLayout.setContentsMargins(0,5,0,0)
+        self.tab1aLayout.setContentsMargins(0,0,0,0)
         self.tab1aLayout.setSpacing(0)
-        self.tab1aLayout.addLayout(mainLayout)
-        self.tab1aLayout.addStretch()
+#        self.tab1aLayout.addLayout(mainLayout)
+#        self.tab1aLayout.addStretch()
         self.tab1aLayout.addLayout(textLayout)
         self.tab1aLayout.addStretch()
-        self.tab1aLayout.addLayout(weightLayout)
-        self.tab1aLayout.addLayout(volumeLayout)
-        self.tab1aLayout.addLayout(densityLayout)
-        self.tab1aLayout.addLayout(colorLayout)
-        self.tab1aLayout.addLayout(humidityGrid)
+        self.tab1aLayout.setSpacing(8)
+        self.tab1aLayout.addLayout(propGrid)
+        self.tab1aLayout.addLayout(ambientGrid)
         tab1Layout = QVBoxLayout()
-        tab1Layout.addStretch()
+#        tab1Layout.addStretch()
         tab1Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         tab1Layout.addLayout(self.tab1aLayout)
+        tab1Layout.setSpacing(0)
         tab1Layout.addStretch()
-        self.calculated_density()
+        # set volume from density if given
+        self.density_in_editing_finished()
+        self.density_out_editing_finished()
+        # set density from volume if given
         #tab 2
         tab2Layout = QVBoxLayout()
         tab2Layout.addLayout(anotationLayout)
         tab2Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         #tab3 events
         tab3Layout = QVBoxLayout()
+        tab3Layout.addLayout(timeLayoutBox)
         tab3Layout.addWidget(self.eventtable)
         tab3Layout.addLayout(eventbuttonLayout)
         tab3Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
@@ -29490,7 +30118,9 @@ class editGraphDlg(ArtisanDialog):
         totallayout.setSpacing(0)
         self.volume_percent()
         self.setLayout(totallayout)
+
         self.titleedit.setFocus()
+
         
         self.updateTemplateLine()
         
@@ -29504,7 +30134,7 @@ class editGraphDlg(ArtisanDialog):
         try:
             if aw.plus_account is not None:
                 import plus.stock
-                plus.stock.update()                
+                plus.stock.update()
                 QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
         except:
             pass
@@ -29550,14 +30180,20 @@ class editGraphDlg(ArtisanDialog):
         
     def beanSizeMaxEdited(self):
         self.modified_beansize_max_text = self.bean_size_max_edit.text()
-        
-    def moistureGreensEdited(self):
+
+    def moistureEdited(self):
+        self.moisture_greens_edit.setText(aw.comma2dot(str(self.moisture_greens_edit.text())))
+        self.moisture_roasted_edit.setText(aw.comma2dot(str(self.moisture_roasted_edit.text())))
         self.modified_moisture_greens_text = self.moisture_greens_edit.text()
+        self.calculated_organic_loss()
         
     def plus_popups_set_enabled(self,b):
-        self.plus_stores_combo.setEnabled(b)
-        self.plus_coffees_combo.setEnabled(b)
-        self.plus_blends_combo.setEnabled(b)        
+        try:
+            self.plus_stores_combo.setEnabled(b)
+            self.plus_coffees_combo.setEnabled(b)
+            self.plus_blends_combo.setEnabled(b)
+        except:
+            pass
 
     # storeIndex is the index of the selected entry in the popup
     def populatePlusCoffeeBlendCombos(self,storeIndex=None):
@@ -29674,7 +30310,7 @@ class editGraphDlg(ArtisanDialog):
                     # if roast is not yet complete we unblock the signals before changing the index to get the blend data be filled in
                     self.plus_blends_combo.blockSignals(False)
                     self.plus_blends_combo.setCurrentIndex(p+1)  
-                self.markPlusBlendFields(True)
+                self.markPlusCoffeeFields(True)
                 
             self.updatePlusSelectedLine() 
         except:
@@ -29685,31 +30321,28 @@ class editGraphDlg(ArtisanDialog):
             self.plus_popups_set_enabled(True)
 
     def markPlusCoffeeFields(self,b):
-        qlineedit_marked_style = "QLineEdit { border: 0px solid gray; background: #e4f3f8; selection-background-color: darkgray; }"
-        background_white_style = "QTextEdit { background-color: white; }" 
+        # for QTextEdit
         if b:
-            self.beansedit.setStyleSheet("QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray; border: 0px solid gray; }")
+            self.beansedit.setStyleSheet("QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray;  }")
         else:
-            self.beansedit.setStyleSheet(background_white_style)
+            self.beansedit.setStyleSheet("")
+        # for QLineEdit
+        if sys.platform.startswith("darwin"):
+            # since Qt5.11 the background color of QLineEdits only changes if also the broder is set
+            qlineedit_marked_style = "QLineEdit { border: 0.5px solid lightgrey; background-color: #e4f3f8; selection-background-color: darkgray; }"
+        else:
+            qlineedit_marked_style = "QLineEdit { background-color: #e4f3f8; selection-background-color: darkgray; }"
+        background_white_style = "" 
         if b:
-            self.bean_density_weight_edit.setStyleSheet(qlineedit_marked_style)
-            self.bean_density_volume_edit.setStyleSheet(qlineedit_marked_style)
+            self.bean_density_in_edit.setStyleSheet(qlineedit_marked_style)
             self.bean_size_min_edit.setStyleSheet(qlineedit_marked_style)
             self.bean_size_max_edit.setStyleSheet(qlineedit_marked_style)
             self.moisture_greens_edit.setStyleSheet(qlineedit_marked_style)
         else:
-            self.bean_density_weight_edit.setStyleSheet(background_white_style)
-            self.bean_density_volume_edit.setStyleSheet(background_white_style)
+            self.bean_density_in_edit.setStyleSheet(background_white_style)
             self.bean_size_min_edit.setStyleSheet(background_white_style)
             self.bean_size_max_edit.setStyleSheet(background_white_style)
             self.moisture_greens_edit.setStyleSheet(background_white_style)
-            
-        
-    def markPlusBlendFields(self,b):
-        if b:
-            self.beansedit.setStyleSheet("QTextEdit { background-color : #e4f3f8; }")
-        else:
-            self.beansedit.setStyleSheet("QTextEdit { background-color : white; }")
         
     def updateTitle(self,prev_coffee_label,prev_blend_label):
         titles_to_be_overwritten = [ "", QApplication.translate("Scope Title", "Roaster Scope",None) ]
@@ -29740,65 +30373,86 @@ class editGraphDlg(ArtisanDialog):
             self.beansedit.clear()
             for l in blend_lines:
                 self.beansedit.append(l)
+            keep_modified_moisture = self.modified_moisture_greens_text
+            keep_modified_density = self.modified_density_in_text
+            blend_dict = plus.stock.getBlendBlendDict(blend)
+            if "moisture" in blend_dict:
+                self.moisture_greens_edit.setText("%g" % blend_dict["moisture"])
+            else:
+                self.moisture_greens_edit.setText(str(0))
+            if "density" in blend_dict:
+                self.bean_density_in_edit.setText("%g" % aw.float2float(blend_dict["density"]))
+            else:
+                self.bean_density_in_edit.setText(str(0))
+            if "screen_min" in blend_dict:
+                self.bean_size_min_edit.setText(str(int(blend_dict["screen_min"])))
+            else:
+                self.bean_size_min_edit.setText("0")
+            if "screen_max" in blend_dict:
+                self.bean_size_max_edit.setText(str(int(blend_dict["screen_max"])))
+            else:
+                self.bean_size_max_edit.setText("0")
             # check if title should be changed (if still default, or equal to the previous selection:
             self.updateTitle(prev_coffee_label,prev_blend_label)
-            self.markPlusBlendFields(True)
+            self.markPlusCoffeeFields(True)
+            self.density_in_editing_finished()
+            self.moistureEdited()
+            self.modified_density_in_text = keep_modified_density
+            self.modified_moisture_greens_text = keep_modified_moisture
         except:
             pass
         
     # if current title is equal to default title or prev_coffee/blend_label, we set title from selected label
     def fillCoffeeData(self,coffee,prev_coffee_label,prev_blend_label):
         import plus.stock
-        cd = plus.stock.getCoffeeCoffeeDict(coffee)
-        self.beansedit.setPlainText(plus.stock.coffee2beans(coffee))
-        if "moisture" in cd:
-            self.moisture_greens_edit.setText(str(cd["moisture"]))
-        else:
-            self.moisture_greens_edit.setText(str(0))
-        if "density" in cd:
-            keep_modified_weight_unit = self.modified_density_weight_unit_idx
-            self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index("g"))            
-            self.modified_density_weight_unit_idx = keep_modified_weight_unit
-                        
-            keep_modified_volume_unit = self.modified_density_volume_unit_idx
-            self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index("l"))          
-            self.modified_density_volume_unit_idx = keep_modified_volume_unit
-            
-            self.bean_density_weight_edit.setText(str(cd["density"]))
-            self.bean_density_volume_edit.setText(str(1.0)) 
-        else:
-            self.bean_density_weight_edit.setText(str(0)) 
-        if "screen_size" in cd:
-            screen = cd["screen_size"]
-            if "min" in screen:
-                self.bean_size_min_edit.setText(str(screen["min"]))
+        try:
+            cd = plus.stock.getCoffeeCoffeeDict(coffee)
+            self.beansedit.setPlainText(plus.stock.coffee2beans(coffee))
+            keep_modified_moisture = self.modified_moisture_greens_text
+            keep_modified_density = self.modified_density_in_text
+            if "moisture" in cd:
+                self.moisture_greens_edit.setText("%g" % cd["moisture"])
+            else:
+                self.moisture_greens_edit.setText(str(0))
+            if "density" in cd:
+                self.bean_density_in_edit.setText("%g" % aw.float2float(cd["density"]))
+            else:
+                self.bean_density_in_edit.setText(str(0)) 
+            if "screen_size" in cd:
+                screen = cd["screen_size"]
+                if "min" in screen:
+                    self.bean_size_min_edit.setText(str(int(screen["min"])))
+                else:
+                    self.bean_size_min_edit.setText("0")
+                if "max" in screen:
+                    self.bean_size_max_edit.setText(str(int(screen["max"])))
+                else:
+                    self.bean_size_max_edit.setText("0")
             else:
                 self.bean_size_min_edit.setText("0")
-            if "max" in screen:
-                self.bean_size_max_edit.setText(str(screen["max"]))
-            else:
                 self.bean_size_max_edit.setText("0")
-        else:
-            self.bean_size_min_edit.setText("0")
-            self.bean_size_max_edit.setText("0")
-        self.standard_density()
-        self.updateTitle(prev_coffee_label,prev_blend_label)
-        self.markPlusCoffeeFields(True)
+            self.updateTitle(prev_coffee_label,prev_blend_label)
+            self.markPlusCoffeeFields(True)
+            self.density_in_editing_finished()
+            self.moistureEdited()
+            self.modified_density_in_text = keep_modified_density
+            self.modified_moisture_greens_text = keep_modified_moisture
+        except:
+            pass
         
     def defaultCoffeeData(self):
         if self.modified_beans is None:
             self.beansedit.clear()
         else:
             self.beansedit.setPlainText(u(self.modified_beans))
-        self.bean_density_weight_edit.setText(self.modified_density_weight_text)
-        self.bean_density_volume_edit.setText(self.modified_density_volume_text)
-        self.bean_density_weightUnitsComboBox.setCurrentIndex(self.modified_density_weight_unit_idx)
-        self.bean_density_volumeUnitsComboBox.setCurrentIndex(self.modified_density_volume_unit_idx)                    
-        self.standard_density()
+        self.bean_density_in_edit.setText(self.modified_density_in_text)
+        self.volumeinedit.setText(self.modified_volume_in_text)
         self.bean_size_min_edit.setText(self.modified_beansize_min_text)
         self.bean_size_max_edit.setText(self.modified_beansize_max_text)
         self.moisture_greens_edit.setText(self.modified_moisture_greens_text)
         self.markPlusCoffeeFields(False)
+        self.density_in_editing_finished()
+        self.moistureEdited()
                     
     def storeSelectionChanged(self,n):
         if n != -1:
@@ -29862,7 +30516,7 @@ class editGraphDlg(ArtisanDialog):
             # reset coffee and set new blend
             self.plus_coffees_combo.setCurrentIndex(0)
             selected_blend = self.plus_blends[n-1]
-            bsd = plus.stock.getBlendStockDict(selected_blend)      
+            bsd = plus.stock.getBlendStockDict(selected_blend)
             self.plus_store_selected = bsd["location_hr_id"]    
             self.plus_store_selected_label = bsd["location_label"]
             bd = plus.stock.getBlendBlendDict(selected_blend)
@@ -29897,20 +30551,18 @@ class editGraphDlg(ArtisanDialog):
             self.volumeinedit.setText("%g" % rr["volumeIn"])
             self.volumeoutedit.setText("%g" % rr["volumeOut"])
             self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
-            self.bean_density_weight_edit.setText(str(rr["densityWeight"]))
-            self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["densityWeightUnit"]))
-            self.bean_density_volume_edit.setText(str(rr["densityVolume"]))
-            self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["densityVolumeUnit"]))
-            self.moisture_greens_edit.setText(str(rr["moistureGreen"]))
-            self.moisture_roasted_edit.setText(str(rr["moistureRoasted"]))
+            self.bean_density_in_edit.setText("%g" % aw.float2float(rr["densityWeight"]))
+            self.bean_density_out_edit.setText("%g" % aw.float2float(rr["densityVolume"]))
+            self.moisture_greens_edit.setText("%g" % aw.float2float(rr["moistureGreen"]))
+            self.moisture_roasted_edit.setText("%g" % aw.float2float(rr["moistureRoasted"]))
             self.whole_color_edit.setText(str(rr["wholeColor"]))
             self.ground_color_edit.setText(str(rr["groundColor"]))
             self.colorSystemComboBox.setCurrentIndex(rr["colorSystem"])
             # items added in v1.4 might not be in the data set of previous stored recent roasts
             if "beanSize_min" in rr:
-                self.bean_size_min_edit.setText(str(rr["beanSize_min"]))
+                self.bean_size_min_edit.setText(str(int(rr["beanSize_min"])))
             if "beanSize_max" in rr:
-                self.bean_size_max_edit.setText(str(rr["beanSize_max"]))
+                self.bean_size_max_edit.setText(str(int(rr["beanSize_max"])))
             # Note: the background profile will not be changed if recent roast is activated from Roast Properties
             if "background" in rr:
                 self.template_file = rr["background"]
@@ -29929,6 +30581,7 @@ class editGraphDlg(ArtisanDialog):
                 self.template_batchnr = None
                 self.template_batchprefix = None
             self.updateTemplateLine()
+            self.percent()
                 
             
 #PLUS            
@@ -29950,7 +30603,6 @@ class editGraphDlg(ArtisanDialog):
                     self.plus_default_store = None # we reset the defaultstore                                    
                 # we now set the actual values from the stock
                 self.populatePlusCoffeeBlendCombos()
-
         self.recentRoastEnabled()
         
     def recentRoastEnabled(self):
@@ -29961,12 +30613,23 @@ class editGraphDlg(ArtisanDialog):
             if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
                 # enable "+" addRecentRoast button
                 self.addRecentButton.setEnabled(True)
+                self.delRecentButton.setEnabled(True)
             else:
                 self.addRecentButton.setEnabled(False)
+                self.delRecentButton.setEnabled(False)
         except:
             self.addRecentButton.setEnabled(False)
+            self.delRecentButton.setEnabled(False)
         
-    
+    def delRecentRoast(self):
+        try:
+            title = u(self.titleedit.currentText())
+            weightIn = float(str(self.weightinedit.text()))
+            weightUnit = u(self.unitsComboBox.currentText())
+            aw.recentRoasts = aw.delRecentRoast(title,weightIn,weightUnit)
+        except:
+            pass
+        
     def addRecentRoast(self):
         try:
             title = u(self.titleedit.currentText())
@@ -29975,43 +30638,41 @@ class editGraphDlg(ArtisanDialog):
             if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
                 beans = u(self.beansedit.toPlainText())
                 if self.weightoutedit.text() != "":
-                    weightOut = float(str(self.weightoutedit.text()))
+                    weightOut = float(aw.comma2dot(str(self.weightoutedit.text())))
                 else:
-                    weightOut = 0.0
+                    weightOut = 0
                 weightUnit = u(self.unitsComboBox.currentText())
                 if self.volumeinedit.text() != "":
-                    volumeIn = float(str(self.volumeinedit.text()))
+                    volumeIn = float(aw.comma2dot(str(self.volumeinedit.text())))
                 else:
-                    volumeIn = 0.0
+                    volumeIn = 0
                 if self.volumeoutedit.text() != "":
-                    volumeOut = float(str(self.volumeoutedit.text()))
+                    volumeOut = float(aw.comma2dot(str(self.volumeoutedit.text())))
                 else:
-                    volumeIn = 0.0
+                    volumeIn = 0
                 volumeUnit = u(self.volumeUnitsComboBox.currentText())
-                if self.bean_density_weight_edit.text() != "":
-                    densityWeight = float(str(self.bean_density_weight_edit.text()))
+                if self.bean_density_in_edit.text() != "":
+                    densityWeight = float(aw.comma2dot(str(self.bean_density_in_edit.text())))
                 else:
-                    densityWeight = 0.0
-                densityWeightUnit = u(self.bean_density_weightUnitsComboBox.currentText())
-                if self.bean_density_volume_edit.text() != "":
-                    densityVolume = float(str(self.bean_density_volume_edit.text()))
+                    densityWeight = 0
+                if self.bean_density_out_edit.text() != "":
+                    densityVolume = float(aw.comma2dot(str(self.bean_density_out_edit.text())))
                 else:
-                    densityVolume = 0.0
-                densityVolumeUnit = u(self.bean_density_volumeUnitsComboBox.currentText())
+                    densityVolume = 0
                 if self.bean_size_min_edit.text() != "":
-                    beanSize_min = float(str(self.bean_size_min_edit.text()))
+                    beanSize_min = int(round(float(str(self.bean_size_min_edit.text()))))
                 else:
-                    beanSize_min = 0.0
+                    beanSize_min = 0
                 if self.bean_size_max_edit.text() != "":
-                    beanSize_max = float(str(self.bean_size_max_edit.text()))
+                    beanSize_max = int(round(float(str(self.bean_size_max_edit.text()))))
                 else:
-                    beanSize_max = 0.0  
+                    beanSize_max = 0  
                 if self.moisture_greens_edit.text() != "":
-                    moistureGreen = float(self.moisture_greens_edit.text())
+                    moistureGreen = float(aw.comma2dot(self.moisture_greens_edit.text()))
                 else:
                     moistureGreen = 0.0
                 if self.moisture_roasted_edit.text() != "":
-                    moistureRoasted = float(self.moisture_roasted_edit.text())
+                    moistureRoasted = float(aw.comma2dot(self.moisture_roasted_edit.text()))
                 else:
                     moistureRoasted = 0.0
                 if self.whole_color_edit.text() != "":
@@ -30033,9 +30694,9 @@ class editGraphDlg(ArtisanDialog):
                     volumeOut,
                     volumeUnit,
                     densityWeight,
-                    densityWeightUnit,
+                    "g",
                     densityVolume,
-                    densityVolumeUnit, 
+                    "l", 
                     beanSize_min,
                     beanSize_max,
                     moistureGreen,
@@ -30070,6 +30731,20 @@ class editGraphDlg(ArtisanDialog):
         settings.setValue("RoastGeometry",self.saveGeometry())
 
     def cancel_dialog(self):
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("RoastGeometry",self.saveGeometry())
+        
+        aw.qmc.beans = self.org_beans
+        aw.qmc.density = self.org_density
+        aw.qmc.density_roasted = self.org_density_roasted
+        aw.qmc.beansize_min = self.org_beansize_min
+        aw.qmc.beansize_max = self.org_beansize_max
+        aw.qmc.moisture_greens = self.org_moisture_greens
+        
+        aw.qmc.weight = self.org_weight
+        aw.qmc.volume = self.org_volume
+        
         aw.qmc.specialevents = self.org_specialevents
         aw.qmc.specialeventstype = self.org_specialeventstype
         aw.qmc.specialeventsStrings = self.org_specialeventsStrings
@@ -30096,30 +30771,6 @@ class editGraphDlg(ArtisanDialog):
                 self.inWeight()
             elif self.weightoutedit.hasFocus():
                 self.outWeight()
-        elif key == 16777220 and self.volumeinedit.hasFocus() and (str(self.volumeinedit.text()) == "" or float(self.volumeinedit.text().replace(",",".")) == 0.):
-            try:
-                dw = float(str(self.bean_density_weight_edit.text()))
-                dv = float(str(self.bean_density_volume_edit.text()))                    
-                if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None) :
-                    dw = dw * 1000.0
-                if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None) :
-                    dv = dv / 1000.0
-                d = dw / dv
-                w = self.weightinedit.text()
-                if d and d != "" and w and w != "":
-                    # calculate in-volume from density and weight
-                    d = float(d)
-                    w = float(w)
-                    if self.unitsComboBox.currentIndex() == 1:
-                        w = w * 1000.0
-                    res = self.calc_volume(d,w)
-                    if self.volumeUnitsComboBox.currentIndex() == 1:
-                        res = res / 1000.0
-                        self.volumeinedit.setText("%g" % aw.float2float(res,4))
-                    else:
-                        self.volumeinedit.setText("%g" % aw.float2float(res))
-            except Exception:
-                pass
                         
     def tareChanged(self,i):
         if i == 0 and self.tarePopupEnabled:
@@ -30136,8 +30787,16 @@ class editGraphDlg(ArtisanDialog):
             if le.text() and le.text() != "":
                 wi = float(le.text())
                 if wi != 0.0:
-                    le.setText("%g" % aw.float2float(aw.convertWeight(wi,o,i),4))
+                    converted = aw.convertWeight(wi,o,i)
+                    le.setText("%g" % aw.float2floatWeightVolume(converted))
         self.calculated_density()
+#PLUS
+        try:
+            # weight unit changed, we update the coffee/blend lists in plus mode
+            if aw.plus_account is not None:
+                self.populatePlusCoffeeBlendCombos(self.plus_stores_combo.currentIndex())
+        except:
+            pass
 
     def changeVolumeUnit(self,i):
         o = aw.qmc.volume_units.index(aw.qmc.volume[2]) # previous unit index
@@ -30146,26 +30805,9 @@ class editGraphDlg(ArtisanDialog):
             if le.text() and le.text() != "":
                 wi = float(le.text())
                 if wi != 0.0:
-                    le.setText(str(aw.float2float(aw.convertVolume(wi,o,i),4)))
-        self.calculated_density()
-        
-    def changeDensityWeightUnit(self,i):
-        self.modified_density_weight_unit_idx = i
-        o = aw.qmc.weight_units.index(aw.qmc.density[1]) # previous unit index        
-        aw.qmc.density[1] = u(self.bean_density_weightUnitsComboBox.currentText())
-        if self.bean_density_weight_edit.text() and self.bean_density_weight_edit.text() != "":
-            wi = float(self.bean_density_weight_edit.text())
-            if wi != 0.0:
-                self.bean_density_weight_edit.setText(str(aw.float2float(aw.convertWeight(wi,o,i),4)))
-
-    def changeDensityVolumeUnit(self,i):
-        self.modified_density_volume_unit_idx = i
-        o = aw.qmc.volume_units.index(aw.qmc.density[3]) # previous unit index        
-        aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
-        if self.bean_density_volume_edit.text() and self.bean_density_volume_edit.text() != "":
-            wi = float(self.bean_density_volume_edit.text())
-            if wi != 0.0:
-                self.bean_density_volume_edit.setText(str(aw.float2float(aw.convertVolume(wi,o,i),4)))
+                    converted = aw.convertVolume(wi,o,i)
+                    le.setText("%g" % aw.float2floatWeightVolume(converted))
+#        self.calculated_density() # if just the unit changes, the density will not change as it is fixed now
 
     def tabSwitched(self,i):
         if i == 3:
@@ -30206,9 +30848,9 @@ class editGraphDlg(ArtisanDialog):
 
     def updateAmbientTemp(self):
         aw.qmc.updateAmbientTemp()
-        self.ambientedit.setText(str(aw.qmc.ambientTemp))
-        self.ambient_humidity_edit.setText(str(aw.qmc.ambient_humidity))
-        self.pressureedit.setText(str(aw.qmc.ambient_pressure))
+        self.ambientedit.setText("%g" % aw.float2float(aw.qmc.ambientTemp))
+        self.ambient_humidity_edit.setText("%g" % aw.float2float(aw.qmc.ambient_humidity))
+        self.pressureedit.setText("%g" % aw.float2float(aw.qmc.ambient_pressure))
 
     def scanWholeColor(self):
         v = aw.color.readColor()
@@ -30233,15 +30875,12 @@ class editGraphDlg(ArtisanDialog):
             weightout = float(self.weightoutedit.text())
         except Exception:
             pass
-        if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None):
-            k = 1000.
-        else:
-            k = 1.
-        if weightin:
+        k = 1.
+        if weightin is not None:
             weightin = weightin * k
         else:
             weightin = None
-        if weightout:
+        if weightout is not None:
             weightout = weightout * k
         else:
             weightout = None
@@ -30273,10 +30912,10 @@ class editGraphDlg(ArtisanDialog):
             pass
         previous_out = aw.qmc.weight[1]
         aw.retrieveWeightOut(tare)
-        if tare != 0 and previous_out == aw.qmc.weight[1] and self.weightoutedit.text() != "" and self.weightoutedit.text().toFloat()[0] != 0.0:
+        if tare != 0 and previous_out == aw.qmc.weight[1] and self.weightoutedit.text() != "" and float(self.weightoutedit.text()) != 0.0:
             # no value received from scale:
             # we reduce the tare from the outWeight
-            text_out = self.weightoutedit.text().toFloat()[0]
+            text_out = float(self.weightoutedit.text())
             # convert to 'g'
             text_out = aw.convertWeight(text_out,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
             # substract tare
@@ -30295,10 +30934,10 @@ class editGraphDlg(ArtisanDialog):
             pass
         previous_in = aw.qmc.weight[0]
         aw.retrieveWeightIn(tare)
-        if tare != 0 and previous_in == aw.qmc.weight[0] and self.weightinedit.text() != "" and self.weightinedit.text().toFloat()[0] != 0.0:
+        if tare != 0 and previous_in == aw.qmc.weight[0] and self.weightinedit.text() != "" and float(self.weightinedit.text()) != 0.0:
             # no value received from scale:
             # we reduce the tare from the inWeight
-            text_in = self.weightinedit.text().toFloat()[0]
+            text_in = float(self.weightinedit.text())
             # convert to 'g'
             text_in = aw.convertWeight(text_in,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
             # substract tare
@@ -30453,7 +31092,6 @@ class editGraphDlg(ArtisanDialog):
         
         self.eventtable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-#        regexvalue = QRegExp(r"^100|\d?\d?$")
         self.eventtable.setShowGrid(True) 
         etypes = aw.qmc.getetypes()
         #populate table
@@ -30483,7 +31121,6 @@ class editGraphDlg(ArtisanDialog):
             
             valueEdit = QLineEdit()
             valueEdit.setAlignment(Qt.AlignRight)
-#            valueEdit.setValidator(QRegExpValidator(regexvalue,self))
             valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[i]))
             
             timeline = QLineEdit()
@@ -30667,10 +31304,12 @@ class editGraphDlg(ArtisanDialog):
         else:
             message = QApplication.translate("Message","No events found", None)
             aw.sendmessage(message)
-            
+        
     def weightouteditChanged(self):
+        self.weightoutedit.setText(aw.comma2dot(str(self.weightoutedit.text())))
         self.percent()
         self.calculated_density()
+        self.density_out_editing_finished() # recalc volume_out
 
     def checkWeightIn(self):
         enough = True        
@@ -30690,12 +31329,43 @@ class editGraphDlg(ArtisanDialog):
             self.weightinedit.setStyleSheet("""QLineEdit { color: red }""")
         
     def weightineditChanged(self):
+        self.weightinedit.setText(aw.comma2dot(str(self.weightinedit.text())))
         self.percent()
         self.calculated_density()
+        keep_modified_density = self.modified_density_in_text
+        self.density_in_editing_finished() # recalc volume_in
+        self.modified_density_in_text = keep_modified_density
         self.recentRoastEnabled()
         if aw.plus_account is not None:
             self.checkWeightIn()
         
+    def density_percent(self):
+        percent = 0.
+        try:
+            if self.bean_density_out_edit.text() != "" and float(str(self.bean_density_out_edit.text())) != 0.0:
+                percent = aw.weight_loss(float(aw.comma2dot(str(self.bean_density_in_edit.text()))),float(aw.comma2dot(str(self.bean_density_out_edit.text()))))
+        except Exception:
+            pass
+        if percent == 0:
+            self.densitypercentlabel.setText("")
+        else:
+            percentstring =  "-%.1f" %(percent) + "%"
+            self.densitypercentlabel.setText(u(percentstring))    #density percent loss
+        
+    def moisture_percent(self):
+        percent = 0.
+        try:
+            m_roasted = float(aw.comma2dot(str(self.moisture_roasted_edit.text())))
+            if m_roasted != 0.0:
+                percent = float(aw.comma2dot(str(self.moisture_greens_edit.text()))) - m_roasted
+        except Exception:
+            pass
+        if percent == 0:
+            self.moisturepercentlabel.setText("")
+        else:
+            percentstring =  "-%.1f" %(percent) + "%"
+            self.moisturepercentlabel.setText(u(percentstring))    #density percent loss
+                
     def percent(self):
         percent = 0.
         try:
@@ -30703,42 +31373,50 @@ class editGraphDlg(ArtisanDialog):
                 percent = aw.weight_loss(float(str(self.weightinedit.text())),float(str(self.weightoutedit.text())))
         except Exception:
             pass
-        percentstring =  "%.1f" %(percent) + "%"
-        self.weightpercentlabel.setText(u(percentstring))    #weight percent loss
-# do not disclose this roast degree resulting from an oversimplified calculation
-#        roastdegreestring = ""
-#        if percent > 0.:
-#            roastdegreestring = aw.roast_degree(percent)
-#        self.roastdegreelabel.setText(u(roastdegreestring))
+        if percent > 0:
+            percentstring =  "-%.1f" %(percent) + "%"
+            self.weightpercentlabel.setText(u(percentstring))    #weight percent loss
+        else:
+            self.weightpercentlabel.setText("")
 
     def volume_percent(self):
+        self.volumeinedit.setText(aw.comma2dot(str(self.volumeinedit.text())))
+        self.volumeoutedit.setText(aw.comma2dot(str(self.volumeoutedit.text())))
+        self.modified_volume_in_text = str(self.volumeinedit.text())
         percent = 0.
         try:
             if self.volumeoutedit.text() != "" and float(str(self.volumeoutedit.text())) != 0.0:
                 percent = aw.volume_increase(float(str(self.volumeinedit.text()).replace(",",".")),float(str(self.volumeoutedit.text().replace(",","."))))
         except Exception:
             pass
-        percentstring =  "%.1f" %(percent) + "%"
-        self.volumepercentlabel.setText(u(percentstring))    #volume percent gain
+        if percent == 0:
+            self.volumepercentlabel.setText("")
+        else:
+            percentstring =  "%.1f" %(percent) + "%"
+            self.volumepercentlabel.setText(u(percentstring))    #volume percent gain
         self.calculated_density()
         
-    # calculates density in g/l
+    # calculates density in g/l from weightin/weightout and volumein/volumeout
     def calc_density(self):
         din = dout = 0.0
         try:
-            if self.volumeinedit.text() != "" and self.volumeoutedit.text() != "" and self.weightinedit.text() != "" and self.weightoutedit.text() != "":
-                volumein = float(str(self.volumeinedit.text()).replace(",","."))
-                volumeout = float(str(self.volumeoutedit.text()).replace(",","."))
-                weightin = float(str(self.weightinedit.text()).replace(",","."))
-                weightout = float(str(self.weightoutedit.text()).replace(",","."))
-                if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
+            if self.volumeinedit.text() != "" and self.weightinedit.text() != "":
+                volumein = float(str(self.volumeinedit.text()))
+                weightin = float(str(self.weightinedit.text()))
+                if volumein != 0.0 and weightin != 0.0:
                     vol_idx = aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
                     volumein = aw.convertVolume(volumein,vol_idx,0)
-                    volumeout = aw.convertVolume(volumeout,vol_idx,0)
                     weight_idx = aw.qmc.weight_units.index(self.unitsComboBox.currentText())
                     weightin = aw.convertWeight(weightin,weight_idx,0)
-                    weightout = aw.convertWeight(weightout,weight_idx,0)
                     din = (weightin / volumein) 
+            if self.volumeoutedit.text() != ""  and self.weightoutedit.text() != "":
+                volumeout = float(str(self.volumeoutedit.text()))
+                weightout = float(str(self.weightoutedit.text()))
+                if volumeout != 0.0 and weightout != 0.0:
+                    vol_idx = aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
+                    volumeout = aw.convertVolume(volumeout,vol_idx,0)
+                    weight_idx = aw.qmc.weight_units.index(self.unitsComboBox.currentText())
+                    weightout = aw.convertWeight(weightout,weight_idx,0)
                     dout = (weightout / volumeout)
         except:
             pass
@@ -30746,83 +31424,87 @@ class editGraphDlg(ArtisanDialog):
 
     def calculated_density(self):
         din, dout = self.calc_density()
-        if din > 0. and dout > 0.:
-            self.calculateddensitylabel.setText(QApplication.translate("Label","Density in: {0} g/l   =>   Density out: {1} g/l", None).format("%.1f"%din,"%.1f"%dout))
-            self.tab1aLayout.insertWidget(6,self.calculateddensitylabel)
+        if din > 0.:
             # set also the green density if not yet set
-            if (str(self.bean_density_weight_edit.text()) == "" or float(str(self.bean_density_weight_edit.text())) == 0.) and \
-                (str(self.bean_density_volume_edit.text()) == "" or float(str(self.bean_density_volume_edit.text())) in [0.,1.]):
-                self.bean_density_weightUnitsComboBox.setCurrentIndex(0) # "g"
-                self.bean_density_volumeUnitsComboBox.setCurrentIndex(0) # "l"
-                self.bean_density_weight_edit.setText(str(aw.float2float(din)))
-                self.bean_density_volume_edit.setText("1.0")
-        else:
-            self.calculateddensitylabel.setText("")
-            self.tab1aLayout.removeWidget(self.calculateddensitylabel)
+            self.bean_density_in_edit.setText("%g" % aw.float2float(din))
+        if  dout > 0.:
+            # set also the roasted density if not yet set
+            self.bean_density_out_edit.setText("%g" % aw.float2float(dout))
+        self.density_percent()
         self.calculated_organic_loss()
-#PLUS
-        try:
-            # weight unit changed, we update the coffee/blend lists in plus mode
-            if aw.plus_account is not None:
-                self.populatePlusCoffeeBlendCombos(self.plus_stores_combo.currentIndex())
-        except:
-            pass
             
     def calc_organic_loss(self):
         wloss = 0. # weight (moisture + organic)
         mloss = 0. # moisture
         try:
             if self.weightpercentlabel.text() and self.weightpercentlabel.text() != "":
-                wloss = float(self.weightpercentlabel.text().split("%")[0])
+                wloss = abs(float(self.weightpercentlabel.text().split("%")[0]))
         except Exception:
             pass
         try:
-            if self.moisture_greens_edit.text() and self.moisture_greens_edit.text() != "" and self.moisture_roasted_edit.text() and self.moisture_roasted_edit.text() != "":
-                m_in = float(self.moisture_greens_edit.text())
-                m_out = float(self.moisture_roasted_edit.text())
-                if m_in > 0 and m_out > 0:
-                    mloss = m_in - m_out
+            if self.moisturepercentlabel.text() and self.moisturepercentlabel.text() != "":
+                mloss = abs(float(self.moisturepercentlabel.text().split("%")[0]))
         except Exception:
             pass
         if mloss != 0. and wloss != 0.:
-            return mloss, wloss - mloss
+            return mloss, aw.float2float(max(min(wloss - mloss,100),0))
         else:
             return 0., 0.
 
     def calculated_organic_loss(self):
+        self.moisture_percent()
         mloss, oloss = self.calc_organic_loss()
         if oloss > 0. and mloss > 0.:
-            self.calculateorganiclosslabel.setText(QApplication.translate("Label","Moisture loss: {0}%    Organic loss: {1}%", None).format("%.1f"%mloss,"%.1f"%oloss))
-#            self.tab1bLayout.addWidget(self.calculateorganiclosslabel)
-            self.tab1aLayout.addWidget(self.calculateorganiclosslabel)
+            self.organiclosslabel.setText(QApplication.translate("Label", "organic loss",None))
+            self.organicpercentlabel.setText("-{}%".format(oloss))
         else:
-            self.calculateorganiclosslabel.setText("")
-#            self.tab1bLayout.removeWidget(self.calculateorganiclosslabel)
-            self.tab1aLayout.removeWidget(self.calculateorganiclosslabel)
+            self.organiclosslabel.setText("")
+            self.organicpercentlabel.setText("")
 
-    def density_volume_editing_finished(self):
-        self.modified_density_volume_text = str(self.bean_density_volume_edit.text())
-        self.standard_density()
-            
-    def density_weight_editing_finished(self):
-        self.modified_density_weight_text = str(self.bean_density_weight_edit.text())
-        self.standard_density()
-    
-    def standard_density(self):
-        if self.bean_density_volume_edit.text() != "" and \
-            float(str(self.bean_density_volume_edit.text())) != 0.0 and  \
-            self.bean_density_weight_edit.text() != "" and \
-            float(str(self.bean_density_weight_edit.text())) != 0.0 and \
-            not (float(str(self.bean_density_volume_edit.text())) == 1. and  
-            self.bean_density_volumeUnitsComboBox.currentIndex() == 1 and 
-            self.bean_density_weightUnitsComboBox.currentIndex() == 0):
-            volume = float(str(self.bean_density_volume_edit.text()))
-            weight = float(str(self.bean_density_weight_edit.text()))
-            volume = aw.convertVolume(volume,self.bean_density_volumeUnitsComboBox.currentIndex(),0)
-            weight = aw.convertWeight(weight,self.bean_density_weightUnitsComboBox.currentIndex(),0)            
-            self.standarddensitylabel.setText(QApplication.translate("Label","({0}g/l)", None).format(aw.float2float(weight / volume,0)))
-        else:
-            self.standarddensitylabel.setText("")
+    def greens_temp_editing_finished(self):
+        self.greens_temp_edit.setText(aw.comma2dot(str(self.greens_temp_edit.text())))
+        
+    def ambientedit_editing_finished(self):
+        self.ambientedit.setText(aw.comma2dot(str(self.ambientedit.text())))
+        
+    def ambient_humidity_editing_finished(self):
+        self.ambient_humidity_edit.setText(aw.comma2dot(str(self.ambient_humidity_edit.text())))
+        
+    def pressureedit_editing_finished(self):
+        self.pressureedit.setText(aw.comma2dot(str(self.pressureedit.text())))
+        
+    def density_in_editing_finished(self):
+        self.bean_density_in_edit.setText(aw.comma2dot(str(self.bean_density_in_edit.text())))
+        self.modified_density_in_text = str(self.bean_density_in_edit.text())
+        # if density-in and weight-in is given, we re-calc volume-in:
+        if self.bean_density_in_edit.text() != "" and self.weightinedit.text() != "":
+            density_in = float(str(self.bean_density_in_edit.text()))
+            weight_in = float(str(self.weightinedit.text()))
+            if density_in != 0 and weight_in != 0:
+                weight_in = aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),aw.qmc.weight_units.index("g"))
+                volume_in = weight_in / density_in # in g/l
+                # convert to selected volume unit
+                volume_in = aw.convertVolume(volume_in,aw.qmc.volume_units.index("l"),self.volumeUnitsComboBox.currentIndex())
+            else:
+                volume_in = 0
+            self.volumeinedit.setText("%g" % aw.float2floatWeightVolume(volume_in))
+            self.volume_percent()
+        
+    def density_out_editing_finished(self):
+        self.bean_density_out_edit.setText(aw.comma2dot(str(self.bean_density_out_edit.text())))
+        # if density-out and weight-out is given, we re-calc volume-out:
+        if self.bean_density_out_edit.text() != "" and self.weightoutedit.text() != "":
+            density_out = float(str(self.bean_density_out_edit.text()))
+            weight_out = float(str(self.weightoutedit.text()))
+            if density_out != 0 and weight_out != 0:
+                weight_out = aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),aw.qmc.weight_units.index("g"))
+                volume_out = weight_out / density_out # in g/l
+                # convert to selected volume unit
+                volume_out = aw.convertVolume(volume_out,aw.qmc.volume_units.index("l"),self.volumeUnitsComboBox.currentIndex())
+            else:
+                volume_out = 0
+            self.volumeoutedit.setText("%g" % aw.float2floatWeightVolume(volume_out))
+            self.volume_percent()
                 
     def accept(self):
         #check for graph
@@ -30937,40 +31619,40 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.ambientTempSource = self.ambientComboBox.currentIndex()
         #update weight
         try:
-            aw.qmc.weight[0] = float(str(self.weightinedit.text()).replace(",","."))
+            aw.qmc.weight[0] = float(aw.comma2dot(str(self.weightinedit.text())))
         except Exception:
             aw.qmc.weight[0] = 0
         try:
-            aw.qmc.weight[1] = float(str(self.weightoutedit.text()).replace(",","."))
+            aw.qmc.weight[1] = float(aw.comma2dot(str(self.weightoutedit.text())))
         except Exception:
             aw.qmc.weight[1] = 0
         aw.qmc.weight[2] =u(self.unitsComboBox.currentText())
         #update volume
         try:
-            aw.qmc.volume[0] = float(str(self.volumeinedit.text()).replace(",","."))
+            aw.qmc.volume[0] = float(aw.comma2dot(str(self.volumeinedit.text())))
         except Exception:
             aw.qmc.volume[0] = 0
         try:
-            aw.qmc.volume[1] = float(str(self.volumeoutedit.text()).replace(",","."))
+            aw.qmc.volume[1] = float(aw.comma2dot(str(self.volumeoutedit.text())))
         except Exception:
             aw.qmc.volume[1] = 0
         aw.qmc.volume[2] = u(self.volumeUnitsComboBox.currentText())
         #update density
         try:
-            aw.qmc.density[0] = float(str(self.bean_density_weight_edit.text()).replace(",","."))
+            aw.qmc.density[0] = float(aw.comma2dot(str(self.bean_density_in_edit.text())))
         except Exception:
             aw.qmc.density[0] = 0
-        aw.qmc.density[1] = u(self.bean_density_weightUnitsComboBox.currentText())
+        aw.qmc.density[1] = "g"
+        aw.qmc.density[2] = 1
+        aw.qmc.density[3] = "l"
         try:
-            aw.qmc.density[2] = float(str(self.bean_density_volume_edit.text()).replace(",","."))
+            aw.qmc.density_roasted[0] = float(aw.comma2dot(str(self.bean_density_out_edit.text())))
         except Exception:
-            aw.qmc.density[2] = 0
-        aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
+            aw.qmc.density_roasted[0] = 0
+        aw.qmc.density_roasted[1] = "g"
+        aw.qmc.density_roasted[2] = 1
+        aw.qmc.density_roasted[3] = "l"
         #update bean size
-#        try:
-#            aw.qmc.beansize = float(str(self.bean_size_edit.text()))
-#        except Exception:
-#            aw.qmc.beansize = 0.0
         try:
             aw.qmc.beansize_min = int(str(self.bean_size_min_edit.text()))
         except Exception:
@@ -31002,17 +31684,17 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.color_system_idx = self.colorSystemComboBox.currentIndex()
         #update beans temperature
         try:
-            aw.qmc.greens_temp = float(str(self.greens_temp_edit.text()))
+            aw.qmc.greens_temp = float(aw.comma2dot(str(self.greens_temp_edit.text())))
         except:
             aw.qmc.greens_temp = 0.
         #update greens moisture
         try:
-            aw.qmc.moisture_greens = float(str(self.moisture_greens_edit.text()))
+            aw.qmc.moisture_greens = float(aw.comma2dot(str(self.moisture_greens_edit.text())))
         except Exception:
             aw.qmc.moisture_greens = 0.
         #update roasted moisture
         try:
-            aw.qmc.moisture_roasted = float(str(self.moisture_roasted_edit.text()))
+            aw.qmc.moisture_roasted = float(aw.comma2dot(str(self.moisture_roasted_edit.text())))
         except Exception:
             aw.qmc.moisture_roasted = 0.
         #update ambient temperature
@@ -31024,12 +31706,12 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.ambientTemp = 0.0
         #update ambient humidity
         try:
-            aw.qmc.ambient_humidity = float(str(self.ambient_humidity_edit.text()))
+            aw.qmc.ambient_humidity = float(aw.comma2dot(str(self.ambient_humidity_edit.text())))
         except Exception:
             aw.qmc.ambient_humidity = 0
         #update ambient pressure
         try:
-            aw.qmc.ambient_pressure = float(str(self.pressureedit.text()))
+            aw.qmc.ambient_pressure = float(aw.comma2dot(str(self.pressureedit.text())))
         except Exception:
             aw.qmc.ambient_pressure = 0
         #update notes
@@ -31361,29 +32043,43 @@ class autosaveDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(autosaveDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Keyboard Autosave [a]", None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Autosave", None))
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None))
         autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]", None))
         self.autocheckbox = QCheckBox()
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None))
         self.autocheckbox.setChecked(aw.qmc.autosaveflag)        
-        autopdflabel = QLabel(QApplication.translate("CheckBox","Save PDF also", None))
+        autopdflabel = QLabel(QApplication.translate("CheckBox","Save also", None))
         self.autopdfcheckbox = QCheckBox()
-        self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save PDF version alongside .alog profiles",None))
-        self.autopdfcheckbox.setChecked(aw.qmc.autosavepdf)        
+        self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save image alongside .alog profiles",None))
+        self.autopdfcheckbox.setChecked(aw.qmc.autosaveimage)
+        imageTypes = ["PDF", "SVG", "PNG", "JPEG", "BMP"]
+        self.imageTypesComboBox = QComboBox()
+        self.imageTypesComboBox.addItems(imageTypes)
+        self.imageTypesComboBox.setCurrentIndex(imageTypes.index(aw.qmc.autosaveimageformat))
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None)))
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel", None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
         pathButton = QPushButton(QApplication.translate("Button","Path", None))
         pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(u(aw.qmc.autosavepath))
         self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None))
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
+        cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.autoChanged())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         pathButton.clicked.connect(lambda _:self.getpath())
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -31393,16 +32089,18 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignRight)
         autolayout.addWidget(autochecklabel,0,1)
         autolayout.addWidget(prefixlabel,1,0)
-        autolayout.addWidget(self.prefixEdit,1,1)
+        autolayout.addWidget(self.prefixEdit,1,1,1,2)
         autolayout.addWidget(pathButton,2,0)
-        autolayout.addWidget(self.pathEdit,2,1)
+        autolayout.addWidget(self.pathEdit,2,1,1,2)
         autolayout.addWidget(self.autopdfcheckbox,3,0,Qt.AlignRight)
         autolayout.addWidget(autopdflabel,3,1)
+        autolayout.addWidget(self.imageTypesComboBox,3,2)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(autolayout)
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        okButton.setFocus()
 
     def getpath(self):
         filename = aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Path", None))
@@ -31419,7 +32117,8 @@ class autosaveDlg(ArtisanDialog):
             aw.qmc.autosaveflag = 0
             message = QApplication.translate("Message","Autosave OFF", None)
             aw.sendmessage(message)
-        aw.qmc.autosavepdf = self.autopdfcheckbox.isChecked()
+        aw.qmc.autosaveimage = self.autopdfcheckbox.isChecked()
+        aw.qmc.autosaveimageformat = self.imageTypesComboBox.currentText()
         self.close()
 
 ##########################################################################
@@ -31462,7 +32161,18 @@ class batchDlg(ArtisanDialog):
         cancelButton = QPushButton(QApplication.translate("Button","Cancel", None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
+        cancelButton.setAutoDefault(False)
         okButton.clicked.connect(lambda _:self.batchChanged())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         self.batchcheckbox.stateChanged.connect(lambda _:self.toggleCounterFlag())
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -31480,6 +32190,7 @@ class batchDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        okButton.setFocus()
 
     def toggleCounterFlag(self):
         if self.batchcheckbox.isChecked():
@@ -31637,6 +32348,14 @@ class WindowsDlg(ArtisanDialog):
         except Exception:
             self.xaxislencombobox.setCurrentIndex(0)
         self.xaxislencombobox.currentIndexChanged.connect(self.xaxislenloc)
+        self.timeGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Time",None))
+        self.timeGridCheckBox.setChecked(aw.qmc.time_grid)
+        self.timeGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show time grid", None))
+        self.timeGridCheckBox.setFocusPolicy(Qt.NoFocus)
+        self.tempGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Temp",None))
+        self.tempGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show temperature grid", None))
+        self.tempGridCheckBox.setChecked(aw.qmc.temp_grid)
+        self.tempGridCheckBox.setFocusPolicy(Qt.NoFocus)
         ygridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.ygridSpinBox = QSpinBox()
         self.ygridSpinBox.setRange(10,500)
@@ -31683,7 +32402,18 @@ class WindowsDlg(ArtisanDialog):
         resetButton = QPushButton(QApplication.translate("Button","Defaults",None))
         resetButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.close())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
+        cancelButton.setAutoDefault(False)        
         okButton.clicked.connect(lambda _:self.updatewindow())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         resetButton.clicked.connect(lambda _:self.reset())
         
         hline = QFrame()
@@ -31719,9 +32449,6 @@ class WindowsDlg(ArtisanDialog):
         xlayout.addLayout(xlayout2) 
         xlayout.addWidget(hline)
         xlayout.addLayout(xlayout3)
-        
-        
-        
         ylayout = QGridLayout()
         ylayout.addWidget(ylimitLabel_min,0,0,Qt.AlignRight)
         ylayout.addWidget(self.ylimitEdit_min,0,1)
@@ -31757,6 +32484,8 @@ class WindowsDlg(ArtisanDialog):
         graphgridlayout.addWidget(self.gridstylecombobox,1,1,Qt.AlignLeft)
         graphgridlayout.addWidget(gridthicknesslabel,1,2,Qt.AlignRight)
         graphgridlayout.addWidget(self.gridwidthSpinBox,1,3,Qt.AlignLeft)
+        graphgridlayout.addWidget(self.timeGridCheckBox,2,0,Qt.AlignLeft)
+        graphgridlayout.addWidget(self.tempGridCheckBox,2,1,Qt.AlignLeft)
         graphgridlayout.addWidget(gridalphalabel,2,2,Qt.AlignRight)
         graphgridlayout.addWidget(self.gridalphaSpinBox,2,3,Qt.AlignLeft)
         xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None))
@@ -31791,6 +32520,7 @@ class WindowsDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        okButton.setFocus()
         
         if aw.qmc.locktimex:
             self.disableXAxisControls()
@@ -31892,6 +32622,8 @@ class WindowsDlg(ArtisanDialog):
     # exit dialog with OK
     def updatewindow(self):
         limits_changed = False
+        aw.qmc.time_grid = self.timeGridCheckBox.isChecked()
+        aw.qmc.temp_grid = self.tempGridCheckBox.isChecked()
         try:
             yl = int(str(self.ylimitEdit.text()))
             yl_min = int(str(self.ylimitEdit_min.text()))
@@ -32019,8 +32751,8 @@ class calculatorDlg(ArtisanDialog):
         clabel = QLabel(QApplication.translate("Label", "Celsius",None))
         self.faEdit = QLineEdit()
         self.ceEdit = QLineEdit()
-        self.faEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.faEdit))
-        self.ceEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.ceEdit))
+        self.faEdit.setValidator(aw.createCLocaleDoubleValidator(-999999., 9999999., 2, self.faEdit))
+        self.ceEdit.setValidator(aw.createCLocaleDoubleValidator(-999999., 9999999., 2, self.ceEdit))
         self.faEdit.editingFinished.connect(lambda :self.convertTemp("FtoC"))
         self.ceEdit.editingFinished.connect(lambda :self.convertTemp("CtoF"))
         #WEIGHT CONVERSION
@@ -32039,8 +32771,8 @@ class calculatorDlg(ArtisanDialog):
         self.WoutEdit.setMaximumWidth(70)
         #self.WinEdit.setMinimumWidth(60)
         #self.WoutEdit.setMinimumWidth(60)
-        self.WinEdit.setValidator(QDoubleValidator(0., 99999., 5, self.WinEdit))
-        self.WoutEdit.setValidator(QDoubleValidator(0., 99999., 5, self.WoutEdit))
+        self.WinEdit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 4, self.WinEdit))
+        self.WoutEdit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 4, self.WoutEdit))
         self.WinEdit.editingFinished.connect(lambda :self.convertWeight("ItoO"))
         self.WoutEdit.editingFinished.connect(lambda :self.convertWeight("OtoI"))
         #VOLUME CONVERSION
@@ -32065,8 +32797,8 @@ class calculatorDlg(ArtisanDialog):
         self.VoutEdit.setMaximumWidth(70)
         #self.VinEdit.setMinimumWidth(60)
         #self.VoutEdit.setMinimumWidth(60)
-        self.VinEdit.setValidator(QDoubleValidator(0., 99999., 5, self.VinEdit))
-        self.VoutEdit.setValidator(QDoubleValidator(0., 99999., 5, self.VoutEdit))
+        self.VinEdit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 4, self.VinEdit))
+        self.VoutEdit.setValidator(aw.createCLocaleDoubleValidator(0., 99999., 4, self.VoutEdit))
         self.VinEdit.editingFinished.connect(lambda :self.convertVolume("ItoO"))
         self.VoutEdit.editingFinished.connect(lambda :self.convertVolume("OtoI"))
         #EXTRACTION YIELD
@@ -32079,9 +32811,9 @@ class calculatorDlg(ArtisanDialog):
         self.tdsEdit = QLineEdit()
         self.yieldEdit = QLineEdit()
         self.yieldEdit.setReadOnly(True)
-        self.groundsEdit.setValidator(QDoubleValidator(1., 999., 2, self.groundsEdit))
-        self.coffeeEdit.setValidator(QDoubleValidator(1., 999., 2, self.coffeeEdit))
-        self.tdsEdit.setValidator(QDoubleValidator(0., 100., 2, self.tdsEdit))
+        self.groundsEdit.setValidator(aw.createCLocaleDoubleValidator(1., 999999., 2, self.groundsEdit))
+        self.coffeeEdit.setValidator(aw.createCLocaleDoubleValidator(1., 999999., 2, self.coffeeEdit))
+        self.tdsEdit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 2, self.tdsEdit))
         for e in [self.groundsEdit, self.coffeeEdit, self.tdsEdit]:
             e.editingFinished.connect(self.calculateYield)
         #LAYOUTS
@@ -32208,6 +32940,8 @@ class calculatorDlg(ArtisanDialog):
             self.result2.setText("")
 
     def convertTemp(self,x):
+        self.faEdit.setText(aw.comma2dot(str(self.faEdit.text())))
+        self.ceEdit.setText(aw.comma2dot(str(self.ceEdit.text())))
         if x == "FtoC":
             newC = aw.qmc.fromFtoC(float(str(self.faEdit.text())))
             result = "%.2f"%newC
@@ -32219,28 +32953,35 @@ class calculatorDlg(ArtisanDialog):
 
     def convertWeight(self,x):
         if x == "ItoO":
+            self.WinEdit.setText(aw.comma2dot(str(self.WinEdit.text())))
             inx = float(str(self.WinEdit.text()))
             outx = aw.convertWeight(inx,self.WinComboBox.currentIndex(),self.WoutComboBox.currentIndex())
             self.WoutEdit.setText("%.2f"%outx)
             
         elif x == "OtoI":
+            self.WoutEdit.setText(aw.comma2dot(str(self.WoutEdit.text())))
             outx = float(str(self.WoutEdit.text()))
             inx = aw.convertWeight(outx,self.WoutComboBox.currentIndex(),self.WinComboBox.currentIndex())
             self.WinEdit.setText("%.2f"%inx)
 
     def convertVolume(self,x):
         if x == "ItoO":
+            self.VinEdit.setText(aw.comma2dot(str(self.VinEdit.text())))
             inx = float(str(self.VinEdit.text()))
             outx = aw.convertVolume(inx,self.VinComboBox.currentIndex(),self.VoutComboBox.currentIndex())
             self.VoutEdit.setText("%.3f"%outx)
             
         elif x == "OtoI":
+            self.VoutEdit.setText(aw.comma2dot(str(self.VoutEdit.text())))
             outx = float(str(self.VoutEdit.text()))
             inx = aw.convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
             self.VinEdit.setText("%.3f"%inx)
 
 
     def calculateYield(self):
+        self.groundsEdit.setText(aw.comma2dot(str(self.groundsEdit.text())))
+        self.tdsEdit.setText(aw.comma2dot(str(self.tdsEdit.text())))
+        self.coffeeEdit.setText(aw.comma2dot(str(self.coffeeEdit.text())))
         # Extraction yield % = Brewed Coffee[g] x TDS[%] / Coffee Grounds[g]
         if self.groundsEdit.text() == "" or self.tdsEdit.text() == "" or self.coffeeEdit.text == "":
             return
@@ -32553,6 +33294,17 @@ class EventsDlg(ArtisanDialog):
         closeButton.clicked.connect(lambda _:self.restoreState())
         self.okButton.clicked.connect(lambda _:self.updatetypes())
         defaultButton.clicked.connect(lambda _:self.settypedefault())
+        self.okButton.setAutoDefault(True)
+        self.okButton.setFocusPolicy(Qt.StrongFocus)
+        closeButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.restoreState())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        closeButton.addActions([cancelAction])
+        closeButton.setAutoDefault(False)
         ###  TAB 2
         #number of buttons per row
         self.nbuttonslabel = QLabel(QApplication.translate("Label","Max buttons per row", None))
@@ -32674,7 +33426,9 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "S7 Command",None),
                        QApplication.translate("ComboBox", "Aillio R1 Heater",None),
                        QApplication.translate("ComboBox", "Aillio R1 Fan",None),
-                       QApplication.translate("ComboBox", "Aillio R1 Drum",None)]
+                       QApplication.translate("ComboBox", "Aillio R1 Drum",None),
+                       QApplication.translate("ComboBox", "Artisan Command",None),
+                       QApplication.translate("ComboBox", "RC Command",None)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -32996,7 +33750,9 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Aillio R1 Heater",None),
                        QApplication.translate("ComboBox", "Aillio R1 Fan",None),
                        QApplication.translate("ComboBox", "Aillio R1 Drum",None),
-                       QApplication.translate("ComboBox", "Aillio R1 Command",None)]
+                       QApplication.translate("ComboBox", "Aillio R1 Command",None),
+                       QApplication.translate("ComboBox", "Artisan Command",None),
+                       QApplication.translate("ComboBox", "RC Command",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -33404,6 +34160,7 @@ class EventsDlg(ArtisanDialog):
         mainLayout.setContentsMargins(5, 15, 5, 5)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        self.okButton.setFocus()
         
     def selectionChanged(self):
         selected = self.eventbuttontable.selectedRanges()
@@ -33880,7 +34637,9 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","Aillio R1 Heater",None),
                                      QApplication.translate("ComboBox","Aillio R1 Fan",None),
                                      QApplication.translate("ComboBox","Aillio R1 Drum",None),
-                                     QApplication.translate("ComboBox","Aillio R1 Command",None)])
+                                     QApplication.translate("ComboBox","Aillio R1 Command",None),
+                                     QApplication.translate("ComboBox","Artisan Command",None),
+                                     QApplication.translate("ComboBox","RC Command",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1
@@ -34613,13 +35372,24 @@ class phasesGraphDlg(ArtisanDialog):
         self.autoDRYflag.stateChanged.connect(self.autoDRYflagChanged)
         self.autoFCsFlag.stateChanged.connect(self.autoFCsFlagChanged)
         okButton = QPushButton(QApplication.translate("Button","OK",None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))        
         setDefaultButton = QPushButton(QApplication.translate("Button","Default Temperatures",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         setDefaultButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.cancel())
         okButton.clicked.connect(lambda _:self.updatephases())
         setDefaultButton.clicked.connect(lambda _:self.setdefault())
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.close())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
+        cancelButton.setAutoDefault(False)
         
         phaseLayout = QGridLayout()
         phaseLayout.addWidget(minf,0,1,Qt.AlignHCenter|Qt.AlignBottom)
@@ -34712,6 +35482,7 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
         self.getphases()
+        okButton.setFocus()
 
 #    def lcdmodeFlagDryChanged(self,value):
 #        aw.qmc.phasesLCDmode_all[0] = bool(value)
@@ -35126,6 +35897,7 @@ class backgroundDlg(ArtisanDialog):
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
         self.pathedit.setReadOnly(True)
+        self.pathedit.setFocusPolicy(Qt.NoFocus)
         self.filename = ""
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Show", None))
         self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Annotations", None))
@@ -35148,6 +35920,18 @@ class backgroundDlg(ArtisanDialog):
         delButton = QPushButton(QApplication.translate("Button","Delete", None))
         delButton.setFocusPolicy(Qt.NoFocus)
         okButton = QPushButton(QApplication.translate("Button","OK", None))
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
+        # add standard Mac OS X shortcut CMD-. to close this dialog
+        okButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.accept())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        okButton.addActions([cancelAction])
+        
         alignButton = QPushButton(QApplication.translate("Button","Align", None))
         alignButton.setFocusPolicy(Qt.NoFocus)
         self.alignComboBox = QComboBox()
@@ -35337,6 +36121,7 @@ class backgroundDlg(ArtisanDialog):
         mainLayout.addLayout(buttonLayout)
         mainLayout.setContentsMargins(5, 10, 5, 5) # left, top, right, bottom 
         self.setLayout(mainLayout)
+        okButton.setFocus()
         
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):
@@ -35815,6 +36600,8 @@ class StatisticsDlg(ArtisanDialog):
         okButton = QPushButton(QApplication.translate("Button","OK",None))
         resetButton = QPushButton(QApplication.translate("Button","Defaults",None))
         okButton.clicked.connect(lambda _:self.accept())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         resetButton.clicked.connect(lambda _:self.initialsettings())
         flagsLayout = QGridLayout()
         flagsLayout.addWidget(self.timez,0,0)
@@ -35922,6 +36709,7 @@ class StatisticsDlg(ArtisanDialog):
         mainLayout.addLayout(buttonsLayout)
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
+        okButton.setFocus()
 
     def AUCLCFflagChanged(self,_):
         aw.qmc.AUClcdFlag = not aw.qmc.AUClcdFlag
@@ -36232,6 +37020,26 @@ class colorport(extraserialport):
 
 
 ###########################################################################################
+##################### YOCTO ASYNC THREAD ##################################################
+###########################################################################################
+
+class YoctoThread(threading.Thread):
+    def __init__(self):
+        self._stopevent = threading.Event()
+        threading.Thread.__init__(self)
+    
+    def run(self):
+        from yoctopuce.yocto_api import YAPI, YRefParam
+        errmsg = YRefParam()
+        while not self._stopevent.isSet():
+            YAPI.UpdateDeviceList(errmsg)  # traps plug/unplug events
+            YAPI.Sleep(500, errmsg)  # traps others events
+
+    def join(self, timeout=None):
+        self._stopevent.set()
+        threading.Thread.join(self, timeout)
+
+###########################################################################################
 ##################### SERIAL PORT #########################################################
 ###########################################################################################
 
@@ -36257,26 +37065,27 @@ class serialport(object):
         ##### SPECIAL METER FLAGS ########
         #stores the Phidget 1048 TemperatureSensor object (None if not initialized)
         self.PhidgetTemperatureSensor = None # either None or a list containing one PhidgetTemperatureSensor() object per channel
-        self.Phidget1048values = [-1]*4 # the values gathered by registered change triggers
-        self.Phidget1048asynctimes = [None]*4 # the time a temp value was async received
-        self.Phidget1048asynctimesAveraged = [None]*4 # the time between Phidget1048asynctime and the last received value
+        self.Phidget1048values = [[],[],[],[]] # the values for each of the 4 channels gathered by registered change triggers in the last period
+        self.Phidget1048lastvalues = [-1]*4 # the last async values returned
+        self.Phidget1048semaphores = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
         # list of (serial,port) tuples filled on attaching the corresponding main device and consumed on attaching the other channel pairs
         #stores the Phidget 1045 TemperatureSensor object (None if not initialized)
         self.PhidgetIRSensor = None
         self.PhidgetIRSensorIC = None
-        self.Phidget1045value = -1
-        self.Phidget1045asynctime = None # the time a temp value was async received
-        self.Phidget1045asynctimeAveraged = None # the time between Phidget1045asynctime and the last received value
+        self.Phidget1045values = [] # async values of the one channel
+        self.Phidget1045lastvalue = -1
+        self.Phidget1045tempIRavg = None
+        self.Phidget1045semaphore = QSemaphore(1) # semaphore protecting the access to self.Phidget1045values per channel        
         #stores the Phidget BridgeSensor object (None if not initialized)
         self.PhidgetBridgeSensor = None
-        self.Phidget1046values = [-1]*4 # the values gathered by registered change triggers
-        self.Phidget1046asynctimes = [None]*4 # the time a temp value was async received
-        self.Phidget1046asynctimesAveraged = [None]*4 # the time between Phidget1046asynctime and the last received value
+        self.Phidget1046values = [[],[],[],[]] # the values for each of the 4 channels gathered by registered change triggers in the last period
+        self.Phidget1046lastvalues = [-1]*4 # the last async values returned
+        self.Phidget1046semaphores = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1046values per channel
         #stores the Phidget IO object (None if not initialized)
         self.PhidgetIO = None
-        self.PhidgetIOvalues = [-1]*8 # the values gathered by registered change triggers
-        self.PhidgetIOasynctimes = [None]*8 # the time a temp value was async received
-        self.PhidgetIOasynctimesAveraged = [None]*8 # the time between PhidgetIOasynctime and the last received value
+        self.PhidgetIOvalues = [[],[],[],[],[],[],[],[]] # the values gathered by registered change triggers
+        self.PhidgetIOlastvalues = [-1]*8 # the values gathered by registered change triggers
+        self.PhidgetIOsemaphores = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
         #stores the Phidget Digital Output PMW objects (None if not initialized)      
         self.PhidgetDigitalOut = None
         self.PhidgetDigitalOutLastPWM = [0]*4 # 0-100
@@ -36286,12 +37095,20 @@ class serialport(object):
         self.PhidgetDigitalOutLastToggleHub = [None]*6 # if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
         self.PhidgetAnalogOut = None
         self.PhidgetAnalogOutHub = None
+        self.PhidgetRCServo = None
         #store the Phidget IO Binary Output objects
         self.PhidgetBinaryOut = None # if attached, it contains a list of th 8 attached output channel objects
         #Yoctopuce channels
         self.YOCTOsensor = None
         self.YOCTOchan1 = None
         self.YOCTOchan2 = None
+        self.YOCTOtempIRavg = None # averages IR module temperature channel to eliminate noise
+
+        self.YOCTOvalues = [[],[]] # the values for each of the 2 channels gathered by registered change triggers in the last period
+        self.YOCTOlastvalues = [-1]*2 # the last async values returned
+        self.YOCTOsemaphores = [QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to YOCTO per channel
+        self.YOCTOthread = None
+
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid = "X"
         #MS6514 variables
@@ -36424,7 +37241,9 @@ class serialport(object):
                                    self.PHIDGET_DAQ1400_CURRENT,   #95
                                    self.PHIDGET_DAQ1400_FREQUENCY, #96 
                                    self.PHIDGET_DAQ1400_DIGITAL,   #97 
-                                   self.PHIDGET_DAQ1400_VOLTAGE,   #98 
+                                   self.PHIDGET_DAQ1400_VOLTAGE,   #98
+                                   self.R1_BTIBTS,            # 99
+                                   self.YOCTO_IR,             #100
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -36771,178 +37590,142 @@ class serialport(object):
         
     def PHIDGET1045(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_1045)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_1045)
         return tx,a,t
 
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,0)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,0)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
 
     def PHIDGET1048_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,1)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,1)
         return tx,t1,t2
 
     def PHIDGET1048_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,_ = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,2)
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,2)
         return tx,t1,t2
 
     def PHIDGET1046(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1046temperature(0)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1046temperature(0)
         return tx,t1,t2
 
     def PHIDGET1046_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1046temperature(1)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1046temperature(1)
         return tx,t1,t2
         
     def PHIDGET1051(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_1051)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_1051)
         return tx,a,t
         
     def PHIDGET1011(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"voltage")
         return tx,v1,v2
                 
     def PHIDGET1018(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"voltage")
         return tx,v1,v2
 
     def PHIDGET1018_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"voltage")
         return tx,v1,v2
 
     def PHIDGET1018_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"voltage")
         return tx,v1,v2
 
     def PHIDGET1018_78(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"voltage")
         return tx,v1,v2
         
     def PHIDGET1011_D(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,"digital")
         return tx,v1,v2
         
     def PHIDGET1018_D(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,"digital")
         return tx,v1,v2
 
     def PHIDGET1018_D_78(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,"digital")
         return tx,v1,v2
         
     def PHIDGET_HUB0000_D(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"digital")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_D_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"digital")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_D_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"digital")
         return tx,v1,v2        
 
     def PHIDGET_TMP1101(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,0)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,0)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
         
     def PHIDGET_TMP1101_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,tx_async = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,1)
-        if tx_async is not None:
-            tx = tx_async
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,1)
         return tx,t1,t2
             
     def PHIDGET_TMP1101_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1,_ = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,2)
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,2)
         return tx,t1,t2
 
     def PHIDGET_TMP1100(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1100)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1100)
         return tx,a,t
 
     def PHIDGET_TMP1200(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t,a,tx_async = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
-        if tx_async is not None:
-            tx = tx_async
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
         return tx,a,t
         
     def PHIDGET_HUB0000(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1  = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,"voltage")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,"voltage")
         return tx,v1,v2
 
     def PHIDGET_HUB0000_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"voltage")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_CURRENT(self):
@@ -36952,19 +37735,17 @@ class serialport(object):
 
     def PHIDGET_DAQ1400_FREQUENCY(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"frequency")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"frequency")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_DIGITAL(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"digital")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"digital")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_VOLTAGE(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"voltage")
-        if tx_async is not None:
-            tx = tx_async
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"voltage")
         return tx,v1,v2
 
     def HOTTOP_BTET(self):
@@ -37028,6 +37809,12 @@ class serialport(object):
             error = QApplication.translate("Error Message", "Aillio R1: " + str(exception), None)
             aw.qmc.adderror(error)
         return tx, aw.qmc.R1_DT, aw.qmc.R1_BT
+
+    def R1_BTIBTS(self):
+        self.R1_DTBT()
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        # DT is being used as IBTS.
+        return tx, aw.qmc.R1_BT, aw.qmc.R1_DT
 
     def R1_DRUM_BTROR(self):
         tx = aw.qmc.R1_TX
@@ -37257,6 +38044,11 @@ class serialport(object):
         v2,v1 = self.YOCTOtemperatures(1)
         return tx,v1,v2
 
+    def YOCTO_IR(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.YOCTOtemperatures(2)
+        return tx,v2,v1
+
     def TEVA18B(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.TEVA18Btemperature()
@@ -37355,7 +38147,51 @@ class serialport(object):
             ### not finished
         else:
             return tx, 0., float(val)   #send a 0. as second reading because the meter only returns one reading
+
+    # connects to a Yocto Meteo, returns current humidity value
+    def YoctoMeteoHUM(self):
+        try:
+            self.YOCTOimportLIB() # first via import the lib
+            from yoctopuce.yocto_humidity import YHumidity
+            HUMsensor = YHumidity.FirstHumidity()
+            if HUMsensor.isOnline():
+                return HUMsensor.get_currentValue()
+            else:
+                return None
+        except:
+            return None
             
+    # connects to a Yocto Meteo, returns current temperature value
+    def YoctoMeteoTEMP(self):
+        try:
+            self.YOCTOimportLIB() # first via import the lib
+            from yoctopuce.yocto_temperature import YTemperature
+            METEOsensor = self.getNextYOCTOsensorOfType(3,[],YTemperature.FirstTemperature())
+            if METEOsensor is not None and METEOsensor.isOnline():
+                serial = METEOsensor.get_module().get_serialNumber()
+                tempCh = YTemperature.FindTemperature(serial + '.temperature')
+                if tempCh.isOnline():
+                    return tempCh.get_currentValue()
+                else:
+                    return None
+            else:
+                return None
+        except:
+            return None
+            
+    # connects to a Yocto Meteo, returns current pressure value
+    def YoctoMeteoPRESS(self):
+        try:
+            self.YOCTOimportLIB() # first via import the lib
+            from yoctopuce.yocto_pressure import YPressure
+            PRESSsensor = YPressure.FirstPressure()
+            if PRESSsensor.isOnline():
+                return PRESSsensor.get_currentValue()
+            else:
+                return None
+        except:
+            return None
+
     # connects to a Phidgets HUM1000, returns current temperature value and disconnects
     def PhidgetHUM1000temperature(self):
         try:
@@ -38350,24 +39186,22 @@ class serialport(object):
 #---
 
     def phidget1045TemperatureChanged(self,_,t):
-        prev_time = self.Phidget1045asynctime
-        self.Phidget1045asynctime = aw.qmc.timeclock.elapsed()/1000.
-        if prev_time is None:
-            self.Phidget1045asynctimeAveraged = self.Phidget1045asynctime
-        else:
-            self.Phidget1045asynctimeAveraged = (prev_time + self.Phidget1045asynctime) / 2.0
-        if self.Phidget1045value != -1:
-            self.Phidget1045value = (self.Phidget1045value + t)/2.0
-        else:
-            self.Phidget1045value = t
-            
-    def phidget1045temp(self,temp,ambient):
-        return (temp - ambient) * aw.qmc.phidget1045_emissivity + ambient
+        try:
+            #### lock shared resources #####
+            self.Phidget1045semaphore.acquire(1)
+            self.Phidget1045values.append(t)
+        finally:
+            if self.Phidget1045semaphore.available() < 1:
+                self.Phidget1045semaphore.release(1)
+          
+    # applies given emissivity to the IR temperature value assuming the given ambient temperature
+    def IRtemp(self,emissivity,temp,ambient):
+        return (temp - ambient) * emissivity + ambient
 
     def configure1045(self):
-        self.Phidget1045value = -1
-        self.Phidget1045asynctime = None
-        self.Phidget1045asynctimeAveraged = None
+        self.Phidget1045values = []
+        self.Phidget1045lastvalue = -1
+        self.Phidget1045tempIRavg = None
         if self.PhidgetIRSensor is not None:
             try:
                 if aw.qmc.phidget1045_async:
@@ -38390,9 +39224,8 @@ class serialport(object):
                 pass
             
     def configureOneTC(self):
-        self.Phidget1045value = -1
-        self.Phidget1045asynctime = None
-        self.Phidget1045asynctimeAveraged = None
+        self.Phidget1045values = []
+        self.Phidget1045lastvalue = -1
         self.PhidgetIRSensor.setThermocoupleType(PHIDGET_THERMOCOUPLE_TYPE(aw.qmc.phidget1048_types[0]))
         if aw.qmc.phidget1048_async[0]:
             self.PhidgetIRSensor.setTemperatureChangeTrigger(aw.qmc.phidget1048_changeTriggers[0])
@@ -38409,18 +39242,15 @@ class serialport(object):
             pass
             
     def configureOneRTD(self):
-        self.Phidget1045value = -1
-        self.Phidget1045asynctime = None
-        self.Phidget1045asynctimeAveraged = None
+        self.Phidget1045values = []
+        self.Phidget1045lastvalue = -1
         self.PhidgetIRSensor.setRTDType(PHIDGET_RTD_TYPE(aw.qmc.phidget1200_formula))
         self.PhidgetIRSensor.setRTDWireSetup(PHIDGET_RTD_WIRE(aw.qmc.phidget1200_wire))        
         if aw.qmc.phidget1200_async:
             self.PhidgetIRSensor.setTemperatureChangeTrigger(aw.qmc.phidget1200_changeTrigger)
-        else:
-            self.PhidgetIRSensor.setTemperatureChangeTrigger(0)
-        if aw.qmc.phidget1200_async:
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
         else:
+            self.PhidgetIRSensor.setTemperatureChangeTrigger(0)
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda *_:None)
         # set rate
         try:
@@ -38516,10 +39346,10 @@ class serialport(object):
                         except Exception:
                             pass
                         self.PhidgetIRSensor = None
-                        self.Phidget1045value = -1
-                        self.Phidget1045asynctime = None
-                        self.Phidget1045asynctimeAveraged = None
+                        self.Phidget1045values = []
+                        self.Phidget1045lastvalue = -1
                         self.PhidgetIRSensorIC = None
+                        self.Phidget1045tempIRavg = None
             if self.PhidgetIRSensor and self.PhidgetIRSensor.getAttached():
                 res = -1
                 ambient = -1
@@ -38527,11 +39357,33 @@ class serialport(object):
                     if (deviceType == DeviceID.PHIDID_1045 and aw.qmc.phidget1045_async) or \
                         (deviceType in [DeviceID.PHIDID_1051,DeviceID.PHIDID_TMP1100] and aw.qmc.phidget1048_async[0]) or \
                         (deviceType == DeviceID.PHIDID_TMP1200 and aw.qmc.phidget1200_async):
-                        if self.Phidget1045value == -1:
-                            self.Phidget1045asynctime = aw.qmc.timeclock.elapsed()/1000.
-                            self.Phidget1045asynctimeAveraged = self.Phidget1045asynctime
-                            self.Phidget1045value = self.PhidgetIRSensor.getTemperature()
-                        probe = self.Phidget1045value
+                        async_res = None
+                        try:
+                            #### lock shared resources #####
+                            self.Phidget1045semaphore.acquire(1)
+                            if len(self.Phidget1045values) > 0:
+                                async_res = numpy.average(self.Phidget1045values)
+                                if deviceType == DeviceID.PHIDID_1045:
+                                    rate = aw.qmc.phidget1045_dataRate
+                                elif deviceType == DeviceID.PHIDID_TMP1200:
+                                    rate = aw.qmc.phidget1200_dataRate
+                                else:
+                                    rate = aw.qmc.phidget1048_dataRate
+                                self.Phidget1045values = self.Phidget1045values[-round((aw.qmc.delay/rate)):]
+                        except:
+                            self.Phidget1045values = []
+                        finally:
+                            if self.Phidget1045semaphore.available() < 1:
+                                self.Phidget1045semaphore.release(1)
+                        if async_res is None:
+                            if self.Phidget1045lastvalue == -1: # there is no last value yet, we take a sync value
+                                probe = self.PhidgetIRSensor.getTemperature()
+                                self.Phidget1045lastvalue = self.PhidgetIRSensor.getTemperature()
+                            else:
+                                probe = self.Phidget1045lastvalue
+                        else:
+                            self.Phidget1045lastvalue = async_res
+                            probe = async_res
                     else:
                         probe = self.PhidgetIRSensor.getTemperature()
                     if aw.qmc.mode == "F":
@@ -38542,6 +39394,12 @@ class serialport(object):
                 try:
                     if self.PhidgetIRSensorIC and self.PhidgetIRSensorIC.getAttached():
                         ambient = self.PhidgetIRSensorIC.getTemperature()
+                        # we heavily average this ambient temperature IC readings not to introduce additional noise via emissivity calc to the IR reading
+                        if self.Phidget1045tempIRavg is None:
+                            self.Phidget1045tempIRavg = ambient
+                        else:
+                            self.Phidget1045tempIRavg = (20*self.Phidget1045tempIRavg + ambient) / 21.0
+                            ambient = self.Phidget1045tempIRavg
                         if aw.qmc.mode == "F":
                             ambient = aw.qmc.fromCtoF(ambient)
                 except Exception:
@@ -38549,20 +39407,17 @@ class serialport(object):
                 if deviceType == DeviceID.PHIDID_TMP1200:
                     ambient = res
                 if ambient == -1:
-                    return -1,-1,None
+                    return -1,-1
                 else:
                     if deviceType == DeviceID.PHIDID_1045:
-                        return self.phidget1045temp(res,ambient),ambient,self.Phidget1045asynctimeAveraged
+                        return self.IRtemp(aw.qmc.phidget1045_emissivity,res,ambient),ambient
                     else:
-                        return res,ambient,self.Phidget1045asynctimeAveraged
-                # reset async timestamps for next sampling interval
-                self.Phidget1045asynctime = None
-                self.Phidget1045asynctimeAveraged = None
+                        return res,ambient
             elif retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1045temperature(deviceType,retry=False)
             else:
-                return -1,-1,None
+                return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -38574,40 +39429,62 @@ class serialport(object):
             except Exception:
                 pass
             self.PhidgetIRSensor = None
-            self.Phidget1045value = -1
-            self.Phidget1045asynctime = None
-            self.Phidget1045asynctimeAveraged = None            
+            self.Phidget1045values = []  
+            self.Phidget1045lastvalue = -1      
             self.PhidgetIRSensorIC = None
+            self.Phidget1045tempIRavg = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return -1,-1,None
+            return -1,-1
 
 #----
 
-    
-    
-    def phidget1048TemperatureChanged(self,t,idx):
-        if self.PhidgetTemperatureSensor and len(self.PhidgetTemperatureSensor) > idx:
-            prev_time = self.Phidget1048asynctimes[idx]
-            self.Phidget1048asynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-            if prev_time is None:
-                self.Phidget1048asynctimesAveraged[idx] = self.Phidget1048asynctimes[idx]
-            else:
-                self.Phidget1048asynctimesAveraged[idx] = (prev_time + self.Phidget1048asynctimes[idx]) / 2.0
-            channel = self.PhidgetTemperatureSensor[idx].getChannel()
-            if aw.qmc.phidget1048_async[channel]:
-                if self.Phidget1048values[channel] != -1:
-                    self.Phidget1048values[channel] = (self.Phidget1048values[channel] + t)/2.0
-                else:
-                    self.Phidget1048values[channel] = t
+    def phidget1048TemperatureChanged(self,t,channel):
+        try:
+            #### lock shared resources #####
+            self.Phidget1048semaphores[channel].acquire(1)
+            self.Phidget1048values[channel].append(t)
+        finally:
+            if self.Phidget1048semaphores[channel].available() < 1:
+                self.Phidget1048semaphores[channel].release(1)
 
-    def phidget1048getSensorReading(self,i,idx):
-        if aw.qmc.phidget1048_async[i]:
-            if self.Phidget1048values[i] == -1:
-                self.Phidget1048asynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-                self.Phidget1048asynctimesAveraged[idx] = self.Phidget1048asynctimes[idx]
-                self.Phidget1048values[i] = self.PhidgetTemperatureSensor[idx].getTemperature()
-            return self.Phidget1048values[i]
+    def phidget1048getSensorReading(self,channel,idx):
+        if aw.qmc.phidget1048_async[channel]:
+            res = None
+            try:
+                #### lock shared resources #####
+                self.Phidget1048semaphores[channel].acquire(1)
+                if len(self.Phidget1048values[channel]) > 0:
+                    res = numpy.average(self.Phidget1048values[channel])
+                    
+#                    data = self.Phidget1048values[channel]
+#                    data_mean, data_std = numpy.mean(data), numpy.std(data)
+#                    if data_std > 0:
+#                        cut_off = data_std * 0.9
+#                        lower, upper = data_mean - cut_off, data_mean + cut_off
+#                        outliers_removed = [x for x in data if x > lower and x < upper]
+#                        if len(outliers_removed) < 3:
+#                            outliers_removed = data
+#                    else:
+#                        outliers_removed = data
+#                    res = numpy.average(outliers_removed)
+
+                    self.Phidget1048values[channel] = self.Phidget1048values[channel][-round((aw.qmc.delay/aw.qmc.phidget1048_dataRate)):]                
+            except Exception as e:
+                self.Phidget1048values[channel] = []
+            finally:
+                if self.Phidget1048semaphores[channel].available() < 1:
+                    self.Phidget1048semaphores[channel].release(1)
+            if res is None:
+                if self.Phidget1048lastvalues[channel] == -1: # there is no last value yet, we take a sync value
+                    res = self.PhidgetTemperatureSensor[idx].getTemperature()
+                    self.Phidget1048lastvalues[channel] = res
+                    return res
+                else:
+                    return self.Phidget1048lastvalues[channel] # return the previous result
+            else:
+                self.Phidget1048lastvalues[channel] = res
+                return res
         else:
             return self.PhidgetTemperatureSensor[idx].getTemperature()
     
@@ -38628,15 +39505,14 @@ class serialport(object):
                 try:
                     if aw.qmc.phidget1048_async[channel]:
                         self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(aw.qmc.phidget1048_changeTriggers[channel])
-                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda _,t: self.phidget1048TemperatureChanged(t,idx))
+                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda _,t: self.phidget1048TemperatureChanged(t,channel))
                     else:
                         self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(0)
                         self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda *_:None)
                 except:
                     pass
-                self.Phidget1048values[channel] = -1
-                self.Phidget1048asynctimes[idx] = None
-                self.Phidget1048asynctimesAveraged[idx] = None
+                self.Phidget1048values[channel] = []
+                self.Phidget1048lastvalues[channel] = -1
 
     def phidget1048attached(self,serial,port,deviceType,idx):
         try:
@@ -38725,9 +39601,8 @@ class serialport(object):
                                 self.PhidgetTemperatureSensor[1].close()
                         except Exception:
                             pass
-                        self.Phidget1048values = [-1]*4
-                        self.Phidget1048asynctimes = [None]*4
-                        self.Phidget1048asynctimesAveraged = [None]*4
+                        self.Phidget1048values = [[],[],[],[]]
+                        self.Phidget1048lastvalues = [-1]*4
                         self.PhidgetTemperatureSensor = None
             if self.PhidgetTemperatureSensor and ((mode == 2) or (len(self.PhidgetTemperatureSensor)>1 and self.PhidgetTemperatureSensor[0].getAttached() and self.PhidgetTemperatureSensor[1].getAttached())):
                 # now just harvest both temps (or one in case type is 2)
@@ -38745,41 +39620,22 @@ class serialport(object):
                             probe2 = aw.qmc.fromCtoF(probe2)
                     except Exception:
                         pass
-                    async_time = None
-                    try:
-                        tx_avg_1 = self.Phidget1048asynctimesAveraged[mode*2]
-                        tx_avg_2 = self.Phidget1048asynctimesAveraged[mode*2 + 1]
-                        if tx_avg_1 is None and tx_avg_2 is not None:
-                            async_time = tx_avg_2
-                        elif tx_avg_1 is not None and tx_avg_2 is None:
-                            async_time = tx_avg_1
-                        elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 > tx_avg_2:
-                            async_time = tx_avg_1
-                        elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 <= tx_avg_2:
-                            async_time = tx_avg_2
-                    except Exception:
-                        pass
-                    # reset async timestamps for next sampling interval
-                    self.Phidget1048asynctimes[mode*2] = None
-                    self.Phidget1048asynctimes[mode*2 + 1] = None
-                    self.Phidget1048asynctimesAveraged[mode*2] = None
-                    self.Phidget1048asynctimesAveraged[mode*2 + 1] = None
-                    return probe1, probe2, async_time
+                    return probe1, probe2
                 elif mode == 2:
                     try:
                         at = self.PhidgetTemperatureSensor[0].getTemperature()
                         if aw.qmc.mode == "F":
                             at = aw.qmc.fromCtoF(at)
-                        return at,-1,None
+                        return at,-1
                     except Exception:
-                        return -1,-1,None
+                        return -1,-1
                 else:
-                    return -1,-1,None
+                    return -1,-1
             elif retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1048temperature(deviceType,mode,False)
             else:
-                return -1,-1,None
+                return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -38790,13 +39646,12 @@ class serialport(object):
                     self.PhidgetTemperatureSensor[1].close()
             except Exception:
                 pass
-            self.Phidget1048values = [-1]*4
-            self.Phidget1048asynctimes = [None]*4
-            self.Phidget1048asynctimesAveraged = [None]*4
+            self.Phidget1048values = [[],[],[],[]]
+            self.Phidget1048lastvalues = [-1]*4
             self.PhidgetTemperatureSensor = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return -1,-1,None
+            return -1,-1
 
 #--- code for the Phidgets 1046
 
@@ -38836,23 +39691,17 @@ class serialport(object):
 #        bvf = bv / (1000 - bv)
 #        return 4750.3 * bvf * bvf + 4615.6 * bvf - 242.615                
 
-    def phidget1046TemperatureChanged(self,v,idx):
-        if self.PhidgetBridgeSensor and len(self.PhidgetBridgeSensor) > idx:
-            prev_time = self.Phidget1046asynctimes[idx]
-            self.Phidget1046asynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-            if prev_time is None:
-                self.Phidget1046asynctimesAveraged[idx] = self.Phidget1046asynctimes[idx]
-            else:
-                self.Phidget1046asynctimesAveraged[idx] = (prev_time + self.Phidget1046asynctimes[idx]) / 2.0
-            channel = self.PhidgetBridgeSensor[idx].getChannel()
-            if self.phidget1046_async[channel]:        
-                temp = self.bridgeValue2Temperature(channel,v)
-                if aw.qmc.mode == "F":
-                    temp = aw.qmc.fromCtoF(temp)
-                if self.Phidget1046values[channel] != -1:
-                    self.Phidget1046values[channel] = (self.Phidget1046values[channel] + temp)/2.0
-                else:
-                    self.Phidget1046values[channel] = temp
+    def phidget1046TemperatureChanged(self,v,channel):
+        try:
+            #### lock shared resources #####
+            self.Phidget1046semaphores[channel].acquire(1)
+            temp = self.bridgeValue2Temperature(channel,v*1000) # Note in Phidgets API v22 this factor 1000 has to be added
+            if aw.qmc.mode == "F" and aw.qmc.phidget1046_formula[channel] != 2:
+                temp = aw.qmc.fromCtoF(temp)
+            self.Phidget1046values[channel].append(temp)
+        finally:
+            if self.Phidget1046semaphores[channel].available() < 1:
+                self.Phidget1046semaphores[channel].release(1)
 
     def bridgeValue2Temperature(self,i,bv):
         v = -1
@@ -38884,15 +39733,32 @@ class serialport(object):
             v = -1
         return v
                         
-    def phidget1046getSensorReading(self,i,idx):
-        if aw.qmc.phidget1046_async[i]:
-            if self.Phidget1046values[i] == -1:
-                self.Phidget1046asynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-                self.Phidget1046asynctimesAveraged[idx] = self.Phidget1046asynctimes[idx]
-                self.Phidget1046values[i] = self.phidget1046getTemperature(i,idx)               
-            return self.Phidget1046values[i]
+    def phidget1046getSensorReading(self,channel,idx):
+        if aw.qmc.phidget1046_async[channel]:
+            res = None
+            try:
+                #### lock shared resources #####
+                self.Phidget1046semaphores[channel].acquire(1)
+                if len(self.Phidget1046values[channel]) > 0:
+                    res = numpy.average(self.Phidget1046values[channel])
+                    self.Phidget1046values[channel] = self.Phidget1046values[channel][-round((aw.qmc.delay/aw.qmc.phidget1046_dataRate)):] 
+            except Exception as e:
+                self.Phidget1046values[channel] = []
+            finally:
+                if self.Phidget1046semaphores[channel].available() < 1:
+                    self.Phidget1046semaphores[channel].release(1)
+            if res is None:
+                if self.Phidget1046lastvalues[channel] == -1: # there is no last value yet, we take a sync value
+                    res = self.phidget1046getTemperature(channel,idx)
+                    self.Phidget1046lastvalues[channel] = res
+                    return res
+                else:
+                    return self.Phidget1046lastvalues[channel]
+            else:
+                self.Phidget1046lastvalues[channel] = res
+                return res
         else:
-            return self.phidget1046getTemperature(i,idx)
+            return self.phidget1046getTemperature(channel,idx)
 
     def configure1046(self,idx):
         if self.PhidgetBridgeSensor and len(self.PhidgetBridgeSensor) > idx:
@@ -38919,20 +39785,19 @@ class serialport(object):
                 except Exception:
                     pass
                 if aw.qmc.phidget1046_async[channel]:
-                    self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda _,v:self.phidget1046TemperatureChanged(v,idx))
+                    self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda _,v:self.phidget1046TemperatureChanged(v,channel))
                 else:
                     self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda *_:None)
                 # reset async value
-                self.Phidget1046values[channel] = -1
-                self.Phidget1046asynctimes[idx] = None
-                self.Phidget1046asynctimesAveraged[idx] = None
+                self.Phidget1046values[channel] = []
+                self.Phidget1046lastvalues[channel] = -1
 
     def phidget1046attached(self,serial,port,deviceType,idx):
         try:
             self.configure1046(idx)
             if self.PhidgetBridgeSensor is not None:
                 channel = self.PhidgetBridgeSensor[idx].getChannel()
-                aw.qmc.phidgetManager.reserveSerialPort(serial,port,channel,"VoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                aw.qmc.phidgetManager.reserveSerialPort(serial,port,channel,"PhidgetVoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if channel == 0:
                     aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None))
         except:
@@ -38942,7 +39807,7 @@ class serialport(object):
         try:
             if self.PhidgetBridgeSensor is not None:
                 channel = self.PhidgetBridgeSensor[idx].getChannel()
-                aw.qmc.phidgetManager.releaseSerialPort(serial,port,channel,"VoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                aw.qmc.phidgetManager.releaseSerialPort(serial,port,channel,"PhidgetVoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if channel == 0:
                     aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input detached",None))
         except:
@@ -38956,11 +39821,11 @@ class serialport(object):
                 port = None 
                 if mode == 0:
                     # we scan for available main device
-                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,0,
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageRatioInput',DeviceID.PHIDID_1046,0,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
                 elif mode == 1:
-                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,2,
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageRatioInput',DeviceID.PHIDID_1046,2,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
                     self.PhidgetBridgeSensor = [VoltageRatioInput(),VoltageRatioInput()]
@@ -38998,10 +39863,9 @@ class serialport(object):
                                 self.PhidgetBridgeSensor[1].close()
                         except Exception:
                             pass
-                        self.Phidget1046values = [-1]*4
+                        self.Phidget1046values = [[],[],[],[]]
+                        self.Phidget1046lastvalues = [-1]*4
                         self.PhidgetBridgeSensor = None
-                        self.Phidget1046asynctimes = [None]*4
-                        self.Phidget1046asynctimesAveraged = [None]*4
             if self.PhidgetBridgeSensor and len(self.PhidgetBridgeSensor) == 2 and self.PhidgetBridgeSensor[0].getAttached() and self.PhidgetBridgeSensor[1].getAttached():
                 if mode in [0,1]:
                     probe1 = probe2 = -1
@@ -39013,33 +39877,14 @@ class serialport(object):
                         probe2 = self.phidget1046getSensorReading(mode*2+1,1)
                     except Exception:
                         pass
-                    async_time = None
-                    try:
-                        tx_avg_1 = self.Phidget1046asynctimesAveraged[mode*2]
-                        tx_avg_2 = self.Phidget1046asynctimesAveraged[mode*2 + 1]
-                        if tx_avg_1 is None and tx_avg_2 is not None:
-                            async_time = tx_avg_2
-                        elif tx_avg_1 is not None and tx_avg_2 is None:
-                            async_time = tx_avg_1
-                        elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 > tx_avg_2:
-                            async_time = tx_avg_1
-                        elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 <= tx_avg_2:
-                            async_time = tx_avg_2
-                    except Exception:
-                        pass
-                    # reset async timestamps for next sampling interval
-                    self.Phidget1046asynctimes[mode*2] = None
-                    self.Phidget1046asynctimes[mode*2 + 1] = None
-                    self.Phidget1046asynctimesAveraged[mode*2] = None
-                    self.Phidget1046asynctimesAveraged[mode*2 + 1] = None
-                    return probe1, probe2, async_time
+                    return probe1, probe2
                 else:
-                    return -1,-1,None
+                    return -1,-1
             elif retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1046temperature(mode,False)                
             else:
-                return -1,-1,None
+                return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -39050,13 +39895,12 @@ class serialport(object):
                     self.PhidgetBridgeSensor[1].close()
             except Exception:
                 pass
-            self.Phidget1046values = [-1]*4
+            self.Phidget1046values = [[],[],[],[]]
+            self.Phidget1046lastvalues = [-1]*4
             self.PhidgetBridgeSensor = None
-            self.Phidget1046asynctimes = [None]*4
-            self.Phidget1046asynctimesAveraged = [None]*4
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1046temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return -1,-1,None
+            return -1,-1
 
 #--- Phidget IO Binay Output (only one device supported for now)
 #  only supporting (trying to attach in this order)
@@ -39148,7 +39992,7 @@ class serialport(object):
     
              
 #--- Phidget Digital PWM Output (only one supported for now)
-#  only supporting 4 channel Phidget OUT1100 module
+#  only supporting 4 channel Phidget OUT1100, REL1000, REL1100, REL1101 module
 #  commands: out(n,v) and toggle(n) with n channel number and value v from [0-100]
 #    toggle switches between last value != 0 and 0
 
@@ -39373,41 +40217,168 @@ class serialport(object):
                     pass
             aw.ser.PhidgetAnalogOut = None
 
+
+#--- Phidget RC (only one supported for now)
+#  supporting up to 16 channels like those of the RCC1000
+#  commands: 
+#     pulse(ch,min,max) # sets min/max pulse width
+#     pos(ch,min,max) # sets min/max position
+#     enable(ch,state) # enables channel
+#     set(ch,pos) # sets position
+#     move(ch,pos) # sets position, enables servo, disables servo once target position is reached
+
+    def phidgetRCattach(self,channel):
+        if not aw.ser.PhidgetRCServo:
+            aw.qmc.startPhidgetManager()
+            # try to attach an Phidget RCC1000 module
+            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_RCC1000,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+            ports = 16
+            # try to attach an Phidget RC 1061 module
+            if ser is None:
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1061,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                ports = 8
+            # try to attach an Phidget RC 1066 module
+            if ser is None:
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1066,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                ports = 1
+            if ser is not None:
+                aw.ser.PhidgetRCServo = []
+                for i in range(ports):
+                    rcservo = RCServo()
+                    aw.ser.PhidgetRCServo.append(rcservo)
+                    if port is not None:
+                        rcservo.setHubPort(port)
+                    rcservo.setDeviceSerialNumber(ser)
+                    rcservo.setChannel(i)
+                    if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
+                        rcservo.setIsRemote(True)
+                        rcservo.setIsLocal(False)
+        try:
+            if not aw.ser.PhidgetRCServo[channel].getAttached():
+                aw.ser.PhidgetRCServo[channel].openWaitForAttachment(1000)
+        except:
+            pass
+
+    # sets min/max pulse width
+    def phidgetRCpulse(self,channel,min_pulse,max_pulse):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setMinPulseWidth(min_pulse)
+            aw.ser.PhidgetRCServo[channel].setMaxPulseWidth(max_pulse)
+
+    # sets min/max position
+    def phidgetRCpos(self,channel,min_pos,max_pos):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setMinPosition(min_pos)
+            aw.ser.PhidgetRCServo[channel].setMaxPosition(max_pos)
+
+    # engage channel
+    def phidgetRCengaged(self,channel,state):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setEngaged(state)
+
+    # sets position
+    def phidgetRCset(self,channel,position):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setTargetPosition(position)
+
+    # set speed rampling state per channel
+    def phidgetRCspeedRamping(self,channel,state):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setSpeedRampingState(state)
+
+    # set voltage per channel
+    def phidgetRCvoltage(self,channel,volt):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            from Phidget22.RCServoVoltage import RCServoVoltage
+            if volt>6:
+                # set to 7.4V
+                v = RCServoVoltage.RCSERVO_VOLTAGE_7_4V
+            elif volt < 6:
+                # set to 5V
+                v = RCServoVoltage.RCSERVO_VOLTAGE_5V
+            else:
+                # set to 6V
+                v = RCServoVoltage.RCSERVO_VOLTAGE_6V
+            aw.ser.PhidgetRCServo[channel].setVoltage(v)
+            
+    # sets acceleration
+    def phidgetRCaccel(self,channel,accel):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setAcceleration(accel)
+            
+    # sets velocity
+    def phidgetRCveloc(self,channel,veloc):
+        self.phidgetRCattach(channel)
+        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+            aw.ser.PhidgetRCServo[channel].setVelocityLimit(veloc)
+
+    def phidgetRCclose(self):
+        if aw.ser.PhidgetRCServo:
+            for i in range(len(aw.ser.PhidgetRCServo)):
+                try:
+                    aw.ser.PhidgetRCServo[i].setEngaged(False)
+                    aw.ser.PhidgetRCServo[i].close()
+                except Exception:
+                    pass
+            aw.ser.PhidgetRCServo = None
         
 #---
 
     def phidget1018SensorChanged(self,v,channel,idx,API):
         if self.PhidgetIO and len(self.PhidgetIO) > idx:
-            prev_time = self.PhidgetIOasynctimes[idx]
-            self.PhidgetIOasynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-            if prev_time is None:
-                self.PhidgetIOasynctimesAveraged[idx] = self.PhidgetIOasynctimes[idx]
-            else:
-                self.PhidgetIOasynctimesAveraged[idx] = (prev_time + self.PhidgetIOasynctimes[idx]) / 2.0
             if API == "current" or (API == "voltage" and not aw.qmc.phidget1018_ratio[channel]):
                 v = v * aw.qmc.phidget1018valueFactor
-            if aw.qmc.phidget1018_async[channel]:
-                if self.PhidgetIOvalues[channel] != -1:
-                    self.PhidgetIOvalues[channel] = (self.PhidgetIOvalues[channel] + v)/2.0
-                else:
-                    self.PhidgetIOvalues[channel] = v
+            try:
+                #### lock shared resources #####
+                self.PhidgetIOsemaphores[channel].acquire(1)
+                self.PhidgetIOvalues[channel].append(v)
+            finally:
+                if self.PhidgetIOsemaphores[channel].available() < 1:
+                    self.PhidgetIOsemaphores[channel].release(1)
 
-    def phidget1018getSensorReading(self,i,idx,API="voltage"):
+    def phidget1018getSensorReading(self,i,idx,deviceType,API="voltage"):
         if self.PhidgetIO and len(self.PhidgetIO) > idx: 
-            if API != "digital" and aw.qmc.phidget1018_async[i]:            
-                if self.PhidgetIOvalues[i] == -1:
-                    self.PhidgetIOasynctimes[idx] = aw.qmc.timeclock.elapsed()/1000.
-                    self.PhidgetIOasynctimesAveraged[idx] = self.PhidgetIOasynctimes[idx]
-                    if API == "current":
-                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getCurrent() * aw.qmc.phidget1018valueFactor
-                    elif API == "frequency":
-                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getFrequency()
-                    else:
-                        if aw.qmc.phidget1018_ratio[i]:
-                            self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltageRatio()
+            if API != "digital" and aw.qmc.phidget1018_async[i]:
+                res = None
+                try:
+                    #### lock shared resources #####
+                    self.PhidgetIOsemaphores[i].acquire(1)
+                    if len(self.PhidgetIOvalues[i]) > 0:
+                        res = numpy.average(self.PhidgetIOvalues[i])
+                        self.PhidgetIOvalues[i] = self.PhidgetIOvalues[i][-round((aw.qmc.delay/aw.qmc.phidget1018_dataRates[i])):] 
+                except Exception as e:
+                    self.PhidgetIOvalues[i] = []
+                finally:
+                    if self.PhidgetIOsemaphores[i].available() < 1:
+                        self.PhidgetIOsemaphores[i].release(1)
+                if res is None:
+                    if self.PhidgetIOlastvalues[i] == -1: # there is no last value yet, we take a sync value
+                        if API == "current":
+                            res = self.PhidgetIO[idx].getCurrent() * aw.qmc.phidget1018valueFactor
+                        elif API == "frequency":
+                            res = self.PhidgetIO[idx].getFrequency()
                         else:
-                            self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
-                return self.PhidgetIOvalues[i]
+                            if aw.qmc.phidget1018_ratio[i] and deviceType != DeviceID.PHIDID_DAQ1400:
+                                res = self.PhidgetIO[idx].getVoltageRatio()
+                            else:
+                                res = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
+                        self.PhidgetIOlastvalues[i] = res
+                        return res
+                    else:
+                        return self.PhidgetIOlastvalues[i] # return the previous result
+                else:
+                    self.PhidgetIOlastvalues[i] = res
+                    return res
             else:
                 if API == "digital":
                     v = self.PhidgetIOvalues[i] = int(self.PhidgetIO[idx].getState())
@@ -39416,7 +40387,7 @@ class serialport(object):
                 elif API == "frequency":
                     v = self.PhidgetIO[idx].getFrequency()
                 else:
-                    if aw.qmc.phidget1018_ratio[i]:
+                    if aw.qmc.phidget1018_ratio[i] and deviceType != DeviceID.PHIDID_DAQ1400:
                         v = self.PhidgetIO[idx].getVoltageRatio()
                     else:
                         v = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
@@ -39447,7 +40418,7 @@ class serialport(object):
                         power = PowerSupply.POWER_SUPPLY_OFF
                     elif power_idx == 1:
                         power = PowerSupply.POWER_SUPPLY_12V
-                    elif power_idx == 2:
+                    else: # power_idx == 2:
                         power = PowerSupply.POWER_SUPPLY_24V
                     self.PhidgetIO[idx].setPowerSupply(power)
                 except:
@@ -39496,9 +40467,8 @@ class serialport(object):
                 if deviceType == DeviceID.PHIDID_DAQ1400:
                     # set the InputMode for the DAQ1400
                     self.setDAQ1400inputMode(idx)
-            self.PhidgetIOvalues[channel] = -1
-            self.PhidgetIOasynctimes[channel] = None
-            self.PhidgetIOasynctimesAveraged[channel] = None
+            self.PhidgetIOvalues[channel] = [[],[],[],[],[],[],[],[]]
+            self.PhidgetIOlastvalues = [-1]*8
             
     def setDAQ1400inputMode(self,idx):
         try:
@@ -39569,7 +40539,7 @@ class serialport(object):
                 elif API == "frequency":
                     tp = "PhidgetFrequencyCounter"
                 else:
-                    if aw.qmc.phidget1018_ratio[mode*2]:
+                    if aw.qmc.phidget1018_ratio[mode*2] and deviceType != DeviceID.PHIDID_DAQ1400:
                         tp = "PhidgetVoltageRatioInput"
                     else:
                         tp = "PhidgetVoltageInput"
@@ -39593,12 +40563,12 @@ class serialport(object):
                         self.PhidgetIO = [CurrentInput(),CurrentInput()]
                     elif API == "frequency":
                         self.PhidgetIO = [FrequencyCounter(),FrequencyCounter()]
-                    else:
-                        if aw.qmc.phidget1018_ratio[mode*2]:
+                    else: # voltage
+                        if aw.qmc.phidget1018_ratio[mode*2] and deviceType != DeviceID.PHIDID_DAQ1400:
                             ch1 = VoltageRatioInput()
                         else:
                             ch1 = VoltageInput()
-                        if aw.qmc.phidget1018_ratio[mode*2+1]:
+                        if aw.qmc.phidget1018_ratio[mode*2+1 and deviceType != DeviceID.PHIDID_DAQ1400]:
                             ch2 = VoltageRatioInput()
                         else:
                             ch2 = VoltageInput()
@@ -39650,55 +40620,31 @@ class serialport(object):
                         except Exception:
                             pass
                         self.PhidgetIO = None
-                        self.PhidgetIOvalues = [-1]*8
-                        self.PhidgetIOasynctimes = [None]*8
-                        self.PhidgetIOasynctimesAveraged = [None]*8
+                        self.PhidgetIOvalues = [[],[],[],[],[],[],[],[]]
+                        self.PhidgetIOlastvalues = [-1]*8
             if deviceType == DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and self.PhidgetIO[0].getAttached():
                 probe = -1
                 try:
-                    probe = self.phidget1018getSensorReading(0,0,API)
+                    probe = self.phidget1018getSensorReading(0,0,deviceType,API)
                 except Exception:
                     pass
-                async_time = self.PhidgetIOasynctimesAveraged[0]
-                # reset async timestamps for next sampling interval
-                self.PhidgetIOasynctimes[0] = None
-                self.PhidgetIOasynctimesAveraged[0] = None
-                return probe, -1, async_time
+                return probe, -1
             elif deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
                 probe1 = probe2 = -1
                 try:
-                    probe1 = self.phidget1018getSensorReading(mode*2,0,API)
+                    probe1 = self.phidget1018getSensorReading(mode*2,0,deviceType,API)
                 except Exception:
                     pass
                 try:
-                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,API)
+                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,deviceType,API)
                 except Exception:
                     pass
-                async_time = None
-                try:
-                    tx_avg_1 = self.PhidgetIOasynctimesAveraged[mode*2]
-                    tx_avg_2 = self.PhidgetIOasynctimesAveraged[mode*2 + 1]
-                    if tx_avg_1 is None and tx_avg_2 is not None:
-                        async_time = tx_avg_2
-                    elif tx_avg_1 is not None and tx_avg_2 is None:
-                        async_time = tx_avg_1
-                    elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 > tx_avg_2:
-                        async_time = tx_avg_1
-                    elif tx_avg_1 is not None and tx_avg_2 is not None and tx_avg_1 <= tx_avg_2:
-                        async_time = tx_avg_2
-                except Exception:
-                    pass
-                # reset async timestamps for next sampling interval
-                self.PhidgetIOasynctimes[mode*2] = None
-                self.PhidgetIOasynctimes[mode*2 + 1] = None
-                self.PhidgetIOasynctimesAveraged[mode*2] = None
-                self.PhidgetIOasynctimesAveraged[mode*2 + 1] = None
-                return probe1, probe2, async_time
+                return probe1, probe2
             elif retry:
                 libtime.sleep(0.1)
                 self.PHIDGET1018values(deviceType,mode,API,False)
             else:
-                return -1,-1, None
+                return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -39710,69 +40656,90 @@ class serialport(object):
             except Exception:
                 pass
             self.PhidgetIO = None
-            self.PhidgetIOvalues = [-1]*8
-            self.PhidgetIOasynctimes = [None]*8
-            self.PhidgetIOasynctimesAveraged = [None]*8
+            self.PhidgetIOlastvalues = [[],[],[],[],[],[],[],[]] 
+            self.PhidgetIOlastvalues = [-1]*8
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1018values() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return -1,-1, None
+            return -1,-1
 
 #---
 
-    # given the YOCTOsensor, return the first of the given mode (mode=0 => Yocto-Thermocouple; mode=1 => Yocto-Thermocouple)
+    # given the YOCTOsensor, return the first of the given mode
+    #   mode=0 => Yocto-Thermocouple
+    #   mode=1 => Yocto-Pt100
+    #   mode=2 => Yocto-IR
+    #   mode=3 => Yocto-METEO
     # that is not in the list of already connected ones
     def getNextYOCTOsensorOfType(self,mode,connected_yoctos,YOCTOsensor):
         from yoctopuce.yocto_temperature import YTemperature
         if YOCTOsensor:
             productName = YOCTOsensor.get_module().get_productName()
-            if not (YOCTOsensor.get_module().get_serialNumber() in connected_yoctos) and ((mode == 0 and productName == "Yocto-Thermocouple") or (mode == 1 and productName == "Yocto-PT100")):
+            if not (YOCTOsensor.get_module().get_serialNumber() in connected_yoctos) and  \
+                ((mode == 0 and productName == "Yocto-Thermocouple") or (mode == 1 and productName == "Yocto-PT100") or \
+                 (mode == 2 and productName == "Yocto-Temperature-IR") or \
+                 (mode == 3 and productName.startswith("Yocto-Meteo"))):
                 return YOCTOsensor
             else:
                 return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.nextTemperature(YOCTOsensor))
         else:
             return None
+            
+    def YOCTOimportLIB(self):
+        # import Yoctopuce Python library (installed form PyPI)
+        from yoctopuce.yocto_api import YAPI, YRefParam
+        errmsg=YRefParam()
+        #aw.sendmessage(str(errmsg))
+        YAPI.DisableExceptions
+        ## WINDOWS/Linux DLL HACK BEGIN
+        arch = platform.architecture()[0]
+        machine = platform.machine()
+        libpath = os.path.dirname(sys.executable)
+        if platf == 'Windows' and appFrozen():
+            if arch == '32bit':
+                YAPI._yApiCLibFile = libpath + "\\lib\\yapi.dll"
+            else:
+                YAPI._yApiCLibFile = libpath + "\\lib\\yapi64.dll"
+            YAPI._yApiCLibFileFallback = libpath + "\\lib\\yapi.dll"
+        elif platf == "Linux" and appFrozen():
+            if machine.find("arm") >= 0: # Raspberry
+                YAPI._yApiCLibFile = libpath + "/libyapi-armhf.so"
+                YAPI._yApiCLibFileFallback = libpath + "/libyapi-armel.so"
+            elif machine.find("mips") >= 0:
+                YAPI._yApiCLibFile = libpath + "/libyapi-mips.so"
+                YAPI._yApiCLibFileFallback = ""
+            elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
+                YAPI._yApiCLibFile = libpath + "/libyapi-i386.so"
+                YAPI._yApiCLibFileFallback = libpath + "/libyapi-amd64.so"  # just in case
+            elif machine == 'x86_64':
+                YAPI._yApiCLibFile = libpath + "/libyapi-amd64.so"
+                YAPI._yApiCLibFileFallback = libpath + "/libyapi-i386.so"  # just in case
+        ## WINDOWS/Linux DLL HACK END
+        try:
+            if aw.qmc.yoctoRemoteFlag:
+                YAPI.RegisterHub(aw.qmc.yoctoServerID)
+            else:
+                YAPI.RegisterHub("usb", errmsg)
+        except Exception as e:
+            aw.sendmessage(str(e))
 
-    # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe
+    def yoctoTimedCallback(self,_, measure,channel):
+        try:
+            #### lock shared resources #####
+            self.YOCTOsemaphores[channel].acquire(1)
+            self.YOCTOvalues[channel].append(measure.get_averageValue())
+        finally:
+            if self.YOCTOsemaphores[channel].available() < 1:
+                self.YOCTOsemaphores[channel].release(1)
+    
+    # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe; mode = 2 for IR sensor
     def YOCTOtemperatures(self,mode=0):
         try: 
             if not self.YOCTOsensor:
-                # import Yoctopuce Python library (installed form PyPI)
-                from yoctopuce.yocto_api import YAPI, YRefParam
-                from yoctopuce.yocto_temperature import YTemperature
-                errmsg=YRefParam()
-#                aw.sendmessage(str(errmsg))
-                ## WINDOWS/Linux DLL HACK BEGIN
-                arch = platform.architecture()[0]
-                machine = platform.machine()
-                libpath = os.path.dirname(sys.executable)
-                if platf == 'Windows' and appFrozen():
-                    if arch == '32bit':
-                        YAPI._yApiCLibFile = libpath + "\\lib\\yapi.dll"
-                    else:
-                        YAPI._yApiCLibFile = libpath + "\\lib\\yapi64.dll"
-                    YAPI._yApiCLibFileFallback = libpath + "\\lib\\yapi.dll"
-                elif platf == "Linux" and appFrozen():
-                    if machine.find("arm") >= 0: # Raspberry
-                        YAPI._yApiCLibFile = libpath + "/libyapi-armhf.so"
-                        YAPI._yApiCLibFileFallback = libpath + "/libyapi-armel.so"
-                    elif machine.find("mips") >= 0:
-                        YAPI._yApiCLibFile = libpath + "/libyapi-mips.so"
-                        YAPI._yApiCLibFileFallback = ""
-                    elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
-                        YAPI._yApiCLibFile = libpath + "/libyapi-i386.so"
-                        YAPI._yApiCLibFileFallback = libpath + "/libyapi-amd64.so"  # just in case
-                    elif machine == 'x86_64':
-                        YAPI._yApiCLibFile = libpath + "/libyapi-amd64.so"
-                        YAPI._yApiCLibFileFallback = libpath + "/libyapi-i386.so"  # just in case                
-                ## WINDOWS/Linux DLL HACK END
+                self.YOCTOimportLIB()
                 try:
-                    if aw.qmc.yoctoRemoteFlag:
-                        YAPI.RegisterHub(aw.qmc.yoctoServerID)
-                    else:
-                        YAPI.RegisterHub("usb", errmsg)
-                except Exception as e:
-                    aw.sendmessage(str(e))
-                try:
+                    from yoctopuce.yocto_api import YAPI
+                    from yoctopuce.yocto_temperature import YTemperature
+                    YAPI.DisableExceptions
                     # already connected YOCTOsensors?
                     if not aw.ser.YOCTOsensor:
                         connected_yoctos = []
@@ -39785,12 +40752,15 @@ class serialport(object):
                     # search for the next one of the required type, but not yet connected
                     self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.FirstTemperature())
                     
-                    yocto_res = 0.001
-                    if mode == 0 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
+                    yocto_res = 0.0001 # while 0.001 seems to be the maximum accepted, but just returning mostly 2 decimals!?
+                    if mode in [0,2] and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
                         self.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
-                        aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None))  
+                        if mode == 0:
+                            aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None))  
+                        elif mode == 2:
+                            aw.sendmessage(QApplication.translate("Message","Yocto IR attached",None))  
                         # increase the resolution
                         try:
                             self.YOCTOchan1.set_resolution(yocto_res)
@@ -39810,7 +40780,21 @@ class serialport(object):
                             else:
                                 aw.qmc.YOCTOchan2Unit = "C"
                         except:
-                            pass                   
+                            pass
+                        if aw.qmc.YOCTO_async[0]:
+                            self.YOCTOchan1.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms 
+                            self.YOCTOchan1.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,0))
+                        else:
+                            self.YOCTOchan1.registerTimedReportCallback(lambda *_:None)
+                        if aw.qmc.YOCTO_async[1]:
+                            self.YOCTOchan2.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms
+                            self.YOCTOchan2.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,1))
+                        else:
+                            self.YOCTOchan2.registerTimedReportCallback(lambda *_:None)
+                        if aw.qmc.YOCTO_async[0] or aw.qmc.YOCTO_async[1]:
+                            if self.YOCTOthread is None:
+                                self.YOCTOthread = YoctoThread()
+                            self.YOCTOthread.start()
                     elif mode == 1 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None))  
                         # increase the resolution
@@ -39827,16 +40811,47 @@ class serialport(object):
                             else:
                                 aw.qmc.YOCTOchanUnit = "C"
                         except:
-                            pass   
-                    
+                            pass
+                        if aw.qmc.YOCTO_async[0]:
+                            self.YOCTOsensor.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms 
+                            self.YOCTOsensor.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,0))
+                            if self.YOCTOthread is None:
+                                self.YOCTOthread = YoctoThread()
+                            self.YOCTOthread.start()
                 except:
-                    pass
+                    if self.YOCTOthread is not None:
+                        self.YOCTOthread.join()
+                        self.YOCTOthread = None
             probe1 = -1
             probe2 = -1
-            if mode == 0:
+            if mode in [0,2]:
                 try:
-                    if self.YOCTOchan1 and self.YOCTOchan1.isOnline():
+                    if aw.qmc.YOCTO_async[0]:
+                        try:
+                            #### lock shared resources #####
+                            self.YOCTOsemaphores[0].acquire(1)
+                            if len(self.YOCTOvalues[0]) > 0:
+                                probe1 = numpy.average(self.YOCTOvalues[0])
+                                self.YOCTOvalues[0] = self.YOCTOvalues[0][-round((aw.qmc.delay/aw.qmc.YOCTO_dataRate)):]
+                        except:
+                            self.YOCTOvalues[0] = []
+                        finally:
+                            if self.YOCTOsemaphores[0].available() < 1:
+                                self.YOCTOsemaphores[0].release(1)
+                        if probe1 == -1:
+                            probe1 = self.YOCTOlastvalues[0]
+                        else:
+                            self.YOCTOlastvalues[0] = probe1
+                    if probe1 == -1 and self.YOCTOchan1 and self.YOCTOchan1.isOnline():
                         probe1 = self.YOCTOchan1.get_currentValue()
+                    if probe1 != -1:
+                        if mode == 2:
+                            # we average this module temperature channel for the IR module to remove noise
+                            if self.YOCTOtempIRavg is None:
+                                self.YOCTOtempIRavg = probe1
+                            else:
+                                self.YOCTOtempIRavg = (20* self.YOCTOtempIRavg + probe1) / 21.0
+                                probe1 = self.YOCTOtempIRavg
                         # convert temperature scale
                         if aw.qmc.YOCTOchan1Unit == "C" and aw.qmc.mode == "F":
                             probe1 = aw.qmc.fromCtoF(probe1)
@@ -39845,8 +40860,25 @@ class serialport(object):
                 except:
                     pass
                 try:
-                    if self.YOCTOchan2 and self.YOCTOchan2.isOnline():
+                    if aw.qmc.YOCTO_async[1]:
+                        try:
+                            #### lock shared resources #####
+                            self.YOCTOsemaphores[1].acquire(1)
+                            if len(self.YOCTOvalues[1]) > 0:
+                                probe2 = numpy.average(self.YOCTOvalues[1])
+                                self.YOCTOvalues[1] = self.YOCTOvalues[1][-round((aw.qmc.delay/aw.qmc.YOCTO_dataRate)):]
+                        except:
+                            self.YOCTOvalues[1] = []
+                        finally:
+                            if self.YOCTOsemaphores[1].available() < 1:
+                                self.YOCTOsemaphores[1].release(1)
+                        if probe2 == -1:
+                            probe2 = self.YOCTOlastvalues[1]
+                        else:
+                            self.YOCTOlastvalues[1] = probe2
+                    if probe2 == -1 and self.YOCTOchan2 and self.YOCTOchan2.isOnline():
                         probe2 = self.YOCTOchan2.get_currentValue()
+                    if probe2 != -1:
                         # convert temperature scale
                         if aw.qmc.YOCTOchan2Unit == "C" and aw.qmc.mode == "F":
                             probe2 = aw.qmc.fromCtoF(probe2)
@@ -39856,8 +40888,25 @@ class serialport(object):
                     pass
             elif mode == 1:
                 try:
-                    if self.YOCTOsensor and self.YOCTOsensor.isOnline():
+                    if aw.qmc.YOCTO_async[0]:
+                        try:
+                            #### lock shared resources #####
+                            self.YOCTOsemaphores[0].acquire(1)
+                            if len(self.YOCTOvalues[0]) > 0:
+                                probe1 = numpy.average(self.YOCTOvalues[0])
+                                self.YOCTOvalues[0] = self.YOCTOvalues[0][-round((aw.qmc.delay/aw.qmc.YOCTO_dataRate)):]
+                        except:
+                            self.YOCTOvalues[0] = []
+                        finally:
+                            if self.YOCTOsemaphores[0].available() < 1:
+                                self.YOCTOsemaphores[0].release(1)
+                        if probe1 == -1:
+                            probe1 = self.YOCTOlastvalues[0]
+                        else:
+                            self.YOCTOlastvalues[0] = probe1
+                    if probe1 == -1 and self.YOCTOsensor and self.YOCTOsensor.isOnline():
                         probe1 = self.YOCTOsensor.get_currentValue()
+                    if probe1 != -1:
                         # convert temperature scale
                         if aw.qmc.YOCTOchanUnit == "C" and aw.qmc.mode == "F":
                             probe1 = aw.qmc.fromCtoF(probe1)
@@ -39865,15 +40914,24 @@ class serialport(object):
                             probe1 = aw.qmc.fromFtoC(probe1)
                 except Exception:
                     pass
+            # apply the emissivity to the IR value
+            if mode == 2 and probe1 != -1 and probe2 != -1:
+                probe2 = self.IRtemp(aw.qmc.YOCTO_emissivity,probe2,probe1)
             return probe1, probe2
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             try:
-                YAPI.FreeAPI()
+                if self.YOCTOthread is not None:
+                    self.YOCTOthread.join()
+                    self.YOCTOthread = None
                 self.YOCTOsensor = None
                 self.YOCTOchan1 = None
                 self.YOCTOchan2 = None
+                self.YOCOTtempIRavg = None
+                self.YOCTOvalues = [[],[]]
+                self.YOCTOlastvalues = [-1]*2
+                YAPI.FreeAPI()
             except Exception:
                 pass
             _, _, exc_tb = sys.exc_info()
@@ -40565,20 +41623,35 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4.setValidator(QRegExpValidator(regextime,self))
         self.Edit5.setValidator(QRegExpValidator(regextime,self))
         self.Edit6.setValidator(QRegExpValidator(regextime,self))
-        self.Edit0bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit0bt))
-        self.Edit1bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit1bt))
-        self.Edit2bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit2bt))
-        self.Edit3bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit3bt))
-        self.Edit4bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit4bt))
-        self.Edit5bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit5bt))
-        self.Edit6bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit6bt))
-        self.Edit0et.setValidator(QDoubleValidator(0., 999., 1, self.Edit0et))
-        self.Edit1et.setValidator(QDoubleValidator(0., 999., 1, self.Edit1et))
-        self.Edit2et.setValidator(QDoubleValidator(0., 999., 1, self.Edit2et))
-        self.Edit3et.setValidator(QDoubleValidator(0., 999., 1, self.Edit3et))
-        self.Edit4et.setValidator(QDoubleValidator(0., 999., 1, self.Edit4et))
-        self.Edit5et.setValidator(QDoubleValidator(0., 999., 1, self.Edit5et))
-        self.Edit6et.setValidator(QDoubleValidator(0., 999., 1, self.Edit6et))
+        regextemp = QRegExp(r"^-?[0-9]?[0-9]?[0-9]?\.?[0-9]?$")
+        self.Edit0bt.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit1bt.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit2bt.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit3bt.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit4bt.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit5bt.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit6bt.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit0et.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit1et.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit2et.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit3et.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit4et.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit5et.setValidator(QRegExpValidator(regextemp,self))
+        self.Edit6et.setValidator(QRegExpValidator(regextemp,self))
+#        self.Edit0bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit0bt))
+#        self.Edit1bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit1bt))
+#        self.Edit2bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit2bt))
+#        self.Edit3bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit3bt))
+#        self.Edit4bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit4bt))
+#        self.Edit5bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit5bt))
+#        self.Edit6bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit6bt))
+#        self.Edit0et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit0et))
+#        self.Edit1et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit1et))
+#        self.Edit2et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit2et))
+#        self.Edit3et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit3et))
+#        self.Edit4et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit4et))
+#        self.Edit5et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit5et))
+#        self.Edit6et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit6et))
         curvinesslabel = QLabel(QApplication.translate("Label", "Curviness",None))
         etcurviness = QLabel(QApplication.translate("Label", "ET",None))
         btcurviness = QLabel(QApplication.translate("Label", "BT",None))
@@ -40721,61 +41794,81 @@ class designerconfigDlg(ArtisanDialog):
             return 1
         if self.Edit0bt.text() != self.Edit0btcopy:
             aw.qmc.temp2[aw.qmc.timeindex[0]] = float(str(self.Edit0bt.text()))
+            self.Edit0btcopy = self.Edit0bt.text()
         if self.Edit0et.text() != self.Edit0etcopy:
             aw.qmc.temp1[aw.qmc.timeindex[0]] = float(str(self.Edit0et.text()))
+            self.Edit0etcopy = self.Edit0et.text()
         if self.dryend.isChecked():
             if self.Edit1.text() != self.Edit1copy:
                 if aw.qmc.stringtoseconds(str(self.Edit1.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit1.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[1]] = timez
+                    self.Edit1copy = self.Edit1.text()
             if self.Edit1bt.text() != self.Edit1btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[1]] = float(str(self.Edit1bt.text()))
+                self.Edit1btcopy = self.Edit1bt.text()
             if self.Edit1et.text() != self.Edit1etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[1]] = float(str(self.Edit1et.text()))
+                self.Edit1etcopy = self.Edit1et.text()
         if self.fcs.isChecked():
             if self.Edit2.text() != self.Edit2copy:
                 if aw.qmc.stringtoseconds(str(self.Edit2.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit2.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[2]] = timez
+                    self.Edit2copy = self.Edit2.text()
             if self.Edit2bt.text() != self.Edit2btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[2]] = float(str(self.Edit2bt.text()))
+                self.Edit2btcopy = self.Edit2bt.text()
             if self.Edit2et.text() != self.Edit2etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[2]] = float(str(self.Edit2et.text()))
+                self.Edit2etcopy = self.Edit2et.text()
         if self.fce.isChecked():
             if self.Edit3.text() != self.Edit3copy:
                 if aw.qmc.stringtoseconds(str(self.Edit3.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit3.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[3]] = timez
+                    self.Edit3copy = self.Edit3.text()
             if self.Edit3bt.text() != self.Edit3btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[3]] = float(str(self.Edit3bt.text()))
+                self.Edit3btcopy = self.Edit3bt.text()
             if self.Edit3et.text() != self.Edit3etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[3]] = float(str(self.Edit3et.text()))
+                self.Edit3etcopy = self.Edit3et.text()
         if self.scs.isChecked():
             if self.Edit4.text() != self.Edit4copy:
                 if aw.qmc.stringtoseconds(str(self.Edit4.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit4.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[4]] = timez
+                    self.Edit4copy = self.Edit4.text()
             if self.Edit4bt.text() != self.Edit4btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[4]] = float(str(self.Edit4bt.text()))
+                self.Edit4btcopy = self.Edit4bt.text()
             if self.Edit4et.text() != self.Edit4etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[4]] = float(str(self.Edit4et.text()))
+                self.Edit4etcopy = self.Edit4et.text()
         if self.sce.isChecked():
             if self.Edit5.text() != self.Edit5copy:
                 if aw.qmc.stringtoseconds(str(self.Edit5.text())):
                     timez = aw.qmc.stringtoseconds(str(self.Edit5.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                     aw.qmc.timex[aw.qmc.timeindex[5]] = timez
+                    self.Edit5copy = self.Edit5.text()
             if self.Edit5bt.text() != self.Edit5btcopy:
                 aw.qmc.temp2[aw.qmc.timeindex[5]] = float(str(self.Edit5bt.text()))
+                self.Edit5btcopy = self.Edit5bt.text()
             if self.Edit5et.text() != self.Edit5etcopy:
                 aw.qmc.temp1[aw.qmc.timeindex[5]] = float(str(self.Edit5et.text()))
+                self.Edit5etcopy = self.Edit5et.text()
         if self.Edit6.text() != self.Edit6copy:
             if aw.qmc.stringtoseconds(str(self.Edit6.text())):
                 timez = aw.qmc.stringtoseconds(str(self.Edit6.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
                 aw.qmc.timex[aw.qmc.timeindex[6]] = timez
+                self.Edit6copy = self.Edit6.text()
         if self.Edit6bt.text() != self.Edit6btcopy:
             aw.qmc.temp2[aw.qmc.timeindex[6]] = float(str(self.Edit6bt.text()))
+            self.Edit6btcopy = self.Edit6bt.text()
         if self.Edit6et.text() != self.Edit6etcopy:
             aw.qmc.temp1[aw.qmc.timeindex[6]] = float(str(self.Edit6et.text()))
+            self.Edit6etcopy = self.Edit6et.text()
         for i in range(1,6): #1-5
             aw.qmc.designertimeinit[i] = aw.qmc.timex[aw.qmc.timeindex[i]]
         aw.qmc.xaxistosm(redraw=False)
@@ -41141,7 +42234,7 @@ class comportDlg(ArtisanDialog):
         self.stopbitsComboBox.setCurrentIndex(aw.ser.stopbits-1)
         timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
-        self.timeoutEdit.setValidator(QDoubleValidator(0,5,1,self.timeoutEdit))
+        self.timeoutEdit.setValidator(aw.createCLocaleDoubleValidator(0,5,1,self.timeoutEdit))
         etbt_help_label = QLabel(QApplication.translate("Label", "Settings for non-Modbus devices",None) + "<br>")
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
         self.serialtable = QTableWidget()
@@ -41180,7 +42273,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_stopbitsComboBox.setCurrentIndex(aw.modbus.stopbits - 1)
         modbus_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.modbus_timeoutEdit = QLineEdit(str(aw.modbus.timeout))
-        self.modbus_timeoutEdit.setValidator(QDoubleValidator(0,5,1,self.modbus_timeoutEdit))
+        self.modbus_timeoutEdit.setValidator(aw.createCLocaleDoubleValidator(0,5,1,self.modbus_timeoutEdit))
 
         modbus_function_codes = ["1","2","3","4"]
         modbus_modes = ["", "C","F"]
@@ -41583,8 +42676,8 @@ class comportDlg(ArtisanDialog):
         self.scale_stopbitsComboBox.addItems(self.stopbits)
         self.scale_stopbitsComboBox.setCurrentIndex(aw.scale.stopbits - 1)
         scale_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
-        self.scale_timeoutEdit = QLineEdit(str(aw.scale.timeout))
-        self.scale_timeoutEdit.setValidator(QDoubleValidator(0,5,1,self.scale_timeoutEdit))
+        self.scale_timeoutEdit = QLineEdit(str(aw.float2float(aw.scale.timeout)))
+        self.scale_timeoutEdit.setValidator(aw.createCLocaleDoubleValidator(0,5,1,self.scale_timeoutEdit))
         ##########################    TAB 5 WIDGETS   COLOR
         color_devicelabel = QLabel(QApplication.translate("Label", "Device", None))
         self.color_deviceEdit = QComboBox()
@@ -41628,13 +42721,24 @@ class comportDlg(ArtisanDialog):
         self.color_stopbitsComboBox.setCurrentIndex(aw.color.stopbits - 1)
         color_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.color_timeoutEdit = QLineEdit(str(aw.color.timeout))
-        self.color_timeoutEdit.setValidator(QDoubleValidator(0,5,1,self.color_timeoutEdit))
+        self.color_timeoutEdit.setValidator(aw.createCLocaleDoubleValidator(0,5,1,self.color_timeoutEdit))
         #### dialog buttons
         okButton = QPushButton(QApplication.translate("Button","OK",None))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         okButton.clicked.connect(lambda _:self.accept())
         cancelButton.clicked.connect(lambda _:self.reject())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.reject())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
+        cancelButton.setAutoDefault(False)
         #button layout
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(helpButton)
@@ -42110,6 +43214,7 @@ class comportDlg(ArtisanDialog):
         Mlayout.addLayout(buttonLayout)
         Mlayout.setContentsMargins(2,5,2,5)
         self.setLayout(Mlayout)
+        okButton.setFocus()
         
     def colorDeviceIndexChanged(self,i):
         try:
@@ -42148,7 +43253,7 @@ class comportDlg(ArtisanDialog):
         scan_mobuds_dlg.bytesize = int(str(self.modbus_bytesizeComboBox.currentText()))
         scan_mobuds_dlg.stopbits = int(str(self.modbus_stopbitsComboBox.currentText()))
         scan_mobuds_dlg.parity = str(self.modbus_parityComboBox.currentText())
-        scan_mobuds_dlg.timeout = aw.float2float(toFloat(str(self.modbus_timeoutEdit.text())))
+        scan_mobuds_dlg.timeout = aw.float2float(toFloat(aw.comma2dot(str(self.modbus_timeoutEdit.text()))))
         scan_mobuds_dlg.mtype = int(self.modbus_type.currentIndex())
         scan_mobuds_dlg.mhost = str(self.modbus_hostEdit.text())
         scan_mobuds_dlg.mport = int(str(self.modbus_portEdit.text()))
@@ -42276,7 +43381,7 @@ class comportDlg(ArtisanDialog):
         bytesize = str(self.bytesizeComboBox.currentText())
         parity = str(self.parityComboBox.currentText())
         stopbits = str(self.stopbitsComboBox.currentText())
-        timeout = str(self.timeoutEdit.text())
+        timeout = aw.comma2dot(str(self.timeoutEdit.text()))
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         if not(aw.qmc.device in aw.qmc.nonSerialDevices) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
@@ -42545,6 +43650,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     break 
         self.sorted_devices = sorted(dev)        
         self.devicetypeComboBox = QComboBox()
+#        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+#        self.devicetypeComboBox.view().setTextElideMode(Qt.ElideNone)
+        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; withou long items get cutted in the popup
+        #  note the -7 as the width of the popup is too large if given the correct maximum characters
+        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(aw.ser.externalprogram)
         self.outprogramedit = QLineEdit(aw.ser.externaloutprogram)
@@ -42641,6 +43751,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         okButton.clicked.connect(lambda _:self.okEvent())
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
+        cancelButton.setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.cancelEvent())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        cancelButton.addActions([cancelAction])
+        cancelButton.setAutoDefault(False)
         cancelButton.clicked.connect(lambda _:self.cancelEvent())
         labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None))
         labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None))
@@ -42691,7 +43812,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
             
-            changeTriggersCombo.setMinimumContentsLength(1)
+            changeTriggersCombo.setMinimumContentsLength(4)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)
@@ -42781,7 +43902,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             pass
             
         #self.changeTriggerCombos1045.setMaximumSize(65,100)
-        self.changeTriggerCombos1045.setMinimumContentsLength(1)
+        self.changeTriggerCombos1045.setMinimumContentsLength(4)
         self.changeTriggerCombos1045.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength) 
         
         phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,1)
@@ -42948,10 +44069,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.formulaCombo1200.setCurrentIndex(aw.qmc.phidget1200_formula)
         except Exception:
             pass                                   
-        self.formulaCombo1200.setMinimumContentsLength(3)
+        self.formulaCombo1200.setMinimumContentsLength(5)
         width = self.formulaCombo1200.minimumSizeHint().width()
         self.formulaCombo1200.setMinimumWidth(width)
-#        self.formulaCombo1200.setMaximumWidth(width)   
+#        self.formulaCombo1200.setMaximumWidth(width)
         
         self.wireCombo1200 = QComboBox()
         self.wireCombo1200.setFocusPolicy(Qt.NoFocus)
@@ -42963,7 +44084,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.wireCombo1200.setCurrentIndex(aw.qmc.phidget1200_wire)
         except Exception:
             pass                                   
-        self.wireCombo1200.setMinimumContentsLength(3)
+        self.wireCombo1200.setMinimumContentsLength(5)
         width = self.wireCombo1200.minimumSizeHint().width()
         self.wireCombo1200.setMinimumWidth(width)
 #        self.wireCombo1200.setMaximumWidth(width)
@@ -42983,7 +44104,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.changeTriggerCombo1200.setCurrentIndex(aw.qmc.phidget1200_changeTriggersValues.index(aw.qmc.phidget1200_changeTrigger))
         except Exception:
             pass
-        self.changeTriggerCombo1200.setMinimumContentsLength(3)
+        self.changeTriggerCombo1200.setMinimumContentsLength(4)
         width = self.changeTriggerCombo1200.minimumSizeHint().width()
         self.changeTriggerCombo1200.setMinimumWidth(width)
 #        self.changeTriggerCombo1200.setMaximumWidth(width) 
@@ -43227,6 +44348,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.yoctoBoxRemoteFlag.setChecked(aw.qmc.yoctoRemoteFlag)
         yoctoServerIdLabel = QLabel(QApplication.translate("Label","VirtualHub", None))
         self.yoctoServerId = QLineEdit(aw.qmc.yoctoServerID)
+        YoctoEmissivityLabel = QLabel(QApplication.translate("Label","Emissivity", None))
+        self.yoctoEmissivitySpinBox = QDoubleSpinBox()
+        self.yoctoEmissivitySpinBox.setAlignment(Qt.AlignRight)
+        self.yoctoEmissivitySpinBox.setRange(0.,1.)
+        self.yoctoEmissivitySpinBox.setSingleStep(.1) 
+        self.yoctoEmissivitySpinBox.setValue(aw.qmc.YOCTO_emissivity) 
         yoctoServerBox = QHBoxLayout()
         yoctoServerBox.addWidget(yoctoServerIdLabel)
         yoctoServerBox.addSpacing(10)
@@ -43240,8 +44367,47 @@ class DeviceAssignmentDlg(ArtisanDialog):
         yoctoNetworkGrid.setSpacing(20)
         yoctoNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None))
         yoctoNetworkGroupBox.setLayout(yoctoNetworkGrid)
+        yoctoIRGrid = QGridLayout()
+        yoctoIRGrid.addWidget(YoctoEmissivityLabel,0,0)
+        yoctoIRGrid.addWidget(self.yoctoEmissivitySpinBox,0,1)
+        yoctoIRHorizontalLayout = QHBoxLayout()
+        yoctoIRHorizontalLayout.addLayout(yoctoIRGrid)
+        yoctoIRHorizontalLayout.addStretch()
+        self.yoctoDataRateCombo = QComboBox()
+        self.yoctoDataRateCombo.setFocusPolicy(Qt.NoFocus)
+        model = self.yoctoDataRateCombo.model()
+        dataRateItems = self.createItems(aw.qmc.phidget_dataRatesStrings)
+        for item in dataRateItems:
+                model.appendRow(item)
+        try:
+            self.yoctoDataRateCombo.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.YOCTO_dataRate))
+        except Exception:
+            pass
+        self.yoctoDataRateCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.yoctoDataRateCombo.setMinimumContentsLength(5)
+        width = self.yoctoDataRateCombo.minimumSizeHint().width()
+        self.yoctoDataRateCombo.setMinimumWidth(width)
+        self.yoctoAyncChan1Flag = QCheckBox(QApplication.translate("Label","Channel 1", None))
+        self.yoctoAyncChan1Flag.setFocusPolicy(Qt.NoFocus)
+        self.yoctoAyncChan1Flag.setChecked(aw.qmc.YOCTO_async[0])
+        self.yoctoAyncChan2Flag = QCheckBox(QApplication.translate("Label","Channel 2", None))
+        self.yoctoAyncChan2Flag.setFocusPolicy(Qt.NoFocus)
+        self.yoctoAyncChan2Flag.setChecked(aw.qmc.YOCTO_async[1])
+        yoctoAsyncGrid = QGridLayout()
+        yoctoAsyncGrid.addWidget(self.yoctoDataRateCombo,0,0)
+        yoctoAsyncGrid.addWidget(self.yoctoAyncChan1Flag,0,1)
+        yoctoAsyncGrid.addWidget(self.yoctoAyncChan2Flag,0,2)
+        yoctoAsyncHorizontalLayout = QHBoxLayout()
+        yoctoAsyncHorizontalLayout.addLayout(yoctoAsyncGrid)
+        yoctoAsyncHorizontalLayout.addStretch()
+        yoctoAsyncGroupBox = QGroupBox(QApplication.translate("GroupBox","Async",None))
+        yoctoAsyncGroupBox.setLayout(yoctoAsyncHorizontalLayout)
+        yoctoIRGroupBox = QGroupBox(QApplication.translate("GroupBox","IR",None))
+        yoctoIRGroupBox.setLayout(yoctoIRHorizontalLayout)
         yoctoVBox = QVBoxLayout()
         yoctoVBox.addWidget(yoctoNetworkGroupBox)
+        yoctoVBox.addWidget(yoctoIRGroupBox)
+        yoctoVBox.addWidget(yoctoAsyncGroupBox)
         yoctoVBox.addStretch()
         yoctoVBox.setSpacing(5)
         yoctoVBox.setContentsMargins(0,0,0,0)  
@@ -43249,6 +44415,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.temperatureDeviceCombo = QComboBox()
         self.temperatureDeviceCombo.setFocusPolicy(Qt.NoFocus)
         self.temperatureDeviceCombo.addItems(aw.qmc.temperaturedevicefunctionlist)
+        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; withou long items get cutted in the popup
+        #  note the -7 as the width of the popup is too large if given the correct maximum characters
+        self.temperatureDeviceCombo.setMinimumContentsLength(max(22,len(max(aw.qmc.temperaturedevicefunctionlist, key=len)) - 7)) # expects # characters, but is to wide
         try:
             self.temperatureDeviceCombo.setCurrentIndex(aw.qmc.ambient_temperature_device)
         except:
@@ -43272,7 +44441,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.elevationSpinBox.setRange(0,3000)
         self.elevationSpinBox.setSingleStep(1)
         self.elevationSpinBox.setValue(aw.qmc.elevation)
-        self.elevationSpinBox.setSuffix(" m.a.s.l")
+        self.elevationSpinBox.setSuffix(" " + QApplication.translate("Label","MASL"))
         temperatureDeviceLabel = QLabel(QApplication.translate("Label","Temperature",None))
         humidityDeviceLabel = QLabel(QApplication.translate("Label","Humidity",None))
         pressureDeviceLabel = QLabel(QApplication.translate("Label","Pressure",None))
@@ -43452,6 +44621,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         #Mlayout.setContentsMargins(0,0,0,0)
         Mlayout.setContentsMargins(10,10,10,10)
         self.setLayout(Mlayout)
+        okButton.setFocus()
         
     def changeOutprogramFlag(self):
         aw.ser.externaloutprogramFlag = not aw.ser.externaloutprogramFlag
@@ -44448,12 +45618,47 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ####  DEVICE 90 and 91 are an slider 01 and slider 23
                 ##########################
                 ##########################
-                ####  DEVICE 92-94 and 91 are an Probat Middleware and have no serial setup
+                ####  DEVICE 92-94 are an Probat Middleware and have no serial setup
                 ##########################
                 elif meter == "Probat Middleware":
                     aw.qmc.device = 92
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
-                
+                ##########################
+                ####  DEVICE 95 is Phidget DAQ1400 Current
+                ##########################
+                elif meter == "Phidget DAQ1400 Current":
+                    aw.qmc.device = 95
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ####  DEVICE 96 is Phidget DAQ1400 Frequency
+                ##########################
+                elif meter == "Phidget DAQ1400 Frequency":
+                    aw.qmc.device = 96
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ####  DEVICE 97 is Phidget DAQ1400 Digital
+                ##########################
+                elif meter == "Phidget DAQ1400 Digital":
+                    aw.qmc.device = 97
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ####  DEVICE 98 is Phidget DAQ1400 Voltage
+                ##########################
+                elif meter == "Phidget DAQ1400 Voltage":
+                    aw.qmc.device = 98
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ####  DEVICE 99 is Aillio Bullet R1 IBTS/DT
+                ##########################
+                elif meter == "Aillio Bullet R1 IBTS/DT":
+                    aw.qmc.device = 99
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ####  DEVICE 100 are Yocto IR
+                ##########################
+                elif meter == "Yocto IR":
+                    aw.qmc.device = 100
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 # ADD DEVICE:
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -44567,6 +45772,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 92
                 1, # 93
                 1, # 94
+                1, # 99
+                1, # 100
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -44623,6 +45830,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
             # Yotopuce configurations
             aw.qmc.yoctoRemoteFlag = self.yoctoBoxRemoteFlag.isChecked()
             aw.qmc.yoctoServerID = u(self.yoctoServerId.text())
+            aw.qmc.YOCTO_emissivity = self.yoctoEmissivitySpinBox.value()
+            aw.qmc.YOCTO_async[0] = self.yoctoAyncChan1Flag.isChecked()
+            aw.qmc.YOCTO_async[1] = self.yoctoAyncChan2Flag.isChecked()
+            aw.qmc.YOCTO_dataRate = aw.qmc.phidget_dataRatesValues[self.yoctoDataRateCombo.currentIndex()]
             
             # Ambient confifgurations
             aw.qmc.ambient_temperature_device = self.temperatureDeviceCombo.currentIndex()
@@ -45160,8 +46371,9 @@ class graphColorDlg(ArtisanDialog):
 
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         okButton.clicked.connect(lambda _:self.accept())
+#        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
 #        okButton.setFocus()
-#        okButton.setFocusPolicy(Qt.ClickFocus)
         
         defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
         defaultsButton.setFocusPolicy(Qt.NoFocus)
@@ -46223,6 +47435,8 @@ class AlarmDlg(ArtisanDialog):
         exportButton.setMinimumWidth(80)
         exportButton.setFocusPolicy(Qt.NoFocus)
         okButton = QPushButton(QApplication.translate("Button","OK",None))
+        okButton.setAutoDefault(True)
+        okButton.setFocusPolicy(Qt.StrongFocus)
         okButton.clicked.connect(lambda _:self.closealarms())
         helpButton = QPushButton(QApplication.translate("Button","Help",None))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
@@ -46287,6 +47501,7 @@ class AlarmDlg(ArtisanDialog):
         mainlayout.addLayout(buttonlayout)
         mainlayout.addLayout(okbuttonlayout)
         self.setLayout(mainlayout)
+        okButton.setFocus()
         
     def selectionChanged(self):
         selected = self.alarmtable.selectedRanges()
@@ -46665,7 +47880,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
                 temp = self.alarmtable.cellWidget(i,8)
                 try:
-                    aw.qmc.alarmtemperature[i] = float(str(temp.text()))
+                    aw.qmc.alarmtemperature[i] = float(aw.comma2dot(str(temp.text())))
                 except Exception:
                     aw.qmc.alarmtemperature[i] = 0.0
                 action = self.alarmtable.cellWidget(i,9)
@@ -46755,7 +47970,7 @@ class AlarmDlg(ArtisanDialog):
         tempedit.setAlignment(Qt.AlignRight)
         tempedit.setMaximumWidth(130)
 #        tempedit.setValidator(QIntValidator(0, 999,tempedit))
-        tempedit.setValidator(QDoubleValidator(0., 999.9,1,tempedit))
+        tempedit.setValidator(aw.createCLocaleDoubleValidator(0., 999.9,1,tempedit))
         #action
         actionComboBox = MyQComboBox()
         actionComboBox.addItems(["",
@@ -46873,7 +48088,10 @@ class AlarmDlg(ArtisanDialog):
                 # remember the columnwidth
                 for i in range(len(aw.qmc.alarmtablecolumnwidths)):
                     try:
-                        self.alarmtable.setColumnWidth(i,aw.qmc.alarmtablecolumnwidths[i])
+                        w = aw.qmc.alarmtablecolumnwidths[i]
+                        if i == 6:
+                            w = max(80,w)
+                        self.alarmtable.setColumnWidth(i,w)
                     except:
                         pass
                 self.markNotEnabledAlarmRows()
@@ -47122,7 +48340,7 @@ class PXRpidDlgControl(ArtisanDialog):
                             + QApplication.translate("Label", "After <u>writing</u> an adjustment,<br>never power down the pid<br>for the next 5 seconds <br>or the pid may never recover.",None) + "<br>"
                             + QApplication.translate("Label", "Read operations manual",None) + "</CENTER>")
         self.svedit = QLineEdit()
-        self.svedit.setValidator(QDoubleValidator(0., 999., 1, self.svedit))
+        self.svedit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.svedit))
         #TAB 3
         button_p = QPushButton(QApplication.translate("Button","Set p",None))
         button_p.setFocusPolicy(Qt.NoFocus)
@@ -47139,9 +48357,9 @@ class PXRpidDlgControl(ArtisanDialog):
         self.pedit.setMaximumWidth(60)
         self.iedit.setMaximumWidth(60)
         self.dedit.setMaximumWidth(60)
-        self.pedit.setValidator(QDoubleValidator(0., 999., 1, self.pedit))
+        self.pedit.setValidator(aw.QIntValidator(0., 999, self.pedit))
         self.iedit.setValidator(QIntValidator(0, 3200, self.iedit))
-        self.dedit.setValidator(QDoubleValidator(0., 999.0, 1, self.dedit))
+        self.dedit.setValidator(aw.QIntValidator(0., 999, self.dedit))
         button_autotuneON = QPushButton(QApplication.translate("Button","Autotune ON",None))
         button_autotuneON.setFocusPolicy(Qt.NoFocus)
         button_autotuneOFF = QPushButton(QApplication.translate("Button","Autotune OFF",None))
@@ -47452,6 +48670,7 @@ class PXRpidDlgControl(ArtisanDialog):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby() {0}").format(str(e)),exc_tb.tb_lineno)
 
     def setsv(self):
+        self.svedit.setText(aw.comma2dot(str(self.svedit.text())))
         if self.svedit.text() != "":
             newSVvalue = int(float(self.svedit.text())*10) #multiply by 10 because of decimal point
             if aw.ser.useModbusPort:
@@ -47761,7 +48980,7 @@ class PXRpidDlgControl(ArtisanDialog):
             soakkey = "segment" + str(i+1) + "soak"
             
             svedit = QLineEdit(str(aw.fujipid.PXR[svkey][0]))
-            svedit.setValidator(QDoubleValidator(0., 999., 1, svedit))
+            svedit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, svedit))
             rampedit = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXR[rampkey][0])))
             rampedit.setValidator(QRegExpValidator(regextime,self))
             soakedit  = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXR[soakkey][0])))
@@ -47781,7 +49000,7 @@ class PXRpidDlgControl(ArtisanDialog):
         svedit =  self.segmenttable.cellWidget(i,0)
         rampedit = self.segmenttable.cellWidget(i,1)
         soakedit = self.segmenttable.cellWidget(i,2)
-        sv = float(str(svedit.text()))
+        sv = float(aw.comma2dot(str(svedit.text())))
         ramp = aw.qmc.stringtoseconds(str(rampedit.text()))
         soak = aw.qmc.stringtoseconds(str(soakedit.text()))
         svkey = "segment" + str(idn) + "sv"
@@ -48010,13 +49229,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.sv5edit.setMaximumWidth(80)
         self.sv6edit.setMaximumWidth(80)
         self.sv7edit.setMaximumWidth(80)
-        self.sv1edit.setValidator(QDoubleValidator(0., 999., 1, self.sv1edit))
-        self.sv2edit.setValidator(QDoubleValidator(0., 999., 1, self.sv2edit))
-        self.sv3edit.setValidator(QDoubleValidator(0., 999., 1, self.sv3edit))
-        self.sv4edit.setValidator(QDoubleValidator(0., 999., 1, self.sv4edit))
-        self.sv5edit.setValidator(QDoubleValidator(0., 999., 1, self.sv5edit))
-        self.sv6edit.setValidator(QDoubleValidator(0., 999., 1, self.sv6edit))
-        self.sv7edit.setValidator(QDoubleValidator(0., 999., 1, self.sv7edit))
+        self.sv1edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv1edit))
+        self.sv2edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv2edit))
+        self.sv3edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv3edit))
+        self.sv4edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv4edit))
+        self.sv5edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv5edit))
+        self.sv6edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv6edit))
+        self.sv7edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.sv7edit))
         self.radiosv1 = QRadioButton()
         self.radiosv2 = QRadioButton()
         self.radiosv3 = QRadioButton()
@@ -48150,13 +49369,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.d6edit.setMaximumSize(50, 42)
         self.d7edit.setMaximumSize(50, 42)
         #p = 0-999.9
-        self.p1edit.setValidator(QDoubleValidator(0., 999., 1, self.p1edit))
-        self.p2edit.setValidator(QDoubleValidator(0., 999., 1, self.p2edit))
-        self.p3edit.setValidator(QDoubleValidator(0., 999., 1, self.p3edit))
-        self.p4edit.setValidator(QDoubleValidator(0., 999., 1, self.p4edit))
-        self.p5edit.setValidator(QDoubleValidator(0., 999., 1, self.p5edit))
-        self.p6edit.setValidator(QDoubleValidator(0., 999., 1, self.p6edit))
-        self.p7edit.setValidator(QDoubleValidator(0., 999., 1, self.p7edit))
+        self.p1edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p1edit))
+        self.p2edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p2edit))
+        self.p3edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p3edit))
+        self.p4edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p4edit))
+        self.p5edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p5edit))
+        self.p6edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p6edit))
+        self.p7edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.p7edit))
         #i are int 0-3200
         self.i1edit.setValidator(QIntValidator(0, 3200, self.i1edit))
         self.i2edit.setValidator(QIntValidator(0, 3200, self.i2edit))
@@ -48166,13 +49385,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.i6edit.setValidator(QIntValidator(0, 3200, self.i6edit))
         self.i7edit.setValidator(QIntValidator(0, 3200, self.i7edit))
         #d 0-999.9
-        self.d1edit.setValidator(QDoubleValidator(0., 999., 1, self.d1edit))
-        self.d2edit.setValidator(QDoubleValidator(0., 999., 1, self.d2edit))
-        self.d3edit.setValidator(QDoubleValidator(0., 999., 1, self.d3edit))
-        self.d4edit.setValidator(QDoubleValidator(0., 999., 1, self.d4edit))
-        self.d5edit.setValidator(QDoubleValidator(0., 999., 1, self.d5edit))
-        self.d6edit.setValidator(QDoubleValidator(0., 999., 1, self.d6edit))
-        self.d7edit.setValidator(QDoubleValidator(0., 999., 1, self.d7edit))
+        self.d1edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d1edit))
+        self.d2edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d2edit))
+        self.d3edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d3edit))
+        self.d4edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d4edit))
+        self.d5edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d5edit))
+        self.d6edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d6edit))
+        self.d7edit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.d7edit))
         pid1button = QPushButton(QApplication.translate("Button","pid 1",None))
         pid1button.setFocusPolicy(Qt.NoFocus)
         pid2button = QPushButton(QApplication.translate("Button","pid 2",None))
@@ -48863,24 +50082,31 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict = aw.fujipid.PXF
         #first get the new sv value from the correspondig edit line
         if i == 1:
+            self.sv1edit.setText(aw.comma2dot(str(self.sv1edit.text())))
             if self.sv1edit.text() != "":
                 newSVvalue = int(float(str(self.sv1edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
         elif i == 2:
+            self.sv2edit.setText(aw.comma2dot(str(self.sv2edit.text())))
             if self.sv2edit.text() != "":
                 newSVvalue = int(float(str(self.sv2edit.text()))*10.)
         elif i == 3:
+            self.sv3edit.setText(aw.comma2dot(str(self.sv3edit.text())))
             if self.sv3edit.text() != "":
                 newSVvalue = int(float(str(self.sv3edit.text()))*10.)
         elif i == 4:
+            self.sv4edit.setText(aw.comma2dot(str(self.sv4edit.text())))
             if self.sv4edit.text() != "":
                 newSVvalue = int(float(str(self.sv4edit.text()))*10.)
         elif i == 5:
+            self.sv5edit.setText(aw.comma2dot(str(self.sv5edit.text())))
             if self.sv5edit.text() != "":
                 newSVvalue = int(float(str(self.sv5edit.text()))*10.)
         elif i == 6:
+            self.sv6edit.setText(aw.comma2dot(str(self.sv6edit.text())))
             if self.sv6edit.text() != "":
                 newSVvalue = int(float(str(self.sv6edit.text()))*10.)
         elif i == 7:
+            self.sv7edit.setText(aw.comma2dot(str(self.sv7edit.text())))
             if self.sv7edit.text() != "":
                 newSVvalue = int(float(str(self.sv7edit.text()))*10.)
         #send command to the right sv
@@ -48895,42 +50121,49 @@ class PXG4pidDlgControl(PXpidDlgControl):
         #verify it went ok
         if len(r) == 8:
             if i == 1:
+                self.sv1edit.setText(aw.comma2dot(str(self.sv1edit.text())))
                 reg_dict[svkey][0] = float(str(self.sv1edit.text()))
                 message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv1edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(1)
                 aw.lcd6.display(str(self.sv1edit.text()))
             elif i == 2:
+                self.sv2edit.setText(aw.comma2dot(str(self.sv2edit.text())))
                 reg_dict[svkey][0] = float(str(self.sv2edit.text()))
                 message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv2edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(2)
                 aw.lcd6.display(str(self.sv2edit.text()))
             elif i == 3:
+                self.sv3edit.setText(aw.comma2dot(str(self.sv3edit.text())))
                 reg_dict[svkey][0] = float(str(self.sv3edit.text()))
                 message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv3edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(3)
                 aw.lcd6.display(str(self.sv3edit.text()))
             elif i == 4:
+                self.sv4edit.setText(aw.comma2dot(str(self.sv4edit.text())))
                 reg_dict[svkey][0] = float(str(self.sv4edit.text()))
                 message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv4edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(4)
                 aw.lcd6.display(str(self.sv4edit.text()))
             elif i == 5:
+                self.sv5edit.setText(aw.comma2dot(str(self.sv5edit.text())))
                 reg_dict[svkey][0] = float(str(self.sv5edit.text()))
                 message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv5edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(5)
                 aw.lcd6.display(str(self.sv5edit.text()))
             elif i == 6:
+                self.sv6edit.setText(aw.comma2dot(str(self.sv6edit.text())))
                 reg_dict[svkey][0] = float(str(self.sv6edit.text()))
                 message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv6edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(6)
                 aw.lcd6.display(str(self.sv6edit.text()))
             elif i == 7:
+                self.sv7edit.setText(aw.comma2dot(str(self.sv7edit.text())))
                 reg_dict[svkey][0] = float(str(self.sv7edit.text()))
                 message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv7edit.text()))
                 self.status.showMessage(message,5000)
@@ -49534,13 +50767,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 
     def accept(self):
         # store set values
-        aw.fujipid.PXG4["sv1"][0] = float(self.sv1edit.text())
-        aw.fujipid.PXG4["sv2"][0] = float(self.sv2edit.text())
-        aw.fujipid.PXG4["sv3"][0] = float(self.sv3edit.text())
-        aw.fujipid.PXG4["sv4"][0] = float(self.sv4edit.text())
-        aw.fujipid.PXG4["sv5"][0] = float(self.sv5edit.text())
-        aw.fujipid.PXG4["sv6"][0] = float(self.sv6edit.text())
-        aw.fujipid.PXG4["sv7"][0] = float(self.sv7edit.text())
+        aw.fujipid.PXG4["sv1"][0] = float(aw.comma2dot(self.sv1edit.text()))
+        aw.fujipid.PXG4["sv2"][0] = float(aw.comma2dot(self.sv2edit.text()))
+        aw.fujipid.PXG4["sv3"][0] = float(aw.comma2dot(self.sv3edit.text()))
+        aw.fujipid.PXG4["sv4"][0] = float(aw.comma2dot(self.sv4edit.text()))
+        aw.fujipid.PXG4["sv5"][0] = float(aw.comma2dot(self.sv5edit.text()))
+        aw.fujipid.PXG4["sv6"][0] = float(aw.comma2dot(self.sv6edit.text()))
+        aw.fujipid.PXG4["sv7"][0] = float(aw.comma2dot(self.sv7edit.text()))
         # store set values
         aw.fujipid.PXG4["p1"][0] = float(self.p1edit.text())
         aw.fujipid.PXG4["p2"][0] = float(self.p2edit.text())
@@ -49596,7 +50829,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             rampkey = "segment" + str(i+1) + "ramp"
             soakkey = "segment" + str(i+1) + "soak"
             svedit = QLineEdit(str(aw.fujipid.PXG4[svkey][0]))
-            svedit.setValidator(QDoubleValidator(0., 999., 1, svedit))
+            svedit.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, svedit))
             rampedit = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4[rampkey][0])))
             rampedit.setValidator(QRegExpValidator(regextime,self))    
             soakedit  = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4[soakkey][0])))
@@ -49616,7 +50849,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         svedit =  self.segmenttable.cellWidget(i,0)
         rampedit = self.segmenttable.cellWidget(i,1)
         soakedit = self.segmenttable.cellWidget(i,2)
-        sv = float(str(svedit.text()))
+        sv = float(aw.comma2dot(str(svedit.text())))
         ramp = aw.qmc.stringtoseconds(str(rampedit.text()))
         soak = aw.qmc.stringtoseconds(str(soakedit.text()))
         svkey = "segment" + str(idn) + "sv"
@@ -51185,7 +52418,7 @@ class DTApidDlgControl(ArtisanDialog):
         self.status.showMessage(QApplication.translate("StatusBar","Work in Progress",None),5000)
         svlabel = QLabel(QApplication.translate("Label", "SV", None))
         self.svedit = QLineEdit(str(aw.dtapid.dtamem["sv"][0]))
-        self.svedit.setValidator(QDoubleValidator(0., 999.,1, self.svedit))
+        self.svedit.setValidator(aw.createCLocaleDoubleValidator(0., 999.,1, self.svedit))
         readsvbutton = QPushButton(QApplication.translate("Button","Read", None))
         writesvbutton = QPushButton(QApplication.translate("Button","Write", None))
         readsvbutton.clicked.connect(lambda _:self.readsv())
@@ -51222,7 +52455,7 @@ class DTApidDlgControl(ArtisanDialog):
 
     #write uses function = 6
     def writesv(self):
-        v = self.svedit.text()
+        v = aw.comma2dot(self.svedit.text())
         if v:
             newsv = hex(int(abs(float(str(v)))*10.))[2:].upper()
             ### create command message2send(unitID,function,address,ndata)
@@ -51314,7 +52547,7 @@ class PIDcontrol(object):
                     if aw.pidcontrol.invertControl:
                         vn = 0 - v
                     else:
-                        vp = v
+                        vn = v
                     vn = min(0,max(-100,int(vn)))
                     # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range
                     cool = int(round(numpy.interp(vn,[-100,0],[aw.eventslidermax[slidernr],aw.eventslidermin[slidernr]])))
@@ -51421,15 +52654,17 @@ class PIDcontrol(object):
         # MODBUS hardware PID
         if (aw.pidcontrol.externalPIDControl() == 1 and aw.modbus.PID_OFF_action and aw.modbus.PID_OFF_action != ""):
             aw.eventaction(4,aw.modbus.PID_OFF_action)
-            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            if not aw.HottopControlActive:
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
             self.pidActive = False  
         # S7 hardware PID
         elif (aw.pidcontrol.externalPIDControl() == 2 and aw.s7.PID_OFF_action and aw.s7.PID_OFF_action != ""):
             aw.eventaction(15,aw.s7.PID_OFF_action)
-            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            if not aw.HottopControlActive:
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
             self.pidActive = False   
         # TC4 hardware PID
-        elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
+        elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag and aw.qmc.Controlbuttonflag: # ArduinoTC4 firmware PID
             if aw.ser.ArduinoIsInitialized:
                 try:
                     #### lock shared resources #####
@@ -51442,14 +52677,16 @@ class PIDcontrol(object):
                 finally:
                     if aw.ser.COMsemaphore.available() < 1:
                         aw.ser.COMsemaphore.release(1)
-                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+                if not aw.HottopControlActive:
+                    aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
                 self.pidActive = False
         # software PID
         elif aw.qmc.Controlbuttonflag:
             aw.qmc.pid.setControl(lambda _: _)
             self.pidActive = False
             aw.qmc.pid.off()
-            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            if not aw.HottopControlActive:
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
 
     def sliderMinValueChanged(self,i):
         self.svSliderMin = i
@@ -51871,7 +53108,7 @@ def main():
     artisanviewerFirstStart = False
     if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
         artisanviewerMode = True
-        app.setApplicationName("artisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
+        app.setApplicationName("ArtisanViewer")     #needed by QSettings() to store windows geometry in operating system
         viewersettings = QSettings()
         if not viewersettings.contains("Mode"):
             artisanviewerFirstStart = True
@@ -51945,13 +53182,7 @@ def main():
                     aw.qmc.backgroundprofile = None
     except Exception:
         pass
-    
-    try:
-        sys.stderr = object # this is needed to surpress the message on the ignored Exception
-                            # Phidget that is raised on starting the PhidgetManager without installed
-                            # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
-    except:
-        pass
+
 #    if platf == 'Windows' and appFrozen():
 #        try:
 #            sys.stderr = sys.stdout
