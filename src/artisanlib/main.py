@@ -12297,29 +12297,59 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(6)
 
-        self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
-                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
-                                     "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
-                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
-                                     "ON":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red }",
-                                     "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                     "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                     "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                     "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                     "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "RESET":"QPushButton {font-size: 14pt; font-weight: bold; color: black; background-color: white }",
-                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #bbbeec }",
-                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff }",
-                                     "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
-                                     "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                     "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
-                                     "PIDactive":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
-                                     "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
-                                     "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
-                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
-                                     }
+#        self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
+#                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
+#                                     "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
+#                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
+#                                     "ON":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red }",
+#                                     "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+#                                     "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+#                                     "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
+#                                     "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+#                                     "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+#                                     "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+#                                     "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+#                                     "RESET":"QPushButton {font-size: 14pt; font-weight: bold; color: black; background-color: white }",
+#                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #bbbeec }",
+#                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff }",
+#                                     "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
+#                                     "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
+#                                     "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
+#                                     "PIDactive":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
+#                                     "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
+#                                     "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
+#                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
+#                                     }
+
+        buttonstyle = "border-style:solid; border-radius:6;border-color:grey; border-width:1;" # modernize
+        #buttonstyle = ""  #un-comment to show how any border stuff is not compatible with setFlat()
+        buttonwidth_1 = "min-width:100px;"
+        buttonwidth_2 = "min-width:75px;"
+        self.pushbuttonstyles = {"DISABLED": "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: normal; color: darkgrey; background:" + self.createGradient('lightgrey') +"}",
+                                 "STOP":     "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#00CC66') +"}",  # 00fc7c, 00CC66, 7CEA9C, 4CB944, 06D6A0
+                                 "START":    "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#ff3d00') +"}",
+                                 "OFF":      "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#00eC66') +"}",  #<- changed slightly.  needs to match STOP color
+                                 "ON":       "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#ff3d00') +"}",
+                                 "COOL END": "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
+                                 "DRY END":  "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
+                                 "CHARGE":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('#f07800') +"}",
+                                 "FC START": "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
+                                 "FC END":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
+                                 "SC START": "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
+                                 "SC END":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
+                                 "RESET":    "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: black;    background:" + self.createGradient('white') +"}",
+                                 "HUD_OFF":  "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#b5baff') +"}",
+                                 "HUD_ON":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#60ffed') +"}",
+                                 "EVENT":    "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: black;    background:" + self.createGradient('yellow') +"}",
+                                 "DROP":     "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('#f07800') +"}",
+                                 "PID":      "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 12pt; font-weight: bold;   color: white;    background:" + self.createGradient('#92C3FF') +"}",
+                                 "PIDactive":"QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 12pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#6D4824') +"}",
+                                 "SV +":     "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('#ffaaff') +"}",
+                                 "SV -":     "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('lightblue') +"}",
+                                 "SELECTED": "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 11pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#6D4824') +"}"  #keyboard moves
+                                 }
+
+#Do't forget to update the es locale styles!!  #dave99
         if locale == "es":
             # slightly smaller font size for Spanish
             self.pushbuttonstyles["DISABLED"] = "QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}"
