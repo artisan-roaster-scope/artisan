@@ -1,4 +1,4 @@
-#!/usr/bin/python
+###!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from artisanlib import __version__
@@ -990,8 +990,6 @@ class tgraphcanvas(FigureCanvas):
         # that do not communicate via any serial port thus do not need any serial port configuration
         self.nonSerialDevices = [
             27, # Program
-            29, # MODBUS
-            33, # MODBUS 34
             34, # Phidget 1048 4xTC 01
             37, # Phidget 1046 4xRTD 01
             40, # Phidget IO 01
@@ -5590,8 +5588,11 @@ class tgraphcanvas(FigureCanvas):
                             RoR_start = -1
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
                         
-#                        print("BT RoR mean:",numpy.mean(self.delta2))
-#                        print("BT RoR std:",numpy.std(self.delta2))
+#                        try:
+#                            print("BT RoR mean:",numpy.mean([x for x in self.delta2 if x is not None]))
+#                            print("BT RoR std:",numpy.std([x for x in self.delta2 if x is not None]))
+#                        except Exception as e:
+#                            pass
                                                     
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
