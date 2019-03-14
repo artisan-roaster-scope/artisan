@@ -29144,7 +29144,7 @@ class editGraphDlg(ArtisanDialog):
         chargelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         chargelabel.setStyleSheet("background-color:'#f07800';")
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
-        self.chargeedit.setFocusPolicy(Qt.NoFocus)
+#        self.chargeedit.setFocusPolicy(Qt.NoFocus)
         self.chargeedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.chargeeditcopy = aw.qmc.stringfromseconds(0)
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
@@ -29182,7 +29182,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t2 = 0
         self.dryedit = QLineEdit(aw.qmc.stringfromseconds(t2))
-        self.dryedit.setFocusPolicy(Qt.NoFocus)
+#        self.dryedit.setFocusPolicy(Qt.NoFocus)
         self.dryedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dryeditcopy = aw.qmc.stringfromseconds(t2)
         self.dryedit.setValidator(QRegExpValidator(regextime,self))
@@ -29197,7 +29197,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t3 = 0
         self.Cstartedit = QLineEdit(aw.qmc.stringfromseconds(t3))
-        self.Cstartedit.setFocusPolicy(Qt.NoFocus)
+#        self.Cstartedit.setFocusPolicy(Qt.NoFocus)
         self.Cstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cstarteditcopy = aw.qmc.stringfromseconds(t3)
         self.Cstartedit.setValidator(QRegExpValidator(regextime,self))
@@ -29213,7 +29213,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t4 = 0
         self.Cendedit = QLineEdit(aw.qmc.stringfromseconds(t4))
-        self.Cendedit.setFocusPolicy(Qt.NoFocus)
+#        self.Cendedit.setFocusPolicy(Qt.NoFocus)
         self.Cendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cendeditcopy = aw.qmc.stringfromseconds(t4)
         self.Cendedit.setValidator(QRegExpValidator(regextime,self))
@@ -29228,7 +29228,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t5 = 0
         self.CCstartedit = QLineEdit(aw.qmc.stringfromseconds(t5))
-        self.CCstartedit.setFocusPolicy(Qt.NoFocus)
+#        self.CCstartedit.setFocusPolicy(Qt.NoFocus)
         self.CCstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCstarteditcopy = aw.qmc.stringfromseconds(t5)
         self.CCstartedit.setValidator(QRegExpValidator(regextime,self))
@@ -29243,7 +29243,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t6 = 0
         self.CCendedit = QLineEdit(aw.qmc.stringfromseconds(t6))
-        self.CCendedit.setFocusPolicy(Qt.NoFocus)
+#        self.CCendedit.setFocusPolicy(Qt.NoFocus)
         self.CCendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCendeditcopy = aw.qmc.stringfromseconds(t6)
         self.CCendedit.setValidator(QRegExpValidator(regextime,self))
@@ -29258,7 +29258,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t7 = 0
         self.dropedit = QLineEdit(aw.qmc.stringfromseconds(t7))
-        self.dropedit.setFocusPolicy(Qt.NoFocus)
+#        self.dropedit.setFocusPolicy(Qt.NoFocus)
         self.dropedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dropeditcopy = aw.qmc.stringfromseconds(t7)
         self.dropedit.setValidator(QRegExpValidator(regextime,self))
@@ -29274,7 +29274,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             t8 = 0
         self.cooledit = QLineEdit(aw.qmc.stringfromseconds(t8))
-        self.cooledit.setFocusPolicy(Qt.NoFocus)
+#        self.cooledit.setFocusPolicy(Qt.NoFocus)
         self.cooledit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.cooleditcopy = aw.qmc.stringfromseconds(t8)
         self.cooledit.setValidator(QRegExpValidator(regextime,self))
