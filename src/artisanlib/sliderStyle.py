@@ -35,11 +35,11 @@ artisan_slider_style = """
             QSlider::handle:vertical {{
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #eee);
                 border: 0.5px solid #ddd;
-                height: 8px;
+                height: 10px;
                 margin-top: -1px;
                 margin-bottom: -1px;
-                margin-left: -10px;
-                margin-right: -10px;
+                margin-left: -15px;
+                margin-right: -15px;
                 border-radius: 5px;
             }}
             QSlider::handle:vertical:hover {{

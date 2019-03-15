@@ -983,6 +983,7 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget DAQ1400 Voltage",   #98
                        "Aillio Bullet R1 IBTS/BT",  #99
                        "Yocto IR",                  #100
+                       "Behmor BT/ET",              #101
                        ]
 
         # ADD DEVICE:
@@ -12542,13 +12543,14 @@ class ApplicationWindow(QMainWindow):
             self.lcd1.setVisible(False)
 
 
-        self.lcd2 = self.ArtisanLCD() # Temperature MET
+        self.lcd2 = self.ArtisanLCD() # Temperature ET
         self.lcd2.setContextMenuPolicy(Qt.CustomContextMenu)
         self.lcd2.customContextMenuRequested.connect(lambda _: self.setTare(0))
         self.lcd3 = self.ArtisanLCD() # Temperature BT
         self.lcd3.setContextMenuPolicy(Qt.CustomContextMenu)
         self.lcd3.customContextMenuRequested.connect(lambda _: self.setTare(1))
-        self.lcd4 = self.ArtisanLCD() # rate of change MET
+        self.lcd4 = self.ArtisanLCD() # rate of change ET
+        self.lcd4.setVisible(False) # by default this one is not visible
         self.lcd5 = self.ArtisanLCD() # rate of change BT
         self.lcd6 = self.ArtisanLCD() # pid sv
         self.lcd7 = self.ArtisanLCD() # pid power % duty cycle
@@ -12596,6 +12598,7 @@ class ApplicationWindow(QMainWindow):
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label4.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
         self.setLabelColor(self.label4,QColor(self.qmc.palette["deltaet"]))
+        self.label4.setVisible(False) # by default this one is not visible
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
@@ -37179,6 +37182,7 @@ class serialport(object):
                                    self.PHIDGET_DAQ1400_VOLTAGE,   #98
                                    self.R1_BTIBTS,            # 99
                                    self.YOCTO_IR,             #100
+                                   self.BEHMOR_BTET,          #101
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -37691,6 +37695,11 @@ class serialport(object):
         
     def HOTTOP_HF(self):
         return aw.qmc.hottop_TX,aw.qmc.hottop_MAIN_FAN,aw.qmc.hottop_HEATER # time, Fan (chan2), Heater (chan1)
+        
+    def BEHMOR_BTET(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.BEHMORtemperatures()
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
 
     def S7(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -38410,7 +38419,9 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("DT301 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(data))) 
 
-
+    def BEHMORtemperatures(self):
+        return -1,-1
+    
     def HOTTOPtemperatures(self):
         try:
             from artisanlib.hottop import getHottop
@@ -45399,7 +45410,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
-                ####  DEVICE 54 is +VOLTCRAFT 204_34 but +DEVICE cannot be set as main device
+                ####  DEVICE 54 is +Hottop HF but +DEVICE cannot be set as main device
                 ##########################                    
                 elif meter == "Omega HH806W":
                     aw.qmc.device = 55
@@ -45594,6 +45605,16 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 elif meter == "Yocto IR":
                     aw.qmc.device = 100
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                elif meter == "Behmor BT/ET":
+                    aw.qmc.device = 101
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 57600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1.0
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
+                    
                 # ADD DEVICE:
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -45607,7 +45628,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #extra devices serial config
             #set of different serial settings modes options
             ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
-                         [19200,8,'N',1,1],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1],[115200,8,'N',1,1]]
+                         [19200,8,'N',1,1],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1],[115200,8,'N',1,1],[57600,8,'N',1,1]]
             #map device index to a setting mode (chose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
@@ -45709,6 +45730,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 94
                 1, # 99
                 1, # 100
+                9, # 101
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):

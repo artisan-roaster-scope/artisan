@@ -268,7 +268,12 @@ Section Uninstall
   RMDir /r "$INSTDIR\tk"
   RMDir /r "$INSTDIR\translations"
   RMDir /r "$INSTDIR\Wheels"
-
+  RMDir /r "$INSTDIR\gevent-*"
+  RMDir /r "$INSTDIR\gevent"
+  RMDir /r "$INSTDIR\matplotlib"
+  RMDir /r "$INSTDIR\numpy"
+  RMDir /r "$INSTDIR\scipy"
+  RMDir /r "$INSTDIR\win32com"
   Delete "$INSTDIR\artisan.png"
   Delete "$INSTDIR\LICENSE.txt"
   Delete "$INSTDIR\README.txt"
@@ -300,7 +305,7 @@ Section Uninstall
   Delete "$SMPROGRAMS\Artisan\Artisan.lnk"
   
   RMDir "$SMPROGRAMS\Artisan"
-  RMDir "$INSTDIR"
+  RMDir /r "$INSTDIR"
   
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
