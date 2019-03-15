@@ -321,7 +321,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\scipy"
   RMDir /r "$INSTDIR\win32com"
   RMDir "$SMPROGRAMS\Artisan"
-  RMDir /r "$INSTDIR"
+  RMDir "$INSTDIR"
   
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
