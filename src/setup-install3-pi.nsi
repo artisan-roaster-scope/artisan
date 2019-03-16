@@ -268,7 +268,9 @@ Section Uninstall
   RMDir /r "$INSTDIR\tk"
   RMDir /r "$INSTDIR\translations"
   RMDir /r "$INSTDIR\Wheels"
-  RMDir /r "$INSTDIR\gevent-*"
+
+  RMDir /r "$INSTDIR\gevent-1.4.0-py3.6.egg-info"
+
   RMDir /r "$INSTDIR\gevent"
   RMDir /r "$INSTDIR\matplotlib"
   RMDir /r "$INSTDIR\numpy"
