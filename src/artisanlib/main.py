@@ -2104,6 +2104,7 @@ class tgraphcanvas(FigureCanvas):
             if res is not None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
                 aw.qmc.ambientTemp = aw.float2float(float(res))
         try:
+            aw.qmc.startPhidgetManager()
             aw.qmc.getAmbientData()
         except:
             pass
