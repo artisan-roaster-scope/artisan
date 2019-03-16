@@ -39244,7 +39244,7 @@ class serialport(object):
     # this one is reused for the 1045 (IR), the 1051 (1xTC), TMP1100 (1xTC), and TMP1200 (1xRTD)
     def PHIDGET1045temperature(self,deviceType=DeviceID.PHIDID_1045,retry=True):
         try:
-            if not self.PhidgetIRSensor:
+            if not self.PhidgetIRSensor and aw.qmc.phidgetManager is not None:
                 ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType,
                             remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
@@ -39486,7 +39486,7 @@ class serialport(object):
     # works for the 4xTC USB_Phidget 1048 and the 4xTC VINT Phidget TMP1101
     def PHIDGET1048temperature(self,deviceType=DeviceID.PHIDID_1048,mode=0,retry=True):
         try:
-            if not self.PhidgetTemperatureSensor:
+            if not self.PhidgetTemperatureSensor and aw.qmc.phidgetManager is not None:
                 ser = None
                 port = None 
                 if mode == 0:
@@ -39763,7 +39763,7 @@ class serialport(object):
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4
     def PHIDGET1046temperature(self,mode=0,retry=True):
         try:
-            if not self.PhidgetBridgeSensor:
+            if not self.PhidgetBridgeSensor and aw.qmc.phidgetManager is not None:
                 ser = None
                 port = None 
                 if mode == 0:
@@ -39857,7 +39857,7 @@ class serialport(object):
 #  commands: set(n,0), set(n,1), toggle(n) with n channel number
 
     def phidgetBinaryOUTattach(self,channel):
-        if not aw.ser.PhidgetBinaryOut:
+        if not aw.ser.PhidgetBinaryOut and aw.qmc.phidgetManager is not None:
             aw.qmc.startPhidgetManager()
             ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1014,channel,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
@@ -39944,7 +39944,7 @@ class serialport(object):
 #    toggle switches between last value != 0 and 0
 
     def phidgetOUTattach(self,channel):
-        if not aw.ser.PhidgetDigitalOut:
+        if not aw.ser.PhidgetDigitalOut and aw.qmc.phidgetManager is not None:
             aw.qmc.startPhidgetManager()
             # try to attach the 4 channels of the Phidget OUT1100 module
             ser = None
@@ -40025,7 +40025,7 @@ class serialport(object):
 #  only supporting 6 channel Phidget HUB0000 module
 
     def phidgetOUTattachHub(self,channel):
-        if not aw.ser.PhidgetDigitalOutHub:
+        if not aw.ser.PhidgetDigitalOutHub and aw.qmc.phidgetManager is not None:
             aw.qmc.startPhidgetManager()
             # try to attach the 6 channels of the Phidget HUB0000 module
             ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_DIGITALOUTPUT_PORT,channel,
@@ -40100,7 +40100,7 @@ class serialport(object):
 #  commands: out(n,v) with n channel number and value v voltage in V as a float
 
     def phidgetVOUTattach(self,channel):
-        if not aw.ser.PhidgetAnalogOut:
+        if not aw.ser.PhidgetAnalogOut and aw.qmc.phidgetManager is not None:
             aw.qmc.startPhidgetManager()
             # try to attach the Phidget OUT100x module
             ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1000,
@@ -40175,7 +40175,7 @@ class serialport(object):
 #     move(ch,pos) # sets position, enables servo, disables servo once target position is reached
 
     def phidgetRCattach(self,channel):
-        if not aw.ser.PhidgetRCServo:
+        if not aw.ser.PhidgetRCServo and aw.qmc.phidgetManager is not None:
             aw.qmc.startPhidgetManager()
             # try to attach an Phidget RCC1000 module
             ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_RCC1000,
@@ -40476,7 +40476,7 @@ class serialport(object):
     # the API parameter is one of "voltage", "digital", "current", "frequency"
     def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0, API="voltage", retry=True):
         try:
-            if self.PhidgetIO is None:
+            if self.PhidgetIO is None and aw.qmc.phidgetManager is not None:
                 ser = None
                 port = None 
                 if API == "digital":
