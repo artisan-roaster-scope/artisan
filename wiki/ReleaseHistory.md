@@ -3,7 +3,7 @@ Detailed Release History
 
 ----
 
-v1.6.1 (10.03.2019)
+v1.6.1 (20.03.2019)
 ------------------
 
 * Changes
