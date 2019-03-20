@@ -1,3 +1,10 @@
+artisan (1.6.2-0) precise; urgency=low
+  * new upstream release
+  * changes since 1.6.1:
+   - fixes communication with Phidgets under the Mac OS X 10.14 security framework
+   - bug fixes
+ --  <marko.luther@gmx.net>  Sun, 10 Mar 2019 19:32:14 +0200
+
 artisan (1.6.1-0) precise; urgency=low
   * new upstream release
   * changes since 1.5.0:

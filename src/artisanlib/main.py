@@ -983,7 +983,7 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget DAQ1400 Voltage",   #98
                        "Aillio Bullet R1 IBTS/BT",  #99
                        "Yocto IR",                  #100
-                       "Behmor BT/ET",              #101
+                       "-Behmor BT/ET",              #101
                        ]
 
         # ADD DEVICE:
@@ -4009,8 +4009,9 @@ class tgraphcanvas(FigureCanvas):
                 self.roastdate = QDateTime.currentDateTime()
                 self.roastepoch = QDateTime.currentDateTime().toTime_t()
                 self.roasttzoffset = libtime.timezone
-                self.errorlog = []
-                aw.seriallog = []
+                if not sampling: # just if the RESET button is manually pressed we clear the error log
+                    self.errorlog = []
+                    aw.seriallog = []
 
                 aw.qmc.zoom_follow = False # reset the zoom follow feature
                 
@@ -4142,8 +4143,8 @@ class tgraphcanvas(FigureCanvas):
                     self.togglecrosslines()
                     
 #PLUS-COMMENT
-                if aw is not None and not artisanviewerMode:
-                    aw.updatePlusStatus()                                  
+#                if aw is not None and not artisanviewerMode:
+#                    aw.updatePlusStatus()                                  
                     
             except Exception as ex:
 #                import traceback
@@ -6646,19 +6647,24 @@ class tgraphcanvas(FigureCanvas):
         #                            # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
         _stderr = sys.stderr
         sys.stderr = object
-        if self.phidgetRemoteFlag:
-            try:
-                self.addPhidgetServer()
-            except:
-                pass
-        if self.phidgetManager is None:
-            try:
-                self.phidgetManager = PhidgetManager()
-                libtime.sleep(0.3)
-            except Exception as e:
-                aw.sendmessage("PhidgetManager Error: " + str(e))
-                pass
-        sys.stderr = _stderr
+        try:
+            if self.phidgetRemoteFlag:
+                try:
+                    self.addPhidgetServer()
+                except:
+                    aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetServer couldn't be started. Verify that the Phidget driver is correctly installed!",None))
+#                    _, _, exc_tb = sys.exc_info()
+#                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " addPhidgetServer() {0}").format(str(e)),exc_tb.tb_lineno)
+            if self.phidgetManager is None:
+                try:
+                    self.phidgetManager = PhidgetManager()
+                    libtime.sleep(0.3)
+                except Exception as e:
+                    aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
+#                     _, _, exc_tb = sys.exc_info()
+#                   aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startPhidgetManager() {0}").format(str(e)),exc_tb.tb_lineno)
+        finally:
+            sys.stderr = _stderr
     
     def stopPhidgetManager(self):
         if self.phidgetManager is not None:
@@ -6802,52 +6808,60 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     def getAmbientData(self):
-        humidity = None
-        temp = None # assumed to be gathered in C (not F!)
-        pressure = None 
-
-        #--- humidity
-        if self.ambient_humidity_device == 1: # Phidget HUM1000
-            humidity = aw.ser.PhidgetHUM1000humidity()
-        elif self.ambient_humidity_device == 2: # Yocto Meteo
-            humidity = aw.ser.YoctoMeteoHUM()
-
-        #--- temperature
-        if self.ambient_temperature_device == 1: # Phidget HUM1000
-            temp = aw.ser.PhidgetHUM1000temperature()
-        elif self.ambient_temperature_device == 2: # Yocto Meteo
-            temp = aw.ser.YoctoMeteoTEMP()
-
-        #--- pressure
-        if self.ambient_pressure_device == 1: # Phidget PRE1000
-            pressure = aw.ser.PhidgetPRE1000pressure()
+        # this is needed to surpress the message on the ignored Exception
+        #                            # Phidget that is raised on starting the PhidgetManager without installed
+        #                            # Phidget driver (artisanlib/surpress_error.py fails to surpress this)
+        _stderr = sys.stderr
+        sys.stderr = object
+        try:
+            humidity = None
+            temp = None # assumed to be gathered in C (not F!)
+            pressure = None 
+    
+            #--- humidity
+            if self.ambient_humidity_device == 1: # Phidget HUM1000
+                humidity = aw.ser.PhidgetHUM1000humidity()
+            elif self.ambient_humidity_device == 2: # Yocto Meteo
+                humidity = aw.ser.YoctoMeteoHUM()
+    
+            #--- temperature
+            if self.ambient_temperature_device == 1: # Phidget HUM1000
+                temp = aw.ser.PhidgetHUM1000temperature()
+            elif self.ambient_temperature_device == 2: # Yocto Meteo
+                temp = aw.ser.YoctoMeteoTEMP()
+    
+            #--- pressure
+            if self.ambient_pressure_device == 1: # Phidget PRE1000
+                pressure = aw.ser.PhidgetPRE1000pressure()
+                if pressure is not None:
+                    pressure = pressure * 10 # convert to hPa/mbar
+            elif self.ambient_pressure_device == 2: # Yocto Meteo
+                pressure = aw.ser.YoctoMeteoPRESS()
+                
+            # calc final values
             if pressure is not None:
-                pressure = pressure * 10 # convert to hPa/mbar
-        elif self.ambient_pressure_device == 2: # Yocto Meteo
-            pressure = aw.ser.YoctoMeteoPRESS()
-            
-        # calc final values
-        if pressure is not None:
-            if temp is None:
-                t = 23 # we just assume 23C room temperature if no ambient temperature is given
-            else:
-                t = temp
-            pressure = self.barometricPressure(pressure,t,self.elevation)
-            
-        # set and report
-        if humidity is not None:
-            self.ambient_humidity = aw.float2float(humidity,1)
-            aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
-            
-        if temp is not None:
-            if self.mode == "F":
-                temp = self.fromCtoF(temp)
-            self.ambientTemp = aw.float2float(temp,1)
-            aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
-            
-        if pressure is not None:
-            self.ambient_pressure = aw.float2float(pressure,1)
-            aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa", None).format(self.ambient_pressure))
+                if temp is None:
+                    t = 23 # we just assume 23C room temperature if no ambient temperature is given
+                else:
+                    t = temp
+                pressure = self.barometricPressure(pressure,t,self.elevation)
+                
+            # set and report
+            if humidity is not None:
+                self.ambient_humidity = aw.float2float(humidity,1)
+                aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
+                
+            if temp is not None:
+                if self.mode == "F":
+                    temp = self.fromCtoF(temp)
+                self.ambientTemp = aw.float2float(temp,1)
+                aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
+                
+            if pressure is not None:
+                self.ambient_pressure = aw.float2float(pressure,1)
+                aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa", None).format(self.ambient_pressure))
+        finally:
+            sys.stderr = _stderr
       
     # computes the barometric pressure from 
     #   aap:  atmospheric pressure in hPa
@@ -10337,7 +10351,7 @@ class VMToolbar(NavigationToolbar):
             self.toolitems = (
 
 #PLUS-COMMENT
-                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
+#                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
                 
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -10386,8 +10400,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-        if aw is not None and not artisanviewerMode:
-            aw.updatePlusStatus(self)
+#        if aw is not None and not artisanviewerMode:
+#            aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -17220,13 +17234,13 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
 #PLUS-COMMENT          
-                if aw is not None and not artisanviewerMode:
-                    aw.updatePlusStatus()
-                    if aw.plus_account is not None:
-                        import plus.config
-                        if plus.config.uuid_tag in obj:
-                            import plus.sync                            
-                            QTimer.singleShot(100,lambda : plus.sync.sync())
+#                if aw is not None and not artisanviewerMode:
+#                    aw.updatePlusStatus()
+#                    if aw.plus_account is not None:
+#                        import plus.config
+#                        if plus.config.uuid_tag in obj:
+#                            import plus.sync                            
+#                            QTimer.singleShot(100,lambda : plus.sync.sync())
                                     
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -19579,12 +19593,12 @@ class ApplicationWindow(QMainWindow):
                 if pf:
 
 #PLUS-COMMENT  
-                    if not artisanviewerMode and aw.plus_account is not None:
-                        import plus.controller
-                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-                        if sync_record_hash is not None:
-                            # we add the hash over the sync record to be able to detect offline changes
-                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+#                    if not artisanviewerMode and aw.plus_account is not None:
+#                        import plus.controller
+#                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+#                        if sync_record_hash is not None:
+#                            # we add the hash over the sync record to be able to detect offline changes
+#                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
 
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
@@ -19879,12 +19893,12 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
-                self.plus_account = settings.value("plus_account",self.plus_account)
-                if settings.contains("plus_remember_credentials"):
-                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
-                if settings.contains("plus_email"):
-                    self.plus_email = settings.value("plus_email",self.plus_email)
+#            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
+#                self.plus_account = settings.value("plus_account",self.plus_account)
+#                if settings.contains("plus_remember_credentials"):
+#                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+#                if settings.contains("plus_email"):
+#                    self.plus_email = settings.value("plus_email",self.plus_email)
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -21079,13 +21093,13 @@ class ApplicationWindow(QMainWindow):
                     aw.fullscreenAction.setChecked(True)
             
 #PLUS-COMMENT
-            if filename is None and not artisanviewerMode and self.plus_account is not None:
-                try:
-                    import plus.controller
-                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
-                except:
-                    pass
-            #aw.updatePlusStatus()
+#            if filename is None and not artisanviewerMode and self.plus_account is not None:
+#                try:
+#                    import plus.controller
+#                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
+#                except:
+#                    pass
+#            #aw.updatePlusStatus()
             
 #            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
             # but with this one in place, the window size is not properly set (just the position!?)

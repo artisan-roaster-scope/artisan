@@ -2,6 +2,19 @@ Detailed Release History
 ========================
 
 ----
+
+v1.6.1 (10.03.2019)
+------------------
+
+* Changes
+  - larger slider handles
+* Fixes
+  - enables communication with Phidgets under the Mac OS X 10.14 security framework
+  - removes MODBUS from the non-serial device list
+  - ensures that uninstaller on Windows is removing everything
+  - fixes regression that disabled the editing of roast properties event times
+
+
 v1.6.1 (10.03.2019)
 ------------------
 
