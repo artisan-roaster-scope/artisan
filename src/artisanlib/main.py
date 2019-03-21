@@ -983,7 +983,7 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget DAQ1400 Voltage",   #98
                        "Aillio Bullet R1 IBTS/BT",  #99
                        "Yocto IR",                  #100
-                       "Behmor BT/ET",              #101
+                       "-Behmor BT/ET",              #101
                        ]
 
         # ADD DEVICE:
@@ -1016,7 +1016,29 @@ class tgraphcanvas(FigureCanvas):
             99,  # Aillio Bullet R1 IBTS/BT
             100  # Yocto IR
         ]
-                       
+        
+        # ADD DEVICE:
+        # ids of (main) Phidget devices (without a + in front of their name string) 
+        self.phidgetDevices = [
+            34, # Phidget 1048
+            37, # Phidget 1046
+            40, # Phidget IO
+            47, # Phidget 1045
+            52, # Phidget 1051
+            58, # Phidget TMP1101
+            61, # Phidget TMP1100
+            62, # Phidget 1011
+            63, # Phidget HUB0000
+            68, # Phidget TMP1200
+            69, # Phidget IO Digital
+            73, # Phidget 1011 IO Digital
+            74, # Phidget HUB0000 IO Digital
+            95, # Phidget DAQ1400 Current
+            96, # Phidget DAQ1400 Frequency
+            97, # Phidget DAQ1400 Digital
+            98, # Phidget DAQ1400 Voltage
+        ]
+                 
         # ADD DEVICE:
         # ids of devices temperature conversions should not be applied
         self.nonTempDevices = [
@@ -4143,8 +4165,8 @@ class tgraphcanvas(FigureCanvas):
                     self.togglecrosslines()
                     
 #PLUS-COMMENT
-                if aw is not None and not artisanviewerMode:
-                    aw.updatePlusStatus()                                  
+#                if aw is not None and not artisanviewerMode:
+#                    aw.updatePlusStatus()                                  
                     
             except Exception as ex:
 #                import traceback
@@ -6652,17 +6674,19 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     self.addPhidgetServer()
                 except:
-                    aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetServer couldn't be started. Verify that the Phidget driver is correctly installed!",None))
-#                    _, _, exc_tb = sys.exc_info()
-#                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " addPhidgetServer() {0}").format(str(e)),exc_tb.tb_lineno)
+                    if aw.qmc.device in aw.qmc.phidgetDevices:
+                        aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetServer couldn't be started. Verify that the Phidget driver is correctly installed!",None))
+#                        _, _, exc_tb = sys.exc_info()
+#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " addPhidgetServer() {0}").format(str(e)),exc_tb.tb_lineno)
             if self.phidgetManager is None:
                 try:
                     self.phidgetManager = PhidgetManager()
                     libtime.sleep(0.3)
                 except Exception as e:
-                    aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
-#                     _, _, exc_tb = sys.exc_info()
-#                   aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startPhidgetManager() {0}").format(str(e)),exc_tb.tb_lineno)
+                    if aw.qmc.device in aw.qmc.phidgetDevices:
+                        aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
+#                        _, _, exc_tb = sys.exc_info()
+#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startPhidgetManager() {0}").format(str(e)),exc_tb.tb_lineno)
         finally:
             sys.stderr = _stderr
     
@@ -10351,7 +10375,7 @@ class VMToolbar(NavigationToolbar):
             self.toolitems = (
 
 #PLUS-COMMENT
-                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
+#                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
                 
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -10400,8 +10424,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-        if aw is not None and not artisanviewerMode:
-            aw.updatePlusStatus(self)
+#        if aw is not None and not artisanviewerMode:
+#            aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -17234,13 +17258,13 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
 #PLUS-COMMENT          
-                if aw is not None and not artisanviewerMode:
-                    aw.updatePlusStatus()
-                    if aw.plus_account is not None:
-                        import plus.config
-                        if plus.config.uuid_tag in obj:
-                            import plus.sync                            
-                            QTimer.singleShot(100,lambda : plus.sync.sync())
+#                if aw is not None and not artisanviewerMode:
+#                    aw.updatePlusStatus()
+#                    if aw.plus_account is not None:
+#                        import plus.config
+#                        if plus.config.uuid_tag in obj:
+#                            import plus.sync                            
+#                            QTimer.singleShot(100,lambda : plus.sync.sync())
                                     
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -19593,12 +19617,12 @@ class ApplicationWindow(QMainWindow):
                 if pf:
 
 #PLUS-COMMENT  
-                    if not artisanviewerMode and aw.plus_account is not None:
-                        import plus.controller
-                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-                        if sync_record_hash is not None:
-                            # we add the hash over the sync record to be able to detect offline changes
-                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+#                    if not artisanviewerMode and aw.plus_account is not None:
+#                        import plus.controller
+#                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+#                        if sync_record_hash is not None:
+#                            # we add the hash over the sync record to be able to detect offline changes
+#                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
 
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
@@ -19893,12 +19917,12 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
-                self.plus_account = settings.value("plus_account",self.plus_account)
-                if settings.contains("plus_remember_credentials"):
-                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
-                if settings.contains("plus_email"):
-                    self.plus_email = settings.value("plus_email",self.plus_email)
+#            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
+#                self.plus_account = settings.value("plus_account",self.plus_account)
+#                if settings.contains("plus_remember_credentials"):
+#                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+#                if settings.contains("plus_email"):
+#                    self.plus_email = settings.value("plus_email",self.plus_email)
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -21093,13 +21117,13 @@ class ApplicationWindow(QMainWindow):
                     aw.fullscreenAction.setChecked(True)
             
 #PLUS-COMMENT
-            if filename is None and not artisanviewerMode and self.plus_account is not None:
-                try:
-                    import plus.controller
-                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
-                except:
-                    pass
-            #aw.updatePlusStatus()
+#            if filename is None and not artisanviewerMode and self.plus_account is not None:
+#                try:
+#                    import plus.controller
+#                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
+#                except:
+#                    pass
+#            #aw.updatePlusStatus()
             
 #            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
             # but with this one in place, the window size is not properly set (just the position!?)
