@@ -15535,7 +15535,7 @@ class ApplicationWindow(QMainWindow):
                                 c = toInt(cs_a[1])
                                 t = toInt(cs_a[2])
                                 #print("pulse(%d, %d)" % (c, t))
-                                if t>= 0.0 and t <= 1000:
+                                if t>= 0.0 and t <= 999999:
                                     aw.ser.phidgetBinaryOUTpulse(c, t)
                                 else:
                                     aw.sendmessage(QApplication.translate("Message", "Pulse out of range (%d)" % (t), None))
