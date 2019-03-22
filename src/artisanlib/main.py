@@ -983,7 +983,7 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget DAQ1400 Voltage",   #98
                        "Aillio Bullet R1 IBTS/BT",  #99
                        "Yocto IR",                  #100
-                       "Behmor BT/ET",              #101
+                       "Behmor BT/CT",              #101
                        ]
 
         # ADD DEVICE:
@@ -38507,7 +38507,7 @@ class serialport(object):
 #                except Exception:
 #                    t2 = -1
 
-                # READ ET
+                # READ CT
                 try:
                     command = "gts,8\r\n"
                     self.SP.write(str2cmd(command))
@@ -45719,7 +45719,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 elif meter == "Yocto IR":
                     aw.qmc.device = 100
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
-                elif meter == "Behmor BT/ET":
+                elif meter == "Behmor BT/CT":
                     aw.qmc.device = 101
                     #aw.ser.comport = "COM4"
                     aw.ser.baudrate = 57600
