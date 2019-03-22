@@ -38513,6 +38513,9 @@ class serialport(object):
                     self.SP.write(str2cmd(command))
                     res = self.readline_null_terminated().decode('utf-8', 'ignore').rstrip('\x00')
                     t1 = float(res)
+                    if aw.seriallogflag:
+                        settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                        aw.addserial("Behmor :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f"%t1)
                 except:
                     pass
                 # READ BT
@@ -38521,6 +38524,9 @@ class serialport(object):
                     self.SP.write(str2cmd(command))
                     res = self.readline_null_terminated().decode('utf-8', 'ignore').rstrip('\x00')
                     t2 = float(res)
+                    if aw.seriallogflag:
+                        settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                        aw.addserial("Behmor :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f"%t2)
                 except:
                     pass
                 return t1,t2
@@ -38531,9 +38537,6 @@ class serialport(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
-            if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("Behmor :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f, %.2f"%(t1,t2))
 
     
     def HOTTOPtemperatures(self):
