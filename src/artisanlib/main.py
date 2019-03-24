@@ -4723,7 +4723,7 @@ class tgraphcanvas(FigureCanvas):
         title = aw.qmc.abbrevString(title,stl)
         fontprop_xlarge = aw.mpl_fontproperties.copy()
         fontprop_xlarge.set_size("x-large")
-        t_artist = self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
+        t_artist = self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"], loc='left',
                     fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
         try:
             t_artist.set_in_layout(False) # remove title from tight_layout calculation
@@ -12603,7 +12603,6 @@ class ApplicationWindow(QMainWindow):
         self.lcd3.setContextMenuPolicy(Qt.CustomContextMenu)
         self.lcd3.customContextMenuRequested.connect(lambda _: self.setTare(1))
         self.lcd4 = self.ArtisanLCD() # rate of change ET
-        self.lcd4.setVisible(False) # by default this one is not visible
         self.lcd5 = self.ArtisanLCD() # rate of change BT
         self.lcd6 = self.ArtisanLCD() # pid sv
         self.lcd7 = self.ArtisanLCD() # pid power % duty cycle
@@ -12875,6 +12874,7 @@ class ApplicationWindow(QMainWindow):
 
         self.LCD4frame = QFrame()
         LCDlayout.addWidget(self.makeLCDbox(self.label4,self.lcd4,self.LCD4frame))
+        self.LCD4frame.setVisible(False) # by default this one is not visible
 
         self.LCD5frame = QFrame()
         LCDlayout.addWidget(self.makeLCDbox(self.label5,self.lcd5,self.LCD5frame))
