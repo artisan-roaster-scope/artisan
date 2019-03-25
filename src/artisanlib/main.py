@@ -12654,7 +12654,6 @@ class ApplicationWindow(QMainWindow):
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label4.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
         self.setLabelColor(self.label4,QColor(self.qmc.palette["deltaet"]))
-        self.label4.setVisible(False) # by default this one is not visible
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
@@ -24524,10 +24523,10 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.weight[1] = w
         #dave99
         if d is not None and d > -1:
-            print("Set density to:",d)
+#            print("Set density to:",d)
             aw.qmc.density_roasted[0] = d
         if m is not None and m > -1:
-            print("Set moisture to:",m)
+#            print("Set moisture to:",m)
             aw.qmc.moisture_roasted = m
 
     def desktopscreenshot(self):
@@ -37019,7 +37018,7 @@ class scaleport(extraserialport):
                         line2 = self.SP.readline()
 #                        print("line2",line2)   #dave99
                         d = re.findall(r'[0-9\.\-]+',str(line2))
-                        print("d",d)    #dave99
+#                        print("d",d)    #dave99
                         if len(d) == 1:
                             den = toFloat(d[0]) *12.8718597   # convert from LBS/BU to g/
                             return -1,toFloat(den),-1
@@ -37032,7 +37031,7 @@ class scaleport(extraserialport):
                         line2 = self.SP.readline()
 #                        print("line2",line2)  #dave99
                         m = re.findall(r'[0-9\.\-]+',str(line2))
-                        line3 = self.SP.readline()
+#                        line3 = self.SP.readline() # unused!
                         if len(m) == 1:
                             return -1,-1,toFloat(m[0])
                         else:
