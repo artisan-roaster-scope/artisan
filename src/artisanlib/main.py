@@ -9128,9 +9128,12 @@ class tgraphcanvas(FigureCanvas):
                                          QApplication.translate("Message","Importing a profile in to Designer will decimate all data except the main [points].\nContinue?",None),
                                          QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
-                self.initfromprofile()
-                self.connect_designer()
-                self.redraw(True)
+                res = self.initfromprofile()
+                if res:
+                    self.connect_designer()
+                    self.redraw(True)
+                else:
+                    aw.designerAction.setChecked(False)
             elif reply == QMessageBox.Cancel:
                 aw.designerAction.setChecked(False)
         else:
@@ -9221,7 +9224,7 @@ class tgraphcanvas(FigureCanvas):
             QMessageBox.information(aw,QApplication.translate("Message","Designer Init",None),
                                     QApplication.translate("Message","Unable to start designer.\nProfile missing [CHARGE] or [DROP]",None))
             self.disconnect_designer()
-            return()
+            return False
 
         #save events. They will be deleted on qmc.reset()
         self.specialeventsStringscopy = self.specialeventsStrings[:]
@@ -9266,6 +9269,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.xaxistosm(redraw=False)
         self.redrawdesigner()                                   #redraw the designer screen
+        return True
 
     #redraws designer
     def redrawdesigner(self):
