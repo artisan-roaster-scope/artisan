@@ -24499,20 +24499,32 @@ class ApplicationWindow(QMainWindow):
             imag.save(fileName, fmt) 
 
     def retrieveWeightIn(self,tare=0):
-        v = aw.scale.readWeight() # read value from scale in 'g'
-        if v is not None and v > -1:
-            v = v - tare
-            v = aw.convertWeight(v,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
-            aw.qmc.weight[0] = v
+        w,d,m = aw.scale.readWeight() # read value from scale in 'g'
+#        print("Returned w,d,m",w,d,m)  #dave99
+        if w is not None and w > -1:
+            w = w - tare
+            w = aw.convertWeight(w,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
+            aw.qmc.weight[0] = w
+        if d is not None and d > -1:
+            aw.qmc.density[0] = d
+        if m is not None and m > -1:
+            aw.qmc.moisture_greens = m
 
     def retrieveWeightOut(self,tare=0):
-        v = aw.scale.readWeight() # read value from scale in 'g'
-        if v is not None and v > -1:
-            v = v - tare
-            v = aw.convertWeight(v,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
+        w,d,m = aw.scale.readWeight() # read value from scale in 'g'
+        if w is not None and w > -1:
+            w = w - tare
+            w = aw.convertWeight(w,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
             if aw.qmc.weight[2] != 'g':
-                v = v / 1000.0
-            aw.qmc.weight[1] = v
+                w = w / 1000.0
+            aw.qmc.weight[1] = w
+        #dave99
+        if d is not None and d > -1:
+            print("Set density to:",d)
+            aw.qmc.density_roasted[0] = d
+        if m is not None and m > -1:
+            print("Set moisture to:",m)
+            aw.qmc.moisture_roasted = m
 
     def desktopscreenshot(self):
         screen = QApplication.primaryScreen()
@@ -30907,6 +30919,8 @@ class editGraphDlg(ArtisanDialog):
         except Exception:
             pass
         previous_out = aw.qmc.weight[1]
+        previous_out_den = aw.qmc.density_roasted[0]
+        previous_out_moi = aw.qmc.moisture_roasted
         aw.retrieveWeightOut(tare)
         if tare != 0 and previous_out == aw.qmc.weight[1] and self.weightoutedit.text() != "" and float(self.weightoutedit.text()) != 0.0:
             # no value received from scale:
@@ -30919,6 +30933,10 @@ class editGraphDlg(ArtisanDialog):
             self.weightoutedit.setText("%g" % aw.float2float(text_out))
         elif previous_out != aw.qmc.weight[1]:
             self.weightoutedit.setText("%g" % aw.float2float(aw.qmc.weight[1]))
+        if previous_out_den != aw.qmc.density_roasted[0]:
+            self.bean_density_out_edit.setText("%g" % aw.float2float(aw.qmc.density_roasted[0]))
+        if previous_out_moi != aw.qmc.moisture_roasted:
+            self.moisture_roasted_edit.setText("%g" % aw.float2float(aw.qmc.moisture_roasted))
 
     def inWeight(self):
         tare = 0
@@ -30929,6 +30947,8 @@ class editGraphDlg(ArtisanDialog):
         except Exception:
             pass
         previous_in = aw.qmc.weight[0]
+        previous_in_den = aw.qmc.density[0]
+        previous_in_moi = aw.qmc.moisture_greens
         aw.retrieveWeightIn(tare)
         if tare != 0 and previous_in == aw.qmc.weight[0] and self.weightinedit.text() != "" and float(self.weightinedit.text()) != 0.0:
             # no value received from scale:
@@ -30941,7 +30961,11 @@ class editGraphDlg(ArtisanDialog):
             self.weightinedit.setText("%g" % aw.float2float(text_in))
         elif previous_in != aw.qmc.weight[0]:
             self.weightinedit.setText("%g" % aw.float2float(aw.qmc.weight[0]))
-
+        if previous_in_den != aw.qmc.density[0]:
+            self.bean_density_in_edit.setText("%g" % aw.float2float(aw.qmc.density[0]))
+        if previous_in_moi != aw.qmc.moisture_greens:
+            self.moisture_greens_edit.setText("%g" % aw.float2float(aw.qmc.moisture_greens))        
+        
     def roastpropertiesChanged(self):
         if self.roastproperties.isChecked():
             aw.qmc.roastpropertiesflag = 1
@@ -36872,6 +36896,7 @@ class scaleport(extraserialport):
             "None" : None,
             "KERN NDE" : self.readKERN_NDE,
             "acaia" : self.readAcaia,
+            "Shore 930" : self.readShore930,
         }
 
     def closeport(self):
@@ -36884,16 +36909,23 @@ class scaleport(extraserialport):
                 pass
         super(scaleport, self).closeport()
         
-    # returns weight as int in g or -1 if something went wrong
+    # returns one of weight (g), density (g/l), or moisture (%).  Others return -1.
     def readWeight(self):
         if self.device is not None and self.device != "None" and self.device != "":
-            res = self.devicefunctionlist[u(self.device)]()
-            if res is not None:
-                return aw.float2float(res)
+            wei,den,moi = self.devicefunctionlist[u(self.device)]()
+            if moi is not None and moi > -1:
+#                print("Moisture =",moi)  #dave99
+                return -1, -1, aw.float2float(moi)
+            elif den is not None and den > -1:
+#                print("Density =",den)  #dave99
+                return -1, aw.float2float(den), -1
+            elif wei is not None and wei > -1:
+#                print("Weight =",res)  #dave99
+                return aw.float2float(wei), -1, -1
             else:
-                return -1
+                return -1,-1,-1
         else:
-            return -1
+            return -1,-1,-1
             
     def readLine(self):
         return str(self.SP.readline().decode('ascii'))
@@ -36934,11 +36966,11 @@ class scaleport(extraserialport):
                     # if res[1] = ' ' and res[2] = v.strip().split(' ') then weight in g
                     # if res[1] = 'oz' then weight in oz
                     if res[1] == 'oz':
-                        return n * 28.3495231
+                        return n * 28.3495231, -1, -1
                     else:
-                        return n
+                        return n, -1, -1
         except Exception:
-            return -1
+            return -1, -1, -1
 
     def readKERN_NDE(self):
         try:
@@ -36953,11 +36985,61 @@ class scaleport(extraserialport):
                     v = self.SP.readline()
                     sa = v.decode('ascii').split('g')
                     if len(sa) == 2:
-                        return int(sa[0])
+                        return int(sa[0]), -1, -1
                     else:
-                        return -1 
+                        return -1, -1, -1
         except Exception:
-            return -1
+            return -1, -1, -1
+
+    def readShore930(self):
+        try:
+            if not self.SP:
+                self.connect()
+            if self.SP:
+                if not self.SP.isOpen():
+                    self.openport()
+                if self.SP.isOpen():
+                    line1 = self.SP.readline()
+#                    print("line1",line1)  #dave99
+                    weight = re.search(r'Current Weight:',str(line1))
+                    if weight:                    
+                        w = re.findall(r'([0-9\.]+)',str(line1))
+                        if len(w) == 1:
+                            return toFloat(w[0]),-1,-1
+                        else:
+#                            print("NOT GOOD Multiple results")  #dave99
+                            return -1,-1,-1
+
+                    density = re.search(r'Test Weight',str(line1))
+                    if density:
+                        line2 = self.SP.readline()
+#                        print("line2",line2)   #dave99
+                        d = re.findall(r'[0-9\.\-]+',str(line2))
+                        print("d",d)    #dave99
+                        if len(d) == 1:
+                            den = toFloat(d[0]) *12.8718597   # convert from LBS/BU to g/
+                            return -1,toFloat(den),-1
+                        else:
+#                            print("NOT GOOD Multiple results")  #dave99
+                            return -1,-1,-1
+
+                    moisture = re.search(r'Beans',str(line1))
+                    if moisture:
+                        line2 = self.SP.readline()
+#                        print("line2",line2)  #dave99
+                        m = re.findall(r'[0-9\.\-]+',str(line2))
+                        line3 = self.SP.readline()
+                        if len(m) == 1:
+                            return -1,-1,toFloat(m[0])
+                        else:
+#                            print("NOT GOOD Multiple results")  #dave99
+                            return -1,-1,-1
+
+                    else:
+#                        print("DID NOT SEE ANYTHING")   #dave99
+                        return -1,-1,-1
+        except Exception:
+            return -1,-1,-1
 
 
 class colorport(extraserialport):
