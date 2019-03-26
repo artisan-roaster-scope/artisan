@@ -113,19 +113,23 @@ def setKeyring():
             keyring.set_keyring(keyring.backends.OS_X.Keyring())
         else: # Linux
             try:
-                import keyring # @Reimport
+#                import keyring # @Reimport
 #                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
 #                # test if secretstorage dbus is working
 #                import secretstorage  # @Reimport @UnresolvedImport
 #                bus = secretstorage.dbus_init()
 #                _ = list(secretstorage.get_all_collections(bus))
-                # if yes, import it
+#                # if yes, import it
+#                import keyring.backends.SecretService # @Reimport
+#                ss_keyring = keyring.backends.SecretService.Keyring()
+#                if ss_keyring.priority:
+#                    import keyring # @Reimport
+#                    # if priority is not 0, we set it as keyring system
+#                    keyring.set_keyring(ss_keyring)
+
+                import keyring # @Reimport
                 import keyring.backends.SecretService # @Reimport
-                ss_keyring = keyring.backends.SecretService.Keyring()
-                if ss_keyring.priority:
-                    import keyring # @Reimport
-                    # if priority is not 0, we set it as keyring system
-                    keyring.set_keyring(ss_keyring)
+                keyring.set_keyring(keyring.backends.SecretService.Keyring())
             except Exception as e:
                 import sys
                 _, _, exc_tb = sys.exc_info()
