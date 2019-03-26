@@ -94,7 +94,6 @@ class Login(QDialog):
     def textChanged(self,_):
         login = self.textName.text()
         passwd = self.textPass.text()
-        # TODO: activate valid credential condition
         if len(passwd) >= config.min_passwd_len and len(login) >= config.min_login_len and "@" in login and "." in login:
             self.buttonLogin.setEnabled(True)
             self.buttonLogin.setDefault(True)

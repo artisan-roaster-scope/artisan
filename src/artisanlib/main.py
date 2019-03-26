@@ -860,6 +860,8 @@ class tgraphcanvas(FigureCanvas):
         self.YOCTO_emissivity = 1.0
         self.YOCTO_async = [False]*2
         self.YOCTO_dataRate = 256 # in ms
+        self.YOCTO_dataRatesStrings = ["32ms","64ms","128ms","256ms","512ms","768ms","1s","1s*"]
+        self.YOCTO_dataRatesValues = [32,64,128,256,512,768,1000,1024] # the 1024 mode returns every sec an average over the period, while 1000 returns every second the last sample
         
         self.phidget1018valueFactor = 1000 # we map the 0-5V voltage returned by the Phidgets22 API to mV (0-5000)
         self.phidget1018_async = [False]*8
@@ -40956,13 +40958,20 @@ class serialport(object):
                                 aw.qmc.YOCTOchan2Unit = "C"
                         except:
                             pass
+                        if aw.qmc.YOCTO_dataRate > 1000:
+                            reportFrequency = "60/m" # in this mode the average of a measurements over the last second is returned
+                        else:
+                            reportFrequency = "{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate)))   # 30/s => 30ms
+                            # if reportFrequency is set to "1/s", every second the last measurement sampled by the device is returned
+                            # note that this is different from "60/m" which returns an average over many values
+
                         if aw.qmc.YOCTO_async[0]:
-                            self.YOCTOchan1.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms 
+                            self.YOCTOchan1.set_reportFrequency(reportFrequency)
                             self.YOCTOchan1.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,0))
                         else:
                             self.YOCTOchan1.registerTimedReportCallback(lambda *_:None)
                         if aw.qmc.YOCTO_async[0]: # flag for channel 1 is ignored and only that of channel 0 is respected for both channels
-                            self.YOCTOchan2.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms
+                            self.YOCTOchan2.set_reportFrequency(reportFrequency)
                             self.YOCTOchan2.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,1))
                         else:
                             self.YOCTOchan2.registerTimedReportCallback(lambda *_:None)
@@ -41007,7 +41016,7 @@ class serialport(object):
                             self.YOCTOsemaphores[0].acquire(1)
                             if len(self.YOCTOvalues[0]) > 0:
                                 probe1 = numpy.average(self.YOCTOvalues[0])
-                                self.YOCTOvalues[0] = self.YOCTOvalues[0][-round((aw.qmc.delay/aw.qmc.YOCTO_dataRate)):]
+                                self.YOCTOvalues[0] = self.YOCTOvalues[0][-max(1,round((aw.qmc.delay/aw.qmc.YOCTO_dataRate))):]
                         except:
                             self.YOCTOvalues[0] = []
                         finally:
@@ -44551,11 +44560,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.yoctoDataRateCombo = QComboBox()
         self.yoctoDataRateCombo.setFocusPolicy(Qt.NoFocus)
         model = self.yoctoDataRateCombo.model()
-        dataRateItems = self.createItems(aw.qmc.phidget_dataRatesStrings)
+        dataRateItems = self.createItems(aw.qmc.YOCTO_dataRatesStrings)
         for item in dataRateItems:
                 model.appendRow(item)
         try:
-            self.yoctoDataRateCombo.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.YOCTO_dataRate))
+            self.yoctoDataRateCombo.setCurrentIndex(aw.qmc.YOCTO_dataRatesValues.index(aw.qmc.YOCTO_dataRate))
         except Exception:
             pass
         self.yoctoDataRateCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
@@ -46015,7 +46024,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.YOCTO_emissivity = self.yoctoEmissivitySpinBox.value()
             aw.qmc.YOCTO_async[0] = self.yoctoAyncChanFlag.isChecked()
             aw.qmc.YOCTO_async[1] = self.yoctoAyncChanFlag.isChecked() # flag for channel 1 is ignored and only that of channel 0 is respected for both channels
-            aw.qmc.YOCTO_dataRate = aw.qmc.phidget_dataRatesValues[self.yoctoDataRateCombo.currentIndex()]
+            aw.qmc.YOCTO_dataRate = aw.qmc.YOCTO_dataRatesValues[self.yoctoDataRateCombo.currentIndex()]
             
             # Ambient confifgurations
             aw.qmc.ambient_temperature_device = self.temperatureDeviceCombo.currentIndex()
