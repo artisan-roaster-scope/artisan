@@ -15830,7 +15830,7 @@ class ApplicationWindow(QMainWindow):
                                     pass
                             elif cs.startswith("autoCHARGE(") and cs.endswith(")"):
                                 try:
-                                    value = cs[len("alarms("):-1]
+                                    value = cs[len("autoCHARGE("):-1]
                                     if value.lower() in ("yes", "true", "t", "1"):
                                         aw.qmc.autoChargeFlag = True
                                         aw.sendmessage(QApplication.translate("Message","autoCHARGE on", None))
@@ -15841,7 +15841,7 @@ class ApplicationWindow(QMainWindow):
                                     pass
                             elif cs.startswith("autoDROP(") and cs.endswith(")"):
                                 try:
-                                    value = cs[len("alarms("):-1]
+                                    value = cs[len("autoDROP("):-1]
                                     if value.lower() in ("yes", "true", "t", "1"):
                                         aw.qmc.autoDropFlag = True
                                         aw.sendmessage(QApplication.translate("Message","autoDROP on", None))
