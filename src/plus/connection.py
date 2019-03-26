@@ -114,11 +114,11 @@ def setKeyring():
         else: # Linux
             try:
                 import keyring # @Reimport
-                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
-                # test if secretstorage dbus is working
-                import secretstorage  # @Reimport @UnresolvedImport
-                bus = secretstorage.dbus_init()
-                _ = list(secretstorage.get_all_collections(bus))
+#                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
+#                # test if secretstorage dbus is working
+#                import secretstorage  # @Reimport @UnresolvedImport
+#                bus = secretstorage.dbus_init()
+#                _ = list(secretstorage.get_all_collections(bus))
                 # if yes, import it
                 import keyring.backends.SecretService # @Reimport
                 ss_keyring = keyring.backends.SecretService.Keyring()
