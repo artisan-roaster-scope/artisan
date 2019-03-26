@@ -5613,7 +5613,7 @@ class tgraphcanvas(FigureCanvas):
                             RoR_start = -1
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
                         
-# Output Idle Noise StdDev of BT RoR
+## Output Idle Noise StdDev of BT RoR
 #                        try:
 #                            start = aw.qmc.timeindex[0]
 #                            end = aw.qmc.timeindex[6]
@@ -5623,7 +5623,8 @@ class tgraphcanvas(FigureCanvas):
 #                            if end == 0:
 #                                end = min(len(self.delta2) -1,100)
 #                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
-#                            print("BT RoR std:",numpy.std([x for x in self.delta2[start:end] if x is not None]))
+#                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
+#                            print("BT RoR std (new):",numpy.std(self.delta2))
 #                        except Exception as e:
 #                            print(e)
 #                            pass
@@ -40960,12 +40961,12 @@ class serialport(object):
                             self.YOCTOchan1.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,0))
                         else:
                             self.YOCTOchan1.registerTimedReportCallback(lambda *_:None)
-                        if aw.qmc.YOCTO_async[1]:
+                        if aw.qmc.YOCTO_async[0]: # flag for channel 1 is ignored and only that of channel 0 is respected for both channels
                             self.YOCTOchan2.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms
                             self.YOCTOchan2.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,1))
                         else:
                             self.YOCTOchan2.registerTimedReportCallback(lambda *_:None)
-                        if aw.qmc.YOCTO_async[0] or aw.qmc.YOCTO_async[1]:
+                        if aw.qmc.YOCTO_async[0]:# or aw.qmc.YOCTO_async[1]: # flag for channel 1 is ignored and only that of channel 0 is respected for both channels
                             if self.YOCTOthread is None:
                                 self.YOCTOthread = YoctoThread()
                             self.YOCTOthread.start()
@@ -41034,7 +41035,7 @@ class serialport(object):
                 except:
                     pass
                 try:
-                    if aw.qmc.YOCTO_async[1]:
+                    if aw.qmc.YOCTO_async[0]: # flag for channel 1 is ignored and only that of channel 0 is respected for both channels
                         try:
                             #### lock shared resources #####
                             self.YOCTOsemaphores[1].acquire(1)
@@ -44561,16 +44562,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.yoctoDataRateCombo.setMinimumContentsLength(5)
         width = self.yoctoDataRateCombo.minimumSizeHint().width()
         self.yoctoDataRateCombo.setMinimumWidth(width)
-        self.yoctoAyncChan1Flag = QCheckBox(QApplication.translate("Label","Channel 1", None))
-        self.yoctoAyncChan1Flag.setFocusPolicy(Qt.NoFocus)
-        self.yoctoAyncChan1Flag.setChecked(aw.qmc.YOCTO_async[0])
-        self.yoctoAyncChan2Flag = QCheckBox(QApplication.translate("Label","Channel 2", None))
-        self.yoctoAyncChan2Flag.setFocusPolicy(Qt.NoFocus)
-        self.yoctoAyncChan2Flag.setChecked(aw.qmc.YOCTO_async[1])
+        self.yoctoAyncChanFlag = QCheckBox()
+        self.yoctoAyncChanFlag.setFocusPolicy(Qt.NoFocus)
+        self.yoctoAyncChanFlag.setChecked(aw.qmc.YOCTO_async[0]) # only one flag for both channels, as running on async and the other sync will disturbe the readings
         yoctoAsyncGrid = QGridLayout()
-        yoctoAsyncGrid.addWidget(self.yoctoDataRateCombo,0,0)
-        yoctoAsyncGrid.addWidget(self.yoctoAyncChan1Flag,0,1)
-        yoctoAsyncGrid.addWidget(self.yoctoAyncChan2Flag,0,2)
+        yoctoAsyncGrid.addWidget(self.yoctoAyncChanFlag,0,0)
+        yoctoAsyncGrid.addWidget(self.yoctoDataRateCombo,0,1)
         yoctoAsyncHorizontalLayout = QHBoxLayout()
         yoctoAsyncHorizontalLayout.addLayout(yoctoAsyncGrid)
         yoctoAsyncHorizontalLayout.addStretch()
@@ -46016,8 +46013,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.yoctoRemoteFlag = self.yoctoBoxRemoteFlag.isChecked()
             aw.qmc.yoctoServerID = u(self.yoctoServerId.text())
             aw.qmc.YOCTO_emissivity = self.yoctoEmissivitySpinBox.value()
-            aw.qmc.YOCTO_async[0] = self.yoctoAyncChan1Flag.isChecked()
-            aw.qmc.YOCTO_async[1] = self.yoctoAyncChan2Flag.isChecked()
+            aw.qmc.YOCTO_async[0] = self.yoctoAyncChanFlag.isChecked()
+            aw.qmc.YOCTO_async[1] = self.yoctoAyncChanFlag.isChecked() # flag for channel 1 is ignored and only that of channel 0 is respected for both channels
             aw.qmc.YOCTO_dataRate = aw.qmc.phidget_dataRatesValues[self.yoctoDataRateCombo.currentIndex()]
             
             # Ambient confifgurations
