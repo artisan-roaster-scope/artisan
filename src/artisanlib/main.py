@@ -15828,6 +15828,28 @@ class ApplicationWindow(QMainWindow):
                                         aw.sendmessage(QApplication.translate("Message","Alarms off", None))
                                 except Exception:
                                     pass
+                            elif cs.startswith("autoCHARGE(") and cs.endswith(")"):
+                                try:
+                                    value = cs[len("alarms("):-1]
+                                    if value.lower() in ("yes", "true", "t", "1"):
+                                        aw.qmc.autoChargeFlag = True
+                                        aw.sendmessage(QApplication.translate("Message","autoCHARGE on", None))
+                                    else:
+                                        aw.qmc.autoChargeFlag = False
+                                        aw.sendmessage(QApplication.translate("Message","autoCHARGE off", None))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("autoDROP(") and cs.endswith(")"):
+                                try:
+                                    value = cs[len("alarms("):-1]
+                                    if value.lower() in ("yes", "true", "t", "1"):
+                                        aw.qmc.autoDropFlag = True
+                                        aw.sendmessage(QApplication.translate("Message","autoDROP on", None))
+                                    else:
+                                        aw.qmc.autoDropFlag = False
+                                        aw.sendmessage(QApplication.translate("Message","autoDROP off", None))
+                                except Exception:
+                                    pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):])
