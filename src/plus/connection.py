@@ -128,7 +128,7 @@ def setKeyring():
                     keyring.set_keyring(ss_keyring)
             except Exception as e:
                 import sys
-                 _, _, exc_tb = sys.exc_info() 
+                _, _, exc_tb = sys.exc_info()
                 config.logger.error("controller: Linux keyring Exception %s",e, exc_tb.tb_lineno)
                 pass               
         #config.logger.debug("keyring: %s",str(keyring.get_keyring()))
