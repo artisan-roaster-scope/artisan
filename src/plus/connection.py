@@ -127,13 +127,15 @@ def setKeyring():
                     # if priority is not 0, we set it as keyring system
                     keyring.set_keyring(ss_keyring)
             except Exception as e:
-#                import sys
-#                _, _, exc_tb = sys.exc_info()
-#                config.logger.error("controller: Linux keyring Exception %s",e, exc_tb.tb_lineno)
+                import sys
+                _, _, exc_tb = sys.exc_info()
+                config.logger.error("controller: Linux keyring Exception %s (line %s)",e,exc_tb.tb_lineno)
                 pass               
         #config.logger.debug("keyring: %s",str(keyring.get_keyring()))
     except Exception as e:
-        config.logger.error("controller: keyring Exception %s",e) 
+        import sys
+        _, _, exc_tb = sys.exc_info()
+        config.logger.error("controller: keyring Exception %s (line %s)",e,exc_tb.tb_lineno)
     
 # returns True on successful authentification
 def authentify():
