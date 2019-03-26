@@ -6,5 +6,5 @@ scipy==1.2.1
 matplotlib==3.0.3
 PyQt5==5.11.3 # 5.12 builds depends on OpenGL
 pyinstaller==3.4
-SecretStorage==3.1.1
 keyring==18.0.0
+SecretStorage==3.1.1
