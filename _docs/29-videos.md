@@ -27,6 +27,7 @@ toc: false
 
   * By Elvio Junior from [Mestre Cafeeiro](https://www.mestrecafeeiro.com.br/) (in Portuguese)
       - [Torrando cafés com software](https://www.mestrecafeeiro.com.br/video)
+      - [Vídeo sobre software de torra para torrar cafés com consistência](https://www.youtube.com/watch?v=LyZKYkKB9F8&feature=youtu.be&fbclid=IwAR1W19MV5if2k7b3NQqR2unHoirtOsAsqKYjQMeL-Jdj1z_h7olQvkmVmiI)
 
   * By John Uriarte
       - [Coffee Insanity - Modifying your Behmor 1600+ with probes and using Artisan to record your roasts](https://www.youtube.com/watch?v=EwqifxjkXgc&feature=youtu.be)
