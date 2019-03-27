@@ -113,8 +113,8 @@ def setKeyring():
             keyring.set_keyring(keyring.backends.OS_X.Keyring())
         else: # Linux
             try:
-                import os
-                config.logger.debug("keyring dbus path: %s",os.environ['DBUS_SESSION_BUS_ADDRESS'])
+#                import os
+#                config.logger.debug("keyring dbus path: %s",os.environ['DBUS_SESSION_BUS_ADDRESS'])
                 
 #                import keyring # @Reimport
 #                
