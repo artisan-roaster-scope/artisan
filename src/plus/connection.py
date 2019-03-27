@@ -131,9 +131,9 @@ def setKeyring():
 #                    keyring.set_keyring(ss_keyring)
                 import keyring.backends.SecretService # @Reimport
                 import keyring # @Reimport
-                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
+#                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
                 keyring.set_keyring(keyring.backends.SecretService.Keyring())
-                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
+#                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
             except Exception as e:
                 import sys
                 _, _, exc_tb = sys.exc_info()
