@@ -113,8 +113,11 @@ def setKeyring():
             keyring.set_keyring(keyring.backends.OS_X.Keyring())
         else: # Linux
             try:
+                import os
+                config.logger.debug("keyring dbus path: %s",os.environ['DBUS_SESSION_BUS_ADDRESS'])
+                
 #                import keyring # @Reimport
-#                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
+#                
 #                # test if secretstorage dbus is working
 #                import secretstorage  # @Reimport @UnresolvedImport
 #                bus = secretstorage.dbus_init()
@@ -126,10 +129,11 @@ def setKeyring():
 #                    import keyring # @Reimport
 #                    # if priority is not 0, we set it as keyring system
 #                    keyring.set_keyring(ss_keyring)
-
-                import keyring # @Reimport
                 import keyring.backends.SecretService # @Reimport
+                import keyring # @Reimport
+                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
                 keyring.set_keyring(keyring.backends.SecretService.Keyring())
+                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
             except Exception as e:
                 import sys
                 _, _, exc_tb = sys.exc_info()
