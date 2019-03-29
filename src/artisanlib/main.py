@@ -5615,21 +5615,21 @@ class tgraphcanvas(FigureCanvas):
                             RoR_start = -1
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
                         
-## Output Idle Noise StdDev of BT RoR
-#                        try:
-#                            start = aw.qmc.timeindex[0]
-#                            end = aw.qmc.timeindex[6]
-#                            if start == -1:
-#                                start = 0
-#                            start = start + 30 # avoiding the empty begin of heavy smoothed data
-#                            if end == 0:
-#                                end = min(len(self.delta2) -1,100)
-#                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
-#                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
-#                            print("BT RoR std (new):",numpy.std(self.delta2))
-#                        except Exception as e:
-#                            print(e)
-#                            pass
+# Output Idle Noise StdDev of BT RoR
+                        try:
+                            start = aw.qmc.timeindex[0]
+                            end = aw.qmc.timeindex[6]
+                            if start == -1:
+                                start = 0
+                            start = start + 30 # avoiding the empty begin of heavy smoothed data
+                            if end == 0:
+                                end = min(len(self.delta2) -1,100)
+                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
+                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
+                            print("BT RoR std (new):",numpy.std(self.delta2))
+                        except Exception as e:
+                            print(e)
+                            pass
                                                     
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
@@ -31035,8 +31035,8 @@ class editGraphDlg(ArtisanDialog):
             else:
                 new_w = current_w + w # we add the new weight to the already existing one!
             weight_edit.setText("%g" % aw.float2float(new_w))
-            #weight_edit.update() # seems to be needed for proper redraw on OSX 10.4 (Qt/PyQt bug?)
-            weight_edit.setFocus()
+            weight_edit.update() # seems to be needed for proper redraw on OSX 10.4 (Qt/PyQt bug?)
+            QApplication.processEvents()
         if d is not None and d > -1:
             density_edit.setText("%g" % aw.float2float(d))
         if m is not None and m > -1:
