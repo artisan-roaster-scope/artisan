@@ -11,5 +11,5 @@ scipy==1.2.1
 matplotlib==3.0.2
 #PyQt 5.7 is preinstalled
 pyinstaller==3.3.1
-cryptography==2.5
-keyring==18.0.0
+#cryptography==2.6.1 #2.5
+keyring==19.0.1

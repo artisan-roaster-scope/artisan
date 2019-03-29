@@ -5615,21 +5615,21 @@ class tgraphcanvas(FigureCanvas):
                             RoR_start = -1
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
                         
-# Output Idle Noise StdDev of BT RoR
-                        try:
-                            start = aw.qmc.timeindex[0]
-                            end = aw.qmc.timeindex[6]
-                            if start == -1:
-                                start = 0
-                            start = start + 30 # avoiding the empty begin of heavy smoothed data
-                            if end == 0:
-                                end = min(len(self.delta2) -1,100)
-                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
-                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
-                            print("BT RoR std (new):",numpy.std(self.delta2))
-                        except Exception as e:
-                            print(e)
-                            pass
+## Output Idle Noise StdDev of BT RoR
+#                        try:
+#                            start = aw.qmc.timeindex[0]
+#                            end = aw.qmc.timeindex[6]
+#                            if start == -1:
+#                                start = 0
+#                            start = start + 30 # avoiding the empty begin of heavy smoothed data
+#                            if end == 0:
+#                                end = min(len(self.delta2) -1,100)
+#                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
+#                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
+#                            print("BT RoR std (new):",numpy.std(self.delta2))
+#                        except Exception as e:
+#                            print(e)
+#                            pass
                                                     
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
@@ -28699,7 +28699,9 @@ class volumeCalculatorDlg(ArtisanDialog):
         else:
             c = 0.
         v = aw.float2floatWeightVolume(self.retrieveWeight(c))
-        widget.setText("%g" % aw.float2float(v))
+#        widget.setText("%g" % aw.float2float(v))
+        # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problesm
+        QTimer.singleShot(2,lambda : widget.setText("%g" % aw.float2float(v)))
         
     def unitWeight(self):
         self.widgetWeight(self.unitvolumeEdit)
@@ -29467,7 +29469,9 @@ class editGraphDlg(ArtisanDialog):
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + roastpos + u(" ")
             batchedit = QLineEdit(batch)
             batchedit.setReadOnly(True)
-            if sys.platform.startswith("darwin"):
+            if False: # sys.platform.startswith("darwin"):
+                # since Qt5.11 the background color of QLineEdits only changes if also the broder is set
+                # fixed in 5.12.2
                 batchedit.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
             else:
                 batchedit.setStyleSheet("background-color:'lightgrey'")
@@ -30408,8 +30412,9 @@ class editGraphDlg(ArtisanDialog):
         else:
             self.beansedit.setStyleSheet("")
         # for QLineEdit
-        if sys.platform.startswith("darwin"):
+        if False: #sys.platform.startswith("darwin"):
             # since Qt5.11 the background color of QLineEdits only changes if also the broder is set
+            # fixed in 5.12.2
             qlineedit_marked_style = "QLineEdit { border: 0.5px solid lightgrey; background-color: #e4f3f8; selection-background-color: darkgray; }"
         else:
             qlineedit_marked_style = "QLineEdit { background-color: #e4f3f8; selection-background-color: darkgray; }"
@@ -31034,9 +31039,11 @@ class editGraphDlg(ArtisanDialog):
                 new_w = w
             else:
                 new_w = current_w + w # we add the new weight to the already existing one!
-            weight_edit.setText("%g" % aw.float2float(new_w))
-            weight_edit.update() # seems to be needed for proper redraw on OSX 10.4 (Qt/PyQt bug?)
-            QApplication.processEvents()
+#            weight_edit.setText("%g" % aw.float2float(new_w))
+            # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problesm
+            # a QApplication.processEvents() or an weight_edit.update() seems not to help
+            # no issue on OS X 10.13
+            QTimer.singleShot(2,lambda : weight_edit.setText("%g" % aw.float2float(new_w)))
         if d is not None and d > -1:
             density_edit.setText("%g" % aw.float2float(d))
         if m is not None and m > -1:
