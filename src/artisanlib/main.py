@@ -31035,7 +31035,8 @@ class editGraphDlg(ArtisanDialog):
             else:
                 new_w = current_w + w # we add the new weight to the already existing one!
             weight_edit.setText("%g" % aw.float2float(new_w))
-            weight_edit.update() # seems to be needed for proper redraw on OSX 10.4 (Qt/PyQt bug?)
+            #weight_edit.update() # seems to be needed for proper redraw on OSX 10.4 (Qt/PyQt bug?)
+            weight_edit.setFocus()
         if d is not None and d > -1:
             density_edit.setText("%g" % aw.float2float(d))
         if m is not None and m > -1:
