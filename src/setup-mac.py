@@ -161,7 +161,9 @@ OPTIONS = {
                  'PyQt5.QtSvg',
                  'PyQt5.QtXml',
                  'PyQt5.QtDBus',
-                 'PyQt5.QtPrintSupport'],
+                 'PyQt5.QtPrintSupport',
+                 'PyQt5.QtBluetooth'
+                 ],
     'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
                       '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
                       'bsddb','curses','tcl',

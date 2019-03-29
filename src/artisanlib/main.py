@@ -10330,7 +10330,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.base_horizontalcrossline and self.base_verticalcrossline:
                         aw.qmc.ax.draw_artist(self.base_horizontalcrossline)
                         aw.qmc.ax.draw_artist(self.base_verticalcrossline)
-                    self.fig.canvas.blit(aw.qmc.ax.bbox)
+                    self.fig.canvas.blit(aw.qmc.ax.get_tightbbox(self.fig.canvas.get_renderer()))
                 else:
                     self.fig.canvas.draw()
         elif event.inaxes == self.delta_ax:
@@ -16747,11 +16747,7 @@ class ApplicationWindow(QMainWindow):
                 elif key == 58 and not aw.qmc.flagon: # screenshots only if not sampling!
                     self.desktopscreenshot()
                 elif key == 59 and not aw.qmc.flagon: # screenshots only if not sampling!
-                    self.applicationscreenshot() 
-                elif key == 73:                     #letter I (get weight in from scale)
-                    self.retrieveWeightIn()
-                elif key == 79:                     #letter O (get weight out from scale)
-                    self.retrieveWeightOut()
+                    self.applicationscreenshot()
                 else:
                     QWidget.keyPressEvent(self, event)
             except:
@@ -16995,8 +16991,8 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[m]</b></td><td>Shows/Hides Event Buttons</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[b]</b></td><td>Shows/Hides Extra Event Buttons</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[s]</b></td><td>Shows/Hides Event Sliders</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[i]</b></td><td>Retrieve Weight In from Scale</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[o]</b></td><td>Retrieve Weight Out from Scale</td></tr>",None))
+#        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[i]</b></td><td>Retrieve Weight In from Scale</td></tr>",None))
+#        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[o]</b></td><td>Retrieve Weight Out from Scale</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[p]</b></td><td>Toggle PID mode</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[h]</b></td><td>Load background profile</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[l]</b></td><td>Load alarms</td></tr>",None))
@@ -24526,34 +24522,6 @@ class ApplicationWindow(QMainWindow):
         if fileName:
             imag.save(fileName, fmt) 
 
-    def retrieveWeightIn(self,tare=0):
-        w,d,m = aw.scale.readWeight() # read value from scale in 'g'
-#        print("Returned w,d,m",w,d,m)  #dave99
-        if w is not None and w > -1:
-            w = w - tare
-            w = aw.convertWeight(w,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
-            aw.qmc.weight[0] = w
-        if d is not None and d > -1:
-            aw.qmc.density[0] = d
-        if m is not None and m > -1:
-            aw.qmc.moisture_greens = m
-
-    def retrieveWeightOut(self,tare=0):
-        w,d,m = aw.scale.readWeight() # read value from scale in 'g'
-        if w is not None and w > -1:
-            w = w - tare
-            w = aw.convertWeight(w,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
-            if aw.qmc.weight[2] != 'g':
-                w = w / 1000.0
-            aw.qmc.weight[1] = w
-        #dave99
-        if d is not None and d > -1:
-#            print("Set density to:",d)
-            aw.qmc.density_roasted[0] = d
-        if m is not None and m > -1:
-#            print("Set moisture to:",m)
-            aw.qmc.moisture_roasted = m
-
     def desktopscreenshot(self):
         screen = QApplication.primaryScreen()
         imag = screen.grabWindow(QApplication.desktop().winId())
@@ -28451,8 +28419,8 @@ class HUDDlg(ArtisanDialog):
 
 class volumeCalculatorDlg(ArtisanDialog):
     def __init__(self, parent = None, weightIn=None, weightOut=None,
-        weightunit=0,volumeunit=0,
-        inlineedit=None,outlineedit=None,tare=0): # weight in and out expected in g (int)
+            weightunit=0,volumeunit=0,
+            inlineedit=None,outlineedit=None,tare=0): # weight in and out expected in g (int)
         self.parent_dialog = parent
         # weightunit 0:g, 1:Kg  volumeunit 0:ml, 1:l
         super(volumeCalculatorDlg,self).__init__(parent)
@@ -28482,6 +28450,14 @@ class volumeCalculatorDlg(ArtisanDialog):
         # the current active tare
         self.tare = tare
         
+        # Scale Weight
+        self.scale_weight = self.parent_dialog.scale_weight
+        self.scaleWeight = QLabel() # displays the current reading - tare of the connected scale
+        if self.parent_dialog.ble is not None:
+            self.update_scale_weight()
+            self.parent_dialog.ble.weightChanged.connect(self.ble_weight_changed)
+            self.parent_dialog.ble.deviceDisconnected.connect(self.ble_scan_failed)
+        
         # Unit Group
         unitvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit", None)) + "</b>")
         self.unitvolumeEdit = QLineEdit("%g" % aw.qmc.volumeCalcUnit)
@@ -28499,6 +28475,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         unitLayout = QHBoxLayout()
         if self.scale_connected:
             unitLayout.addStretch()
+        if self.parent_dialog.ble is not None:
+            unitLayout.addWidget(self.scaleWeight)
         unitLayout.addStretch()
         unitLayout.addWidget(unitvolumeLabel)
         unitLayout.addWidget(self.unitvolumeEdit)
@@ -28688,6 +28666,19 @@ class volumeCalculatorDlg(ArtisanDialog):
         mainlayout.addLayout(buttonLayout)
         self.setLayout(mainlayout)
         self.coffeeinweightEdit.setFocus()
+
+    def ble_scan_failed(self):
+        self.scale_weight = None
+        self.scaleWeight.setText("")
+
+    def ble_weight_changed(self,w):
+        if w is not None:
+            self.scale_weight = w
+            self.update_scale_weight()
+
+    def update_scale_weight(self):
+        if self.scale_weight is not None and self.tare is not None:
+            self.scaleWeight.setText("{0:.1f}g".format(self.scale_weight - self.tare))
         
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):
@@ -28696,11 +28687,11 @@ class volumeCalculatorDlg(ArtisanDialog):
             v = self.retrieveWeight()
             if v and v != 0:
                 if self.unitvolumeEdit.hasFocus():
-                    self.unitvolumeEdit.setText(str(v))
+                    self.unitvolumeEdit.setText(str(aw.float2float(v)))
                 elif self.coffeeinweightEdit.hasFocus():
-                    self.coffeeinweightEdit.setText(str(v))
+                    self.coffeeinweightEdit.setText(str(aw.float2float(v)))
                 elif self.coffeeoutweightEdit.hasFocus():
-                    self.coffeeoutweightEdit.setText(str(v))
+                    self.coffeeoutweightEdit.setText(str(aw.float2float(v)))
                     
     def widgetWeight(self,widget):
         if widget.text() != "":
@@ -28708,7 +28699,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         else:
             c = 0.
         v = aw.float2floatWeightVolume(self.retrieveWeight(c))
-        widget.setText("%g" % v)
+        widget.setText("%g" % aw.float2float(v))
         
     def unitWeight(self):
         self.widgetWeight(self.unitvolumeEdit)
@@ -28720,15 +28711,12 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.widgetWeight(self.coffeeoutweightEdit)
         
     def retrieveWeight(self,current=0):
-        v = aw.scale.readWeight() # read value from scale in 'g'
-        if v is not None and v > -1: # value received
+        v = aw.scale.readWeight(self.parent_dialog.scale_weight) # read value from scale in 'g'
+        if v is not None and len(v)>1 and v[0] > -1: # value received
             # substruct tare
-            return (v - self.tare)
-        elif current != 0:
-            # substruct tare from current value
-            return current - self.tare
+            return current + (v[0] - self.tare)
         else:
-            return 0
+            return current # we keep the previous reading
 
     def resetVolume(self):
         self.resetInVolume()
@@ -29217,6 +29205,9 @@ class editGraphDlg(ArtisanDialog):
         self.org_weight = aw.qmc.weight[:]
         self.org_volume = aw.qmc.volume[:]
         
+        self.ble = None # the BLE interface
+        self.scale_weight = None # weight received from a connected scale
+        
         # other parameters remembered for Cancel operation        
         self.org_specialevents = aw.qmc.specialevents
         self.org_specialeventstype = aw.qmc.specialeventstype
@@ -29677,7 +29668,7 @@ class editGraphDlg(ArtisanDialog):
         moisture_roasted.addStretch()
         #Ambient temperature (uses display mode as unit (F or C)
         ambientlabel = QLabel("<b>" + u(QApplication.translate("Label", "Ambient Conditions",None)) + "</b>")
-        ambientunitslabel = QLabel(" " + aw.qmc.mode)
+        ambientunitslabel = QLabel(aw.qmc.mode)
         ambient_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.ambient_humidity_edit = QLineEdit()
         self.ambient_humidity_edit.setText("%g" % aw.float2float(aw.qmc.ambient_humidity))
@@ -29693,7 +29684,7 @@ class editGraphDlg(ArtisanDialog):
         self.ambientedit.setValidator(aw.createCLocaleDoubleValidator(-9999., 9999999., 1, self.ambientedit))  # larger range needed to triger editing_finished
         self.ambientedit.setAlignment(Qt.AlignRight)
         self.ambientedit.editingFinished.connect(self.ambientedit_editing_finished)
-        pressureunitslabel = QLabel(" " + "hPa")
+        pressureunitslabel = QLabel("hPa")
         self.pressureedit = QLineEdit()
         self.pressureedit.setText("%g" % aw.float2float(aw.qmc.ambient_pressure))
         self.pressureedit.setMinimumWidth(55)
@@ -29702,13 +29693,20 @@ class editGraphDlg(ArtisanDialog):
         self.pressureedit.setAlignment(Qt.AlignRight)
         self.pressureedit.editingFinished.connect(self.pressureedit_editing_finished)           
         ambient = QHBoxLayout()
+        ambient.addWidget(self.ambient_humidity_edit)
+        ambient.addSpacing(1)
+        ambient.addWidget(ambient_humidity_unit_label)
+        ambient.addSpacing(7)
         ambient.addWidget(self.ambientedit)
+        ambient.addSpacing(1)
         ambient.addWidget(ambientunitslabel)
-        ambient.addSpacing(10)
+        ambient.addSpacing(7)
         ambient.addWidget(self.pressureedit)
+        ambient.addSpacing(1)
         ambient.addWidget(pressureunitslabel)
         ambient.addStretch()
         self.organiclosslabel = QLabel()
+        self.scaleWeight = QLabel()
         # NOTES
         roastertypelabel = QLabel()
         roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Machine",None)) + "</b>")
@@ -29795,11 +29793,21 @@ class editGraphDlg(ArtisanDialog):
         inButton.clicked.connect(lambda _:self.inWeight())
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         inButton.setFocusPolicy(Qt.NoFocus)
+        inButton.setMinimumWidth(70)
+        inButtonLayout = QHBoxLayout()
+        inButtonLayout.addStretch()
+        inButtonLayout.addWidget(inButton)
+        inButtonLayout.addStretch()
         # out button
         outButton = QPushButton(QApplication.translate("Button", "out",None))
         outButton.clicked.connect(lambda _:self.outWeight())
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         outButton.setFocusPolicy(Qt.NoFocus)
+        outButton.setMinimumWidth(70)
+        outButtonLayout = QHBoxLayout()
+        outButtonLayout.addStretch()
+        outButtonLayout.addWidget(outButton)
+        outButtonLayout.addStretch()
         # scan whole button
         scanWholeButton = QPushButton(QApplication.translate("Button", "scan",None))
         scanWholeButton.clicked.connect(lambda _:self.scanWholeColor())
@@ -29965,10 +29973,12 @@ class editGraphDlg(ArtisanDialog):
         textLayout.addLayout(roasteroperator,5+textLayoutPlusOffset,1)
         
         beanSizeLayout = QHBoxLayout()
+        beanSizeLayout.setSpacing(2)
         beanSizeLayout.addStretch()
         beanSizeLayout.addWidget(self.bean_size_min_edit)
         beanSizeLayout.addWidget(bean_size_sep_label)
         beanSizeLayout.addWidget(self.bean_size_max_edit)
+        beanSizeLayout.addStretch()
         
         propGrid = QGridLayout()
         propGrid.setContentsMargins(0,0,0,0)
@@ -29978,6 +29988,7 @@ class editGraphDlg(ArtisanDialog):
         propGrid.addWidget(roasted_label,0,2,Qt.AlignCenter | Qt.AlignBottom)
         propGrid.addWidget(self.organicpercentlabel,0,4,Qt.AlignRight)
         propGrid.addWidget(self.organiclosslabel,0,5,1,3,Qt.AlignLeft)
+        propGrid.addWidget(self.scaleWeight,0,8,1,2,Qt.AlignCenter)
         
         propGrid.addWidget(weightlabel,1,0)
         propGrid.addWidget(self.weightinedit,1,1,Qt.AlignRight)
@@ -29989,8 +30000,22 @@ class editGraphDlg(ArtisanDialog):
         
         if aw.scale.device is not None and aw.scale.device != "" and aw.scale.device != "None":
             propGrid.addWidget(self.tareComboBox,1,7)
-            propGrid.addWidget(inButton,1,8)
-            propGrid.addWidget(outButton,1,9)
+            propGrid.addLayout(inButtonLayout,1,8)
+            propGrid.addLayout(outButtonLayout,1,9)
+            
+            if aw.scale.device == "acaia":
+                try:
+                    # if selected scale is the Acaia, start the BLE interface
+                    from artisanlib.ble import BleInterface
+                    from artisanlib.acaia import AcaiaBLE
+                    acaia = AcaiaBLE()
+                    self.ble = BleInterface(acaia.SERVICE_UUID,acaia.CHAR_UUID,acaia.processData)
+                    # start BLE loop
+                    self.ble.scanDevices()
+                    self.ble.weightChanged.connect(self.ble_weight_changed)
+                    self.ble.deviceDisconnected.connect(self.ble_scan_failed)
+                except:
+                    pass
         
         propGrid.addWidget(volumelabel,2,0)
         propGrid.addWidget(self.volumeinedit,2,1,Qt.AlignRight)
@@ -30040,9 +30065,7 @@ class editGraphDlg(ArtisanDialog):
         ambientGrid.setHorizontalSpacing(3)
         ambientGrid.setVerticalSpacing(0)
         ambientGrid.addWidget(ambientlabel,2,0)
-        ambientGrid.addWidget(self.ambient_humidity_edit,2,1)
-        ambientGrid.addWidget(ambient_humidity_unit_label,2,2)
-        ambientGrid.addLayout(ambient,2,5)
+        ambientGrid.addLayout(ambient,2,2,1,5)
         ambientGrid.addWidget(updateAmbientTemp,2,10)
         ambientGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignRight)
         ambientGrid.setColumnMinimumWidth(3, 11)
@@ -30174,6 +30197,28 @@ class editGraphDlg(ArtisanDialog):
                 QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
         except:
             pass
+
+    def ble_scan_failed(self):
+        self.scale_weight = None
+        self.scaleWeight.setText("")
+        if self.ble is not None:
+            QTimer.singleShot(250,lambda : self.ble.scanDevices())
+
+    def ble_weight_changed(self,w):
+        if w is not None:
+            self.scale_weight = w
+            self.update_scale_weight()
+            
+    def update_scale_weight(self):
+        tare = 0
+        try:
+            tare_idx = self.tareComboBox.currentIndex() - 3
+            if tare_idx > -1:
+                tare = aw.qmc.container_weights[tare_idx]
+        except Exception:
+            pass
+        if self.scale_weight is not None and tare is not None:
+            self.scaleWeight.setText("{0:.1f}g".format(self.scale_weight - tare))
             
     def updateTemplateLine(self):
         line = ""
@@ -30760,13 +30805,35 @@ class editGraphDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),exc_tb.tb_lineno)
 
-        
+    # triggered if dialog is closed via its windows close box
+    # and called from accept if dialog is closed via OK
     def closeEvent(self, _):
+        if self.ble is not None:
+            try:
+                self.ble.weightChanged.disconnect()
+                self.ble.deviceDisconnected.disconnect()
+            except:
+                pass
+            try:
+                self.ble.disconnectDevice()
+            except:
+                pass
         settings = QSettings()
         #save window geometry
         settings.setValue("RoastGeometry",self.saveGeometry())
 
+    # triggered via the cancel button
     def cancel_dialog(self):
+        if self.ble is not None:
+            try:
+                self.ble.weightChanged.disconnect()
+                self.ble.deviceDisconnected.disconnect()
+            except:
+                pass
+            try:
+                self.ble.disconnectDevice()
+            except:
+                pass
         settings = QSettings()
         #save window geometry
         settings.setValue("RoastGeometry",self.saveGeometry())
@@ -30804,9 +30871,9 @@ class editGraphDlg(ArtisanDialog):
                 aw.copy_cells_to_clipboard(self.datatable)
         if key == 16777220 and aw.scale.device is not None and aw.scale.device != "" and aw.scale.device != "None": # ENTER key pressed and scale connected
             if self.weightinedit.hasFocus():
-                self.inWeight()
+                self.inWeight(True) # we don't add to current reading but overwrite
             elif self.weightoutedit.hasFocus():
-                self.outWeight()
+                self.outWeight(True) # we don't add to current reading but overwrite
                         
     def tareChanged(self,i):
         if i == 0 and self.tarePopupEnabled:
@@ -30815,6 +30882,8 @@ class editGraphDlg(ArtisanDialog):
             QApplication.processEvents()
             # reset index and popup
             self.tareComboBox.setCurrentIndex(aw.qmc.container_idx + 3)
+            # update displayed scale weight
+            self.update_scale_weight()
                         
     def changeWeightUnit(self,i):
         o = aw.qmc.weight_units.index(aw.qmc.weight[2]) # previous unit index
@@ -30936,9 +31005,15 @@ class editGraphDlg(ArtisanDialog):
             outlineedit=self.volumeoutedit,
             tare=tare)
         volumedialog.show()
-        volumedialog.setFixedSize(volumedialog.size())        
+        volumedialog.setFixedSize(volumedialog.size())
 
-    def outWeight(self):
+    def inWeight(self,overwrite=False):
+        self.setWeight(self.weightinedit,self.bean_density_in_edit,self.moisture_greens_edit,overwrite)
+        
+    def outWeight(self,overwrite=False):
+        self.setWeight(self.weightoutedit,self.bean_density_out_edit,self.moisture_roasted_edit,overwrite)
+
+    def setWeight(self,weight_edit,density_edit,moisture_edit,overwrite=False):
         tare = 0
         try:
             tare_idx = self.tareComboBox.currentIndex() - 3
@@ -30946,53 +31021,24 @@ class editGraphDlg(ArtisanDialog):
                 tare = aw.qmc.container_weights[tare_idx]
         except Exception:
             pass
-        previous_out = aw.qmc.weight[1]
-        previous_out_den = aw.qmc.density_roasted[0]
-        previous_out_moi = aw.qmc.moisture_roasted
-        aw.retrieveWeightOut(tare)
-        if tare != 0 and previous_out == aw.qmc.weight[1] and self.weightoutedit.text() != "" and float(self.weightoutedit.text()) != 0.0:
-            # no value received from scale:
-            # we reduce the tare from the outWeight
-            text_out = float(self.weightoutedit.text())
-            # convert to 'g'
-            text_out = aw.convertWeight(text_out,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
-            # substract tare
-            text_out = text_out - tare
-            self.weightoutedit.setText("%g" % aw.float2float(text_out))
-        elif previous_out != aw.qmc.weight[1]:
-            self.weightoutedit.setText("%g" % aw.float2float(aw.qmc.weight[1]))
-        if previous_out_den != aw.qmc.density_roasted[0]:
-            self.bean_density_out_edit.setText("%g" % aw.float2float(aw.qmc.density_roasted[0]))
-        if previous_out_moi != aw.qmc.moisture_roasted:
-            self.moisture_roasted_edit.setText("%g" % aw.float2float(aw.qmc.moisture_roasted))
-
-    def inWeight(self):
-        tare = 0
-        try:
-            tare_idx = self.tareComboBox.currentIndex() - 3
-            if tare_idx > -1:
-                tare = aw.qmc.container_weights[tare_idx]
-        except Exception:
-            pass
-        previous_in = aw.qmc.weight[0]
-        previous_in_den = aw.qmc.density[0]
-        previous_in_moi = aw.qmc.moisture_greens
-        aw.retrieveWeightIn(tare)
-        if tare != 0 and previous_in == aw.qmc.weight[0] and self.weightinedit.text() != "" and float(self.weightinedit.text()) != 0.0:
-            # no value received from scale:
-            # we reduce the tare from the inWeight
-            text_in = float(self.weightinedit.text())
-            # convert to 'g'
-            text_in = aw.convertWeight(text_in,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
-            # substract tare
-            text_in = text_in - tare
-            self.weightinedit.setText("%g" % aw.float2float(text_in))
-        elif previous_in != aw.qmc.weight[0]:
-            self.weightinedit.setText("%g" % aw.float2float(aw.qmc.weight[0]))
-        if previous_in_den != aw.qmc.density[0]:
-            self.bean_density_in_edit.setText("%g" % aw.float2float(aw.qmc.density[0]))
-        if previous_in_moi != aw.qmc.moisture_greens:
-            self.moisture_greens_edit.setText("%g" % aw.float2float(aw.qmc.moisture_greens))        
+        w,d,m = aw.scale.readWeight(self.scale_weight) # read value from scale in 'g'
+        if w is not None and w > -1:
+            w = w - tare
+            w = aw.convertWeight(w,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
+            current_w = 0
+            try:
+                current_w = float(weight_edit.text())
+            except:
+                pass
+            if overwrite:
+                new_w = w
+            else:
+                new_w = current_w + w # we add the new weight to the already existing one!
+            weight_edit.setText("%g" % aw.float2float(new_w))
+        if d is not None and d > -1:
+            density_edit.setText("%g" % aw.float2float(d))
+        if m is not None and m > -1:
+            moisture_edit.setText("%g" % aw.float2float(m))
         
     def roastpropertiesChanged(self):
         if self.roastproperties.isChecked():
@@ -31798,6 +31844,7 @@ class editGraphDlg(ArtisanDialog):
 class tareDlg(ArtisanDialog):
     def __init__(self, parent = None, tarePopup = None):
         super(tareDlg,self).__init__(parent)
+        self.parent = parent
         self.tarePopup = tarePopup
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Tare Setup", None))
@@ -31850,8 +31897,8 @@ class tareDlg(ArtisanDialog):
         self.tarePopup.tarePopupEnabled = False
         self.tarePopup.tareComboBox.clear()
         self.tarePopup.tareComboBox.addItem("<edit> TARE")
-        self.tarePopup.tareComboBox.addItem("")
         self.tarePopup.tareComboBox.insertSeparator(2)
+        self.tarePopup.tareComboBox.addItem("")
         self.tarePopup.tareComboBox.addItems(aw.qmc.container_names)
         self.tarePopup.tareComboBox.setCurrentIndex(2) # reset to the empty entry
         aw.qmc.container_idx = -1
@@ -31865,7 +31912,7 @@ class tareDlg(ArtisanDialog):
         name = QLineEdit()
         name.setAlignment(Qt.AlignRight)
         name.setText("name")
-        w = aw.scale.readWeight() # read value from scale in 'g'
+        w,_,_ = aw.scale.readWeight(self.parent.scale_weight) # read value from scale in 'g'
         weight = QLineEdit()
         weight.setAlignment(Qt.AlignRight)
         if w > -1:
@@ -36938,22 +36985,25 @@ class scaleport(extraserialport):
         super(scaleport, self).closeport()
         
     # returns one of weight (g), density (g/l), or moisture (%).  Others return -1.
-    def readWeight(self):
-        if self.device is not None and self.device != "None" and self.device != "":
-            wei,den,moi = self.devicefunctionlist[u(self.device)]()
-            if moi is not None and moi > -1:
-#                print("Moisture =",moi)  #dave99
-                return -1, -1, aw.float2float(moi)
-            elif den is not None and den > -1:
-#                print("Density =",den)  #dave99
-                return -1, aw.float2float(den), -1
-            elif wei is not None and wei > -1:
-#                print("Weight =",res)  #dave99
-                return aw.float2float(wei), -1, -1
+    def readWeight(self,scale_weight=None):
+        if scale_weight != None:
+            return scale_weight,-1,-1
+        else:
+            if self.device is not None and self.device != "None" and self.device != "" and self.device != "acaia":
+                wei,den,moi = self.devicefunctionlist[u(self.device)]()
+                if moi is not None and moi > -1:
+    #                print("Moisture =",moi)  #dave99
+                    return -1, -1, aw.float2float(moi)
+                elif den is not None and den > -1:
+    #                print("Density =",den)  #dave99
+                    return -1, aw.float2float(den), -1
+                elif wei is not None and wei > -1:
+    #                print("Weight =",res)  #dave99
+                    return aw.float2float(wei), -1, -1
+                else:
+                    return -1,-1,-1
             else:
                 return -1,-1,-1
-        else:
-            return -1,-1,-1
             
     def readLine(self):
         return str(self.SP.readline().decode('ascii'))
@@ -40997,7 +41047,13 @@ class serialport(object):
                         except:
                             pass
                         if aw.qmc.YOCTO_async[0]:
-                            self.YOCTOsensor.set_reportFrequency("{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate))))  # 30/s => 30ms 
+                            if aw.qmc.YOCTO_dataRate > 1000:
+                                reportFrequency = "60/m" # in this mode the average of a measurements over the last second is returned
+                            else:
+                                reportFrequency = "{}/s".format(int(round(1000/aw.qmc.YOCTO_dataRate)))   # 30/s => 30ms
+                                # if reportFrequency is set to "1/s", every second the last measurement sampled by the device is returned
+                                # note that this is different from "60/m" which returns an average over many values
+                            self.YOCTOsensor.set_reportFrequency(reportFrequency)
                             self.YOCTOsensor.registerTimedReportCallback(lambda fct,measure: self.yoctoTimedCallback(fct,measure,0))
                             if self.YOCTOthread is None:
                                 self.YOCTOthread = YoctoThread()

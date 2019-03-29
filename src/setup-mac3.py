@@ -176,7 +176,9 @@ OPTIONS = {
                  'PyQt5.QtXml',
                  'PyQt5.QtDBus',
                  'PyQt5.QtNetwork',
-                 'PyQt5.QtPrintSupport'
+                 'PyQt5.QtPrintSupport',
+                 'PyQt5.QtBluetooth',
+                 'PyQt5.QtConcurrent',
                  ],
     'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
                       '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
@@ -251,6 +253,8 @@ Qt_frameworks = [
     'QtPrintSupport.framework',
     'QtNetwork.framework',
     'QtDBus.framework',
+    'QtBluetooth.framework',
+    'QtConcurrent.framework'
 ]
 for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
     for d in dirs:
