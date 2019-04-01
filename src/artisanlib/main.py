@@ -16110,7 +16110,9 @@ class ApplicationWindow(QMainWindow):
                 new_value = min(aw.eventslidermax[etype],max(aw.eventslidermin[etype],new_value))
                     
                 # the new_value is combined with the event factor and offset as specified in the slider definition
-                actionvalue = int(round((self.eventsliderfactors[etype] * new_value) + self.eventslideroffsets[etype]))
+                actionvalue = (self.eventsliderfactors[etype] * new_value) + self.eventslideroffsets[etype]
+                if self.extraeventsactions[ee] != 14: # only for VOUT Commands we keep the floats
+                    actionvalue = int(round(actionvalue))
                 if self.extraeventsactions[ee] in [8,9,16,17,18]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
                     self.eventaction(self.extraeventsactions[ee],u(int(new_value)))
                 else:
@@ -40537,7 +40539,7 @@ class serialport(object):
 
     # value: float
     # returns True or False indicating set status
-    def phidgetVOUTsetVOUT(self,channel,value): 
+    def phidgetVOUTsetVOUT(self,channel,value):
         res = False
         self.phidgetVOUTattach(channel)
         if aw.ser.PhidgetAnalogOut:
