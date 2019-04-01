@@ -28,11 +28,18 @@ import os
 import datetime
 import dateutil.parser
 
-from PyQt5.QtCore import QStandardPaths
+from PyQt5.QtCore import QStandardPaths,QCoreApplication
 
 from artisanlib.util import d as decode
 
 from plus import config
+
+# we set the app name temporary to "Artisan" to have ArtisanViewer using the same data location as Artisan
+app = QCoreApplication.instance()
+appName = app.applicationName()
+app.setApplicationName("Artisan")
+data_dir = QStandardPaths.standardLocations(QStandardPaths.AppLocalDataLocation)[0]
+app.setApplicationName(appName)
 
 ## Files
 
@@ -41,7 +48,6 @@ from plus import config
 # eg. /Users/<username>/Library/Application Support/Artisan-Scope/Artisan on MacOS X
 def getDataDirectory():
     try:
-        data_dir = QStandardPaths.standardLocations(QStandardPaths.AppLocalDataLocation)[0]
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
         return data_dir
@@ -49,8 +55,14 @@ def getDataDirectory():
         config.logger.error("util: Exception in getDataDirectory() %s",e)
         return None
 
-def getDirectory(filename,ext=None):
-    fp = Path(getDataDirectory(),filename)
+# if share is True, the same (cache) file is shared between the Artisan and ArtisanViewer apps
+# and locks have to be used to avoid race conditions
+def getDirectory(filename,ext=None,share=False):
+    fn = filename
+    if not share:
+        if app.artisanviewerMode:
+            fn = filename + "_viewer"
+    fp = Path(getDataDirectory(),fn)
     if ext is not None:
         fp = fp.with_suffix(ext)
     try:

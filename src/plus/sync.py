@@ -24,6 +24,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import shelve
+import portalocker
 
 from PyQt5.QtCore import QSemaphore, QTimer
 from PyQt5.QtWidgets import QApplication
@@ -34,22 +35,28 @@ from plus import config, util, connection, controller, roast
 #### Sync Cache
 
 # holding all roast UUIDs under sync with the server
+# shared cache between the Artisan and the ArtisanViewer app
 
 sync_cache_semaphore = QSemaphore(1)
 
-def getSyncPath():
+# if lock is True, return the path of the corresponding lock file
+def getSyncPath(lock=False):
     if config.account_nr is None or config.account_nr == 0:
-        return util.getDirectory(config.sync_cache)
+        fn = config.sync_cache
     else:
-        return util.getDirectory(config.sync_cache + str(config.account_nr))
+        fn = config.sync_cache + str(config.account_nr)
+    if lock:
+        fn = fn + "_lock"
+    return util.getDirectory(fn,share=True)
 
 # register the modified_at timestamp (EPOC as float with milliseoncds) for the given uuid, assuming it holds the last timepoint modifications were last synced with the server
 def addSync(uuid,modified_at):
     try:
         config.logger.debug("sync:addSync(" + str(uuid) + "," + str(modified_at) + ")")
         sync_cache_semaphore.acquire(1)
-        with shelve.open(getSyncPath()) as db:
-            db[uuid] = modified_at
+        with portalocker.Lock(getSyncPath(lock=True), timeout=1) as _:
+            with shelve.open(getSyncPath()) as db:
+                db[uuid] = modified_at
     except Exception as e:
         config.logger.error("sync: Exception in addSync() %s",e)
     finally:

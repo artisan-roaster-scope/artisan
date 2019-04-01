@@ -173,7 +173,7 @@ from unidecode import unidecode
 
 import artisanlib.arabic_reshaper
 from artisanlib.util import appFrozen, decs2string, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
-#from artisanlib.suppress_errors import suppress_stdout_stderr
+from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
@@ -336,13 +336,20 @@ platf = str(platform.system())
 
 
 appGuid = '9068bd2fa8e54945a6be1f1a0a589e92'
+viewerAppGuid = '9068bd2fa8e54945a6be1f1a0a589e93'
 
 class Artisan(QtSingleApplication):
     def __init__(self, args):
-        super(Artisan, self).__init__(appGuid,args)
+        super(Artisan, self).__init__(appGuid,viewerAppGuid,args)
         
         self.focusChanged.connect(self.appRaised)
         self.background = False # True if app was send to background
+        
+        if multiprocessing.current_process().name == 'MainProcess' and self.isRunning():
+            self.artisanviewerMode = True
+            if self.isRunningViewer(): sys.exit(0) # there is already one ArtisanViewer running, we terminate
+        else:
+            self.artisanviewerMode = False
         
     def appRaised(self,oldFocusWidget,newFocusWidget):
         if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.background:
@@ -350,7 +357,8 @@ class Artisan(QtSingleApplication):
             self.background = False
 #PLUS
             try:
-                if aw is not None and not artisanviewerMode and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None:
+#                if aw is not None and not artisanviewerMode and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None:
+                if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None:
                     import plus.sync
                     plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
             except:
@@ -4167,7 +4175,8 @@ class tgraphcanvas(FigureCanvas):
                     self.togglecrosslines()
                     
 #PLUS-COMMENT
-                if aw is not None and not artisanviewerMode:
+#                if aw is not None and not artisanviewerMode:
+                if aw is not None:
                     aw.updatePlusStatus()                                  
                     
             except Exception as ex:
@@ -5940,13 +5949,13 @@ class tgraphcanvas(FigureCanvas):
                         w = str(aw.float2float(aw.qmc.weight[0],2))
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ w + aw.qmc.weight[2]
                     if aw.qmc.weight[1]:
-                        statstr += '\n' + QApplication.translate("AddlInfo", "Weight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
+                        statstr += '\n' + QApplication.translate("AddlInfo", "Weight Loss", None) + ': '+ str(aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
 
                 if aw.qmc.density[0] and aw.qmc.density[2] != 0:
                     statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3])
                     if "roasted_density" in cp:
-                        statstr += '\n' + QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(-aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%"
+                        statstr += '\n' + QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%"
 
                 if aw.qmc.volume[0]:
                     statstr += skipline
@@ -10373,7 +10382,8 @@ def my_get_icon(name):
         
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
-        if artisanviewerMode:
+#        if artisanviewerMode:
+        if False:
             self.toolitems = (
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -10435,7 +10445,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-        if aw is not None and not artisanviewerMode:
+#        if aw is not None and not artisanviewerMode:
+        if aw is not None:
             aw.updatePlusStatus(self)
 
 
@@ -11364,6 +11375,7 @@ class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
     
         self.superusermode = False
+        self.artisanviewerMode = False # is set to True on initialization if we are running the ArtisanViewer
         
 #PLUS
         self.plus_account = None # if set to a login string, Artisan plus features are enabled
@@ -12458,8 +12470,8 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setMinimumHeight(50)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
         self.button_7.clicked.connect(lambda _: self.qmc.reset())
-        if artisanviewerMode:
-            self.button_7.setVisible(False)
+#        if artisanviewerMode:
+#            self.button_7.setVisible(False)
 
         #create CHARGE button
         self.button_8 = QPushButton(QApplication.translate("Button", "CHARGE", None))
@@ -16507,8 +16519,10 @@ class ApplicationWindow(QMainWindow):
     def displayonlymenus(self):
         if artisanviewerMode:
             self.newRoastMenu.setEnabled(False)
-            self.deviceAction.setEnabled(False)
-            self.commportAction.setEnabled(False)
+#            self.deviceAction.setEnabled(False)
+#            self.commportAction.setEnabled(False)
+            self.calibrateDelayAction.setEnabled(False)
+            self.oversamplingAction.setEnabled(False)
             self.saveAsSettingsAction.setEnabled(False)
 #            self.resetAction.setEnabled(False)
             self.machineMenu.setEnabled(False)
@@ -17286,7 +17300,8 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
 #PLUS-COMMENT          
-                if aw is not None and not artisanviewerMode:
+#                if aw is not None and not artisanviewerMode:
+                if aw is not None:
                     aw.updatePlusStatus()
                     if aw.plus_account is not None:
                         import plus.config
@@ -19645,7 +19660,8 @@ class ApplicationWindow(QMainWindow):
                 if pf:
 
 #PLUS-COMMENT  
-                    if not artisanviewerMode and aw.plus_account is not None:
+#                    if not artisanviewerMode and aw.plus_account is not None:
+                    if aw.plus_account is not None:
                         import plus.controller
                         sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
                         if sync_record_hash is not None:
@@ -19945,7 +19961,8 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
+#            if filename is None and not artisanviewerMode and settings.contains("plus_account"):
+            if filename is None and settings.contains("plus_account"):
                 self.plus_account = settings.value("plus_account",self.plus_account)
                 if settings.contains("plus_remember_credentials"):
                     self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
@@ -21145,7 +21162,8 @@ class ApplicationWindow(QMainWindow):
                     aw.fullscreenAction.setChecked(True)
             
 #PLUS-COMMENT
-            if filename is None and not artisanviewerMode and self.plus_account is not None:
+#            if filename is None and not artisanviewerMode and self.plus_account is not None:
+            if filename is None and self.plus_account is not None:
                 try:
                     import plus.controller
                     QTimer.singleShot(50,lambda : plus.controller.start(aw))
@@ -28421,6 +28439,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     def __init__(self, parent = None, weightIn=None, weightOut=None,
             weightunit=0,volumeunit=0,
             inlineedit=None,outlineedit=None,tare=0): # weight in and out expected in g (int)
+        
         self.parent_dialog = parent
         # weightunit 0:g, 1:Kg  volumeunit 0:ml, 1:l
         super(volumeCalculatorDlg,self).__init__(parent)
@@ -28475,8 +28494,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         unitLayout = QHBoxLayout()
         if self.scale_connected:
             unitLayout.addStretch()
-        if self.parent_dialog.ble is not None:
-            unitLayout.addWidget(self.scaleWeight)
+        unitLayout.addWidget(self.scaleWeight)
         unitLayout.addStretch()
         unitLayout.addWidget(unitvolumeLabel)
         unitLayout.addWidget(self.unitvolumeEdit)
@@ -28666,6 +28684,9 @@ class volumeCalculatorDlg(ArtisanDialog):
         mainlayout.addLayout(buttonLayout)
         self.setLayout(mainlayout)
         self.coffeeinweightEdit.setFocus()
+        
+        self.parent_dialog.scaleWeightUpdated.connect(lambda w : self.update_scale_weight(w))
+        
 
     def ble_scan_failed(self):
         self.scale_weight = None
@@ -28676,9 +28697,16 @@ class volumeCalculatorDlg(ArtisanDialog):
             self.scale_weight = w
             self.update_scale_weight()
 
-    def update_scale_weight(self):
-        if self.scale_weight is not None and self.tare is not None:
-            self.scaleWeight.setText("{0:.1f}g".format(self.scale_weight - self.tare))
+    def update_scale_weight(self,weight=None):
+        try:
+            if weight is not None:
+                self.scale_weight = weight
+            if self.scale_weight is not None and self.tare is not None:
+                self.scaleWeight.setText("{0:.1f}g".format(self.scale_weight - self.tare))
+            else:
+                self.scaleWeight.setText("")
+        except: # the dialog might have been closed already and thus the qlabel might not exist anymore
+            pass
         
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):
@@ -28687,38 +28715,40 @@ class volumeCalculatorDlg(ArtisanDialog):
             v = self.retrieveWeight()
             if v and v != 0:
                 if self.unitvolumeEdit.hasFocus():
-                    self.unitvolumeEdit.setText(str(aw.float2float(v)))
+                    self.unitvolumeEdit.setText("%g" % aw.float2float(v))
                 elif self.coffeeinweightEdit.hasFocus():
-                    self.coffeeinweightEdit.setText(str(aw.float2float(v)))
+                    self.coffeeinweightEdit.setText("%g" % aw.float2float(v))
                 elif self.coffeeoutweightEdit.hasFocus():
-                    self.coffeeoutweightEdit.setText(str(aw.float2float(v)))
+                    self.coffeeoutweightEdit.setText("%g" % aw.float2float(v))
                     
     def widgetWeight(self,widget):
-        if widget.text() != "":
-            c = float(widget.text())
-        else:
-            c = 0.
-        v = aw.float2floatWeightVolume(self.retrieveWeight(c))
-#        widget.setText("%g" % aw.float2float(v))
-        # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problesm
-        QTimer.singleShot(2,lambda : widget.setText("%g" % aw.float2float(v)))
+        w = self.retrieveWeight()
+        if w is not None:
+            v = aw.float2floatWeightVolume(w)
+#            widget.setText("%g" % aw.float2float(v))
+            # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problesm
+            QTimer.singleShot(2,lambda : widget.setText("%g" % aw.float2float(v)))
         
     def unitWeight(self):
         self.widgetWeight(self.unitvolumeEdit)
         
     def inWeight(self):
-        self.widgetWeight(self.coffeeinweightEdit)
+        QTimer.singleShot(1,lambda : self.widgetWeight(self.coffeeinweightEdit))
+        QTimer.singleShot(10,lambda : self.resetInVolume())
+        QApplication.processEvents()
         
     def outWeight(self):
-        self.widgetWeight(self.coffeeoutweightEdit)
+        QTimer.singleShot(1,lambda : self.widgetWeight(self.coffeeoutweightEdit))
+        QTimer.singleShot(10,lambda : self.resetOutVolume())
+        QApplication.processEvents()
         
-    def retrieveWeight(self,current=0):
-        v = aw.scale.readWeight(self.parent_dialog.scale_weight) # read value from scale in 'g'
-        if v is not None and len(v)>1 and v[0] > -1: # value received
+    def retrieveWeight(self):
+        v = self.scale_weight
+        if v is not None: # value received
             # substruct tare
-            return current + (v[0] - self.tare)
+            return v - self.tare
         else:
-            return current # we keep the previous reading
+            return None
 
     def resetVolume(self):
         self.resetInVolume()
@@ -28734,7 +28764,8 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.inVolume = aw.convertVolume(aw.convertWeight(self.weightIn,self.weightunit,0) * float(aw.comma2dot(str(self.unitvolumeEdit.text()))) / float(aw.comma2dot(str(self.coffeeinweightEdit.text()))),5,self.volumeunit)
                 self.coffeeinvolume.setText("%g" % aw.float2floatWeightVolume(self.inVolume))
         except Exception:
-            pass
+            self.inVolume = None
+            self.coffeeinvolume.setText("")
 
     def resetOutVolume(self):
         try:
@@ -28746,7 +28777,8 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.outVolume = aw.convertVolume(aw.convertWeight(self.weightOut,self.weightunit,0) * float(aw.comma2dot(str(self.unitvolumeEdit.text()))) / float(aw.comma2dot(str(self.coffeeoutweightEdit.text()))),5,self.volumeunit)
                 self.coffeeoutvolume.setText("%g" % aw.float2floatWeightVolume(self.outVolume))
         except Exception:
-            pass
+            self.outVolume = None
+            self.coffeeoutvolume.setText("")
 
     def updateVolumes(self):
         if self.inVolume and self.inVolume != "":
@@ -28763,6 +28795,10 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.closeEvent(None)
         
     def closeEvent(self,_):
+        try:
+            self.parent_dialog.volumedialog = None
+        except:
+            pass
         if self.unitvolumeEdit.text() and self.unitvolumeEdit.text() != "":
             aw.qmc.volumeCalcUnit = int(round(float(self.unitvolumeEdit.text())))
             aw.qmc.volumeCalcWeightInStr = aw.comma2dot(str(self.coffeeinweightEdit.text()))
@@ -29145,6 +29181,16 @@ class RoastsComboBox(QComboBox):
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
 ########################################################################################
 
+class ClickableQLabel(QLabel):
+    clicked = pyqtSignal()
+    
+    def __init__(self, *args, **kwargs):
+        super(ClickableQLabel, self).__init__(*args, **kwargs)
+
+    def mousePressEvent(self, _):
+        self.clicked.emit()
+
+
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
 class ClickableTextEdit(QTextEdit):
     clicked = pyqtSignal()
@@ -29183,6 +29229,10 @@ class ClickableTextEdit(QTextEdit):
             
 
 class editGraphDlg(ArtisanDialog):
+    scaleWeightUpdated = pyqtSignal(float)
+    connectScaleSignal = pyqtSignal()
+    readScaleSignal = pyqtSignal()
+
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
         self.setModal(True)
@@ -29209,6 +29259,10 @@ class editGraphDlg(ArtisanDialog):
         
         self.ble = None # the BLE interface
         self.scale_weight = None # weight received from a connected scale
+        self.scale_set = None # set weight for accumulation
+        
+        self.disconnecting = False # this is set to True to terminate the scale connection
+        self.volumedialog = None # link forward to the the Volume Calculator
         
         # other parameters remembered for Cancel operation        
         self.org_specialevents = aw.qmc.specialevents
@@ -29480,7 +29534,6 @@ class editGraphDlg(ArtisanDialog):
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
         self.beansedit = ClickableTextEdit()
-        #self.beansedit.clicked.connect(self.openCoffeeBlend)
         self.beansedit.editingFinished.connect(self.beansEdited)
         
         self.beansedit.setMaximumHeight(60)
@@ -29580,7 +29633,7 @@ class editGraphDlg(ArtisanDialog):
         
         # volume calc button
         volumeCalcButton = QPushButton(QApplication.translate("Button", "calc",None))
-        volumeCalcButton.clicked.connect(lambda _:self.volumeCalculator())
+        volumeCalcButton.clicked.connect(lambda _: QTimer.singleShot(1,lambda : self.volumeCalculator()))
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         volumeCalcButton.setFocusPolicy(Qt.NoFocus)
         
@@ -29711,6 +29764,8 @@ class editGraphDlg(ArtisanDialog):
         ambient.addStretch()
         self.organiclosslabel = QLabel()
         self.scaleWeight = QLabel()
+        self.scaleWeightAccumulated = ClickableQLabel("")
+        self.scaleWeightAccumulated.clicked.connect(lambda :self.resetScaleSet())
         # NOTES
         roastertypelabel = QLabel()
         roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Machine",None)) + "</b>")
@@ -30009,23 +30064,28 @@ class editGraphDlg(ArtisanDialog):
             
             if aw.scale.device == "acaia":
                 try:
-                    # if selected scale is the Acaia, start the BLE interface
-                    from artisanlib.ble import BleInterface
-                    from artisanlib.acaia import AcaiaBLE
-                    acaia = AcaiaBLE()
-                    self.ble = BleInterface(acaia.SERVICE_UUID,acaia.CHAR_UUID,acaia.processData)
-                    # start BLE loop
-                    self.ble.scanDevices()
-                    self.ble.weightChanged.connect(self.ble_weight_changed)
-                    self.ble.deviceDisconnected.connect(self.ble_scan_failed)
+                    with suppress_stdout_stderr():
+                        # if selected scale is the Acaia, start the BLE interface
+                        from artisanlib.ble import BleInterface
+                        from artisanlib.acaia import AcaiaBLE
+                        acaia = AcaiaBLE()
+                        self.ble = BleInterface(acaia.SERVICE_UUID,acaia.CHAR_UUID,acaia.processData)
+                        # start BLE loop
+                        self.ble.scanDevices()
+                        self.ble.weightChanged.connect(self.ble_weight_changed)
+                        self.ble.deviceDisconnected.connect(self.ble_scan_failed)
                 except:
                     pass
+            elif aw.scale.device in ["KERN NDE","Shore 930"]:
+                self.connectScaleSignal.connect(lambda : self.connectScaleLoop())
+                QTimer.singleShot(2,lambda : self.connectScaleSignal.emit())
         
         propGrid.addWidget(volumelabel,2,0)
         propGrid.addWidget(self.volumeinedit,2,1,Qt.AlignRight)
         propGrid.addWidget(self.volumeoutedit,2,2,Qt.AlignRight)
         propGrid.addWidget(self.volumeUnitsComboBox,2,3)
         propGrid.addWidget(self.volumepercentlabel,2,4,Qt.AlignRight)
+        propGrid.addWidget(self.scaleWeightAccumulated,2,7,1,2,Qt.AlignCenter)
         propGrid.addWidget(volumeCalcButton,2,9)
         
         propGrid.setRowMinimumHeight(3,self.volumeUnitsComboBox.minimumSizeHint().height())
@@ -30202,6 +30262,51 @@ class editGraphDlg(ArtisanDialog):
         except:
             pass
 
+    def readScale(self):
+        if self.disconnecting:
+            aw.scale.closeport()
+            self.scale_weight = None
+        else:
+            if aw.scale.SP is None or not aw.scale.SP.isOpen():
+                self.connectScaleSignal.emit()
+            else:
+                w,_,_ = aw.scale.readWeight()
+                if w != -1:
+                    self.scale_weight = w
+                else:
+                    self.scale_weight = None
+                self.update_scale_weight()
+                if self.volumedialog is not None:
+                    self.scaleWeightUpdated.emit(w)
+                self.readScaleSignal.emit()
+        
+    def readScaleLoop(self):
+        QTimer.singleShot(1000,lambda : self.readScale())
+        
+    def connectScaleLoop(self):
+        QTimer.singleShot(2000,lambda : self.connectScale())
+        
+    def connectScale(self):
+        if self.disconnecting:
+            aw.scale.closeport()
+        else:
+            res = aw.scale.connect(error=False)
+            if res:
+                self.readScaleSignal.connect(lambda : self.readScaleLoop())
+                QTimer.singleShot(2,lambda : self.readScaleSignal.emit())
+            else:
+                self.connectScaleSignal.emit()
+
+    def resetScaleSet(self):
+        self.scale_set = None
+        self.updateScaleWeightAccumulated()
+    
+    def updateScaleWeightAccumulated(self,weight=None):
+        if self.scale_set is None or weight is None:
+            self.scaleWeightAccumulated.setText("")
+        else:
+            self.scaleWeightAccumulated.setText("{0:.1f}g".format(weight + self.scale_set))
+
     def ble_scan_failed(self):
         self.scale_weight = None
         self.scaleWeight.setText("")
@@ -30223,6 +30328,10 @@ class editGraphDlg(ArtisanDialog):
             pass
         if self.scale_weight is not None and tare is not None:
             self.scaleWeight.setText("{0:.1f}g".format(self.scale_weight - tare))
+            self.updateScaleWeightAccumulated(self.scale_weight - tare)
+        else:
+            self.scaleWeight.setText("")
+            self.updateScaleWeightAccumulated()
             
     def updateTemplateLine(self):
         line = ""
@@ -30813,6 +30922,7 @@ class editGraphDlg(ArtisanDialog):
     # triggered if dialog is closed via its windows close box
     # and called from accept if dialog is closed via OK
     def closeEvent(self, _):
+        self.disconnecting = True
         if self.ble is not None:
             try:
                 self.ble.weightChanged.disconnect()
@@ -30829,6 +30939,7 @@ class editGraphDlg(ArtisanDialog):
 
     # triggered via the cancel button
     def cancel_dialog(self):
+        self.disconnecting = True
         if self.ble is not None:
             try:
                 self.ble.weightChanged.disconnect()
@@ -30884,7 +30995,7 @@ class editGraphDlg(ArtisanDialog):
         if i == 0 and self.tarePopupEnabled:
             tareDLG = tareDlg(self,tarePopup=self)
             tareDLG.show()
-            QApplication.processEvents()
+#            QApplication.processEvents()
             # reset index and popup
             self.tareComboBox.setCurrentIndex(aw.qmc.container_idx + 3)
             # update displayed scale weight
@@ -31001,7 +31112,7 @@ class editGraphDlg(ArtisanDialog):
                 tare = aw.qmc.container_weights[tare_idx]
         except Exception:
             pass
-        volumedialog = volumeCalculatorDlg(self,
+        self.volumedialog = volumeCalculatorDlg(self,
             weightIn=weightin,
             weightOut=weightout,
             weightunit=self.unitsComboBox.currentIndex(),
@@ -31009,14 +31120,22 @@ class editGraphDlg(ArtisanDialog):
             inlineedit=self.volumeinedit,
             outlineedit=self.volumeoutedit,
             tare=tare)
-        volumedialog.show()
-        volumedialog.setFixedSize(volumedialog.size())
+#        QApplication.processEvents()
+        self.volumedialog.show()
+        self.volumedialog.setFixedSize(self.volumedialog.size())
+#        QApplication.processEvents()
 
     def inWeight(self,overwrite=False):
-        self.setWeight(self.weightinedit,self.bean_density_in_edit,self.moisture_greens_edit,overwrite)
+        QTimer.singleShot(1,lambda : self.setWeight(self.weightinedit,self.bean_density_in_edit,self.moisture_greens_edit,overwrite))
+#        self.setWeight(self.weightinedit,self.bean_density_in_edit,self.moisture_greens_edit,overwrite)
+        QTimer.singleShot(10,lambda : self.weightineditChanged())
+#        QApplication.processEvents()
         
     def outWeight(self,overwrite=False):
-        self.setWeight(self.weightoutedit,self.bean_density_out_edit,self.moisture_roasted_edit,overwrite)
+        QTimer.singleShot(1,lambda : self.setWeight(self.weightoutedit,self.bean_density_out_edit,self.moisture_roasted_edit,overwrite))
+#        self.setWeight(self.weightoutedit,self.bean_density_out_edit,self.moisture_roasted_edit,overwrite)
+        QTimer.singleShot(10,lambda : self.weightouteditChanged())
+#        QApplication.processEvents()
 
     def setWeight(self,weight_edit,density_edit,moisture_edit,overwrite=False):
         tare = 0
@@ -31026,7 +31145,8 @@ class editGraphDlg(ArtisanDialog):
                 tare = aw.qmc.container_weights[tare_idx]
         except Exception:
             pass
-        w,d,m = aw.scale.readWeight(self.scale_weight) # read value from scale in 'g'
+        #w,d,m = aw.scale.readWeight(self.scale_weight) # read value from scale in 'g'
+        w,d,m = self.scale_weight,-1,-1
         if w is not None and w > -1:
             w = w - tare
             w = aw.convertWeight(w,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
@@ -31039,11 +31159,13 @@ class editGraphDlg(ArtisanDialog):
                 new_w = w
             else:
                 new_w = current_w + w # we add the new weight to the already existing one!
+                self.scale_set = new_w
 #            weight_edit.setText("%g" % aw.float2float(new_w))
             # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problesm
             # a QApplication.processEvents() or an weight_edit.update() seems not to help
             # no issue on OS X 10.13
             QTimer.singleShot(2,lambda : weight_edit.setText("%g" % aw.float2float(new_w)))
+            QTimer.singleShot(2,lambda : self.updateScaleWeightAccumulated(new_w))
         if d is not None and d > -1:
             density_edit.setText("%g" % aw.float2float(d))
         if m is not None and m > -1:
@@ -33375,9 +33497,13 @@ class EventsDlg(ArtisanDialog):
         self.autoCharge = QCheckBox(QApplication.translate("CheckBox","Auto CHARGE",None))
         self.autoCharge.setChecked(aw.qmc.autoChargeFlag)
         self.autoCharge.setFocusPolicy(Qt.NoFocus)
+        if artisanviewerMode:
+            self.autoCharge.setEnabled(False)
         self.autoDrop = QCheckBox(QApplication.translate("CheckBox","Auto DROP",None))
         self.autoDrop.setChecked(aw.qmc.autoDropFlag)
         self.autoDrop.setFocusPolicy(Qt.NoFocus)
+        if artisanviewerMode:
+            self.autoDrop.setEnabled(False)
         self.markTP = QCheckBox(QApplication.translate("CheckBox","Mark TP",None))
         self.markTP.setChecked(aw.qmc.markTPflag)
         self.markTP.setFocusPolicy(Qt.NoFocus)
@@ -34035,6 +34161,8 @@ class EventsDlg(ArtisanDialog):
         samplingLayout.addStretch()
         SamplingGroupLayout = QGroupBox(QApplication.translate("GroupBox","Sampling",None))
         SamplingGroupLayout.setLayout(samplingLayout)
+        if artisanviewerMode:
+            SamplingGroupLayout.setEnabled(False)
         topLineLayout = QHBoxLayout()
         topLineLayout.addWidget(TypeGroupLayout)
         topLineLayout.addWidget(SamplingGroupLayout)
@@ -36944,7 +37072,7 @@ class extraserialport(object):
                 self.SP.open()
         except Exception:
             self.SP.close()            
-            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
+#            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
             error = QApplication.translate("Error Message","Serial Exception:",None)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(error + " Unable to open serial port",exc_tb.tb_lineno)
@@ -36954,15 +37082,31 @@ class extraserialport(object):
             self.SP.close()
             libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
 
-    def connect(self):
+    # this one is called from scale and color meter code
+    def connect(self,error=True):
         if self.SP is None:
             try:
                 import serial  # @UnusedImport
                 self.SP = serial.Serial()
-                self.openport()
             except Exception as e:
-                _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None) + " connect() {0}").format(str(e)),exc_tb.tb_lineno)
+                if error:
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None) + " connect() {0}").format(str(e)),exc_tb.tb_lineno)
+        if self.SP is not None:
+            try:
+                self.openport()
+                if self.SP.isOpen():
+                    return True
+                else:
+                    return False
+            except Exception as e:
+                if error:
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None) + " connect() {0}").format(str(e)),exc_tb.tb_lineno)
+                return False
+        else:
+            return False
+
 
 
 class scaleport(extraserialport):
@@ -36975,7 +37119,7 @@ class scaleport(extraserialport):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 1.0
+        self.timeout = 0.2
         self.devicefunctionlist = {
             "None" : None,
             "KERN NDE" : self.readKERN_NDE,
@@ -37017,47 +37161,9 @@ class scaleport(extraserialport):
     def readLine(self):
         return str(self.SP.readline().decode('ascii'))
 
+    # replaced by BLE direct implementation
     def readAcaia(self):
-        try:
-            if not self.SP:
-                # connect serial port if not yet connected                
-                self.connect()
-            if self.SP:
-                if not self.SP.isOpen():
-                    # open serial port if not yet open
-                    self.openport()
-                if self.SP.isOpen(): 
-                    self.SP.write(str2cmd('BTST\r\n')) # request connection state
-                    v = self.readLine()
-                    if v.startswith('status=DISCONNECTED'):
-                        # connect to scale if not yet connected
-                        self.SP.write(str2cmd('BTLS\r\n')) # scan for scales
-                        # read reply until "SCAN_STOP"
-                        v = self.readLine()
-                        while not v.startswith(' SCAN_STOP'):                        
-                            v = str(self.SP.readline().decode('ascii'))
-                        self.SP.write(str2cmd('BTCN1\r\n')) # connect to scale 1
-                        # read until non-empty reply
-                        v = self.readLine()
-                        while v == "": # read until non-empty line
-                            v = self.readLine()
-                        if v.startswith('status=connected'):
-                            # we read another line after the "connected" message
-                            v = self.readLine()
-                    # request weight
-                    self.SP.write(str2cmd('GWT1,1,1\r\n'))
-                    self.readLine() # first line of the reply contains reading number
-                    v = self.readLine() # the second line of the reply contains the reading
-                    res = v.strip().split(' ')
-                    n = float(res[0])
-                    # if res[1] = ' ' and res[2] = v.strip().split(' ') then weight in g
-                    # if res[1] = 'oz' then weight in oz
-                    if res[1] == 'oz':
-                        return n * 28.3495231, -1, -1
-                    else:
-                        return n, -1, -1
-        except Exception:
-            return -1, -1, -1
+        pass
 
     def readKERN_NDE(self):
         try:
@@ -37070,10 +37176,16 @@ class scaleport(extraserialport):
                     #self.SP.write(str2cmd('s')) # only stable
                     self.SP.write(str2cmd('w')) # any weight
                     v = self.SP.readline()
+                    if len(v) == 0:
+                        return -1,-1,-1
                     sa = v.decode('ascii').split('g')
                     if len(sa) == 2:
-                        return int(sa[0]), -1, -1
+                        return int(sa[0].replace(" ", "")), -1, -1
                     else:
+                        # some times the unit is just missing, we assume it is g
+                        sa = v.decode('ascii').split('\r\n')
+                        if len(sa) == 2:
+                            return int(sa[0].replace(" ", "")),-1,-1
                         return -1, -1, -1
         except Exception:
             return -1, -1, -1
@@ -53362,7 +53474,7 @@ def main():
     
     artisanviewerMode = False
     artisanviewerFirstStart = False
-    if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
+    if app.artisanviewerMode:
         artisanviewerMode = True
         app.setApplicationName("ArtisanViewer")     #needed by QSettings() to store windows geometry in operating system
         viewersettings = QSettings()
@@ -53373,6 +53485,7 @@ def main():
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
     aw = ApplicationWindow()
+    aw.artisanviewerMode = artisanviewerMode
     
     app.setActivationWindow(aw) # set the activation window for the QtSingleApplication
     

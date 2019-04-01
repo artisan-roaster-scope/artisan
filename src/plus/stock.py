@@ -455,10 +455,10 @@ def getBlends(weight_unit_idx,store=None):
                             coffeeLabels[coffee] = coffee2beans([coffee,[cd,sd]])
                         # only if the moisture of all components is known, we can estimate the moisture of this blend
                         if len(blend["ingredients"]) == len(moisture):
-                            blend["moisture"] = config.app_window.float2float(sum(moisture),1)
+                            blend["moisture"] = config.app_window.float2float(sum(moisture),1)  # @UndefinedVariable
                         # only if the density of all components is known, we can estimate the density of this blend
                         if len(blend["ingredients"]) == len(density):
-                            blend["density"] = config.app_window.float2float(sum(density),1)
+                            blend["density"] = config.app_window.float2float(sum(density),1)  # @UndefinedVariable
                         if len(blend["ingredients"]) == len(screen):
                             sizes = []
                             for sc in screen:
