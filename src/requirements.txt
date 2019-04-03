@@ -14,3 +14,4 @@ python-snap7==0.10
 pyusb==1.0.2
 setuptools==40.6.3
 persist-queue==0.4.2
+portalocker==1.4.0
