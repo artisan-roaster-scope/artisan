@@ -287,7 +287,7 @@ def applyServerUpdates(data):
             aw.setTitleSignal.emit(aw.qmc.title,True) # we force an updatebackground to ensure proper repainting   
         if dirty:
             aw.qmc.safesaveflag = True
-            aw.sendmessageSignal.emit(QApplication.translate("Plus","Updated data received from artisan.plus", None))
+            aw.sendmessageSignal.emit(QApplication.translate("Plus","Updated data received from artisan.plus", None),True,None)
             if "modified_at" in data: # we remember the timestamp of the applied server updates
                 setApplidedServerUpdatesModifiedAt(data["modified_at"])
 

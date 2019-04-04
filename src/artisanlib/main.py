@@ -178,7 +178,6 @@ from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
 from artisanlib.phidgets import PhidgetManager
-
 from artisanlib.sliderStyle import *
 
 
@@ -343,7 +342,8 @@ class Artisan(QtSingleApplication):
         super(Artisan, self).__init__(appGuid,viewerAppGuid,args)
         
         self.focusChanged.connect(self.appRaised)
-        self.background = False # True if app was send to background
+        self.sentToBackground = None # set to timestamp on putting app to background without any open dialog
+        self.plus_sync_cache_expiration = 2*60 # how long a plus sync is valid in seconds
         
         if multiprocessing.current_process().name == 'MainProcess' and self.isRunning():
             self.artisanviewerMode = True
@@ -352,20 +352,22 @@ class Artisan(QtSingleApplication):
             self.artisanviewerMode = False
         
     def appRaised(self,oldFocusWidget,newFocusWidget):
-        if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.background:
+        if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
             #focus gained
-            self.background = False
 #PLUS
             try:
-                if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None:
-                    import plus.sync
-                    plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
+                if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
+                        libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
+                        plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
             except:
                 pass
+            self.sentToBackground = None
                 
         elif oldFocusWidget is not None and newFocusWidget is None and aw is not None and aw.centralWidget() == oldFocusWidget:
             # focus released
-            self.background = True
+            self.sentToBackground = libtime.time() # keep the timestamp on sending the app with the main window to background
+        else: # on raising another dialog/widget was open, reset timer
+            self.sentToBackground = None
         
 
     def event(self, event):
@@ -581,6 +583,15 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 from const import UIconst
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
+
+#PLUS-COMMENT
+# import artisan.plus module
+import plus.config
+import plus.util
+import plus.sync
+import plus.queue
+import plus.controller
+import plus.register
 
 #######################################################################################
 #################### Ambient Data Collection  #########################################
@@ -2345,7 +2356,6 @@ class tgraphcanvas(FigureCanvas):
 #PLUS
             elif not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==1 and event.dblclick==True and \
                     event.x < event.y and aw.plus_account is not None and aw.qmc.roastUUID is not None:
-                import plus.util
                 QDesktopServices.openUrl(QUrl(plus.util.roastLink(aw.qmc.roastUUID), QUrl.TolerantMode))
                                                         
             elif event.button==1 and event.inaxes and aw.qmc.crossmarker and not self.designerflag and not self.wheelflag and not aw.qmc.flagon:
@@ -7783,7 +7793,6 @@ class tgraphcanvas(FigureCanvas):
                                 pass
                                 # add to out-queue
                             try:
-                                import plus.queue
                                 plus.queue.addRoast()
                             except:
                                 pass
@@ -10497,7 +10506,6 @@ class VMToolbar(NavigationToolbar):
 
 #PLUS
     def plus(self):
-        import plus.controller
         plus.controller.toggle(aw)
         
     def edit_parameters(self):
@@ -13301,12 +13309,11 @@ class ApplicationWindow(QMainWindow):
             ntb = self.ntb
         try:
             if aw.plus_account is not None:
-                import plus.controller
                 if plus.controller.is_connected():
                     if aw.editgraphdialog == False:
                         # syncing from server in progress
                         plus_icon = "plus-dirty"
-                        tooltip = QApplication.translate("Tooltip", 'Syncing with artisan.plus', None)                        
+                        tooltip = QApplication.translate("Tooltip", 'Syncing with artisan.plus', None)    
                     else:
                         if plus.controller.is_synced():
                             plus_icon = "plus-connected"
@@ -17284,13 +17291,11 @@ class ApplicationWindow(QMainWindow):
                 message = u(QApplication.translate("Message","{0}  loaded ", None).format(u(filename)))
                 self.sendmessage(message)
 
-#PLUS-COMMENT          
+#PLUS-COMMENT   
                 if aw is not None:
                     aw.updatePlusStatus()
                     if aw.plus_account is not None:
-                        import plus.config
-                        if plus.config.uuid_tag in obj:
-                            import plus.sync                            
+                        if plus.config.uuid_tag in obj:                            
                             QTimer.singleShot(100,lambda : plus.sync.sync())
                                     
                 #check colors
@@ -18600,9 +18605,7 @@ class ApplicationWindow(QMainWindow):
         # fill plus UUID register
         try:
             if self.plus_account is not None and obj is not None:
-                import plus.config
                 if plus.config.uuid_tag in obj:
-                    import plus.register
                     plus.register.addPath(obj[plus.config.uuid_tag],fn)
         except:
             pass
@@ -18622,9 +18625,7 @@ class ApplicationWindow(QMainWindow):
             # fill plus UUID register
             try:
                 if self.plus_account is not None and obj is not None:
-                    import plus.config
                     if plus.config.uuid_tag in obj:
-                        import plus.register
                         plus.register.addPath(obj[plus.config.uuid_tag],fn)
             except:
                 pass
@@ -18844,7 +18845,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.plus_coffee = None
                 self.qmc.plus_coffee_label = None
             if "plus_blend_spec" in profile:
-                import plus.stock
                 # we convert the blend specification from its list to its internal dictionary representation
                 self.qmc.plus_blend_spec = plus.stock.list2blend(profile["plus_blend_spec"])
                 if "plus_blend_label" in profile:
@@ -19485,7 +19485,6 @@ class ApplicationWindow(QMainWindow):
                     profile["plus_coffee_label"] = encodeLocal(self.qmc.plus_coffee_label)  
             if self.qmc.plus_blend_spec is not None:
                 # we convert the internal blend dictionary specification to the external list specification
-                import plus.stock
                 profile["plus_blend_spec"] = plus.stock.blend2list(self.qmc.plus_blend_spec)
                 profile["plus_blend_label"] = encodeLocal(self.qmc.plus_blend_label) 
                 if self.qmc.plus_blend_spec_labels is not None:
@@ -19645,7 +19644,6 @@ class ApplicationWindow(QMainWindow):
 
 #PLUS-COMMENT  
                     if aw.plus_account is not None:
-                        import plus.controller
                         sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
                         if sync_record_hash is not None:
                             # we add the hash over the sync record to be able to detect offline changes
@@ -21146,11 +21144,9 @@ class ApplicationWindow(QMainWindow):
 #PLUS-COMMENT
             if filename is None and self.plus_account is not None:
                 try:
-                    import plus.controller
-                    QTimer.singleShot(50,lambda : plus.controller.start(aw))
+                    plus.controller.start(aw)
                 except:
                     pass
-            #aw.updatePlusStatus()
             
 #            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
             # but with this one in place, the window size is not properly set (just the position!?)
@@ -30233,11 +30229,10 @@ class editGraphDlg(ArtisanDialog):
             self.restoreGeometry(settings.value("RoastGeometry"))
         else:
             self.resize(self.minimumSizeHint())
-        
+
 #PLUS
         try:
             if aw.plus_account is not None:
-                import plus.stock
                 plus.stock.update()
                 QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
         except:
@@ -30330,7 +30325,6 @@ class editGraphDlg(ArtisanDialog):
         self.template_line.setText(line)
             
     def updatePlusSelectedLine(self):
-        import plus.util
         try:
             line = ""
             if self.plus_coffee_selected is not None and self.plus_coffee_selected_label:
@@ -30374,7 +30368,6 @@ class editGraphDlg(ArtisanDialog):
     def populatePlusCoffeeBlendCombos(self,storeIndex=None):
         try: # this can crash if dialog got closed while this is processed in a different thread!
             self.plus_popups_set_enabled(False)
-            import plus.stock
             
             #---- Stores
             
@@ -30422,9 +30415,8 @@ class editGraphDlg(ArtisanDialog):
                 self.plus_default_store = plus.stock.getStoreId(self.plus_stores[storeIdx-1])
             else:
                 self.plus_default_store = None
-                     
-            # mark plus coffee fields
-            self.markPlusCoffeeFields(False)
+            
+            mark_coffee_fields = False
             
             #---- Coffees
             
@@ -30451,7 +30443,7 @@ class editGraphDlg(ArtisanDialog):
                     # if roast is not yet complete we unblock the signals before changing the index to get the coffee data be filled in
                     self.plus_coffees_combo.blockSignals(False)
                     self.plus_coffees_combo.setCurrentIndex(p+1)
-                self.markPlusCoffeeFields(True)
+                mark_coffee_fields = True
             
             
             #---- Blends  
@@ -30485,8 +30477,9 @@ class editGraphDlg(ArtisanDialog):
                     # if roast is not yet complete we unblock the signals before changing the index to get the blend data be filled in
                     self.plus_blends_combo.blockSignals(False)
                     self.plus_blends_combo.setCurrentIndex(p+1)  
-                self.markPlusCoffeeFields(True)
-                
+                mark_coffee_fields = True
+
+            self.markPlusCoffeeFields(mark_coffee_fields)
             self.updatePlusSelectedLine() 
         except:
 #            import traceback
@@ -30539,7 +30532,6 @@ class editGraphDlg(ArtisanDialog):
                 self.titleedit.setEditText(default_title)
                         
     def fillBlendData(self,blend,prev_coffee_label,prev_blend_label):
-        import plus.stock
         try:
             if self.weightinedit.text() != "":
                 weightIn = float(str(self.weightinedit.text()))
@@ -30580,7 +30572,6 @@ class editGraphDlg(ArtisanDialog):
         
     # if current title is equal to default title or prev_coffee/blend_label, we set title from selected label
     def fillCoffeeData(self,coffee,prev_coffee_label,prev_blend_label):
-        import plus.stock
         try:
             cd = plus.stock.getCoffeeCoffeeDict(coffee)
             self.beansedit.setPlainText(plus.stock.coffee2beans(coffee))
@@ -30638,7 +30629,6 @@ class editGraphDlg(ArtisanDialog):
             self.updateTitle(prev_coffee_label,prev_blend_label)
 
     def coffeeSelectionChanged(self,n):
-        import plus.stock
         # check for previously selected blend label
         prev_coffee_label = self.plus_coffee_selected_label
         prev_blend_label = self.plus_blend_selected_label
@@ -30675,7 +30665,6 @@ class editGraphDlg(ArtisanDialog):
         self.updatePlusSelectedLine()
 
     def blendSelectionChanged(self,n):
-        import plus.stock
         # check for previously selected blend label
         prev_coffee_label = self.plus_coffee_selected_label
         prev_blend_label = self.plus_blend_selected_label

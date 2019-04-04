@@ -40,7 +40,7 @@ stock_cache_path = util.getDirectory(config.stock_cache)
 
 stock = None # holds the dict with the current stock data (coffees, blends,..)
 
-
+import threading
 
 ################### 
 # stock cache update
@@ -49,14 +49,22 @@ stock = None # holds the dict with the current stock data (coffees, blends,..)
 # updates the stock cache
 
 def update():
-    QTimer.singleShot(2,lambda : update_blocking())
+    #QTimer.singleShot(2,lambda : update_blocking()) # QThread seems to block dialogs
+    update_thread = threading.Thread(target=update_blocking)
+    update_thread.start()
     
 def update_blocking():
     global stock
     config.logger.debug("stock:update_blocking()")
     if stock is None:
         load()
-    if config.connected and (stock is None or ("retrieved" in stock and (time.time() - stock["retrieved"]) > config.stock_cache_expiration)):
+    try:
+        stock_semaphore.acquire(1)
+        fetch_enabled = config.connected and (stock is None or ("retrieved" in stock and (time.time() - stock["retrieved"]) > config.stock_cache_expiration))
+    finally:
+        if stock_semaphore.available() < 1:
+            stock_semaphore.release(1)
+    if fetch_enabled:
         res = fetch()
         if res:
             save()
@@ -68,16 +76,20 @@ def fetch():
     global stock
     config.logger.info("stock:fetch()")
     try:
-        stock_semaphore.acquire(1)
         # fetch from server
         d = connection.getData(config.stock_url)
         config.logger.debug("stock: -> %s",d.status_code)
         j = d.json()
         if "success" in j and j["success"] and "result" in j and j["result"]:
-            stock = j["result"]
-            stock["retrieved"] = time.time()
-            config.logger.debug("stock: -> retrieved")
-            config.logger.debug("stock = %s"%stock)
+            try:
+                stock_semaphore.acquire(1)
+                stock = j["result"]
+                stock["retrieved"] = time.time()
+                config.logger.debug("stock: -> retrieved")
+                config.logger.debug("stock = %s"%stock)
+            finally:
+                if stock_semaphore.available() < 1:
+                    stock_semaphore.release(1)
             controller.reconnected()
             return True
         else:
@@ -92,9 +104,6 @@ def fetch():
 #        aw.qmc.adderror(str(tr))
         #controller.disconnect(False) # don't disconnect on failure
         return False
-    finally:
-        if stock_semaphore.available() < 1:
-            stock_semaphore.release(1)
             
 
 ################### 
@@ -220,18 +229,24 @@ def getStoreId(store):
     return store[1]
 
 # returns the list of stores defined in stock
-def getStores():
+def getStores(acquire_lock=True):
     global stock
     config.logger.debug("stock:getStores()")
-    if stock is not None and "coffees" in stock:
-        res = {}
-        for c in stock["coffees"]:
-            if "stock" in c:
-                for s in c["stock"]:
-                    res[s["location_label"]] = s["location_hr_id"]
-        return sorted(res.items(), key=lambda x: getStoreLabel(x))
-    else:
-        return []
+    try:
+        if acquire_lock:
+            stock_semaphore.acquire(1)
+        if stock is not None and "coffees" in stock:
+            res = {}
+            for c in stock["coffees"]:
+                if "stock" in c:
+                    for s in c["stock"]:
+                        res[s["location_label"]] = s["location_hr_id"]
+            return sorted(res.items(), key=lambda x: getStoreLabel(x))
+        else:
+            return []
+    finally:
+        if acquire_lock and stock_semaphore.available() < 1:
+            stock_semaphore.release(1)
 
 # given a list of stores, returns a list of labels to populate the stores popup
 def getStoreLabels(stores):
@@ -309,41 +324,46 @@ def coffee2beans(coffee):
 def getCoffees(weight_unit_idx,store=None):
     global stock
     config.logger.debug("stock:getCoffees(%s,%s)",weight_unit_idx,store)
-    if stock is not None and "coffees" in stock:
-        res = {}
-        for c in stock["coffees"]:
-            try:
-                origin = ""
-                if "origin" in c:
-                    origin = c["origin"] + " "
-                label = c["label"]
-                if "default_unit" in c:
-                    default_unit = c["default_unit"]
-                else:
-                    default_unit = None
-                for s in c["stock"]:
-                    if store is None or ("location_hr_id" in s and s["location_hr_id"] == store):
-                        if "location_label" in s:
-                            location = s["location_label"]
-                            if "amount" in s:
-                                amount = s["amount"]
-                                if amount > 0: # TODO: check here the machines capacity limits
-                                    # add location only if this coffee is available in several locations
-                                    if store:
-                                        loc = ""
-                                    else:
-                                        loc = location + ", "
-                                    res[origin + label + " (" + loc + renderAmount(amount,default_unit,weight_unit_idx) + ")"] = [c,s]
-                            else:
-                                if store:
-                                    res[origin + label] = [c,s]
+    try:
+        stock_semaphore.acquire(1)
+        if stock is not None and "coffees" in stock:
+            res = {}
+            for c in stock["coffees"]:
+                try:
+                    origin = ""
+                    if "origin" in c:
+                        origin = c["origin"] + " "
+                    label = c["label"]
+                    if "default_unit" in c:
+                        default_unit = c["default_unit"]
+                    else:
+                        default_unit = None
+                    for s in c["stock"]:
+                        if store is None or ("location_hr_id" in s and s["location_hr_id"] == store):
+                            if "location_label" in s:
+                                location = s["location_label"]
+                                if "amount" in s:
+                                    amount = s["amount"]
+                                    if amount > 0: # TODO: check here the machines capacity limits
+                                        # add location only if this coffee is available in several locations
+                                        if store:
+                                            loc = ""
+                                        else:
+                                            loc = location + ", "
+                                        res[origin + label + " (" + loc + renderAmount(amount,default_unit,weight_unit_idx) + ")"] = [c,s]
                                 else:
-                                    res[origin + label + " (" + location + ")"] = [c,s]
-            except:
-                pass
-        return sorted(res.items(), key=lambda x: x[0])
-    else:
-        return []    
+                                    if store:
+                                        res[origin + label] = [c,s]
+                                    else:
+                                        res[origin + label + " (" + location + ")"] = [c,s]
+                except:
+                    pass
+            return sorted(res.items(), key=lambda x: x[0])
+        else:
+            return []
+    finally:
+        if stock_semaphore.available() < 1:
+            stock_semaphore.release(1)
 
 # returns the position of coffee hr_id in coffees or None if coffee not in the coffees
 def getCoffeePosition(coffeeId,coffees):
@@ -362,12 +382,18 @@ def getCoffeeStockPosition(coffeeId,stockId,coffees):
         return None
 
 # returns the coffee and stock dicts of the given coffeeId and storeId or None
-def getCoffeeStore(coffeeId,storeId):
+def getCoffeeStore(coffeeId,storeId,acquire_lock=True):
+    global stock
     try:
+        if acquire_lock:
+            stock_semaphore.acquire(1)
         coffee = [c for c in stock["coffees"] if c["hr_id"] == coffeeId][0]
         return [(coffee,s) for s in coffee["stock"] if s["location_hr_id"] == storeId][0]
     except: # we end up here if there is no stock available
         return None, None
+    finally:
+        if acquire_lock and stock_semaphore.available() < 1:
+            stock_semaphore.release(1)
 
 #================== 
 # Blends
@@ -416,93 +442,80 @@ def blend2beans(blend,weight_unit_idx,weightIn = 0):
 def getBlends(weight_unit_idx,store=None):
     global stock
     config.logger.debug("stock:getBlends(%s,%s)",weight_unit_idx,store)
-    if stock is not None and "blends" in stock:
-        res = {}
-        if store == None:
-            stores = [getStoreId(s) for s in getStores()]
+    try:
+        stock_semaphore.acquire(1)
+        if stock is not None and "blends" in stock:
+            res = {}
+            if store == None:
+                stores = [getStoreId(s) for s in getStores(acquire_lock=False)]
+            else:
+                stores = [store]   
+            for s in stores:
+                location_label = ""
+                for blend in stock["blends"]:
+                    try:
+                        coffeeLabels = {}
+                        if "ingredients" in blend: 
+                            amount = None
+                            moisture = [] # for each ingredients we list its moisture*ratio, if the moisture is known
+                            density = []  # for each ingredients we list its density*ratio, if the density is known
+                            screen = []   # for each ingredients we list the screen_size tuple {'min':x,'max':y}
+                            for i in blend["ingredients"]:
+                                coffee = i["coffee"]
+                                ratio = i["ratio"]
+                                cd, sd = getCoffeeStore(coffee,s,acquire_lock=False) # if no stock of this coffee is available this returns None
+                                if ratio > 0:
+                                    if "moisture" in cd and cd["moisture"] is not None and cd["moisture"] > 0:
+                                        moisture.append(cd["moisture"]*ratio)
+                                    if "density" in cd and cd["density"] is not None and cd["density"] > 0:
+                                        density.append(cd["density"]*ratio)
+                                    if "screen_size" in cd and cd["screen_size"] is not None and len(cd["screen_size"]) > 0:
+                                        screen.append(cd["screen_size"])
+                                i["label"] = cd["label"] # add label of coffee to ingredient
+                                stock_amount = sd["amount"]   # if sd is None, this fails
+                                if location_label == "":
+                                    location_label = sd["location_label"]
+                                a = stock_amount / ratio
+                                if amount:
+                                    amount = min(a,amount)
+                                else:
+                                    amount = a
+                                coffeeLabels[coffee] = coffee2beans([coffee,[cd,sd]])
+                            # only if the moisture of all components is known, we can estimate the moisture of this blend
+                            if len(blend["ingredients"]) == len(moisture):
+                                blend["moisture"] = config.app_window.float2float(sum(moisture),1)  # @UndefinedVariable
+                            # only if the density of all components is known, we can estimate the density of this blend
+                            if len(blend["ingredients"]) == len(density):
+                                blend["density"] = config.app_window.float2float(sum(density),1)  # @UndefinedVariable
+                            if len(blend["ingredients"]) == len(screen):
+                                sizes = []
+                                for sc in screen:
+                                    if "min" in sc:
+                                        sizes.append(sc["min"])
+                                    if "max" in sc:
+                                        sizes.append(sc["max"])
+                                if len(sizes) > 0:
+                                    min_size = min(sizes)
+                                    max_size = max(sizes)
+                                    blend["screen_min"] = min_size
+                                    if max_size != min_size:
+                                        blend["screen_max"] = max_size
+                            if amount and amount > 0: # TODO: check here with machines capacity                    
+                                # add location only if this coffee is available in several locations
+                                if store:
+                                    loc = ""
+                                else:
+                                    loc = location_label + ", "
+                                label = blend["label"] + " (" + loc + renderAmount(amount,target_unit_idx=weight_unit_idx) + ")"
+                                res[label] = [blend,sd,amount,coffeeLabels]
+                    except: # we end up here if a coffee is out of stock and thus cd and sd are None
+                        pass
+            return sorted(res.items(), key=lambda x: x[0])
         else:
-            stores = [store]   
-        for s in stores:
-            location_label = ""
-            for blend in stock["blends"]:
-                try:
-                    coffeeLabels = {}
-                    if "ingredients" in blend: 
-                        amount = None
-                        moisture = [] # for each ingredients we list its moisture*ratio, if the moisture is known
-                        density = []  # for each ingredients we list its density*ratio, if the density is known
-                        screen = []   # for each ingredients we list the screen_size tuple {'min':x,'max':y}
-                        for i in blend["ingredients"]:
-                            coffee = i["coffee"]
-                            ratio = i["ratio"]
-                            cd, sd = getCoffeeStore(coffee,s) # if no stock of this coffee is available this returns None
-                            if ratio > 0:
-                                if "moisture" in cd and cd["moisture"] is not None and cd["moisture"] > 0:
-                                    moisture.append(cd["moisture"]*ratio)
-                                if "density" in cd and cd["density"] is not None and cd["density"] > 0:
-                                    density.append(cd["density"]*ratio)
-                                if "screen_size" in cd and cd["screen_size"] is not None and len(cd["screen_size"]) > 0:
-                                    screen.append(cd["screen_size"])
-                            i["label"] = cd["label"] # add label of coffee to ingredient
-                            stock_amount = sd["amount"]   # if sd is None, this fails
-                            if location_label == "":
-                                location_label = sd["location_label"]
-                            a = stock_amount / ratio
-                            if amount:
-                                amount = min(a,amount)
-                            else:
-                                amount = a
-                            coffeeLabels[coffee] = coffee2beans([coffee,[cd,sd]])
-                        # only if the moisture of all components is known, we can estimate the moisture of this blend
-                        if len(blend["ingredients"]) == len(moisture):
-                            blend["moisture"] = config.app_window.float2float(sum(moisture),1)  # @UndefinedVariable
-                        # only if the density of all components is known, we can estimate the density of this blend
-                        if len(blend["ingredients"]) == len(density):
-                            blend["density"] = config.app_window.float2float(sum(density),1)  # @UndefinedVariable
-                        if len(blend["ingredients"]) == len(screen):
-                            sizes = []
-                            for sc in screen:
-                                if "min" in sc:
-                                    sizes.append(sc["min"])
-                                if "max" in sc:
-                                    sizes.append(sc["max"])
-                            if len(sizes) > 0:
-                                min_size = min(sizes)
-                                max_size = max(sizes)
-                                blend["screen_min"] = min_size
-                                if max_size != min_size:
-                                    blend["screen_max"] = max_size
-                        if amount and amount > 0: # TODO: check here with machines capacity                    
-                            # add location only if this coffee is available in several locations
-                            if store:
-                                loc = ""
-                            else:
-                                loc = location_label + ", "
-                            label = blend["label"] + " (" + loc + renderAmount(amount,target_unit_idx=weight_unit_idx) + ")"
-                            res[label] = [blend,sd,amount,coffeeLabels]
-                except: # we end up here if a coffee is out of stock and thus cd and sd are None
-                    pass
-        return sorted(res.items(), key=lambda x: x[0])
-    else:
-        return [] 
- 
-# not used currently:       
-## returns the position of blend id in blends or None if blend not in the blends
-#def getBlendPosition(blendId,blends):
-#    try:
-#        return [getBlendId(b) for b in blends].index(blendId)
-#    except:
-#        return None
-#        # returns the position of blend id in blends or None if store not in the stores
-     
-# not used currently: 
-## returns the position in blends which matches the given blendId and stockId and None if no match is found
-#def getBlendStockPosition(blendId,stockId,blends):
-#    res = [i for i, b in enumerate(blends) if getBlendBlendDict(b)["hr_id"] == blendId and getBlendStockDict(b)["location_hr_id"] == stockId]
-#    if len(res)>0:
-#        return res[0]
-#    else:
-#        return None
+            return []
+    finally:
+        if stock_semaphore.available() < 1:
+            stock_semaphore.release(1)
 
 # returns True if blendSpec of the form
 #   {"label": <blend-name>, "ingredients": [{"coffee": <hr_id>, "ratio": <n>}, .. ,{"coffee":<hr_id>, "ratio": <n>}]}
