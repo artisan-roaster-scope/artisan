@@ -4702,24 +4702,30 @@ class tgraphcanvas(FigureCanvas):
             return jl
             
     def drawAUC(self):
-        TP_Index = aw.findTP()
-        if aw.qmc.AUCbaseFlag:
-            _,_,_,idx = aw.ts()
-            idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.stemp2[idx])
-        else:
-            idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.AUCbase)
-        rtbt = aw.qmc.stemp2[idx]
-                
-        ix = self.timex[idx:self.timeindex[6]+1]
-        iy = self.stemp2[idx:self.timeindex[6]+1]
-
-        # Create the shaded region
-        from matplotlib.patches import Polygon
-        a = ix[0]
-        b = ix[-1]
-        verts = [ xy for xy in [(a, rtbt)] + list(zip(ix, iy)) + [(b, rtbt)] if xy[1] > 0 ]
-        poly = Polygon(verts, facecolor=self.palette["aucarea"], edgecolor='0.5', alpha=0.3)
-        self.ax.add_patch(poly)
+        try:
+            TP_Index = aw.findTP()
+            if aw.qmc.AUCbaseFlag:
+                _,_,_,idx = aw.ts()
+                idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.stemp2[idx])
+            else:
+                idx = TP_Index + self.bisection(self.stemp2[TP_Index:self.timeindex[6]],aw.qmc.AUCbase)
+            rtbt = aw.qmc.stemp2[idx]
+                    
+            ix = self.timex[idx:self.timeindex[6]+1]
+            iy = self.stemp2[idx:self.timeindex[6]+1]
+    
+            # Create the shaded region
+            from matplotlib.patches import Polygon
+            a = ix[0]
+            b = ix[-1]
+            verts = [ xy for xy in [(a, rtbt)] + list(zip(ix, iy)) + [(b, rtbt)] if xy[1] > 0 ]
+            if verts:
+                poly = Polygon(verts, facecolor=self.palette["aucarea"], edgecolor='0.5', alpha=0.3)
+                self.ax.add_patch(poly)
+        except:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            pass
 
     def setProfileTitle(self,title,updatebackground=False):
         if self.flagon and self.batchcounter != -1:
