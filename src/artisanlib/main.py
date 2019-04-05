@@ -1890,6 +1890,7 @@ class tgraphcanvas(FigureCanvas):
         self.errorsemaphore = QSemaphore(1)
         self.serialsemaphore = QSemaphore(1)
         self.eventactionsemaphore = QSemaphore(1)
+        self.updateBackgroundSemaphore = QSemaphore(1)
 
         #flag to plot cross lines from mouse
         self.crossmarker = False
@@ -2048,8 +2049,13 @@ class tgraphcanvas(FigureCanvas):
 
     def updateBackground(self):
         if not self.block_update:
-            self.block_update = True
-            self.doUpdate()
+            try:
+                aw.qmc.updateBackgroundSemaphore.acquire(1)
+                self.block_update = True
+                self.doUpdate()
+            finally:
+                if aw.qmc.updateBackgroundSemaphore.available() < 1:
+                    aw.qmc.updateBackgroundSemaphore.release(1)
 
     def doUpdate(self):
         if not self.designerflag:
@@ -7262,7 +7268,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception:
                     pass
                 if aw.qmc.roastpropertiesAutoOpenFlag:
-                    aw.editgraph()
+                    QTimer.singleShot(20,lambda : aw.editgraph())
 
     # called from sample() and marks the autodetected TP visually on the graph
     def markTP(self):
@@ -7723,10 +7729,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
 
     #record end of roast (drop of beans). Called from push button 'Drop'
-    def markDrop(self,takeLock=True):
+    def markDrop(self):
         try:
-            if takeLock:
-                aw.qmc.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 removed = False
                 if len(self.timex) > 0:
@@ -7810,7 +7815,7 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDrop() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
-            if takeLock and aw.qmc.samplingsemaphore.available() < 1:
+            if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
             # redraw (within timealign) should not be called if semaphore is hold!
@@ -29450,8 +29455,7 @@ class editGraphDlg(ArtisanDialog):
         
         #DATA Table
         self.datatable = QTableWidget()
-        self.datatable.setTabKeyNavigation(True)
-        #self.createDataTable()  # called on tab switch       
+        self.datatable.setTabKeyNavigation(True)     
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
         self.titleedit = RoastsComboBox(selection = aw.qmc.title)

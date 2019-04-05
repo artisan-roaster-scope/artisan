@@ -101,11 +101,14 @@ log_file_path = util.getDirectory(log_file,".log")
 
 logger = logging.getLogger("plus")
 logger.setLevel(logging.DEBUG)
-handler = RotatingFileHandler(log_file_path, maxBytes=200000, backupCount=1, encoding='utf-8')
-handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s') # - %(name)s 
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+try:
+    handler = RotatingFileHandler(log_file_path, maxBytes=200000, backupCount=1, encoding='utf-8')
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s') # - %(name)s 
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+except: # if permission on the log file is denied, fail silently
+    pass
 
 ## Usage:
 ##   config.logger.info("something")

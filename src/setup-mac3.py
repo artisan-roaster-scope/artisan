@@ -143,6 +143,7 @@ with open('Info.plist', 'r+b') as fp:
 
 OPTIONS = {
     'strip':True,
+#    'xref': True,
     'argv_emulation': False, # this would confuses GUI processing
 # this does not work on Python3.4/PyQt5 for unknown reasons
 #    'qt_plugins': [
@@ -156,18 +157,18 @@ OPTIONS = {
 #                    'platforms/libqoffscreen.dylib'],  # qt5
     'semi_standalone': False,
     'site_packages': True,
-    'dylib_excludes': ['phonon','QtDeclarative','QtDesigner',
-                    'QtHelp','QtMultimedia',
-                    'QtOpenGL','QtScript','QtScriptTools',
-                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
-    'packages': ['yoctopuce','gevent','openpyxl','certifi'],
+# this seems not to work
+#    'dylib_excludes': ['phonon','QtDeclarative','QtDesigner',
+#                    'QtHelp','QtMultimedia',
+#                    'QtOpenGL','QtScript','QtScriptTools',
+#                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
+#    'packages': ['yoctopuce','gevent','openpyxl','certifi'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
     'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'
     'includes': ['serial',
-                 'sqlite3',
                  'PyQt5',
                  'PyQt5.QtCore',
                  'PyQt5.QtGui',
@@ -180,10 +181,8 @@ OPTIONS = {
                  'PyQt5.QtBluetooth',
                  'PyQt5.QtConcurrent',
                  ],
-    'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
-                      '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
-                      'bsddb','curses','tcl',
-                      '_wxagg','_gtagg','_cocoaagg','_wx'],
+    'excludes' :  ['tkinter','curses','sqlite3',
+                ],
     'plist'    : plist}
 
 setup(
@@ -315,4 +314,3 @@ else:
     subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r".dmg",shell = True)
     subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"',shell = True)
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
-
