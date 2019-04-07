@@ -1,6 +1,8 @@
 version: '1.6.2.{build}'
 
 environment:
+  GITHUB_TOKEN:
+    secure: 9UB76Z8mCWYt1u7Ci2fPVNiI3iK3LzTuIPhtNGBbxKP7YOPaUuq2yHxRjIfRPEAx
   matrix:
     - PYTHON: "C:\\Python36-x64"
       PYTHON_VERSION: 3.6
@@ -37,10 +39,6 @@ build_script:
 artifacts:
   - path: 'src\artisan-*.zip'
 
-environment:
-  GITHUB_TOKEN:
-    secure: 9UB76Z8mCWYt1u7Ci2fPVNiI3iK3LzTuIPhtNGBbxKP7YOPaUuq2yHxRjIfRPEAx
-    
 deploy_script:
   - ps: wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - ps: bash upload.sh src\artisan-*.zip
