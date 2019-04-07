@@ -3,11 +3,8 @@
 set -ex
 sudo apt-get update
 sudo apt-get install p7zip-full libglib2.0-dev zlib1g-dev
+sudo apt-get install qemu-system-arm
 
-# Use updated qemu
-curl -L -O https://dl.bintray.com/artisan/artisan-cache/qemu.tar.gz
-tar xvf qemu.tar.gz
-sudo mv qemu-img qemu-system-arm /usr/bin
 #curl -L -O https://download.qemu.org/qemu-2.11.1.tar.xz
 #tar xJf qemu-2.11.1.tar.xz
 #cd qemu-2.11.1
