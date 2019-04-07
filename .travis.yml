@@ -50,10 +50,8 @@ script:
 
 after_success:
   - cd src
-  - ls
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - bash upload.sh artisan*.rpm artisan*.deb artisan*.dmg
-
+  - if [ "$ARTISAN_OS" = "osx" ]; then bash upload.sh artisan*.dmg; else bash upload.sh artisan*.rpm artisan*.deb; fi 
 
  
 
