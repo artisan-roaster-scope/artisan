@@ -37,18 +37,28 @@ build_script:
 artifacts:
   - path: 'src\artisan-*.zip'
 
-deploy:
-  provider: BinTray
-  username: rpaulo
-  api_key:
-    secure: CZTTHkcD4MGQO6Gqc5UoPdsDdiyiYfhTI6LI9eqyAzgiIAJlD5U9MctwgICalT6q
-  subject: artisan
-  repo: artisan-artifacts
-  package: artisan
-  version: master
-  publish: true
-  override: true
-  explode: false
+environment:
+  GITHUB_TOKEN:
+    secure: 9UB76Z8mCWYt1u7Ci2fPVNiI3iK3LzTuIPhtNGBbxKP7YOPaUuq2yHxRjIfRPEAx
+    
+deploy_script:
+  - ps: wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - ps: bash upload.sh src\artisan-*.zip
   on:
     branch: master
+
+#deploy:
+#  provider: BinTray
+#  username: rpaulo
+#  api_key:
+#    secure: CZTTHkcD4MGQO6Gqc5UoPdsDdiyiYfhTI6LI9eqyAzgiIAJlD5U9MctwgICalT6q
+#  subject: artisan
+#  repo: artisan-artifacts
+#  package: artisan
+#  version: master
+#  publish: true
+#  override: true
+#  explode: false
+#  on:
+#    branch: master
   
