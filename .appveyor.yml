@@ -1,4 +1,4 @@
-version: '1.6.2.{build}'
+version: '1.6.99.{build}'
 
 branches:
   only:
@@ -10,7 +10,7 @@ environment:
   matrix:
     - PYTHON: "C:\\Python36-x64"
       PYTHON_VERSION: 3.6
-      ARTISAN_VERSION: 1.6.2
+      ARTISAN_VERSION: 1.6.99
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
