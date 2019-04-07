@@ -52,10 +52,6 @@ after_success:
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - bash upload.sh src/artisan*.rpm src/artisan*.deb src/artisan*.dmg
 
-branches:
-  except:
-    - # Do not build tags that we create when we upload to GitHub Releases
-    - /^(?i:continuous)$/
 
  
 
