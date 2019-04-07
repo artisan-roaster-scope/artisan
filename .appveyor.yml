@@ -40,7 +40,7 @@ artifacts:
   - path: 'src\artisan-*.zip'
 
 deploy_script:
-  - cmd: cd src
+  - cmd: ls
   - cmd: curl -L -O https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - cmd: bash upload.sh artisan-*.zip
   
