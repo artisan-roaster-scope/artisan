@@ -42,6 +42,8 @@ artifacts:
 deploy_script:
   - ps: wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - ps: bash upload.sh src\artisan-*.zip
+
+deploy:
   on:
     branch: master
 
