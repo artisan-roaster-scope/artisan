@@ -1,5 +1,9 @@
 version: '1.6.2.{build}'
 
+branches:
+  only:
+    - master
+    
 environment:
   GITHUB_TOKEN:
     secure: 9UB76Z8mCWYt1u7Ci2fPVNiI3iK3LzTuIPhtNGBbxKP7YOPaUuq2yHxRjIfRPEAx
@@ -40,7 +44,6 @@ artifacts:
   - path: 'src\artisan-*.zip'
 
 deploy_script:
-  - cmd: ls
   - cmd: curl -L -O https://github.com/rpaulo/uploadtool/raw/master/upload.sh
   - cmd: bash upload.sh artisan-*.zip
   
