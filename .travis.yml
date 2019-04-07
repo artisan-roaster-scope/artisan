@@ -52,8 +52,7 @@ after_success:
   - cd src
   - ls
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - chmod a+x upload.sh
-  - upload.sh artisan*.rpm artisan*.deb artisan*.dmg
+  - bash upload.sh artisan*.rpm artisan*.deb artisan*.dmg
 
 
  
