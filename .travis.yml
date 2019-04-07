@@ -49,8 +49,9 @@ script:
   - .travis/script-${ARTISAN_OS}.sh
 
 after_success:
+  - ls
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - bash upload.sh src/artisan*.rpm src/artisan*.deb src/artisan*.dmg
+  - bash upload.sh artisan*.rpm artisan*.deb artisan*.dmg
 
 
  
