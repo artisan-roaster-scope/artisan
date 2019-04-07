@@ -4,8 +4,6 @@ branches:
   only:
     - master
 
-shallow_clone: true
-
 environment:
   GITHUB_TOKEN:
     secure: 9UB76Z8mCWYt1u7Ci2fPVNiI3iK3LzTuIPhtNGBbxKP7YOPaUuq2yHxRjIfRPEAx
