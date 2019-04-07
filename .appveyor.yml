@@ -41,6 +41,6 @@ artifacts:
 
 deploy_script:
   - cmd: ls
-  - cmd: curl -L -O https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - cmd: curl -L -O https://github.com/rpaulo/uploadtool/raw/master/upload.sh
   - cmd: bash upload.sh artisan-*.zip
   
