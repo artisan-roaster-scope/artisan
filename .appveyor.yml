@@ -1,8 +1,8 @@
 version: '1.6.99.{build}'
 
 branches:
-  except:
-  - continous
+  only:
+  - master
 
 environment:
   GITHUB_TOKEN:
