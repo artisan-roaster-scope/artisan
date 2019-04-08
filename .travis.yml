@@ -51,6 +51,7 @@ script:
 after_success:
   - cd src
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - export UPLOADTOOL_BODY="WARNING: pre-release builds may not work. Use at your own risk."
   - if [ "$ARTISAN_OS" = "osx" ]; then bash upload.sh artisan*.dmg; else bash upload.sh artisan*.rpm artisan*.deb; fi 
 
  

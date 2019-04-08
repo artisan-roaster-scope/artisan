@@ -7,6 +7,8 @@ branches:
 environment:
   GITHUB_TOKEN:
     secure: 9UB76Z8mCWYt1u7Ci2fPVNiI3iK3LzTuIPhtNGBbxKP7YOPaUuq2yHxRjIfRPEAx
+  UPLOADTOOL_BODY:
+    "WARNING: pre-release builds may not work. Use at your own risk."
   matrix:
     - PYTHON: "C:\\Python36-x64"
       PYTHON_VERSION: 3.6
