@@ -5783,10 +5783,10 @@ class tgraphcanvas(FigureCanvas):
                         if self.timeindex[6]:
                             self.writestatistics(TP_index)
                 
-                if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.statssummary:
+                if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.statssummary:
                     self.statsSummary()
 
-                if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.AUCshowFlag:
+                if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.AUCshowFlag:
                     self.drawAUC()
     
 # this seems to mess up the focus if sliders are shown, but mini editor not
@@ -5813,7 +5813,7 @@ class tgraphcanvas(FigureCanvas):
                         label.set_color(self.palette["ylabel"])
     
                 #write legend
-                if self.legendloc and not sampling and not aw.qmc.flagstart and len(self.timex) > 2:
+                if self.legendloc and not sampling and not aw.qmc.flagon and len(self.timex) > 2:
                     rcParams['path.effects'] = []
                     prop = aw.mpl_fontproperties.copy()
                     prop.set_size("x-small")
@@ -7268,7 +7268,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception:
                     pass
                 if aw.qmc.roastpropertiesAutoOpenFlag:
-                    QTimer.singleShot(20,lambda : aw.editgraph())
+                    aw.openPropertiesSignal.emit()
 
     # called from sample() and marks the autodetected TP visually on the graph
     def markTP(self):
@@ -7790,12 +7790,7 @@ class tgraphcanvas(FigureCanvas):
                             pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
-                        # this might block:
-#                        try:
-#                            # update ambient temperature if a ambient temperature source is configured and no value yet established
-#                            aw.qmc.updateAmbientTemp()
-#                        except Exception:
-#                            pass
+
 #PLUS
                         if aw.plus_account is not None:
                             try:
@@ -11377,6 +11372,9 @@ class ApplicationWindow(QMainWindow):
     updatePlusStatusSignal = pyqtSignal() # can be called from another thread or a QTimer to trigger to update the plus icon status
     setTitleSignal = pyqtSignal(str,bool) # can be called from another thread or a QTimer to set the profile title in the main GUI thread
     sendmessageSignal = pyqtSignal(str,bool,str)
+    openPropertiesSignal = pyqtSignal()
+    
+    
     def __init__(self, parent = None):
     
         self.superusermode = False
@@ -13263,6 +13261,8 @@ class ApplicationWindow(QMainWindow):
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
         self.setTitleSignal.connect(self.qmc.setProfileTitle)
         self.sendmessageSignal.connect(self.sendmessage)
+        self.openPropertiesSignal.connect(self.editgraph)
+        
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatus)
 
@@ -41776,26 +41776,6 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("Serial Ccommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
 
-    #Example function
-    #NOT USED YET, maybe FUTURE Arduino?
-    #sends a command to the ET/BT device and receives data of length nbytes
-#    def sendTXRXcommand(self,command,nbytes):
-#        try:
-#            self.SP.write(str2cmd(command))
-#            r = self.SP.read(nbytes)
-#            if len(r) == nbytes:
-#                return r
-#            else:
-#                return "ERR"
-#        except Exception as ex:
-#            self.closeport()
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.sendTXRXcommand() {0}").format(str(ex)),exc_tb.tb_lineno)
-#        finally:
-#            #note: logged chars should not be binary
-#            if aw.seriallogflag:
-#                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-#                aw.addserial("FutureArduinocommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
 
 #########################################################################
 #############  DESIGNER CONFIG DIALOG ###################################
