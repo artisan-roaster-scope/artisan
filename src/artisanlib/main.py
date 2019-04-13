@@ -11293,7 +11293,6 @@ class SampleThread(QThread):
             next_tx = libtime.perf_counter()+interval
             while True:
                 if aw.qmc.flagon:
-#                    print(bool(libtime.perf_counter() < (next_tx + 0.25*interval)))
                     # if we are already beyond 1/4 of the next sampling we skip this one
                     if libtime.perf_counter() < (next_tx + 0.25*interval):
                         # only if we still have the time in this sampling interval, we sample
@@ -29260,10 +29259,11 @@ class editGraphDlg(ArtisanDialog):
         self.volumedialog = None # link forward to the the Volume Calculator
         
         # other parameters remembered for Cancel operation        
-        self.org_specialevents = aw.qmc.specialevents
-        self.org_specialeventstype = aw.qmc.specialeventstype
-        self.org_specialeventsStrings = aw.qmc.specialeventsStrings
-        self.org_specialeventsvalue = aw.qmc.specialeventsvalue
+        self.org_specialevents = aw.qmc.specialevents[:]
+        self.org_specialeventstype = aw.qmc.specialeventstype[:]
+        self.org_specialeventsStrings = aw.qmc.specialeventsStrings[:]
+        self.org_specialeventsvalue = aw.qmc.specialeventsvalue[:]
+        self.org_timeindex = aw.qmc.timeindex[:]
         
         self.org_ambientTemp = aw.qmc.ambientTemp
         self.org_ambient_humidity = aw.qmc.ambient_humidity
@@ -30220,13 +30220,12 @@ class editGraphDlg(ArtisanDialog):
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         self.TabWidget.addTab(C2Widget,QApplication.translate("Tab", "Notes",None))
-        if not aw.qmc.flagon:
-            C3Widget = QWidget()
-            C3Widget.setLayout(tab3Layout)
-            self.TabWidget.addTab(C3Widget,QApplication.translate("Tab", "Events",None))
-            C4Widget = QWidget()
-            C4Widget.setLayout(tab4Layout)
-            self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None)) 
+        C3Widget = QWidget()
+        C3Widget.setLayout(tab3Layout)
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab", "Events",None))
+        C4Widget = QWidget()
+        C4Widget.setLayout(tab4Layout)
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None)) 
         self.TabWidget.currentChanged.connect(lambda i=0:self.tabSwitched(i))
         #incorporate layouts
         totallayout = QVBoxLayout()
@@ -30956,6 +30955,7 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.specialeventstype = self.org_specialeventstype
         aw.qmc.specialeventsStrings = self.org_specialeventsStrings
         aw.qmc.specialeventsvalue = self.org_specialeventsvalue
+        aw.qmc.timeindex = self.org_timeindex
         
         aw.qmc.ambientTemp = self.org_ambientTemp
         aw.qmc.ambient_humidity = self.org_ambient_humidity
@@ -31020,9 +31020,21 @@ class editGraphDlg(ArtisanDialog):
 
     def tabSwitched(self,i):
         if i == 3:
-            self.createDataTable()
+            try:
+                #### lock shared resources #####
+                aw.qmc.samplingsemaphore.acquire(1)
+                self.createDataTable()
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
         elif i == 2:
-            self.createEventTable()
+            try:
+                #### lock shared resources #####
+                aw.qmc.samplingsemaphore.acquire(1)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+                self.createEventTable()
 # to clear the selection on entering the event table tab one first has to clear the focus
 # if the event table is freshly created by the call above this is not needed            
 #            QApplication.focusWidget().clearFocus()
@@ -31808,7 +31820,12 @@ class editGraphDlg(ArtisanDialog):
                     aw.qmc.phases[1] = int(round(aw.qmc.temp2[aw.qmc.timeindex[1]]))
                 if aw.qmc.timeindex[2]:
                     aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
-            self.saveEventTable()
+            try:
+                #### lock shared resources #####
+                self.saveEventTable()
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
         # Update Title
         aw.qmc.title = u(self.titleedit.currentText())
         aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
@@ -31937,7 +31954,7 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.roastbatchprefix = u(self.batchprefixedit.text())
             aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
             aw.qmc.roastbatchpos = self.batchposSpinBox.value()
-            
+        
         # load selected recent roast template in the background
         if self.template_file:
             try:
@@ -31948,8 +31965,14 @@ class editGraphDlg(ArtisanDialog):
                 aw.qmc.redraw()
             except:
                 pass
-        elif not aw.qmc.flagon:
+        elif ((not aw.qmc.flagon) or
+            (aw.qmc.specialevents != self.org_specialevents) or
+            (aw.qmc.specialeventstype != self.org_specialeventstype) or
+            (aw.qmc.specialeventsStrings != self.org_specialeventsStrings) or
+            (aw.qmc.specialeventsvalue != self.org_specialeventsvalue) or
+            (aw.qmc.timeindex != self.org_timeindex)):
             # we do a general redraw only if not sampling
+            print("redraw")
             aw.qmc.redraw(recomputeAllDeltas=False)
         elif (self.org_title != aw.qmc.title) or self.org_title_show_always != aw.qmc.title_show_always:
             # if title changed we at least update that one
