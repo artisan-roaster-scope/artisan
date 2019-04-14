@@ -5849,8 +5849,19 @@ class tgraphcanvas(FigureCanvas):
                     self.legend = None
     
                 # we create here the project line plots to have the accurate time axis after CHARGE               
-                dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0                
+                dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0  
                     
+            except Exception as ex:
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
+                _, _, exc_tb = sys.exc_info()    
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+
+            # we can run the actual redraw outside of the sampling semaphore
+            try:  
                 ############  ready to plot ############
                 #self.fig.canvas.draw() # done by updateBackground()
                 self.updateBackground() # update bitlblit backgrounds
@@ -5904,9 +5915,7 @@ class tgraphcanvas(FigureCanvas):
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()    
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
-            finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+
 
 
     #add stats summmary to graph 
@@ -31972,7 +31981,6 @@ class editGraphDlg(ArtisanDialog):
             (aw.qmc.specialeventsvalue != self.org_specialeventsvalue) or
             (aw.qmc.timeindex != self.org_timeindex)):
             # we do a general redraw only if not sampling
-            print("redraw")
             aw.qmc.redraw(recomputeAllDeltas=False)
         elif (self.org_title != aw.qmc.title) or self.org_title_show_always != aw.qmc.title_show_always:
             # if title changed we at least update that one
