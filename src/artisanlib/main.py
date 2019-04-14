@@ -7191,7 +7191,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]                            
                             self.timeindex[0] = -1
                             self.xaxistosm(redraw=False)
-                        removed = True
+                            removed = True
                     else:
                         if self.device == 18: #manual mode
                             tx,et,bt = aw.ser.NONE()
@@ -10676,7 +10676,8 @@ class SampleThread(QThread):
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
         ##### (try to) lock resources  #########
-        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,100) # we try to catch a lock for 100ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+#        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,100) # we try to catch a lock for 100ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
         if gotlock:
             try:
                 # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
@@ -11318,7 +11319,7 @@ class SampleThread(QThread):
                     if aw.qmc.flagon:
                         next_tx += interval
                         now = libtime.perf_counter()
-                        libtime.sleep(max(0.1,next_tx - now))
+                        libtime.sleep(max(0.2,next_tx - now)) # the 200ms here to allow other threads to intercept
                 else:
                     aw.qmc.flagsampling = False # we signal that we are done with sampling
                     try:
