@@ -33579,7 +33579,7 @@ class EventsDlg(ArtisanDialog):
         self.nbuttonsSpinBox.setAlignment(Qt.AlignCenter)
         self.nbuttonsSpinBox.setRange(6,30)
         self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
-        self.nbuttonsSpinBox.valueChanged.connect(self.realignbuttons)        
+        self.nbuttonsSpinBox.valueChanged.connect(self.setbuttonlistmaxlen)
         #table for showing events
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
@@ -34755,40 +34755,48 @@ class EventsDlg(ArtisanDialog):
         if answer:
             self.createEventbuttonTable()
 
-    #applys a pattern of colors 
+    #applys a pattern of colors
     def colorizebuttons(self,pattern=None):
         if self.changingcolorflag:
             n = self.colorSpinBox.value()
             self.colorSpinBox.setValue(n-1)
             return
         self.changingcolorflag = True
+
         if not pattern:
             pattern = self.colorSpinBox.value()
+
         ncolumns = aw.buttonlistmaxlen
-        nbuttons = len(aw.buttonlist)
+        nbuttons = len(self.extraeventstypes)
+
         initbuttons = ncolumns - 9
         nrows,extra = divmod((nbuttons-initbuttons),ncolumns)
-        #button background colors (aw.extraeventbuttoncolor)
-        bcolor = ["lightgrey"]*initbuttons
+
         step = pattern
+        bcolor = []
+
         if extra:
             nrows += 1
         gap = int(-1*(230-50)/ncolumns)
+        #Color
         for i in range(nrows):
             for f in range(230,50,gap):
-                color = QColor()    
+                color = QColor()
                 color.setHsv(step,255,f,255)
                 bcolor.append(str(color.name()))
             step += pattern*2
-        #text color (aw.extraeventbuttontextcolor)
+
+        #Text Color
         tcolor = ["yellow"]*nbuttons
-        aw.extraeventbuttoncolor = bcolor[:nbuttons]
-        aw.extraeventbuttontextcolor = tcolor[:]
+
+        #Apply Colors in Right Oder
         for i in range(nbuttons):
-            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[i],aw.extraeventbuttoncolor[i])
-            aw.buttonlist[i].setStyleSheet(style)
-        self.createEventbuttonTable()
+            visualIndex = self.eventbuttontable.visualRow(i)
+            self.extraeventbuttoncolor[i]     = bcolor[visualIndex]
+            self.extraeventbuttontextcolor[i]   = tcolor[visualIndex]
+
         self.changingcolorflag = False
+        self.createEventbuttonTable()
 
     def seteventmarker(self,_,m):
         if m == 0 and self.marker1typeComboBox.currentIndex() != 0:
@@ -34819,19 +34827,19 @@ class EventsDlg(ArtisanDialog):
             self.updateStyleTab()
             aw.qmc.redraw()
 
-    def realignbuttons(self):
-        aw.buttonlistmaxlen = self.nbuttonsSpinBox.value()
-        aw.realignbuttons()
+    def setbuttonlistmaxlen(self):
+        self.buttonlistmaxlen = self.nbuttonsSpinBox.value()
 
     def createEventbuttonTable(self):
-        self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
-        nbuttons = len(aw.extraeventstypes) 
-        
+
+        self.nbuttonsSpinBox.setValue(self.buttonlistmaxlen)
+        nbuttons = len(self.extraeventstypes)
+
         # self.eventbuttontable.clear() # this crashes Ubuntu 16.04
 #        if ndata != 0:
 #            self.eventbuttontable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
 #        self.eventbuttontable.clearSelection() # this seems to work also for Ubuntu 16.04
-        
+
         self.eventbuttontable.setRowCount(nbuttons)
         self.eventbuttontable.setColumnCount(10)
         self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None),
@@ -34848,39 +34856,53 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
         self.eventbuttontable.setShowGrid(True)
+
         self.eventbuttontable.verticalHeader().setSectionResizeMode(2)
+
+        #Enable Drag Sorting
+        self.eventbuttontable.setDragEnabled(True)
+        self.eventbuttontable.verticalHeader().setSectionsMovable(True)
+        self.eventbuttontable.verticalHeader().setDragDropMode(QTableWidget.InternalMove)
+
         visibility = [QApplication.translate("ComboBox","OFF",None),
                       QApplication.translate("ComboBox","ON",None)]
+
         std_extra_events = [self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),"--"]
         std_extra_events += [uchr(177) + e for e in std_extra_events[:-1]] # chr(241)
         std_extra_events.insert(0,QApplication.translate("Label", "")) # we prepend the empty item that does not create an event entry
+
+
         for i in range(nbuttons):
             #label
-            labeledit = QLineEdit(u(aw.extraeventslabels[i]).replace(chr(10),"\\n"))
+            labeledit = QLineEdit(u(self.extraeventslabels[i]).replace(chr(10),"\\n"))
             labeledit.editingFinished.connect(lambda x=i:self.setlabeleventbutton(x))
-        
-            #description
-            descriptionedit = QLineEdit(u(aw.extraeventsdescriptions[i]))
+
+            #Description
+            descriptionedit = QLineEdit(u(self.extraeventsdescriptions[i]))
             descriptionedit.editingFinished.connect(lambda x=i:self.setdescriptioneventbutton(x))
-            #type
+
+            #Type
             typeComboBox = MyQComboBox()
             typeComboBox.addItems(std_extra_events)
-            if aw.extraeventstypes[i] == 9:  # we add an offset of +1 here to jump over the new EVENT entry
+            if self.extraeventstypes[i] == 9:  # we add an offset of +1 here to jump over the new EVENT entry
                 idx = 5
-            elif aw.extraeventstypes[i] == 4:
+            elif self.extraeventstypes[i] == 4:
                 idx = 0
             else:
-                idx = aw.extraeventstypes[i]+1
+                idx = self.extraeventstypes[i]+1
+
             typeComboBox.setCurrentIndex(idx)
             typeComboBox.currentIndexChanged.connect(lambda _=0,i=i:self.settypeeventbutton(i))
-            #value
+
+            #Values
             valueEdit = QLineEdit()
 #            valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\-?\d?\d?$"),self)) # QRegExp(r"^100|\d?\d?$"),self))
             valueEdit.setValidator(QIntValidator(-999, 999, valueEdit))
-            valueEdit.setText(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
+            valueEdit.setText(aw.qmc.eventsvalues(self.extraeventsvalues[i]))
             valueEdit.setAlignment(Qt.AlignRight)
             valueEdit.editingFinished.connect(lambda i=i:self.setvalueeventbutton(1,i))
-            #action
+
+            #Action
             actionComboBox = MyQComboBox()
             actionComboBox.addItems(["",
                                      QApplication.translate("ComboBox","Serial Command",None),
@@ -34903,31 +34925,33 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","Aillio R1 Command",None),
                                      QApplication.translate("ComboBox","Artisan Command",None),
                                      QApplication.translate("ComboBox","RC Command",None)])
-            act = aw.extraeventsactions[i]
+            act = self.extraeventsactions[i]
             if act > 7:
                 act = act - 1
             actionComboBox.setCurrentIndex(act)
             actionComboBox.currentIndexChanged.connect(lambda _=0,i=i:self.setactioneventbutton(i))
-            #action description
-            actiondescriptionedit = QLineEdit(u(aw.extraeventsactionstrings[i]))
+
+            #Action Description
+            actiondescriptionedit = QLineEdit(u(self.extraeventsactionstrings[i]))
             actiondescriptionedit.editingFinished.connect(lambda i=i:self.setactiondescriptioneventbutton(1,i))
-            #visibility
+
+            #Visibility
             visibilityComboBox =  MyQComboBox()
             visibilityComboBox.addItems(visibility)
-            visibilityComboBox.setCurrentIndex(aw.extraeventsvisibility[i])
+            visibilityComboBox.setCurrentIndex(self.extraeventsvisibility[i])
             visibilityComboBox.currentIndexChanged.connect(lambda _=0,x=i:self.setvisibilitytyeventbutton(x))
             #Color
             self.colorButton = QPushButton("Select")
             self.colorButton.setFocusPolicy(Qt.NoFocus)
             self.colorButton.clicked.connect(lambda _,x=i : self.setbuttoncolor(x))
-            self.colorButton.setText(u(aw.extraeventslabels[i]))
-            self.colorButton.setStyleSheet("background-color: %s; color: %s;"%(aw.extraeventbuttoncolor[i],aw.extraeventbuttontextcolor[i]))
+            self.colorButton.setText(u(self.extraeventslabels[i]))
+            self.colorButton.setStyleSheet("background-color: %s; color: %s;"%(self.extraeventbuttoncolor[i],self.extraeventbuttontextcolor[i]))
             #Text Color
             self.colorTextButton = QPushButton("Select")
             self.colorTextButton.setFocusPolicy(Qt.NoFocus)
-            self.colorTextButton.clicked.connect(lambda _,x=i : self.setbuttontextcolor(x))
-            self.colorTextButton.setText(u(aw.extraeventslabels[i]))
-            self.colorTextButton.setStyleSheet("background-color: %s; color: %s;"%(aw.extraeventbuttoncolor[i],aw.extraeventbuttontextcolor[i]))
+            self.colorTextButton.clicked.connect(lambda _,x =i : self.setbuttontextcolor(x))
+            self.colorTextButton.setText(u(self.extraeventslabels[i]))
+            self.colorTextButton.setStyleSheet("background-color: %s; color: %s;"%(self.extraeventbuttoncolor[i],self.extraeventbuttontextcolor[i]))
             #Empty Cell
             emptyCell = QLabel("")
             #add widgets to the table
@@ -34940,7 +34964,8 @@ class EventsDlg(ArtisanDialog):
             self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
             self.eventbuttontable.setCellWidget(i,7,self.colorButton)
             self.eventbuttontable.setCellWidget(i,8,self.colorTextButton)
-            self.eventbuttontable.setCellWidget(i,9,emptyCell)        
+            self.eventbuttontable.setCellWidget(i,9,emptyCell)
+
         self.eventbuttontable.horizontalHeader().setStretchLastSection(False)
         self.eventbuttontable.resizeColumnsToContents()
         self.eventbuttontable.horizontalHeader().setStretchLastSection(True)
@@ -34953,134 +34978,158 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.setColumnWidth(6,80)
         self.eventbuttontable.setColumnWidth(7,80)
         self.eventbuttontable.setColumnWidth(8,80)
-        
+
+
         # remember the columnwidth
         for i in range(len(aw.eventbuttontablecolumnwidths)):
             try:
-                self.eventbuttontable.setColumnWidth(i,aw.eventbuttontablecolumnwidths[i])      
+                self.eventbuttontable.setColumnWidth(i,aw.eventbuttontablecolumnwidths[i])
             except Exception:
                 pass
 
-    def setbuttoncolor(self,x):
-        colorf = aw.colordialog(QColor(aw.extraeventbuttoncolor[x]))
-        if colorf.isValid():
-            colorname = str(colorf.name())
-            aw.extraeventbuttoncolor[x] = colorname
-            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
-            aw.buttonlist[x].setStyleSheet(style)
-            self.createEventbuttonTable()
-            colorButton = self.eventbuttontable.cellWidget(x,7)
-            colorButton.setStyleSheet("background-color: %s; color: %s;"%(aw.extraeventbuttoncolor[x],aw.extraeventbuttontextcolor[x]))            
-            aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[x]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
-            
-    def setbuttontextcolor(self,x):
-        colorf = aw.colordialog(QColor(aw.extraeventbuttontextcolor[x]))
-        if colorf.isValid():
-            colorname = str(colorf.name())
-            aw.extraeventbuttontextcolor[x] = colorname
-            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
-            aw.buttonlist[x].setStyleSheet(style)            
-            colorTextButton = self.eventbuttontable.cellWidget(x,8)
-            colorTextButton.setStyleSheet("background-color: %s; color: %s;"%(aw.extraeventbuttoncolor[x],aw.extraeventbuttontextcolor[x]))
-            aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[x]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
+    def setbuttoncolor(self,i):
+        if i < len(self.extraeventbuttoncolor):
+            colorf = aw.colordialog(QColor(self.extraeventbuttoncolor[i]))
+            if colorf.isValid():
+
+                self.extraeventbuttoncolor[i] = str(colorf.name())
+
+                textColor = self.extraeventbuttontextcolor[i]
+                backColor =  self.extraeventbuttoncolor[i]
+                label = self.extraeventslabels[i]
+                style = "background-color: %s; color: %s;"%(backColor,textColor)
+
+                self.eventbuttontable.cellWidget(i,7).setStyleSheet(style)
+                self.eventbuttontable.cellWidget(i,8).setStyleSheet(style)
+
+                aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(label), backColor, " "+QApplication.translate("Label","its text",None), textColor)])
+
+    def setbuttontextcolor(self,i):
+        if i < len(self.extraeventbuttontextcolor):
+            colorf = aw.colordialog(QColor(self.extraeventbuttontextcolor[i]))
+            if colorf.isValid():
+
+                self.extraeventbuttontextcolor[i] = str(colorf.name())
+
+                textColor = self.extraeventbuttontextcolor[i]
+                backColor =  self.extraeventbuttoncolor[i]
+                label = self.extraeventslabels[i]
+                style = "background-color: %s; color: %s;"%(backColor,textColor)
+
+                self.eventbuttontable.cellWidget(i,7).setStyleSheet(style)
+                self.eventbuttontable.cellWidget(i,8).setStyleSheet(style)
+
+                aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(label), backColor, " "+QApplication.translate("Label","its text",None),textColor)])
 
     def savetableextraeventbutton(self):
-        for i in range(len(aw.extraeventstypes)):
-            labeledit = self.eventbuttontable.cellWidget(i,0)
-            label = u(labeledit.text())
-            if "\\n" in label:              #make multiple line text if "\n" found in label string
-                parts = label.split("\\n")
-                label = chr(10).join(parts)
-            aw.extraeventslabels[i] = label  
-            # event type et
-            et = aw.extraeventstypes[i]
-            if et > 4 and et < 9:
-                et = et - 5
-            if et < 4:
-                label = label.replace("\\t",aw.qmc.etypes[et])
-            aw.buttonlist[i].setText(label)
-            descriptionedit = self.eventbuttontable.cellWidget(i,1)
-            aw.extraeventsdescriptions[i] = u(descriptionedit.text())
-#            typecombobox = self.eventbuttontable.cellWidget(i,2)
-#            aw.extraeventstypes[i] = typecombobox.currentIndex()
-            valueedit = self.eventbuttontable.cellWidget(i,3)
-            aw.extraeventsvalues[i] = aw.qmc.str2eventsvalue(str(valueedit.text()))
-            actioncombobox = self.eventbuttontable.cellWidget(i,4)
-            aw.extraeventsactions[i] = actioncombobox.currentIndex()
-            if aw.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
-                aw.extraeventsactions[i] = aw.extraeventsactions[i] + 1
-            actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
-            ades = u(actiondescriptionedit.text())
-            aw.extraeventsactionstrings[i] = ades
-            aw.update_extraeventbuttons_visibility()
+        maxButton = len(self.extraeventstypes)
+        #Clean Lists:
+        #Labels
+        aw.extraeventslabels         = [None] * maxButton
+        #Description
+        aw.extraeventsdescriptions   = [None] * maxButton
+        #Types
+        aw.extraeventstypes          = [None] * maxButton
+        #Values
+        aw.extraeventsvalues         = [None] * maxButton
+        #Actions
+        aw.extraeventsactions        = [None] * maxButton
+        #Action Description
+        aw.extraeventsactionstrings  = [None] * maxButton
+        #Visibility
+        aw.extraeventsvisibility     = [None] * maxButton
+        #Color
+        aw.extraeventbuttoncolor     = [None] * maxButton
+        #Text Color
+        aw.extraeventbuttontextcolor = [None] * maxButton
+
+        #Sorting buttons nased on the visualRow
+        for i in range(maxButton):
+            visualIndex = self.eventbuttontable.visualRow(i)
+
+            #Labels
+            aw.extraeventslabels[visualIndex]         = self.extraeventslabels[i]
+            #Description
+            aw.extraeventsdescriptions[visualIndex]   = self.extraeventsdescriptions[i]
+            #Types
+            aw.extraeventstypes[visualIndex]          = self.extraeventstypes[i]
+            #Values
+            aw.extraeventsvalues[visualIndex]         = self.extraeventsvalues[i]
+            #Actions
+            aw.extraeventsactions[visualIndex]        = self.extraeventsactions[i]
+            #Action Description
+            aw.extraeventsactionstrings[visualIndex]  = self.extraeventsactionstrings[i]
+            #Visibility
+            aw.extraeventsvisibility[visualIndex]     = self.extraeventsvisibility[i]
+            #Color
+            aw.extraeventbuttoncolor[visualIndex]     = self.extraeventbuttoncolor[i]
+            #Text Color
+            aw.extraeventbuttontextcolor[visualIndex] = self.extraeventbuttontextcolor[i]
+
+        aw.buttonlistmaxlen = self.buttonlistmaxlen
+        #Apply Event Button Changes
+        aw.settooltip()
+        aw.realignbuttons()
+        aw.update_extraeventbuttons_visibility()
 
     def setvisibilitytyeventbutton(self,i):
         actioncombobox = self.eventbuttontable.cellWidget(i,6)
-        aw.extraeventsvisibility[i] = actioncombobox.currentIndex()
-        aw.update_extraeventbuttons_visibility()
+        if i < len(self.extraeventsvisibility):
+            self.extraeventsvisibility[i] = actioncombobox.currentIndex()
+
 
     def setlabeleventbutton(self,i):
         labeledit = self.eventbuttontable.cellWidget(i,0)
         label = u(labeledit.text())
-        if "\\n" in label:              #make multiple line text if "\n" found in label string
-            parts = label.split("\\n")
-            label = chr(10).join(parts)
-        if i < len(aw.extraeventslabels):
-            aw.extraeventslabels[i] = label
-        aw.settooltip()
+        label = label.replace("\\n", chr(10))
+
+        if i < len(self.extraeventslabels):
+            et = self.extraeventstypes[i]
+            if et > 4 and et < 9:
+                et = et - 5
+            if et < 4:
+                label = label.replace("\\t",aw.qmc.etypes[et])
+
+            self.extraeventslabels[i] = label
+
+        #Update Color Buttons
+        self.eventbuttontable.cellWidget(i,7).setText(label)
+        self.eventbuttontable.cellWidget(i,8).setText(label)
 
     def setdescriptioneventbutton(self,i):
         descriptionedit = self.eventbuttontable.cellWidget(i,1)
-        if i < len(aw.extraeventsdescriptions):
-            aw.extraeventsdescriptions[i] = u(descriptionedit.text())
-        aw.settooltip()
+        if i < len(self.extraeventsdescriptions):
+            self.extraeventsdescriptions[i] = u(descriptionedit.text())
+
 
     def setactiondescriptioneventbutton(self,_,i):
         actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
-        if i < len(aw.extraeventsactionstrings):
-            aw.extraeventsactionstrings[i] = u(actiondescriptionedit.text())
-        aw.settooltip()
+        if i < len(self.extraeventsactionstrings):
+            self.extraeventsactionstrings[i] = u(actiondescriptionedit.text())
 
     def setactioneventbutton(self,i):
         actioncombobox = self.eventbuttontable.cellWidget(i,4)
         if i < len(aw.extraeventsactions):
-            aw.extraeventsactions[i] = actioncombobox.currentIndex()
-            if aw.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
-                aw.extraeventsactions[i] = aw.extraeventsactions[i] + 1
-            aw.settooltip()
+            self.extraeventsactions[i] = actioncombobox.currentIndex()
+            if self.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
+                self.extraeventsactions[i] = self.extraeventsactions[i] + 1
+
 
     def setvalueeventbutton(self,_,i):
         valueedit = self.eventbuttontable.cellWidget(i,3)
-        aw.extraeventsvalues[i] = aw.qmc.str2eventsvalue(str(valueedit.text()))
-        part2 = ""
-        if aw.extraeventsvalues[i] >= 0:
-            part2 = str(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
-        aw.buttonlist[i].setText(u(aw.qmc.etypesf(aw.extraeventstypes[i])[0])+part2)
-        aw.settooltip()
+        if i < len(self.extraeventsvalues):
+            self.extraeventsvalues[i] = aw.qmc.str2eventsvalue(str(valueedit.text()))
+
 
     def settypeeventbutton(self,i):
         typecombobox = self.eventbuttontable.cellWidget(i,2)
-        aw.extraeventstypes[i] = typecombobox.currentIndex() - 1 # we remove again the offset of 1 here to jump over the new EVENT entry
-        if aw.extraeventstypes[i] == -1:
-            aw.extraeventstypes[i] = 4 # and map the first entry to 4
-        elif aw.extraeventstypes[i] == 4:
-            aw.extraeventstypes[i] = 9 # and map the entry 4 to 9
-#        etype_char = ""
-#        if aw.extraeventstypes[i] < 4 or (aw.extraeventstypes[i] > 4 and aw.extraeventstypes[i] < 9):
-#            etype_char = str(aw.qmc.etypesf(aw.extraeventstypes[i])[0])
-#        elif aw.extraeventstypes[i] == 9:
-#            etype_char = "E"
-        labeledit = self.eventbuttontable.cellWidget(i,0)
-        label = u(labeledit.text())
-        if "\\n" in label:              #make multiple line text if "\n" found in label string
-            parts = label.split("\\n")
-            label = chr(10).join(parts)
-        et = aw.extraeventstypes[i]
-        if et < 4:
-            label = label.replace("\\t",aw.qmc.etypes[et])
-        aw.buttonlist[i].setText(label)                            
-#        aw.buttonlist[i].setText(etype_char+str(aw.qmc.eventsvalues(aw.extraeventsvalues[i])))
-        aw.settooltip()
+        evType = typecombobox.currentIndex() - 1 # we remove again the offset of 1 here to jump over the new EVENT entry
+        if i < len(self.extraeventstypes):
+            if evType == -1:
+                evType = 4 # and map the first entry to 4
+            elif evType == 4:
+                evType = 9 # and map the entry 4 to 9
+            self.extraeventstypes[i] = evType
 
     def disconnectTableItemActions(self):
         for x in range(self.eventbuttontable.rowCount()):
@@ -35096,78 +35145,50 @@ class EventsDlg(ArtisanDialog):
                 self.eventbuttontable.cellWidget(x,8).clicked.disconnect() # color text button
             except:
                 pass
-        
+
     def delextraeventbutton(self):
         self.disconnectTableItemActions() # we ensure that signals from to be deleted items are not fired anymore
-        bindex = len(aw.extraeventstypes)-1
+        bindex = len(self.extraeventstypes)-1
         selected = self.eventbuttontable.selectedRanges()
+
         if len(selected) > 0:
             bindex = selected[0].topRow()
+
         if bindex >= 0:
-            aw.extraeventslabels.pop(bindex)
-            aw.extraeventsdescriptions.pop(bindex)
-            aw.extraeventstypes.pop(bindex)
-            aw.extraeventsvalues.pop(bindex)
-            aw.extraeventsactions.pop(bindex)
-            aw.extraeventsactionstrings.pop(bindex)
-            aw.extraeventsvisibility.pop(bindex)
-            aw.extraeventbuttoncolor.pop(bindex)
-            aw.extraeventbuttontextcolor.pop(bindex)
-            if len(aw.e4buttondialog.buttons()):
-                aw.e4buttondialog.removeButton(aw.buttonlist[bindex])
-                if not len(aw.e4buttondialog.buttons()):
-                    aw.e4buttondialog.setContentsMargins(0,0,0,0)
-            elif len(aw.e3buttondialog.buttons()):
-                aw.e3buttondialog.removeButton(aw.buttonlist[bindex])
-                if not len(aw.e3buttondialog.buttons()):
-                    aw.e3buttondialog.setContentsMargins(0,0,0,0)
-            elif len(aw.e2buttondialog.buttons()):
-                aw.e2buttondialog.removeButton(aw.buttonlist[bindex])
-                if not len(aw.e2buttondialog.buttons()):
-                    aw.e2buttondialog.setContentsMargins(0,0,0,0)
-            elif len(aw.e1buttondialog.buttons()):
-                aw.e1buttondialog.removeButton(aw.buttonlist[bindex])
-                if not len(aw.e1buttondialog.buttons()):
-                    aw.e1buttondialog.setContentsMargins(0,0,0,0)
-            elif len(aw.lowerbuttondialog.buttons()):
-                aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
-            aw.buttonlist.pop(bindex)
-            self.createEventbuttonTable()  #update table
-        aw.update_extraeventbuttons_visibility()
-        
+            self.extraeventslabels.pop(bindex)
+            self.extraeventsdescriptions.pop(bindex)
+            self.extraeventstypes.pop(bindex)
+            self.extraeventsvalues.pop(bindex)
+            self.extraeventsactions.pop(bindex)
+            self.extraeventsactionstrings.pop(bindex)
+            self.extraeventsvisibility.pop(bindex)
+            self.extraeventbuttoncolor.pop(bindex)
+            self.extraeventbuttontextcolor.pop(bindex)
+
+            self.createEventbuttonTable()
+
     def insertextraeventbutton(self,insert=False):
-        aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
-        self.savetableextraeventbutton() #save previous changes
         if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
             return
-        bindex = len(aw.extraeventstypes)
+
+        bindex = len(self.extraeventstypes)
         selected = self.eventbuttontable.selectedRanges()
+
         if len(selected) > 0 and insert:
             bindex = selected[0].topRow()
-        if bindex >= 0:
-            aw.extraeventsdescriptions = aw.extraeventsdescriptions[:bindex] + [""] + aw.extraeventsdescriptions[bindex:]
-            aw.extraeventstypes = aw.extraeventstypes[:bindex] + [4] + aw.extraeventstypes[bindex:]
-            aw.extraeventsvalues = aw.extraeventsvalues[:bindex] + [0] + aw.extraeventsvalues[bindex:]
-            aw.extraeventsactions = aw.extraeventsactions[:bindex] + [0] + aw.extraeventsactions[bindex:]
-            aw.extraeventsactionstrings = aw.extraeventsactionstrings[:bindex] + [""] +  aw.extraeventsactionstrings[bindex:]
-            aw.extraeventsvisibility = aw.extraeventsvisibility[:bindex] + [1] + aw.extraeventsvisibility[bindex:]
-            aw.extraeventbuttoncolor = aw.extraeventbuttoncolor[:bindex] + ["yellow"] + aw.extraeventbuttoncolor[bindex:]
-            aw.extraeventbuttontextcolor = aw.extraeventbuttontextcolor[:bindex] + ["black"] + aw.extraeventbuttontextcolor[bindex:]
-            initialtext = u("E")
-            aw.extraeventslabels = aw.extraeventslabels[:bindex] + [initialtext] + aw.extraeventslabels[bindex:]
-            
-            self.createEventbuttonTable() 
-            aw.buttonlist.append(QPushButton())
 
-#            aw.buttonlist[bindex].setFocusPolicy(Qt.NoFocus)
-            aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ")
-            aw.buttonlist[bindex].setMinimumWidth(90)
-            aw.buttonlist[bindex].setMinimumHeight(aw.standard_button_height)
-            aw.buttonlist[bindex].setText(initialtext)
-            aw.buttonlist[bindex].clicked.connect(lambda _:aw.recordextraevent(bindex))            
-            aw.realignbuttons()
-            aw.update_extraeventbuttons_visibility()
-            aw.settooltip()
+        if bindex >= 0:
+            self.extraeventsdescriptions.insert(bindex,"")
+            self.extraeventstypes.insert(bindex,4)
+            self.extraeventsvalues.insert(bindex,0)
+            self.extraeventsactions.insert(bindex,0)
+            self.extraeventsactionstrings.insert(bindex,"")
+            self.extraeventsvisibility.insert(bindex,1)
+            self.extraeventbuttoncolor.insert(bindex,"yellow")
+            self.extraeventbuttontextcolor.insert(bindex,"black")
+            self.extraeventslabels.insert(bindex,u("E"))
+
+            self.createEventbuttonTable()
 
     def eventsbuttonflagChanged(self):
         if self.eventsbuttonflag.isChecked():
