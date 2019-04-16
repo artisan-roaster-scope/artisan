@@ -332,7 +332,13 @@ def getCoffees(weight_unit_idx,store=None):
                 try:
                     origin = ""
                     if "origin" in c:
-                        origin = c["origin"] + " "
+                        origin = c["origin"]
+                        if "crop_date" in c:
+                            cy = c["crop_date"]
+                            picked = None
+                            if "picked" in cy and len(cy["picked"]) > 0:
+                                origin += ' {:d}'.format(cy["picked"][0])
+                        origin += ", "
                     label = c["label"]
                     if "default_unit" in c:
                         default_unit = c["default_unit"]

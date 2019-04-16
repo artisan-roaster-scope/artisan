@@ -5783,10 +5783,10 @@ class tgraphcanvas(FigureCanvas):
                         if self.timeindex[6]:
                             self.writestatistics(TP_index)
                 
-                if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.statssummary:
+                if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.statssummary:
                     self.statsSummary()
 
-                if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.AUCshowFlag:
+                if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.AUCshowFlag:
                     self.drawAUC()
     
 # this seems to mess up the focus if sliders are shown, but mini editor not
@@ -5813,7 +5813,7 @@ class tgraphcanvas(FigureCanvas):
                         label.set_color(self.palette["ylabel"])
     
                 #write legend
-                if self.legendloc and not sampling and not aw.qmc.flagstart and len(self.timex) > 2:
+                if self.legendloc and not sampling and not aw.qmc.flagon and len(self.timex) > 2:
                     rcParams['path.effects'] = []
                     prop = aw.mpl_fontproperties.copy()
                     prop.set_size("x-small")
@@ -5849,8 +5849,19 @@ class tgraphcanvas(FigureCanvas):
                     self.legend = None
     
                 # we create here the project line plots to have the accurate time axis after CHARGE               
-                dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0                
+                dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0  
                     
+            except Exception as ex:
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
+                _, _, exc_tb = sys.exc_info()    
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+
+            # we can run the actual redraw outside of the sampling semaphore
+            try:  
                 ############  ready to plot ############
                 #self.fig.canvas.draw() # done by updateBackground()
                 self.updateBackground() # update bitlblit backgrounds
@@ -5904,9 +5915,7 @@ class tgraphcanvas(FigureCanvas):
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()    
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
-            finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+
 
 
     #add stats summmary to graph 
@@ -7182,7 +7191,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]                            
                             self.timeindex[0] = -1
                             self.xaxistosm(redraw=False)
-                        removed = True
+                            removed = True
                     else:
                         if self.device == 18: #manual mode
                             tx,et,bt = aw.ser.NONE()
@@ -7268,7 +7277,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception:
                     pass
                 if aw.qmc.roastpropertiesAutoOpenFlag:
-                    QTimer.singleShot(20,lambda : aw.editgraph())
+                    aw.openPropertiesSignal.emit()
 
     # called from sample() and marks the autodetected TP visually on the graph
     def markTP(self):
@@ -7790,12 +7799,7 @@ class tgraphcanvas(FigureCanvas):
                             pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
-                        # this might block:
-#                        try:
-#                            # update ambient temperature if a ambient temperature source is configured and no value yet established
-#                            aw.qmc.updateAmbientTemp()
-#                        except Exception:
-#                            pass
+
 #PLUS
                         if aw.plus_account is not None:
                             try:
@@ -10672,7 +10676,8 @@ class SampleThread(QThread):
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
         ##### (try to) lock resources  #########
-        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,350) # we try to catch a lock for 350ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+#        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,100) # we try to catch a lock for 100ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
         if gotlock:
             try:
                 # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
@@ -11298,20 +11303,23 @@ class SampleThread(QThread):
             next_tx = libtime.perf_counter()+interval
             while True:
                 if aw.qmc.flagon:
-                    
-#                    print(datetime.datetime.now()) # use this to check for drifts
-                    
-                    #collect information
-                    aw.qmc.flagsampling = True # we signal that we are sampling
-                    self.sample()
-                    aw.qmc.flagsampling = False # we signal that we are done with sampling
-                    
+                    # if we are already beyond 1/4 of the next sampling we skip this one
+                    if libtime.perf_counter() < (next_tx + 0.25*interval):
+                        # only if we still have the time in this sampling interval, we sample
+                        
+#                        print(datetime.datetime.now()) # use this to check for drifts
+                        
+                        #collect information
+                        aw.qmc.flagsampling = True # we signal that we are sampling
+                        self.sample()
+                        aw.qmc.flagsampling = False # we signal that we are done with sampling
+                        
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)                    
-                    #apply sampling interval here
+                    # apply sampling interval here
                     if aw.qmc.flagon:
                         next_tx += interval
                         now = libtime.perf_counter()
-                        libtime.sleep(max(0.1,next_tx - now))
+                        libtime.sleep(max(0.2,next_tx - now)) # the 200ms here to allow other threads to intercept
                 else:
                     aw.qmc.flagsampling = False # we signal that we are done with sampling
                     try:
@@ -11377,6 +11385,9 @@ class ApplicationWindow(QMainWindow):
     updatePlusStatusSignal = pyqtSignal() # can be called from another thread or a QTimer to trigger to update the plus icon status
     setTitleSignal = pyqtSignal(str,bool) # can be called from another thread or a QTimer to set the profile title in the main GUI thread
     sendmessageSignal = pyqtSignal(str,bool,str)
+    openPropertiesSignal = pyqtSignal()
+    
+    
     def __init__(self, parent = None):
     
         self.superusermode = False
@@ -13263,6 +13274,8 @@ class ApplicationWindow(QMainWindow):
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
         self.setTitleSignal.connect(self.qmc.setProfileTitle)
         self.sendmessageSignal.connect(self.sendmessage)
+        self.openPropertiesSignal.connect(self.editgraph)
+        
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatus)
 
@@ -29242,6 +29255,9 @@ class editGraphDlg(ArtisanDialog):
         self.org_beansize_max = aw.qmc.beansize_max
         self.org_moisture_greens = aw.qmc.moisture_greens
         
+        self.org_title = aw.qmc.title
+        self.org_title_show_always = aw.qmc.title_show_always
+        
         self.org_weight = aw.qmc.weight[:]
         self.org_volume = aw.qmc.volume[:]
         
@@ -29253,10 +29269,11 @@ class editGraphDlg(ArtisanDialog):
         self.volumedialog = None # link forward to the the Volume Calculator
         
         # other parameters remembered for Cancel operation        
-        self.org_specialevents = aw.qmc.specialevents
-        self.org_specialeventstype = aw.qmc.specialeventstype
-        self.org_specialeventsStrings = aw.qmc.specialeventsStrings
-        self.org_specialeventsvalue = aw.qmc.specialeventsvalue
+        self.org_specialevents = aw.qmc.specialevents[:]
+        self.org_specialeventstype = aw.qmc.specialeventstype[:]
+        self.org_specialeventsStrings = aw.qmc.specialeventsStrings[:]
+        self.org_specialeventsvalue = aw.qmc.specialeventsvalue[:]
+        self.org_timeindex = aw.qmc.timeindex[:]
         
         self.org_ambientTemp = aw.qmc.ambientTemp
         self.org_ambient_humidity = aw.qmc.ambient_humidity
@@ -30218,7 +30235,7 @@ class editGraphDlg(ArtisanDialog):
         self.TabWidget.addTab(C3Widget,QApplication.translate("Tab", "Events",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None))        
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None)) 
         self.TabWidget.currentChanged.connect(lambda i=0:self.tabSwitched(i))
         #incorporate layouts
         totallayout = QVBoxLayout()
@@ -30948,6 +30965,7 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.specialeventstype = self.org_specialeventstype
         aw.qmc.specialeventsStrings = self.org_specialeventsStrings
         aw.qmc.specialeventsvalue = self.org_specialeventsvalue
+        aw.qmc.timeindex = self.org_timeindex
         
         aw.qmc.ambientTemp = self.org_ambientTemp
         aw.qmc.ambient_humidity = self.org_ambient_humidity
@@ -31012,9 +31030,21 @@ class editGraphDlg(ArtisanDialog):
 
     def tabSwitched(self,i):
         if i == 3:
-            self.createDataTable()
+            try:
+                #### lock shared resources #####
+                aw.qmc.samplingsemaphore.acquire(1)
+                self.createDataTable()
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
         elif i == 2:
-            self.createEventTable()
+            try:
+                #### lock shared resources #####
+                aw.qmc.samplingsemaphore.acquire(1)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+                self.createEventTable()
 # to clear the selection on entering the event table tab one first has to clear the focus
 # if the event table is freshly created by the call above this is not needed            
 #            QApplication.focusWidget().clearFocus()
@@ -31800,7 +31830,12 @@ class editGraphDlg(ArtisanDialog):
                     aw.qmc.phases[1] = int(round(aw.qmc.temp2[aw.qmc.timeindex[1]]))
                 if aw.qmc.timeindex[2]:
                     aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
-            self.saveEventTable()
+            try:
+                #### lock shared resources #####
+                self.saveEventTable()
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
         # Update Title
         aw.qmc.title = u(self.titleedit.currentText())
         aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
@@ -31929,7 +31964,7 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.roastbatchprefix = u(self.batchprefixedit.text())
             aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
             aw.qmc.roastbatchpos = self.batchposSpinBox.value()
-            
+        
         # load selected recent roast template in the background
         if self.template_file:
             try:
@@ -31940,8 +31975,29 @@ class editGraphDlg(ArtisanDialog):
                 aw.qmc.redraw()
             except:
                 pass
-        else:
+        elif ((not aw.qmc.flagon) or
+            (aw.qmc.specialevents != self.org_specialevents) or
+            (aw.qmc.specialeventstype != self.org_specialeventstype) or
+            (aw.qmc.specialeventsStrings != self.org_specialeventsStrings) or
+            (aw.qmc.specialeventsvalue != self.org_specialeventsvalue) or
+            (aw.qmc.timeindex != self.org_timeindex)):
+            # we do a general redraw only if not sampling
             aw.qmc.redraw(recomputeAllDeltas=False)
+        elif (self.org_title != aw.qmc.title) or self.org_title_show_always != aw.qmc.title_show_always:
+            # if title changed we at least update that one
+            if aw.qmc.flagstart and not aw.qmc.title_show_always:
+                aw.qmc.setProfileTitle("")
+                st_artist = aw.qmc.fig.suptitle("")
+                try:
+                    st_artist.set_in_layout(False) # remove suptitle from tight_layout calculation
+                except: # set_in_layout not available in mpl<3.x
+                    pass
+                aw.qmc.fig.canvas.draw()
+            else:                        
+                aw.qmc.setProfileTitle(aw.qmc.title)
+#                aw.qmc.updateBackground()
+                aw.qmc.fig.canvas.draw()
+        
         if not aw.qmc.flagon:
             aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None))
         self.close()
@@ -38371,9 +38427,9 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",
                                                     None) + " ser.EXTECH755pressure() {0}").format(str(ex)),
                             exc_tb.tb_lineno)
+            self.closeport()
             return -1, -1
         finally:
-            self.closeport()
             # note: logged chars should be unicode not binary
             if aw.seriallogflag: #I seriously doubt this works!!!!! Not sure what its for
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize) + "," + str(
@@ -38677,9 +38733,9 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.MS6514temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.closeport()
             return -1,-1
         finally:
-            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -38725,9 +38781,9 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.DT301temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.closeport()
             return -1,-1
         finally:
-            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -38865,9 +38921,9 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806AUtemperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.closeport()
             return -1,-1
         finally:
-            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -39124,10 +39180,10 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
+#                self.SP.flush()
                 r = self.SP.read(14)
                 if len(r) == 14:
                     #we convert the hex strings to integers. Divide by 10.0 (decimal position)
@@ -39145,9 +39201,9 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH506RAtemperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.closeport()
             return -1,-1
         finally:
-            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -39160,11 +39216,11 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
-                libtime.sleep(.05)
+#                self.SP.flush()
+#                libtime.sleep(.01)
                 r = self.SP.read(7)                                   #NOTE: different
                 if len(r) == 7:
                     #DECIMAL POINT
@@ -39197,9 +39253,9 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER302temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.closeport()
             return -1,-1
         finally:
-            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -39212,11 +39268,11 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
-                libtime.sleep(.05)
+#                self.SP.flush()
+#                libtime.sleep(.01)
                 r = self.SP.read(8) #NOTE: different to CENTER306
                 if len(r) == 8:
                     #DECIMAL POINT
@@ -39260,9 +39316,9 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER303temperature() {0}").format(str(ex)),exc_tb.tb_lineno)            
+            self.closeport()
             return -1,-1
         finally:
-            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -39276,11 +39332,11 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
-                libtime.sleep(.05)
+#                self.SP.flush()
+#                libtime.sleep(.01)
                 r = self.SP.read(26)
                 if len(r) == 26 and hex2int(r[0],r[1]) == 43605: # filter out bad/strange data
                     #extract T1
@@ -39304,8 +39360,9 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " VOLTCRAFTPL125T2temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
             self.closeport()
+            return -1,-1
+        finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -39318,11 +39375,11 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
-                libtime.sleep(.05)
+#                self.SP.flush()
+#                libtime.sleep(.01)
                 r = self.SP.read(26)
                 if len(r) == 26 and hex2int(r[0],r[1]) == 43605: # filter out bad/strange data
                     aw.qmc.extraPL125T4TX = aw.qmc.timeclock.elapsed()/1000.
@@ -39349,8 +39406,9 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " VOLTCRAFTPL125T4temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
             self.closeport()
+            return -1,-1
+        finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -39364,11 +39422,11 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
-                libtime.sleep(.05)
+#                self.SP.flush()
+#                libtime.sleep(.01)
                 r = self.SP.read(10) #NOTE: different to CENTER303
                 if len(r) == 10:
                     #DECIMAL POINT
@@ -39413,14 +39471,15 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER306temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
             self.closeport()
+            return -1,-1
+        finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER306 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
-    def CENTER309temperature(self, retry=2):
+    def CENTER309temperature(self, retry=1):
         ##    command = "\x4B" returns 4 bytes . Model number.
         ##    command = "\x48" simulates HOLD button
         ##    command = "\x4D" simulates MAX/MIN button
@@ -39450,11 +39509,11 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
-                libtime.sleep(.05)
+#                self.SP.flush()
+#                libtime.sleep(.01)
                 r = self.SP.read(45)
                 if len(r) == 45:
                     T1 = T2 = T3 = T3 = -1
@@ -39491,9 +39550,9 @@ class serialport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER309temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.closeport()
             return -1,-1
         finally:
-            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -41776,26 +41835,6 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("Serial Ccommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
 
-    #Example function
-    #NOT USED YET, maybe FUTURE Arduino?
-    #sends a command to the ET/BT device and receives data of length nbytes
-#    def sendTXRXcommand(self,command,nbytes):
-#        try:
-#            self.SP.write(str2cmd(command))
-#            r = self.SP.read(nbytes)
-#            if len(r) == nbytes:
-#                return r
-#            else:
-#                return "ERR"
-#        except Exception as ex:
-#            self.closeport()
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.sendTXRXcommand() {0}").format(str(ex)),exc_tb.tb_lineno)
-#        finally:
-#            #note: logged chars should not be binary
-#            if aw.seriallogflag:
-#                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-#                aw.addserial("FutureArduinocommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
 
 #########################################################################
 #############  DESIGNER CONFIG DIALOG ###################################
