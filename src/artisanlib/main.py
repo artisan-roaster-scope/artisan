@@ -35395,17 +35395,7 @@ class EventsDlg(ArtisanDialog):
         aw.qmc.autoChargeFlag = self.autoChargeFlagstored
         aw.qmc.autoDropFlag = self.autoDropFlagstored
         aw.qmc.markTPflag = self.markTPFlagstored
-        # buttons
-        aw.extraeventslabels = self.extraeventslabels
-        aw.extraeventsdescriptions = self.extraeventsdescriptions
-        aw.extraeventstypes = self.extraeventstypes
-        aw.extraeventsvalues = self.extraeventsvalues
-        aw.extraeventsactions = self.extraeventsactions
-        aw.extraeventsactionstrings = self.extraeventsactionstrings
-        aw.extraeventsvisibility = self.extraeventsvisibility
-        aw.extraeventbuttoncolor = self.extraeventbuttoncolor
-        aw.extraeventbuttontextcolor = self.extraeventbuttontextcolor
-        aw.buttonlistmaxlen = self.buttonlistmaxlen
+        # buttons saved only if ok is pressed,so no restore needed
         # sliders
         aw.eventslidervisibilities = self.eventslidervisibilities
         aw.eventslideractions = self.eventslideractions
