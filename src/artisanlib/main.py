@@ -6695,7 +6695,8 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Scope monitoring...", None))
             #disable RESET button:
             aw.button_7.setEnabled(False)
-            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+#dave99
+#            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_7.setVisible(False)
             QApplication.processEvents()
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])
@@ -6990,12 +6991,14 @@ class tgraphcanvas(FigureCanvas):
             aw.disableSaveActions()
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None))
             aw.button_2.setEnabled(False)
-            aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+#dave99
+#            aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None))
             aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
             #disable RESET button:
             aw.button_7.setEnabled(False)
-            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+#dave99
+#            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_18.setEnabled(True)
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
             self.updateLCDtime()
@@ -7029,7 +7032,8 @@ class tgraphcanvas(FigureCanvas):
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"]) 
             aw.button_7.setEnabled(True)
-            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+#dave99
+#            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_18.setEnabled(False)
             self.updateLCDtime()
             #prevents accidentally deleting a modified profile:
@@ -12321,42 +12325,477 @@ class ApplicationWindow(QMainWindow):
 #                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
 #                                     }
 
-        buttonstyle = "border-style:solid; border-radius:6;border-color:grey; border-width:1;" # modernize
-        #buttonstyle = ""  #un-comment to show how any border stuff is not compatible with setFlat()
-        buttonwidth_1 = "min-width:100px;"
-        buttonwidth_2 = "min-width:75px;"
-        self.pushbuttonstyles = {"DISABLED": "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: normal; color: darkgrey; background:" + self.createGradient('lightgrey') +"}",
-                                 "STOP":     "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#00CC66') +"}",  # 00fc7c, 00CC66, 7CEA9C, 4CB944, 06D6A0
-                                 "START":    "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#ff3d00') +"}",
-                                 "OFF":      "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#00eC66') +"}",  #<- changed slightly.  needs to match STOP color
-                                 "ON":       "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#ff3d00') +"}",
-                                 "COOL END": "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                 "DRY END":  "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                 "CHARGE":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('#f07800') +"}",
-                                 "FC START": "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                 "FC END":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                 "SC START": "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                 "SC END":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('orange') +"}",
-                                 "RESET":    "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 14pt; font-weight: bold;   color: black;    background:" + self.createGradient('white') +"}",
-                                 "HUD_OFF":  "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#b5baff') +"}",
-                                 "HUD_ON":   "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 14pt; font-weight: bold;   color: white;    background:" + self.createGradient('#60ffed') +"}",
-                                 "EVENT":    "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: black;    background:" + self.createGradient('yellow') +"}",
-                                 "DROP":     "QPushButton {" + buttonstyle + buttonwidth_2 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('#f07800') +"}",
-                                 "PID":      "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 12pt; font-weight: bold;   color: white;    background:" + self.createGradient('#92C3FF') +"}",
-                                 "PIDactive":"QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 12pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#6D4824') +"}",
-                                 "SV +":     "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('#ffaaff') +"}",
-                                 "SV -":     "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 10pt; font-weight: bold;   color: white;    background:" + self.createGradient('lightblue') +"}",
-                                 "SELECTED": "QPushButton {" + buttonstyle + buttonwidth_1 +" font-size: 11pt; font-weight: bold;   color: yellow;   background:" + self.createGradient('#6D4824') +"}"  #keyboard moves
-                                 }
-
-#Do't forget to update the es locale styles!!  #dave99
+        # set a few broad style parameters
         if locale == "es":
-            # slightly smaller font size for Spanish
-            self.pushbuttonstyles["DISABLED"] = "QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}"
-            self.pushbuttonstyles["STOP"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
-            self.pushbuttonstyles["START"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}"
-            self.pushbuttonstyles["OFF"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
-            self.pushbuttonstyles["ON"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }"
+            self.ooss_font_size = '12pt'
+        else:
+            self.ooss_font_size = '14pt'
+        border_modern = "border-style:solid; border-radius:6;border-color:grey; border-width:0;" # modernize
+        border_modern_pressed = "border-style:solid; border-radius:6;border-color:black; border-width:0;" # modernize
+
+        # Can't find a way to use palette colors here i.e., aw.palette['canvas']  This needs to get solved.
+        self.pushbuttonstyles = {
+
+            "RESET":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 14pt; 
+                    font-weight: bold;   
+                    color: black;    
+                    background:""" + self.createGradient('white') + """ ;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;    
+                    background:""" + self.createGradient('lightgrey') + """ ;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #116999; 
+                }
+                QPushButton:hover:!pressed {
+                    color: black;
+                    background:""" + self.createGradient('white',reverse=True) + """ ;
+                }
+            """,
+
+            "OFF":    """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: """ + self.ooss_font_size + """; 
+                    font-weight: bold;   
+                    color: white;   
+                    background:""" + self.createGradient('#00eC66') + """ ;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #116999; 
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#00eC66',reverse=True) + """ ;
+                }
+            """,
+
+            "ON":    """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: """ + self.ooss_font_size + """; 
+                    font-weight: bold;   
+                    color: yellow;   
+                    background:""" + self.createGradient('#ff3d00') + """ ;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #116999; 
+                }
+                QPushButton:hover:!pressed {
+                    color: yellow;   
+                    background:""" + self.createGradient('#ff3d00',reverse=True) + """ ;
+                }
+            """,
+
+            "STOP":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: """ + self.ooss_font_size + """; 
+                    font-weight: bold;   
+                    color: white;    
+                    background:""" + self.createGradient('#00eC66') + """ ;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;    
+                    background:""" + self.createGradient('lightgrey') + """ ;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #116999; 
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#00eC66') + """ ;
+                }
+            """,
+
+            "START":    """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: """ + self.ooss_font_size + """; 
+                    font-weight: bold;   
+                    color: yellow;   
+                    background:""" + self.createGradient('#ff3d00') + """ ;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;    
+                    background:""" + self.createGradient('lightgrey') + """ ;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #116999; 
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background-color: red; 
+                }
+            """,
+
+            "CHARGE":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;   
+                    background:""" + self.createGradient('#f07800') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0;
+                }
+                QPushButton:pressed {
+                    color: white;   
+                    background:""" + self.createGradient('#f07800') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;   
+                    background:""" + self.createGradient('#f07800') + """ ;
+                }
+            """,
+
+            "DRY END":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0; 
+                }
+                QPushButton:pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+            """,
+
+            "FC START":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0; 
+                }
+                QPushButton:pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+            """,
+
+            "FC END":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0; 
+                }
+                QPushButton:pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+            """,
+
+            "SC START":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0; 
+                }
+                QPushButton:pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+            """,
+
+            "SC END":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0; 
+                }
+                QPushButton:pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+            """,
+
+            "DROP":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;   
+                    background:""" + self.createGradient('#f07800') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0; 
+                }
+                QPushButton:pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+            """,
+
+            "COOL END":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0; 
+                }
+                QPushButton:pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;   
+                    background:""" + self.createGradient('orange') + """ ;
+                }
+            """,
+
+            "EVENT":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: black;   
+                    background:""" + self.createGradient('yellow') + """ ;
+                }
+                QPushButton:pressed {
+                    color: black;   
+                    background:""" + self.createGradient('yellow') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: black;   
+                    background:""" + self.createGradient('yellow') + """ ;
+                }
+            """,
+
+            "PID":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 12pt; 
+                    font-weight: bold;   
+                    color: white;    
+                    background:""" + self.createGradient('#92C3FF') + """ ;
+                }
+                QPushButton:pressed {
+                    color: white;    
+                    background:""" + self.createGradient('#92C3FF') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;    
+                    background:""" + self.createGradient('#92C3FF') + """ ;
+                }
+            """,
+
+            "PIDactive":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 12pt; 
+                    font-weight: bold;   
+                    color: yellow;    
+                    background:""" + self.createGradient('#6D4824') + """ ;
+                }
+                QPushButton:pressed {
+                    color: yellow;    
+                    background:""" + self.createGradient('#6D4824') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: yellow;    
+                    background:""" + self.createGradient('#6D4824') + """ ;
+                }
+            """,
+
+            "SV +":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;    
+                    background:""" + self.createGradient('#ffaaff') + """ ;
+                }
+                QPushButton:pressed {
+                    color: white;    
+                    background:""" + self.createGradient('#ffaaff') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;    
+                    background:""" + self.createGradient('#ffaaff') + """ ;
+                }
+            """,
+
+            "SV -":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 10pt; 
+                    font-weight: bold;   
+                    color: white;    
+                    background:""" + self.createGradient('lightblue') + """ ;
+                }
+                QPushButton:pressed {
+                    color: white;    
+                    background:""" + self.createGradient('lightblue') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;    
+                    background:""" + self.createGradient('lightblue') + """ ;
+                }
+            """,
+
+            "HUD_OFF":     """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 14pt; 
+                    font-weight: bold;   
+                    color: white;    
+                    background:""" + self.createGradient('#b5baff') + """ ;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;    
+                    background:""" + self.createGradient('lightgrey') + """ ;
+                }
+                QPushButton:pressed {
+                    color: white;    
+                    background:""" + self.createGradient('#b5baff') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;    
+                    background:""" + self.createGradient('#b5baff') + """ ;
+                }
+            """,
+
+            "HUD_ON":     """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 14pt; 
+                    font-weight: bold;   
+                    color: white;    
+                    background:""" + self.createGradient('#60ffed') + """ ;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;    
+                    background:""" + self.createGradient('lightgrey') + """ ;
+                }
+                QPushButton:pressed {
+                    color: white;    
+                    background:""" + self.createGradient('#60ffed') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;    
+                    background:""" + self.createGradient('#60ffed') + """ ;
+                }
+            """,
+
+            "SELECTED":     """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 11pt; 
+                    font-weight: bold;   
+                    color: yellow;    
+                    background:""" + self.createGradient('#6D4824') + """ ;
+                }
+                QPushButton:pressed {
+                    color: yellow;    
+                    background:""" + self.createGradient('#6D4824') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: yellow;    
+                    background:""" + self.createGradient('#6D4824') + """ ;
+                }
+            """
+
+            }
+
+#        if locale == "es":
+#            # slightly smaller font size for Spanish
+#            self.pushbuttonstyles["DISABLED"] = "QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}"
+#            self.pushbuttonstyles["STOP"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
+#            self.pushbuttonstyles["START"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}"
+#            self.pushbuttonstyles["OFF"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
+#            self.pushbuttonstyles["ON"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }"
 
         #create ON/OFF buttons
         self.button_1 = QPushButton(QApplication.translate("Button", "ON", None))
@@ -12520,7 +12959,9 @@ class ApplicationWindow(QMainWindow):
         #create HUD button
         self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None))
         self.button_18.setFocusPolicy(Qt.NoFocus)
-        self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
+#dave99
+        self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
+#        self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
         if locale in ["el", "no"]:
             self.button_18.setMinimumWidth(100)
         else:
@@ -13231,9 +13672,24 @@ class ApplicationWindow(QMainWindow):
         validator = QDoubleValidator(bot,top,dec,w)
         validator.setLocale(QLocale.c())
         return validator
-#dave90  start...
-    def createGradient(self,rgb, tint_factor=0.2, shade_factor=0.2):
-        res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] +");" 
+
+    def createGradient(self,rgb, tint_factor=0.2, shade_factor=0.2, reverse=False):
+        default_gradient = 'dark_to_light'  # set this to either 'dark_to_light' or 'light_to_dark'
+        if reverse == True:
+            if default_gradient == 'dark_to_light':
+                dir = 'light2dark'
+            else:
+                dir = 'dark2light'
+        else:
+            if default_gradient == 'dark_to_light':
+                dir = 'dark2light'
+            else:
+                dir = 'light2dark'
+                
+        if dir == 'dark2light':
+            res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] +");" 
+        else:    # light2dark
+            res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] +");" 
         return res
             
     def createRGBGradient(self,rgb, tint_factor=0.3, shade_factor=0.3):
@@ -13246,7 +13702,7 @@ class ApplicationWindow(QMainWindow):
                 
             #ref: https://stackoverflow.com/questions/6615002/given-an-rgb-value-how-do-i-create-a-tint-or-shade
 #            rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
-            darker_rgb = '#%02x%02x%02x' % (tuple([int(255 * (x * (1 - shade_factor))) for x in rgb_tuple]))
+            darker_rgb  = '#%02x%02x%02x' % (tuple([int(255 * (x * (1 - shade_factor))) for x in rgb_tuple]))
             lighter_rgb = '#%02x%02x%02x' % (tuple([int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple]))
             
         except Exception as e:
@@ -13257,7 +13713,6 @@ class ApplicationWindow(QMainWindow):
             lighter_rgb = darker_rgb + "000000"
             
         return lighter_rgb,darker_rgb          
-#dave90  ...end    
     
     # for use in widgets that expects a double via a aw.createCLocalDoubleValidator that accepts both,
     # one dot and several commas. If there is no dot, the last comma is interpreted as decimal separator and the others removed
@@ -16836,7 +17291,9 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
         else:
-            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            #dave99  watch out for this one where there is no Enabled(False)
+            #aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            pass
 
     def ignoreFlatButtons(self,moveindex):
         if self.keyboardButtonList[moveindex].isFlat() or not aw.qmc.buttonvisibility[moveindex - 3]:
