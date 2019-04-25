@@ -1,11 +1,10 @@
 pyserial==3.4
-pymodbus==1.5.2
+pymodbus==2.2.0 #1.5.2
 unidecode==1.0.23
 bottle==0.12.16
 qrcode==6.1
-#urllib3==1.24.1
 requests==2.21.0
-yoctopuce==1.10.34990
+yoctopuce==1.10.35153
 pefile==2018.8.8
 openpyxl==2.6.2
 altgraph==0.16.1

@@ -4,7 +4,7 @@ pyobjc-framework-Cocoa==5.2
 py2app==0.19
 gevent==1.4.0
 gevent-websocket==0.10.1
-numpy==1.15.4 # 1.16.2 fails on TravisCI
+numpy==1.16.3 #1.15.4 # 1.16.2 fails on TravisCI
 colorspacious==1.1.2
 scipy==1.2.1
 matplotlib==3.0.3

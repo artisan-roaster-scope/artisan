@@ -20264,7 +20264,7 @@ class ApplicationWindow(QMainWindow):
 #                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
 #                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
             if settings.contains("volumeCalcUnit"):
-                self.qmc.volumeCalcUnit = toInt(settings.value("volumeCalcUnit",int(self.qmc.volumeCalcUnit)))
+                self.qmc.volumeCalcUnit = aw.float2float(toFloat(settings.value("volumeCalcUnit",self.qmc.volumeCalcUnit)))
             settings.endGroup()
             settings.beginGroup("Tare")
             if settings.contains("names"):
@@ -28484,7 +28484,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         # Unit Group
         unitvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit", None)) + "</b>")
         self.unitvolumeEdit = QLineEdit("%g" % aw.qmc.volumeCalcUnit)
-        self.unitvolumeEdit.setValidator(QIntValidator(0, 99999,self.unitvolumeEdit))
+#        self.unitvolumeEdit.setValidator(QIntValidator(0, 99999,self.unitvolumeEdit))
+        self.unitvolumeEdit.setValidator(aw.createCLocaleDoubleValidator(0., 9999999., 4, self.unitvolumeEdit))
         self.unitvolumeEdit.setMinimumWidth(70)
         self.unitvolumeEdit.setMaximumWidth(70)
         self.unitvolumeEdit.setAlignment(Qt.AlignRight)
@@ -28804,7 +28805,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         except:
             pass
         if self.unitvolumeEdit.text() and self.unitvolumeEdit.text() != "":
-            aw.qmc.volumeCalcUnit = int(round(float(self.unitvolumeEdit.text())))
+            aw.qmc.volumeCalcUnit = float(self.unitvolumeEdit.text())
             aw.qmc.volumeCalcWeightInStr = aw.comma2dot(str(self.coffeeinweightEdit.text()))
             aw.qmc.volumeCalcWeightOutStr = aw.comma2dot(str(self.coffeeoutweightEdit.text()))
             self.parent_dialog.calculated_density()
