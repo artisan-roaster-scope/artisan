@@ -15385,7 +15385,10 @@ class ApplicationWindow(QMainWindow):
                         self.ser.sendTXcommand(cmd_str_bin)
                     else:
                         cmd_str = cmd_str.replace('\\r\\n','\n\r').replace('\\n', '\n').replace('\\t','\t')
-                        self.ser.sendTXcommand(cmd_str)
+                        cmd_strs = cmd_str.split(";")
+                        for cmd in cmd_strs:
+                            self.ser.sendTXcommand(cmd)
+                            libtime.sleep(0.03)
                 elif action == 2: # button call program action
                     try:
                         if cmd_str:
@@ -37629,7 +37632,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("Fuji :" + settings + " || Tx = " + cmd2str(binascii.hexlify(binstring)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
+                aw.addserial("Fuji: " + settings + " || Tx = " + cmd2str(binascii.hexlify(binstring)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
     def fujitemperature(self):
@@ -37781,7 +37784,7 @@ class serialport(object):
                 self.COMsemaphore.release(1)
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("DElta DTA:" + settings + " || Tx = " + cmd2str(command) + " || Rx = " + str(r))
+                aw.addserial("Delta DTA: " + settings + " || Tx = " + cmd2str(command) + " || Rx = " + str(r))
 
 
 
@@ -38446,7 +38449,7 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize) + "," + str(
                     self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial(
-                    "EXTECH755 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(b'\x56\xaa\x01')) + " || Rx = " + cmd2str(
+                    "EXTECH755: " + settings + " || Tx = " + cmd2str(binascii.hexlify(b'\x56\xaa\x01')) + " || Rx = " + cmd2str(
                         binascii.hexlify(r[5:])))        
 
     #multimeter
@@ -38605,6 +38608,9 @@ class serialport(object):
             #open port
             if not self.SP.isOpen():
                 self.SP.open()
+                if aw.seriallogflag:
+                    settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                    aw.addserial("serial port openend: " + settings) 
                 libtime.sleep(.2) # avoid possible hickups on startup
         except Exception:
 #            import traceback
@@ -38750,7 +38756,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r))) 
+                aw.addserial("MS6514: " + settings + " || Rx = " + cmd2str(binascii.hexlify(r))) 
 
 
     def DT301temperature(self, retry=2):
@@ -38798,7 +38804,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("DT301 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(data))) 
+                aw.addserial("DT301: " + settings + " || Rx = " + cmd2str(binascii.hexlify(data))) 
 
     # if serial input is not \n terminated standard pyserial readline returns only after the timeout
     def readline_null_terminated(self):
@@ -38847,7 +38853,7 @@ class serialport(object):
                     t1 = float(res)
                     if aw.seriallogflag:
                         settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                        aw.addserial("Behmor :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f"%t1)
+                        aw.addserial("Behmor: " + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + " || Ts= %.2f"%t1)
                 except:
                     pass
                 # READ BT
@@ -38858,7 +38864,7 @@ class serialport(object):
                     t2 = float(res)
                     if aw.seriallogflag:
                         settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                        aw.addserial("Behmor :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f"%t2)
+                        aw.addserial("Behmor: " + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f"%t2)
                 except:
                     pass
                 return t1,t2
@@ -38938,7 +38944,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H806 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
+                aw.addserial("H806: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
     def HH806Winit(self):
         try:
@@ -38963,7 +38969,7 @@ class serialport(object):
             if aw.seriallogflag:
                 command = "#0A0000RA6\r\n #0A0000RA6\r\n \x21\x05\x00\x58\x7E"
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H806Winit :" + settings + " || Tx = " + command + " || Rx = ")
+                aw.addserial("H806Winit: " + settings + " || Tx = " + command + " || Rx = ")
 
     #UNDER WORK 806 wireless meter
     def HH806Wtemperature(self):
@@ -39174,7 +39180,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H506 :" + settings + " || Rx = " + str(ID))
+                aw.addserial("H506: " + settings + " || Rx = " + str(ID))
 
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
@@ -39218,7 +39224,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H506 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
+                aw.addserial("H506: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
     def CENTER302temperature(self,retry=2):
         try:
@@ -39270,7 +39276,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("CENTER302 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+                aw.addserial("CENTER302: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def CENTER303temperature(self,retry=2):
         try:
@@ -39333,7 +39339,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("CENTER303 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+                aw.addserial("CENTER303: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
 
     def VOLTCRAFTPL125T2temperature(self,retry=2):
@@ -39377,7 +39383,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("VOLTCRAFTPL125T2 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+                aw.addserial("VOLTCRAFTPL125T2: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def VOLTCRAFTPL125T4temperature(self,retry=2):
         try:
@@ -39423,7 +39429,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("VOLTCRAFTPL125T4 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+                aw.addserial("VOLTCRAFTPL125T4: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
 
     def CENTER306temperature(self,retry=2):
@@ -39488,7 +39494,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("CENTER306 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+                aw.addserial("CENTER306: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def CENTER309temperature(self, retry=1):
         ##    command = "\x4B" returns 4 bytes . Model number.
@@ -39567,7 +39573,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("CENTER309 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+                aw.addserial("CENTER309: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def addPhidgetServer(self):
         if not aw.qmc.phidgetServerAdded:
@@ -41524,7 +41530,7 @@ class serialport(object):
                 self.COMsemaphore.release(1)
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f, %.2f, %.2f, %.2f, %.2f, %.2f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2,aw.qmc.extraArduinoT3,aw.qmc.extraArduinoT4))
+                aw.addserial("ArduinoTC4: " + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f, %.2f, %.2f, %.2f, %.2f, %.2f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2,aw.qmc.extraArduinoT3,aw.qmc.extraArduinoT4))
 
 
     def TEVA18Bconvert(self, seg):
@@ -41702,7 +41708,7 @@ class serialport(object):
             #note: logged chars should not be binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("TEVA18B :" + settings + " || Tx = " + "No command" + " || Rx = " + cmd2str(binascii.hexlify(r)))
+                aw.addserial("TEVA18B: " + settings + " || Tx = " + "No command" + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
     def HHM28multimeter(self):
         # This meter sends a continuos frame byte by byte. It only transmits data. It does not receive commands.
@@ -41814,7 +41820,7 @@ class serialport(object):
             #note: logged chars should not be binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("HHM28multimeter :" + settings + " || Tx = " + "No command" + " || Rx = " + str(frame))
+                aw.addserial("HHM28multimeter: " + settings + " || Tx = " + "No command" + " || Rx = " + str(frame))
 
     #sends a command to the ET/BT device. (used by eventaction to send serial command to e.g. Arduino)
     def sendTXcommand(self,command):
@@ -41844,7 +41850,7 @@ class serialport(object):
             #note: logged chars should not be binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("Serial Ccommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
+                aw.addserial("Serial Ccommand: " + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
 
 
 #########################################################################
