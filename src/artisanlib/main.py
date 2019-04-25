@@ -13424,20 +13424,20 @@ class ApplicationWindow(QMainWindow):
             "weightUnit": weightUnit,
         }
         d["beans"] = beans
-        d["weightOut"] = weightOut
+#        d["weightOut"] = weightOut
         d["volumeIn"] = volumeIn
-        d["volumeOut"] = volumeOut
+#        d["volumeOut"] = volumeOut
         d["volumeUnit"] = volumeUnit
         d["densityWeight"] = densityWeight
-        d["densityWeightUnit"] = densityWeightUnit
-        d["densityVolume"] = densityVolume
-        d["densityVolumeUnit"] = densityVolumeUnit
+#        d["densityWeightUnit"] = densityWeightUnit
+#        d["densityVolume"] = densityVolume
+#        d["densityVolumeUnit"] = densityVolumeUnit
         d["beanSize_min"] = beanSize_min
         d["beanSize_max"] = beanSize_max
         d["moistureGreen"] = moistureGreen
-        d["moistureRoasted"] = moistureRoasted
-        d["wholeColor"] = wholeColor
-        d["groundColor"] = groundColor
+#        d["moistureRoasted"] = moistureRoasted
+#        d["wholeColor"] = wholeColor
+#        d["groundColor"] = groundColor
         d["colorSystem"] = colorSystem
         d["background"] = file
         d["roastUUID"] = roastUUID
@@ -13456,12 +13456,12 @@ class ApplicationWindow(QMainWindow):
     def setRecentRoast(self,rr):
         if "title" in rr:
             self.qmc.title = rr["title"]
-        if "weightIn" in rr and "weightOut" in rr and "weightUnit" in rr:
-            self.qmc.weight = [rr["weightIn"],rr["weightOut"],rr["weightUnit"]]
-        if "volumeIn" in rr and "volumeOut" in rr and "volumeUnit" in rr:
-            self.qmc.volume = [rr["volumeIn"],rr["volumeOut"],rr["volumeUnit"]]
-        if "densityWeight" in rr and "densityWeightUnit" in rr and "densityVolume" in rr and "densityVolumeUnit" in rr:
-            self.qmc.density = [rr["densityWeight"],rr["densityWeightUnit"],rr["densityVolume"],rr["densityVolumeUnit"]]
+        if "weightIn" in rr and "weightUnit" in rr:
+            self.qmc.weight = [rr["weightIn"],self.qmc.weight[1],rr["weightUnit"]]
+        if "volumeIn" in rr and "volumeUnit" in rr:
+            self.qmc.volume = [rr["volumeIn"],self.qmc.volume[1],rr["volumeUnit"]]
+        if "densityWeight" in rr:
+            self.qmc.density[0] = rr["densityWeight"]
         if "beans" in rr:
             aw.qmc.beans = rr["beans"]
         if "beanSize_min" in rr:
@@ -13470,12 +13470,12 @@ class ApplicationWindow(QMainWindow):
             self.qmc.beansize_max = rr["beanSize_max"]
         if "moistureGreen" in rr:
             self.qmc.moisture_green = rr["moistureGreen"]
-        if "moistureRoasted" in rr:
-            self.qmc.moisture_roasted = rr["moistureRoasted"]
-        if "wholeColor" in rr:
-            self.qmc.whole_color = rr["wholeColor"]
-        if "groundColor" in rr:
-            self.qmc.ground_color = rr["groundColor"]
+#        if "moistureRoasted" in rr:
+#            self.qmc.moisture_roasted = rr["moistureRoasted"]
+#        if "wholeColor" in rr:
+#            self.qmc.whole_color = rr["wholeColor"]
+#        if "groundColor" in rr:
+#            self.qmc.ground_color = rr["groundColor"]
         if "colorSystem" in rr:
             self.qmc.color_system_idx = rr["colorSystem"]
 #PLUS
@@ -30735,24 +30735,38 @@ class editGraphDlg(ArtisanDialog):
     def recentRoastActivated(self,n):
         # note, the first item is the edited text!
         if n > 0 and n <= len(aw.recentRoasts):
-            rr = aw.recentRoasts[n-1]            
-            self.titleedit.textEdited(rr["title"])
-            self.titleedit.setEditText(rr["title"])
-            self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["weightUnit"]))
-            self.weightinedit.setText("%g" % rr["weightIn"])
+            rr = aw.recentRoasts[n-1]
+            if "title" in rr:
+                self.titleedit.textEdited(rr["title"])
+                self.titleedit.setEditText(rr["title"])
+            if "weightUnit" in rr:
+                self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["weightUnit"]))
+            if "weightIn" in rr:
+                self.weightinedit.setText("%g" % rr["weightIn"])
             # all of the following items might not be in the dict
-            self.beansedit.setPlainText(rr["beans"])
-            self.weightoutedit.setText("%g" % rr["weightOut"])
-            self.volumeinedit.setText("%g" % rr["volumeIn"])
-            self.volumeoutedit.setText("%g" % rr["volumeOut"])
-            self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
-            self.bean_density_in_edit.setText("%g" % aw.float2float(rr["densityWeight"]))
-            self.bean_density_out_edit.setText("%g" % aw.float2float(rr["densityVolume"]))
-            self.moisture_greens_edit.setText("%g" % aw.float2float(rr["moistureGreen"]))
-            self.moisture_roasted_edit.setText("%g" % aw.float2float(rr["moistureRoasted"]))
-            self.whole_color_edit.setText(str(rr["wholeColor"]))
-            self.ground_color_edit.setText(str(rr["groundColor"]))
-            self.colorSystemComboBox.setCurrentIndex(rr["colorSystem"])
+            if "beans" in rr:
+                self.beansedit.setPlainText(rr["beans"])
+#            if "weightOut" in rr:
+#                self.weightoutedit.setText("%g" % rr["weightOut"])
+            if "volumeIn" in rr:
+                self.volumeinedit.setText("%g" % rr["volumeIn"])
+#            if "volumeOut" in rr:
+#                self.volumeoutedit.setText("%g" % rr["volumeOut"])
+#            self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
+            if "densityWeight" in rr:
+                self.bean_density_in_edit.setText("%g" % aw.float2float(rr["densityWeight"]))
+#            if "densityVolume" in rr:
+#                self.bean_density_out_edit.setText("%g" % aw.float2float(rr["densityVolume"]))
+            if "moistureGreen" in rr:
+                self.moisture_greens_edit.setText("%g" % aw.float2float(rr["moistureGreen"]))
+#            if "moistureRoasted" in rr:
+#                self.moisture_roasted_edit.setText("%g" % aw.float2float(rr["moistureRoasted"]))
+#            if "wholeColor" in rr:
+#                self.whole_color_edit.setText(str(rr["wholeColor"]))
+#            if "groundColor" in rr:
+#                self.ground_color_edit.setText(str(rr["groundColor"]))
+            if "colorSystem" in rr:
+                self.colorSystemComboBox.setCurrentIndex(rr["colorSystem"])
             # items added in v1.4 might not be in the data set of previous stored recent roasts
             if "beanSize_min" in rr:
                 self.bean_size_min_edit.setText(str(int(rr["beanSize_min"])))
