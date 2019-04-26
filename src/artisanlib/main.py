@@ -30455,7 +30455,7 @@ class editGraphDlg(ArtisanDialog):
             self.plus_coffees = plus.stock.getCoffees(self.unitsComboBox.currentIndex(),self.plus_default_store)
             self.plus_coffees_combo.blockSignals(True)  
             self.plus_coffees_combo.clear()
-            self.plus_coffees_combo.addItems([""] + plus.stock.getCoffeesLabels(self.plus_coffees))        
+            self.plus_coffees_combo.addItems([""] + plus.stock.getCoffeesLabels(self.plus_coffees))
             
             p = None
             if self.plus_coffee_selected:

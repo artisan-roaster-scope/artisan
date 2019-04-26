@@ -336,7 +336,7 @@ def getCoffees(weight_unit_idx,store=None):
                         if "crop_date" in c:
                             cy = c["crop_date"]
                             picked = None
-                            if "picked" in cy and len(cy["picked"]) > 0:
+                            if "picked" in cy and len(cy["picked"]) > 0 and cy["picked"][0] is not None:
                                 origin += ' {:d}'.format(cy["picked"][0])
                         origin += ", "
                     label = c["label"]
