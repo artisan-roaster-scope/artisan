@@ -19,8 +19,9 @@ set -ex # reduced logging
 
 brew install p7zip
 
-#pip3 uninstall -y numpy # to allow install numpy >v1.15.4 avoiding the Permission denied: '/usr/local/bin/f2py' error
 pip3 install --upgrade pip
+# to allow the installation of numpy >v1.15.4, avoiding the Permission denied: '/usr/local/bin/f2py' error, we run the following pip3 installs under sudo:
+# (an alternative could be to use pip install --user ..)
 sudo pip3 install -r src/requirements.txt
 sudo pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
 sudo rm -rf /usr/local/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data

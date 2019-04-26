@@ -13413,9 +13413,9 @@ class ApplicationWindow(QMainWindow):
             sys_clip = QApplication.clipboard()
             sys_clip.setText(clipboard)
             
-    def createRecentRoast(self,title,beans,weightIn,weightOut,weightUnit,volumeIn,volumeOut,volumeUnit,
-            densityWeight,densityWeightUnit,densityVolume,densityVolumeUnit, beanSize_min, beanSize_max,
-            moistureGreen,moistureRoasted,wholeColor,groundColor,colorSystem,file,roastUUID,
+    def createRecentRoast(self,title,beans,weightIn,
+            weightUnit,volumeIn,volumeUnit,densityWeight,beanSize_min, beanSize_max,
+            moistureGreen,colorSystem,file,roastUUID,
             batchnr,batchprefix,plus_account,plus_store,plus_store_label,plus_coffee,
             plus_coffee_label,plus_blend_label,plus_blend_spec,plus_blend_spec_labels):
         d = {
@@ -24430,23 +24430,21 @@ class ApplicationWindow(QMainWindow):
         return (rc1,rc2,rc3)
 
     def viewErrorLog(self):
-        if self.error_dlg:
-            self.error_dlg.raise_()
-            self.error_dlg.activateWindow()
-        else:
+        if self.error_dlg is None:
             self.error_dlg = errorDlg(self)
             self.error_dlg.setModal(False)
             self.error_dlg.show()
+        self.error_dlg.raise_()
+        self.error_dlg.activateWindow()
         QApplication.processEvents()
 
     def viewSerialLog(self):
-        if self.serial_dlg:
-            self.serial_dlg.raise_()
-            self.serial_dlg.activateWindow()
-        else:
+        if self.serial_dlg is None:
             self.serial_dlg = serialLogDlg(self)
             self.serial_dlg.setModal(False)
             self.serial_dlg.show()
+        self.serial_dlg.raise_()
+        self.serial_dlg.activateWindow()
         QApplication.processEvents()
         
 #    def viewartisansettings(self):
@@ -24457,16 +24455,16 @@ class ApplicationWindow(QMainWindow):
         platformDLG = platformDlg(self)
         platformDLG.setModal(False)
         platformDLG.show()
+        platformDLG.activateWindow()
         QApplication.processEvents()
 
     def viewMessageLog(self):
-        if self.message_dlg:
-            self.message_dlg.raise_()
-            self.message_dlg.activateWindow()
-        else:
+        if self.message_dlg is None:
             self.message_dlg = messageDlg(self)
             self.message_dlg.setModal(False)
-        self.message_dlg.show()
+            self.message_dlg.show()
+        self.message_dlg.raise_()
+        self.message_dlg.activateWindow()
         QApplication.processEvents()
 
     def helpAbout(self):
@@ -25118,7 +25116,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings_theme() {0}").format(str(ex)),exc_tb.tb_lineno)
         
     def largeLCDs(self):
-        if not self.largeLCDs_dialog:
+        if self.largeLCDs_dialog is None:
             self.largeLCDs_dialog = LargeLCDs(self)
             self.LargeLCDs = True
         self.largeLCDs_dialog.setModal(False)
@@ -26206,12 +26204,14 @@ class ApplicationWindow(QMainWindow):
     def realtimeHelpDlg(self):
         showHelpDlg = realtimeHelpDlg(self)
         showHelpDlg.resize(700, 500)
-        showHelpDlg.show()        
+        showHelpDlg.show()
+        showHelpDlg.activateWindow()
 
     def showSymbolicHelp(self):
         showHelpDlg = plotterHelpDlg(self)
         showHelpDlg.resize(700, 500)
         showHelpDlg.show()
+        showHelpDlg.activateWindow()
         
         
     def standardButtonsVisibility(self):
@@ -27689,6 +27689,7 @@ class HUDDlg(ArtisanDialog):
         equdataDlg = equDataDlg(self)
         equdataDlg.resize(500, 500)
         equdataDlg.show()
+        equdataDlg.activateWindow()
 
     def setbackgroundequ1(self,foreground=False):
 
@@ -30847,17 +30848,9 @@ class editGraphDlg(ArtisanDialog):
             # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
             if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
                 beans = u(self.beansedit.toPlainText())
-                if self.weightoutedit.text() != "":
-                    weightOut = float(aw.comma2dot(str(self.weightoutedit.text())))
-                else:
-                    weightOut = 0
                 weightUnit = u(self.unitsComboBox.currentText())
                 if self.volumeinedit.text() != "":
                     volumeIn = float(aw.comma2dot(str(self.volumeinedit.text())))
-                else:
-                    volumeIn = 0
-                if self.volumeoutedit.text() != "":
-                    volumeOut = float(aw.comma2dot(str(self.volumeoutedit.text())))
                 else:
                     volumeIn = 0
                 volumeUnit = u(self.volumeUnitsComboBox.currentText())
@@ -30865,10 +30858,6 @@ class editGraphDlg(ArtisanDialog):
                     densityWeight = float(aw.comma2dot(str(self.bean_density_in_edit.text())))
                 else:
                     densityWeight = 0
-                if self.bean_density_out_edit.text() != "":
-                    densityVolume = float(aw.comma2dot(str(self.bean_density_out_edit.text())))
-                else:
-                    densityVolume = 0
                 if self.bean_size_min_edit.text() != "":
                     beanSize_min = int(round(float(str(self.bean_size_min_edit.text()))))
                 else:
@@ -30881,38 +30870,18 @@ class editGraphDlg(ArtisanDialog):
                     moistureGreen = float(aw.comma2dot(self.moisture_greens_edit.text()))
                 else:
                     moistureGreen = 0.0
-                if self.moisture_roasted_edit.text() != "":
-                    moistureRoasted = float(aw.comma2dot(self.moisture_roasted_edit.text()))
-                else:
-                    moistureRoasted = 0.0
-                if self.whole_color_edit.text() != "":
-                    wholeColor = int(str(self.whole_color_edit.text()))
-                else:
-                    wholeColor = 0
-                if self.ground_color_edit.text() != "":
-                    groundColor = int(str(self.ground_color_edit.text()))
-                else:
-                    groundColor = 0
                 colorSystem = self.colorSystemComboBox.currentIndex()                      
                 rr = aw.createRecentRoast(
                     title,
                     beans,
                     weightIn,
-                    weightOut,
                     weightUnit,
                     volumeIn,
-                    volumeOut,
                     volumeUnit,
                     densityWeight,
-                    "g",
-                    densityVolume,
-                    "l", 
                     beanSize_min,
                     beanSize_max,
                     moistureGreen,
-                    moistureRoasted,
-                    wholeColor,
-                    groundColor,
                     colorSystem,                    
                     aw.curFile, # could be empty
                     aw.qmc.roastUUID, # could be empty                    

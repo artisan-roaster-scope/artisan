@@ -283,7 +283,9 @@ class modbusport(object):
                         parity=self.parity,
                         stopbits=self.stopbits,
                         retry_on_empty=False,
-                        timeout=self.timeout)   
+                        strict=False, # settings this to False disables the inter char timeout restriction
+                        timeout=self.timeout)
+#                    self.master.inter_char_timeout = 0.05
                     self.readRetries = 1
                 self.master.connect()
                 time.sleep(.5) # avoid possible hickups on startup
