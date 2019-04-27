@@ -156,5 +156,7 @@ sudo umount $mountpoint
 sudo losetup -d /dev/loop0
 rmdir $mountpoint
 
-ssh_control &
-qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -drive format=raw,file=${RASPBIAN_IMAGE} -netdev user,id=ethernet.0,hostfwd=tcp::2222-:22
+#ssh_control &
+ulimit -c unlimited
+qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -drive format=raw,file=${RASPBIAN_IMAGE}
+#-netdev user,id=ethernet.0,hostfwd=tcp::2222-:22
