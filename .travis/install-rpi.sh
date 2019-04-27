@@ -3,7 +3,7 @@
 set -ex
 sudo apt-get update
 sudo apt-get install p7zip-full libglib2.0-dev zlib1g-dev
-sudo apt-get install qemu-system-arm
+sudo apt-get install qemu
 
 #curl -L -O https://download.qemu.org/qemu-4.0.0.tar.xz
 #tar xJf qemu-4.0.0.tar.xz
