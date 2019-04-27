@@ -3,14 +3,15 @@
 set -ex
 sudo apt-get update
 sudo apt-get install p7zip-full libglib2.0-dev zlib1g-dev
+sudo apt-get install qemu-system-arm
 
-curl -L -O https://download.qemu.org/qemu-4.0.0.tar.xz
-tar xJf qemu-4.0.0.tar.xz
-cd qemu-4.0.0
-./configure --target-list=arm-softmmu
-make -j4
-sudo make install
-cd ..
+#curl -L -O https://download.qemu.org/qemu-4.0.0.tar.xz
+#tar xJf qemu-4.0.0.tar.xz
+#cd qemu-4.0.0
+#./configure --target-list=arm-softmmu
+#make -j4
+#sudo make install
+#cd ..
 
 # Use updated sfdisk
 curl -L -O https://dl.bintray.com/artisan/artisan-cache/sfdisk.tar.gz
