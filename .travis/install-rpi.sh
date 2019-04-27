@@ -4,9 +4,9 @@ set -ex
 sudo apt-get update
 sudo apt-get install p7zip-full libglib2.0-dev zlib1g-dev
 
-curl -L -O https://download.qemu.org/qemu-2.11.1.tar.xz
-tar xJf qemu-2.11.1.tar.xz
-cd qemu-2.11.1
+curl -L -O https://download.qemu.org/qemu-4.0.0.tar.xz
+tar xJf qemu-4.0.0.tar.xz
+cd qemu-4.0.0
 ./configure --target-list=arm-softmmu
 make -j4
 sudo make install
