@@ -21,7 +21,6 @@ matrix:
       - ARTISAN_OS=linux
   - os: linux
     language: generic
-    dist: xenial
     sudo: required
     env:
       ARTISAN_OS=rpi
