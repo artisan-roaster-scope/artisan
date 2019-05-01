@@ -13515,10 +13515,11 @@ class ApplicationWindow(QMainWindow):
         self.AUClcd.customContextMenuRequested.connect(self.AUClcdClicked)
         self.AUClcd.display("---")
         self.AUClcdFrame = self.makePhasesLCDbox(self.AUClabel,self.AUClcd)
-        self.AUClcdFrame.setFrameStyle(QFrame.Plain)
+#        self.AUClcdFrame.setFrameStyle(QFrame.Plain)
         self.AUClcd.setNumDigits(3)
         self.AUClcd.setMinimumWidth(65)
-        self.AUClcdFrame.setStyleSheet("border-radius: 4; background-color: rgb(230,230,230);")
+#        self.AUClcdFrame.setStyleSheet("border-radius: 4; background-color: rgb(230,230,230);")
+        self.AUClcdFrame.setStyleSheet("QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}") #dave99
         
         AUCLayout = QHBoxLayout()
         AUCLayout.addSpacing(20)
@@ -15312,12 +15313,12 @@ class ApplicationWindow(QMainWindow):
         LCDVbox.addWidget(lcd)
         LCDVbox.setSpacing(0)
         LCDVbox.setContentsMargins(0, 0, 0, 0)
-        frame.setStyleSheet("border-radius:4; background-color: rgb(230,230,230);")  #dave99
-        frame.setFrameShadow(QFrame.Sunken)
-        frame.setLineWidth(1)
-        frame.setFrameShape(QFrame.Panel)
+#        frame.setStyleSheet("border-radius:4; background-color: rgb(230,230,230);")  #dave99
+        frame.setStyleSheet("QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}") #dave99
+#        frame.setFrameShadow(QFrame.Sunken)
+#        frame.setLineWidth(1)
+#        frame.setFrameShape(QFrame.Panel)
         frame.setLayout(LCDVbox)
-        #frame.setStyleSheet("border-radius:4; border-width: 1; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;") #dave99
 
         return frame
 
@@ -16998,8 +16999,8 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel1[i].setText(l1)
                 self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
 #dave90  start...
-#            aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-            aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+            aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+#            aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
 #dave90  ...end
             self.extraLCDframe2[i].setVisible(bool(aw.extraLCDvisibility2[i])) 
             if i < len(aw.qmc.extraname2):
@@ -17010,8 +17011,8 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel2[i].setText(l2)
                 self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
 #dave90  start...
-#            aw.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-            aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+            aw.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+#            aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
 #dave90  ...end
         #hide the rest (just in case)
         for i in range(ndev,aw.nLCDS):
@@ -20833,20 +20834,20 @@ class ApplicationWindow(QMainWindow):
                     self.lcdpaletteF[str(k)] = s2a(toString(v))
             #restore colors
 #dave90  start...
-#            self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
-#            self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
-#            self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
-#            self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltaet"],self.lcdpaletteB["deltaet"]))
-#            self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
-#            self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-#            self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-            self.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["timer"],aw.createGradient(self.lcdpaletteB["timer"])))
-            self.lcd2.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["et"],aw.createGradient(self.lcdpaletteB["et"])))
-            self.lcd3.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["bt"],aw.createGradient(self.lcdpaletteB["bt"])))
-            self.lcd4.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltaet"],aw.createGradient(self.lcdpaletteB["deltaet"])))
-            self.lcd5.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltabt"],aw.createGradient(self.lcdpaletteB["deltabt"])))
-            self.lcd6.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
-            self.lcd7.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+#            self.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["timer"],aw.createGradient(self.lcdpaletteB["timer"])))
+#            self.lcd2.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["et"],aw.createGradient(self.lcdpaletteB["et"])))
+#            self.lcd3.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["bt"],aw.createGradient(self.lcdpaletteB["bt"])))
+#            self.lcd4.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltaet"],aw.createGradient(self.lcdpaletteB["deltaet"])))
+#            self.lcd5.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltabt"],aw.createGradient(self.lcdpaletteB["deltabt"])))
+#            self.lcd6.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+#            self.lcd7.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+            self.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
+            self.lcd2.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
+            self.lcd3.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
+            self.lcd4.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltaet"],self.lcdpaletteB["deltaet"]))
+            self.lcd5.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
+            self.lcd6.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+            self.lcd7.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
 #dave90  ...end
             #restore flavors
             self.qmc.flavorlabels = toStringList(settings.value("Flavors",self.qmc.flavorlabels))
