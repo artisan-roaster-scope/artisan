@@ -10514,14 +10514,13 @@ class VMToolbar(NavigationToolbar):
 
     def _icon(self, name):
         if self.white_icons:
-            if not name.startswith("plus"):
-                name = 'white_' + name
+            name = 'white_' + name
             basedir = os.path.join(aw.getResourcePath(),"Icons")
         else:
             if aw is not None and name.startswith("plus"):
                 basedir = os.path.join(aw.getResourcePath(),"Icons")
             else:
-                basedir = self.basedir     
+                basedir = self.basedir
         #dirty hack to prefer .svg over .png Toolbar icons
         if not svgsupport:
             name = name.replace('.svg','.png')
@@ -10531,9 +10530,19 @@ class VMToolbar(NavigationToolbar):
         name = name.replace('.png', '_large.png')
         p = os.path.join(basedir, name)
         pm = QPixmap(p)
+        if not name.startswith("plus") and not name.startswith("white_plus"):
+            pm = self.recolorIcon(pm,QColor("#424242"))
         if hasattr(pm, 'setDevicePixelRatio'):
             pm.setDevicePixelRatio(self.canvas._dpi_ratio)
         return QIcon(pm)
+        
+    def recolorIcon(self, pixmap, color):
+        tmp = pixmap.toImage()
+        for y in range(tmp.height()):
+          for x in range(tmp.width()):
+            color.setAlpha(tmp.pixelColor(x,y).alpha())
+            tmp.setPixelColor(x,y,color)
+        return QPixmap.fromImage(tmp)
 
 #PLUS
     def plus(self):
@@ -30099,7 +30108,7 @@ class editGraphDlg(ArtisanDialog):
         self.titleedit.activated.connect(self.recentRoastActivated)
         self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
         self.titleedit.setStyleSheet(
-            "QComboBox {font-weight: bold;} QComboBox QAbstractItemView {font-weight: normal;}")
+            "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
         self.titleedit.setView(QListView())
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
         self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
@@ -30691,7 +30700,7 @@ class editGraphDlg(ArtisanDialog):
                         from artisanlib.ble import BleInterface
                         from artisanlib.acaia import AcaiaBLE
                         acaia = AcaiaBLE()
-                        self.ble = BleInterface(acaia.SERVICE_UUID,acaia.CHAR_UUID,acaia.processData)
+                        self.ble = BleInterface(acaia.SERVICE_UUID,acaia.CHAR_UUID,acaia.processData,acaia.sendHeartbeat,acaia.reset)
                         # start BLE loop
                         self.ble.scanDevices()
                         self.ble.weightChanged.connect(self.ble_weight_changed)
@@ -30932,7 +30941,7 @@ class editGraphDlg(ArtisanDialog):
         self.scale_weight = None
         self.scaleWeight.setText("")
         if self.ble is not None:
-            QTimer.singleShot(250,lambda : self.ble.scanDevices())
+            QTimer.singleShot(200,lambda : self.ble.scanDevices())
 
     def ble_weight_changed(self,w):
         if w is not None:
@@ -31593,11 +31602,10 @@ class editGraphDlg(ArtisanDialog):
         if i == 0 and self.tarePopupEnabled:
             tareDLG = tareDlg(self,tarePopup=self)
             tareDLG.show()
-#            QApplication.processEvents()
             # reset index and popup
             self.tareComboBox.setCurrentIndex(aw.qmc.container_idx + 3)
-            # update displayed scale weight
-            self.update_scale_weight()
+        # update displayed scale weight
+        self.update_scale_weight()
                         
     def changeWeightUnit(self,i):
         o = aw.qmc.weight_units.index(aw.qmc.weight[2]) # previous unit index
@@ -31730,22 +31738,14 @@ class editGraphDlg(ArtisanDialog):
             inlineedit=self.volumeinedit,
             outlineedit=self.volumeoutedit,
             tare=tare)
-#        QApplication.processEvents()
         self.volumedialog.show()
         self.volumedialog.setFixedSize(self.volumedialog.size())
-#        QApplication.processEvents()
 
     def inWeight(self,overwrite=False):
         QTimer.singleShot(1,lambda : self.setWeight(self.weightinedit,self.bean_density_in_edit,self.moisture_greens_edit,overwrite))
-#        self.setWeight(self.weightinedit,self.bean_density_in_edit,self.moisture_greens_edit,overwrite)
-        QTimer.singleShot(10,lambda : self.weightineditChanged())
-#        QApplication.processEvents()
         
     def outWeight(self,overwrite=False):
         QTimer.singleShot(1,lambda : self.setWeight(self.weightoutedit,self.bean_density_out_edit,self.moisture_roasted_edit,overwrite))
-#        self.setWeight(self.weightoutedit,self.bean_density_out_edit,self.moisture_roasted_edit,overwrite)
-        QTimer.singleShot(10,lambda : self.weightouteditChanged())
-#        QApplication.processEvents()
 
     def setWeight(self,weight_edit,density_edit,moisture_edit,overwrite=False):
         tare = 0
@@ -31771,15 +31771,19 @@ class editGraphDlg(ArtisanDialog):
                 new_w = current_w + w # we add the new weight to the already existing one!
                 self.scale_set = new_w
 #            weight_edit.setText("%g" % aw.float2float(new_w))
-            # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problesm
+            # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problems
             # a QApplication.processEvents() or an weight_edit.update() seems not to help
             # no issue on OS X 10.13
-            QTimer.singleShot(2,lambda : weight_edit.setText("%g" % aw.float2float(new_w)))
-            QTimer.singleShot(2,lambda : self.updateScaleWeightAccumulated(new_w))
+            QTimer.singleShot(2,lambda : self.updateWeightEdits(weight_edit,new_w))
         if d is not None and d > -1:
             density_edit.setText("%g" % aw.float2float(d))
         if m is not None and m > -1:
             moisture_edit.setText("%g" % aw.float2float(m))
+    
+    def updateWeightEdits(self,weight_edit,w):
+        weight_edit.setText("%g" % aw.float2float(w))
+        self.updateScaleWeightAccumulated(w)
+        self.weightouteditChanged()
         
     def roastpropertiesChanged(self):
         if self.roastproperties.isChecked():
@@ -47344,9 +47348,9 @@ class graphColorDlg(ArtisanDialog):
         buttonlayout.setSpacing(0)
         
         lcdlayout1 = QVBoxLayout()
-        lcdlayout1.addWidget(LCD1GroupLayout)
         lcdlayout1.addWidget(LCD2GroupLayout)
         lcdlayout1.addWidget(LCD3GroupLayout)
+        lcdlayout1.addWidget(LCD1GroupLayout)
         lcdlayout2 = QVBoxLayout()
         lcdlayout2.addWidget(LCD4GroupLayout)
         lcdlayout2.addWidget(LCD5GroupLayout)
