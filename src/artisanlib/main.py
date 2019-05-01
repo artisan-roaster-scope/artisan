@@ -78,7 +78,7 @@ except:
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
 
-from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,  # @Reimport
+from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport
                          QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @Reimport
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @Reimport
                          QLCDNumber, QSpinBox, QComboBox, QHeaderView, # @Reimport 
@@ -173,7 +173,7 @@ from unidecode import unidecode
 
 import artisanlib.arabic_reshaper
 from artisanlib.util import appFrozen, decs2string, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
-from artisanlib.suppress_errors import suppress_stdout_stderr
+#from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
@@ -4133,6 +4133,10 @@ class tgraphcanvas(FigureCanvas):
                     # reset color of last pressed button
                     if aw.lastbuttonpressed != -1:
                         normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],aw.extraeventbuttoncolor[aw.lastbuttonpressed])
+#dave90  start...
+                        buttonstyle = "min-width:75px;border-style:solid; border-radius:3;border-color:grey; border-width:1;"
+                        normalstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],self.createGradient(aw.extraeventbuttoncolor[aw.lastbuttonpressed]))
+#dave90  ...end
                         aw.buttonlist[aw.lastbuttonpressed].setStyleSheet(normalstyle)
                     # reset lastbuttonpressed
                     aw.lastbuttonpressed = -1
@@ -6759,7 +6763,10 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
             except Exception:
                 pass
-            aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+#dave90  start...
+#            aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+            aw.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(aw.lcdpaletteF["timer"],aw.createGradient(aw.lcdpaletteB["timer"])))
+#dave90  ...end
             
             #reset alarms
             self.temporaryalarmflag = -3
@@ -6775,7 +6782,8 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Scope monitoring...", None))
             #disable RESET button:
             aw.button_7.setEnabled(False)
-            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+#dave99
+#            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_7.setVisible(False)
             QApplication.processEvents()
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])
@@ -7079,12 +7087,15 @@ class tgraphcanvas(FigureCanvas):
             aw.disableSaveActions()
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None))
             aw.button_2.setEnabled(False)
-            aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+#dave99
+#            aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            aw.button_2.setGraphicsEffect(None)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None))
             aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
             #disable RESET button:
             aw.button_7.setEnabled(False)
-            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+#dave99
+#            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_18.setEnabled(True)
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
             self.updateLCDtime()
@@ -7115,10 +7126,15 @@ class tgraphcanvas(FigureCanvas):
             self.flagstart = False
             aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
             aw.button_2.setEnabled(True)   
+            self.shadow_2 = QGraphicsDropShadowEffect(self)
+            self.shadow_2.setBlurRadius(15)
+            self.shadow_2.setOffset(0,2)
+            aw.button_2.setGraphicsEffect(self.shadow_2)
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"]) 
             aw.button_7.setEnabled(True)
-            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+#dave99
+#            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_18.setEnabled(False)
             self.updateLCDtime()
             #prevents accidentally deleting a modified profile:
@@ -12379,47 +12395,540 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(6)
 
-        self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
-                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
-                                     "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
-                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
-                                     "ON":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red }",
-                                     "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                     "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                     "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                     "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                     "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                     "RESET":"QPushButton {font-size: 14pt; font-weight: bold; color: black; background-color: white }",
-                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #bbbeec }",
-                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff }",
-                                     "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
-                                     "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                     "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
-                                     "PIDactive":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
-                                     "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
-                                     "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
-                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
-                                     }
+#        self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
+#                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
+#                                     "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
+#                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
+#                                     "ON":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red }",
+#                                     "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+#                                     "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+#                                     "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
+#                                     "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+#                                     "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+#                                     "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+#                                     "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+#                                     "RESET":"QPushButton {font-size: 14pt; font-weight: bold; color: black; background-color: white }",
+#                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #bbbeec }",
+#                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff }",
+#                                     "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
+#                                     "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
+#                                     "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
+#                                     "PIDactive":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
+#                                     "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
+#                                     "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
+#                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
+#                                     }
+        # set a few broad style parameters
         if locale == "es":
-            # slightly smaller font size for Spanish
-            self.pushbuttonstyles["DISABLED"] = "QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}"
-            self.pushbuttonstyles["STOP"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
-            self.pushbuttonstyles["START"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}"
-            self.pushbuttonstyles["OFF"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
-            self.pushbuttonstyles["ON"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }"
+            self.ooss_font_size = '12pt'
+        else:
+            self.ooss_font_size = '14pt'
+        border_modern = "border-style:solid; border-radius:4;border-color:grey; border-width:0;" # modernize
+        border_modern_pressed = "border-style:solid; border-radius:4;border-color:black; border-width:0;" # modernize
+        # Can't find a way to use palette colors here i.e., aw.palette['canvas']  This needs to get solved.
+        # parking this green shade in case we want to use it later #00d55a
+        self.pushbuttonstyles = {
+            "RESET":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 14pt;
+                    font-weight: bold;
+                    color: white;
+                    background: #2298c7;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background: lightgrey;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background: #43a7cf;
+                }
+            """,
+            "OFF":    """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: """ + self.ooss_font_size + """;
+                    font-weight: bold;
+                    color: white;
+                    background: '#147bb3';
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #116999;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background: #1985ba';
+                }
+            """,
+            "ON":    """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: """ + self.ooss_font_size + """;
+                    font-weight: bold;
+                    color: white;
+                    background: #cc0f50;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #c70d49;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background: #d4336a;
+                }
+            """,
+            "STOP":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: """ + self.ooss_font_size + """;
+                    font-weight: bold;
+                    color: white;
+                    background: #147bb3;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background: 'lightgrey';
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #116999;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background: #1985ba;
+                }
+            """,
+            "START":    """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: """ + self.ooss_font_size + """;
+                    font-weight: bold;
+                    color: yellow;
+                    background: #ff3d00;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background: lightgrey;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #116999;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background-color: red;
+                }
+            """,
+            "CHARGE":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#116999') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#1985ba') + """ ;
+                }
+            """,
+            "DRY END":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#66b8d7') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#43a7cf') + """ ;
+                }
+            """,
+            "FC START":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#66b8d7') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#43a7cf') + """ ;
+                }
+            """,
+            "FC END":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#66b8d7') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#43a7cf') + """ ;
+                }
+            """,
+            "SC START":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#66b8d7') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#43a7cf') + """ ;
+                }
+            """,
+            "SC END":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#66b8d7') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#43a7cf') + """ ;
+                }
+            """,
+            "DROP":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#116999') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#1985ba') + """ ;
+                }
+            """,
+            "COOL END":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#66b8d7') + """ ;
+                }
+                QPushButton:flat{
+                    color: #D9D9D9;
+                    background-color: #f0f0f0;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#43a7cf') + """ ;
+                }
+            """,
+            "EVENT":    """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: black;
+                    background:""" + self.createGradient('yellow') + """ ;
+                }
+                QPushButton:pressed {
+                    color: black;
+                    background:""" + self.createGradient('yellow') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: black;
+                    background:""" + self.createGradient('yellow') + """ ;
+                }
+            """,
+            "PID":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 14pt;
+                    font-weight: bold;
+                    color: white;
+                    background: #2298c7;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background: lightgrey;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background: #43a7cf;
+                }
+            """,
+            "PIDactive":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 14pt;
+                    font-weight: bold;
+                    color: white;
+                    background: #75c9e3;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background: lightgrey;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background: #43a7cf;
+                }
+            """,
+            "SV +":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#d82a62') + """ ;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#ad0427') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#b90837') + """ ;
+                                     }
+            """,
+            "SV -":     """
+                QPushButton {
+                    min-width:100px;
+                    """ + border_modern + """
+                    font-size: 10pt;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#75c9e3') + """ ;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#1985ba') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#43a7cf') + """ ;
+                }
+            """,
 
+            "HUD_OFF":     """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 14pt;
+                    font-weight: bold;
+                    color: white;
+                    background: #2298c7;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background: lightgrey;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background: #43a7cf;
+                }
+            """,
+            "HUD_ON":     """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 14pt;
+                    font-weight: bold;
+                    color: white;
+                    background: #75c9e3;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background: lightgrey;
+                }
+                QPushButton:pressed {
+                    color: #D9D9D9;
+                    background-color: #1985ba;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background: #43a7cf;
+                }
+            """,
+            "SELECTED":     """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: 11pt;
+                    font-weight: bold;
+                    color: yellow;
+                    background:""" + self.createGradient('#6D4824') + """ ;
+                }
+                QPushButton:pressed {
+                    color: yellow;
+                    background:""" + self.createGradient('#6D4824') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: yellow;
+                    background:""" + self.createGradient('#6D4824') + """ ;
+                }
+            """
+            }
+#        if locale == "es":
+#            # slightly smaller font size for Spanish
+#            self.pushbuttonstyles["DISABLED"] = "QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}"
+#            self.pushbuttonstyles["STOP"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
+#            self.pushbuttonstyles["START"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}"
+#            self.pushbuttonstyles["OFF"] = "QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}"
+#            self.pushbuttonstyles["ON"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }"
+        # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
+        if platf == 'Windows':
+            self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.8
+        else:
+            self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.3
         #create ON/OFF buttons
         self.button_1 = QPushButton(QApplication.translate("Button", "ON", None))
         self.button_1.setFocusPolicy(Qt.NoFocus)
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
+        self.shadow_1 = QGraphicsDropShadowEffect(self)
+        self.shadow_1.setBlurRadius(15)
+        self.shadow_1.setOffset(0,2)
+        self.button_1.setGraphicsEffect(self.shadow_1)
+        self.button_1.pressed.connect(lambda : self.buttonPressed(self.button_1))
+        self.button_1.released.connect(lambda : self.buttonReleased(self.button_1))
+        self.button_1.setCursor(QCursor(Qt.PointingHandCursor))
         if locale in ["el", "no"]:
             self.button_1.setMinimumWidth(120)
         else:
             self.button_1.setMinimumWidth(100)
-        self.button_1.setMinimumHeight(50)
+        self.button_1.setMinimumHeight(self.standard_button_height)
         self.button_1.clicked.connect(lambda _:self.qmc.ToggleMonitor())
         if app.artisanviewerMode:
             self.button_1.setVisible(False)
@@ -12429,20 +12938,22 @@ class ApplicationWindow(QMainWindow):
         self.button_2.setFocusPolicy(Qt.NoFocus)
         self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None))
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
+        self.shadow_2 = QGraphicsDropShadowEffect(self)
+        self.shadow_2.setBlurRadius(15)
+        self.shadow_2.setOffset(0,2)
+        self.button_2.setGraphicsEffect(self.shadow_2)
+        self.button_2.pressed.connect(lambda : self.buttonPressed(self.button_2))
+        self.button_2.released.connect(lambda : self.buttonReleased(self.button_2))
+        self.button_2.setCursor(QCursor(Qt.PointingHandCursor))
         if locale in ["el", "no"]:
             self.button_2.setMinimumWidth(120)
         else:
             self.button_2.setMinimumWidth(100)
-        self.button_2.setMinimumHeight(50)            
+        self.button_2.setMinimumHeight(self.standard_button_height)
         self.button_2.clicked.connect(lambda _:self.qmc.ToggleRecorder())
         if app.artisanviewerMode:
             self.button_2.setVisible(False)
         
-        # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
-        if platf == 'Windows':
-            self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.8
-        else:
-            self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.3
 
 
         #create 1C START, 1C END, 2C START and 2C END buttons
@@ -12478,13 +12989,22 @@ class ApplicationWindow(QMainWindow):
         self.button_7 = QPushButton(QApplication.translate("Button", "RESET", None))
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
+        self.shadow_7 = QGraphicsDropShadowEffect(self)
+        self.shadow_7.setBlurRadius(15)
+        self.shadow_7.setOffset(0,2)
+        self.button_7.setGraphicsEffect(self.shadow_7)
+        self.button_7.pressed.connect(lambda : self.buttonPressed(self.button_7))
+        self.button_7.released.connect(lambda : self.buttonReleased(self.button_7))
+        self.button_7.setCursor(QCursor(Qt.PointingHandCursor))
         if locale in ["el", "no"]:
             self.button_7.setMinimumWidth(120)
         else:
             self.button_7.setMinimumWidth(100)
-        self.button_7.setMinimumHeight(50)
+        self.button_7.setMinimumHeight(self.standard_button_height)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
         self.button_7.clicked.connect(lambda _: self.qmc.reset())
+        if app.artisanviewerMode:
+            self.button_7.setVisible(False)
 
         #create CHARGE button
         self.button_8 = QPushButton(QApplication.translate("Button", "CHARGE", None))
@@ -12506,10 +13026,23 @@ class ApplicationWindow(QMainWindow):
         self.button_10 = QPushButton(QApplication.translate("Button", "Control", None))
         self.button_10.setFocusPolicy(Qt.NoFocus)
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
-        self.button_10.setMinimumSize(90, 50)
+        self.shadow_10 = QGraphicsDropShadowEffect(self)
+        self.shadow_10.setBlurRadius(15)
+        self.shadow_10.setOffset(0,2)
+        self.button_10.setGraphicsEffect(self.shadow_10)
+        self.button_10.pressed.connect(lambda : self.buttonPressed(self.button_10))
+        self.button_10.released.connect(lambda : self.buttonReleased(self.button_10))
+        self.button_10.setCursor(QCursor(Qt.PointingHandCursor))
+        if locale in ["el", "no"]:
+            self.button_10.setMinimumWidth(120)
+        else:
+            self.button_10.setMinimumWidth(100)
+        self.button_10.setMinimumHeight(self.standard_button_height)
         self.button_10.clicked.connect(lambda _:self.PIDcontrol())
         if app.artisanviewerMode:
             self.button_10.setVisible(False)
+
+
 
         #create EVENT record button
         self.button_11 = QPushButton(QApplication.translate("Button", "EVENT", None))
@@ -12570,12 +13103,14 @@ class ApplicationWindow(QMainWindow):
         #create HUD button
         self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None))
         self.button_18.setFocusPolicy(Qt.NoFocus)
-        self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
+#dave99
+        self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
+#        self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
         if locale in ["el", "no"]:
             self.button_18.setMinimumWidth(100)
         else:
             self.button_18.setMinimumWidth(80)
-        self.button_18.setMinimumHeight(50)
+        self.button_18.setMinimumHeight(self.standard_button_height)
         self.button_18.setContentsMargins(0,0,0,0)
         self.button_18.clicked.connect(lambda _:self.qmc.toggleHUD())
         self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None))
@@ -12983,7 +13518,7 @@ class ApplicationWindow(QMainWindow):
         self.AUClcdFrame.setFrameStyle(QFrame.Plain)
         self.AUClcd.setNumDigits(3)
         self.AUClcd.setMinimumWidth(65)
-        self.AUClcdFrame.setStyleSheet("background-color: rgb(210,210,210);")
+        self.AUClcdFrame.setStyleSheet("border-radius: 4; background-color: rgb(230,230,230);")
         
         AUCLayout = QHBoxLayout()
         AUCLayout.addSpacing(20)
@@ -13028,9 +13563,8 @@ class ApplicationWindow(QMainWindow):
         self.level1layout.addWidget(self.button_18)
         self.level1layout.addSpacing(15)
         self.level1layout.addWidget(self.lcd1)
-        self.level1layout.setContentsMargins(0,0,0,0)
         self.level1layout.setSpacing(0)
-        self.level1layout.setContentsMargins(3,3,3,0)
+        self.level1layout.setContentsMargins(0,7,7,12) # left, to, right, bottom
 
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
@@ -13285,6 +13819,54 @@ class ApplicationWindow(QMainWindow):
         validator.setLocale(QLocale.c())
         return validator
     
+    def buttonPressed(self, button):
+        # shadow needs to be recreated each time?
+        self.strong_shadow = QGraphicsDropShadowEffect(self)
+        self.strong_shadow.setBlurRadius(35)
+        self.strong_shadow.setOffset(0,5)
+        button.setGraphicsEffect(self.strong_shadow)
+    def buttonReleased(self,button):
+        # shadow needs to be recreated each time?
+        self.shadow = QGraphicsDropShadowEffect(self)
+        self.shadow.setBlurRadius(15)
+        self.shadow.setOffset(0,2)
+        button.setGraphicsEffect(self.shadow)
+    def createGradient(self,rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
+#    def createGradient(self,rgb, tint_factor=0.2, shade_factor=0.2, reverse=False):
+        default_gradient = 'light_to_dark'  # set this to either 'dark_to_light' or 'light_to_dark'
+        if reverse == True:
+            if default_gradient == 'dark_to_light':
+                dir = 'light2dark'
+            else:
+                dir = 'dark2light'
+        else:
+            if default_gradient == 'dark_to_light':
+                dir = 'dark2light'
+            else:
+                dir = 'light2dark'
+        if dir == 'dark2light':
+            res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] +");"
+        else:    # light2dark
+            res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] +");"
+        return res
+    def createRGBGradient(self,rgb, tint_factor=0.3, shade_factor=0.3):
+        from matplotlib import colors
+        try:
+            if rgb[0:1] == "#":   # hex input like "#ffaa00"
+                rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
+            else:                 # color name
+                rgb_tuple = colors.hex2color(colors.cnames[rgb])
+            #ref: https://stackoverflow.com/questions/6615002/given-an-rgb-value-how-do-i-create-a-tint-or-shade
+#            rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
+            darker_rgb  = '#%02x%02x%02x' % (tuple([int(255 * (x * (1 - shade_factor))) for x in rgb_tuple]))
+            lighter_rgb = '#%02x%02x%02x' % (tuple([int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple]))
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createRGBGradient(): {0}").format(str(e)),exc_tb.tb_lineno)
+            lighter_rgb = darker_rgb + "000000"
+        return lighter_rgb,darker_rgb
     # for use in widgets that expects a double via a aw.createCLocalDoubleValidator that accepts both,
     # one dot and several commas. If there is no dot, the last comma is interpreted as decimal separator and the others removed
     # if there is a dot, the last one is used as a decimal separator and all other comma and dots are removed
@@ -14730,11 +15312,13 @@ class ApplicationWindow(QMainWindow):
         LCDVbox.addWidget(lcd)
         LCDVbox.setSpacing(0)
         LCDVbox.setContentsMargins(0, 0, 0, 0)
-        frame.setStyleSheet("background-color: rgb(230,230,230);")
+        frame.setStyleSheet("border-radius:4; background-color: rgb(230,230,230);")  #dave99
         frame.setFrameShadow(QFrame.Sunken)
         frame.setLineWidth(1)
         frame.setFrameShape(QFrame.Panel)
         frame.setLayout(LCDVbox)
+        #frame.setStyleSheet("border-radius:4; border-width: 1; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;") #dave99
+
         return frame
 
     def updateAUCLCD(self):
@@ -16068,16 +16652,23 @@ class ApplicationWindow(QMainWindow):
                 self.slider4.setValue(v)
 
     def setExtraEventButtonStyle(self, tee, style="normal"):
+#dave90  start...
+        buttonstyle = "min-width:75px;border-style:solid; border-radius:3;border-color:grey; border-width:1;"
+        normalstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background: %s}"%(
+                self.extraeventbuttontextcolor[tee], self.createGradient(self.extraeventbuttoncolor[tee]))
+        pressedstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background: %s}"%(
+                self.extraeventbuttoncolor[tee],self.createGradient(self.extraeventbuttontextcolor[tee]))
+#dave90  ...end
         if style=="normal":
             # set color of this button to "normal"
-            normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
-                    self.extraeventbuttontextcolor[tee],self.extraeventbuttoncolor[tee])
+#dave90            normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
+#dave90                    self.extraeventbuttontextcolor[tee],self.extraeventbuttoncolor[tee])
             self.buttonlist[tee].setStyleSheet(normalstyle)
 
         if style=="pressed":
             # set color of this button to "pressed"
-            pressedstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
-                    self.extraeventbuttoncolor[tee],self.extraeventbuttontextcolor[tee])
+#dave90            pressedstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
+#dave90                    self.extraeventbuttoncolor[tee],self.extraeventbuttontextcolor[tee])
             self.buttonlist[tee].setStyleSheet(pressedstyle)
 
     #called from user configured event buttons
@@ -16406,7 +16997,10 @@ class ApplicationWindow(QMainWindow):
                 except:
                     aw.extraLCDlabel1[i].setText(l1)
                 self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
-            aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+#dave90  start...
+#            aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+#dave90  ...end
             self.extraLCDframe2[i].setVisible(bool(aw.extraLCDvisibility2[i])) 
             if i < len(aw.qmc.extraname2):
                 l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
@@ -16415,7 +17009,10 @@ class ApplicationWindow(QMainWindow):
                 except:
                     aw.extraLCDlabel2[i].setText(l2)
                 self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
-            aw.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+#dave90  start...
+#            aw.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+#dave90  ...end
         #hide the rest (just in case)
         for i in range(ndev,aw.nLCDS):
             aw.extraLCDframe1[i].setVisible(False)
@@ -16872,7 +17469,9 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
         else:
-            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            #dave99  watch out for this one where there is no Enabled(False)
+            #aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            pass
 
     def ignoreFlatButtons(self,moveindex):
         if self.keyboardButtonList[moveindex].isFlat() or not aw.qmc.buttonvisibility[moveindex - 3]:
@@ -20233,13 +20832,22 @@ class ApplicationWindow(QMainWindow):
                 for (k, v) in list(toMap(settings.value("LEDColors")).items()):
                     self.lcdpaletteF[str(k)] = s2a(toString(v))
             #restore colors
-            self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
-            self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
-            self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
-            self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltaet"],self.lcdpaletteB["deltaet"]))
-            self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
-            self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-            self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+#dave90  start...
+#            self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
+#            self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
+#            self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
+#            self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltaet"],self.lcdpaletteB["deltaet"]))
+#            self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
+#            self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+#            self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+            self.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["timer"],aw.createGradient(self.lcdpaletteB["timer"])))
+            self.lcd2.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["et"],aw.createGradient(self.lcdpaletteB["et"])))
+            self.lcd3.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["bt"],aw.createGradient(self.lcdpaletteB["bt"])))
+            self.lcd4.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltaet"],aw.createGradient(self.lcdpaletteB["deltaet"])))
+            self.lcd5.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltabt"],aw.createGradient(self.lcdpaletteB["deltabt"])))
+            self.lcd6.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+            self.lcd7.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+#dave90  ...end
             #restore flavors
             self.qmc.flavorlabels = toStringList(settings.value("Flavors",self.qmc.flavorlabels))
             self.qmc.flavors = [5.]*len(self.qmc.flavorlabels)
@@ -26245,6 +26853,10 @@ class ApplicationWindow(QMainWindow):
         for i in range(len(self.extraeventstypes)):
             p = QPushButton()
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttontextcolor[i],self.extraeventbuttoncolor[i])
+#dave90  start...
+            buttonstyle = "min-width:75px;border-style:solid; border-radius:3;border-color:grey; border-width:1;"
+            style = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background: %s}"%(self.extraeventbuttontextcolor[i],self.createGradient(self.extraeventbuttoncolor[i]))
+#dave90  ...end
             p.setStyleSheet(style)
             p.setMinimumHeight(aw.standard_button_height)
             l = self.extraeventslabels[i]
@@ -34776,6 +35388,7 @@ class EventsDlg(ArtisanDialog):
         #Text Color
         tcolor = ["yellow"]*nbuttons
 
+        #dave99 check around this point +- against UIDev + WIP main.py
         #Apply Colors in Right Oder
         for i in range(nbuttons):
             visualIndex = self.eventbuttontable.visualRow(i)
@@ -34974,6 +35587,7 @@ class EventsDlg(ArtisanDialog):
             except Exception:
                 pass
 
+    #dave99  CHeck this routine against UIDev + Wip main.py
     def setbuttoncolor(self,i):
         if i < len(self.extraeventbuttoncolor):
             colorf = aw.colordialog(QColor(self.extraeventbuttoncolor[i]))
