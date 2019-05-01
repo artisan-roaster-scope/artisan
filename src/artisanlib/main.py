@@ -10531,7 +10531,10 @@ class VMToolbar(NavigationToolbar):
         p = os.path.join(basedir, name)
         pm = QPixmap(p)
         if not name.startswith("plus") and not name.startswith("white_plus"):
-            pm = self.recolorIcon(pm,QColor("#424242"))
+            if self.white_icons:
+                pm = self.recolorIcon(pm,QColor("#f5f5f5"))
+            else:
+                pm = self.recolorIcon(pm,QColor("#424242"))
         if hasattr(pm, 'setDevicePixelRatio'):
             pm.setDevicePixelRatio(self.canvas._dpi_ratio)
         return QIcon(pm)
