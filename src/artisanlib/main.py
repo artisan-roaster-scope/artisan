@@ -10532,7 +10532,7 @@ class VMToolbar(NavigationToolbar):
         pm = QPixmap(p)
         if not name.startswith("plus") and not name.startswith("white_plus"):
             if self.white_icons:
-                pm = self.recolorIcon(pm,QColor("#f5f5f5"))
+                pm = self.recolorIcon(pm,QColor("#424242"))
             else:
                 pm = self.recolorIcon(pm,QColor("#424242"))
         if hasattr(pm, 'setDevicePixelRatio'):
@@ -13621,6 +13621,7 @@ class ApplicationWindow(QMainWindow):
         sliderGrp1.setContentsMargins(0,7,0,0)
         sliderGrp1.setSpacing(0)
         self.sliderGrpBox1 = QGroupBox()
+        self.sliderGrpBox1.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBox1.setLayout(sliderGrp1)
         self.sliderGrpBox1.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox1.setMinimumWidth(55) 
@@ -13647,6 +13648,7 @@ class ApplicationWindow(QMainWindow):
         sliderGrp2.setContentsMargins(0,7,0,0)
         sliderGrp2.setSpacing(0)
         self.sliderGrpBox2 = QGroupBox()
+        self.sliderGrpBox2.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBox2.setLayout(sliderGrp2)
         self.sliderGrpBox2.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox2.setMinimumWidth(55) 
@@ -13672,6 +13674,7 @@ class ApplicationWindow(QMainWindow):
         sliderGrp3.setContentsMargins(0,7,0,0)
         sliderGrp3.setSpacing(0)
         self.sliderGrpBox3 = QGroupBox()
+        self.sliderGrpBox3.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBox3.setLayout(sliderGrp3)
         self.sliderGrpBox3.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox3.setMinimumWidth(55) 
@@ -13697,6 +13700,7 @@ class ApplicationWindow(QMainWindow):
         sliderGrp4.setContentsMargins(0,7,0,0)
         sliderGrp4.setSpacing(0)
         self.sliderGrpBox4 = QGroupBox()
+        self.sliderGrpBox4.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBox4.setLayout(sliderGrp4)
         self.sliderGrpBox4.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox4.setMinimumWidth(55) 
@@ -13713,6 +13717,7 @@ class ApplicationWindow(QMainWindow):
 
         self.sliderSV = self.slider()
         self.sliderLCDSV = self.sliderLCD()
+        self.sliderLCDSV.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.palette["text"])
         self.sliderLCDSV.setNumDigits(3)
         self.sliderLCDSV.setStyleSheet("font-weight: bold;")
         self.sliderLCDSV.display(self.pidcontrol.svValue)
@@ -13723,6 +13728,7 @@ class ApplicationWindow(QMainWindow):
         sliderGrpSV.setContentsMargins(0,7,0,0)
         sliderGrpSV.setSpacing(0)
         self.sliderGrpBoxSV = QGroupBox()
+        self.sliderGrpBoxSV.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBoxSV.setLayout(sliderGrpSV)
         self.sliderGrpBoxSV.setAlignment(Qt.AlignCenter)
         self.sliderGrpBoxSV.setMinimumWidth(55) 
@@ -14746,6 +14752,11 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCD3.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[2])
         self.sliderLCD4.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[3])
         self.sliderLCDSV.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.palette['title'])
+        self.sliderGrpBox1.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
+        self.sliderGrpBox2.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
+        self.sliderGrpBox3.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
+        self.sliderGrpBox4.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
+        self.sliderGrpBoxSV.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.slider1.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[0]))
         self.slider2.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[1]))
         self.slider3.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[2]))
