@@ -58,6 +58,9 @@ class AcaiaBLE():
         # holds msgType on messages split in header and payload
         self.msgType = None
         self.weight = None
+        
+    def reset(self):
+        self.__init__()
 
     # return a bytearray of len 2 containing the even and odd CRCs over the given payload
     def crc(self,payload):
@@ -78,10 +81,10 @@ class AcaiaBLE():
         msg = self.message(tp,payload)
         write(msg)
 
-#    # should be send every 3sec
-#    # seems useless with latest firmware
-#    def sendHeartbeat(self,write):
-#        self.sendMessage(write,self.MSG_SYSTEM,b'\x02,\x00')
+    # should be send every 3-5sec
+    # this seems not to be essential for the acaia. The Pearl disconnects from time to time, the Lunar never!?
+    def sendHeartbeat(self,write):
+        self.sendMessage(write,self.MSG_SYSTEM,b'\x02,\x00')
 
     def sendTare(self,write):
         self.sendMessage(write,self.MSG_TARE,b'\x00')
@@ -101,13 +104,13 @@ class AcaiaBLE():
         self.sendEvent(write,
             bytes([ # pairs of key/setting
                     0,  # weight
-                    5,  # weight argument (speed of notifications in 1/10 sec)
-#                    1,  # battery
-#                    2,  # battery argument (if 0 : fast, 1 : slow)
-#                    2,  # timer
-#                    5,  # timer argument
-#                    3,  # key
-#                    4   # setting
+                    1,  #5,  # weight argument (speed of notifications in 1/10 sec)
+                    1,  # battery
+                    2,  # battery argument (if 0 : fast, 1 : slow)
+                    2,  # timer
+                    5,  # timer argument
+                    3,  # key
+                    4   # setting
                 ]))
 
     def parseInfo(self,data):

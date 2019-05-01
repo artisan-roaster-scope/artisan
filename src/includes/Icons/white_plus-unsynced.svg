@@ -13,7 +13,7 @@
    height="72pt"
    width="72pt"
    inkscape:version="0.91+devel r14842"
-   sodipodi:docname="plus-unsynced_inv.svg">
+   sodipodi:docname="plus-dirty.svg">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -31,11 +31,11 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="1.85"
-     inkscape:cx="90.023763"
-     inkscape:cy="57.543399"
-     inkscape:window-x="114"
-     inkscape:window-y="21"
+     inkscape:zoom="0.79893791"
+     inkscape:cx="-115.57906"
+     inkscape:cy="-19.252708"
+     inkscape:window-x="140"
+     inkscape:window-y="98"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg8"
      units="pt" />
@@ -89,16 +89,18 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="g4223">
+     id="g4227"
+     inkscape:export-xdpi="24.120001"
+     inkscape:export-ydpi="24.120001">
     <circle
-       style="fill:#cc0f50;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1"
        cx="12.967545"
        cy="12.763623"
        r="12.636375"
        id="circle4325" />
     <path
        inkscape:connector-curvature="0"
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#cc0f50;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1"
        d="M 14.652378,11.078723 V 7.6092059 c 0,-0.875352 -0.709631,-1.584994 -1.585008,-1.584994 h -0.199683 c -0.875378,0 -1.585008,0.709642 -1.585008,1.584994 V 11.078723 H 7.8131537 c -0.8753835,0 -1.5850144,0.709626 -1.5850144,1.585041 v 0.199654 c 0,0.8754 0.7096309,1.585026 1.5850144,1.585026 h 3.4695253 v 3.469533 c 0,0.875399 0.70963,1.585041 1.585008,1.585041 h 0.199683 c 0.875377,0 1.585008,-0.709642 1.585008,-1.585041 v -3.469533 h 3.469542 c 0.87536,0 1.584991,-0.709626 1.584991,-1.585026 v -0.199654 c 0,-0.875415 -0.709631,-1.585041 -1.584991,-1.585041 z"
        id="path4327" />
   </g>

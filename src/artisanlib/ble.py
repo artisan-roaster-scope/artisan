@@ -30,11 +30,13 @@ class BleInterface(QtCore.QObject):
     weightChanged=QtCore.pyqtSignal(float)
     deviceDisconnected=QtCore.pyqtSignal()
     
-    def __init__(self, service_uuid, char_uuid, processData):
+    def __init__(self, service_uuid, char_uuid, processData, sendHeartbeat, reset):
         super().__init__()
         self.SERVICE_UUID = QtBluetooth.QBluetoothUuid(service_uuid)
         self.CHAR_UUID = QtBluetooth.QBluetoothUuid(char_uuid)
         self.processData = processData
+        self.sendHeartbeat = sendHeartbeat
+        self.reset = reset
         
         self.m_deviceDiscoveryAgent = QtBluetooth.QBluetoothDeviceDiscoveryAgent()
         self.m_notificationDesc = QtBluetooth.QLowEnergyDescriptor()
@@ -64,11 +66,18 @@ class BleInterface(QtCore.QObject):
         res = self.processData(self.write, data)
         if res is not None:
             self.weightChanged.emit(res)
+    
+    def heartbeat(self):
+        if self.m_connected:
+            self.sendHeartbeat(self.write)
+            QtCore.QTimer.singleShot(2000,lambda : self.heartbeat())
 
     def update_connected(self,connected=bool):
         if connected != self.m_connected:
             self.m_connected = connected
             self.connectedChanged.emit(connected)
+            if not self.m_connected:
+                self.reset()
 
     def setCurrentService(self,currentService = int):
         if self.m_currentService == currentService:
@@ -162,7 +171,6 @@ class BleInterface(QtCore.QObject):
     def onDeviceDisconnected(self):
         self.update_connected(False)
         self.statusInfoChanged.emit("Device disconnected",False)
-#        print("Remote device disconnected")
         self.deviceDisconnected.emit()
        
     def onServiceDiscovered(self,_=QtBluetooth.QBluetoothUuid()):
@@ -267,6 +275,7 @@ class BleInterface(QtCore.QObject):
                         #print("notificationCharacteristic")
                         #print(bytearray([1,0]))
                         self.m_service.writeDescriptor(self.m_notificationDesc,bytearray([1,0]))
+                        self.heartbeat()
 
     def onServiceStateChanged(self,s=QtBluetooth.QLowEnergyService.ServiceState):
 #        print('service state changed , state: {state}'.format(state=s) )
