@@ -76,7 +76,7 @@ EOF
     trap die ERR
     ${SSH} pi@localhost bash script
     ${SCP} pi@localhost:artisan/src/\*.deb src
-    pkill qemu-system-arm
+    pkill -9 qemu-system-arm
 }
 
 ssh-keygen -R "[localhost]:2222"
