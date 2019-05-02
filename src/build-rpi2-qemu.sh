@@ -158,6 +158,8 @@ rmdir $mountpoint
 
 ssh_control &
 set +e
+stty
+stty -tostop
 qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -hda ${RASPBIAN_IMAGE} -redir tcp:2222::22
 echo $?
 ps ax
