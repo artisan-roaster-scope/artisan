@@ -7098,6 +7098,10 @@ class tgraphcanvas(FigureCanvas):
 #            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_18.setEnabled(True)
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
+            aw.shadow_18 = QGraphicsDropShadowEffect(self)
+            aw.shadow_18.setBlurRadius(20)
+            aw.shadow_18.setOffset(0,1)
+            aw.button_18.setGraphicsEffect(aw.shadow_18)
             self.updateLCDtime()
             aw.lowerbuttondialog.setVisible(True)
             aw.applyStandardButtonVisibility()
@@ -7127,8 +7131,8 @@ class tgraphcanvas(FigureCanvas):
             aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
             aw.button_2.setEnabled(True)   
             self.shadow_2 = QGraphicsDropShadowEffect(self)
-            self.shadow_2.setBlurRadius(15)
-            self.shadow_2.setOffset(0,2)
+            self.shadow_2.setBlurRadius(20)
+            self.shadow_2.setOffset(0,1)
             aw.button_2.setGraphicsEffect(self.shadow_2)
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"]) 
@@ -7136,6 +7140,7 @@ class tgraphcanvas(FigureCanvas):
 #dave99
 #            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_18.setEnabled(False)
+            aw.button_18.setGraphicsEffect(None)
             self.updateLCDtime()
             #prevents accidentally deleting a modified profile:
             if len(self.timex) > 2:
@@ -7397,10 +7402,8 @@ class tgraphcanvas(FigureCanvas):
                     if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                         aw.button_8.setFlat(False)
             else:
-                #aw.button_19.setDisabled(True) # deactivate DRY button
-                aw.button_19.setFlat(True)
-                #aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                aw.button_8.setFlat(True)
+                aw.button_19.setFlat(True) # deactivate DRY button
+                aw.button_8.setFlat(True) # also deactivate CHARGE button
                 try:
                     aw.eventactionx(aw.qmc.buttonactions[1],aw.qmc.buttonactionstrings[1])
                     st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
@@ -12442,7 +12445,7 @@ class ApplicationWindow(QMainWindow):
         self.pushbuttonstyles = {
             "RESET":     """
                 QPushButton {
-                    min-width:100px;
+                    min-width:90px;
                     """ + border_modern + """
                     font-size: 14pt;
                     font-weight: bold;
@@ -12454,7 +12457,7 @@ class ApplicationWindow(QMainWindow):
                     background: lightgrey;
                 }
                 QPushButton:pressed {
-                    color: #D9D9D9;
+                    color: #EEEEEE;
                     background-color: #1985ba;
                 }
                 QPushButton:hover:!pressed {
@@ -12464,7 +12467,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "OFF":    """
                 QPushButton {
-                    min-width:100px;
+                    min-width:90px;
                     """ + border_modern + """
                     font-size: """ + self.ooss_font_size + """;
                     font-weight: bold;
@@ -12472,8 +12475,8 @@ class ApplicationWindow(QMainWindow):
                     background: '#147bb3';
                 }
                 QPushButton:pressed {
-                    color: #D9D9D9;
-                    background-color: #116999;
+                    color: #EEEEEE;
+                    background-color: #116D98;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
@@ -12482,7 +12485,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "ON":    """
                 QPushButton {
-                    min-width:100px;
+                    min-width:90px;
                     """ + border_modern + """
                     font-size: """ + self.ooss_font_size + """;
                     font-weight: bold;
@@ -12490,7 +12493,7 @@ class ApplicationWindow(QMainWindow):
                     background: #cc0f50;
                 }
                 QPushButton:pressed {
-                    color: #D9D9D9;
+                    color: #EEEEEE;
                     background-color: #c70d49;
                 }
                 QPushButton:hover:!pressed {
@@ -12500,7 +12503,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "STOP":     """
                 QPushButton {
-                    min-width:100px;
+                    min-width:90px;
                     """ + border_modern + """
                     font-size: """ + self.ooss_font_size + """;
                     font-weight: bold;
@@ -12509,10 +12512,10 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: 'lightgrey';
+                    background: #E0E0E0;
                 }
                 QPushButton:pressed {
-                    color: #D9D9D9;
+                    color: #EEEEEE;
                     background-color: #116999;
                 }
                 QPushButton:hover:!pressed {
@@ -12522,7 +12525,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "START":    """
                 QPushButton {
-                    min-width:100px;
+                    min-width:90px;
                     """ + border_modern + """
                     font-size: """ + self.ooss_font_size + """;
                     font-weight: bold;
@@ -12531,10 +12534,10 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: lightgrey;
+                    background: #E0E0E0;
                 }
                 QPushButton:pressed {
-                    color: #D9D9D9;
+                    color: #EEEEEE;
                     background-color: #116999;
                 }
                 QPushButton:hover:!pressed {
@@ -12542,6 +12545,7 @@ class ApplicationWindow(QMainWindow):
                     background-color: red;
                 }
             """,
+
             "CHARGE":    """
                 QPushButton {
                     min-width:75px;
@@ -12552,15 +12556,19 @@ class ApplicationWindow(QMainWindow):
                     background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:flat{
-                    color: #D9D9D9;
-                    background-color: #f0f0f0;
+                    color: darkgrey;
+                    background-color: #E0E0E0;
                 }
                 QPushButton:flat:hover:!pressed{
-                    color: #D9D9D9;
-                    background-color: #1985ba;
+                    color: #F5F5F5;
+                    background-color: #BDBDBD;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #9E9E9E;
                 }
                 QPushButton:pressed {
-                    color: white;
+                    color: #EEEEEE;
                     background:""" + self.createGradient('#116999') + """ ;
                 }
                 QPushButton:hover:!pressed {
@@ -12578,15 +12586,19 @@ class ApplicationWindow(QMainWindow):
                     background:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
-                    color: #D9D9D9;
-                    background-color: #f0f0f0;
+                    color: #BDBDBD;
+                    background-color: #EEEEEE;
                 }
                 QPushButton:flat:hover:!pressed{
-                    color: #D9D9D9;
-                    background-color: #1985ba;
+                    color: #F5F5F5;
+                    background-color: #DDDDDD;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #9E9E9E;
                 }
                 QPushButton:pressed {
-                    color: white;
+                    color: #EEEEEE;
                     background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
@@ -12604,15 +12616,19 @@ class ApplicationWindow(QMainWindow):
                     background:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
-                    color: #D9D9D9;
-                    background-color: #f0f0f0;
+                    color: #BDBDBD;
+                    background-color: #EEEEEE;
                 }
                 QPushButton:flat:hover:!pressed{
-                    color: #D9D9D9;
-                    background-color: #1985ba;
+                    color: #F5F5F5;
+                    background-color: #DDDDDD;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #9E9E9E;
                 }
                 QPushButton:pressed {
-                    color: white;
+                    color: #EEEEEE;
                     background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
@@ -12630,15 +12646,19 @@ class ApplicationWindow(QMainWindow):
                     background:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
-                    color: #D9D9D9;
-                    background-color: #f0f0f0;
+                    color: #BDBDBD;
+                    background-color: #EEEEEE;
                 }
                 QPushButton:flat:hover:!pressed{
-                    color: #D9D9D9;
-                    background-color: #1985ba;
+                    color: #F5F5F5;
+                    background-color: #DDDDDD;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #9E9E9E;
                 }
                 QPushButton:pressed {
-                    color: white;
+                    color: #EEEEEE;
                     background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
@@ -12656,15 +12676,19 @@ class ApplicationWindow(QMainWindow):
                     background:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
-                    color: #D9D9D9;
-                    background-color: #f0f0f0;
+                    color: #BDBDBD;
+                    background-color: #EEEEEE;
                 }
                 QPushButton:flat:hover:!pressed{
-                    color: #D9D9D9;
-                    background-color: #1985ba;
+                    color: #F5F5F5;
+                    background-color: #DDDDDD;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #9E9E9E;
                 }
                 QPushButton:pressed {
-                    color: white;
+                    color: #EEEEEE;
                     background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
@@ -12682,15 +12706,19 @@ class ApplicationWindow(QMainWindow):
                     background:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
-                    color: #D9D9D9;
-                    background-color: #f0f0f0;
+                    color: #BDBDBD;
+                    background-color: #EEEEEE;
                 }
                 QPushButton:flat:hover:!pressed{
-                    color: #D9D9D9;
-                    background-color: #1985ba;
+                    color: #F5F5F5;
+                    background-color: #DDDDDD;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #9E9E9E;
                 }
                 QPushButton:pressed {
-                    color: white;
+                    color: #EEEEEE;
                     background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
@@ -12708,15 +12736,19 @@ class ApplicationWindow(QMainWindow):
                     background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:flat{
-                    color: #D9D9D9;
-                    background-color: #f0f0f0;
+                    color: darkgrey;
+                    background-color: #E0E0E0;
                 }
                 QPushButton:flat:hover:!pressed{
-                    color: #D9D9D9;
-                    background-color: #1985ba;
+                    color: #F5F5F5;
+                    background-color: #BDBDBD;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #9E9E9E;
                 }
                 QPushButton:pressed {
-                    color: white;
+                    color: #EEEEEE;
                     background:""" + self.createGradient('#116999') + """ ;
                 }
                 QPushButton:hover:!pressed {
@@ -12734,15 +12766,19 @@ class ApplicationWindow(QMainWindow):
                     background:""" + self.createGradient('#66b8d7') + """ ;
                 }
                 QPushButton:flat{
-                    color: #D9D9D9;
-                    background-color: #f0f0f0;
+                    color: #BDBDBD;
+                    background-color: #EEEEEE;
                 }
                 QPushButton:flat:hover:!pressed{
-                    color: #D9D9D9;
-                    background-color: #1985ba;
+                    color: #F5F5F5;
+                    background-color: #DDDDDD;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #9E9E9E;
                 }
                 QPushButton:pressed {
-                    color: white;
+                    color: #EEEEEE;
                     background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
@@ -12770,7 +12806,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "PID":     """
                 QPushButton {
-                    min-width:100px;
+                    min-width:90px;
                     """ + border_modern + """
                     font-size: 14pt;
                     font-weight: bold;
@@ -12782,7 +12818,7 @@ class ApplicationWindow(QMainWindow):
                     background: lightgrey;
                 }
                 QPushButton:pressed {
-                    color: #D9D9D9;
+                    color: #EEEEEE;
                     background-color: #1985ba;
                 }
                 QPushButton:hover:!pressed {
@@ -12792,66 +12828,66 @@ class ApplicationWindow(QMainWindow):
             """,
             "PIDactive":     """
                 QPushButton {
-                    min-width:100px;
+                    min-width:90px;
                     """ + border_modern + """
                     font-size: 14pt;
                     font-weight: bold;
                     color: white;
-                    background: #75c9e3;
+                    background: #54b5ff;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
                     background: lightgrey;
                 }
                 QPushButton:pressed {
-                    color: #D9D9D9;
+                    color: #EEEEEE;
                     background-color: #1985ba;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #43a7cf;
+                    background: #77cafd;
                 }
             """,
             "SV +":     """
                 QPushButton {
-                    min-width:100px;
+                    min-width:75px;
                     """ + border_modern + """
                     font-size: 10pt;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#d82a62') + """ ;
+                    background:""" + self.createGradient('#db5785') + """ ;
                 }
                 QPushButton:pressed {
-                    color: white;
-                    background:""" + self.createGradient('#ad0427') + """ ;
+                    color: #EEEEEE;
+                    background:""" + self.createGradient('#d4336a') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#b90837') + """ ;
+                    background:""" + self.createGradient('#e480a2') + """ ;
                                      }
             """,
             "SV -":     """
                 QPushButton {
-                    min-width:100px;
+                    min-width:75px;
                     """ + border_modern + """
                     font-size: 10pt;
                     font-weight: bold;
                     color: white;
-                    background:""" + self.createGradient('#75c9e3') + """ ;
+                    background:""" + self.createGradient('#64b7d8') + """ ;
                 }
                 QPushButton:pressed {
-                    color: white;
-                    background:""" + self.createGradient('#1985ba') + """ ;
+                    color: #EEEEEE;
+                    background:""" + self.createGradient('#43a7cf') + """ ;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background:""" + self.createGradient('#43a7cf') + """ ;
+                    background:""" + self.createGradient('#85cae1') + """ ;
                 }
             """,
 
             "HUD_OFF":     """
                 QPushButton {
-                    min-width:75px;
+                    min-width:90px;
                     """ + border_modern + """
                     font-size: 14pt;
                     font-weight: bold;
@@ -12860,10 +12896,10 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: lightgrey;
+                    background: #E0E0E0;
                 }
                 QPushButton:pressed {
-                    color: #D9D9D9;
+                    color: #EEEEEE;
                     background-color: #1985ba;
                 }
                 QPushButton:hover:!pressed {
@@ -12873,24 +12909,24 @@ class ApplicationWindow(QMainWindow):
             """,
             "HUD_ON":     """
                 QPushButton {
-                    min-width:75px;
+                    min-width:90px;
                     """ + border_modern + """
                     font-size: 14pt;
                     font-weight: bold;
                     color: white;
-                    background: #75c9e3;
+                    background: #54b5ff;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
-                    background: lightgrey;
+                    background: #E0E0E0;
                 }
                 QPushButton:pressed {
-                    color: #D9D9D9;
+                    color: #EEEEEE;
                     background-color: #1985ba;
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #43a7cf;
+                    background: #77cafd;
                 }
             """,
             "SELECTED":     """
@@ -12930,8 +12966,8 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
         self.shadow_1 = QGraphicsDropShadowEffect(self)
-        self.shadow_1.setBlurRadius(15)
-        self.shadow_1.setOffset(0,2)
+        self.shadow_1.setBlurRadius(20)
+        self.shadow_1.setOffset(0,1)
         self.button_1.setGraphicsEffect(self.shadow_1)
         self.button_1.pressed.connect(lambda : self.buttonPressed(self.button_1))
         self.button_1.released.connect(lambda : self.buttonReleased(self.button_1))
@@ -12951,8 +12987,8 @@ class ApplicationWindow(QMainWindow):
         self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None))
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
         self.shadow_2 = QGraphicsDropShadowEffect(self)
-        self.shadow_2.setBlurRadius(15)
-        self.shadow_2.setOffset(0,2)
+        self.shadow_2.setBlurRadius(20)
+        self.shadow_2.setOffset(0,1)
         self.button_2.setGraphicsEffect(self.shadow_2)
         self.button_2.pressed.connect(lambda : self.buttonPressed(self.button_2))
         self.button_2.released.connect(lambda : self.buttonReleased(self.button_2))
@@ -12966,8 +13002,6 @@ class ApplicationWindow(QMainWindow):
         if app.artisanviewerMode:
             self.button_2.setVisible(False)
         
-
-
         #create 1C START, 1C END, 2C START and 2C END buttons
         self.button_3 = QPushButton(QApplication.translate("Button", "FC\nSTART", None))
         self.button_3.setFocusPolicy(Qt.NoFocus)
@@ -13002,8 +13036,8 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
         self.shadow_7 = QGraphicsDropShadowEffect(self)
-        self.shadow_7.setBlurRadius(15)
-        self.shadow_7.setOffset(0,2)
+        self.shadow_7.setBlurRadius(20)
+        self.shadow_7.setOffset(0,1)
         self.button_7.setGraphicsEffect(self.shadow_7)
         self.button_7.pressed.connect(lambda : self.buttonPressed(self.button_7))
         self.button_7.released.connect(lambda : self.buttonReleased(self.button_7))
@@ -13039,8 +13073,8 @@ class ApplicationWindow(QMainWindow):
         self.button_10.setFocusPolicy(Qt.NoFocus)
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
         self.shadow_10 = QGraphicsDropShadowEffect(self)
-        self.shadow_10.setBlurRadius(15)
-        self.shadow_10.setOffset(0,2)
+        self.shadow_10.setBlurRadius(20)
+        self.shadow_10.setOffset(0,1)
         self.button_10.setGraphicsEffect(self.shadow_10)
         self.button_10.pressed.connect(lambda : self.buttonPressed(self.button_10))
         self.button_10.released.connect(lambda : self.buttonReleased(self.button_10))
@@ -13115,9 +13149,7 @@ class ApplicationWindow(QMainWindow):
         #create HUD button
         self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None))
         self.button_18.setFocusPolicy(Qt.NoFocus)
-#dave99
         self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
-#        self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
         if locale in ["el", "no"]:
             self.button_18.setMinimumWidth(100)
         else:
@@ -13347,7 +13379,7 @@ class ApplicationWindow(QMainWindow):
 
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
-        self.lowerbuttondialog.setContentsMargins(0,0,0,10)
+        self.lowerbuttondialog.setContentsMargins(0,0,0,10) # left, top, right, bottom
         self.lowerbuttondialog.setVisible(False)
         self.lowerbuttondialog.setCenterButtons(True)
         #initiate configuration
@@ -13566,15 +13598,15 @@ class ApplicationWindow(QMainWindow):
         self.level1layout.addWidget(self.AUCLCD)
         self.level1layout.addSpacing(20)
         self.level1layout.addWidget(self.button_7)
-        self.level1layout.addSpacing(5)
+        self.level1layout.addSpacing(10)
         self.level1layout.addWidget(self.button_1)
-        self.level1layout.addSpacing(5)
+        self.level1layout.addSpacing(10)
         self.level1layout.addWidget(self.button_2)
-        self.level1layout.addSpacing(5)
+        self.level1layout.addSpacing(15)
         self.level1layout.addWidget(self.button_10)
-        self.level1layout.addSpacing(5)
+        self.level1layout.addSpacing(10)
         self.level1layout.addWidget(self.button_18)
-        self.level1layout.addSpacing(5)
+        self.level1layout.addSpacing(10)
         self.level1layout.addWidget(self.lcd1)
         self.level1layout.setSpacing(0)
         self.level1layout.setContentsMargins(0,7,7,12) # left, to, right, bottom
@@ -13841,14 +13873,14 @@ class ApplicationWindow(QMainWindow):
     def buttonPressed(self, button):
         # shadow needs to be recreated each time?
         self.strong_shadow = QGraphicsDropShadowEffect(self)
-        self.strong_shadow.setBlurRadius(35)
-        self.strong_shadow.setOffset(0,5)
+        self.strong_shadow.setBlurRadius(30)
+        self.strong_shadow.setOffset(0,4)
         button.setGraphicsEffect(self.strong_shadow)
     def buttonReleased(self,button):
         # shadow needs to be recreated each time?
         self.shadow = QGraphicsDropShadowEffect(self)
-        self.shadow.setBlurRadius(15)
-        self.shadow.setOffset(0,2)
+        self.shadow.setBlurRadius(20)
+        self.shadow.setOffset(0,1)
         button.setGraphicsEffect(self.shadow)
     def createGradient(self,rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
 #    def createGradient(self,rgb, tint_factor=0.2, shade_factor=0.2, reverse=False):
