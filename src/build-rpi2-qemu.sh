@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exm
+set -ex
 
 # User configurable variables
 KERNEL_IMAGE="kernel-qemu-4.9.59-stretch"
