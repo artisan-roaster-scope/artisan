@@ -95,7 +95,7 @@ if [ ! -f versatile-pb.dtb ]; then
     curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/versatile-pb.dtb
 fi
 check_sha1
-qemu-img resize ${RASPBIAN_IMAGE} +2G
+qemu-img resize -f raw ${RASPBIAN_IMAGE} +2G
 LABEL_ID=`sfdisk -d ${RASPBIAN_IMAGE} | grep label-id | awk -F: '{ print $2 }'`
 if [ -z $LABEL_ID ]; then
     echo unable to read label-id
@@ -157,6 +157,6 @@ sudo losetup -d /dev/loop0
 rmdir $mountpoint
 
 ssh_control &
-qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -hda ${RASPBIAN_IMAGE} -netdev user,id=ethernet.0,hostfwd=tcp::2222-:22
+qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -drive file=${RASPBIAN_IMAGE},format=raw -netdev user,id=ethernet.0,hostfwd=tcp::2222-:22
 
 
