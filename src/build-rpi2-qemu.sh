@@ -157,4 +157,5 @@ sudo losetup -d /dev/loop0
 rmdir $mountpoint
 
 ssh_control &
-qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -hda ${RASPBIAN_IMAGE} -redir tcp:2222::22
+strace qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -hda ${RASPBIAN_IMAGE} -redir tcp:2222::22 || true
+ltrace qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -hda ${RASPBIAN_IMAGE} -redir tcp:2222::22
