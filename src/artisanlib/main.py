@@ -12480,7 +12480,7 @@ class ApplicationWindow(QMainWindow):
                 }
                 QPushButton:hover:!pressed {
                     color: white;
-                    background: #1985ba';
+                    background: #1985ba;
                 }
             """,
             "ON":    """
