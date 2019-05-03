@@ -76,7 +76,7 @@ EOF
     trap die ERR
     ${SSH} pi@localhost bash script
     ${SCP} pi@localhost:artisan/src/\*.deb src
-    pkill -9 qemu-system-arm
+    pkill qemu-system-arm
 }
 
 ssh-keygen -R "[localhost]:2222"
@@ -158,6 +158,6 @@ sudo losetup -d /dev/loop0
 rmdir $mountpoint
 
 ssh_control &
-qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -drive file=${RASPBIAN_IMAGE},format=raw -device e1000,netdev=ethernet0 -netdev user,id=ethernet0,hostfwd=tcp::2222-:22
+qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -drive file=${RASPBIAN_IMAGE},format=raw -net nic -netdev user,id=ethernet0,hostfwd=tcp::2222-:22
 
 
