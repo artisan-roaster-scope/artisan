@@ -6764,8 +6764,8 @@ class tgraphcanvas(FigureCanvas):
             except Exception:
                 pass
 #dave90  start...
-#            aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-            aw.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(aw.lcdpaletteF["timer"],aw.createGradient(aw.lcdpaletteB["timer"])))
+            aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+#            aw.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(aw.lcdpaletteF["timer"],aw.createGradient(aw.lcdpaletteB["timer"])))
 #dave90  ...end
             
             #reset alarms
@@ -12799,16 +12799,16 @@ class ApplicationWindow(QMainWindow):
                     """ + border_modern + """
                     font-size: 10pt;
                     font-weight: bold;
-                    color: black;
-                    background:""" + self.createGradient('yellow') + """ ;
+                    color: white;
+                    background:""" + self.createGradient('#bdbdbd') + """ ;
                 }
                 QPushButton:pressed {
-                    color: black;
-                    background:""" + self.createGradient('yellow') + """ ;
+                    color: white;
+                    background:""" + self.createGradient('#757575') + """ ;
                 }
                 QPushButton:hover:!pressed {
-                    color: black;
-                    background:""" + self.createGradient('yellow') + """ ;
+                    color: white;
+                    background:""" + self.createGradient('#9e9e9e') + """ ;
                 }
             """,
             "PID":     """
@@ -12942,16 +12942,16 @@ class ApplicationWindow(QMainWindow):
                     """ + border_modern + """
                     font-size: 11pt;
                     font-weight: bold;
-                    color: yellow;
-                    background:""" + self.createGradient('#6D4824') + """ ;
+                    color: #e687a8;
+                    background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:pressed {
-                    color: yellow;
-                    background:""" + self.createGradient('#6D4824') + """ ;
+                    color: #f0b7cb;
+                    background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
-                    color: yellow;
-                    background:""" + self.createGradient('#6D4824') + """ ;
+                    color: #f0b7cb;
+                    background:""" + self.createGradient('#147bb3') + """ ;
                 }
             """
             }
@@ -13365,7 +13365,7 @@ class ApplicationWindow(QMainWindow):
         self.lineEvent = QLineEdit()
         self.lineEvent.setMinimumWidth(200)
 
-        self.eventlabel.setStyleSheet("background-color:'yellow';")
+        self.eventlabel.setStyleSheet("background-color:'#bdbdbd';")
 
         self.etypeComboBox = QComboBox()
         self.etypeComboBox.setToolTip(QApplication.translate("Tooltip", "Type of event", None))
@@ -13960,7 +13960,7 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createRGBGradient(): {0}").format(str(e)),exc_tb.tb_lineno)
-            lighter_rgb = darker_rgb + "000000"
+            lighter_rgb = darker_rgb = "000000"
         return lighter_rgb,darker_rgb
     # for use in widgets that expects a double via a aw.createCLocalDoubleValidator that accepts both,
     # one dot and several commas. If there is no dot, the last comma is interpreted as decimal separator and the others removed
