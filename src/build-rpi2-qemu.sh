@@ -125,6 +125,7 @@ sudo sh -c "echo 'systemctl stop graphical.target --force' >> $mountpoint/etc/rc
 sudo sh -c "echo 'systemctl stop plymouth.service --force' >> $mountpoint/etc/rc.local"
 # HACK to work around piwheels.org DNS problems
 sudo sh -c "echo '93.93.129.174 proxy.mythic-beasts.com piwheels.org www.piwheels.org' >> $mountpoint/etc/hosts"
+sudo rm $mountpoint/etc/ld.so.preload
 sudo mkdir $mountpoint/home/pi/.ssh
 sudo chown 1000  $mountpoint/home/pi/.ssh
 sudo chmod go-rwx $mountpoint/home/pi/.ssh
@@ -157,6 +158,6 @@ sudo losetup -d /dev/loop0
 rmdir $mountpoint
 
 ssh_control &
-qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -drive file=${RASPBIAN_IMAGE},format=raw -net nic -netdev user,id=ethernet.0,hostfwd=tcp::2222-:22
+qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -drive file=${RASPBIAN_IMAGE},format=raw -nic user,hostfwd=tcp::2222-:22
 
 
