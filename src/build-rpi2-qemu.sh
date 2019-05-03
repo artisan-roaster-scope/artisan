@@ -109,7 +109,7 @@ device: ${RASPBIAN_IMAGE}
 unit: sectors
 
 ${RASPBIAN_IMAGE}1 : start=        8192, size=       85611, type=c
-${RASPBIAN_IMAGE}2 : start=       98304, size=    13860863, type=83
+${RASPBIAN_IMAGE}2 : start=       98304, size=    13869055, type=83
 EOF
 sfdisk  ${RASPBIAN_IMAGE} < $partitions
 rm $partitions
