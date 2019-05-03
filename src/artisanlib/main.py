@@ -13406,6 +13406,7 @@ class ApplicationWindow(QMainWindow):
         self.lowerbuttondialogLayout.setContentsMargins(0, 0, 0, 10)
         self.lowerbuttondialog = QFrame()
         self.lowerbuttondialog.setLayout(self.lowerbuttondialogLayout)
+        self.lowerbuttondialog.setVisible(False)
         
         #initiate configuration
         self.lowerbuttondialogLayout.addStretch()
