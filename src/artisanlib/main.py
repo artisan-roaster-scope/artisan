@@ -11608,6 +11608,13 @@ class ApplicationWindow(QMainWindow):
         #  5-8: custom event types (relative value assignments; +/- steps)
         self.extraeventbuttoncolor,self.extraeventbuttontextcolor = [],[]
         self.extraeventsactionstrings,self.extraeventsactions,self.extraeventsvisibility = [],[],[] #hold string,index,index
+        
+        # indicates if the button is 
+        #   0: square
+        #   1: left rounded
+        #   2: right rounded
+        #   3: rounded on both sides
+        self.extraeventbuttonround = [] # set by realignbuttons on rendering the button rows and read by setExtraEventButtonStyle to update the style
 
         # quantification is blocked if lock_quantification_sampling_ticks is not 0
         # (eg. after a change of the event value by button or slider actions)
@@ -12967,7 +12974,7 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
         self.shadow_1 = QGraphicsDropShadowEffect(self)
         self.shadow_1.setBlurRadius(20)
-        self.shadow_1.setOffset(0,1)
+        self.shadow_1.setOffset(0,0.9)
         self.button_1.setGraphicsEffect(self.shadow_1)
         self.button_1.pressed.connect(lambda : self.buttonPressed(self.button_1))
         self.button_1.released.connect(lambda : self.buttonReleased(self.button_1))
@@ -12988,7 +12995,7 @@ class ApplicationWindow(QMainWindow):
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
         self.shadow_2 = QGraphicsDropShadowEffect(self)
         self.shadow_2.setBlurRadius(20)
-        self.shadow_2.setOffset(0,1)
+        self.shadow_2.setOffset(0,0.9)
         self.button_2.setGraphicsEffect(self.shadow_2)
         self.button_2.pressed.connect(lambda : self.buttonPressed(self.button_2))
         self.button_2.released.connect(lambda : self.buttonReleased(self.button_2))
@@ -13009,6 +13016,7 @@ class ApplicationWindow(QMainWindow):
         self.button_3.setMinimumHeight(self.standard_button_height)
         self.button_3.setToolTip(QApplication.translate("Tooltip", "First Crack Start", None))
         self.button_3.clicked.connect(lambda _:self.qmc.mark1Cstart())
+        self.button_3.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.button_4 = QPushButton(QApplication.translate("Button", "FC\nEND", None))
         self.button_4.setFocusPolicy(Qt.NoFocus)
@@ -13016,6 +13024,7 @@ class ApplicationWindow(QMainWindow):
         self.button_4.setMinimumHeight(self.standard_button_height)
         self.button_4.setToolTip(QApplication.translate("Tooltip", "First Crack End", None))
         self.button_4.clicked.connect(lambda _:self.qmc.mark1Cend())
+        self.button_4.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.button_5 = QPushButton(QApplication.translate("Button", "SC\nSTART", None))
         self.button_5.setFocusPolicy(Qt.NoFocus)
@@ -13023,6 +13032,7 @@ class ApplicationWindow(QMainWindow):
         self.button_5.setMinimumHeight(self.standard_button_height)
         self.button_5.setToolTip(QApplication.translate("Tooltip", "Second Crack Start", None))
         self.button_5.clicked.connect(lambda _:self.qmc.mark2Cstart())
+        self.button_5.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.button_6 = QPushButton(QApplication.translate("Button", "SC\nEND", None))
         self.button_6.setFocusPolicy(Qt.NoFocus)
@@ -13030,6 +13040,7 @@ class ApplicationWindow(QMainWindow):
         self.button_6.setMinimumHeight(self.standard_button_height)
         self.button_6.setToolTip(QApplication.translate("Tooltip", "Second Crack End", None))
         self.button_6.clicked.connect(lambda _:self.qmc.mark2Cend())
+        self.button_6.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create RESET button
         self.button_7 = QPushButton(QApplication.translate("Button", "RESET", None))
@@ -13037,7 +13048,7 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
         self.shadow_7 = QGraphicsDropShadowEffect(self)
         self.shadow_7.setBlurRadius(20)
-        self.shadow_7.setOffset(0,1)
+        self.shadow_7.setOffset(0,0.9)
         self.button_7.setGraphicsEffect(self.shadow_7)
         self.button_7.pressed.connect(lambda : self.buttonPressed(self.button_7))
         self.button_7.released.connect(lambda : self.buttonReleased(self.button_7))
@@ -13059,6 +13070,7 @@ class ApplicationWindow(QMainWindow):
         self.button_8.setMinimumHeight(self.standard_button_height)
         self.button_8.setToolTip(QApplication.translate("Tooltip", "Charge", None))
         self.button_8.clicked.connect(lambda _:self.qmc.markCharge())
+        self.button_8.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create DROP button
         self.button_9 = QPushButton(QApplication.translate("Button", "DROP", None))
@@ -13067,6 +13079,7 @@ class ApplicationWindow(QMainWindow):
         self.button_9.setMinimumHeight(self.standard_button_height)
         self.button_9.setToolTip(QApplication.translate("Tooltip", "Drop", None))
         self.button_9.clicked.connect(lambda _:self.qmc.markDrop())
+        self.button_9.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create PID control button
         self.button_10 = QPushButton(QApplication.translate("Button", "Control", None))
@@ -13074,7 +13087,7 @@ class ApplicationWindow(QMainWindow):
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
         self.shadow_10 = QGraphicsDropShadowEffect(self)
         self.shadow_10.setBlurRadius(20)
-        self.shadow_10.setOffset(0,1)
+        self.shadow_10.setOffset(0,0.9)
         self.button_10.setGraphicsEffect(self.shadow_10)
         self.button_10.pressed.connect(lambda : self.buttonPressed(self.button_10))
         self.button_10.released.connect(lambda : self.buttonReleased(self.button_10))
@@ -13097,6 +13110,7 @@ class ApplicationWindow(QMainWindow):
         self.button_11.setMinimumHeight(self.standard_button_height)
         self.button_11.setToolTip(QApplication.translate("Tooltip", "Event", None))
         self.button_11.clicked.connect(lambda _:self.qmc.EventRecord())
+        self.button_11.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create PID+5 button
         self.button_12 = QPushButton(QApplication.translate("Button", "SV +5", None))
@@ -13105,6 +13119,7 @@ class ApplicationWindow(QMainWindow):
         self.button_12.setMinimumWidth(90)
         self.button_12.setMinimumHeight(self.standard_button_height)
         self.button_12.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 5", None))
+        self.button_12.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create PID+10 button
         self.button_13 = QPushButton(QApplication.translate("Button", "SV +10", None))
@@ -13113,6 +13128,7 @@ class ApplicationWindow(QMainWindow):
         self.button_13.setMinimumWidth(90)
         self.button_13.setMinimumHeight(self.standard_button_height)
         self.button_13.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 10", None))
+        self.button_13.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create PID+20 button
         self.button_14 = QPushButton(QApplication.translate("Button", "SV +20", None))
@@ -13121,6 +13137,7 @@ class ApplicationWindow(QMainWindow):
         self.button_14.setMinimumWidth(90)
         self.button_14.setMinimumHeight(self.standard_button_height)
         self.button_14.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 20", None))
+        self.button_14.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create PID-20 button
         self.button_15 = QPushButton(QApplication.translate("Button", "SV -20", None))
@@ -13129,6 +13146,7 @@ class ApplicationWindow(QMainWindow):
         self.button_15.setMinimumWidth(90)
         self.button_15.setMinimumHeight(self.standard_button_height)
         self.button_15.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 20", None))
+        self.button_15.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create PID-10 button
         self.button_16 = QPushButton(QApplication.translate("Button", "SV -10", None))
@@ -13137,6 +13155,7 @@ class ApplicationWindow(QMainWindow):
         self.button_16.setMinimumWidth(90)
         self.button_16.setMinimumHeight(self.standard_button_height)
         self.button_16.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 10", None))
+        self.button_16.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create PID-5 button
         self.button_17 = QPushButton(QApplication.translate("Button", "SV -5", None))
@@ -13145,6 +13164,7 @@ class ApplicationWindow(QMainWindow):
         self.button_17.setMinimumWidth(90)
         self.button_17.setMinimumHeight(self.standard_button_height)
         self.button_17.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 5", None))
+        self.button_17.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create HUD button
         self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None))
@@ -13159,6 +13179,7 @@ class ApplicationWindow(QMainWindow):
         self.button_18.clicked.connect(lambda _:self.qmc.toggleHUD())
         self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None))
         self.button_18.setEnabled(False)
+        self.button_18.setCursor(QCursor(Qt.PointingHandCursor))
         if not self.qmc.HUDbuttonflag:
             self.button_18.setVisible(False)
         if app.artisanviewerMode:
@@ -13171,6 +13192,7 @@ class ApplicationWindow(QMainWindow):
         self.button_19.setMinimumHeight(self.standard_button_height)
         self.button_19.setToolTip(QApplication.translate("Tooltip", "Dry End", None))
         self.button_19.clicked.connect(lambda _:self.qmc.markDryEnd())
+        self.button_19.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create COOLe button
         self.button_20 = QPushButton(QApplication.translate("Button", "COOL\nEND", None))
@@ -13179,6 +13201,7 @@ class ApplicationWindow(QMainWindow):
         self.button_20.setMinimumHeight(self.standard_button_height)
         self.button_20.setToolTip(QApplication.translate("Tooltip", "Cool End", None))
         self.button_20.clicked.connect(lambda _:self.qmc.markCoolEnd())
+        self.button_20.setCursor(QCursor(Qt.PointingHandCursor))
 
         #connect PID sv easy buttons
         self.button_12.clicked.connect(lambda _: self.adjustPIDsv(5))
@@ -13378,29 +13401,48 @@ class ApplicationWindow(QMainWindow):
         self.eventbuttontablecolumnwidths = [] # custom event button table column widths
 
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
-        self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
-        self.lowerbuttondialog.setContentsMargins(0,0,0,10) # left, top, right, bottom
-        self.lowerbuttondialog.setVisible(False)
-        self.lowerbuttondialog.setCenterButtons(True)
+        self.lowerbuttondialogLayout = QHBoxLayout()
+        self.lowerbuttondialogLayout.setSpacing(5)
+        self.lowerbuttondialogLayout.setContentsMargins(0, 0, 0, 10)
+        self.lowerbuttondialog = QFrame()
+        self.lowerbuttondialog.setLayout(self.lowerbuttondialogLayout)
+        
         #initiate configuration
-        self.lowerbuttondialog.addButton(self.button_8,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_19,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_3,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_4,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_5,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_6,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_9,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_20,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_11,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialogLayout.addStretch()
+        self.lowerbuttondialogLayout.addWidget(self.button_8)
+        self.lowerbuttondialogLayout.addWidget(self.button_19)
+        self.lowerbuttondialogLayout.addWidget(self.button_3)
+        self.lowerbuttondialogLayout.addWidget(self.button_4)
+        self.lowerbuttondialogLayout.addWidget(self.button_5)
+        self.lowerbuttondialogLayout.addWidget(self.button_6)
+        self.lowerbuttondialogLayout.addWidget(self.button_9)
+        self.lowerbuttondialogLayout.addWidget(self.button_20)
+        self.lowerbuttondialogLayout.addWidget(self.button_11)
+        self.lowerbuttondialogLayout.addStretch()
 
-        self.e1buttondialog = QDialogButtonBox(Qt.Horizontal)
-        self.e1buttondialog.setCenterButtons(True)
-        self.e2buttondialog = QDialogButtonBox(Qt.Horizontal)
-        self.e2buttondialog.setCenterButtons(True)
-        self.e3buttondialog = QDialogButtonBox(Qt.Horizontal)
-        self.e3buttondialog.setCenterButtons(True)
-        self.e4buttondialog = QDialogButtonBox(Qt.Horizontal)
-        self.e4buttondialog.setCenterButtons(True)
+        self.e1buttonbarLayout = QHBoxLayout()
+        self.e1buttonbarLayout.setSpacing(1)
+        self.e1buttonbarLayout.setContentsMargins(0, 0, 0, 0)
+        self.e1buttondialog = QFrame()
+        self.e1buttondialog.setContentsMargins(0, 5, 0, 5)
+        self.e1buttondialog.setLayout(self.e1buttonbarLayout)
+        
+        self.e2buttonbarLayout = QHBoxLayout()
+        self.e2buttonbarLayout.setSpacing(1)
+        self.e2buttonbarLayout.setContentsMargins(0, 0, 0, 0)
+        self.e2buttondialog = QFrame()
+        self.e2buttondialog.setContentsMargins(0, 0, 0, 0)
+        self.e2buttondialog.setLayout(self.e2buttonbarLayout)
+        
+        self.e3buttonbarLayout = QHBoxLayout()
+        self.e3buttonbarLayout.setSpacing(1)
+        self.e3buttondialog = QFrame()
+        self.e3buttondialog.setLayout(self.e3buttonbarLayout)
+        
+        self.e4buttonbarLayout = QHBoxLayout()
+        self.e4buttonbarLayout.setSpacing(1)
+        self.e4buttondialog = QFrame()
+        self.e4buttondialog.setLayout(self.e4buttonbarLayout)
 
         # set the focus on the main widget
         self.main_widget.setFocus()
@@ -13619,6 +13661,7 @@ class ApplicationWindow(QMainWindow):
 
         extrabuttonsLayout = QVBoxLayout()
         extrabuttonsLayout.setContentsMargins(0,0,0,0)
+        extrabuttonsLayout.setSpacing(0)
         extrabuttonsLayout.addWidget(self.e1buttondialog)
         extrabuttonsLayout.addWidget(self.e2buttondialog)
         extrabuttonsLayout.addWidget(self.e3buttondialog)
@@ -13873,14 +13916,14 @@ class ApplicationWindow(QMainWindow):
     def buttonPressed(self, button):
         # shadow needs to be recreated each time?
         self.strong_shadow = QGraphicsDropShadowEffect(self)
-        self.strong_shadow.setBlurRadius(30)
-        self.strong_shadow.setOffset(0,4)
+        self.strong_shadow.setBlurRadius(40)
+        self.strong_shadow.setOffset(0,3)
         button.setGraphicsEffect(self.strong_shadow)
     def buttonReleased(self,button):
         # shadow needs to be recreated each time?
         self.shadow = QGraphicsDropShadowEffect(self)
         self.shadow.setBlurRadius(20)
-        self.shadow.setOffset(0,1)
+        self.shadow.setOffset(0,0.9)
         button.setGraphicsEffect(self.shadow)
     def createGradient(self,rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
 #    def createGradient(self,rgb, tint_factor=0.2, shade_factor=0.2, reverse=False):
@@ -16708,24 +16751,44 @@ class ApplicationWindow(QMainWindow):
                 self.slider4.setValue(v)
 
     def setExtraEventButtonStyle(self, tee, style="normal"):
-#dave90  start...
-        buttonstyle = "min-width:75px;border-style:solid; border-radius:3;border-color:grey; border-width:1;"
-        normalstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background: %s}"%(
-                self.extraeventbuttontextcolor[tee], self.createGradient(self.extraeventbuttoncolor[tee]))
-        pressedstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background: %s}"%(
-                self.extraeventbuttoncolor[tee],self.createGradient(self.extraeventbuttontextcolor[tee]))
-#dave90  ...end
+        buttonstyle = "min-width:60px; margin: 0; padding: 0px; border-style: solid; border-color: darkgrey; border-width: 0; font-size: 9pt; font-weight: bold;"
+        if len(self.extraeventbuttonround) > tee:
+            if self.extraeventbuttonround[tee] == 1: # left-side rounded
+                buttonstyle += "border-top-left-radius: 4px; border-bottom-left-radius: 4px;"
+            elif self.extraeventbuttonround[tee] == 2: # right-side rounded
+                buttonstyle += "border-top-right-radius: 4px; border-bottom-right-radius: 4px;"
+            elif self.extraeventbuttonround[tee] == 3: # both-sides rounded
+                buttonstyle += "border-radius: 4px;"
+            else:
+                buttonstyle += "border-radius: 0px;"
         if style=="normal":
-            # set color of this button to "normal"
-#dave90            normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
-#dave90                    self.extraeventbuttontextcolor[tee],self.extraeventbuttoncolor[tee])
-            self.buttonlist[tee].setStyleSheet(normalstyle)
-
-        if style=="pressed":
+            color = self.extraeventbuttontextcolor[tee]
+            backgroundcolor = self.extraeventbuttoncolor[tee]
+        else: # style=="pressed":
             # set color of this button to "pressed"
-#dave90            pressedstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
-#dave90                    self.extraeventbuttoncolor[tee],self.extraeventbuttontextcolor[tee])
-            self.buttonlist[tee].setStyleSheet(pressedstyle)
+            color = self.extraeventbuttoncolor[tee]
+            backgroundcolor = self.extraeventbuttontextcolor[tee]
+        core_style = """
+            min-width:60px; 
+            margin: 0; 
+            padding: 0px; 
+            border-style: solid; 
+            border-color: darkgrey; 
+            border-width: 0; 
+            font-size: 9pt; 
+            font-weight: bold; 
+            color: %s; 
+            background: %s}"""
+        plain_style = "QPushButton {" + \
+            buttonstyle + \
+            core_style%(color,backgroundcolor)
+        pressed_style = "QPushButton:hover:pressed {"+ \
+            buttonstyle + \
+            core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(80).name()))
+        hover_style = "QPushButton:hover:!pressed {"+ \
+            buttonstyle + \
+            core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(110).name()))
+        self.buttonlist[tee].setStyleSheet(plain_style + hover_style + pressed_style)
 
     #called from user configured event buttons
     def recordextraevent(self,ee):
@@ -26892,13 +26955,23 @@ class ApplicationWindow(QMainWindow):
         else:
             aw.showExtraButtons()
 
+    def clearBoxLayout(self,layout):
+        while layout.count(): 
+            item = layout.takeAt(0)
+            widget = item.widget() 
+            if widget is not None: 
+                widget.deleteLater()
+                         
     #orders extra event buttons based on max number of buttons
     def realignbuttons(self):
         #clear buttons
-        self.e1buttondialog.clear()
-        self.e2buttondialog.clear()
-        self.e3buttondialog.clear()
-        self.e4buttondialog.clear()
+        self.clearBoxLayout(self.e1buttonbarLayout)
+        self.clearBoxLayout(self.e2buttonbarLayout)
+        self.clearBoxLayout(self.e3buttonbarLayout)
+        self.clearBoxLayout(self.e4buttonbarLayout)
+        
+        self.extraeventbuttonround = []
+
         self.buttonlist = []
         self.buttonStates = []
         #hide all extra button rows
@@ -26906,15 +26979,88 @@ class ApplicationWindow(QMainWindow):
         self.e2buttondialog.setVisible(False)
         self.e3buttondialog.setVisible(False)
         self.e4buttondialog.setVisible(False)
+
+        row1count = 0
+        row2count = 0
+        row3count = 0
+        row4count = 0
         for i in range(len(self.extraeventstypes)):
             p = QPushButton()
-            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttontextcolor[i],self.extraeventbuttoncolor[i])
-#dave90  start...
-            buttonstyle = "min-width:75px;border-style:solid; border-radius:3;border-color:grey; border-width:1;"
-            style = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background: %s}"%(self.extraeventbuttontextcolor[i],self.createGradient(self.extraeventbuttoncolor[i]))
-#dave90  ...end
-            p.setStyleSheet(style)
-            p.setMinimumHeight(aw.standard_button_height)
+            p.setAutoDefault(False)
+
+            left_rounded_style = "border-top-left-radius: 4px; border-bottom-left-radius: 4px;"
+            right_rounded_style = "border-top-right-radius: 4px; border-bottom-right-radius: 4px;"
+            fully_rounded_style = "border-radius: 4px;"
+            square_style = "border-radius: 0px;"
+            
+            # next button in this group is hidden
+            next_hidden = (i%self.buttonlistmaxlen < self.buttonlistmaxlen -1 and  # at least one more places in the group 
+                    i+1 < len(self.extraeventstypes) and # there is one more button
+                    not self.extraeventsvisibility[i+1]) # and the next one is hidden
+            # previous button in this group is hidden
+            prev_hidden = (i%self.buttonlistmaxlen > 0 and # at least one previous place in this group
+                    i > 0 and # there is more than one button in total
+                    not self.extraeventsvisibility[i-1]) # and the previous one is hidden
+
+            if (i%self.buttonlistmaxlen) == 0: # left-most button in the row
+                if i == len(self.extraeventstypes)-1 or next_hidden:
+                    # a singleton button in a one element bar
+                    buttonstyle = fully_rounded_style
+                    self.extraeventbuttonround.append(3)
+                else:
+                    # the left-most button in this bar
+                    buttonstyle = left_rounded_style
+                    self.extraeventbuttonround.append(1)
+            elif ((i%self.buttonlistmaxlen) < self.buttonlistmaxlen-1) and i != len(self.extraeventstypes)-1:
+                # a button in the middle of this bar
+                if prev_hidden and next_hidden:
+                    # we round both sides
+                    buttonstyle = fully_rounded_style
+                    self.extraeventbuttonround.append(3)
+                elif prev_hidden:
+                    # we start a new rounded-group
+                    buttonstyle = left_rounded_style
+                    self.extraeventbuttonround.append(1)
+                elif next_hidden:
+                    buttonstyle = right_rounded_style
+                    self.extraeventbuttonround.append(2)
+                else:
+                    # squared button
+                    buttonstyle = square_style
+                    self.extraeventbuttonround.append(0)
+            else:
+                # the right-most button in this bar
+                if prev_hidden:
+                    buttonstyle = fully_rounded_style
+                    self.extraeventbuttonround.append(3)
+                else:
+                    buttonstyle = right_rounded_style
+                    self.extraeventbuttonround.append(2)
+            core_style = """
+                min-width:60px; 
+                margin: 0; 
+                padding: 0px; 
+                border-style: solid; 
+                border-color: darkgrey; 
+                border-width: 0; 
+                font-size: 9pt; 
+                font-weight: bold; 
+                color: %s; 
+                background: %s}"""
+            # hover
+            plain_style = "QPushButton {" + \
+                buttonstyle + \
+                core_style%(self.extraeventbuttontextcolor[i],self.createGradient(self.extraeventbuttoncolor[i]))
+            pressed_style = "QPushButton:hover:pressed {"+ \
+                buttonstyle + \
+                core_style%(self.extraeventbuttontextcolor[i],self.createGradient(QColor(self.extraeventbuttoncolor[i]).lighter(80).name()))
+            hover_style = "QPushButton:hover:!pressed {"+ \
+                buttonstyle + \
+                core_style%(self.extraeventbuttontextcolor[i],self.createGradient(QColor(self.extraeventbuttoncolor[i]).lighter(110).name()))
+            p.setStyleSheet(plain_style + hover_style + pressed_style)
+            p.setMinimumHeight(30)
+            p.setCursor(QCursor(Qt.PointingHandCursor))
+            
             l = self.extraeventslabels[i]
             # event type et
             et = self.extraeventstypes[i]
@@ -26927,21 +27073,43 @@ class ApplicationWindow(QMainWindow):
             p.clicked.connect(lambda _,x=i:self.recordextraevent(x))
             self.buttonlist.append(p)
             self.buttonStates.append(0)
-            #add button to row (CHANGED: now never add extra buttons to default button set)
-            if False: #lowerbuttonvisiblebuttons < self.buttonlistmaxlen:
-                self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-            elif len(self.e1buttondialog.buttons()) < self.buttonlistmaxlen:
-                self.e1buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-                self.e1buttondialog.setVisible(True)
-            elif len(self.e2buttondialog.buttons()) < self.buttonlistmaxlen:
-                self.e2buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-                self.e2buttondialog.setVisible(True)
-            elif len(self.e3buttondialog.buttons()) < self.buttonlistmaxlen:
-                self.e3buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-                self.e3buttondialog.setVisible(True)
+            #add button to row
+            if row1count < self.buttonlistmaxlen:
+                self.e1buttonbarLayout.addWidget(self.buttonlist[i])
+                if not self.extraeventsvisibility[i]:
+                    self.e1buttonbarLayout.addSpacing(5)
+                row1count += 1
+            elif row2count < self.buttonlistmaxlen:
+                self.e2buttonbarLayout.addWidget(self.buttonlist[i])
+                if not self.extraeventsvisibility[i]:
+                    self.e2buttonbarLayout.addSpacing(5)
+                row2count += 1
+            elif row3count < self.buttonlistmaxlen:
+                self.e3buttonbarLayout.addWidget(self.buttonlist[i])
+                if not self.extraeventsvisibility[i]:
+                    self.e3buttonbarLayout.addSpacing(5)
+                row3count += 1
             else:
-                self.e4buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-                self.e4buttondialog.setVisible(True)
+                self.e4buttonbarLayout.addWidget(self.buttonlist[i])
+                if not self.extraeventsvisibility[i]:
+                    self.e4buttonbarLayout.addSpacing(5)
+                row4count += 1
+        if self.e1buttonbarLayout.count() > 0:
+            self.e1buttondialog.setVisible(True)
+            self.e1buttonbarLayout.insertStretch(0)
+            self.e1buttonbarLayout.insertStretch(self.e1buttonbarLayout.count())
+        if self.e2buttonbarLayout.count() > 0:
+            self.e2buttondialog.setVisible(True)
+            self.e2buttonbarLayout.insertStretch(0)
+            self.e2buttonbarLayout.insertStretch(self.e2buttonbarLayout.count())
+        if self.e3buttonbarLayout.count() > 0:
+            self.e3buttondialog.setVisible(True)
+            self.e3buttonbarLayout.insertStretch(0)
+            self.e3buttonbarLayout.insertStretch(self.e3buttonbarLayout.count())
+        if self.e4buttonbarLayout.count() > 0:
+            self.e4buttondialog.setVisible(True)
+            self.e4buttonbarLayout.insertStretch(0)
+            self.e4buttonbarLayout.insertStretch(self.e4buttonbarLayout.count())
         self.settooltip()
         aw.buttonsAction.setEnabled(bool(len(aw.extraeventslabels) > 0))
         if app.artisanviewerMode:
@@ -35820,7 +35988,7 @@ class EventsDlg(ArtisanDialog):
             self.createEventbuttonTable()
 
     def insertextraeventbutton(self,insert=False):
-        if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
+        if len(self.extraeventstypes) >= aw.buttonlistmaxlen * 4: # max 4 rows of buttons of buttonlistmaxlen
             return
 
         bindex = len(self.extraeventstypes)
@@ -36158,7 +36326,6 @@ class EventsDlg(ArtisanDialog):
                 aw.updateSlidersProperties() # set visibility and event names on slider widgets
                 # we save the current button and slider definitions to palette 0
                 aw.transferbuttonsto(0)
-                aw.realignbuttons()
                 aw.qmc.redraw(recomputeAllDeltas=False)
                 aw.sendmessage(QApplication.translate("Message","Event configuration saved", None))
                 self.close()
