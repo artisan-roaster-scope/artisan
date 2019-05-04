@@ -72,17 +72,17 @@ buttonpalette="@Variant(\0\0\0\t\0\0\0\x18\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\b\0\0
 buttonpalette_shortcuts=true
 buttonpalettemaxlen=11, 14, 14, 14, 14, 14, 14, 14, 14, 14
 eventbuttontablecolumnwidths=70, 80, 128, 64, 165, 98, 92, 100, 227, 105
-extraeventbuttoncolor=#910113, #910113, #4895ce, #4895ce
-extraeventbuttontextcolor=#ffffff, #ffffff, #ffffff, #ffffff
-extraeventsactions=1, 1, 1, 1
-extraeventsactionstrings="OT1,{}", "OT1,{}", "DCFAN,{}", "DCFAN,{}"
+extraeventbuttoncolor=#910113, #910113, yellow, #4895ce, #4895ce
+extraeventbuttontextcolor=#ffffff, #ffffff, black, #ffffff, #ffffff
+extraeventsactions=1, 1, 0, 1, 1
+extraeventsactionstrings="OT1,{}", "OT1,{}", , "DCFAN,{}", "DCFAN,{}"
 extraeventsbuttonsflag=1
 extraeventsbuttonsflags=0, 1, 1
-extraeventsdescriptions=, , , 
-extraeventslabels=Heater\n+10, Heater\n-10, Fan\n+10, Fan\n-10
-extraeventstypes=8, 8, 5, 5
-extraeventsvalues=2, -2, 2, -2
-extraeventsvisibility=1, 1, 1, 1
+extraeventsdescriptions=, , , , 
+extraeventslabels=Heater\n+10, Heater\n-10, E, Fan\n+10, Fan\n-10
+extraeventstypes=8, 8, 4, 5, 5
+extraeventsvalues=2, -2, 0, 2, -2
+extraeventsvisibility=1, 1, 0, 1, 1
 
 [RoastProperties]
 roastertype=Hottop TC4

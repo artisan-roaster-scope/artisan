@@ -8,6 +8,7 @@ dutyMin=-100
 dutySteps=1
 invertControl=false
 loadRampSoakFromProfile=false
+pOnE=true
 pidCycle=1000
 pidKd=3
 pidKi=0.01
@@ -50,24 +51,6 @@ extramathexpression1=,
 extramathexpression2=, 
 extraname1=DT, {1}
 extraname2=SV, {0}
-
-[ExtraEventButtons]
-buttonlistmaxlen=11
-buttonpalette=@Variant(\0\0\0\t\0\0\0\x18\0\0\0\t\0\0\0\0\0\0\0\t\0\0\0\0\0\0\0\t\0\0\0\0\0\0\0\t\0\0\0\0\0\0\0\t\0\0\0\0\0\0\0\t\0\0\0\0\0\0\0\t\0\0\0\0\0\0\0\t\0\0\0\0\0\0\0\t\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x5\0\0\0\x2\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0)
-buttonpalette_shortcuts=true
-buttonpalettemaxlen=11, 14, 14, 14, 14, 14, 14, 14, 14, 14
-eventbuttontablecolumnwidths=70, 80, 36, 50, 45, 94, 57, 39, 67, 100
-extraeventbuttoncolor=@Invalid()
-extraeventbuttontextcolor=@Invalid()
-extraeventsactions=@Invalid()
-extraeventsactionstrings=@Invalid()
-extraeventsbuttonsflag=1
-extraeventsbuttonsflags=0, 1, 1
-extraeventsdescriptions=@Invalid()
-extraeventslabels=@Invalid()
-extraeventstypes=@Invalid()
-extraeventsvalues=@Invalid()
-extraeventsvisibility=@Invalid()
 
 [Modbus]
 PID_OFF_action=
