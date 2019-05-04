@@ -173,7 +173,7 @@ from unidecode import unidecode
 
 import artisanlib.arabic_reshaper
 from artisanlib.util import appFrozen, decs2string, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
-#from artisanlib.suppress_errors import suppress_stdout_stderr
+from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
@@ -10548,9 +10548,9 @@ class VMToolbar(NavigationToolbar):
     def recolorIcon(self, pixmap, color):
         tmp = pixmap.toImage()
         for y in range(tmp.height()):
-          for x in range(tmp.width()):
-            color.setAlpha(tmp.pixelColor(x,y).alpha())
-            tmp.setPixelColor(x,y,color)
+            for x in range(tmp.width()):
+                color.setAlpha(tmp.pixelColor(x,y).alpha())
+                tmp.setPixelColor(x,y,color)
         return QPixmap.fromImage(tmp)
 
 #PLUS
@@ -12456,7 +12456,7 @@ class ApplicationWindow(QMainWindow):
         else:
             self.ooss_font_size = '14pt'
         border_modern = "border-style:solid; border-radius:4;border-color:grey; border-width:0;" # modernize
-        border_modern_pressed = "border-style:solid; border-radius:4;border-color:black; border-width:0;" # modernize
+#        border_modern_pressed = "border-style:solid; border-radius:4;border-color:black; border-width:0;" # modernize
         # Can't find a way to use palette colors here i.e., aw.palette['canvas']  This needs to get solved.
         # parking this green shade in case we want to use it later #00d55a
         self.pushbuttonstyles = {
@@ -13941,19 +13941,18 @@ class ApplicationWindow(QMainWindow):
         self.shadow.setOffset(0,0.9)
         button.setGraphicsEffect(self.shadow)
     def createGradient(self,rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
-#    def createGradient(self,rgb, tint_factor=0.2, shade_factor=0.2, reverse=False):
         default_gradient = 'light_to_dark'  # set this to either 'dark_to_light' or 'light_to_dark'
         if reverse == True:
             if default_gradient == 'dark_to_light':
-                dir = 'light2dark'
+                cdir = 'light2dark'
             else:
-                dir = 'dark2light'
+                cdir = 'dark2light'
         else:
             if default_gradient == 'dark_to_light':
-                dir = 'dark2light'
+                cdir = 'dark2light'
             else:
-                dir = 'light2dark'
-        if dir == 'dark2light':
+                cdir = 'light2dark'
+        if cdir == 'dark2light':
             res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] +");"
         else:    # light2dark
             res = "QLinearGradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[0] + ", stop: 1 " + self.createRGBGradient(rgb,tint_factor,shade_factor)[1] +");"
@@ -34425,6 +34424,7 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
         self.eventbuttontable.itemSelectionChanged.connect(self.selectionChanged)
+        self.createEventbuttonTable()
         addButton = QPushButton(QApplication.translate("Button","Add",None))
         addButton.setToolTip(QApplication.translate("Tooltip","Add new extra Event button",None))
         #addButton.setMaximumWidth(100)
@@ -35794,7 +35794,6 @@ class EventsDlg(ArtisanDialog):
         self.buttonlistmaxlen = self.nbuttonsSpinBox.value()
 
     def createEventbuttonTable(self):
-
         self.nbuttonsSpinBox.setValue(self.buttonlistmaxlen)
         nbuttons = len(self.extraeventstypes)
 
@@ -36007,7 +36006,7 @@ class EventsDlg(ArtisanDialog):
         #Text Color
         aw.extraeventbuttontextcolor = [None] * maxButton
 
-        #Sorting buttons nased on the visualRow
+        #Sorting buttons based on the visualRow
         for i in range(maxButton):
             visualIndex = self.eventbuttontable.visualRow(i)
 
