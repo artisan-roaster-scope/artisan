@@ -78,23 +78,19 @@ os.system(r'copy Wheels\Roasting\* ' + TARGET + r'Wheels\Roasting')
 os.system('mkdir ' + TARGET + 'translations')
 os.system(r'copy translations\*.qm ' + TARGET + 'translations')
 for tr in [
-    'qt_ar.qm',
-    'qt_de.qm',
-    'qt_es.qm',
-    'qt_fi.qm',
-    'qt_fr.qm',
-    'qt_he.qm',
-    'qt_hu.qm',
-    'qt_it.qm',
-    'qt_ja.qm',
-    'qt_ko.qm',
-    'qt_pt.qm',
-    'qt_pl.qm',
-    'qt_ru.qm',
-    'qt_ru.qm',
-    'qt_sv.qm',
-    'qt_zh_CN.qm',
-    'qt_zh_TW.qm',
+    'qtbase_ar.qm',
+    'qtbase_de.qm',
+    'qtbase_en.qm',
+    'qtbase_es.qm',
+    'qtbase_fi.qm',
+    'qtbase_fr.qm',
+    'qtbase_he.qm',
+    'qtbase_hu.qm',
+    'qtbase_it.qm',
+    'qtbase_ja.qm',
+    'qtbase_ko.qm',
+    'qtbase_pl.qm',
+    'qtbase_ru.qm',
     ]:
   os.system(r'copy "' + PYQT_QT_TRANSLATIONS + '\\' + tr + '" ' + TARGET + 'translations')
 

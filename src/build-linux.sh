@@ -40,22 +40,18 @@ rm -rf dist/artisan.d
 
 # copy translations
 mkdir dist/translations
-cp $QT_PATH/translations/qt_ar.qm dist/translations
-cp $QT_PATH/translations/qt_de.qm dist/translations
-cp $QT_PATH/translations/qt_es.qm dist/translations
-cp $QT_PATH/translations/qt_fi.qm dist/translations
-cp $QT_PATH/translations/qt_fr.qm dist/translations
-cp $QT_PATH/translations/qt_he.qm dist/translations
-cp $QT_PATH/translations/qt_hu.qm dist/translations
-cp $QT_PATH/translations/qt_it.qm dist/translations
-cp $QT_PATH/translations/qt_ja.qm dist/translations
-cp $QT_PATH/translations/qt_ko.qm dist/translations
-cp $QT_PATH/translations/qt_pl.qm dist/translations
-cp $QT_PATH/translations/qt_pt.qm dist/translations
-cp $QT_PATH/translations/qt_ru.qm dist/translations
-cp $QT_PATH/translations/qt_sv.qm dist/translations
-cp $QT_PATH/translations/qt_zh_CN.qm dist/translations
-cp $QT_PATH/translations/qt_zh_TW.qm dist/translations
+cp $QT_PATH/translations/qtbase_ar.qm dist/translations
+cp $QT_PATH/translations/qtbase_de.qm dist/translations
+cp $QT_PATH/translations/qtbase_es.qm dist/translations
+cp $QT_PATH/translations/qtbase_fi.qm dist/translations
+cp $QT_PATH/translations/qtbase_fr.qm dist/translations
+cp $QT_PATH/translations/qtbase_he.qm dist/translations
+cp $QT_PATH/translations/qtbase_hu.qm dist/translations
+cp $QT_PATH/translations/qtbase_it.qm dist/translations
+cp $QT_PATH/translations/qtbase_ja.qm dist/translations
+cp $QT_PATH/translations/qtbase_ko.qm dist/translations
+cp $QT_PATH/translations/qtbase_pl.qm dist/translations
+cp $QT_PATH/translations/qtbase_ru.qm dist/translations
 cp translations/*.qm dist/translations
 
 # copy data

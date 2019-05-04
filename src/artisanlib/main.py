@@ -12977,7 +12977,12 @@ class ApplicationWindow(QMainWindow):
             self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.8
         else:
             self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.3
+
         #create ON/OFF buttons
+        
+        if locale in ["el"]:
+            self.pushbuttonstyles["OFF"] = self.pushbuttonstyles["OFF"].replace("90px","120px")
+            
         self.button_1 = QPushButton(QApplication.translate("Button", "ON", None))
         self.button_1.setFocusPolicy(Qt.NoFocus)
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None))
@@ -12989,10 +12994,6 @@ class ApplicationWindow(QMainWindow):
         self.button_1.pressed.connect(lambda : self.buttonPressed(self.button_1))
         self.button_1.released.connect(lambda : self.buttonReleased(self.button_1))
         self.button_1.setCursor(QCursor(Qt.PointingHandCursor))
-        if locale in ["el", "no"]:
-            self.button_1.setMinimumWidth(120)
-        else:
-            self.button_1.setMinimumWidth(100)
         self.button_1.setMinimumHeight(self.standard_button_height)
         self.button_1.clicked.connect(lambda _:self.qmc.ToggleMonitor())
         if app.artisanviewerMode:
@@ -13010,10 +13011,7 @@ class ApplicationWindow(QMainWindow):
         self.button_2.pressed.connect(lambda : self.buttonPressed(self.button_2))
         self.button_2.released.connect(lambda : self.buttonReleased(self.button_2))
         self.button_2.setCursor(QCursor(Qt.PointingHandCursor))
-        if locale in ["el", "no"]:
-            self.button_2.setMinimumWidth(120)
-        else:
-            self.button_2.setMinimumWidth(100)
+
         self.button_2.setMinimumHeight(self.standard_button_height)
         self.button_2.clicked.connect(lambda _:self.qmc.ToggleRecorder())
         if app.artisanviewerMode:
@@ -13053,6 +13051,9 @@ class ApplicationWindow(QMainWindow):
         self.button_6.setCursor(QCursor(Qt.PointingHandCursor))
 
         #create RESET button
+        if locale in ["no"]:
+            self.pushbuttonstyles["RESET"] = self.pushbuttonstyles["OFF"].replace("90px","120px")
+            
         self.button_7 = QPushButton(QApplication.translate("Button", "RESET", None))
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
@@ -13063,10 +13064,6 @@ class ApplicationWindow(QMainWindow):
         self.button_7.pressed.connect(lambda : self.buttonPressed(self.button_7))
         self.button_7.released.connect(lambda : self.buttonReleased(self.button_7))
         self.button_7.setCursor(QCursor(Qt.PointingHandCursor))
-        if locale in ["el", "no"]:
-            self.button_7.setMinimumWidth(120)
-        else:
-            self.button_7.setMinimumWidth(100)
         self.button_7.setMinimumHeight(self.standard_button_height)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
         self.button_7.clicked.connect(lambda _: self.qmc.reset())
@@ -13102,10 +13099,6 @@ class ApplicationWindow(QMainWindow):
         self.button_10.pressed.connect(lambda : self.buttonPressed(self.button_10))
         self.button_10.released.connect(lambda : self.buttonReleased(self.button_10))
         self.button_10.setCursor(QCursor(Qt.PointingHandCursor))
-        if locale in ["el", "no"]:
-            self.button_10.setMinimumWidth(120)
-        else:
-            self.button_10.setMinimumWidth(100)
         self.button_10.setMinimumHeight(self.standard_button_height)
         self.button_10.clicked.connect(lambda _:self.PIDcontrol())
         if app.artisanviewerMode:
@@ -13180,10 +13173,6 @@ class ApplicationWindow(QMainWindow):
         self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None))
         self.button_18.setFocusPolicy(Qt.NoFocus)
         self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
-        if locale in ["el", "no"]:
-            self.button_18.setMinimumWidth(100)
-        else:
-            self.button_18.setMinimumWidth(80)
         self.button_18.setMinimumHeight(self.standard_button_height)
         self.button_18.setContentsMargins(0,0,0,0)
         self.button_18.clicked.connect(lambda _:self.qmc.toggleHUD())
