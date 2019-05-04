@@ -387,8 +387,7 @@ class Artisan(QtSingleApplication):
                 elif file_suffix == "apal":
                     # load Artisan palettes on double-click on *.apal file
                     if not aw.qmc.flagstart:
-                        aw.loadPalettes(filename)
-                        QTimer.singleShot(20,lambda : aw.loadPalettes(filename))
+                        QTimer.singleShot(20,lambda : aw.getPalettes(filename,aw.buttonpalette))
             except Exception:
                 pass
             return 1
@@ -558,16 +557,17 @@ if len(locale) == 0:
         QSettings().setValue('locale', locale)
 
 
-qtTranslator = QTranslator()
 #load Qt default translations from QLibrary
-if qtTranslator.load("qt_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
+qtTranslator = QTranslator()
+if qtTranslator.load("qtbase_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
     app.installTranslator(qtTranslator)
 #find Qt default translations in Unix binaries
-elif qtTranslator.load("qt_" + locale, QApplication.applicationDirPath() + "/translations"):
+elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/translations"):
     app.installTranslator(qtTranslator)
 #find Qt default translations in Mac binary
-elif qtTranslator.load("qt_" + locale, QApplication.applicationDirPath() + "/../translations"):
+elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/../translations"):
     app.installTranslator(qtTranslator)
+
 #load Artisan translations
 appTranslator = QTranslator()
 #find application translations in source folder
@@ -579,6 +579,9 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 #find application translations in Mac binary
 elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
     app.installTranslator(appTranslator)
+
+
+
 
 from const import UIconst
 from artisanlib import pid
@@ -11446,6 +11449,13 @@ class ApplicationWindow(QMainWindow):
         self.redrawTimer.timeout.connect(lambda : aw.qmc.redraw(False,False))
         
         self.eventaction_running_threads = []
+        
+        # locales that come with a standard qtbase translation for standard elements/buttons
+        # for other locales standard OK/Cancel buttons created in dialogs via QDialogButtonBoxes should be
+        # renamed via setText to link them to artisan translations (which hopefully provides those translations)
+
+        self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","ru"]
+        self.locale = locale
 
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
@@ -13394,7 +13404,7 @@ class ApplicationWindow(QMainWindow):
         self.lastbuttonpressed = -1
         self.buttonlistmaxlen = 11
         #10 palettes of buttons
-        self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
+        self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]] # ,[],[],[],[],[]]
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
 
@@ -13432,17 +13442,21 @@ class ApplicationWindow(QMainWindow):
         self.e2buttonbarLayout.setSpacing(1)
         self.e2buttonbarLayout.setContentsMargins(0, 0, 0, 0)
         self.e2buttondialog = QFrame()
-        self.e2buttondialog.setContentsMargins(0, 0, 0, 0)
+        self.e2buttondialog.setContentsMargins(0, 5, 0, 5)
         self.e2buttondialog.setLayout(self.e2buttonbarLayout)
         
         self.e3buttonbarLayout = QHBoxLayout()
         self.e3buttonbarLayout.setSpacing(1)
+        self.e3buttonbarLayout.setContentsMargins(0, 0, 0, 0)
         self.e3buttondialog = QFrame()
+        self.e3buttondialog.setContentsMargins(0, 5, 0, 5)
         self.e3buttondialog.setLayout(self.e3buttonbarLayout)
         
         self.e4buttonbarLayout = QHBoxLayout()
         self.e4buttonbarLayout.setSpacing(1)
+        self.e4buttonbarLayout.setContentsMargins(0, 0, 0, 0)
         self.e4buttondialog = QFrame()
+        self.e4buttondialog.setContentsMargins(0, 5, 0, 5)
         self.e4buttondialog.setLayout(self.e4buttonbarLayout)
 
         # set the focus on the main widget
@@ -26010,8 +26024,8 @@ class ApplicationWindow(QMainWindow):
             self.KoreanLanguage.setChecked(value)
         elif locale == "pt":
             self.PortugueseLanguage.setChecked(value)
-        elif locale == "pt":
-            self.PortugueseLanguage.setChecked(value)
+        elif locale == "pt_BR":
+            self.PortugueseBrasilLanguage.setChecked(value)
         elif locale == "ru":
             self.RussianLanguage.setChecked(value)
         elif locale == "ar":
@@ -27281,13 +27295,13 @@ class ApplicationWindow(QMainWindow):
         else:
             return tree
     
-    def backuppaletteeventbuttons(self):
+    def backuppaletteeventbuttons(self,pal,maxlen):
         palette = {}
         #convert labels to unicode
-        for i in range(len(self.buttonpalette)):
+        for i in range(len(pal)):
             key = str(i)
-            palette[key] = self.encodeTreeStrings(self.buttonpalette[i])
-        palette["maxlen"] = self.buttonpalettemaxlen
+            palette[key] = self.encodeTreeStrings(pal[i])
+        palette["maxlen"] = maxlen
         try:
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Palettes",None),ext="*.apal") 
             if filename:
@@ -27298,7 +27312,12 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:",None) + " backuppaletteeventbuttons(): {0}").format(str(ex)))
             return
 
-    def loadPalettes(self,filename):
+    def getPalettes(self,filename,pal):
+        maxlen = self.loadPalettes(filename,pal)
+        if maxlen is not None:
+            self.buttonpalettemaxlen = maxlen
+
+    def loadPalettes(self,filename,pal):
         try:
             f = QFile(u(filename))
             if not f.open(QIODevice.ReadOnly):
@@ -27308,11 +27327,11 @@ class ApplicationWindow(QMainWindow):
             if firstChar == "{":
                 f.close()
                 palette = self.deserialize(filename)
-                self.buttonpalettemaxlen = list(map(int,palette["maxlen"]))
+                buttonpalettemaxlen = list(map(int,palette["maxlen"]))
                 for i in range(10):  #10 palettes (0-9)
                     key = str(i)
                     nextpalette = [[], [], [], [], [], [], [], [], [], [], [], [], [], []]
-                    palette[key] = self.decodeTreeStrings(palette[key])                    
+                    palette[key] = self.decodeTreeStrings(palette[key])               
                     if len(palette[key]):
                         for x in range(9):
                             if x < 4:
@@ -27331,8 +27350,8 @@ class ApplicationWindow(QMainWindow):
                             nextpalette[13] = list(map(float,palette[key][13])) #  type double
                         else:
                             for k in range(9,14):
-                                if len(self.buttonpalette[i]) == k+1:
-                                    nextpalette[k] = self.buttonpalette[i][k]
+                                if len(pal[i]) == k+1:
+                                    nextpalette[k] = pal[i][k]
 
                         if len(palette[key])==21:
                             nextpalette[14] = list(map(int,palette[key][14]))     #  type int
@@ -27344,29 +27363,30 @@ class ApplicationWindow(QMainWindow):
                             nextpalette[20] = list(map(int,palette[key][20]))     #  type int
                         else:
                             for k in range(14,21):
-                                if len(self.buttonpalette[i]) == k+1:
-                                    nextpalette[k] = self.buttonpalette[i][k]
+                                if len(pal[i]) == k+1:
+                                    nextpalette[k] = pal[i][k]
                                 
-                    self.buttonpalette[i] = nextpalette[:]
+                    pal[i] = nextpalette[:]
+                return buttonpalettemaxlen
             else:
                 message = QApplication.translate("Message","Invalid palettes file format", None)
                 self.sendmessage(message)
-                return
+                return None
             message =QApplication.translate("Message","Palettes loaded", None)
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadPalettes() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return
+            return None
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadPalettes() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return
+            return None
 
-    def restorepaletteeventbuttons(self):
+    def restorepaletteeventbuttons(self,pal):
         filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Palettes",None),path=self.profilepath)
         if filename:
-            self.loadPalettes(filename)
+            self.getPalettes(filename,pal)
 
     def loadAlarms(self,filename):
         try:
@@ -34371,25 +34391,27 @@ class EventsDlg(ArtisanDialog):
         self.ShowTimeguide.setChecked(aw.qmc.showtimeguide)
         self.ShowTimeguide.setFocusPolicy(Qt.NoFocus)
         self.ShowTimeguide.stateChanged.connect(lambda _:self.changeShowTimeguide())
-        self.okButton = QPushButton(QApplication.translate("Button","OK",None))
-        closeButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
-        closeButton.setFocusPolicy(Qt.NoFocus)
-        defaultButton.setFocusPolicy(Qt.NoFocus)
-        closeButton.clicked.connect(lambda _:self.restoreState())
-        self.okButton.clicked.connect(lambda _:self.updatetypes())
-        defaultButton.clicked.connect(lambda _:self.settypedefault())
-        self.okButton.setAutoDefault(True)
-        self.okButton.setFocusPolicy(Qt.StrongFocus)
-        closeButton.setShortcut(QKeySequence("Ctrl+."))
+        
+        self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel,Qt.Horizontal)
+        if aw.locale not in aw.qtbase_locales:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
+            self.dialogbuttons.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
+        self.dialogbuttons.accepted.connect(lambda :self.updatetypes())
+        self.dialogbuttons.rejected.connect(lambda :self.restoreState())
+        # add additional CMD-. shortcut to close the dialog
+        self.dialogbuttons.button(QDialogButtonBox.Cancel).setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
         cancelAction = QAction(self, triggered=lambda _:self.restoreState())
         try:
             cancelAction.setShortcut(QKeySequence.Cancel)
         except:
             pass
-        closeButton.addActions([cancelAction])
-        closeButton.setAutoDefault(False)
+        self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
+        
+        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
+        defaultButton.setFocusPolicy(Qt.NoFocus)
+        defaultButton.clicked.connect(lambda _:self.settypedefault())
+        
         ###  TAB 2
         #number of buttons per row
         self.nbuttonslabel = QLabel(QApplication.translate("Label","Max buttons per row", None))
@@ -34403,7 +34425,6 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
         self.eventbuttontable.itemSelectionChanged.connect(self.selectionChanged)
-        self.createEventbuttonTable()
         addButton = QPushButton(QApplication.translate("Button","Add",None))
         addButton.setToolTip(QApplication.translate("Tooltip","Add new extra Event button",None))
         #addButton.setMaximumWidth(100)
@@ -34445,8 +34466,11 @@ class EventsDlg(ArtisanDialog):
         transferpalettecurrentLabel = QLabel((QApplication.translate("Label","current palette", None)))
         self.transferpalettecombobox = QComboBox()
         self.transferpalettecombobox.setFocusPolicy(Qt.NoFocus)
-        self.transferpalettecombobox.setMaximumWidth(120)
+        # next line needed to avoid truncation of entries on Mac OS X under Qt 5.12.1-5.12.3
+        # https://bugreports.qt.io/browse/QTBUG-73653
+        self.transferpalettecombobox.setMinimumWidth(120)
         self.transferpalettecombobox.addItems(palettelist)
+        
         transferpalettebutton.clicked.connect(lambda _:self.transferbuttonsto())
         self.switchPaletteByNumberKey = QCheckBox(QApplication.translate("CheckBox","Switch Using Number Keys + Cmd",None))
         self.switchPaletteByNumberKey.setChecked(aw.buttonpalette_shortcuts)
@@ -34461,8 +34485,8 @@ class EventsDlg(ArtisanDialog):
         restorebutton.setToolTip(QApplication.translate("Tooltip","Restore all palettes from a text file",None))
         backupbutton.setMaximumWidth(140)
         restorebutton.setMaximumWidth(140)
-        backupbutton.clicked.connect(lambda _:aw.backuppaletteeventbuttons())
-        restorebutton.clicked.connect(lambda _:aw.restorepaletteeventbuttons())
+        backupbutton.clicked.connect(lambda _:aw.backuppaletteeventbuttons(self.buttonpalette,self.buttonpalettemaxlen))
+        restorebutton.clicked.connect(lambda _:self.restorepaletteeventbuttons())
         ## tab5
         eventtitlelabel = QLabel(QApplication.translate("Label","Event", None))
         eventtitlelabel.setFont(titlefont)
@@ -34810,8 +34834,7 @@ class EventsDlg(ArtisanDialog):
         buttonLayout = QHBoxLayout()
         buttonLayout.addLayout(FlagsLayout2)
         buttonLayout.addStretch()
-        buttonLayout.addWidget(closeButton)
-        buttonLayout.addWidget(self.okButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         typeHBox = QHBoxLayout()
         typeHBox.addLayout(typeLayout)
         typeHBox.addStretch()
@@ -35247,8 +35270,14 @@ class EventsDlg(ArtisanDialog):
         mainLayout.setContentsMargins(5, 15, 5, 5)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        self.okButton.setFocus()
-        
+
+    def restorepaletteeventbuttons(self):
+        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Palettes",None),path=aw.profilepath)
+        if filename:
+            maxlen = aw.loadPalettes(filename,self.buttonpalette)
+            if maxlen is not None:
+                self.buttonpalettemaxlen = maxlen
+            
     def selectionChanged(self):
         selected = self.eventbuttontable.selectedRanges()
         if selected and len(selected) > 0:
@@ -35383,8 +35412,8 @@ class EventsDlg(ArtisanDialog):
             # store sliders
             self.saveSliderSettings()
             self.saveQuantifierSettings()
-            # store buttons
-            self.savetableextraeventbutton()
+#            # store buttons (not done here anymore: buttons are saved on leaving the dialog with OK)
+#            self.savetableextraeventbutton()
         elif i == 5: # switched to Style tab
             self.updateStyleTab()
             self.saveSliderSettings()
@@ -35406,8 +35435,8 @@ class EventsDlg(ArtisanDialog):
         self.E2textcolorButton.setText(self.etype1.text())
         self.E3textcolorButton.setText(self.etype2.text())
         self.E4textcolorButton.setText(self.etype3.text())
-        self.E1colorButton.setMinimumWidth(max(self.okButton.width(),self.E1textcolorButton.minimumSizeHint().width()))
-        self.E1textcolorButton.setMinimumWidth(max(self.okButton.width(),self.E1textcolorButton.minimumSizeHint().width()))
+        self.E1colorButton.setMinimumWidth(max(self.dialogbuttons.button(QDialogButtonBox.Ok).width(),self.E1textcolorButton.minimumSizeHint().width()))
+        self.E1textcolorButton.setMinimumWidth(max(self.dialogbuttons.button(QDialogButtonBox.Ok).width(),self.E1textcolorButton.minimumSizeHint().width()))
         self.E1colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[0] + "; color: " + aw.qmc.EvalueTextColor[0] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
         self.E2colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[1] + "; color: " + aw.qmc.EvalueTextColor[1] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
         self.E3colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[2] + "; color: " + aw.qmc.EvalueTextColor[2] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
@@ -35564,13 +35593,127 @@ class EventsDlg(ArtisanDialog):
         self.E4alphaSpinBox.setDisabled(False)
         aw.qmc.redraw()
 
-    def transferbuttonsto(self):
-        pindex = self.transferpalettecombobox.currentIndex()
-        aw.transferbuttonsto(pindex)
+    def transferbuttonsto(self,pindex=None):
+        if pindex is None:
+            pindex = self.transferpalettecombobox.currentIndex()
+        copy = []
+        copy.append(self.extraeventstypes[:])
+        copy.append(self.extraeventsvalues[:])
+        copy.append(self.extraeventsactions[:])
+        copy.append(self.extraeventsvisibility[:])
+        copy.append(self.extraeventsactionstrings[:])
+        copy.append(self.extraeventslabels[:])
+        copy.append(self.extraeventsdescriptions[:])
+        copy.append(self.extraeventbuttoncolor[:])
+        copy.append(self.extraeventbuttontextcolor[:])
+        # added slider settings
+        copy.append(self.eventslidervisibilities[:])
+        copy.append(self.eventslideractions[:])
+        copy.append(self.eventslidercommands[:])
+        copy.append(self.eventslideroffsets[:])
+        copy.append(self.eventsliderfactors[:])
+        # added quantifier settings
+        copy.append(self.eventquantifieractive[:])
+        copy.append(self.eventquantifiersource[:])
+        copy.append(self.eventquantifiermin[:])
+        copy.append(self.eventquantifiermax[:])
+        copy.append(self.eventquantifiercoarse[:])
+        # added slider min/max
+        copy.append(self.eventslidermin[:])
+        copy.append(self.eventslidermax[:])
+        # added slider coarse
+        copy.append(self.eventslidercoarse[:])
+        # added slider temp
+        copy.append(self.eventslidertemp[:])
+        # added slider unit
+        copy.append(self.eventsliderunits[:])
+              
+        self.buttonpalette[pindex] = copy
+        self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
+
+    def localSetbuttonsfrom(self,pindex):
+        copy = self.buttonpalette[pindex][:]
+        if len(copy):
+            self.extraeventstypes = copy[0][:]
+            self.extraeventsvalues = copy[1][:]
+            self.extraeventsactions = copy[2][:]
+            self.extraeventsvisibility = copy[3][:]
+            self.extraeventsactionstrings = copy[4][:]
+            self.extraeventslabels = copy[5][:]
+            self.extraeventsdescriptions = copy[6][:]
+            self.extraeventbuttoncolor = copy[7][:]
+            self.extraeventbuttontextcolor = copy[8][:]
+            # added slider settings
+            if len(copy)>9 and len(copy[9]) == 4:
+                self.eventslidervisibilities = copy[9][:]
+            else:
+                self.eventslidervisibilities = [0,0,0,0]
+            if len(copy)>10 and len(copy[10]) == 4:
+                self.eventslideractions = copy[10][:]
+            else:
+                self.eventslideractions = [0,0,0,0]
+            if len(copy)>11 and len(copy[11]) == 4:
+                self.eventslidercommands = copy[11][:]
+            else:
+                self.eventslidercommands = ["","","",""]
+            if len(copy)>12 and len(copy[12]) == 4:
+                self.eventslideroffsets = copy[12][:]
+            else:
+                self.eventslideroffsets = [0,0,0,0]
+            if len(copy)>13 and len(copy[13]) == 4:
+                self.eventsliderfactors = copy[13][:]
+            else:
+                self.eventsliderfactors = [1.0,1.0,1.0,1.0]
+                
+            if len(copy)>14 and len(copy[14]) == 4:
+                self.eventquantifieractive = copy[14][:]
+            else:
+                self.eventquantifieractive = [0,0,0,0]
+            if len(copy)>15 and len(copy[15]) == 4:
+                self.eventquantifiersource = copy[15][:]
+            else:
+                self.eventquantifiersource = [0,0,0,0]
+            if len(copy)>16 and len(copy[16]) == 4:
+                self.eventquantifiermin = copy[16][:]
+            else:
+                self.eventquantifiermin = [0,0,0,0]
+            if len(copy)>17 and len(copy[17]) == 4:
+                self.eventquantifiermax = copy[17][:]
+            else:
+                self.eventquantifiermax = [100,100,100,100]
+            if len(copy)>18 and len(copy[18]) == 4:
+                self.eventquantifiercoarse = copy[18][:]
+            else:
+                self.eventquantifiercoarse = [0,0,0,0]
+            if len(copy)>19 and len(copy[19]) == 4:
+                self.eventslidermin = copy[19][:]
+            else:
+                self.eventslidermin = [0,0,0,0]
+            if len(copy)>20 and len(copy[20]) == 4:
+                self.eventslidermax = copy[20][:]
+            else:
+                self.eventslidermax = [100,100,100,100]
+            if len(copy)>21 and len(copy[21]) == 4:
+                self.eventslidercoarse = copy[21][:]
+            else:
+                self.eventslidercoarse = [0,0,0,0]
+            if len(copy)>22 and len(copy[22]) == 4:
+                self.eventslidertemp = copy[22][:]
+            else:
+                self.eventslidertemp = [0,0,0,0]
+            if len(copy)>23 and len(copy[23]) == 4:
+                self.eventsliderunits = copy[23][:]
+            else:
+                self.eventsliderunits = ["","","",""]
+                
+            self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
+            return 1  #success
+        else:
+            return 0  #failed
 
     def setbuttonsfrom(self):
         pindex = self.transferpalettecombobox.currentIndex()
-        answer = aw.setbuttonsfrom(pindex)
+        answer = self.localSetbuttonsfrom(pindex)
         if answer:
             self.createEventbuttonTable()
 
@@ -36171,35 +36314,42 @@ class EventsDlg(ArtisanDialog):
         self.autoDropFlagstored = aw.qmc.autoDropFlag
         self.markTPFlagstored = aw.qmc.markTPflag
         # buttons
-        self.extraeventslabels = aw.extraeventslabels
-        self.extraeventsdescriptions = aw.extraeventsdescriptions
-        self.extraeventstypes = aw.extraeventstypes
-        self.extraeventsvalues = aw.extraeventsvalues
-        self.extraeventsactions = aw.extraeventsactions
-        self.extraeventsactionstrings = aw.extraeventsactionstrings
-        self.extraeventsvisibility = aw.extraeventsvisibility
-        self.extraeventbuttoncolor = aw.extraeventbuttoncolor
-        self.extraeventbuttontextcolor = aw.extraeventbuttontextcolor
+        self.extraeventslabels = aw.extraeventslabels[:]
+        self.extraeventsdescriptions = aw.extraeventsdescriptions[:]
+        self.extraeventstypes = aw.extraeventstypes[:]
+        self.extraeventsvalues = aw.extraeventsvalues[:]
+        self.extraeventsactions = aw.extraeventsactions[:]
+        self.extraeventsactionstrings = aw.extraeventsactionstrings[:]
+        self.extraeventsvisibility = aw.extraeventsvisibility[:]
+        self.extraeventbuttoncolor = aw.extraeventbuttoncolor[:]
+        self.extraeventbuttontextcolor = aw.extraeventbuttontextcolor[:]
         self.buttonlistmaxlen = aw.buttonlistmaxlen
         # sliders
-        self.eventslidervisibilities = aw.eventslidervisibilities
-        self.eventslideractions = aw.eventslideractions
-        self.eventslidercommands = aw.eventslidercommands
-        self.eventslideroffsets = aw.eventslideroffsets
-        self.eventsliderfactors = aw.eventsliderfactors
-        self.eventslidermin = aw.eventslidermin
-        self.eventslidermax = aw.eventslidermax
-        self.eventslidercoarse = aw.eventslidercoarse
-        self.eventslidertemp = aw.eventslidertemp
-        self.eventsliderunits = aw.eventsliderunits
+        self.eventslidervisibilities = aw.eventslidervisibilities[:]
+        self.eventslideractions = aw.eventslideractions[:]
+        self.eventslidercommands = aw.eventslidercommands[:]
+        self.eventslideroffsets = aw.eventslideroffsets[:]
+        self.eventsliderfactors = aw.eventsliderfactors[:]
+        self.eventslidermin = aw.eventslidermin[:]
+        self.eventslidermax = aw.eventslidermax[:]
+        self.eventslidercoarse = aw.eventslidercoarse[:]
+        self.eventslidertemp = aw.eventslidertemp[:]
+        self.eventsliderunits = aw.eventsliderunits[:]
+        # quantifiers
+        self.eventquantifieractive = aw.eventquantifieractive[:]
+        self.eventquantifiersource = aw.eventquantifiersource[:]
+        self.eventquantifiermin = aw.eventquantifiermin[:]
+        self.eventquantifiermax = aw.eventquantifiermax[:]
+        self.eventquantifiercoarse = aw.eventquantifiercoarse[:]
         # palettes
-        self.buttonpalette = aw.buttonpalette
+        self.buttonpalette = aw.buttonpalette[:]
+        self.buttonpalettemaxlen = aw.buttonpalettemaxlen
         # styles
-        self.EvalueColor = aw.qmc.EvalueColor
-        self.EvalueMarker = aw.qmc.EvalueMarker
-        self.Evaluelinethickness = aw.qmc.Evaluelinethickness
-        self.Evaluealpha = aw.qmc.Evaluealpha
-        self.EvalueMarkerSize = aw.qmc.EvalueMarkerSize
+        self.EvalueColor = aw.qmc.EvalueColor[:]
+        self.EvalueMarker = aw.qmc.EvalueMarker[:]
+        self.Evaluelinethickness = aw.qmc.Evaluelinethickness[:]
+        self.Evaluealpha = aw.qmc.Evaluealpha[:]
+        self.EvalueMarkerSize = aw.qmc.EvalueMarkerSize[:]
 
     #called from Cancel button
     def restoreState(self):
@@ -36228,8 +36378,6 @@ class EventsDlg(ArtisanDialog):
         aw.eventslidercoarse = self.eventslidercoarse
         aw.eventslidertemp = self.eventslidertemp
         aw.eventsliderunits = self.eventsliderunits
-        # palettes
-        aw.buttonpalette = self.buttonpalette
         # styles
         aw.qmc.EvalueColor = self.EvalueColor
         aw.qmc.EvalueMarker = self.EvalueMarker
@@ -36264,6 +36412,10 @@ class EventsDlg(ArtisanDialog):
             #save sliders   
             self.saveSliderSettings()
             self.saveQuantifierSettings()
+            # save palettes
+            aw.buttonpalette = self.buttonpalette[:]
+            aw.buttonpalettemaxlen = self.buttonpalettemaxlen
+            #
             aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
             aw.qmc.buttonactions[2] = self.FCSbuttonActionType.currentIndex()
@@ -36326,7 +36478,7 @@ class EventsDlg(ArtisanDialog):
                 #save quantifiers
                 aw.updateSlidersProperties() # set visibility and event names on slider widgets
                 # we save the current button and slider definitions to palette 0
-                aw.transferbuttonsto(0)
+                self.transferbuttonsto(0)
                 aw.qmc.redraw(recomputeAllDeltas=False)
                 aw.sendmessage(QApplication.translate("Message","Event configuration saved", None))
                 self.close()
@@ -44864,11 +45016,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     break 
         self.sorted_devices = sorted(dev)        
         self.devicetypeComboBox = QComboBox()
+        
 #        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 #        self.devicetypeComboBox.view().setTextElideMode(Qt.ElideNone)
-        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; withou long items get cutted in the popup
+        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; without long items get cutted in the popup
         #  note the -7 as the width of the popup is too large if given the correct maximum characters
-        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
+#        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
+
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(aw.ser.externalprogram)
         self.outprogramedit = QLineEdit(aw.ser.externaloutprogram)
@@ -45625,9 +45779,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.temperatureDeviceCombo = QComboBox()
         self.temperatureDeviceCombo.setFocusPolicy(Qt.NoFocus)
         self.temperatureDeviceCombo.addItems(aw.qmc.temperaturedevicefunctionlist)
+
         # HACK: only needed for the macintosh UI on Qt 5.12 onwords; withou long items get cutted in the popup
         #  note the -7 as the width of the popup is too large if given the correct maximum characters
-        self.temperatureDeviceCombo.setMinimumContentsLength(max(22,len(max(aw.qmc.temperaturedevicefunctionlist, key=len)) - 7)) # expects # characters, but is to wide
+#        self.temperatureDeviceCombo.setMinimumContentsLength(max(22,len(max(aw.qmc.temperaturedevicefunctionlist, key=len)) - 7)) # expects # characters, but is to wide
+
         try:
             self.temperatureDeviceCombo.setCurrentIndex(aw.qmc.ambient_temperature_device)
         except:
@@ -54373,7 +54529,7 @@ def main():
                 aw.loadAlarms(u(argv_file))
             elif file_suffix == "apal":
                 # load Artisan palettes on double-click on *.apal file
-                aw.loadPalettes(u(argv_file))
+                aw.getPalettes(u(argv_file),aw.buttonpalette)
             elif file_suffix == "aset":
                 # load Artisan setings on double-click on *.aset file
                 aw.loadSettings(fn=u(argv_file))

@@ -23,7 +23,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtWidgets import QApplication,QDialog,QCheckBox,QGroupBox,QHBoxLayout,QVBoxLayout,QLabel,QLineEdit,QPushButton
+from PyQt5.QtWidgets import QApplication,QDialog,QCheckBox,QGroupBox,QHBoxLayout,QVBoxLayout,QLabel,QLineEdit,QDialogButtonBox,QAction
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtCore import Qt
 
 from plus import config
@@ -55,11 +56,24 @@ class Login(QDialog):
         self.rememberCheckbox.setChecked(self.remember)
         self.rememberCheckbox.stateChanged.connect(self.rememberCheckChanged)
         
-        self.buttonCancel = QPushButton(QApplication.translate("Button","Cancel",None), self)
-        self.buttonCancel.clicked.connect(lambda _:self.reject())
-        self.buttonLogin = QPushButton('Login', self)
-        self.buttonLogin.clicked.connect(self.setCredentials)
-        self.buttonLogin.setEnabled(False)
+        self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel,Qt.Horizontal)
+        aw = config.app_window
+        if aw.locale not in aw.qtbase_locales:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
+            self.dialogbuttons.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
+        self.dialogbuttons.accepted.connect(lambda :self.setCredentials())
+        self.dialogbuttons.rejected.connect(lambda :self.reject())
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(True)
+        # add additional CMD-. shortcut to close the dialog
+        self.dialogbuttons.button(QDialogButtonBox.Cancel).setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog
+        cancelAction = QAction(self, triggered=lambda _:self.restoreState())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
                 
         credentialsLayout = QVBoxLayout(self)
         credentialsLayout.addWidget(self.textName)
@@ -70,9 +84,9 @@ class Login(QDialog):
         credentialsGroup.setLayout(credentialsLayout)
         
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.buttonCancel)
         buttonLayout.addStretch()
-        buttonLayout.addWidget(self.buttonLogin)
+        buttonLayout.addWidget(self.dialogbuttons)
+        buttonLayout.addStretch()
         
         linkLayout = QHBoxLayout()
         linkLayout.addStretch()
@@ -95,11 +109,11 @@ class Login(QDialog):
         login = self.textName.text()
         passwd = self.textPass.text()
         if len(passwd) >= config.min_passwd_len and len(login) >= config.min_login_len and "@" in login and "." in login:
-            self.buttonLogin.setEnabled(True)
-            self.buttonLogin.setDefault(True)
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setDefault(True)
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(True)
         else:
-            self.buttonLogin.setEnabled(False)
-            self.buttonCancel.setDefault(True)
+            self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(True)
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(False)
 
     def setCredentials(self):
         self.login = self.textName.text()

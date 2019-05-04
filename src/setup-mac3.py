@@ -24,7 +24,7 @@ import plistlib
 
 import artisanlib
 
-# current version of Artisan
+# current version of artisan
 VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
@@ -57,22 +57,23 @@ DATA_FILES = [
 #    ("../Resources/qt_plugins/platformthemes", [QTDIR + r'/plugins/platformthemes/libqxdgdesktopportal.dylib']), # unclear what this is for (not available before 5.12)
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
-    ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_de.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_es.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_fi.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_fr.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_he.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_hu.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_it.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_ja.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_ko.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_pt.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_pl.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_ru.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_sv.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_zh_CN.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_zh_TW.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_ar.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_de.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_en.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_es.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_fi.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_fr.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_he.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_hu.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_it.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_ja.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_ko.qm']),
+#    ("../translations", [QTDIR + r'/translations/qtbase_pt.qm']),    # empty/missing
+    ("../translations", [QTDIR + r'/translations/qtbase_pl.qm']),
+    ("../translations", [QTDIR + r'/translations/qtbase_ru.qm']),
+#    ("../translations", [QTDIR + r'/translations/qtbase_sv.qm']),    # empty/missing
+#    ("../translations", [QTDIR + r'/translations/qtbase_zh_CN.qm']), # empty/missing
+#    ("../translations", [QTDIR + r'/translations/qtbase_zh_TW.qm']), # empty/missing (will be added for Qt 5.13)
     ("../translations", [r'translations/artisan_ar.qm']), 
     ("../translations", [r"translations/artisan_de.qm"]),
     ("../translations", [r"translations/artisan_es.qm"]),
@@ -230,6 +231,12 @@ try:
 except:
     subprocess.check_call(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
 
+# add localization stubs to make OS X translate the systems menu item and native dialogs
+for lang in ['ar', 'de','el','en','es','fa','fi','fr','he','hu','id','it','ja','ko','nl','no','pl','pt_BR','pt','ru','sv','th','tr','zh_CN','zh_TW']:
+    loc_dir = r'Artisan.app/Contents/Resources/' + lang + r'.lproj'
+    subprocess.check_call(r'mkdir ' + loc_dir,shell = True)
+    subprocess.check_call(r'touch ' + loc_dir + r'/Localizable.string',shell = True)
+
 
 
 # copy brew installed libusb (note the slight name change of the dylib!)
@@ -309,8 +316,8 @@ for root, dirs, files in os.walk('.'):
 os.chdir('..')
 if os.environ['ARTISAN_LEGACY_BUILD'] == "true":
     subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r"-legacy.dmg",shell = True)
-    subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'-legacy.dmg -volname "Artisan legacy" -fs HFS+ -srcfolder "dist"',shell = True)
+    subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'-legacy.dmg -volname "artisan legacy" -fs HFS+ -srcfolder "dist"',shell = True)
 else:
     subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r".dmg",shell = True)
-    subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"',shell = True)
+    subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "artisan" -fs HFS+ -srcfolder "dist"',shell = True)
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
