@@ -1507,7 +1507,7 @@ class tgraphcanvas(FigureCanvas):
         #flag that makes the events location type bars (horizontal bars) appear on the plot. flag read on redraw()
         # 0 = no event bars; 1 = type bars (4 bars); 2 = value bars; 3 = split (combination of 0 and 2); merge (as 2, values rendered on lines)
         self.eventsGraphflag = 2
-        self.clampEvents = True # if True, custom events are drawn w.r.t. the temperature scale
+        self.clampEvents = False # if True, custom events are drawn w.r.t. the temperature scale
         self.renderEventsDescr = False # if True, descriptions are rendered instead of type/value tags
         self.eventslabelschars = 6 # maximal number of chars to render as events label
         #flag that shows events in the graph
