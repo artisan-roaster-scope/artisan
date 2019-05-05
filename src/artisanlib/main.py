@@ -620,8 +620,17 @@ class tgraphcanvas(FigureCanvas):
     def __init__(self,parent,dpi):
 
         #default palette of colors
-        self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
-                        "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
+        # Artisan 1.x
+#        self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
+#                        "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
+#                        "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
+#                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
+#                        "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
+#                        "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'white',"metbox":'red',
+#                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'}
+        # Artisan 2.x
+        self.palette = {"background":'white',"grid":'#E5E5E5',"ylabel":'#666666',"xlabel":'#666666',"title":'#0C6AA6',
+                        "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#7F7F7F',"rect4":'#bde0ee',"rect5":'lightgrey',
                         "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
                         "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
@@ -39773,7 +39782,7 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("DT301: " + settings + " || Rx = " + cmd2str(binascii.hexlify(data))) 
 
-    # if serial input is not \n terminated standard pyserial readline returns only after the timeout
+    # if serial input is not \0 terminated standard pyserial readline returns only after the timeout
     def readline_null_terminated(self):
         eol = b'\0'
         leneol = len(eol)
@@ -39815,6 +39824,8 @@ class serialport(object):
                 # READ CT
                 try:
                     command = "gts,8\r\n"
+                    self.SP.flushInput()
+                    self.SP.flushOutput()
                     self.SP.write(str2cmd(command))
                     res = self.readline_null_terminated().decode('utf-8', 'ignore').rstrip('\x00')
                     t1 = float(res)
@@ -39826,6 +39837,8 @@ class serialport(object):
                 # READ BT
                 try:
                     command = "gts,9\r\n"
+                    self.SP.flushInput()
+                    self.SP.flushOutput()
                     self.SP.write(str2cmd(command))
                     res = self.readline_null_terminated().decode('utf-8', 'ignore').rstrip('\x00')
                     t2 = float(res)
