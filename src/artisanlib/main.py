@@ -6583,14 +6583,14 @@ class tgraphcanvas(FigureCanvas):
             self.ax1.set_thetagrids(g_angle)
             self.ax1.set_rmax(1.)
             self.ax1.set_autoscale_on(False)
-            self.ax1.grid(True,linewidth=1.,color='green', linestyle = "-",alpha=.3)
+            self.ax1.grid(True,linewidth=1.,color='#212121', linestyle = "-",alpha=.3)
             # hack to make flavor labels visible also on top and bottom
             self.ax1.set_xlabel(" -\n ", alpha=0.0)
             self.ax1.set_title(" -\n ", alpha=0.0)
     
             #create water marks 6-7 anf 8-9
-            self.ax1.bar(.1, .1, width=2.*pi, bottom=.6,color="green",linewidth=0.,alpha = .1)
-            self.ax1.bar(.1, .1, width=2.*pi, bottom=.8,color="green",linewidth=0.,alpha = .1)
+            self.ax1.bar(.1, .1, width=2.*pi, bottom=.6,color="#0c6aa6",linewidth=0.,alpha = .1)
+            self.ax1.bar(.1, .1, width=2.*pi, bottom=.8,color="#0c6aa6",linewidth=0.,alpha = .1)
     
             #delete degrees ticks to anotate flavor characteristics 
             for tick in self.ax1.xaxis.get_major_ticks():
@@ -6643,7 +6643,7 @@ class tgraphcanvas(FigureCanvas):
             score *= 10.
     
             txt = "%.2f" %score
-            self.ax1.text(0.,0.,txt,fontsize="x-large",fontproperties=aw.mpl_fontproperties,color="blue",horizontalalignment="center",bbox={"facecolor":"yellow", "alpha":0.3, "pad":10})
+            self.ax1.text(0.,0.,txt,fontsize="x-large",fontproperties=aw.mpl_fontproperties,color="#FFFFFF",horizontalalignment="center",bbox={"facecolor":"#212121", "alpha":0.5, "pad":10})
     
             #add background to plot if found
             if self.background:
@@ -6654,14 +6654,14 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(len(backgroundplotf)):
                         backgroundplotf[i] /= 10.
     
-                    self.ax1.plot(angles,backgroundplotf,color="orange",marker="o",alpha=.5)
+                    self.ax1.plot(angles,backgroundplotf,color="#cc0f50",marker="o",alpha=.5)
                     #needs matplotlib 1.0.0+
-                    self.ax1.fill_between(angles,0,backgroundplotf, facecolor="yellow", alpha=0.1, interpolate=True)
+                    self.ax1.fill_between(angles,0,backgroundplotf, facecolor="#ff5871", alpha=0.1, interpolate=True)
     
             #add to plot
-            self.ax1.plot(angles,plotf,color="blue",marker="o")
+            self.ax1.plot(angles,plotf,color="#0c6aa6",marker="o")
             
-            self.ax1.fill_between(angles,0,plotf, facecolor='green', alpha=0.1, interpolate=True)
+            self.ax1.fill_between(angles,0,plotf, facecolor='#1985ba', alpha=0.1, interpolate=True)
     
             self.fig.canvas.draw()
         except Exception:
@@ -24434,7 +24434,7 @@ class ApplicationWindow(QMainWindow):
                 degree = u(self.roast_degree(cp["weight_loss"]))
                 if "set_density" in cp:
                     if "green_density" in cp and "roasted_density" in cp:
-                        density = u("%.1fg/l (set)<br>%.1fg/l (green)<br>%.1fg/l (roasted)"%(cp["set_density"],cp["green_density"],cp["roasted_density"]))
+                        density = u("%.1fg/l (green)<br>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"]))
                 elif "green_density" in cp and "roasted_density" in cp:
                     density = u("%.1fg/l (green)<br>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"]))
             else:
@@ -24458,6 +24458,10 @@ class ApplicationWindow(QMainWindow):
             else:
                 if "ambient_temperature" in cp:
                     humidity += u("%d%s"%(cp["ambient_temperature"],self.qmc.mode))
+            if "ambient_pressure" in cp:
+                if len(humidity) != 0:
+                    humidity += ", "
+                humidity += u("%dhPa"%cp["ambient_pressure"])
             if len(humidity) == 0:
                 humidity = u("--")
             if self.qmc.whole_color or self.qmc.ground_color:
@@ -24496,6 +24500,7 @@ class ApplicationWindow(QMainWindow):
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + u(" ")
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                 title=u(cgi.escape(batch)) + u(cgi.escape(self.qmc.title)),
+                titlecolor=QColor(aw.qmc.palette["title"]).name(),
                 doc=u(QApplication.translate("HTML Report Template", "Roasting Report", None)),                
                 datatime_label=u(QApplication.translate("HTML Report Template", "Date:", None)),
                 datetime=u(self.qmc.roastdate.date().toString()) + ", " + u(self.qmc.roastdate.time().toString()[:-3]), 
@@ -24658,8 +24663,8 @@ class ApplicationWindow(QMainWindow):
                             dryphase += u(" [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"])))
                         elif ("AUCbase" in cp):
                             dryphase += u(" [%d]"%(round(cp["AUCbase"])))
-                    if "dryphaseeval" in cp:
-                        dryphase += "<br>" + d(cp["dryphaseeval"])
+#                    if "dryphaseeval" in cp:
+#                        dryphase += "<br>" + d(cp["dryphaseeval"])
                 #midphase
                 if "midphasetime" in cp:
                     midphasetime = cp["midphasetime"]
@@ -24672,8 +24677,8 @@ class ApplicationWindow(QMainWindow):
                             midphase += u(" [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"])))
                         elif ("AUCbase" in cp):
                             midphase += u(" [%d]"%(round(cp["AUCbase"])))
-                    if "midphaseeval" in cp:
-                        midphase += "<br>" + d(cp["midphaseeval"])
+#                    if "midphaseeval" in cp:
+#                        midphase += "<br>" + d(cp["midphaseeval"])
                 #finishphase
                 if "finishphasetime" in cp:
                     finishphasetime = cp["finishphasetime"]
@@ -24686,14 +24691,14 @@ class ApplicationWindow(QMainWindow):
                             finishphase += u(" [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"])))
                         elif ("AUCbase" in cp):
                             finishphase += u(" [%d]"%(round(cp["AUCbase"])))
-                    if "finishphaseeval" in cp:
-                        finishphase += "<br>" + d(cp["finishphaseeval"])
+#                    if "finishphaseeval" in cp:
+#                        finishphase += "<br>" + d(cp["finishphaseeval"])
                 #coolphase
                 if "coolphasetime" in cp:
                     coolphasetime = cp["coolphasetime"]
                     coolphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["coolphasetime"]),int(round(coolphasetime*100./totaltime)))
-                    if "coolphaseeval" in cp:
-                        coolphase += "<br>" + d(cp["coolphaseeval"])
+#                    if "coolphaseeval" in cp:
+#                        coolphase += "<br>" + d(cp["coolphaseeval"])
         return dryphase, midphase, finishphase, coolphase
 
     def event2html(self,cp,time_key,BT_key=None,prev_time_key=None):
