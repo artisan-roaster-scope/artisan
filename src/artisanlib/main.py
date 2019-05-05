@@ -36170,8 +36170,8 @@ class EventsDlg(ArtisanDialog):
             self.extraeventsactions.insert(bindex,0)
             self.extraeventsactionstrings.insert(bindex,"")
             self.extraeventsvisibility.insert(bindex,1)
-            self.extraeventbuttoncolor.insert(bindex,"yellow")
-            self.extraeventbuttontextcolor.insert(bindex,"black")
+            self.extraeventbuttoncolor.insert(bindex,"#808080")
+            self.extraeventbuttontextcolor.insert(bindex,"white")
             self.extraeventslabels.insert(bindex,u("E"))
 
             self.createEventbuttonTable()
