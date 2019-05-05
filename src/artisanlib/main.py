@@ -624,22 +624,24 @@ class tgraphcanvas(FigureCanvas):
 #        self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
 #                        "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
 #                        "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
-#                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
+#                        "deltabt":'blue',"markers":'#404040',"text":'#404040',"watermarks":'yellow',"timeguide":'blue',
 #                        "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
-#                        "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'white',"metbox":'red',
+#                        "specialeventbox":'yellow',"specialeventtext":'black',
+#                        "bgeventmarker":'black',"bgeventtext":'black',
+#                        "mettext":'white',"metbox":'red',
 #                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'}
         # Artisan 2.x
-        self.palette = {"background":'white',"grid":'#E5E5E5',"ylabel":'#666666',"xlabel":'#666666',"title":'#0C6AA6',
-                        "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#7F7F7F',"rect4":'#bde0ee',"rect5":'lightgrey',
-                        "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
-                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
-                        "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
-                        "specialeventbox":'yellow',"specialeventtext":'black', 
-                        "bgeventmarker":'black',"bgeventtext":'black',
-                        "mettext":'white',"metbox":'red',
-                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'} 
+        self.palette = {"background":'white',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
+                        "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#bde0ee',"rect5":'lightgrey',
+                        "et":'#cc0f50',"bt":'#0A5C90',"xt":'#404040',"deltaet":'#cc0f50',
+                        "deltabt":'#0A5C90',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'#0A5C90',
+                        "canvas":'#F8F8F8',"legendbg":'white',"legendborder":'darkgrey', 
+                        "specialeventbox":'#ff5871',"specialeventtext":'white', 
+                        "bgeventmarker":'white',"bgeventtext":'black',
+                        "mettext":'white',"metbox":'#CC0F50',
+                        "aucguide":'#0c6aa6',"messages":'black',"aucarea":'#767676'} 
         self.palette1 = self.palette.copy()
-        self.EvalueColor_default = ['#4895CE','#49B160','#800080','#910113'] #["brown","blue","purple","grey"]
+        self.EvalueColor_default = ['#43a7cf','#49B160','#800080','#ad0427']
         self.EvalueTextColor_default = ['white','white','white','white']
 #        self.legendbgalpha = 0.2
         
@@ -777,8 +779,8 @@ class tgraphcanvas(FigureCanvas):
         self.extra_event_sampling_delay = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, ..
 
         #watermarks limits: dryphase1, dryphase2 (DRY), midphase (FCs), and finish phase Y limits
-        self.phases_fahrenheit_defaults = [200,300,390,450]
-        self.phases_celsius_defaults = [110,150,200,230]
+        self.phases_fahrenheit_defaults = [300,300,390,450]
+        self.phases_celsius_defaults = [150,150,200,230]
         self.phases = list(self.phases_fahrenheit_defaults) # contains either the phases_filter or phases_espresso, depending on the mode
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
         self.phasesbuttonflag = False #False no change; True make the DRY and FC buttons change the phases during roast automatically
@@ -793,7 +795,7 @@ class tgraphcanvas(FigureCanvas):
 
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
-        self.statisticsflags = [1,1,0,1,1,0]
+        self.statisticsflags = [1,1,0,1,0,0]
         self.statisticsmode = 1 # one of 0: standard computed values, 1: roast properties
         #conditions to estimate bad flavor:dry[min,max],mid[min,max],finish[min,max] in seconds
         self.defaultstatisticsconditions = [180,360,180,600,180,360,180,300]
@@ -1300,7 +1302,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundEtypes = []
         self.backgroundEvalues = []
         self.backgroundEStrings = []
-        self.backgroundalpha = 0.3
+        self.backgroundalpha = 0.2
         self.backgroundmetcolor = self.palette["et"]
         self.backgroundbtcolor = self.palette["bt"]
         self.backgroundxtcolor = self.palette["xt"]
@@ -1405,7 +1407,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.optimalSmoothing = True
 
-        self.patheffects = 2
+        self.patheffects = 1
         self.graphstyle = 0
         self.graphfont = 0
 
@@ -1531,8 +1533,10 @@ class tgraphcanvas(FigureCanvas):
         #curve styles
         self.linestyle_default = "-"
         self.drawstyle_default = "default"
-        self.linewidth_default = 2
+        self.linewidth_default = 1.5
+        self.back_linewidth_default = 2
         self.delta_linewidth_default = 1
+        self.back_delta_linewidth_default = 1.5
         self.extra_linewidth_default = 1
         self.marker_default = None
         self.markersize_default = 6
@@ -1559,12 +1563,12 @@ class tgraphcanvas(FigureCanvas):
         self.ETdeltamarkersize = self.markersize_default
         self.BTbacklinestyle = self.linestyle_default
         self.BTbackdrawstyle = self.drawstyle_default
-        self.BTbacklinewidth = self.linewidth_default
+        self.BTbacklinewidth = self.back_linewidth_default
         self.BTbackmarker = self.marker_default
         self.BTbackmarkersize = self.markersize_default
         self.ETbacklinestyle = self.linestyle_default
         self.ETbackdrawstyle = self.drawstyle_default
-        self.ETbacklinewidth = self.linewidth_default
+        self.ETbacklinewidth = self.back_linewidth_default
         self.ETbackmarker = self.marker_default
         self.ETbackmarkersize = self.markersize_default
         self.XTbacklinestyle = self.linestyle_default
@@ -1574,12 +1578,12 @@ class tgraphcanvas(FigureCanvas):
         self.XTbackmarkersize = self.markersize_default                
         self.BTBdeltalinestyle = self.linestyle_default
         self.BTBdeltadrawstyle = self.drawstyle_default
-        self.BTBdeltalinewidth = self.delta_linewidth_default
+        self.BTBdeltalinewidth = self.back_delta_linewidth_default
         self.BTBdeltamarker = self.marker_default
         self.BTBdeltamarkersize = self.markersize_default
         self.ETBdeltalinestyle = self.linestyle_default
         self.ETBdeltadrawstyle = self.drawstyle_default
-        self.ETBdeltalinewidth = self.delta_linewidth_default
+        self.ETBdeltalinewidth = self.back_delta_linewidth_default
         self.ETBdeltamarker = self.marker_default
         self.ETBdeltamarkersize = self.markersize_default
         self.BTBdeltalinestyle = self.linestyle_default
@@ -1642,20 +1646,20 @@ class tgraphcanvas(FigureCanvas):
         
         self.ylimit_F_default = 500
         self.ylimit_min_F_default = 100
-        self.ygrid_F_default = 50
+        self.ygrid_F_default = 100
         self.zlimit_F_default = 45
         self.zlimit_min_F_default = 0
         self.zgrid_F_default = 10
         
         self.ylimit_C_default = 250
         self.ylimit_min_C_default = 0
-        self.ygrid_C_default = 25
+        self.ygrid_C_default = 50
         self.zlimit_C_default = 25
         self.zlimit_min_C_default = 0
         self.zgrid_C_default = 5
         
-        self.temp_grid = True
-        self.time_grid = True
+        self.temp_grid = False
+        self.time_grid = False
         
         # maximum accepted min/max settings for y and z axis
         self.zlimit_max = 500
@@ -3803,13 +3807,14 @@ class tgraphcanvas(FigureCanvas):
         formatter = ticker.FuncFormatter(self.formtime)
         self.ax.xaxis.set_major_formatter(formatter)
 
+
         #adjust the length of the minor ticks
         for i in self.ax.xaxis.get_minorticklines() + self.ax.yaxis.get_minorticklines():
-            i.set_markersize(5)
+            i.set_markersize(4)
 
         #adjust the length of the major ticks
         for i in self.ax.get_xticklines() + self.ax.get_yticklines():
-            i.set_markersize(10)
+            i.set_markersize(6)
             #i.set_markeredgewidth(2)   #adjust the width
 
         # check x labels rotation
@@ -4810,13 +4815,17 @@ class tgraphcanvas(FigureCanvas):
                 randomness = 12 # 2 (16 default)
                 rcParams['path.sketch'] = (scale, length, randomness)
     
-                rcParams['axes.linewidth'] = 1.5
-                rcParams['xtick.major.size'] = 8
-                rcParams['xtick.major.width'] = 1.5
-                rcParams['xtick.minor.width'] = 1
-                rcParams['ytick.major.size'] = 8
-                rcParams['ytick.major.width'] = 1.5
+                rcParams['axes.linewidth'] = 0.8 # 1.5
+                rcParams['xtick.major.size'] = 6 # 8
+                rcParams['xtick.major.width'] = 1
+#                rcParams['xtick.major.pad'] = 5
+                rcParams['xtick.minor.width'] = 0.8
+                
+                rcParams['ytick.major.size'] = 4 # 8
+                rcParams['ytick.major.width'] = 1
+#                rcParams['ytick.major.pad'] = 5
                 rcParams['ytick.minor.width'] = 1
+                
                 rcParams['xtick.color'] = self.palette["xlabel"]
                 rcParams['ytick.color'] = self.palette["ylabel"]
     
@@ -11535,7 +11544,7 @@ class ApplicationWindow(QMainWindow):
 
         ####      create Matplotlib canvas widget
         #resolution
-        self.defaultdpi = 120
+        self.defaultdpi = 90
         self.dpi = self.defaultdpi
         
         #mpl.rc_context({'toolbar': None}) # this does not work to remove the default toolbar
@@ -11609,20 +11618,20 @@ class ApplicationWindow(QMainWindow):
 
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv seetings)
         self.lcdpaletteB = {
-            "timer":'black',
-            "et":'#D9D9D9', #'black',
-            "bt":'#D9D9D9', #'black',
-            "deltaet":'#BFBFBF', #'black',
-            "deltabt":'#BFBFBF', #'black',
-            "sv":'#404040', #'black'
+            "timer":'#F8F8F8',
+            "et":'#cc0f50', #'black',
+            "bt":'#0A5C90', #'black',
+            "deltaet":'#EBEBEB', #'black',
+            "deltabt":'#EBEBEB', #'black',
+            "sv":'#F8F8F8', #'black'
             }
         self.lcdpaletteF = {
-            "timer":'white',
-            "et":'red', #'white',
-            "bt":'#00007F', #'white',
-            "deltaet":'orange', #'white',
-            "deltabt":'blue', #'white',
-            "sv":'yellow'
+            "timer":'#262626',
+            "et":'white', #'white',
+            "bt":'white', #'white',
+            "deltaet":'#cc0f50', #'white',
+            "deltabt":'#0A5C90', #'white',
+            "sv":'#4C4C4C'
             }
 
         #user defined event buttons
@@ -13268,13 +13277,13 @@ class ApplicationWindow(QMainWindow):
         self.lcd6.display(zz)
         self.lcd7.display(zz)
 
-        self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
-        self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
-        self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
-        self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltaet"],self.lcdpaletteB["deltaet"]))
-        self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
-        self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-        self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+        self.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
+        self.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
+        self.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
+        self.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["deltaet"],self.lcdpaletteB["deltaet"]))
+        self.lcd5.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
+        self.lcd6.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+        self.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
 
         self.lcd1.setToolTip(QApplication.translate("Tooltip", "Timer",None))
         self.lcd2.setToolTip(QApplication.translate("Tooltip", "ET Temperature",None))
@@ -14670,12 +14679,12 @@ class ApplicationWindow(QMainWindow):
         aw.lcdpaletteB["sv"] = "black"
         aw.lcdpaletteF["sv"] = "white"
         aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-        aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
-        aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
-        aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
-        aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
-        aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-        aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+        aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+        aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+        aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
+        aw.lcd5.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
+        aw.lcd6.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+        aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         aw.updateExtraLCDvisibility()
 
 
@@ -17138,10 +17147,7 @@ class ApplicationWindow(QMainWindow):
                 except:
                     aw.extraLCDlabel1[i].setText(l1)
                 self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
-#dave90  start...
-#            aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-            aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
-#dave90  ...end
+            aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCDframe2[i].setVisible(bool(aw.extraLCDvisibility2[i])) 
             if i < len(aw.qmc.extraname2):
                 l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
@@ -17150,10 +17156,7 @@ class ApplicationWindow(QMainWindow):
                 except:
                     aw.extraLCDlabel2[i].setText(l2)
                 self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
-#dave90  start...
-            aw.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-#            aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
-#dave90  ...end
+            aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
         #hide the rest (just in case)
         for i in range(ndev,aw.nLCDS):
             aw.extraLCDframe1[i].setVisible(False)
@@ -22943,7 +22946,7 @@ class ApplicationWindow(QMainWindow):
                         self.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
                         self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
                     self.extraLCDframe1[i].setVisible(True)
-                    self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+                    self.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
                 else:
                     self.extraLCDframe1[i].setVisible(False)
                 if self.extraLCDvisibility2[i]:
@@ -22952,7 +22955,7 @@ class ApplicationWindow(QMainWindow):
                         self.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
                         self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
                     self.extraLCDframe2[i].setVisible(True)
-                    self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+                    self.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
                 else:
                     self.extraLCDframe2[i].setVisible(False)
         #hide the rest (just in case)
@@ -47826,32 +47829,32 @@ class graphColorDlg(ArtisanDialog):
             color = QColor(aw.lcdpaletteF["et"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["et"] = str(color.name())
-            aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+            aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         elif lcd == 3:
             color = QColor(aw.lcdpaletteF["bt"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["bt"] = str(color.name())
-            aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+            aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
         elif lcd == 4:
             color = QColor(aw.lcdpaletteF["deltaet"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["deltaet"] = str(color.name())
-            aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
+            aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
         elif lcd == 5:
             color = QColor(aw.lcdpaletteF["deltabt"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["deltabt"] = str(color.name())
-            aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
+            aw.lcd5.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
         elif lcd == 6:
             color = QColor(aw.lcdpaletteF["sv"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["sv"] = str(color.name())
-            aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-            aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            aw.lcd6.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
 
     def paintlcds(self,flag,lcdnumber):
         if lcdnumber ==1:
@@ -47859,7 +47862,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"timer")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"timer")
-            aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+            aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
         if lcdnumber == 2:
@@ -47867,7 +47870,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"et")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"et")
-            aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+            aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         if lcdnumber ==3:
@@ -47875,7 +47878,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"bt")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"bt")
-            aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+            aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
         if lcdnumber ==4:
@@ -47883,20 +47886,20 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltaet")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltaet")
-            aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
+            aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
         if lcdnumber ==5:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltabt")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltabt")
-            aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
+            aw.lcd5.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
         if lcdnumber ==6:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"sv")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"sv")
-            aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-            aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            aw.lcd6.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.updateExtraLCDvisibility()
         self.setColorLabels()
 
@@ -48084,7 +48087,7 @@ class LargeLCDs(ArtisanDialog):
                 lcd.setVisible(aw.qmc.ETlcd)
             elif s == "bt":
                 lcd.setVisible(aw.qmc.BTlcd)
-        lcd.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
+        lcd.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
         return lcd
         
     # tight 0: leading space on lcd2 and lcd 1, 1: leading space on lcd3, 2: no leading spaces
