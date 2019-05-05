@@ -625,7 +625,9 @@ class tgraphcanvas(FigureCanvas):
                         "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
                         "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
-                        "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'white',"metbox":'red',
+                        "specialeventbox":'yellow',"specialeventtext":'black', 
+                        "bgeventmarker":'black',"bgeventtext":'black',
+                        "mettext":'white',"metbox":'red',
                         "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'} 
         self.palette1 = self.palette.copy()
         self.EvalueColor_default = ['#4895CE','#49B160','#800080','#910113'] #["brown","blue","purple","grey"]
@@ -5200,8 +5202,11 @@ class tgraphcanvas(FigureCanvas):
                                     continue
                                 anno = self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),path_effects=[],
                                                     xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
-                                                    fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
-                                                    alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)
+                                                    va="center", ha="center",
+                                                    fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["bgeventtext"],
+                                                    arrowprops=dict(arrowstyle='wedge',color=self.palette["bgeventmarker"],
+                                                                    alpha=self.backgroundalpha),#relpos=(0,0)),
+                                                    alpha=self.backgroundalpha)
                                 try:
                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                 except: # mpl before v3.0 do not have this set_in_layout() function
@@ -6521,6 +6526,8 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["legendborder"] = str(dialog.legendborderLabel.text())
                 self.palette["specialeventbox"] = str(dialog.specialeventboxLabel.text())
                 self.palette["specialeventtext"] = str(dialog.specialeventtextLabel.text())
+                self.palette["bgeventmarker"] = str(dialog.bgeventmarkerLabel.text())
+                self.palette["bgeventtext"] = str(dialog.bgeventtextLabel.text())
                 self.palette["mettext"] = str(dialog.mettextLabel.text())
                 self.palette["metbox"] = str(dialog.metboxLabel.text())
                 self.backgroundmetcolor = str(dialog.bgmetLabel.text())
@@ -13325,8 +13332,8 @@ class ApplicationWindow(QMainWindow):
             self.extraLCD2[i].setContextMenuPolicy(Qt.CustomContextMenu)
             self.extraLCD2[i].customContextMenuRequested.connect(lambda _,r=2+i*2: self.setTare(r+1))
             self.extraLCDframe2[i].setVisible(False)
-            self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-            self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+            self.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+            self.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             #configure Labels
             self.extraLCDlabel1[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
@@ -14469,6 +14476,9 @@ class ApplicationWindow(QMainWindow):
 
                 (QApplication.translate("Label","SpecialEventText",None), aw.qmc.palette["specialeventtext"],
                  QApplication.translate("Label","SpecialEventBox",None), aw.qmc.palette["specialeventbox"]),
+
+                (QApplication.translate("Label","Bg SpecialEventText",None), aw.qmc.palette["bgeventtext"],
+                 QApplication.translate("Label","Bg SpecialEventBox",None), aw.qmc.palette["bgeventmarker"]),
 
                 (QApplication.translate("Label","ET",None), aw.qmc.palette["et"],
                  QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette["legendbg"]),
@@ -17120,8 +17130,8 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel1[i].setText(l1)
                 self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
 #dave90  start...
-            aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-#            aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
+#            aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius:4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
 #dave90  ...end
             self.extraLCDframe2[i].setVisible(bool(aw.extraLCDvisibility2[i])) 
             if i < len(aw.qmc.extraname2):
@@ -47520,6 +47530,20 @@ class graphColorDlg(ArtisanDialog):
         self.specialeventtextButton.setFocusPolicy(Qt.NoFocus)
         self.specialeventtextLabel.setFrameStyle(frameStyle)
         self.specialeventtextButton.clicked.connect(lambda _: self.setColor("specialeventtext",self.specialeventtextLabel,"specialeventtext"))
+        self.bgeventmarkerLabel = QLabel(aw.qmc.palette["bgeventmarker"])
+        self.bgeventmarkerLabel.setPalette(QPalette(QColor(aw.qmc.palette["bgeventmarker"])))
+        self.bgeventmarkerLabel.setAutoFillBackground(True)
+        self.bgeventmarkerButton = QPushButton(QApplication.translate("Button","Bkgd Event Marker", None))
+        self.bgeventmarkerButton.setFocusPolicy(Qt.NoFocus)
+        self.bgeventmarkerLabel.setFrameStyle(frameStyle)
+        self.bgeventmarkerButton.clicked.connect(lambda _: self.setColor("bgeventmarker",self.bgeventmarkerLabel,"bgeventmarker"))
+        self.bgeventtextLabel = QLabel(aw.qmc.palette["specialeventtext"])
+        self.bgeventtextLabel.setPalette(QPalette(QColor(aw.qmc.palette["bgeventtext"])))
+        self.bgeventtextLabel.setAutoFillBackground(True)
+        self.bgeventtextButton = QPushButton(QApplication.translate("Button","Bkgd Event Text", None))
+        self.bgeventtextButton.setFocusPolicy(Qt.NoFocus)
+        self.bgeventtextLabel.setFrameStyle(frameStyle)
+        self.bgeventtextButton.clicked.connect(lambda _: self.setColor("bgeventtext",self.bgeventtextLabel,"bgeventtext"))
         self.mettextLabel = QLabel(aw.qmc.palette["mettext"])
         self.mettextLabel.setPalette(QPalette(QColor(aw.qmc.palette["mettext"])))
         self.mettextLabel.setAutoFillBackground(True)
@@ -47649,16 +47673,20 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.specialeventboxLabel,5,3) 
         grid.addWidget(self.specialeventtextButton,6,2) 
         grid.addWidget(self.specialeventtextLabel,6,3) 
-        grid.addWidget(self.metboxButton,7,2) 
-        grid.addWidget(self.metboxLabel,7,3) 
-        grid.addWidget(self.mettextButton,8,2) 
-        grid.addWidget(self.mettextLabel,8,3) 
-        grid.addWidget(self.timeguideButton,9,2)
-        grid.addWidget(self.timeguideLabel,9,3)
-        grid.addWidget(self.aucguideButton,10,2)
-        grid.addWidget(self.aucguideLabel,10,3)
-        grid.addWidget(self.aucareaButton,11,2)
-        grid.addWidget(self.aucareaLabel,11,3)
+        grid.addWidget(self.bgeventmarkerButton,7,2) 
+        grid.addWidget(self.bgeventmarkerLabel,7,3) 
+        grid.addWidget(self.bgeventtextButton,8,2) 
+        grid.addWidget(self.bgeventtextLabel,8,3) 
+        grid.addWidget(self.metboxButton,9,2) 
+        grid.addWidget(self.metboxLabel,9,3) 
+        grid.addWidget(self.mettextButton,10,2) 
+        grid.addWidget(self.mettextLabel,10,3) 
+        grid.addWidget(self.timeguideButton,11,2)
+        grid.addWidget(self.timeguideLabel,11,3)
+        grid.addWidget(self.aucguideButton,12,2)
+        grid.addWidget(self.aucguideLabel,12,3)
+        grid.addWidget(self.aucareaButton,13,2)
+        grid.addWidget(self.aucareaLabel,13,3)
         graphLayout = QVBoxLayout()
         graphLayout.addLayout(grid)
 
@@ -47888,6 +47916,8 @@ class graphColorDlg(ArtisanDialog):
                 (self.legendborderLabel,"legendborder"),
                 (self.specialeventboxLabel,"specialeventbox"),
                 (self.specialeventtextLabel,"specialeventtext"),
+                (self.bgeventmarkerLabel,"bgeventmarker"),
+                (self.bgeventtextLabel,"bgeventtext"),
                 (self.mettextLabel,"mettext"),
                 (self.metboxLabel,"metbox"),
                 ]:
