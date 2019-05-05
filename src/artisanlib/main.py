@@ -6748,7 +6748,7 @@ class tgraphcanvas(FigureCanvas):
                     self.addPhidgetServer()
                 except:
                     if aw.qmc.device in aw.qmc.phidgetDevices:
-                        aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetServer couldn't be started. Verify that the Phidget driver is correctly installed!",None))
+                        aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
 #                        _, _, exc_tb = sys.exc_info()
 #                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " addPhidgetServer() {0}").format(str(e)),exc_tb.tb_lineno)
             if self.phidgetManager is None:
@@ -11797,6 +11797,11 @@ class ApplicationWindow(QMainWindow):
         self.fileSaveAsAction.setShortcut(QKeySequence.SaveAs)
         self.fileSaveAsAction.triggered.connect(lambda _:self.fileSave(None))
         self.fileMenu.addAction(self.fileSaveAsAction)
+
+        # same as SaveAs, just that the saved file gets a new roastUUID assigned
+        self.fileSaveCopyAsAction = QAction(UIconst.FILE_MENU_SAVECOPYAS,self)
+        self.fileSaveCopyAsAction.triggered.connect(lambda _:self.fileSave(None,copy=True))
+        self.fileMenu.addAction(self.fileSaveCopyAsAction)
 
         self.fileMenu.addSeparator()
 
@@ -20395,7 +20400,8 @@ class ApplicationWindow(QMainWindow):
 
     #saves recorded profile in hard drive. Called from file menu 
     # returns True if file was saved successfully
-    def fileSave(self,fname):
+    # if copy is True, 
+    def fileSave(self,fname,copy=False):
         try:
             filename = fname
             if not filename:
@@ -20411,7 +20417,8 @@ class ApplicationWindow(QMainWindow):
                 #write
                 pf = self.getProfile()
                 if pf:
-
+                    # if the copy flag is set, we generate a new roastUUID
+                    pf["roastUUID"] = uuid.uuid4().hex # generate UUID
 #PLUS-COMMENT  
                     if aw.plus_account is not None:
                         sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
