@@ -40,18 +40,15 @@ rm -rf dist/artisan.d
 
 # copy translations
 mkdir dist/translations
-cp $QT_PATH/translations/qtbase_ar.qm dist/translations
-cp $QT_PATH/translations/qtbase_de.qm dist/translations
-cp $QT_PATH/translations/qtbase_es.qm dist/translations
-cp $QT_PATH/translations/qtbase_fi.qm dist/translations
-cp $QT_PATH/translations/qtbase_fr.qm dist/translations
-cp $QT_PATH/translations/qtbase_he.qm dist/translations
-cp $QT_PATH/translations/qtbase_hu.qm dist/translations
-cp $QT_PATH/translations/qtbase_it.qm dist/translations
-cp $QT_PATH/translations/qtbase_ja.qm dist/translations
-cp $QT_PATH/translations/qtbase_ko.qm dist/translations
-cp $QT_PATH/translations/qtbase_pl.qm dist/translations
-cp $QT_PATH/translations/qtbase_ru.qm dist/translations
+Languages=("de" "es" "fi" "fr" "he" "hu" "it" "ja" "ko" "pl" "ru")
+
+for lan in ${Languages[*]}; do
+     QTBASE_FILE=$QT_PATH/translations/qtbase_${lan}.qm
+     QT_FILE=$QT_PATH/translations/qt_${lan}.qm
+     [[ -e ${QTBASE_FILE} ]] && cp ${QTBASE_FILE} dist/translations
+     [[ -e ${QT_FILE} ]] && cp ${QT_FILE} dist/translations
+done
+
 cp translations/*.qm dist/translations
 
 # copy data
