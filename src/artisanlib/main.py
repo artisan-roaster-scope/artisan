@@ -1020,11 +1020,13 @@ class tgraphcanvas(FigureCanvas):
                        "Aillio Bullet R1 IBTS/BT",  #99
                        "Yocto IR",                  #100
                        "Behmor BT/CT",              #101
+                       "-Behmor X/X",               #102
+                       "VICTOR 86B",                #103
                        ]
 
         # ADD DEVICE:
         # ids of (main) devices (without a + in front of their name string) 
-        # that do not communicate via any serial port thus do not need any serial port configuration
+        # that do NOT communicate via any serial port thus do not need any serial port configuration
         self.nonSerialDevices = [
             27, # Program
             34, # Phidget 1048 4xTC 01
@@ -20400,7 +20402,7 @@ class ApplicationWindow(QMainWindow):
 
     #saves recorded profile in hard drive. Called from file menu 
     # returns True if file was saved successfully
-    # if copy is True, 
+    # if copy is True, a new UUID is generated to be saved along the file
     def fileSave(self,fname,copy=False):
         try:
             filename = fname
@@ -20418,7 +20420,8 @@ class ApplicationWindow(QMainWindow):
                 pf = self.getProfile()
                 if pf:
                     # if the copy flag is set, we generate a new roastUUID
-                    pf["roastUUID"] = uuid.uuid4().hex # generate UUID
+                    if copy:
+                        pf["roastUUID"] = uuid.uuid4().hex # generate UUID
 #PLUS-COMMENT  
                     if aw.plus_account is not None:
                         sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
@@ -38558,6 +38561,8 @@ class serialport(object):
                                    self.R1_BTIBTS,            # 99
                                    self.YOCTO_IR,             #100
                                    self.BEHMOR_BTET,          #101
+                                   self.BEHMOR_34,            #102
+                                   self.VICTOR86B,            #103
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -39075,6 +39080,15 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.BEHMORtemperatures()
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
+    
+    def BEHMOR_34(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        return tx,-1,-1
+    
+    def VICTOR86B(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t = self.VICTOR86Btemperature()
+        return tx,-1,t
 
     def S7(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -40491,6 +40505,138 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER306: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
+    # by Lewis, Li Ching 6 May 2019 Github: https://github.com/lewisliching
+    def VICTOR86Btemperature(self, retry=1):
+        try:
+            command = str2cmd("\x41") #this comand makes the meter answer back with 14 bytes
+            r = ""
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+#                self.SP.reset_input_buffer()
+#                self.SP.reset_output_buffer()
+                self.SP.write(command)
+#                self.SP.flush()
+#                libtime.sleep(.01)
+                r = self.SP.read(14)
+                if len(r) == 14:
+                    if r[13] != 226 :
+                        #Not switch to Thermometer mode
+                        aw.qmc.adderror(QApplication.translate("Error Message","VICTOR86Btemperatures(): not in thermometer mode",None))            
+                        return -1
+                    else:
+                        digit = [0, 0, 0, 0]
+                        
+                        # Digit in tenth (with Decimal point in front)
+                        if r[7] == 139 and r[8] == 159 :
+                            digit[3] = 9
+                        elif  r[7] == 143 and r[8] == 159 :
+                            digit[3] = 8
+                        elif  r[7] == 137 and r[8] == 149 :
+                            digit[3] = 7
+                        elif  r[7] == 143 and r[8] == 158 :
+                            digit[3] = 6
+                        elif  r[7] == 139 and r[8] == 158 :
+                            digit[3] = 5
+                        elif  r[7] == 138 and r[8] == 151 :
+                            digit[3] = 4
+                        elif  r[7] == 137  and r[8] == 159 :
+                            digit[3] = 3
+                        elif  r[7] == 141 and r[8] == 155 :
+                            digit[3] = 2
+                        elif  r[7] == 136 and r[8] == 149 :
+                            digit[3] = 1
+                        elif  r[7] == 143  and r[8] == 157 :
+                            digit[3] = 0
+                
+                        # Digit in ones
+                        if r[5] == 99 and r[6] == 127 :
+                            digit[2] = 9
+                        elif  r[5] == 103 and r[6] == 127 :
+                            digit[2] = 8
+                        elif  r[5] == 97 and r[6] == 117 :
+                            digit[2] = 7
+                        elif  r[5] == 103 and r[6] == 126 :
+                            digit[2] = 6
+                        elif  r[5] == 99 and r[6] == 126 :
+                            digit[2] = 5
+                        elif  r[5] == 98 and r[6] == 119 :
+                            digit[2] = 4
+                        elif  r[5] == 97  and r[6] == 127 :
+                            digit[2] = 3
+                        elif  r[5] == 101 and r[6] == 123 :
+                            digit[2] = 2
+                        elif  r[5] == 96 and r[6] == 117 :
+                            digit[2] = 1
+                        elif  r[5] == 103  and r[6] == 125 :
+                            digit[2] = 0
+                
+                        # Digit in tens
+                        if r[3] == 67 and r[4] == 95 :
+                            digit[1] = 9
+                        elif  r[3] == 71 and r[4] == 95 :
+                            digit[1] = 8
+                        elif  r[3] == 65 and r[4] == 85 :
+                            digit[1] = 7
+                        elif  r[3] == 71 and r[4] == 94 :
+                            digit[1] = 6
+                        elif  r[3] == 67 and r[4] == 94 :
+                            digit[1] = 5
+                        elif  r[3] == 66 and r[4] == 87 :
+                            digit[1] = 4
+                        elif  r[3] == 65  and r[4] == 95 :
+                            digit[1] = 3
+                        elif  r[3] == 69 and r[4] == 91 :
+                            digit[1] = 2
+                        elif  r[3] == 64 and r[4] == 85 :
+                            digit[1] = 1
+                        elif  r[3] == 71  and r[4] == 93 :
+                            digit[1] = 0
+                
+                        # Digit in hundreds
+                        if r[1] == 35 and r[2] == 63 :
+                            digit[0] = 9
+                        elif  r[1] == 39 and r[2] == 63 :
+                            digit[0] = 8
+                        elif  r[1] == 33 and r[2] == 53 :
+                            digit[0] = 7
+                        elif  r[1] == 39 and r[2] == 62 :
+                            digit[0] = 6
+                        elif  r[1] == 35 and r[2] == 62 :
+                            digit[0] = 5
+                        elif  r[1] == 34 and r[2] == 55 :
+                            digit[0] = 4
+                        elif  r[1] == 33  and r[2] == 63 :
+                            digit[0] = 3
+                        elif  r[1] == 37 and r[2] == 59 :
+                            digit[0] = 2
+                        elif  r[1] == 32 and r[2] == 53 :
+                            digit[0] = 1
+                        elif  r[1] == 39  and r[2] == 61 :
+                            digit[0] = 0
+                
+                        return digit[3]/10. + digit[2] + digit[1]*10 + digit[0]*100
+
+                else:
+                    if retry:
+                        return self.VICTORtemperatures(retry=retry-1)
+                    else:
+                        nbytes = len(r)
+                        aw.qmc.adderror(QApplication.translate("Error Message","VICTOR86Btemperatures(): {0} bytes received but 14 needed",None).format(nbytes))            
+                        return -1
+            else:
+                return -1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " VICTOR86Btemperatures() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.closeport()
+            return -1
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("VICTOR86B: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+
     def CENTER309temperature(self, retry=1):
         ##    command = "\x4B" returns 4 bytes . Model number.
         ##    command = "\x48" simulates HOLD button
@@ -40521,8 +40667,10 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
+#                self.SP.flushInput() # deprecated in v3
+#                self.SP.reset_input_buffer()
+#                self.SP.flushOutput() # deprecated in v3
+#                self.SP.reset_output_buffer()
                 self.SP.write(command)
 #                self.SP.flush()
 #                libtime.sleep(.01)
@@ -47060,7 +47208,19 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
-                    
+                ##########################
+                ####  DEVICE 102 Behmor channel 3 and 4
+                ##########################
+                elif meter == "VICTOR 86B":
+                    aw.qmc.device = 103
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 2400
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1.0
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
+                
                 # ADD DEVICE:
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -47177,6 +47337,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 99
                 1, # 100
                 9, # 101
+                9, # 102
+                5, # 103
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
