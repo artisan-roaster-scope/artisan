@@ -40,9 +40,21 @@ rm -rf dist/artisan.d
 
 # copy translations
 mkdir dist/translations
-Languages=("de" "es" "fi" "fr" "he" "hu" "it" "ja" "ko" "pl" "ru")
 
-for lan in ${Languages[*]}; do
+
+for lan in 
+     "de"
+     "es"
+     "fi"
+     "fr"
+     "he"
+     "hu"
+     "it"
+     "ja"
+     "ko"
+     "pl"
+     "ru"
+do
      QTBASE_FILE=$QT_PATH/translations/qtbase_${lan}.qm
      QT_FILE=$QT_PATH/translations/qt_${lan}.qm
      [[ -e ${QTBASE_FILE} ]] && cp ${QTBASE_FILE} dist/translations
