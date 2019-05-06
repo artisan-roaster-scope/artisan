@@ -43,16 +43,16 @@ mkdir dist/translations
 
 
 for lan in 
-     "de"
-     "es"
-     "fi"
-     "fr"
-     "he"
-     "hu"
-     "it"
-     "ja"
-     "ko"
-     "pl"
+     "de" \
+     "es" \
+     "fi" \
+     "fr" \
+     "he" \
+     "hu" \
+     "it" \
+     "ja" \
+     "ko" \
+     "pl" \
      "ru"
 do
      QTBASE_FILE=$QT_PATH/translations/qtbase_${lan}.qm
