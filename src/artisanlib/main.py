@@ -2022,7 +2022,7 @@ class tgraphcanvas(FigureCanvas):
         self.met_annotate = []
         self.extendevents = True
         self.statssummary = False        
-        self.showtimeguide = False
+        self.showtimeguide = True
         
         #mouse cross lines measurement 
         self.baseX,self.baseY = None, None
@@ -3972,6 +3972,10 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
+                
+    def resetButtonAction(self):
+        self.disconnectProbes() # release serial/S7/MODBUS connections
+        self.reset()
 
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
@@ -13098,7 +13102,7 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setCursor(QCursor(Qt.PointingHandCursor))
         self.button_7.setMinimumHeight(self.standard_button_height)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
-        self.button_7.clicked.connect(lambda _: self.qmc.reset())
+        self.button_7.clicked.connect(lambda _: self.qmc.resetButtonAction())
         if app.artisanviewerMode:
             self.button_7.setVisible(False)
 
@@ -16106,10 +16110,7 @@ class ApplicationWindow(QMainWindow):
                         self.ser.sendTXcommand(cmd_str_bin)
                     else:
                         cmd_str = cmd_str.replace('\\r\\n','\n\r').replace('\\n', '\n').replace('\\t','\t')
-                        cmd_strs = cmd_str.split(";")
-                        for cmd in cmd_strs:
-                            self.ser.sendTXcommand(cmd)
-                            libtime.sleep(0.03)
+                        self.ser.sendTXcommand(cmd_str)
                 elif action == 2: # button call program action
                     try:
                         if cmd_str:
@@ -31953,15 +31954,17 @@ class editGraphDlg(ArtisanDialog):
 
     def scanWholeColor(self):
         v = aw.color.readColor()
-        if v >= 0 and v <= 250:
-            aw.qmc.whole_color = v
-            self.whole_color_edit.setText(str(v))
+        if v is not None and v > -1:
+            if v >= 0 and v <= 250:
+                aw.qmc.whole_color = v
+                self.whole_color_edit.setText(str(v))
 
     def scanGroundColor(self):
         v = aw.color.readColor()
-        v = max(0,min(250,v))
-        aw.qmc.ground_color = v
-        self.ground_color_edit.setText(str(v))
+        if v is not None and v > -1:
+            v = max(0,min(250,v))
+            aw.qmc.ground_color = v
+            self.ground_color_edit.setText(str(v))
 
     def volumeCalculator(self):
         weightin = None
@@ -38309,7 +38312,20 @@ class colorport(extraserialport):
         else:
             return -1
 
-    def readTonino(self):
+    def readline_terminated(self,eol=b'\r'):
+        leneol = len(eol)
+        line = bytearray()
+        while True:
+            c = self.SP.read(1)
+            if c:
+                line += c
+                if line[-leneol:] == eol:
+                    break
+            else:
+                break
+        return bytes(line)
+
+    def readTonino(self,retry=2):
         try:
             if not self.SP:
                 self.connect()
@@ -38317,20 +38333,23 @@ class colorport(extraserialport):
                 # put Tonino into PC mode on first connect
                 self.SP.write(str2cmd('\nTONINO\n'))
                 #self.SP.flush()
-                libtime.sleep(.1)
-                self.SP.readline()
+                self.readline_terminated(b'\n')
             if self.SP:
                 if not self.SP.isOpen():
                     self.openport()
                 if self.SP.isOpen():
-                    self.SP.flushInput()
-                    self.SP.flushOutput()
+                    self.SP.reset_input_buffer()
+                    self.SP.reset_output_buffer()
                     self.SP.write(str2cmd('\nSCAN\n'))
                     #self.SP.flush()
-                    libtime.sleep(.1)
-                    v = self.SP.readline()
-                    n = int(v.decode('ascii').split(":")[1]) # response should have format "SCAN:128"
-                    return n
+                    v = self.readline_terminated(b'\n').decode('ascii')
+                    if "SCAN" in v:
+                        n = int(v.split(":")[1]) # response should have format "SCAN:128"
+                        return n
+                    elif retry > 0:
+                        return self.readTonino(self,retry-1)
+                    else:
+                        return -1
         except Exception:
             return -1
 
@@ -38578,11 +38597,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(binstring)
-                #self.SP.flush()
-                libtime.sleep(.1)
                 r = self.SP.read(nbytes)
                 #serTX.close()
                 libtime.sleep(0.035)                     #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
@@ -38729,12 +38746,10 @@ class serialport(object):
             if self.SP.isOpen():
                 nrxbytes = 15
                 #clear
-                self.SP.flushInput()
-                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_input_buffer()
                 #SEND (tx)
                 self.SP.write(str2cmd(command))
-                #self.SP.flush()
-                libtime.sleep(.1)
                 #READ n bytes(rx)
                 r = self.SP.read(nrxbytes).decode('utf-8')
 ##                command = ":010347000001B4"
@@ -39400,10 +39415,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(b'\x56\xaa\x01')
-                self.SP.flush()
                 r = self.SP.read(10)
                 if len(r) == 10:
                     ##Single  line to return pressure twice. obviously only need to do this once.
@@ -39659,10 +39673,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+#                self.SP.reset_output_buffer()
 #                self.SP.write(command)
-#                libtime.sleep(.1)
                 r = self.SP.read(18)
                 index = -1
                 if(len(r) == 18 and o(r[0]) == 101 and o(r[1]) == 20):  # 101="\x65"  20="\x14"
@@ -39782,8 +39795,8 @@ class serialport(object):
                         self.DT301PrevTemp = temp/10.0,0
                         return self.DT301PrevTemp,-1
                 if retry:
-                    self.SP.flushInput()
-                    self.SP.flushOutput()
+                    self.SP.reset_input_buffer()
+                    self.SP.reset_output_buffer()
                     libtime.sleep(.05)
                     return self.DT301temperature(retry=retry-1)
                 else:
@@ -39812,8 +39825,7 @@ class serialport(object):
                 aw.addserial("DT301: " + settings + " || Rx = " + cmd2str(binascii.hexlify(data))) 
 
     # if serial input is not \0 terminated standard pyserial readline returns only after the timeout
-    def readline_null_terminated(self):
-        eol = b'\0'
+    def readline_terminated(self,eol=b'\r'):
         leneol = len(eol)
         line = bytearray()
         while True:
@@ -39835,28 +39847,16 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                #READ TEMPERATURE
-#                command = "tcs\r\n"  #Read 2 temps
-#                self.SP.write(str2cmd(command))
-#                rl = self.SP.readline().decode('utf-8')[:-2]
-#                res = rl.rsplit(',')
-#                #response: list ["t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT
-#                try:
-#                    t1 = float(res[0])
-#                except Exception:
-#                    t1 = -1
-#                try:
-#                    t2 = float(res[1])
-#                except Exception:
-#                    t2 = -1
-
                 # READ CT
                 try:
                     command = "gts,8\r\n"
-                    self.SP.flushInput()
-                    self.SP.flushOutput()
+                    self.SP.reset_input_buffer()
+                    self.SP.reset_output_buffer()
                     self.SP.write(str2cmd(command))
-                    res = self.readline_null_terminated().decode('utf-8', 'ignore').rstrip('\x00')
+                    res = self.readline_terminated(b'\r') # .decode('utf-8', 'ignore')
+                    print(res)
+                    #res = self.SP.readline() # takes at least the timeout period as line is not \n terminated!
+                    #res = self.SP.read_until('\r') # takes at least the timeout period!
                     t1 = float(res)
                     if aw.seriallogflag:
                         settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -39866,10 +39866,12 @@ class serialport(object):
                 # READ BT
                 try:
                     command = "gts,9\r\n"
-                    self.SP.flushInput()
-                    self.SP.flushOutput()
+                    self.SP.reset_input_buffer()
+                    self.SP.reset_output_buffer()
                     self.SP.write(str2cmd(command))
-                    res = self.readline_null_terminated().decode('utf-8', 'ignore').rstrip('\x00')
+                    res = self.readline_terminated(b'\r') # .decode('utf-8', 'ignore')
+                    print(res)
+                    #res = self.SP.readline() # takes at least the timeout period as line is not \n terminated!
                     t2 = float(res)
                     if aw.seriallogflag:
                         settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -39880,6 +39882,7 @@ class serialport(object):
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " ser.BEHMORtemperatures(): {0}").format(str(e)),exc_tb.tb_lineno)
+            self.closeport()
             return -1.,-1.
         finally:
             if self.COMsemaphore.available() < 1:
@@ -39914,10 +39917,9 @@ class serialport(object):
                 self.openport()
                 libtime.sleep(.05)
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(command)
-                libtime.sleep(.05)
                 r = self.SP.read(16)
                 if len(r) == 16 and hex2int(r[0])==62 and hex2int(r[1])==15:
                     #convert to binary to hex string
@@ -39960,8 +39962,8 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(str2cmd("#0A0000RA6\r\n"))
                 libtime.sleep(.3)
                 self.SP.write(str2cmd("#0A0000RA6\r\n"))
@@ -39991,8 +39993,8 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 for _ in range(27):
                     rcode = self.SP.read(1)
                     #locate first byte
@@ -40164,13 +40166,11 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 sync = None
                 while sync != b"Err\r\n":
                     self.SP.write(b"\r\n")
-                    #self.SP.flush()
-                    libtime.sleep(.1)
                     sync = self.SP.read(5)
                     libtime.sleep(1)
                 self.SP.write(b"%000R")
@@ -40206,10 +40206,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(command)
-#                self.SP.flush()
                 r = self.SP.read(14)
                 if len(r) == 14:
                     #we convert the hex strings to integers. Divide by 10.0 (decimal position)
@@ -40242,11 +40241,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(command)
-#                self.SP.flush()
-#                libtime.sleep(.01)
                 r = self.SP.read(7)                                   #NOTE: different
                 if len(r) == 7:
                     #DECIMAL POINT
@@ -40294,11 +40291,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(command)
-#                self.SP.flush()
-#                libtime.sleep(.01)
                 r = self.SP.read(8) #NOTE: different to CENTER306
                 if len(r) == 8:
                     #DECIMAL POINT
@@ -40358,11 +40353,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(command)
-#                self.SP.flush()
-#                libtime.sleep(.01)
                 r = self.SP.read(26)
                 if len(r) == 26 and hex2int(r[0],r[1]) == 43605: # filter out bad/strange data
                     #extract T1
@@ -40401,11 +40394,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(command)
-#                self.SP.flush()
-#                libtime.sleep(.01)
                 r = self.SP.read(26)
                 if len(r) == 26 and hex2int(r[0],r[1]) == 43605: # filter out bad/strange data
                     aw.qmc.extraPL125T4TX = aw.qmc.timeclock.elapsed()/1000.
@@ -40448,11 +40439,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(command)
-#                self.SP.flush()
-#                libtime.sleep(.01)
                 r = self.SP.read(10) #NOTE: different to CENTER303
                 if len(r) == 10:
                     #DECIMAL POINT
@@ -40667,13 +40656,9 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                self.SP.flushInput() # deprecated in v3
-#                self.SP.reset_input_buffer()
-#                self.SP.flushOutput() # deprecated in v3
-#                self.SP.reset_output_buffer()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(command)
-#                self.SP.flush()
-#                libtime.sleep(.01)
                 r = self.SP.read(45)
                 if len(r) == 45:
                     T1 = T2 = T3 = T3 = -1
@@ -42514,8 +42499,8 @@ class serialport(object):
             if self.SP.isOpen():
                 #INITIALIZE (ONLY ONCE)
                 if not self.ArduinoIsInitialized:
-#                    self.SP.flushInput()
-#                    self.SP.flushOutput()
+#                    self.SP.reset_input_buffer()
+#                    self.SP.reset_output_buffer()
                     #build initialization command
                     et_channel = self.arduinoETChannel
                     if et_channel == "None":
@@ -42546,24 +42531,20 @@ class serialport(object):
                         raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None))
                     elif result.startswith("#"):             
                         #OK. NOW SET UNITS
-#                        self.SP.flushInput()
-#                        self.SP.flushOutput()
+#                        self.SP.reset_input_buffer()
+#                        self.SP.reset_output_buffer()
                         command = "UNITS;" + aw.qmc.mode + "\n"   #Set units
                         self.SP.write(str2cmd(command))
-                        #self.SP.flush()
-                        #libtime.sleep(.1)
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
                             raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None))
                         else:
                             #OK. NOW SET FILTER
-#                            self.SP.flushInput()
-#                            self.SP.flushOutput()
+#                            self.SP.reset_input_buffer()
+#                            self.SP.reset_output_buffer()
                             filt =  ",".join(map(str,aw.ser.ArduinoFILT))
                             command = "FILT;" + filt + "\n"   #Set filters
                             self.SP.write(str2cmd(command))
-                            #self.SP.flush()
-                            #libtime.sleep(.1)
                             result = self.SP.readline().decode('utf-8')[:-2]
                             if (not len(result) == 0 and not result.startswith("#")):
                                 raise Exception(QApplication.translate("Error Message","Arduino could not set filters",None))
@@ -42573,12 +42554,10 @@ class serialport(object):
                         aw.sendmessage(QApplication.translate("Message","TC4 initialized",None))
                 #READ TEMPERATURE
                 command = "READ\n"  #Read command.
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(str2cmd(command))
-                #self.SP.flush()
-                #libtime.sleep(.1)
-                rl = self.SP.readline().decode('utf-8')[:-2]
+                rl = self.SP.readline().decode('utf-8', 'ignore')[:-2]
                 res = rl.rsplit(',')
                 #response: list ["t0","t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT on "CHAN;1200" 
                 #response: list ["t0","t1","t2","t3","t4"]  with t0 = internal temp; t1 = ET; t2 = BT, t3 = chan3, t4 = chan4 on "CHAN;1234" if ArduinoTC4_34 is configured
@@ -42719,7 +42698,7 @@ class serialport(object):
                     self.openport()    
                     libtime.sleep(1)
                 if self.SP.isOpen():
-                    self.SP.flushInput()
+                    self.SP.reset_input_buffer() # self.SP.flushInput() # deprecated in v3
                     r = self.SP.read(14)
                     if len(r) != 14:
                         continue
@@ -42867,8 +42846,8 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+                self.SP.reset_input_buffer() # self.SP.flushInput() # deprecated in v3
+                self.SP.reset_output_buffer() # self.SP.flushOutput() # deprecated in v3
             #keep reading till the first byte of next frame (till we read an actual 1 in 1A )
             for i in range(28):  #any number > 14 will be OK
                 r = self.SP.read(1)
@@ -42977,8 +42956,8 @@ class serialport(object):
                 if aw.qmc.device == 19:
                     self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+                self.SP.reset_input_buffer() # self.SP.flushInput() # deprecated in v3
+                self.SP.reset_output_buffer() # self.SP.flushOutput() # deprecated in v3
                 if (aw.qmc.device == 19 and not command.endswith("\n")):
                     command += "\n"
                 self.SP.write(str2cmd(command))
@@ -54255,8 +54234,8 @@ class PIDcontrol(object):
                     #### lock shared resources #####
                     aw.ser.COMsemaphore.acquire(1)
                     if aw.ser.SP.isOpen():
-#                        aw.ser.SP.flushInput()
-#                        aw.ser.SP.flushOutput()
+                        aw.ser.SP.reset_input_buffer() # aw.ser.SP.flushInput() # deprecated in v3
+                        aw.ser.SP.reset_output_buffer() # aw.ser.SP.flushOutput() # deprecated in v3
                         aw.ser.SP.write(str2cmd("PID;OFF\n"))
                         aw.sendmessage(QApplication.translate("Message","PID turned off", None))
                 finally:
@@ -54419,8 +54398,8 @@ class PIDcontrol(object):
                         #### lock shared resources #####
                         aw.ser.COMsemaphore.acquire(1)
                         if aw.ser.SP.isOpen():
-                            aw.ser.SP.flushInput()
-                            aw.ser.SP.flushOutput()
+                            aw.ser.SP.reset_input_buffer() # aw.ser.SP.flushInput() # deprecated in v3
+                            aw.ser.SP.reset_output_buffer() # aw.ser.SP.flushOutput() # deprecated in v3
                             aw.ser.SP.write(str2cmd("PID;SV;" + str(sv) +"\n"))
                             self.sv = sv # remember last sv
                     finally:
@@ -54504,8 +54483,8 @@ class PIDcontrol(object):
                     #### lock shared resources #####
                     aw.ser.COMsemaphore.acquire(1)
                     if aw.ser.SP.isOpen():
-                        aw.ser.SP.flushInput()
-                        aw.ser.SP.flushOutput()
+                        aw.ser.SP.reset_input_buffer() # aw.ser.SP.flushInput() # deprecated in v3
+                        aw.ser.SP.reset_output_buffer() # aw.ser.SP.flushOutput() # deprecated in v3
                         if pOnE:
                             aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
                         else:

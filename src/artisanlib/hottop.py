@@ -85,8 +85,10 @@ def gettemperatures(p,retry=True):
     try:
         openport(p)
         if p.isOpen():
-            p.flushInput()
-            p.flushOutput()
+            #p.flushInput() # deprecated in v3
+            p.reset_input_buffer()
+            #p.flushOutput() # deprecated in v3
+            p.reset_output_buffer()
             r = p.read(36)
 #            print(len(r),"".join("\\x%02x" % ord(i) for i in r))
             if len(r) != 36:
@@ -193,8 +195,10 @@ def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
             cmd = HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
                     aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR)
 #            print("".join("\\x%02x" % ord(i) for i in cmd))
-            p.flushInput()
-            p.flushOutput()
+            #p.flushInput() # deprecated in v3
+            p.reset_input_buffer()
+            #p.flushOutput() # deprecated in v3
+            p.reset_output_buffer()
             p.write(cmd) 
     except Exception:
 #        import traceback
