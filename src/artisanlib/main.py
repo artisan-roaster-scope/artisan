@@ -39854,7 +39854,6 @@ class serialport(object):
                     self.SP.reset_output_buffer()
                     self.SP.write(str2cmd(command))
                     res = self.readline_terminated(b'\r') # .decode('utf-8', 'ignore')
-                    print(res)
                     #res = self.SP.readline() # takes at least the timeout period as line is not \n terminated!
                     #res = self.SP.read_until('\r') # takes at least the timeout period!
                     t1 = float(res)
@@ -39870,7 +39869,6 @@ class serialport(object):
                     self.SP.reset_output_buffer()
                     self.SP.write(str2cmd(command))
                     res = self.readline_terminated(b'\r') # .decode('utf-8', 'ignore')
-                    print(res)
                     #res = self.SP.readline() # takes at least the timeout period as line is not \n terminated!
                     t2 = float(res)
                     if aw.seriallogflag:
