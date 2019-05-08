@@ -1020,7 +1020,7 @@ class tgraphcanvas(FigureCanvas):
                        "Aillio Bullet R1 IBTS/BT",  #99
                        "Yocto IR",                  #100
                        "Behmor BT/CT",              #101
-                       "-Behmor X/X",               #102
+                       "Behmor 34",                 #102
                        "VICTOR 86B",                #103
                        ]
 
@@ -39093,12 +39093,13 @@ class serialport(object):
         
     def BEHMOR_BTET(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.BEHMORtemperatures()
+        t2,t1 = self.BEHMORtemperatures(8,9)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
     
     def BEHMOR_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        return tx,-1,-1
+        t2,t1 = self.BEHMORtemperatures(10,11)
+        return tx,t1,t2 # time, chan2, chan1
     
     def VICTOR86B(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -39838,49 +39839,37 @@ class serialport(object):
                 break
         return bytes(line)
     
-    def BEHMORtemperatures(self):
+    def BEHMORtemperatures(self,ch1,ch2):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             command = ""
-            t1,t2 = -1,-1
-            if not self.SP.isOpen():
-                self.openport()
-            if self.SP.isOpen():
-                # READ CT
-                try:
-                    command = "gts,8\r\n"
-                    self.SP.reset_input_buffer()
-                    self.SP.reset_output_buffer()
-                    self.SP.write(str2cmd(command))
-                    res = self.readline_terminated(b'\r') # .decode('utf-8', 'ignore')
-                    #res = self.SP.readline() # takes at least the timeout period as line is not \n terminated!
-                    #res = self.SP.read_until('\r') # takes at least the timeout period!
-                    t1 = float(res)
-                    if aw.seriallogflag:
-                        settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                        aw.addserial("Behmor: " + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + " || Ts= %.2f"%t1)
-                except:
-                    pass
-                # READ BT
-                try:
-                    command = "gts,9\r\n"
-                    self.SP.reset_input_buffer()
-                    self.SP.reset_output_buffer()
-                    self.SP.write(str2cmd(command))
-                    res = self.readline_terminated(b'\r') # .decode('utf-8', 'ignore')
-                    #res = self.SP.readline() # takes at least the timeout period as line is not \n terminated!
-                    t2 = float(res)
-                    if aw.seriallogflag:
-                        settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                        aw.addserial("Behmor: " + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f"%t2)
-                except:
-                    pass
-                return t1,t2
+            if not aw.ser.SP.isOpen():
+                aw.ser.openport()
+            temps = [-1,-1]
+            if aw.ser.SP.isOpen():
+                
+                for i,c in [(0,ch1),(1,ch2)]:
+                    try:
+                        command = "gts," + str(c) + "\r\n"
+                        aw.ser.SP.reset_input_buffer()
+                        aw.ser.SP.reset_output_buffer()
+                        aw.ser.SP.write(str2cmd(command))
+                        res = aw.ser.readline_terminated(b'\r') # .decode('utf-8', 'ignore')
+                        #res = aw.ser.SP.readline() # takes at least the timeout period as line is not \n terminated!
+                        #res = aw.ser.SP.read_until('\r') # takes at least the timeout period!
+                        t = float(res)
+                        temps[i] = t
+                        if aw.seriallogflag:
+                            settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                            aw.addserial("Behmor: " + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + " || Ts= %.2f"%t)
+                    except:
+                        pass
+            return temps[0],temps[1]
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " ser.BEHMORtemperatures(): {0}").format(str(e)),exc_tb.tb_lineno)
-            self.closeport()
+            aw.ser.closeport()
             return -1.,-1.
         finally:
             if self.COMsemaphore.available() < 1:
@@ -47187,7 +47176,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
-                ####  DEVICE 102 Behmor channel 3 and 4
+                ####  DEVICE 102 Behmor 34 channel 3 and 4
                 ##########################
                 elif meter == "VICTOR 86B":
                     aw.qmc.device = 103
