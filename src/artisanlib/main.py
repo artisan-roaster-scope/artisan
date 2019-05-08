@@ -40408,14 +40408,14 @@ class serialport(object):
             r = ""
             if not self.SP.isOpen():
                 self.openport()
+                libtime.sleep(.3)
             if self.SP.isOpen():
-                self.SP.reset_input_buffer()
-                self.SP.reset_output_buffer()
+#                self.SP.reset_input_buffer()
+#                self.SP.reset_output_buffer()
                 self.SP.write(command)
 #                self.SP.flush()
 #                libtime.sleep(.01)
                 r = self.SP.read(14)
-#                self.SP.close() # this is bad as it takes time to re-open, but without the data received is outdated
                 if len(r) == 14:
                     if r[13] != 226 :
                         #Not switch to Thermometer mode
@@ -45601,11 +45601,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 pass
 
             dataRatesCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
-            dataRatesCombo.setMinimumContentsLength(5)
+            dataRatesCombo.setMinimumContentsLength(4)
             width = dataRatesCombo.minimumSizeHint().width()
             dataRatesCombo.setMinimumWidth(width)
-            if platf == 'Darwin':
-                dataRatesCombo.setMaximumWidth(width)
+#            if platf == 'Darwin':
+#                dataRatesCombo.setMaximumWidth(width)
             
             self.dataRateCombos.append(dataRatesCombo)
             
@@ -45623,8 +45623,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
 
-            changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
             changeTriggersCombo.setMinimumContentsLength(4)
+            changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)            
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
             if platf == 'Darwin':
@@ -45935,7 +45935,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         buttonLayout.setSpacing(10)
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(grid)
-        tab1Layout.setContentsMargins(0,5,0,0)
+        tab1Layout.setContentsMargins(5,5,5,5)
         tab1Layout.addStretch()
         bLayout = QHBoxLayout()
         bLayout.addWidget(self.addButton)
@@ -45989,9 +45989,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(buttonLayout)
-        #Mlayout.setSpacing(0)
-        #Mlayout.setContentsMargins(0,0,0,0)
-        Mlayout.setContentsMargins(10,10,10,10)
+        Mlayout.setSpacing(0)
+        Mlayout.setContentsMargins(5,10,5,5)
         self.setLayout(Mlayout)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         
