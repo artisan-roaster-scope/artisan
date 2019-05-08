@@ -40503,6 +40503,7 @@ class serialport(object):
 #                self.SP.reset_input_buffer()
 #                self.SP.reset_output_buffer()
                 self.SP.write(command)
+                self.SP.close() # this is bad as it takes time to re-open, but without the data received is outdated
 #                self.SP.flush()
 #                libtime.sleep(.01)
                 r = self.SP.read(14)
