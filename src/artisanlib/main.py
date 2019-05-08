@@ -40409,13 +40409,13 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-#                self.SP.reset_input_buffer()
-#                self.SP.reset_output_buffer()
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 self.SP.write(command)
 #                self.SP.flush()
 #                libtime.sleep(.01)
                 r = self.SP.read(14)
-                self.SP.close() # this is bad as it takes time to re-open, but without the data received is outdated
+#                self.SP.close() # this is bad as it takes time to re-open, but without the data received is outdated
                 if len(r) == 14:
                     if r[13] != 226 :
                         #Not switch to Thermometer mode
