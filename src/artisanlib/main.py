@@ -9710,10 +9710,11 @@ class tgraphcanvas(FigureCanvas):
                 offset = 0
                 if self.timeindex[0] > -1:
                     offset = self.timex[self.timeindex[0]]
-                dlg = pointDlg(parent=aw,x=self.currentx-offset,y=self.currenty)
+                values = [self.currentx-offset, self.currenty]
+                dlg = pointDlg(parent=aw,values = values)
                 if dlg.exec_():
-                    self.currentx = dlg.getX() + offset
-                    self.currenty = dlg.getY()
+                    self.currentx = values[0] + offset
+                    self.currenty = values[1]
                 else:
                     return
 
@@ -13687,7 +13688,7 @@ class ApplicationWindow(QMainWindow):
         self.level1layout.addSpacing(10)
         self.level1layout.addWidget(self.lcd1)
         self.level1layout.setSpacing(0)
-        self.level1layout.setContentsMargins(0,7,7,12) # left, to, right, bottom
+        self.level1layout.setContentsMargins(0,7,7,12) # left, top, right, bottom
 
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
@@ -27463,7 +27464,29 @@ class ArtisanDialog(QDialog):
 #        windowFlags |= Qt.WindowSystemMenuHint  # Adds a window system menu, and possibly a close button
 #            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
 #            self.setWindowFlags(windowFlags)
-                              
+
+        # configure standard dialog buttons
+        self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel,Qt.Horizontal)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setDefault(True)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setAutoDefault(True)
+        self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(False)
+        self.dialogbuttons.button(QDialogButtonBox.Cancel).setAutoDefault(True)
+        if aw.locale not in aw.qtbase_locales:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
+            self.dialogbuttons.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
+        # add additional CMD-. shortcut to close the dialog
+        self.dialogbuttons.button(QDialogButtonBox.Cancel).setShortcut(QKeySequence("Ctrl+."))
+        # add additional CMD-W shortcut to close this dialog (ESC on Mac OS X)
+        cancelAction = QAction(self, triggered=lambda _:self.dialogbuttons.rejected.emit())
+        try:
+            cancelAction.setShortcut(QKeySequence.Cancel)
+        except:
+            pass
+        self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
+
+    def closeEvent(self,_):
+        self.dialogbuttons.rejected.emit()
+
     def keyPressEvent(self,event):
         key = int(event.key())
         #uncomment next line to find the integer value of a key
@@ -27516,22 +27539,9 @@ class SamplingDlg(ArtisanDialog):
         self.interval.setAlignment(Qt.AlignRight)
         self.interval.setSuffix("s")
         
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
-        cancelButton.clicked.connect(lambda _:self.close())
-        cancelButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.close())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        cancelButton.addActions([cancelAction])
-        cancelButton.setAutoDefault(False)
-        okButton.clicked.connect(lambda _:self.ok()) 
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.ok())
+        self.dialogbuttons.rejected.connect(lambda :self.close())
         
         flagLayout = QHBoxLayout()
         flagLayout.addStretch()
@@ -27539,8 +27549,7 @@ class SamplingDlg(ArtisanDialog):
         flagLayout.addStretch()      
         buttonsLayout = QHBoxLayout()        
         buttonsLayout.addStretch()
-        buttonsLayout.addWidget(cancelButton)
-        buttonsLayout.addWidget(okButton)
+        buttonsLayout.addWidget(self.dialogbuttons)
         
         #incorporate layouts
         layout = QVBoxLayout()
@@ -27550,7 +27559,7 @@ class SamplingDlg(ArtisanDialog):
         layout.addLayout(buttonsLayout)
         layout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(layout) 
-        okButton.setFocus()        
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()     
         
     def closeEvent(self,_):
         self.close()
@@ -27731,22 +27740,11 @@ class HUDDlg(ArtisanDialog):
         self.ETpidP.setMaximumWidth(60)
         self.ETpidI.setMaximumWidth(60)
         self.ETpidD.setMaximumWidth(60)
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
-        cancelButton.clicked.connect(lambda _:self.close())
-        cancelButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.close())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        cancelButton.addActions([cancelAction])
-        cancelButton.setAutoDefault(False)
-        okButton.clicked.connect(lambda _:self.updatetargets())
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.updatetargets())
+        self.dialogbuttons.rejected.connect(lambda :self.close())
+
         hudLayout = QGridLayout()
         hudLayout.addWidget(BTLabel,0,0)
         hudLayout.addWidget(self.BTlineEdit,0,1)
@@ -28026,8 +28024,10 @@ class HUDDlg(ArtisanDialog):
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
         saveImgButton.clicked.connect(lambda _:aw.resizeImg(0,1))
-        helpcurveButton = QPushButton(QApplication.translate("Button","Help",None))
-        helpcurveButton.setFocusPolicy(Qt.NoFocus)
+        helpcurveDialogButton = QDialogButtonBox()
+        helpcurveButton = helpcurveDialogButton.addButton(QDialogButtonBox.Help)
+        if aw.locale not in aw.qtbase_locales:
+            helpcurveButton.setText(QApplication.translate("Button","Help", None))
         helpcurveButton.clicked.connect(lambda _:aw.showSymbolicHelp())
         curve1Layout = QGridLayout()
         curve1Layout.setSpacing(5)
@@ -28080,7 +28080,7 @@ class HUDDlg(ArtisanDialog):
         curvebuttonlayout.addStretch()
         curvebuttonlayout.addWidget(equshowtablebutton)
         curvebuttonlayout.addStretch()
-        curvebuttonlayout.addWidget(helpcurveButton)
+        curvebuttonlayout.addWidget(helpcurveDialogButton)
         tab2Layout = QVBoxLayout()
         tab2Layout.addWidget(self.equlabel)
         tab2Layout.addWidget(plot1GroupBox)
@@ -28381,8 +28381,7 @@ class HUDDlg(ArtisanDialog):
         TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None))
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
-        buttonsLayout.addWidget(cancelButton)
-        buttonsLayout.addWidget(okButton)
+        buttonsLayout.addWidget(self.dialogbuttons)
         #incorporate layouts
         Slayout = QVBoxLayout()
         Slayout.addWidget(TabWidget,1)
@@ -28393,7 +28392,8 @@ class HUDDlg(ArtisanDialog):
         self.setLayout(Slayout)
         
         TabWidget.setContentsMargins(0,0,0,0)
-        Slayout.setContentsMargins(0,0,0,0)
+        Slayout.setContentsMargins(5,15,5,5)
+        Slayout.setSpacing(5)
 
         self.updatePlotterleftlabels()  
          
@@ -28401,8 +28401,8 @@ class HUDDlg(ArtisanDialog):
         self.endEdit.editingFinished.connect(lambda :self.polyfitcurveschanged(2))
         self.polyfitdeg.valueChanged.connect(lambda _:self.polyfitcurveschanged(3))
         self.c1ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(4))
-        self.c2ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(5))      
-        okButton.setFocus()
+        self.c2ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(5))              
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     def renameBT(self):
         aw.BTname = str(self.renameBTLine.text()).strip()
@@ -29556,7 +29556,6 @@ class volumeCalculatorDlg(ArtisanDialog):
             pass
         cancelButton.addActions([cancelAction])
         
-
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(cancelButton)
@@ -30698,30 +30697,10 @@ class editGraphDlg(ArtisanDialog):
         self.scorching.setChecked(aw.qmc.scorching_flag)
         self.divots = QCheckBox(QApplication.translate("CheckBox","Divots", None))
         self.divots.setChecked(aw.qmc.divots_flag)
-        # Save button
-        saveButton = QPushButton(QApplication.translate("Button", "OK",None))
-        saveButton.clicked.connect(lambda _:self.accept())
-        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        saveButton.setMaximumSize(saveButton.sizeHint())
-        saveButton.setMinimumSize(saveButton.minimumSizeHint()) 
-        #Cancel Button
-        cancelButton = QPushButton(QApplication.translate("Button", "Cancel",None))
-        cancelButton.clicked.connect(lambda _:self.cancel_dialog())
-        cancelButton.setMaximumSize(cancelButton.sizeHint())
-        cancelButton.setMinimumSize(cancelButton.minimumSize())
-        cancelButton.setAutoDefault(False)
-        cancelButton.setFocusPolicy(Qt.StrongFocus)
-        saveButton.setAutoDefault(True)
-        saveButton.setFocusPolicy(Qt.StrongFocus)
-        # add standard Mac OS X shortcut CMD-. to close this dialog
-        cancelButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.cancel_dialog())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        cancelButton.addActions([cancelAction])
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.accept())
+        self.dialogbuttons.rejected.connect(lambda :self.cancel_dialog())
         
         # container tare
         self.tareComboBox = QComboBox()
@@ -31048,8 +31027,7 @@ class editGraphDlg(ArtisanDialog):
         okLayout.addStretch()
         okLayout.addWidget(self.roastpropertiesAutoOpen)
         okLayout.addStretch()
-        okLayout.addWidget(cancelButton,0)
-        okLayout.addWidget(saveButton,1)
+        okLayout.addWidget(self.dialogbuttons)
         okLayout.setSpacing(10)
         okLayout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
         timeLayoutBox = QHBoxLayout()
@@ -31148,6 +31126,7 @@ class editGraphDlg(ArtisanDialog):
                 QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
         except:
             pass
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     def readScale(self):
         if self.disconnecting:
@@ -33186,30 +33165,20 @@ class autosaveDlg(ArtisanDialog):
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None)))
-        okButton = QPushButton(QApplication.translate("Button","OK", None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel", None))
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.autoChanged())
+        self.dialogbuttons.rejected.connect(lambda :self.close())
+        
         pathButton = QPushButton(QApplication.translate("Button","Path", None))
         pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(u(aw.qmc.autosavepath))
         self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None))
-        cancelButton.clicked.connect(lambda _:self.close())
-        cancelButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.close())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        cancelButton.addActions([cancelAction])
-        cancelButton.setAutoDefault(False)
-        okButton.clicked.connect(lambda _:self.autoChanged())
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
+
         pathButton.clicked.connect(lambda _:self.getpath())
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(cancelButton)
-        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         autolayout = QGridLayout()
         autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignRight)
         autolayout.addWidget(autochecklabel,0,1)
@@ -33225,7 +33194,7 @@ class autosaveDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        okButton.setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     def getpath(self):
         filename = aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Path", None))
@@ -33282,27 +33251,15 @@ class batchDlg(ArtisanDialog):
         counterlabel = QLabel()
         counterlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         counterlabel.setText(u(QApplication.translate("Label", "Counter",None)))
-        okButton = QPushButton(QApplication.translate("Button","OK", None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel", None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
-        cancelButton.clicked.connect(lambda _:self.close())
-        cancelButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.close())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        cancelButton.addActions([cancelAction])
-        cancelButton.setAutoDefault(False)
-        okButton.clicked.connect(lambda _:self.batchChanged())
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
+        
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.batchChanged())
+        self.dialogbuttons.rejected.connect(lambda :self.close())
+        
         self.batchcheckbox.stateChanged.connect(lambda _:self.toggleCounterFlag())
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(cancelButton)
-        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         batchlayout = QGridLayout()
         batchlayout.addWidget(self.batchcheckbox,0,0,Qt.AlignRight)
         batchlayout.addWidget(batchchecklabel,0,1)
@@ -33315,7 +33272,7 @@ class batchDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        okButton.setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     def toggleCounterFlag(self):
         if self.batchcheckbox.isChecked():
@@ -33521,24 +33478,13 @@ class WindowsDlg(ArtisanDialog):
         self.gridalphaSpinBox.valueChanged.connect(self.changegridalpha)
         self.gridalphaSpinBox.setMaximumWidth(40)
         self.gridalphaSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.updatewindow())
+        self.dialogbuttons.rejected.connect(lambda :self.close())
+        
         resetButton = QPushButton(QApplication.translate("Button","Defaults",None))
         resetButton.setFocusPolicy(Qt.NoFocus)
-        cancelButton.clicked.connect(lambda _:self.close())
-        cancelButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.close())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        cancelButton.addActions([cancelAction])
-        cancelButton.setAutoDefault(False)        
-        okButton.clicked.connect(lambda _:self.updatewindow())
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
         resetButton.clicked.connect(lambda _:self.reset())
         
         hline = QFrame()
@@ -33626,8 +33572,7 @@ class WindowsDlg(ArtisanDialog):
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(resetButton)
         buttonLayout.addStretch()
-        buttonLayout.addWidget(cancelButton)
-        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         mainLayout1 = QVBoxLayout()
         mainLayout1.addWidget(xGroupLayout)
         mainLayout1.addWidget(yGroupLayout)
@@ -33645,7 +33590,7 @@ class WindowsDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        okButton.setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         
         if aw.qmc.locktimex:
             self.disableXAxisControls()
@@ -34415,22 +34360,10 @@ class EventsDlg(ArtisanDialog):
         self.ShowTimeguide.setChecked(aw.qmc.showtimeguide)
         self.ShowTimeguide.setFocusPolicy(Qt.NoFocus)
         self.ShowTimeguide.stateChanged.connect(lambda _:self.changeShowTimeguide())
-        
-        self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel,Qt.Horizontal)
-        if aw.locale not in aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
-            self.dialogbuttons.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(lambda :self.updatetypes())
         self.dialogbuttons.rejected.connect(lambda :self.restoreState())
-        # add additional CMD-. shortcut to close the dialog
-        self.dialogbuttons.button(QDialogButtonBox.Cancel).setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.restoreState())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        self.dialogbuttons.button(QDialogButtonBox.Cancel).addActions([cancelAction])
         
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
         defaultButton.setFocusPolicy(Qt.NoFocus)
@@ -34464,10 +34397,12 @@ class EventsDlg(ArtisanDialog):
         self.insertButton.clicked.connect(lambda _:self.insertextraeventbutton(True))
         self.insertButton.setMinimumWidth(80)
         self.insertButton.setFocusPolicy(Qt.NoFocus)
-        self.insertButton.setEnabled(False)        
-        helpButton = QPushButton(QApplication.translate("Button","Help",None))
+        self.insertButton.setEnabled(False)
+        helpDialogButton = QDialogButtonBox()
+        helpButton = helpDialogButton.addButton(QDialogButtonBox.Help)
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
-        helpButton.setFocusPolicy(Qt.NoFocus)
+        if aw.locale not in aw.qtbase_locales:
+            helpButton.setText(QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(lambda _:self.showEventbuttonhelp())
         #color patterns
         #flag that prevents changing colors too fast
@@ -34708,8 +34643,10 @@ class EventsDlg(ArtisanDialog):
         self.E4unit = QLineEdit(aw.eventsliderunits[3])
         self.E4unit.setMaximumWidth(maxwidth)        
         self.E4unit.setToolTip(QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None))
-        helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None))
-        helpsliderbutton.setFocusPolicy(Qt.NoFocus)
+        helpsliderDialogButton = QDialogButtonBox()
+        helpsliderbutton = helpsliderDialogButton.addButton(QDialogButtonBox.Help)
+        if aw.locale not in aw.qtbase_locales:
+            helpsliderbutton.setText(QApplication.translate("Button","Help", None))
         helpsliderbutton.clicked.connect(lambda _:self.showSliderHelp())
         ## tab4
         qeventtitlelabel = QLabel(QApplication.translate("Label","Event", None))
@@ -35090,7 +35027,7 @@ class EventsDlg(ArtisanDialog):
         tab2buttonlayout.addWidget(self.insertButton)
         tab2buttonlayout.addWidget(delButton)
         tab2buttonlayout.addStretch()
-        tab2buttonlayout.addWidget(helpButton)
+        tab2buttonlayout.addWidget(helpDialogButton)
         ### tab2 layout
         tab2layout = QVBoxLayout()
         tab2layout.addWidget(self.eventbuttontable)
@@ -35215,7 +35152,7 @@ class EventsDlg(ArtisanDialog):
         tab5Layout.addWidget(self.E4unit,4,9)
         SliderHelpHBox = QHBoxLayout()
         SliderHelpHBox.addStretch()
-        SliderHelpHBox.addWidget(helpsliderbutton)
+        SliderHelpHBox.addWidget(helpsliderDialogButton)
         C5VBox = QVBoxLayout()
         C5VBox.addLayout(tab5Layout)
         C5VBox.addStretch()
@@ -35295,6 +35232,7 @@ class EventsDlg(ArtisanDialog):
         mainLayout.setContentsMargins(5, 15, 5, 5)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     def restorepaletteeventbuttons(self):
         filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Palettes",None),path=aw.profilepath)
@@ -36641,25 +36579,14 @@ class phasesGraphDlg(ArtisanDialog):
         self.phasesLCDflag.stateChanged.connect(self.phasesLCDsflagChanged)
         self.autoDRYflag.stateChanged.connect(self.autoDRYflagChanged)
         self.autoFCsFlag.stateChanged.connect(self.autoFCsFlagChanged)
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))        
-        setDefaultButton = QPushButton(QApplication.translate("Button","Default Temperatures",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
-        setDefaultButton.setFocusPolicy(Qt.NoFocus)
-        cancelButton.clicked.connect(lambda _:self.cancel())
-        okButton.clicked.connect(lambda _:self.updatephases())
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.updatephases())
+        self.dialogbuttons.rejected.connect(lambda :self.close())
+        setDefaultButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
         setDefaultButton.clicked.connect(lambda _:self.setdefault())
-        cancelButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.close())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        cancelButton.addActions([cancelAction])
-        cancelButton.setAutoDefault(False)
+        if aw.locale not in aw.qtbase_locales:
+            setDefaultButton.setText(QApplication.translate("Button","Default Temperatures", None))
         
         phaseLayout = QGridLayout()
         phaseLayout.addWidget(minf,0,1,Qt.AlignHCenter|Qt.AlignBottom)
@@ -36740,10 +36667,7 @@ class phasesGraphDlg(ArtisanDialog):
         boxedPhaseFlagLayout.addLayout(boxedPhaseFlagGrid)
         boxedPhaseFlagLayout.addStretch()
         buttonsLayout = QHBoxLayout()
-        buttonsLayout.addWidget(setDefaultButton)
-        buttonsLayout.addStretch()
-        buttonsLayout.addWidget(cancelButton)
-        buttonsLayout.addWidget(okButton)
+        buttonsLayout.addWidget(self.dialogbuttons)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(boxedPhaseLayout)
         mainLayout.addLayout(boxedPhaseFlagLayout)
@@ -36752,7 +36676,7 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
         self.getphases()
-        okButton.setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
 #    def lcdmodeFlagDryChanged(self,value):
 #        aw.qmc.phasesLCDmode_all[0] = bool(value)
@@ -36941,8 +36865,11 @@ class flavorDlg(ArtisanDialog):
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.clicked.connect(lambda _:aw.resizeImg(0,1))
-        backButton = QPushButton(QApplication.translate("Button","OK",None))
-        backButton.clicked.connect(lambda _:self.close())
+        
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.close())
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Background", None))
         if aw.qmc.flavorbackgroundflag:
             self.backgroundCheck.setChecked(True)
@@ -36983,7 +36910,7 @@ class flavorDlg(ArtisanDialog):
         mainButtonsLayout = QHBoxLayout()
         mainButtonsLayout.addWidget(saveImgButton)
         mainButtonsLayout.addStretch()
-        mainButtonsLayout.addWidget(backButton)
+        mainButtonsLayout.addWidget(self.dialogbuttons)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(flavorLayout)
         mainLayout.addLayout(blayout1)
@@ -36993,6 +36920,7 @@ class flavorDlg(ArtisanDialog):
         mainLayout.addLayout(mainButtonsLayout)
         self.setLayout(mainLayout)
         aw.qmc.flavorchart()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     def setaspect(self):
         aw.qmc.flavoraspect = self.aspectSpinBox.value()
@@ -37139,7 +37067,7 @@ class flavorDlg(ArtisanDialog):
     def closeEvent(self,_):
         self.close()
 
-    def close(self):  
+    def close(self):
         settings = QSettings()
         #save window geometry
         settings.setValue("FlavorProperties",self.saveGeometry())  
@@ -37189,18 +37117,10 @@ class backgroundDlg(ArtisanDialog):
         loadButton.setFocusPolicy(Qt.NoFocus)
         delButton = QPushButton(QApplication.translate("Button","Delete", None))
         delButton.setFocusPolicy(Qt.NoFocus)
-        okButton = QPushButton(QApplication.translate("Button","OK", None))
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
-        # add standard Mac OS X shortcut CMD-. to close this dialog
-        okButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.accept())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        okButton.addActions([cancelAction])
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.accept())
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
         
         alignButton = QPushButton(QApplication.translate("Button","Align", None))
         alignButton.setFocusPolicy(Qt.NoFocus)
@@ -37219,7 +37139,6 @@ class backgroundDlg(ArtisanDialog):
         self.alignComboBox.setCurrentIndex(aw.qmc.alignEvent)
         self.alignComboBox.currentIndexChanged.connect(lambda i=self.alignComboBox.currentIndex() :self.changeAlignEventidx(i))
         loadButton.clicked.connect(lambda _:self.load())
-        okButton.clicked.connect(lambda _:self.accept())
         alignButton.clicked.connect(lambda _: aw.qmc.timealign())
         
         self.speedSpinBox = QSpinBox()
@@ -37384,14 +37303,14 @@ class backgroundDlg(ArtisanDialog):
         buttonLayout.addWidget(loadButton)
         buttonLayout.addWidget(delButton)
         buttonLayout.addStretch()
-        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.TabWidget) 
         mainLayout.addWidget(self.pathedit)
         mainLayout.addLayout(buttonLayout)
         mainLayout.setContentsMargins(5, 10, 5, 5) # left, top, right, bottom 
         self.setLayout(mainLayout)
-        okButton.setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):
@@ -37867,11 +37786,13 @@ class StatisticsDlg(ArtisanDialog):
         self.ror.stateChanged.connect(lambda x=0: self.changeStatisticsflag(x,4))
         self.ts.stateChanged.connect(lambda x=0: self.changeStatisticsflag(x,5))
         self.timez.stateChanged.connect(lambda x=0: self.changeStatisticsflag(x,0))
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        resetButton = QPushButton(QApplication.translate("Button","Defaults",None))
-        okButton.clicked.connect(lambda _:self.accept())
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
+        
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.accept())
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        resetButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
+        if aw.locale not in aw.qtbase_locales:
+            resetButton.setText(QApplication.translate("Button","Reset", None))
         resetButton.clicked.connect(lambda _:self.initialsettings())
         flagsLayout = QGridLayout()
         flagsLayout.addWidget(self.timez,0,0)
@@ -37896,7 +37817,6 @@ class StatisticsDlg(ArtisanDialog):
         layout.addWidget(coollabel,4,0,Qt.AlignRight)
         layout.addWidget(self.mincooledit,4,1)
         layout.addWidget(self.maxcooledit,4,2)
-        resetButton.setFocusPolicy(Qt.NoFocus)
         layoutHorizontal = QHBoxLayout()
         layoutHorizontal.addLayout(layout)
         layoutHorizontal.addStretch()
@@ -37966,9 +37886,7 @@ class StatisticsDlg(ArtisanDialog):
         displayGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display",None))
         displayGroupLayout.setLayout(flagsLayout)
         buttonsLayout = QHBoxLayout()
-        buttonsLayout.addWidget(resetButton)
-        buttonsLayout.addStretch()
-        buttonsLayout.addWidget(okButton)
+        buttonsLayout.addWidget(self.dialogbuttons)
         hgroupLayout = QHBoxLayout()
         hgroupLayout.addWidget(eventsGroupLayout)
         hgroupLayout.addWidget(AUCgroupLayout)
@@ -37979,7 +37897,7 @@ class StatisticsDlg(ArtisanDialog):
         mainLayout.addLayout(buttonsLayout)
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
-        okButton.setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     def AUCLCFflagChanged(self,_):
         aw.qmc.AUClcdFlag = not aw.qmc.AUClcdFlag
@@ -38018,8 +37936,14 @@ class StatisticsDlg(ArtisanDialog):
 
     def initialsettings(self):
         aw.qmc.statisticsconditions = aw.qmc.defaultstatisticsconditions
-        self.close()
-        aw.showstatistics()
+        self.mindryedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))
+        self.maxdryedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[1]))
+        self.minmidedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[2]))
+        self.maxmidedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[3]))
+        self.minfinishedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[4]))
+        self.maxfinishedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[5]))
+        self.mincooledit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[6]))
+        self.maxcooledit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[7]))
 
     def accept(self):
         mindry = aw.qmc.stringtoseconds(str(self.mindryedit.text()))
@@ -40488,10 +40412,10 @@ class serialport(object):
 #                self.SP.reset_input_buffer()
 #                self.SP.reset_output_buffer()
                 self.SP.write(command)
-                self.SP.close() # this is bad as it takes time to re-open, but without the data received is outdated
 #                self.SP.flush()
 #                libtime.sleep(.01)
                 r = self.SP.read(14)
+                self.SP.close() # this is bad as it takes time to re-open, but without the data received is outdated
                 if len(r) == 14:
                     if r[13] != 226 :
                         #Not switch to Thermometer mode
@@ -43141,20 +43065,6 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4et.setValidator(QRegExpValidator(regextemp,self))
         self.Edit5et.setValidator(QRegExpValidator(regextemp,self))
         self.Edit6et.setValidator(QRegExpValidator(regextemp,self))
-#        self.Edit0bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit0bt))
-#        self.Edit1bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit1bt))
-#        self.Edit2bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit2bt))
-#        self.Edit3bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit3bt))
-#        self.Edit4bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit4bt))
-#        self.Edit5bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit5bt))
-#        self.Edit6bt.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit6bt))
-#        self.Edit0et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit0et))
-#        self.Edit1et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit1et))
-#        self.Edit2et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit2et))
-#        self.Edit3et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit3et))
-#        self.Edit4et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit4et))
-#        self.Edit5et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit5et))
-#        self.Edit6et.setValidator(aw.createCLocaleDoubleValidator(0., 999., 1, self.Edit6et))
         curvinesslabel = QLabel(QApplication.translate("Label", "Curviness",None))
         etcurviness = QLabel(QApplication.translate("Label", "ET",None))
         btcurviness = QLabel(QApplication.translate("Label", "BT",None))
@@ -43168,29 +43078,26 @@ class designerconfigDlg(ArtisanDialog):
         self.BTsplineComboBox.addItems(["1","2","3","4","5"])
         self.BTsplineComboBox.setCurrentIndex(aw.qmc.BTsplinedegree - 1)
         self.BTsplineComboBox.currentIndexChanged.connect(self.redrawcurviness)
-#        reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None))
-#        self.reproduceComboBox = QComboBox()
-#        self.reproduceComboBox.addItems(["",
-#                                         deltaLabelPrefix + QApplication.translate("ComboBox","BT",None),
-#                                         deltaLabelPrefix + QApplication.translate("ComboBox","ET",None),
-#                                         QApplication.translate("ComboBox","SV Commands",None),
-#                                         QApplication.translate("ComboBox","Ramp Commands",None)])
-#        self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
-#        self.reproduceComboBox.currentIndexChanged.connect(self.changereproducemode)
-        updateButton = QPushButton(QApplication.translate("Button","Update",None))
-        updateButton.setFocusPolicy(Qt.NoFocus)
-        updateButton.clicked.connect(lambda _:self.settimes())
-        updateButton.setMinimumWidth(100)
-        defaultButton = QPushButton(QApplication.translate("Button","Reset",None))
-        defaultButton.setFocusPolicy(Qt.NoFocus)
-        defaultButton.setMinimumWidth(100)
-        defaultButton.clicked.connect(lambda _:self.reset())
-        closeButton = QPushButton(QApplication.translate("Button","Close",None))
-        closeButton.setFocusPolicy(Qt.NoFocus)
-        closeButton.clicked.connect(lambda _:self.accept())
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.accept())
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Ok))
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        
+        self.dialogbuttons.addButton(QDialogButtonBox.Close)
+        self.dialogbuttons.addButton(QDialogButtonBox.Apply)
+        self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
+        if aw.locale not in aw.qtbase_locales:
+            self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Reset", None))
+        
+        self.dialogbuttons.rejected.connect(lambda :self.accept())
+        self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(lambda :self.reset())
+        self.dialogbuttons.button(QDialogButtonBox.Apply).clicked.connect(lambda :self.settimes())
+        
+        
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(closeButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         marksLayout = QGridLayout()
         marksLayout.addWidget(markersettinglabel,0,0)
         marksLayout.addWidget(timesettinglabel,0,1)
@@ -43224,27 +43131,16 @@ class designerconfigDlg(ArtisanDialog):
         marksLayout.addWidget(self.Edit6,7,1)
         marksLayout.addWidget(self.Edit6bt,7,2)
         marksLayout.addWidget(self.Edit6et,7,3)
-        updateLayout = QHBoxLayout()
-        updateLayout.addStretch()
-        updateLayout.addWidget(defaultButton)
-        updateLayout.addStretch()
-        updateLayout.addWidget(updateButton)
-        updateLayout.addStretch()
         settingsLayout = QVBoxLayout()
         settingsLayout.addLayout(marksLayout)
-        settingsLayout.addLayout(updateLayout)
         curvinessLayout = QHBoxLayout()
         curvinessLayout.addWidget(curvinesslabel)
         curvinessLayout.addWidget(etcurviness)
         curvinessLayout.addWidget(self.ETsplineComboBox)
         curvinessLayout.addWidget(btcurviness)
         curvinessLayout.addWidget(self.BTsplineComboBox)
-#        reproduceLayout = QHBoxLayout()
-#        reproduceLayout.addWidget(reproducelabel)
-#        reproduceLayout.addWidget(self.reproduceComboBox)
         modLayout = QVBoxLayout()
         modLayout.addLayout(curvinessLayout)
-#        modLayout.addLayout(reproduceLayout)
         marksGroupLayout = QGroupBox(QApplication.translate("GroupBox","Initial Settings",None))
         marksGroupLayout.setLayout(settingsLayout)
         mainLayout = QVBoxLayout()
@@ -43252,9 +43148,7 @@ class designerconfigDlg(ArtisanDialog):
         mainLayout.addLayout(modLayout)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-
-#    def changereproducemode(self):
-#        aw.qmc.reproducedesigner = self.reproduceComboBox.currentIndex()
+        self.dialogbuttons.button(QDialogButtonBox.Close).setFocus()
 
     def redrawcurviness(self):
         ETcurviness = int(str(self.ETsplineComboBox.currentText()))
@@ -43534,29 +43428,29 @@ class designerconfigDlg(ArtisanDialog):
             aw.qmc.xaxistosm(redraw=False)
             aw.qmc.redrawdesigner()
 
-class pointDlg(QDialog):
-    def __init__(self,parent = None,x=0,y=0):
+class pointDlg(ArtisanDialog):
+    def __init__(self,parent = None, values = [0,0]):
         super(pointDlg,self).__init__(parent)
+        self.values = values
         self.setWindowTitle(QApplication.translate("Form Caption","Add Point",None))
-        self.tempEdit = QLineEdit(str(int(round(y))))
+        self.tempEdit = QLineEdit(str(int(round(self.values[1]))))
         self.tempEdit.setValidator(QIntValidator(0, 999, self.tempEdit))
         self.tempEdit.setFocus()
         self.tempEdit.setAlignment(Qt.AlignRight)
         templabel = QLabel(QApplication.translate("Label", "temp",None))
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.timeEdit = QLineEdit(aw.qmc.stringfromseconds(x,leadingzero=False)) # 
+        self.timeEdit = QLineEdit(aw.qmc.stringfromseconds(self.values[0],leadingzero=False))
         self.timeEdit.setAlignment(Qt.AlignRight)
         self.timeEdit.setValidator(QRegExpValidator(regextime,self))
         timelabel = QLabel(QApplication.translate("Label", "time",None))
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
-        okButton.clicked.connect(lambda _:self.accept())
-        cancelButton.clicked.connect(lambda _:self.reject())
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.return_values())
+        self.dialogbuttons.rejected.connect(lambda :self.reject())
+        
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(cancelButton)
-        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         grid = QGridLayout()
         grid.addWidget(timelabel,0,0)
         grid.addWidget(self.timeEdit,0,1)
@@ -43567,12 +43461,12 @@ class pointDlg(QDialog):
         mainLayout.addStretch()  
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         
-    def getX(self):
-        return aw.qmc.stringtoseconds(str(self.timeEdit.text()))
-        
-    def getY(self):
-        return float(self.tempEdit.text())
+    def return_values(self):
+        self.values[0] = aw.qmc.stringtoseconds(str(self.timeEdit.text()))
+        self.values[1] = float(self.tempEdit.text())
+        self.accept()
 
 
 #########################################################################
@@ -44127,11 +44021,6 @@ class comportDlg(ArtisanDialog):
         modbus_pid.setContentsMargins(0,10,0,0)
         modbus_pidgroup.setContentsMargins(0,20,0,3)
         
-        helpButton = QPushButton(QApplication.translate("Button","Help",None))
-        helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
-        helpButton.setFocusPolicy(Qt.NoFocus)
-        helpButton.clicked.connect(lambda _:self.showModbusbuttonhelp())
-        
         scanButton = QPushButton(QApplication.translate("Button","Scan",None))
         scanButton.setToolTip(QApplication.translate("Tooltip","Scan MODBUS",None))
         scanButton.setFocusPolicy(Qt.NoFocus)
@@ -44226,28 +44115,19 @@ class comportDlg(ArtisanDialog):
         self.color_timeoutEdit = QLineEdit(str(aw.color.timeout))
         self.color_timeoutEdit.setValidator(aw.createCLocaleDoubleValidator(0,5,1,self.color_timeoutEdit))
         #### dialog buttons
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
-        okButton.clicked.connect(lambda _:self.accept())
-        cancelButton.clicked.connect(lambda _:self.reject())
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
-        cancelButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.reject())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        cancelButton.addActions([cancelAction])
-        cancelButton.setAutoDefault(False)
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.accept())
+        self.dialogbuttons.rejected.connect(lambda :self.reject())
+        
+        helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
+        helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
+        if aw.locale not in aw.qtbase_locales:
+            helpButton.setText(QApplication.translate("Button","Help", None))
+        helpButton.clicked.connect(lambda _:self.showModbusbuttonhelp())
+        
         #button layout
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(helpButton)
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(cancelButton)
-        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         #LAYOUT TAB 1
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
@@ -44715,9 +44595,10 @@ class comportDlg(ArtisanDialog):
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(buttonLayout)
-        Mlayout.setContentsMargins(2,5,2,5)
+        Mlayout.setContentsMargins(5,15,5,5)
+        Mlayout.setSpacing(5)
         self.setLayout(Mlayout)
-        okButton.setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         
     def colorDeviceIndexChanged(self,i):
         try:
@@ -45252,22 +45133,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
             spinBox.setValue(aw.ser.ArduinoFILT[i])
             self.FILTspinBoxes.append(spinBox)
         ####################################################
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancelButton.setFocusPolicy(Qt.NoFocus)
-        okButton.clicked.connect(lambda _:self.okEvent())
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
-        cancelButton.setShortcut(QKeySequence("Ctrl+."))
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.cancelEvent())
-        try:
-            cancelAction.setShortcut(QKeySequence.Cancel)
-        except:
-            pass
-        cancelButton.addActions([cancelAction])
-        cancelButton.setAutoDefault(False)
-        cancelButton.clicked.connect(lambda _:self.cancelEvent())
+        
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.okEvent())
+        self.dialogbuttons.rejected.connect(lambda :self.cancelEvent())
+        
         labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None))
         labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None))
         self.ETfunctionedit = QLineEdit(str(aw.qmc.ETfunction))
@@ -46061,8 +45931,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         grid.setSpacing(3)
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(cancelButton)
-        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         buttonLayout.setSpacing(10)
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(grid)
@@ -46124,7 +45993,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         #Mlayout.setContentsMargins(0,0,0,0)
         Mlayout.setContentsMargins(10,10,10,10)
         self.setLayout(Mlayout)
-        okButton.setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         
     def changeOutprogramFlag(self):
         aw.ser.externaloutprogramFlag = not aw.ser.externaloutprogramFlag
@@ -47915,24 +47784,23 @@ class graphColorDlg(ArtisanDialog):
         C2Widget.setLayout(lllayout)
         self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","LCDs",None))
 
-        okButton = QPushButton(QApplication.translate("Button","OK", None))
-        okButton.clicked.connect(lambda _:self.accept())
-#        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
-#        okButton.setFocus()
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.accept())
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
+        self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(lambda :self.recolor(1))
+        if aw.locale not in aw.qtbase_locales:
+            self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Defaults", None))
         
-        defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
-        defaultsButton.setFocusPolicy(Qt.NoFocus)
-        defaultsButton.clicked.connect(lambda _:self.recolor(1))
         greyButton = QPushButton(QApplication.translate("Button","Grey", None))
         greyButton.setFocusPolicy(Qt.NoFocus)
         greyButton.clicked.connect(lambda _:self.recolor(2))
+        
+        self.dialogbuttons.addButton(greyButton, QDialogButtonBox.ActionRole)
 
         okLayout = QHBoxLayout()
         okLayout.addStretch()
-        okLayout.addWidget(defaultsButton)
-        okLayout.addWidget(greyButton)
-        okLayout.addWidget(okButton)
+        okLayout.addWidget(self.dialogbuttons)
         okLayout.setContentsMargins(0, 0, 0, 0)
         self.TabWidget.setContentsMargins(0, 0, 0, 0)
         C0Widget.setContentsMargins(0, 0, 0, 0)
@@ -47946,6 +47814,7 @@ class graphColorDlg(ArtisanDialog):
         Mlayout.setContentsMargins(5,10,5,0)
         self.setLayout(Mlayout)
         self.setColorLabels()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         
     def accept(self):
         self.close()
@@ -48328,18 +48197,20 @@ class WheelDlg(ArtisanDialog):
         self.createdatatable()
         #table for labels
         self.labeltable = QTableWidget()
-        self.labelCloseButton = QPushButton(QApplication.translate("Button","Close",None))
-        self.labelCloseButton.clicked.connect(lambda _:self.closelabels())
-        self.labelResetButton = QPushButton(QApplication.translate("Button","Reset Parents",None))
-        self.labelResetButton.setToolTip(QApplication.translate("Tooltip","Erases wheel parent hierarchy",None))
-        self.labelResetButton.clicked.connect(lambda _:self.resetlabelparents())
+
+        self.subdialogbuttons = QDialogButtonBox(QDialogButtonBox.Close | QDialogButtonBox.RestoreDefaults, Qt.Horizontal)
+        if aw.locale not in aw.qtbase_locales:
+            self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Reset Parents", None))
+            self.dialogbuttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close",None))
+        self.subdialogbuttons.rejected.connect(lambda :self.closelabels())
+        self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(lambda _:self.resetlabelparents())
+        
         self.labelwheelx = 0   #index of wheel being edited on labeltable
         self.hierarchyButton = QPushButton(QApplication.translate("Button","Reverse Hierarchy",None))
         self.hierarchyButton.setToolTip(QApplication.translate("Tooltip","Sets graph hierarchy child->parent instead of parent->child",None))
         self.hierarchyButton.clicked.connect(lambda _:aw.qmc.setWheelHierarchy())
         self.labeltable.setVisible(False)
-        self.labelCloseButton.setVisible(False)
-        self.labelResetButton.setVisible(False)
+        self.subdialogbuttons.setVisible(False)
         aspectlabel = QLabel(QApplication.translate("Label","Ratio",None))
         self.aspectSpinBox = QDoubleSpinBox()
         self.aspectSpinBox.setToolTip(QApplication.translate("Tooltip","Aspect Ratio",None))
@@ -48388,33 +48259,42 @@ class WheelDlg(ArtisanDialog):
         rotateRightButton = QPushButton(QApplication.translate("Button",">",None))
         rotateRightButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree clockwise",None))
         rotateRightButton.clicked.connect(lambda _: self.rotatewheels(0))
+        
+        self.main_buttons = QDialogButtonBox()
+        
         saveButton = QPushButton(QApplication.translate("Button","Save File",None))
         saveButton.clicked.connect(lambda _:self.fileSave())
         saveButton.setToolTip(QApplication.translate("Tooltip","Save graph to a text file.wg",None))
+        self.main_buttons.addButton(saveButton,QDialogButtonBox.ActionRole)
+        
         saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None))
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
         saveImgButton.clicked.connect(lambda _:aw.resizeImg(0,1))
-        viewModeButton = QPushButton(QApplication.translate("Button","Close",None))
-        viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None))
-        viewModeButton.clicked.connect(lambda _:self.viewmode())
-        openButton = QPushButton(QApplication.translate("Button","Open",None))
+        self.main_buttons.addButton(saveImgButton,QDialogButtonBox.ActionRole)
+        
+        openButton = self.main_buttons.addButton(QDialogButtonBox.Open)
         openButton.setToolTip(QApplication.translate("Tooltip","open wheel graph file",None))
         openButton.clicked.connect(lambda _:self.loadWheel())
+        
+        viewModeButton = self.main_buttons.addButton(QDialogButtonBox.Close)
+        viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None))
+        viewModeButton.clicked.connect(lambda _:self.viewmode())
+        
+        if aw.locale not in aw.qtbase_locales:
+            self.dialogbuttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close", None))
+            self.dialogbuttons.button(QDialogButtonBox.Open).setText(QApplication.translate("Button","Open",None))
+        
         aw.qmc.drawWheel()
         label1layout = QVBoxLayout()
         label2layout = QHBoxLayout()
         label1layout.addWidget(self.labeltable)
-        label2layout.addWidget(self.labelCloseButton)
-        label2layout.addWidget(self.labelResetButton)
+        label2layout.addWidget(self.subdialogbuttons)
         label1layout.addLayout(label2layout)
         self.labelGroupLayout = QGroupBox(QApplication.translate("GroupBox","Label Properties",None))
         self.labelGroupLayout.setLayout(label1layout)
         self.labelGroupLayout.setVisible(False)
         buttonlayout = QHBoxLayout()
-        buttonlayout.addWidget(openButton)
-        buttonlayout.addWidget(saveButton)
-        buttonlayout.addWidget(saveImgButton)
-        buttonlayout.addWidget(viewModeButton)
+        buttonlayout.addWidget(self.main_buttons)
         configlayout =  QHBoxLayout()
         configlayout.addWidget(colorlabel)
         configlayout.addWidget(self.colorSpinBox)
@@ -48450,8 +48330,7 @@ class WheelDlg(ArtisanDialog):
         self.labelwheelx = x                    #wheel being edited
         self.labelGroupLayout.setVisible(True)
         self.labeltable.setVisible(True)
-        self.labelCloseButton.setVisible(True)
-        self.labelResetButton.setVisible(True)
+        self.subdialogbuttons.setVisible(True)
         
         nlabels = len(aw.qmc.wheelnames[x])
         # self.labeltable.clear() # this crashes Ubuntu 16.04
@@ -48626,8 +48505,9 @@ class WheelDlg(ArtisanDialog):
     def closelabels(self):
         self.labelGroupLayout.setVisible(False)
         self.labeltable.setVisible(False)
-        self.labelCloseButton.setVisible(False)
-        self.labelResetButton.setVisible(False)
+#        self.labelCloseButton.setVisible(False)
+#        self.labelResetButton.setVisible(False)
+        self.subdialogbuttons.setVisible(False)
 
     #creates graph table
     def createdatatable(self):
@@ -48982,10 +48862,11 @@ class AlarmDlg(ArtisanDialog):
         exportButton.clicked.connect(lambda _:self.exportalarms())
         exportButton.setMinimumWidth(80)
         exportButton.setFocusPolicy(Qt.NoFocus)
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        okButton.setAutoDefault(True)
-        okButton.setFocusPolicy(Qt.StrongFocus)
-        okButton.clicked.connect(lambda _:self.closealarms())
+        
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(lambda :self.closealarms())
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        
         helpButton = QPushButton(QApplication.translate("Button","Help",None))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         helpButton.setFocusPolicy(Qt.NoFocus)
@@ -49041,15 +48922,14 @@ class AlarmDlg(ArtisanDialog):
         okbuttonlayout.addSpacing(15)
         okbuttonlayout.addWidget(popupTimeoutLabel)
         okbuttonlayout.addWidget(self.popupTimoutSpinBox)
-#        okbuttonlayout.addStretch()
         okbuttonlayout.addWidget(self.alarmsfile)
         okbuttonlayout.addSpacing(15)
-        okbuttonlayout.addWidget(okButton)
+        okbuttonlayout.addWidget(self.dialogbuttons)
         mainlayout.addLayout(tablelayout)
         mainlayout.addLayout(buttonlayout)
         mainlayout.addLayout(okbuttonlayout)
         self.setLayout(mainlayout)
-        okButton.setFocus()
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         
     def selectionChanged(self):
         selected = self.alarmtable.selectedRanges()
@@ -49854,8 +49734,10 @@ class PXRpidDlgControl(ArtisanDialog):
         button_standbyON.setFocusPolicy(Qt.NoFocus)
         button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None))
         button_standbyOFF.setFocusPolicy(Qt.NoFocus)
+
         button_exit = QPushButton(QApplication.translate("Button","OK",None))
         button_exit.setFocus()
+
         self.patternComboBox.currentIndexChanged.connect(self.paintlabels)
         button_getall.clicked.connect(lambda _:self.getallsegments())
         button_rson.clicked.connect(lambda _: self.setONOFFrampsoak(1))
