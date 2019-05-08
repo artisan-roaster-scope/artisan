@@ -10479,14 +10479,12 @@ class VMToolbar(NavigationToolbar):
 # add green flag menu on matplotlib v2.0 and later
         if len(self.actions()) > 0:
             # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
-            if svgsupport:
-                a = QAction(self._icon("qt4_editor_options.svg"),'Customize',self)
-            else:
-                a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
+            a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
             a.triggered.connect(self.edit_parameters)   
             a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
             self.insertAction(self.actions()[-1],a) 
 
+        # adjust for dark or light canvas and set hover/selection style
         for a in self.actions():
             if aw is not None: 
                 if aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"] == "None":
@@ -10501,7 +10499,7 @@ class VMToolbar(NavigationToolbar):
                     border_color = "white"
                 else:
                     selected_canvas_color = canvas_color.darker(120)
-                    border_color = "black"                    
+                    border_color = "black"           
                 self.widgetForAction(a).setStyleSheet(" \
                         QToolButton:checked {border:1px solid transparent; margin: 1px; padding: 2px; background-color:" + selected_canvas_color.name() + ";border-radius: 3px;} \
                         QToolButton:hover {border:1px solid " + border_color + "; margin: 2px; padding: 2px; background-color:transparent;border-radius: 3px;} \
@@ -10550,26 +10548,24 @@ class VMToolbar(NavigationToolbar):
             self.push_current()
 
     def _icon(self, name):
-        if self.white_icons:
-            name = 'white_' + name
+        if aw is not None and name.startswith("plus"):
             basedir = os.path.join(aw.getResourcePath(),"Icons")
         else:
-            if aw is not None and name.startswith("plus"):
-                basedir = os.path.join(aw.getResourcePath(),"Icons")
-            else:
-                basedir = self.basedir
+            basedir = self.basedir
+        if name.startswith("plus") and not self.white_icons:
+            name = 'white_' + name
         #dirty hack to prefer .svg over .png Toolbar icons
         if not svgsupport:
             name = name.replace('.svg','.png')
         else:
             name = name.replace('.png','.svg')
-        # large png icons introduced in MPL 2.1
+        # large png icons introduced in MPL 2.1 for Qt5
         name = name.replace('.png', '_large.png')
         p = os.path.join(basedir, name)
         pm = QPixmap(p)
         if not name.startswith("plus") and not name.startswith("white_plus"):
             if self.white_icons:
-                pm = self.recolorIcon(pm,QColor("#424242"))
+                pm = self.recolorIcon(pm,QColor("#dfdfdf"))
             else:
                 pm = self.recolorIcon(pm,QColor("#424242"))
         if hasattr(pm, 'setDevicePixelRatio'):

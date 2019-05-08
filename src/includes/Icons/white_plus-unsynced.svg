@@ -5,71 +5,42 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   id="svg8"
-   version="1.1"
-   viewBox="0 0 25.400001 25.400001"
-   height="72pt"
    width="72pt"
-   inkscape:version="0.91+devel r14842"
-   sodipodi:docname="plus-dirty.svg">
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1096"
-     inkscape:window-height="622"
-     id="namedview19"
-     showgrid="false"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:zoom="0.79893791"
-     inkscape:cx="-115.57906"
-     inkscape:cy="-19.252708"
-     inkscape:window-x="140"
-     inkscape:window-y="98"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg8"
-     units="pt" />
+   height="72pt"
+   viewBox="0 0 25.400001 25.400001"
+   version="1.1"
+   id="svg8">
   <defs
      id="defs2">
     <font-face
-       overline-thickness="0"
-       overline-position="0"
-       strikethrough-thickness="0"
-       strikethrough-position="0"
-       v-hanging="0"
-       v-mathematical="0"
-       v-alphabetic="0"
-       v-ideographic="0"
-       hanging="0"
-       mathematical="0"
-       alphabetic="0"
-       ideographic="0"
-       accent-height="0"
-       stemh="0"
-       stemv="0"
-       font-family="Arial"
-       font-size="52"
-       panose-1="2 11 6 4 2 2 2 2 2 4"
-       units-per-em="1000"
-       underline-position="-105.95703"
-       underline-thickness="73.242188"
-       slope="0"
-       x-height="518.5547"
-       cap-height="716.3086"
-       ascent="905.27344"
-       descent="-211.91406"
+       id="font-face4315"
        font-weight="500"
-       id="font-face4315">
+       descent="-211.91406"
+       ascent="905.27344"
+       cap-height="716.3086"
+       x-height="518.5547"
+       slope="0"
+       underline-thickness="73.242188"
+       underline-position="-105.95703"
+       units-per-em="1000"
+       panose-1="2 11 6 4 2 2 2 2 2 4"
+       font-size="52"
+       font-family="Arial"
+       stemv="0"
+       stemh="0"
+       accent-height="0"
+       ideographic="0"
+       alphabetic="0"
+       mathematical="0"
+       hanging="0"
+       v-ideographic="0"
+       v-alphabetic="0"
+       v-mathematical="0"
+       v-hanging="0"
+       strikethrough-position="0"
+       strikethrough-thickness="0"
+       overline-position="0"
+       overline-thickness="0">
       <font-face-src>
         <font-face-name
            name="ArialMT" />
@@ -84,24 +55,22 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
-     id="g4227"
-     inkscape:export-xdpi="24.120001"
-     inkscape:export-ydpi="24.120001">
+     transform="translate(-0.26754406)"
+     id="g4223">
     <circle
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1"
-       cx="12.967545"
-       cy="12.763623"
+       id="circle4325"
        r="12.636375"
-       id="circle4325" />
+       cy="12.763623"
+       cx="12.967545"
+       style="fill:#cc0f50;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1" />
     <path
-       inkscape:connector-curvature="0"
-       style="fill:#cc0f50;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1"
+       id="path4327"
        d="M 14.652378,11.078723 V 7.6092059 c 0,-0.875352 -0.709631,-1.584994 -1.585008,-1.584994 h -0.199683 c -0.875378,0 -1.585008,0.709642 -1.585008,1.584994 V 11.078723 H 7.8131537 c -0.8753835,0 -1.5850144,0.709626 -1.5850144,1.585041 v 0.199654 c 0,0.8754 0.7096309,1.585026 1.5850144,1.585026 h 3.4695253 v 3.469533 c 0,0.875399 0.70963,1.585041 1.585008,1.585041 h 0.199683 c 0.875377,0 1.585008,-0.709642 1.585008,-1.585041 v -3.469533 h 3.469542 c 0.87536,0 1.584991,-0.709626 1.584991,-1.585026 v -0.199654 c 0,-0.875415 -0.709631,-1.585041 -1.584991,-1.585041 z"
-       id="path4327" />
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.55722821;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>
