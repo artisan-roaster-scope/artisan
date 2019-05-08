@@ -13457,28 +13457,28 @@ class ApplicationWindow(QMainWindow):
         self.e1buttonbarLayout.setSpacing(1)
         self.e1buttonbarLayout.setContentsMargins(0, 0, 0, 0)
         self.e1buttondialog = QFrame()
-        self.e1buttondialog.setContentsMargins(0, 5, 0, 5)
+        self.e1buttondialog.setContentsMargins(0, 0, 0, 0)
         self.e1buttondialog.setLayout(self.e1buttonbarLayout)
         
         self.e2buttonbarLayout = QHBoxLayout()
         self.e2buttonbarLayout.setSpacing(1)
         self.e2buttonbarLayout.setContentsMargins(0, 0, 0, 0)
         self.e2buttondialog = QFrame()
-        self.e2buttondialog.setContentsMargins(0, 5, 0, 5)
+        self.e2buttondialog.setContentsMargins(0, 0, 0, 0)
         self.e2buttondialog.setLayout(self.e2buttonbarLayout)
         
         self.e3buttonbarLayout = QHBoxLayout()
         self.e3buttonbarLayout.setSpacing(1)
         self.e3buttonbarLayout.setContentsMargins(0, 0, 0, 0)
         self.e3buttondialog = QFrame()
-        self.e3buttondialog.setContentsMargins(0, 5, 0, 5)
+        self.e3buttondialog.setContentsMargins(0, 0, 0, 0)
         self.e3buttondialog.setLayout(self.e3buttonbarLayout)
         
         self.e4buttonbarLayout = QHBoxLayout()
         self.e4buttonbarLayout.setSpacing(1)
         self.e4buttonbarLayout.setContentsMargins(0, 0, 0, 0)
         self.e4buttondialog = QFrame()
-        self.e4buttondialog.setContentsMargins(0, 5, 0, 5)
+        self.e4buttondialog.setContentsMargins(0, 0, 0, 0)
         self.e4buttondialog.setLayout(self.e4buttonbarLayout)
 
         # set the focus on the main widget
@@ -13697,8 +13697,8 @@ class ApplicationWindow(QMainWindow):
         level3layout.setContentsMargins(0,0,0,0)
 
         extrabuttonsLayout = QVBoxLayout()
-        extrabuttonsLayout.setContentsMargins(0,0,0,0)
-        extrabuttonsLayout.setSpacing(0)
+        extrabuttonsLayout.setContentsMargins(0,0,0,10)
+        extrabuttonsLayout.setSpacing(5)
         extrabuttonsLayout.addWidget(self.e1buttondialog)
         extrabuttonsLayout.addWidget(self.e2buttondialog)
         extrabuttonsLayout.addWidget(self.e3buttondialog)
@@ -13953,7 +13953,7 @@ class ApplicationWindow(QMainWindow):
     def buttonPressed(self, button):
         # shadow needs to be recreated each time?
         self.strong_shadow = QGraphicsDropShadowEffect(self)
-        self.strong_shadow.setBlurRadius(40)
+        self.strong_shadow.setBlurRadius(30)
         self.strong_shadow.setOffset(0,3)
         button.setGraphicsEffect(self.strong_shadow)
     def buttonReleased(self,button):
@@ -28026,6 +28026,7 @@ class HUDDlg(ArtisanDialog):
         saveImgButton.clicked.connect(lambda _:aw.resizeImg(0,1))
         helpcurveDialogButton = QDialogButtonBox()
         helpcurveButton = helpcurveDialogButton.addButton(QDialogButtonBox.Help)
+        helpcurveButton.setFocusPolicy(Qt.NoFocus)
         if aw.locale not in aw.qtbase_locales:
             helpcurveButton.setText(QApplication.translate("Button","Help", None))
         helpcurveButton.clicked.connect(lambda _:aw.showSymbolicHelp())
@@ -28359,25 +28360,33 @@ class HUDDlg(ArtisanDialog):
         TabWidget = QTabWidget()
         C0Widget = QWidget()
         C0Widget.setLayout(tab0Layout)
+        tab0Layout.setContentsMargins(10,10,10,10)
+        C0Widget.setContentsMargins(0,10,0,10)
         TabWidget.addTab(C0Widget,QApplication.translate("Tab","RoR",None))
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
+        tab1Layout.setContentsMargins(10,10,10,10)
+        C1Widget.setContentsMargins(0,10,0,10)
         TabWidget.addTab(C1Widget,QApplication.translate("Tab","Filters",None))
         C11Widget = QWidget()
         C11Widget.setLayout(tab11Layout)
+        tab11Layout.setContentsMargins(10,10,10,10)
+        C11Widget.setContentsMargins(0,10,0,10)
         TabWidget.addTab(C11Widget,QApplication.translate("Tab","HUD",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        tab2Layout.setContentsMargins(10,0,10,0)
+        tab2Layout.setContentsMargins(10,10,10,10)
         C2Widget.setContentsMargins(0,0,0,0)
         TabWidget.addTab(C2Widget,QApplication.translate("Tab","Plotter",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        tab3Layout.setContentsMargins(10,0,10,0)
+        tab3Layout.setContentsMargins(10,10,10,10)
         C3Widget.setContentsMargins(0,0,0,0)
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","Math",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
+        tab5Layout.setContentsMargins(10,10,10,10)
+        C5Widget.setContentsMargins(0,10,0,0)
         TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None))
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
@@ -31029,7 +31038,7 @@ class editGraphDlg(ArtisanDialog):
         okLayout.addStretch()
         okLayout.addWidget(self.dialogbuttons)
         okLayout.setSpacing(10)
-        okLayout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
+        okLayout.setContentsMargins(5, 15, 5, 15) # left, top, right, bottom
         timeLayoutBox = QHBoxLayout()
         timeLayoutBox.addStretch()
         timeLayoutBox.addLayout(timeLayout)
@@ -33483,9 +33492,10 @@ class WindowsDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(lambda :self.updatewindow())
         self.dialogbuttons.rejected.connect(lambda :self.close())
         
-        resetButton = QPushButton(QApplication.translate("Button","Defaults",None))
-        resetButton.setFocusPolicy(Qt.NoFocus)
+        resetButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
         resetButton.clicked.connect(lambda _:self.reset())
+        if aw.locale not in aw.qtbase_locales:
+            resetButton.setText(QApplication.translate("Button","Defaults", None))
         
         hline = QFrame()
         hline.setFrameShape(QFrame.HLine)
@@ -33570,8 +33580,6 @@ class WindowsDlg(ArtisanDialog):
         GridGroupLayout = QGroupBox(QApplication.translate("GroupBox","Grid",None))
         GridGroupLayout.setLayout(graphgridlayout)
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(resetButton)
-        buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         mainLayout1 = QVBoxLayout()
         mainLayout1.addWidget(xGroupLayout)
@@ -34365,9 +34373,11 @@ class EventsDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(lambda :self.updatetypes())
         self.dialogbuttons.rejected.connect(lambda :self.restoreState())
         
-        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
-        defaultButton.setFocusPolicy(Qt.NoFocus)
+        defaultButtonDialog = QDialogButtonBox()
+        defaultButton = defaultButtonDialog.addButton(QDialogButtonBox.RestoreDefaults)
         defaultButton.clicked.connect(lambda _:self.settypedefault())
+        if aw.locale not in aw.qtbase_locales:
+            defaultButton.setText(QApplication.translate("Button","Defaults", None))
         
         ###  TAB 2
         #number of buttons per row
@@ -34800,7 +34810,7 @@ class EventsDlg(ArtisanDialog):
         typeHBox = QHBoxLayout()
         typeHBox.addLayout(typeLayout)
         typeHBox.addStretch()
-        typeHBox.addWidget(defaultButton)
+        typeHBox.addWidget(defaultButtonDialog)
         TypeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Event Types",None))
         TypeGroupLayout.setLayout(typeHBox)
         self.buttonActionTypes = ["",#QApplication.translate("ComboBox", "None",None),
@@ -35204,6 +35214,7 @@ class EventsDlg(ArtisanDialog):
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
         self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None))
+        C1Widget.setContentsMargins(5, 0, 5, 0)
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
         if app.artisanviewerMode:
@@ -45187,7 +45198,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
             
-            changeTriggersCombo.setMinimumContentsLength(4)
+            changeTriggersCombo.setMinimumContentsLength(3)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)
@@ -45240,7 +45251,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombo1048.setMaximumWidth(width)
         
         phidgetBox1048.addWidget(self.dataRateCombo1048,4,1,1,2)
-        phidgetBox1048.setSpacing(5)
+        phidgetBox1048.setSpacing(1)
             
         typeLabel = QLabel(QApplication.translate("Label","Type", None))
         asyncLabel = QLabel(QApplication.translate("Label","Async", None))
@@ -45265,6 +45276,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         
         # Phidget IR
         phidgetBox1045 = QGridLayout()
+        phidgetBox1045.setSpacing(1)
         self.changeTriggerCombos1045 = QComboBox()
         self.changeTriggerCombos1045.setFocusPolicy(Qt.NoFocus)
         model = self.changeTriggerCombos1045.model()
@@ -45333,6 +45345,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
 
         # 1046 RTD
         phidgetBox1046 = QGridLayout()
+        phidgetBox1046.setSpacing(1)
         self.gainCombos1046 = []
         self.formulaCombos1046 = []
         self.asyncCheckBoxes1046 = []        
@@ -45433,6 +45446,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         
         # TMP1200 RTD
         phidgetBox1200 = QGridLayout()
+        phidgetBox1200.setSpacing(1)
 
         self.formulaCombo1200 = QComboBox()
         self.formulaCombo1200.setFocusPolicy(Qt.NoFocus)
@@ -45552,6 +45566,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.modeCombo1400.setMinimumWidth(width)
 
         phidgetBox1400 = QGridLayout()
+        phidgetBox1400.setSpacing(1)
         phidgetBox1400.addWidget(powerLabel,0,0,Qt.AlignRight)
         phidgetBox1400.addWidget(self.powerCombo1400,0,1)
         phidgetBox1400.addWidget(modeLabel,1,0,Qt.AlignRight)
@@ -45577,13 +45592,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phdget10481045GroupBoxHBox.addWidget(phidget1400GroupBox)
         phdget10481045GroupBoxHBox.addStretch()
         phdget10481045GroupBoxHBox.addWidget(phidget1046GroupBox)
-        phdget10481045GroupBoxHBox.setContentsMargins(0,0,0,0)
+        phdget10481045GroupBoxHBox.setContentsMargins(2,0,2,0)
+        phdget10481045GroupBoxHBox.setSpacing(1)
 
 
         # Phidget IO 1018
         # per each of the 8-channels: raw flag / data rate popup / change trigger popup
         phidgetBox1018 = QGridLayout()
-        phidgetBox1018.setSpacing(5)
+        phidgetBox1018.setSpacing(1)
         self.asyncCheckBoxes = []
         self.ratioCheckBoxes = []
         self.dataRateCombos = []
@@ -45601,11 +45617,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 pass
 
             dataRatesCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
-            dataRatesCombo.setMinimumContentsLength(4)
+            dataRatesCombo.setMinimumContentsLength(5)
             width = dataRatesCombo.minimumSizeHint().width()
             dataRatesCombo.setMinimumWidth(width)
-#            if platf == 'Darwin':
-#                dataRatesCombo.setMaximumWidth(width)
+            if platf == 'Darwin':
+                dataRatesCombo.setMaximumWidth(width)
             
             self.dataRateCombos.append(dataRatesCombo)
             
@@ -45623,7 +45639,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
 
-            changeTriggersCombo.setMinimumContentsLength(4)
+            changeTriggersCombo.setMinimumContentsLength(5)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)            
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
@@ -45712,11 +45728,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget10451018HBox.addWidget(phidget1045GroupBox)
         phidget10451018HBox.addStretch()
         phidget10451018HBox.addWidget(phidget1018GroupBox)
+        phidget10451018HBox.setSpacing(1)
         phidgetVBox = QVBoxLayout()
         phidgetVBox.addLayout(phdget10481045GroupBoxHBox)
         phidgetVBox.addLayout(phidget10451018HBox)
         phidgetVBox.addWidget(phidgetNetworkGroupBox)
         phidgetVBox.addStretch()
+        phidgetVBox.setSpacing(5)
         # yoctopuce widgets
         self.yoctoBoxRemoteFlag = QCheckBox()
         self.yoctoBoxRemoteFlag.setFocusPolicy(Qt.NoFocus)
@@ -45734,11 +45752,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
         yoctoServerBox.addSpacing(10)
         yoctoServerBox.addWidget(self.yoctoServerId)
         yoctoServerBox.setContentsMargins(0,0,0,0)
-        yoctoServerBox.setSpacing(3)
+        yoctoServerBox.setSpacing(10)
         yoctoNetworkGrid = QGridLayout()
         yoctoNetworkGrid.addWidget(self.yoctoBoxRemoteFlag,0,0)
         yoctoNetworkGrid.addLayout(yoctoServerBox,0,1)
-        yoctoNetworkGrid.setContentsMargins(0,0,0,0)
+#        yoctoNetworkGrid.setContentsMargins(10,10,10,10)
         yoctoNetworkGrid.setSpacing(20)
         yoctoNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None))
         yoctoNetworkGroupBox.setLayout(yoctoNetworkGrid)
@@ -45955,7 +45973,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         #LAYOUT TAB 4 (Phidgets)
         tab4Layout = QVBoxLayout()
         tab4Layout.addLayout(phidgetVBox)        
-        tab4Layout.setContentsMargins(0,0,0,0)
+        tab4Layout.setContentsMargins(2,5,2,5)
         tab4Layout.setSpacing(3)
         #LAYOUT TAB 5 (Yoctopuce)
         tab5Layout = QVBoxLayout()
@@ -47680,6 +47698,10 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.legendborderLabel,9,1) 
         grid.addWidget(self.watermarksButton,10,0)
         grid.addWidget(self.watermarksLabel,10,1)
+        grid.addWidget(self.aucguideButton,11,0)
+        grid.addWidget(self.aucguideLabel,11,1)
+        grid.addWidget(self.aucareaButton,12,0)
+        grid.addWidget(self.aucareaLabel,12,1)
         grid.addWidget(self.rect1Button,0,2)
         grid.addWidget(self.rect1Label,0,3)
         grid.addWidget(self.rect2Button,1,2)
@@ -47704,10 +47726,6 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.mettextLabel,10,3) 
         grid.addWidget(self.timeguideButton,11,2)
         grid.addWidget(self.timeguideLabel,11,3)
-        grid.addWidget(self.aucguideButton,12,2)
-        grid.addWidget(self.aucguideLabel,12,3)
-        grid.addWidget(self.aucareaButton,13,2)
-        grid.addWidget(self.aucareaLabel,13,3)
         graphLayout = QVBoxLayout()
         graphLayout.addLayout(grid)
 
@@ -47800,7 +47818,7 @@ class graphColorDlg(ArtisanDialog):
         okLayout = QHBoxLayout()
         okLayout.addStretch()
         okLayout.addWidget(self.dialogbuttons)
-        okLayout.setContentsMargins(0, 0, 0, 0)
+        okLayout.setContentsMargins(10, 10, 10, 10)
         self.TabWidget.setContentsMargins(0, 0, 0, 0)
         C0Widget.setContentsMargins(0, 0, 0, 0)
         C1Widget.setContentsMargins(0, 0, 0, 0)
@@ -47811,6 +47829,7 @@ class graphColorDlg(ArtisanDialog):
         Mlayout.addWidget(self.TabWidget)
         Mlayout.addLayout(okLayout)
         Mlayout.setContentsMargins(5,10,5,0)
+        Mlayout.setSpacing(0)
         self.setLayout(Mlayout)
         self.setColorLabels()
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
