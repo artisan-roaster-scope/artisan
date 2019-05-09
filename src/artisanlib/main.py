@@ -2737,12 +2737,20 @@ class tgraphcanvas(FigureCanvas):
                                         if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
                                             aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
                                             xtra_dev_lines2 = xtra_dev_lines2 + 1
-                                    # draw ET
-                                    if aw.qmc.ETcurve:
-                                        aw.qmc.ax.draw_artist(self.l_temp1)
-                                    # draw BT
-                                    if aw.qmc.BTcurve:
-                                        aw.qmc.ax.draw_artist(self.l_temp2)
+                                    if aw.qmc.swaplcds:
+                                        # draw ET
+                                        if aw.qmc.ETcurve:
+                                            aw.qmc.ax.draw_artist(self.l_temp1)
+                                        # draw BT
+                                        if aw.qmc.BTcurve:
+                                            aw.qmc.ax.draw_artist(self.l_temp2)
+                                    else:
+                                        # draw BT
+                                        if aw.qmc.BTcurve:
+                                            aw.qmc.ax.draw_artist(self.l_temp2)
+                                        # draw ET
+                                        if aw.qmc.ETcurve:
+                                            aw.qmc.ax.draw_artist(self.l_temp1)
                                      
                                     if aw.qmc.flagstart and (aw.qmc.device == 18 or aw.qmc.showtimeguide) and aw.qmc.l_timeline is not None: # not NONE device
                                         aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
@@ -4800,6 +4808,17 @@ class tgraphcanvas(FigureCanvas):
         else:
             return (lst + [-1]*(ln-len(lst)))[:ln]
 
+    def drawET(self):
+        if aw.qmc.ETcurve:
+            self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,
+                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+                linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
+    
+    def drawBT(self):
+        self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
+            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+            linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
+    
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
@@ -5741,25 +5760,13 @@ class tgraphcanvas(FigureCanvas):
                         _, _, exc_tb = sys.exc_info() 
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)                        
                 ##### ET,BT curves
-                if aw.qmc.ETcurve:
-                    if False and aw.qmc.flagon:
-                        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                        linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
-                    else:
-                        self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                        linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
-                if aw.qmc.BTcurve:
-                    if False and aw.qmc.flagon:
-                        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                        linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
-                    else:
-                        self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                        linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
-    
+                if aw.qmc.swaplcds:
+                    self.drawET()
+                    self.drawBT()
+                else:
+                    self.drawBT()
+                    self.drawET()
+                
                 if aw.qmc.ETcurve:
                     self.handles.append(self.l_temp1)
                     self.labels.append(aw.arabicReshape(QApplication.translate("Label", aw.ETname, None)))
@@ -17188,8 +17195,8 @@ class ApplicationWindow(QMainWindow):
         for i in range(ndev,aw.nLCDS):
             aw.extraLCDframe1[i].setVisible(False)
             self.extraLCDframe2[i].setVisible(False)
-        aw.LCD2frame.setVisible(aw.qmc.ETlcd)
-        aw.LCD3frame.setVisible(aw.qmc.BTlcd)
+        aw.LCD2frame.setVisible((aw.qmc.BTlcd if aw.qmc.swaplcds else aw.qmc.ETlcd))
+        aw.LCD3frame.setVisible((aw.qmc.ETlcd if aw.qmc.swaplcds else aw.qmc.BTlcd))
         aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)        
         aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
         if aw.largeLCDs_dialog:
@@ -47323,8 +47330,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.phidget1018_changeTriggers[i] = aw.qmc.phidget1018_changeTriggersValues[self.changeTriggerCombos[i].currentIndex()]
 
             # LCD visibility
-            aw.LCD2frame.setVisible(aw.qmc.ETlcd)
-            aw.LCD3frame.setVisible(aw.qmc.BTlcd)
+            aw.LCD2frame.setVisible((aw.qmc.BTlcd if aw.qmc.swaplcds else aw.qmc.ETlcd))
+            aw.LCD3frame.setVisible((aw.qmc.ETlcd if aw.qmc.swaplcds else aw.qmc.BTlcd))
             if aw.largeLCDs_dialog:
                 try:
                     aw.largeLCDs_dialog.lcd2.setVisible(aw.qmc.ETlcd)
