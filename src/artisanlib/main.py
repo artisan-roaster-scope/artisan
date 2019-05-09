@@ -20717,8 +20717,32 @@ class ApplicationWindow(QMainWindow):
     def settingsLoad(self, filename=None):
         res = False
         try: 
+            updateBatchCounter = True
             if filename is not None:
                 settings = QSettings(filename,QSettings.IniFormat)
+                settings.beginGroup("Batch")
+                if settings.contains("batchcounter"):
+                    files_batchcounter = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
+                    files_batchprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
+                    if files_batchcounter != aw.qmc.batchcounter or files_batchprefix != aw.qmc.batchprefix:
+                        current_counter = aw.qmc.batchprefix + str(aw.qmc.batchcounter)
+                        files_counter = files_batchprefix + str(files_batchcounter)
+                        if aw.qmc.batchcounter < 0:
+                            string = QApplication.translate("Message","Your batch counter is currently turned off. Turn it on and set it to %s from the settings file?"%(files_counter), None)
+                        elif files_batchcounter < 0:
+                            string = QApplication.translate("Message","Your batch counter is set to %s. Turn it off as in the settings file?"%(current_counter), None)
+                        else:
+                            string = QApplication.translate("Message","Overwrite your current batch counter %s by %s from the settings file?"%(current_counter,files_counter), None)
+                        reply = QMessageBox.question(aw,QApplication.translate("Message","Batch Counter", None),string,
+                                QMessageBox.Cancel |QMessageBox.No|QMessageBox.Yes)
+                        if reply == QMessageBox.Cancel:
+                            aw.sendmessage(QApplication.translate("Message","Load Settings canceled"))
+                            return
+                        elif reply == QMessageBox.No:
+                            updateBatchCounter = False
+                        else:
+                            updateBatchCounter = True
+                settings.endGroup()
             else:
                 settings = QSettings()
             if settings.contains("resetqsettings"):
@@ -21778,10 +21802,13 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("Batch")
             if settings.contains("batchcounter"):
-                aw.qmc.batchcounter = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
-                aw.qmc.batchsequence = toInt(settings.value("batchsequence",aw.qmc.batchsequence))
-                aw.qmc.batchprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
-                aw.qmc.lastroastepoch = toInt(settings.value("lastroastepoch",aw.qmc.lastroastepoch))
+                if updateBatchCounter:
+                    aw.qmc.batchcounter = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
+                    aw.qmc.batchprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
+                    if filename is None:
+                        # we do not load those two from setting files!
+                        aw.qmc.batchsequence = toInt(settings.value("batchsequence",aw.qmc.batchsequence))
+                        aw.qmc.lastroastepoch = toInt(settings.value("lastroastepoch",aw.qmc.lastroastepoch))
             settings.endGroup()
             self.computeLinespaces()
             self.updateSlidersProperties()
