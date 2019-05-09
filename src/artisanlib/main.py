@@ -12485,9 +12485,9 @@ class ApplicationWindow(QMainWindow):
 #                                     }
         # set a few broad style parameters
         if locale == "es":
-            self.ooss_font_size_pt = 12
+            self.ooss_font_size_pt = 11
         else:
-            self.ooss_font_size_pt = 14
+            self.ooss_font_size_pt = 13
         if platf == 'Windows':
             self.ooss_font_size = str(self.ooss_font_size_pt - 2) + 'pt'
             self.ooss_font_size_small = str(self.ooss_font_size_pt - 6) + 'pt'
