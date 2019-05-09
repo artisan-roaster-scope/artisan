@@ -16574,11 +16574,11 @@ class ApplicationWindow(QMainWindow):
                     if cmd_str == "PRS":
                         self.ser.R1.prs()
                 elif action == 20: # Artisan Command
-                    # alarms(<bool>)
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
+                            # alarms(<bool>) enable/disable alarms
                             if cs.startswith("alarms(") and cs.endswith(")"):
                                 try:
                                     value = cs[len("alarms("):-1]
@@ -16590,6 +16590,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.sendmessage(QApplication.translate("Message","Alarms off", None))
                                 except Exception:
                                     pass
+                            # autoCHARGE(<bool>) enable/disable autoCHARGE
                             elif cs.startswith("autoCHARGE(") and cs.endswith(")"):
                                 try:
                                     value = cs[len("autoCHARGE("):-1]
@@ -16601,6 +16602,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.sendmessage(QApplication.translate("Message","autoCHARGE off", None))
                                 except Exception:
                                     pass
+                            # autoDROP(<bool>) enable/disable autoDROP
                             elif cs.startswith("autoDROP(") and cs.endswith(")"):
                                 try:
                                     value = cs[len("autoDROP("):-1]
@@ -16612,12 +16614,21 @@ class ApplicationWindow(QMainWindow):
                                         aw.sendmessage(QApplication.translate("Message","autoDROP off", None))
                                 except Exception:
                                     pass
+                            # sleep(<n>) sleep <n> seconds (might be a float like in "sleep(1.2)"
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):])
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
+                                except Exception:
+                                    pass
+                            # tare(<n>) tare channel <n> with 1 => ET, 2 => BT, 3 => E1c1, 4: E1c2,..
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('tare'):])
+                                    if isinstance(cmds,int):
+                                        aw.setTare(cmds)
                                 except Exception:
                                     pass
                 elif action == 21: # RC Command
