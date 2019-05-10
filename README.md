@@ -27,14 +27,15 @@ If you think Artisan is useful to you, contribute financially to its further dev
 
 > *Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roasting businesses and consultant that use Artisan in their daily work tend to donate 100-300.- (in $ or EUR). For extra tech support, please inquire.*
 
-<!--
+<!-- blury
 ![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover-small.png?raw=true)
 -->
 
 ![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover.png?raw=true)
 
-<img src="https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover.png?raw" width="600">
-
+<!-- explicit width
+<img src="https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover.png?raw" width="700">
+-->
 
 [Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)
 
