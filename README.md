@@ -1,4 +1,4 @@
-<img align="right" src="https://raw.githubusercontent.com/MAKOMO/artisan/master/wiki/screenshots/artisan.png">
+<img align="right" src="https://raw.githubusercontent.com/MAKOMO/artisan/master/wiki/screenshots/artisan.png" width="70">
 
 [Artisan](https://artisan-scope.org/) 
 ==========
