@@ -45,7 +45,12 @@ export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 $PYTHON/bin/pylupdate5 artisan.pro
 # there is no full Qt installation on Travis, thus don't run  lrelease
 if [ -z $TRAVIS ]; then
-  $QT_SRC_PATH/bin/lrelease -verbose artisan.pro || true
+    $QT_SRC_PATH/bin/lrelease -verbose artisan.pro || true
+    for f in translations/qtbase_*.ts
+    do
+        echo "Processing $f file..."
+        $QT_SRC_PATH/bin/lrelease -verbose $f || true
+    done
 fi
 
 # distribution

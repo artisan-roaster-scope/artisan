@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="fa" sourcelanguage="en">
+<!DOCTYPE TS><TS version="2.0" language="sv_SE" sourcelanguage="">
 <context>
     <name>About</name>
     <message>
         <location filename="../artisanlib/main.py" line="25353"/>
         <source>About</source>
-        <translation>درباره</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25353"/>
         <source>Core Developers</source>
-        <translation>توسعه دهندگان اصلی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25353"/>
         <source>Contributors</source>
-        <translation>همکاران</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25353"/>
         <source>License</source>
-        <translation>مجوزها</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -28,67 +28,67 @@
     <message>
         <location filename="../artisanlib/main.py" line="6010"/>
         <source>Roast of the Day</source>
-        <translation>برشته کاری امروز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6035"/>
         <source>Bean Temp</source>
-        <translation>دمای دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6051"/>
         <source>Charge Weight</source>
-        <translation>تغییر وزن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6053"/>
         <source>Weight Loss</source>
-        <translation>وزن از دست رفته</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6057"/>
         <source>Charge Density</source>
-        <translation>چگالی بار زده شده</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6059"/>
         <source>Density Loss</source>
-        <translation>چگالی از دست رفته</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6063"/>
         <source>Charge Volume</source>
-        <translation>حجم بار زده شده</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6065"/>
         <source>Volume Gain</source>
-        <translation>حجم به دست آمده</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6079"/>
         <source>Screen</source>
-        <translation>اندازه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6084"/>
         <source>Moisture Green</source>
-        <translation>رطوبت دانه سبز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6086"/>
         <source>Moisture Roasted</source>
-        <translation>رطوبت دانه برشته شده</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6091"/>
         <source>Whole Color</source>
-        <translation>رنگ بیرون دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6093"/>
         <source>Ground Color</source>
-        <translation>رنگ داخل دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -96,66 +96,66 @@
     <message>
         <location filename="../artisanlib/main.py" line="13066"/>
         <source>ON</source>
-        <translation>روشن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13083"/>
         <source>START</source>
-        <translation>شروع</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6861"/>
         <source>OFF</source>
-        <translation>خاموش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13101"/>
         <source>FC
 START</source>
-        <translation>شروع ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13109"/>
         <source>FC
 END</source>
-        <translation>پایان ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13117"/>
         <source>SC
 START</source>
-        <translation>شروع ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13125"/>
         <source>SC
 END</source>
-        <translation>پایان ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13137"/>
         <source>RESET</source>
-        <translation>تنظیم مجدد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13154"/>
         <source>CHARGE</source>
-        <translation>بار زدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13163"/>
         <source>DROP</source>
-        <translation>انداختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13172"/>
         <source>Control</source>
-        <translation>کنترل</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13190"/>
         <source>EVENT</source>
-        <translation>رویداد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13199"/>
@@ -196,328 +196,323 @@ END</source>
         <location filename="../artisanlib/main.py" line="13268"/>
         <source>DRY
 END</source>
-        <translation>پایان خشک شدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13277"/>
         <source>COOL
 END</source>
-        <translation>پایان خنک شدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48546"/>
         <source>Update</source>
-        <translation>به روز رسانی</translation>
+        <translation type="unfinished">Uppdatera</translation>
     </message>
     <message>
         <location filename="../plus/login.py" line="62"/>
         <source>OK</source>
-        <translation>تایید</translation>
+        <translation type="unfinished">OK</translation>
     </message>
     <message>
         <location filename="../plus/login.py" line="63"/>
         <source>Cancel</source>
-        <translation>لغو</translation>
+        <translation type="unfinished">Avbryt</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28076"/>
         <source>Color</source>
-        <translation>رنگ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28098"/>
         <source>Plot</source>
-        <translation>طرح</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28101"/>
         <source>Data</source>
-        <translation>داده</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47608"/>
         <source>Background</source>
-        <translation>پس زمینه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28109"/>
         <source>ET/BT</source>
-        <translation>دمای اگزوز\دمای.دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36978"/>
         <source>Save Image</source>
-        <translation>ذخیره‌ی.عکس</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49259"/>
         <source>Help</source>
-        <translation>کمک رسانی</translation>
+        <translation type="unfinished">Hjälp</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28200"/>
         <source>Info</source>
-        <translation>اطلاعات</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53510"/>
         <source>Set</source>
-        <translation>نهایی کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29483"/>
         <source>unit</source>
-        <translation>واحد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30826"/>
         <source>in</source>
-        <translation>داخل</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30836"/>
         <source>out</source>
-        <translation>خارج</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30433"/>
         <source>Cluster</source>
-        <translation>گروه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48877"/>
         <source>Clear</source>
-        <translation>پاک سازی</translation>
+        <translation type="unfinished">Töm</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30443"/>
         <source>Create Alarms</source>
-        <translation>ساختن زنگ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30448"/>
         <source>Order</source>
-        <translation>دستور</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48844"/>
         <source>Add</source>
-        <translation>اضافه کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48855"/>
         <source>Delete</source>
-        <translation>پاک کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30630"/>
         <source>calc</source>
-        <translation>محاسبه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30852"/>
         <source>scan</source>
-        <translation>اسکن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30863"/>
         <source>update</source>
-        <translation>به روز کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33281"/>
         <source>Path</source>
-        <translation>مسیر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33512"/>
         <source>Calc</source>
-        <translation>محاسبه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47795"/>
         <source>Defaults</source>
-        <translation>پیشفرض</translation>
+        <translation type="unfinished">Standardvärden</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48849"/>
         <source>Insert</source>
-        <translation>وارد کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34529"/>
         <source>&lt;&lt;</source>
-        <translation>&lt;&lt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34531"/>
         <source>&gt;&gt;</source>
-        <translation>&gt;&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53676"/>
         <source>Save</source>
-        <translation>ذخیره</translation>
+        <translation type="unfinished">Spara</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53673"/>
         <source>Load</source>
-        <translation>بازخوانی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34851"/>
         <source>Apply</source>
-        <translation>اعمال کردن</translation>
+        <translation type="unfinished">Verkställ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36701"/>
         <source>Default Temperatures</source>
-        <translation>دمای پیشفرض</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36975"/>
         <source>Del</source>
-        <translation>حذف</translation>
+        <translation type="unfinished">Del</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37238"/>
         <source>Align</source>
-        <translation>ردیف کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37274"/>
         <source>Up</source>
-        <translation>بالا</translation>
+        <translation type="unfinished">Upp</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37276"/>
         <source>Down</source>
-        <translation>پایین</translation>
+        <translation type="unfinished">Ned</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37278"/>
         <source>Left</source>
-        <translation>چپ</translation>
+        <translation type="unfinished">Vänster</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37280"/>
         <source>Right</source>
-        <translation>راست</translation>
+        <translation type="unfinished">Höger</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45155"/>
         <source>Reset</source>
-        <translation>تنظیم مجدد</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48286"/>
-        <source>Close</source>
-        <translation>بستن</translation>
+        <translation type="unfinished">Återställ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44019"/>
         <source>Scan</source>
-        <translation>اسکن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44848"/>
         <source>Start</source>
-        <translation>شروع</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48548"/>
         <source>Select</source>
-        <translation>انتخاب</translation>
+        <translation type="unfinished">Välj</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47362"/>
         <source>ET</source>
-        <translation>دمای اگزوز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47369"/>
         <source>BT</source>
-        <translation>دمای دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47391"/>
         <source>Extra</source>
-        <translation>اضافی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47417"/>
         <source>Grid</source>
-        <translation>جدول بندی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47431"/>
         <source>Y Label</source>
-        <translation>برچسب الف</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47438"/>
         <source>X Label</source>
-        <translation>برچسب ب</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47445"/>
         <source>Drying Phase</source>
-        <translation>فاز خشک شدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47452"/>
         <source>Maillard Phase</source>
-        <translation>فاز خشک شدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47459"/>
         <source>Finishing Phase</source>
-        <translation>فاز پایانی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47466"/>
         <source>Cooling Phase</source>
-        <translation>فاز خنک شدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47473"/>
         <source>Bars Bkgnd</source>
-        <translation>میله پیش زمینه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47480"/>
         <source>Markers</source>
-        <translation>نشانگرها</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47487"/>
         <source>Text</source>
-        <translation>متن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47494"/>
         <source>Watermarks</source>
-        <translation>علامت گذاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47501"/>
         <source>Time Guide</source>
-        <translation>راهنمایی زمان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47508"/>
         <source>AUC Guide</source>
-        <translation>راهنماییauc</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47515"/>
         <source>AUC Area</source>
-        <translation>منطقهauc</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47522"/>
         <source>Legend bkgnd</source>
-        <translation>شرح پیش زمینه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47529"/>
@@ -527,17 +522,27 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="47539"/>
         <source>Canvas</source>
-        <translation>بوم نقاشی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47546"/>
         <source>SpecialEvent Marker</source>
-        <translation>نشانه گذار ویژه رویداد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47553"/>
         <source>SpecialEvent Text</source>
-        <translation>نشانه گذار ویژه متن</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="47560"/>
+        <source>Bkgd Event Marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="47567"/>
+        <source>Bkgd Event Text</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47574"/>
@@ -552,7 +557,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="47596"/>
         <source>Digits</source>
-        <translation>ارقام</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47617"/>
@@ -562,82 +567,87 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="47797"/>
         <source>Grey</source>
-        <translation>خاکستری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48205"/>
         <source>Reset Parents</source>
-        <translation>تنظیم مجدد کلی</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="48286"/>
+        <source>Close</source>
+        <translation type="unfinished">Stäng</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48211"/>
         <source>Reverse Hierarchy</source>
-        <translation>معکوس کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48224"/>
         <source>+</source>
-        <translation>+</translation>
+        <translation type="unfinished">+</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48227"/>
         <source>-</source>
-        <translation>-</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48242"/>
         <source>Line Color</source>
-        <translation>رنگ خط</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48245"/>
         <source>Text Color</source>
-        <translation>رنگ نوشته</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48258"/>
         <source>&lt;</source>
-        <translation>&lt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48261"/>
         <source>&gt;</source>
-        <translation>&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48267"/>
         <source>Save File</source>
-        <translation>ذخیره پوشه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48272"/>
         <source>Save Img</source>
-        <translation>ذخیره عکس</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48287"/>
         <source>Open</source>
-        <translation>باز کردن</translation>
+        <translation type="unfinished">Öppna</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48571"/>
         <source>Set Color</source>
-        <translation>تنظیم رنگ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48838"/>
         <source>All On</source>
-        <translation>روشن کردن همه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48841"/>
         <source>All Off</source>
-        <translation>خاموش کردن همه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49729"/>
         <source>Read Ra/So values</source>
-        <translation>خواندن مقدارها</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50554"/>
@@ -652,82 +662,82 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="50559"/>
         <source>PID OFF</source>
-        <translation>خاموش کردنPID</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50561"/>
         <source>PID ON</source>
-        <translation>روشن کردن PID</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50693"/>
         <source>Write SV</source>
-        <translation>نوشتن بر روی sv</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49762"/>
         <source>Read SV</source>
-        <translation>خواندن از روی sv</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49777"/>
         <source>Set p</source>
-        <translation>تنظیم p</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49779"/>
         <source>Set i</source>
-        <translation>تنظیم i</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49781"/>
         <source>Set d</source>
-        <translation>تنظیم d</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50845"/>
         <source>Autotune ON</source>
-        <translation>روشن کردن تنظیم خودکار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50847"/>
         <source>Autotune OFF</source>
-        <translation>خاموش کردن تنظیم خودکار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49799"/>
         <source>Read PID Values</source>
-        <translation>خواندن اطلاعات pid</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53854"/>
         <source>Read</source>
-        <translation>خواندن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50917"/>
         <source>Set ET PID to 1 decimal point</source>
-        <translation>تنظیم pid دمای اگزوز در نقطه ۱</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50919"/>
         <source>Set BT PID to 1 decimal point</source>
-        <translation>تنظیم pid دمای دانه در نقطه ۱</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50546"/>
         <source>Write All</source>
-        <translation>نوشتن کلی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50550"/>
         <source>Read RS values</source>
-        <translation>خواندن وروودی RS</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50552"/>
         <source>Write RS values</source>
-        <translation>نوشتن وروودی RS</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50629"/>
@@ -812,41 +822,31 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="50841"/>
         <source>Read PIDs</source>
-        <translation>خواندن PIDها</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50843"/>
         <source>Write PIDs</source>
-        <translation>نوشتن PIDها</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50921"/>
         <source>Set ET PID to MM:SS time units</source>
-        <translation>تنظیم PID دمای اگزوز بر زمان های وروودی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53698"/>
         <source>On</source>
-        <translation>روشن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53700"/>
         <source>Off</source>
-        <translation>خاموش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53855"/>
         <source>Write</source>
-        <translation>نوشتن</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47560"/>
-        <source>Bkgd Event Marker</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47567"/>
-        <source>Bkgd Event Text</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -855,47 +855,47 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="30782"/>
         <source>Heavy FC</source>
-        <translation>ترق اول سخت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30785"/>
         <source>Low FC</source>
-        <translation>ترق اول آهسته</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30788"/>
         <source>Light Cut</source>
-        <translation>بریدن روشن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30791"/>
         <source>Dark Cut</source>
-        <translation>بریدن تیره</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30794"/>
         <source>Drops</source>
-        <translation>ریختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30797"/>
         <source>Oily</source>
-        <translation>روغنی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30800"/>
         <source>Uneven</source>
-        <translation>غیر یکنواخت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30802"/>
         <source>Tipping</source>
-        <translation>سرسوزی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30804"/>
         <source>Scorching</source>
-        <translation>سطح سوزی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30806"/>
@@ -905,12 +905,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="27722"/>
         <source>Optimal Smoothing Post Roast</source>
-        <translation>صاف شدن مطلوب پایان برشته کاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27736"/>
         <source>Smooth Spikes</source>
-        <translation>نرم رشد کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27741"/>
@@ -920,267 +920,277 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="27930"/>
         <source>Limits</source>
-        <translation>محدودیت ها</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27775"/>
         <source>Projection</source>
-        <translation>پروژه</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="44989"/>
+        <source>Swap</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27868"/>
         <source>Decimal Places</source>
-        <translation>ارقام اعشاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37213"/>
         <source>Show</source>
-        <translation>نمایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28216"/>
         <source>TP</source>
-        <translation>نقطه بازگشت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37319"/>
         <source>Beep</source>
-        <translation>بوق</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28400"/>
         <source>Alarm Popups</source>
-        <translation>زنگ برنامه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30423"/>
         <source>Delete roast properties on RESET</source>
-        <translation>پاک کردن و تنظیم مجدد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30426"/>
         <source>Open on CHARGE</source>
-        <translation>باز کردن در شارژ کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30477"/>
         <source>Show Always</source>
-        <translation>نشان دادن همیشگی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33154"/>
         <source>Serial Log ON/OFF</source>
-        <translation>خاموش روشن کردن وروودی سریال</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33261"/>
         <source>Autosave [a]</source>
-        <translation>ذخیره خودکار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31375"/>
-        <source>Save PDF also</source>
-        <translation type="obsolete">ذخیره فایل PDF</translation>
+        <location filename="../artisanlib/main.py" line="33265"/>
+        <source>Save also</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33350"/>
         <source>Batch Counter</source>
-        <translation>شمارنده مقدار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33499"/>
         <source>Expand</source>
-        <translation>افزایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33503"/>
         <source>Lock</source>
-        <translation>قفل کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33507"/>
         <source>Auto</source>
-        <translation>خودکار</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34198"/>
-        <source>Button</source>
-        <translation>دکمه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37214"/>
-        <source>Annotations</source>
-        <translation>یادداشت</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34204"/>
-        <source>Show on BT</source>
-        <translation>نشان دادن بر روی دمای دانه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34212"/>
-        <source>Snap</source>
-        <translation>گیره</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34215"/>
-        <source>Descr.</source>
-        <translation>توضیحات</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34227"/>
-        <source>Mini Editor</source>
-        <translation>تغییر دهنده کوچک</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34450"/>
-        <source>Auto CHARGE</source>
-        <translation>شارژ خودکار</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34455"/>
-        <source>Auto DROP</source>
-        <translation>ریختن خودکار</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34460"/>
-        <source>Mark TP</source>
-        <translation>علامت گذاری نقطه بازگشت</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34464"/>
-        <source>Mark MET</source>
-        <translation>نشانه گذاری MET</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34468"/>
-        <source>Show Time Guide</source>
-        <translation>راهنمای زمان</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34546"/>
-        <source>Switch Using Number Keys + Cmd</source>
-        <translation>استفاده از کلید ها</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34937"/>
-        <source>CHARGE</source>
-        <translation>شارژ کردن</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42894"/>
-        <source>DRY END</source>
-        <translation>پایان فاز خشک شدن</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42896"/>
-        <source>FC START</source>
-        <translation>شروع ترق اول</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42898"/>
-        <source>FC END</source>
-        <translation>پایان ترق اول</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42900"/>
-        <source>SC START</source>
-        <translation>شروع ترق دوم</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42902"/>
-        <source>SC END</source>
-        <translation>پایان ترق دوم</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34991"/>
-        <source>DROP</source>
-        <translation>ریختن</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35000"/>
-        <source>COOL END</source>
-        <translation>پایان خنک کردن</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36676"/>
-        <source>Auto Adjusted</source>
-        <translation>تنظیم خودکار</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36679"/>
-        <source>From Background</source>
-        <translation>از پس زمینه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36682"/>
-        <source>Watermarks</source>
-        <translation>نشانه گذاری</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36684"/>
-        <source>Phases LCDs</source>
-        <translation>نمایشگر فازها</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36686"/>
-        <source>Auto DRY</source>
-        <translation>خشک شدن خودکار</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36688"/>
-        <source>Auto FCs</source>
-        <translation>ترق اول خودکار</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37980"/>
-        <source>Background</source>
-        <translation>پیش زمینه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37215"/>
-        <source>Events</source>
-        <translation>رخداد</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44983"/>
-        <source>ET</source>
-        <translation>دمای اگزوز</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44986"/>
-        <source>BT</source>
-        <translation>دمای دانه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37315"/>
-        <source>Playback Aid</source>
-        <translation>تکرار کمکی</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37323"/>
-        <source>Playback Events</source>
-        <translation>تکرار رویدادها</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37327"/>
-        <source>Playback DROP</source>
-        <translation>تکرار ریختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37830"/>
         <source>Time</source>
-        <translation>زمان</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="33547"/>
+        <source>Temp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34198"/>
+        <source>Button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="37214"/>
+        <source>Annotations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34204"/>
+        <source>Show on BT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34212"/>
+        <source>Snap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34215"/>
+        <source>Descr.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34227"/>
+        <source>Mini Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34450"/>
+        <source>Auto CHARGE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34455"/>
+        <source>Auto DROP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34460"/>
+        <source>Mark TP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34464"/>
+        <source>Mark MET</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34468"/>
+        <source>Show Time Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34546"/>
+        <source>Switch Using Number Keys + Cmd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34937"/>
+        <source>CHARGE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="42894"/>
+        <source>DRY END</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="42896"/>
+        <source>FC START</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="42898"/>
+        <source>FC END</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="42900"/>
+        <source>SC START</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="42902"/>
+        <source>SC END</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="34991"/>
+        <source>DROP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="35000"/>
+        <source>COOL END</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="36676"/>
+        <source>Auto Adjusted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="36679"/>
+        <source>From Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="36682"/>
+        <source>Watermarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="36684"/>
+        <source>Phases LCDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="36686"/>
+        <source>Auto DRY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="36688"/>
+        <source>Auto FCs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="37980"/>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="37215"/>
+        <source>Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="44983"/>
+        <source>ET</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="44986"/>
+        <source>BT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="37315"/>
+        <source>Playback Aid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="37323"/>
+        <source>Playback Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="37327"/>
+        <source>Playback DROP</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37831"/>
         <source>Bar</source>
-        <translation>بار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37832"/>
         <source>/min</source>
-        <translation>\دقیقه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37833"/>
@@ -1190,37 +1200,37 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="37834"/>
         <source>Evaluation</source>
-        <translation>ارزیابی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37835"/>
         <source>Characteristics</source>
-        <translation>متمایز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37836"/>
         <source>Summary</source>
-        <translation>خلاصه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37971"/>
         <source>From Event</source>
-        <translation>از رخداد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37984"/>
         <source>Guide</source>
-        <translation>راهنما</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37986"/>
         <source>LCD</source>
-        <translation>صفحه نمایشگر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37989"/>
         <source>Show Area</source>
-        <translation>فضای نمایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44840"/>
@@ -1233,14 +1243,9 @@ END</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="44989"/>
-        <source>Swap</source>
-        <translation>بالا کشیدن</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/main.py" line="45042"/>
         <source>Output</source>
-        <translation>خروجی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45080"/>
@@ -1250,7 +1255,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="45083"/>
         <source>Modbus Port</source>
-        <translation>وروودی MODBUS</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45117"/>
@@ -1260,37 +1265,27 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="48882"/>
         <source>Load from profile</source>
-        <translation>بازخوانی از پروفایل</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48884"/>
         <source>Load from background</source>
-        <translation>بازخوانی پس زمینه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50601"/>
         <source>Follow Background</source>
-        <translation>دنبالگر پسزمینه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53629"/>
         <source>Start PID on CHARGE</source>
-        <translation>شروع pid در شروع</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53684"/>
         <source>Load Ramp/Soak table from profile</source>
-        <translation>شروع از ابتدای پروفایل</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33265"/>
-        <source>Save also</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33547"/>
-        <source>Temp</source>
-        <translation type="unfinished">دما</translation>
     </message>
 </context>
 <context>
@@ -1298,47 +1293,47 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22456"/>
         <source>Air</source>
-        <translation>جریان هوا</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22456"/>
         <source>Drum</source>
-        <translation>سرعت مخزن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22456"/>
         <source>Damper</source>
-        <translation>ضامن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22456"/>
         <source>Burner</source>
-        <translation>مشعل</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28188"/>
         <source>linear</source>
-        <translation>خطی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27777"/>
         <source>newton</source>
-        <translation>نیوتون</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29392"/>
         <source>metrics</source>
-        <translation>متر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29394"/>
         <source>thermal</source>
-        <translation>حرارتی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27980"/>
         <source>classic</source>
-        <translation>کلاسیک</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27980"/>
@@ -1348,477 +1343,477 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="27992"/>
         <source>Default</source>
-        <translation>پیشفرض</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27992"/>
         <source>Humor</source>
-        <translation>فان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27992"/>
         <source>Comic</source>
-        <translation>کمیک</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28188"/>
         <source>cubic</source>
-        <translation>مکعب</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28188"/>
         <source>nearest</source>
-        <translation>نزدیکترین</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49336"/>
         <source>ET</source>
-        <translation>دمای اگزوز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49337"/>
         <source>BT</source>
-        <translation>دمای دانه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30239"/>
-        <source>g</source>
-        <translation type="obsolete">گرم</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30108"/>
-        <source>ml</source>
-        <translation type="obsolete">میلی لیتر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33466"/>
         <source>upper right</source>
-        <translation>بالا راست</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33467"/>
         <source>upper left</source>
-        <translation>بالا چپ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33468"/>
         <source>lower left</source>
-        <translation>پایین چپ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33469"/>
         <source>lower right</source>
-        <translation>پایین راست</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33470"/>
         <source>right</source>
-        <translation>راست</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33471"/>
         <source>center left</source>
-        <translation>مرکز چپ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33472"/>
         <source>center right</source>
-        <translation>مرکز راست</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33473"/>
         <source>lower center</source>
-        <translation>مرکز پایین</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33474"/>
         <source>upper center</source>
-        <translation>مرکز بالا</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33475"/>
         <source>center</source>
-        <translation>مرکز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33520"/>
         <source>1 minute</source>
-        <translation>۱ دقیقه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33521"/>
         <source>2 minutes</source>
-        <translation>۲ دقیقه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33522"/>
         <source>3 minutes</source>
-        <translation>۳ دقیقه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33523"/>
         <source>4 minutes</source>
-        <translation>۴ دقیقه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33524"/>
         <source>5 minutes</source>
-        <translation>۵ دقیقه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33525"/>
         <source>10 minutes</source>
-        <translation>۱۰ دقیقه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33526"/>
         <source>30 minutes</source>
-        <translation>۳۰ دقیقه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33527"/>
         <source>1 hour</source>
-        <translation>۱ ساعت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33569"/>
         <source>solid</source>
-        <translation>جامد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33570"/>
         <source>dashed</source>
-        <translation>قطعه قطعه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33571"/>
         <source>dashed-dot</source>
-        <translation>قطعه نقطه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33572"/>
         <source>dotted</source>
-        <translation>نقطه ای</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33573"/>
         <source>None</source>
-        <translation>هیچی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33919"/>
         <source>Event #0</source>
-        <translation>رخداد#۰</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33921"/>
         <source>Event #{0}</source>
-        <translation>رخداد#{۰}</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33959"/>
         <source>liter</source>
-        <translation>لیتر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33960"/>
         <source>gallon</source>
-        <translation>گالون</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33961"/>
         <source>quart</source>
-        <translation>یک بخش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33962"/>
         <source>pint</source>
-        <translation>پیمانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33963"/>
         <source>cup</source>
-        <translation>فنجان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33964"/>
         <source>cm^3</source>
-        <translation>سانتی متر مربع</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34233"/>
         <source>Flag</source>
-        <translation>پرچم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34234"/>
         <source>Bar</source>
-        <translation>بار بر اتمسفر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34235"/>
         <source>Step</source>
-        <translation>مرحله</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34236"/>
         <source>Step+</source>
-        <translation>مرحله+</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34237"/>
         <source>Combo</source>
-        <translation>تلفیق</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Serial Command</source>
-        <translation>سریال فرمان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Modbus Command</source>
-        <translation>فرمان وروودی مادباس</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>DTA Command</source>
-        <translation>فرمان DTA</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>Call Program</source>
-        <translation>تماس با برنامه نویس</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Hottop Heater</source>
-        <translation>بخار گرمکن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Hottop Fan</source>
-        <translation>فن گرمکن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Hottop Command</source>
-        <translation>فرمان گرمکن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Fuji Command</source>
-        <translation>فرمان فوجی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>PWM Command</source>
-        <translation>فرمان PWM</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>VOUT Command</source>
-        <translation>فرمان VOUT</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>IO Command</source>
-        <translation>فرمان IO</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>S7 Command</source>
-        <translation>فرمان S7</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Aillio R1 Heater</source>
-        <translation>گرمکن آیلیو</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Aillio R1 Fan</source>
-        <translation>فن آیلیو</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Aillio R1 Drum</source>
-        <translation>استوانه آیلیو</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="35944"/>
+        <source>Artisan Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="35944"/>
+        <source>RC Command</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>p-i-d</source>
-        <translation>مشتق انتگرال نسبی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Aillio R1 Command</source>
-        <translation>فرمان آیلیو</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>OFF</source>
-        <translation>خاموش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49367"/>
         <source>ON</source>
-        <translation>روشن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35944"/>
         <source>Multiple Event</source>
-        <translation>روشن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36716"/>
         <source>Time</source>
-        <translation>زمان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36717"/>
         <source>Percentage</source>
-        <translation>درصد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36718"/>
         <source>Temp</source>
-        <translation>دما</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43887"/>
         <source>bytes</source>
-        <translation>بایتز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43891"/>
         <source>words</source>
-        <translation>کلمه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48562"/>
         <source>Flat</source>
-        <translation>صاف</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48562"/>
         <source>Perpendicular</source>
-        <translation>عمود</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48562"/>
         <source>Radial</source>
-        <translation>شعاعی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>START</source>
-        <translation>شروع</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>CHARGE</source>
-        <translation>شارژ کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49367"/>
         <source>TP</source>
-        <translation>نقطه برگشت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49367"/>
         <source>DRY END</source>
-        <translation>پایان خشک شدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49367"/>
         <source>FC START</source>
-        <translation>شروع ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49367"/>
         <source>FC END</source>
-        <translation>پایان ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49367"/>
         <source>SC START</source>
-        <translation>شروع ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49367"/>
         <source>SC END</source>
-        <translation>پایان ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>DROP</source>
-        <translation>انداختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49367"/>
         <source>COOL</source>
-        <translation>سرد کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49367"/>
         <source>If Alarm</source>
-        <translation>زنگ خطر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49395"/>
         <source>below</source>
-        <translation>در زیر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49395"/>
         <source>above</source>
-        <translation>در بالا</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>Pop Up</source>
-        <translation>پاپ آپ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>Event Button</source>
-        <translation>دکمه رخداد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>Slider</source>
-        <translation>لغزنده</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>DRY</source>
-        <translation>خشک</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>FCs</source>
-        <translation>شروع ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>FCe</source>
-        <translation>پایان ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>SCs</source>
-        <translation>شروع ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>SCe</source>
-        <translation>شروع ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>COOL END</source>
-        <translation>پایان خنک شدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
@@ -1833,26 +1828,16 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>PID ON</source>
-        <translation>PIDروشن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>PID OFF</source>
-        <translation>PIDخاموش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49406"/>
         <source>SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Artisan Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>RC Command</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1861,47 +1846,47 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="9515"/>
         <source>Add point</source>
-        <translation>وارد کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9519"/>
         <source>Remove point</source>
-        <translation>پاک کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9525"/>
         <source>Load points</source>
-        <translation>بارگزاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9529"/>
         <source>Save points</source>
-        <translation>ذخیره سازی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9535"/>
         <source>Reset Designer</source>
-        <translation>تنظیم مجدد طراح</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9539"/>
         <source>Config...</source>
-        <translation>تایید</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10173"/>
         <source>Add to Cupping Notes</source>
-        <translation>اضافه شدن به طعم یاد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10177"/>
         <source>Add to Roasting Notes</source>
-        <translation>اضافه کردن به یاداشت برشته کاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10183"/>
         <source>Edit</source>
-        <translation>ویرایش</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1909,12 +1894,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="26776"/>
         <source>profiles</source>
-        <translation>نمودار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="26766"/>
         <source>other</source>
-        <translation>سایر</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1922,62 +1907,67 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="53766"/>
         <source>Exception:</source>
-        <translation type="unfinished">توقعات</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="6802"/>
+        <source>Exception: PhidgetManager couldn&apos;t be started. Verify that the Phidget driver is correctly installed!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="42823"/>
         <source>Value Error:</source>
-        <translation type="unfinished">خطای ارزشی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9042"/>
         <source>Error in lnRegression:</source>
-        <translation type="unfinished">خطای برگشت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17818"/>
         <source>Error:</source>
-        <translation type="unfinished">خطا</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48725"/>
         <source>IO Error:</source>
-        <translation type="unfinished">خطای io</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23032"/>
         <source>Error</source>
-        <translation type="unfinished">خطا</translation>
+        <translation type="unfinished">Fel</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24099"/>
         <source>Exception (probably due to an empty profile):</source>
-        <translation type="unfinished">استثنا (نمودار خالی)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28820"/>
         <source>Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)</source>
-        <translation type="unfinished">نقشه کشی ( برنامه نویسی نا درست)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28937"/>
         <source>ln(): no profile data available</source>
-        <translation type="unfinished">بدون اطلاعات از داده</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28953"/>
         <source>xxvar(): no profile data available</source>
-        <translation type="unfinished">بدون اطلاعات</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28967"/>
         <source>Univariate: no profile data available</source>
-        <translation type="unfinished">تک متغییر(بدون اطلاعات)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29188"/>
         <source>Polyfit: no profile data available</source>
-        <translation type="unfinished">بدون اطلاعات</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32721"/>
@@ -2134,63 +2124,58 @@ END</source>
         <source>pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6802"/>
-        <source>Exception: PhidgetManager couldn&apos;t be started. Verify that the Phidget driver is correctly installed!</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>Flavor Scope Label</name>
     <message>
         <location filename="../artisanlib/main.py" line="24935"/>
         <source>OK</source>
-        <translation>تایید</translation>
+        <translation type="unfinished">OK</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24936"/>
         <source>Grassy</source>
-        <translation>سبزیجاتی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24937"/>
         <source>Leathery</source>
-        <translation>چرم مانند</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24938"/>
         <source>Toasty</source>
-        <translation>نان تست</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24939"/>
         <source>Bready</source>
-        <translation>نان مانند</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24940"/>
         <source>Acidic</source>
-        <translation>اسیدی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24941"/>
         <source>Flat</source>
-        <translation>یکنواخت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24942"/>
         <source>Fracturing</source>
-        <translation>از هم گسیخته</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24943"/>
         <source>Sweet</source>
-        <translation>شیرین</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24944"/>
         <source>Less Sweet</source>
-        <translation>ملایم</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2198,152 +2183,152 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="27678"/>
         <source>Curves</source>
-        <translation type="unfinished">منحنی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29439"/>
         <source>Volume Calculator</source>
-        <translation type="unfinished">ماشین حساب اندازه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29810"/>
         <source>Symbolic Device Assignment Help</source>
-        <translation type="unfinished">کمک نمادین دستگاه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29875"/>
         <source>Plotter Help</source>
-        <translation type="unfinished">راه کمکی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29958"/>
         <source>Plotter Data</source>
-        <translation type="unfinished">راه اطلاعات</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30231"/>
         <source>Roast Properties</source>
-        <translation type="unfinished">بازخوانی تنظیمات</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32967"/>
         <source>Tare Setup</source>
-        <translation type="unfinished">بازخوانی نصب</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33100"/>
         <source>Artisan Platform</source>
-        <translation type="unfinished">نقشه اصلی آرتیزان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33153"/>
         <source>Serial Log</source>
-        <translation type="unfinished">سیال های وروودی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33196"/>
         <source>Error Log</source>
-        <translation type="unfinished">سریال های خطا</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33231"/>
         <source>Message History</source>
-        <translation type="unfinished">تاریخچه پیام ها</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="31368"/>
-        <source>Keyboard Autosave [a]</source>
-        <translation type="obsolete">ذخیره خودکار کیبرد</translation>
+        <location filename="../artisanlib/main.py" line="33258"/>
+        <source>Autosave</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33309"/>
         <source>AutoSave Path</source>
-        <translation type="unfinished">راه ذخیره خودکار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33335"/>
         <source>Batch</source>
-        <translation type="unfinished">گنجایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33411"/>
         <source>Axes</source>
-        <translation type="unfinished">محور</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33899"/>
         <source>Roast Calculator</source>
-        <translation type="unfinished">ماشین حساب برشته کار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34191"/>
         <source>Events</source>
-        <translation type="unfinished">رخداد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36616"/>
         <source>Roast Phases</source>
-        <translation type="unfinished">فاز های برشته کاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36951"/>
         <source>Cup Profile</source>
-        <translation type="unfinished">مشخصات طعمی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37200"/>
         <source>Profile Background</source>
-        <translation type="unfinished">مشخصات پیشین</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37827"/>
         <source>Statistics</source>
-        <translation type="unfinished">استاتیک</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="42888"/>
         <source>Designer Config</source>
-        <translation type="unfinished">تاییدیه های طراح</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43430"/>
         <source>Add Point</source>
-        <translation type="unfinished">نقطه \ذاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43475"/>
         <source>Manual Temperature Logger</source>
-        <translation type="unfinished">دمای ورودی دستی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43595"/>
         <source>Ports Configuration</source>
-        <translation type="unfinished">تاییدیه های وروودی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44819"/>
         <source>Scan Modbus</source>
-        <translation type="unfinished">جستجوی مادباس</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44969"/>
         <source>Device Assignment</source>
-        <translation type="unfinished">واگذاری دستگاه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47314"/>
         <source>Colors</source>
-        <translation type="unfinished">رنگ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48196"/>
         <source>Wheel Graph Editor</source>
-        <translation type="unfinished">ویرایش چرخه نمودار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48822"/>
         <source>Alarms</source>
-        <translation type="unfinished">هشدار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49702"/>
@@ -2363,16 +2348,11 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="53330"/>
         <source>PID Control</source>
-        <translation type="unfinished">پی.ای.دی. کنترل</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53847"/>
         <source>Delta DTA PID Control</source>
-        <translation type="unfinished">مثلث کنترل پی.ای.دی و دی.تی.ای</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33258"/>
-        <source>Autosave</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2381,42 +2361,42 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="27892"/>
         <source>Rate of Rise Curves</source>
-        <translation type="unfinished">منحنی ار او ار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27894"/>
         <source>Rate of Rise LCDs</source>
-        <translation type="unfinished">صفحه نمایش ار.او.ار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27900"/>
         <source>Head Up Display</source>
-        <translation type="unfinished">صفحه نمایش بالایی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27922"/>
         <source>Input Filter</source>
-        <translation type="unfinished">فیلترهای داخلی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27927"/>
         <source>Curve Filter</source>
-        <translation type="unfinished">فیلتر منحنی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27963"/>
         <source>Rate of Rise Filter</source>
-        <translation type="unfinished">فیلتر ار.او.ار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28267"/>
         <source>Interpolate</source>
-        <translation type="unfinished">درون یابی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28273"/>
         <source>Univariate</source>
-        <translation type="unfinished">تک متغییر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28281"/>
@@ -2431,97 +2411,102 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="28316"/>
         <source>Polyfit</source>
-        <translation type="unfinished">پلی فیت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28365"/>
         <source>Appearance</source>
-        <translation type="unfinished">ظاهر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28375"/>
         <source>Resolution</source>
-        <translation type="unfinished">دقت تصویر(رزلوشن)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28424"/>
         <source>WebLCDs</source>
-        <translation type="unfinished">تصویر اینترنتی</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="28440"/>
+        <source>Rename ET and BT</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33673"/>
         <source>Time Axis</source>
-        <translation type="unfinished">زمان محور</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33675"/>
         <source>Temperature Axis</source>
-        <translation type="unfinished">دمای محور</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33677"/>
         <source>Axis</source>
-        <translation type="unfinished">محور</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33679"/>
         <source>Legend Location</source>
-        <translation type="unfinished">موقعیت مکانی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33681"/>
         <source>Grid</source>
-        <translation type="unfinished">جدول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34040"/>
         <source>Rate of Change</source>
-        <translation type="unfinished">نرخ تغییر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34042"/>
         <source>Temperature Conversion</source>
-        <translation type="unfinished">دمای کلی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34044"/>
         <source>Weight Conversion</source>
-        <translation type="unfinished">وزن کلی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34046"/>
         <source>Volume Conversion</source>
-        <translation type="unfinished">مقدار کلی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34048"/>
         <source>Extraction Yield</source>
-        <translation type="unfinished">مقدار عصاره گیری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34915"/>
         <source>Event Types</source>
-        <translation type="unfinished">بخش رخدادها</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35102"/>
         <source>Default Buttons</source>
-        <translation type="unfinished">دکمه پیش فرض</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35113"/>
         <source>Sampling</source>
-        <translation type="unfinished">نمونه برداری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35166"/>
         <source>Management</source>
-        <translation type="unfinished">مدیریت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37948"/>
         <source>Evaluation</source>
-        <translation type="unfinished">ارزیابی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38009"/>
@@ -2531,136 +2516,71 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="38011"/>
         <source>Display</source>
-        <translation type="unfinished">صفحه نمایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43139"/>
         <source>Initial Settings</source>
-        <translation type="unfinished">تنظیمات اولیه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44443"/>
         <source>Registers</source>
-        <translation type="unfinished">ثبت کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44460"/>
         <source>Commands</source>
-        <translation type="unfinished">دستورات</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45858"/>
         <source>PID</source>
-        <translation type="unfinished">پی ای دی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44182"/>
         <source>Input 1</source>
-        <translation type="unfinished">ورودی ۱</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44190"/>
         <source>Input 2</source>
-        <translation type="unfinished">ورودی ۲</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44198"/>
         <source>Input 3</source>
-        <translation type="unfinished">ورودی ۳</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44206"/>
         <source>Input 4</source>
-        <translation type="unfinished">ورودی ۴</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44214"/>
         <source>Input 5</source>
-        <translation type="unfinished">ورودی ۵</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44222"/>
         <source>Input 6</source>
-        <translation type="unfinished">ورودی ۶</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44998"/>
         <source>Curves</source>
-        <translation type="unfinished">منحنی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45008"/>
         <source>LCDs</source>
-        <translation type="unfinished">صفحه نمایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45745"/>
         <source>Network</source>
-        <translation type="unfinished">شبکه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45885"/>
-        <source>Arduino TC4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45897"/>
-        <source>External Program</source>
-        <translation type="unfinished">برنامه جانبی</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45905"/>
-        <source>Symbolic Assignments</source>
-        <translation type="unfinished">نشانه واگذاری</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47736"/>
-        <source>Timer LCD</source>
-        <translation type="unfinished">نمایشگر زمان</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47745"/>
-        <source>ET LCD</source>
-        <translation type="unfinished">نمایشگر دمای اگزوز</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47748"/>
-        <source>BT LCD</source>
-        <translation type="unfinished">نمایشگر دمای دانه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47751"/>
-        <source>Extra Devices / PID SV LCD</source>
-        <translation type="unfinished">وسیله های اضافی</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48295"/>
-        <source>Label Properties</source>
-        <translation type="unfinished">برچسب تنظیمات</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53338"/>
-        <source>p-i-d</source>
-        <translation type="unfinished">پی ای دی</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53471"/>
-        <source>Target</source>
-        <translation type="unfinished">هدف</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53601"/>
-        <source>Set Value</source>
-        <translation type="unfinished">تثبیت مقدار</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53618"/>
-        <source>Duty</source>
-        <translation type="unfinished">وظایف</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28440"/>
-        <source>Rename ET and BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2673,303 +2593,363 @@ END</source>
         <source>IR</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="45885"/>
+        <source>Arduino TC4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="45897"/>
+        <source>External Program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="45905"/>
+        <source>Symbolic Assignments</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="47736"/>
+        <source>Timer LCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="47745"/>
+        <source>ET LCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="47748"/>
+        <source>BT LCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="47751"/>
+        <source>Extra Devices / PID SV LCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="48295"/>
+        <source>Label Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="53338"/>
+        <source>p-i-d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="53471"/>
+        <source>Target</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="53601"/>
+        <source>Set Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="53618"/>
+        <source>Duty</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HTML Report Template</name>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Ambient:</source>
-        <translation type="unfinished">فضا</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24295"/>
         <source>Profile</source>
-        <translation type="unfinished">نمودار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23342"/>
         <source>Roast Batches</source>
-        <translation type="unfinished">دسته برشته کاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24290"/>
         <source>Batch</source>
-        <translation type="unfinished">گنجایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23342"/>
         <source>Date</source>
-        <translation type="unfinished">داده</translation>
+        <translation type="unfinished">Datum</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23455"/>
         <source>Beans</source>
-        <translation type="unfinished">دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23458"/>
         <source>In</source>
-        <translation type="unfinished">ورودی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23460"/>
         <source>Out</source>
-        <translation type="unfinished">خروجی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24318"/>
         <source>Loss</source>
-        <translation type="unfinished">از دست دادن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23495"/>
         <source>SUM</source>
-        <translation type="unfinished">جمع</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24284"/>
         <source>Production Report</source>
-        <translation type="unfinished">گذارش تولید</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24292"/>
         <source>Time</source>
-        <translation type="unfinished">زمان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24175"/>
         <source>Roast Ranking</source>
-        <translation type="unfinished">امتیاز دهی برشته کاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24298"/>
         <source>Load</source>
-        <translation type="unfinished">بازخوانی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24300"/>
         <source>Charge</source>
-        <translation type="unfinished">بار زدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24304"/>
         <source>FCs</source>
-        <translation type="unfinished">ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24308"/>
         <source>DROP</source>
-        <translation type="unfinished">انداختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24310"/>
         <source>DRY</source>
-        <translation type="unfinished">خشک کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24312"/>
         <source>MAI</source>
-        <translation type="unfinished">میلارد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24314"/>
         <source>DEV</source>
-        <translation type="unfinished">توسعه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24316"/>
         <source>AUC</source>
-        <translation type="unfinished">ای یو سی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24320"/>
         <source>Color</source>
-        <translation type="unfinished">رنگ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24322"/>
         <source>Cup</source>
-        <translation type="unfinished">فنجان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24401"/>
         <source>AVG</source>
-        <translation type="unfinished">میانگین</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Roasting Report</source>
-        <translation type="unfinished">گزارش برشته کاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Date:</source>
-        <translation type="unfinished">روز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Beans:</source>
-        <translation type="unfinished">دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Weight:</source>
-        <translation type="unfinished">مقدار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Degree:</source>
-        <translation type="unfinished">درجه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Volume:</source>
-        <translation type="unfinished">حجم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Roaster:</source>
-        <translation type="unfinished">برشته کار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Operator:</source>
-        <translation type="unfinished">اپراتور</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Cupping:</source>
-        <translation type="unfinished">ارزیابی چشایی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Color:</source>
-        <translation type="unfinished">رنگ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>CHARGE:</source>
-        <translation type="unfinished">بار زدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Size:</source>
-        <translation type="unfinished">سایز</translation>
+        <translation type="unfinished">Storlek:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Density:</source>
-        <translation type="unfinished">چگالی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Moisture:</source>
-        <translation type="unfinished">رطوبت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>TP:</source>
-        <translation type="unfinished">تی پی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>DRY:</source>
-        <translation type="unfinished">خشکیدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>FCs:</source>
-        <translation type="unfinished">سر ترق</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>FCe:</source>
-        <translation type="unfinished">ته ترق</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>SCs:</source>
-        <translation type="unfinished">سر سوختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>SCe:</source>
-        <translation type="unfinished">ته سوختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>DROP:</source>
-        <translation type="unfinished">ریختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>COOL:</source>
-        <translation type="unfinished">خنکیدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>MET:</source>
-        <translation type="unfinished">نهایت دمای مخذن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>CM:</source>
-        <translation type="unfinished">سی ام</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Drying:</source>
-        <translation type="unfinished">خشکیدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Maillard:</source>
-        <translation type="unfinished">میلارد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Finishing:</source>
-        <translation type="unfinished">پایان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Cooling:</source>
-        <translation type="unfinished">خنکیدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Background:</source>
-        <translation type="unfinished">پس زمینه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Alarms:</source>
-        <translation type="unfinished">هشدار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>RoR:</source>
-        <translation type="unfinished">ار او ار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>AUC:</source>
-        <translation type="unfinished">ای یو سی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Roasting Notes</source>
-        <translation type="unfinished">یاداشت برشته کاری</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Events</source>
-        <translation type="unfinished">رخداد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24589"/>
         <source>Cupping Notes</source>
-        <translation type="unfinished">یاداشتهای فنجان</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2977,292 +2957,302 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="2415"/>
         <source>at</source>
-        <translation type="unfinished">در</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="42891"/>
         <source>CHARGE</source>
-        <translation type="unfinished">بارزدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37955"/>
         <source>DRY END</source>
-        <translation type="unfinished">پایان خشکیدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37956"/>
         <source>FC START</source>
-        <translation type="unfinished">سر ترق</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30347"/>
         <source>FC END</source>
-        <translation type="unfinished">ته ترق</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30362"/>
         <source>SC START</source>
-        <translation type="unfinished">سر سوختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30377"/>
         <source>SC END</source>
-        <translation type="unfinished">ته سوختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="42904"/>
         <source>DROP</source>
-        <translation type="unfinished">ریختن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30408"/>
         <source>COOL</source>
-        <translation type="unfinished">خنکیدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2441"/>
         <source>EVENT</source>
-        <translation type="unfinished">رخداد</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37883"/>
-        <source>min</source>
-        <translation type="unfinished">دقیقه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10637"/>
-        <source>/min</source>
-        <translation type="unfinished">\دقیقه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5195"/>
-        <source>BackgroundXT</source>
-        <translation type="unfinished">پیش زمینه دمایx</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9413"/>
-        <source>BackgroundET</source>
-        <translation type="unfinished">پیش زمینه دمای خروجی</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9417"/>
-        <source>BackgroundBT</source>
-        <translation type="unfinished">پیش زمینه دمای دانه</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5247"/>
-        <source>BackgroundDeltaET</source>
-        <translation type="unfinished">پیش زمینه  دلتا دمای اگزوز</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5251"/>
-        <source>BackgroundDeltaBT</source>
-        <translation type="unfinished">پیش زمینه دلتا دمای دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49334"/>
         <source>ET</source>
-        <translation type="unfinished">دمای اگزوز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49335"/>
         <source>BT</source>
-        <translation type="unfinished">دمای دانه</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="37883"/>
+        <source>min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="10637"/>
+        <source>/min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="5195"/>
+        <source>BackgroundXT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="9413"/>
+        <source>BackgroundET</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="9417"/>
+        <source>BackgroundBT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="5247"/>
+        <source>BackgroundDeltaET</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="5251"/>
+        <source>BackgroundDeltaBT</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="5945"/>
         <source>BTprojection</source>
-        <translation type="unfinished">تصویر دمای دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="5950"/>
         <source>ETprojection</source>
-        <translation type="unfinished">تصویر دمای خروجی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="5956"/>
         <source>AUCguide</source>
-        <translation type="unfinished">راهنمای ای یو سی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="5961"/>
         <source>TIMEguide</source>
-        <translation type="unfinished">راهنمای زمان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30770"/>
         <source>Drum Speed</source>
-        <translation type="unfinished">سرعت محفظه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17860"/>
         <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
-        <translation type="unfinished">رخداد#&lt;b&gt;{0} &lt;/b&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15535"/>
         <source>AUC</source>
-        <translation type="unfinished">ای یو سی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8545"/>
         <source>RoR</source>
-        <translation type="unfinished">ار او ار</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8544"/>
         <source>MET</source>
-        <translation type="unfinished">ام ای تی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8551"/>
         <source>CM</source>
-        <translation type="unfinished">سی ام</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8553"/>
         <source>FC</source>
-        <translation type="unfinished">ترق</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9409"/>
         <source>Designer</source>
-        <translation type="unfinished">طراح</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10005"/>
         <source>BT {0} {1}/min for {2}</source>
-        <translation type="unfinished">دمای دانه{0} {1}/min for {2}</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10021"/>
         <source>ET {0} {1}/min for {2}</source>
-        <translation type="unfinished">دمای اگزوز{0} {1}/min for {2}</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="42919"/>
         <source>Time</source>
-        <translation type="unfinished">زمان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13374"/>
         <source>PID SV</source>
-        <translation type="unfinished">پی ای دی اس وی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13378"/>
         <source>PID %</source>
-        <translation type="unfinished">درصد پی ای دی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13435"/>
         <source>Event #&lt;b&gt;0 &lt;/b&gt;</source>
-        <translation type="unfinished">رخداد #&lt;b&gt;0 &lt;/b&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37954"/>
         <source>TP</source>
-        <translation type="unfinished">تی پی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37243"/>
         <source>DRY</source>
-        <translation type="unfinished">خشکیدن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37244"/>
         <source>FCs</source>
-        <translation type="unfinished">سر ترق</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53519"/>
         <source>Background</source>
-        <translation type="unfinished">پیش زمینه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14517"/>
         <source>Markers</source>
-        <translation type="unfinished">نشانگرها</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48223"/>
         <source>Text</source>
-        <translation type="unfinished">نوشته</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14523"/>
         <source>Time Guide</source>
-        <translation type="unfinished">راهنمای زمان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14526"/>
         <source>Background ET</source>
-        <translation type="unfinished">پیش زمینه دمای خروجی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14529"/>
         <source>Background BT</source>
-        <translation type="unfinished">پیش زمینه دمای دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14538"/>
         <source>Background Extra</source>
-        <translation type="unfinished">پیش زمینه دمای اضافی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14541"/>
         <source>X Label</source>
-        <translation type="unfinished">برچسب ایکس</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14547"/>
         <source>Canvas</source>
-        <translation type="unfinished">نقاشی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14544"/>
         <source>Y Label</source>
-        <translation type="unfinished">برچسب وای</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47424"/>
         <source>Title</source>
-        <translation type="unfinished">سرتیتر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14550"/>
         <source>SpecialEventText</source>
-        <translation type="unfinished">متن رخداد سفارشی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14550"/>
         <source>SpecialEventBox</source>
-        <translation type="unfinished">متن باکس سفارشی</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="14553"/>
+        <source>Bg SpecialEventText</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="14553"/>
+        <source>Bg SpecialEventBox</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="46409"/>
         <source>Legend bkgnd</source>
-        <translation type="unfinished">شرح پیش زمینه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14568"/>
         <source>MET Text</source>
-        <translation type="unfinished">متن ام ای سی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14571"/>
         <source>MET Box</source>
-        <translation type="unfinished">جعبه ام ای تی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14575"/>
         <source>Timer LCD Digits</source>
-        <translation type="unfinished">ارقام زمانبند صفحه نمایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14575"/>
         <source>Timer LCD Background</source>
-        <translation type="unfinished">پیش زمینه زمانبندی صفخه نمایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14584"/>
@@ -3302,7 +3292,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="53527"/>
         <source>Slider</source>
-        <translation type="unfinished">لغزنده</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36060"/>
@@ -3572,12 +3562,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="44289"/>
         <source>Start</source>
-        <translation type="unfinished">شروع</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28237"/>
         <source>End</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">End</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45677"/>
@@ -3592,7 +3582,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="29480"/>
         <source>ml</source>
-        <translation type="unfinished">میلی لیتر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29573"/>
@@ -3602,7 +3592,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="29578"/>
         <source>g</source>
-        <translation type="unfinished">گرم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30546"/>
@@ -3612,6 +3602,16 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="30578"/>
         <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="30547"/>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="30703"/>
+        <source>Roasted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3627,7 +3627,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="30481"/>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Datum</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30492"/>
@@ -3652,7 +3652,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="30648"/>
         <source>Screen</source>
-        <translation type="unfinished">اندازه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30662"/>
@@ -3660,13 +3660,28 @@ END</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="30724"/>
-        <source>%</source>
+        <location filename="../artisanlib/main.py" line="34347"/>
+        <source>Color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="30703"/>
-        <source>Roasted</source>
+        <location filename="../artisanlib/main.py" line="30665"/>
+        <source>Whole</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="30671"/>
+        <source>Ground</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="30694"/>
+        <source>Moisture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="30724"/>
+        <source>%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3720,6 +3735,11 @@ END</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="32643"/>
+        <source>organic loss</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="33213"/>
         <source>Number of errors found {0}</source>
         <translation type="unfinished"></translation>
@@ -3747,12 +3767,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="35045"/>
         <source>RESET</source>
-        <translation type="unfinished">تنظیم مجدد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33559"/>
         <source>Step</source>
-        <translation type="unfinished">مرحله</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33577"/>
@@ -3837,17 +3857,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="34231"/>
         <source>Events</source>
-        <translation type="unfinished">رخداد</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34347"/>
-        <source>Color</source>
-        <translation type="unfinished">رنگ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34349"/>
         <source>Text Color</source>
-        <translation type="unfinished">رنگ نوشته</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="42917"/>
@@ -3867,7 +3882,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="34357"/>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Storlek</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34485"/>
@@ -3917,7 +3932,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="34578"/>
         <source>Temp</source>
-        <translation type="unfinished">دما</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53376"/>
@@ -3927,22 +3942,22 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="34854"/>
         <source>Cluster</source>
-        <translation type="unfinished">گروه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44450"/>
         <source>ON</source>
-        <translation type="unfinished">روشن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44447"/>
         <source>OFF</source>
-        <translation type="unfinished">خاموش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35053"/>
         <source>START</source>
-        <translation type="unfinished">شروع</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37879"/>
@@ -3974,7 +3989,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="36957"/>
         <source>Default</source>
-        <translation type="unfinished">پیشفرض</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36990"/>
@@ -3984,17 +3999,17 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="37245"/>
         <source>FCe</source>
-        <translation type="unfinished">پایان ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37246"/>
         <source>SCs</source>
-        <translation type="unfinished">شروع ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37247"/>
         <source>SCe</source>
-        <translation type="unfinished">شروع ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37249"/>
@@ -4004,7 +4019,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="37262"/>
         <source>Extra</source>
-        <translation type="unfinished">اضافی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37307"/>
@@ -4134,7 +4149,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="45501"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Typ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45670"/>
@@ -4204,7 +4219,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="45011"/>
         <source>Control</source>
-        <translation type="unfinished">کنترل</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45056"/>
@@ -4304,6 +4319,11 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="45726"/>
         <source>VirtualHub</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="45819"/>
+        <source>MASL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4469,7 +4489,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="50758"/>
         <source>Write</source>
-        <translation type="unfinished">نوشتن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50706"/>
@@ -4531,72 +4551,47 @@ LCDs All</source>
         <source>Buttons</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30547"/>
-        <source>Green</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30665"/>
-        <source>Whole</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30671"/>
-        <source>Ground</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30694"/>
-        <source>Moisture</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32643"/>
-        <source>organic loss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45819"/>
-        <source>MASL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14553"/>
-        <source>Bg SpecialEventText</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14553"/>
-        <source>Bg SpecialEventBox</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
-        <location filename="../const/UIconst.py" line="37"/>
-        <source>Services</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="38"/>
-        <source>Hide {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="39"/>
-        <source>Hide Others</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="40"/>
-        <source>Show All</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../qtbase/src/plugins/platforms/cocoa/messages.cpp" line="56"/>
+        <source>About %1</source>
+        <translation type="obsolete">Om %1</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="41"/>
         <source>Preferences...</source>
+        <translation type="unfinished">Inställningar…</translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="37"/>
+        <source>Services</source>
+        <translation type="unfinished">Tjänster</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Hide %1</source>
+        <translation type="obsolete">Göm %1</translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="39"/>
+        <source>Hide Others</source>
+        <translation type="unfinished">Göm övriga</translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="40"/>
+        <source>Show All</source>
+        <translation type="unfinished">Visa alla</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Quit %1</source>
+        <translation type="obsolete">Avsluta %1</translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="38"/>
+        <source>Hide {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4660,7 +4655,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="34311"/>
         <source>None</source>
-        <translation type="unfinished">هیچی</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4726,6 +4721,16 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="11916"/>
+        <source>JPEG...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11920"/>
+        <source>BMP...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="11924"/>
         <source>SVG...</source>
         <translation type="unfinished"></translation>
@@ -4743,7 +4748,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="46"/>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fil</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="49"/>
@@ -4768,11 +4773,16 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="53"/>
         <source>Save</source>
-        <translation type="unfinished">ذخیره</translation>
+        <translation type="unfinished">Spara</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="54"/>
         <source>Save As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="55"/>
+        <source>Save a Copy As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4838,7 +4848,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="75"/>
         <source>Edit</source>
-        <translation type="unfinished">ویرایش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="78"/>
@@ -5068,12 +5078,12 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="174"/>
         <source>Help</source>
-        <translation type="unfinished">کمک رسانی</translation>
+        <translation type="unfinished">Hjälp</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="180"/>
         <source>About Qt</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Om Qt</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="181"/>
@@ -5113,21 +5123,6 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="192"/>
         <source>Factory Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11916"/>
-        <source>JPEG...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11920"/>
-        <source>BMP...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="55"/>
-        <source>Save a Copy As...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5541,13 +5536,53 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="13973"/>
+        <source>Welcome to the ArtisanViewer!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="13974"/>
+        <source>This is a one time message to introduce you to the ArtisanViewer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="13975"/>
+        <source>The ArtisanViewer opens whenever a copy of Artisan is already running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="13976"/>
         <source>Only one instance of Artisan able to record profiles may be open.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="13977"/>
+        <source>Multiple instances of ArtisanViewer can be open at the same time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="13978"/>
+        <source>ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="13979"/>
+        <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using &apos;Help&gt;Save Settings&apos; and &apos;Help&gt;Load Settings&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="13980"/>
+        <source>Enjoy using ArtisanViewer,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="13981"/>
         <source>The Artisan Team</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="13982"/>
+        <source>One time message about ArtisanViewer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5613,6 +5648,36 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="15148"/>
         <source>super off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="16623"/>
+        <source>Alarms on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="16626"/>
+        <source>Alarms off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="16635"/>
+        <source>autoCHARGE on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="16638"/>
+        <source>autoCHARGE off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="16647"/>
+        <source>autoDROP on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="16650"/>
+        <source>autoDROP off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5818,17 +5883,17 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="17993"/>
         <source>Select</source>
-        <translation type="unfinished">انتخاب</translation>
+        <translation type="unfinished">Välj</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18003"/>
         <source>Open</source>
-        <translation type="unfinished">باز کردن</translation>
+        <translation type="unfinished">Öppna</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18013"/>
         <source>Save</source>
-        <translation type="unfinished">ذخیره</translation>
+        <translation type="unfinished">Spara</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18022"/>
@@ -5964,6 +6029,16 @@ Modify your setup?</source>
     <message>
         <location filename="../artisanlib/main.py" line="20743"/>
         <source>Import RoastLogger</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="20765"/>
+        <source>Batch Counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="20768"/>
+        <source>Load Settings canceled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6160,6 +6235,11 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="26748"/>
         <source>HH506RA file loaded successfully</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="26791"/>
+        <source>Save Graph as</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7003,6 +7083,11 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="42198"/>
+        <source>Yocto IR attached</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="42241"/>
         <source>Yocto PT100 attached</source>
         <translation type="unfinished"></translation>
@@ -7040,22 +7125,22 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="43381"/>
         <source>FC START</source>
-        <translation type="unfinished">شروع ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43382"/>
         <source>FC END</source>
-        <translation type="unfinished">پایان ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43383"/>
         <source>SC START</source>
-        <translation type="unfinished">شروع ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43384"/>
         <source>SC END</source>
-        <translation type="unfinished">پایان ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43385"/>
@@ -7320,7 +7405,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="52017"/>
         <source>OFF</source>
-        <translation type="unfinished">خاموش</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="52010"/>
@@ -7330,7 +7415,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="52023"/>
         <source>ON</source>
-        <translation type="unfinished">روشن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="52022"/>
@@ -7533,95 +7618,18 @@ Proceed?</source>
         <source>p-i-d values updated</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>PPDOptionsModel</name>
     <message>
-        <location filename="../artisanlib/main.py" line="13973"/>
-        <source>Welcome to the ArtisanViewer!</source>
-        <translation type="unfinished"></translation>
+        <location filename="." line="1"/>
+        <source>Name</source>
+        <translation type="obsolete">Namn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13974"/>
-        <source>This is a one time message to introduce you to the ArtisanViewer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13975"/>
-        <source>The ArtisanViewer opens whenever a copy of Artisan is already running.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13977"/>
-        <source>Multiple instances of ArtisanViewer can be open at the same time.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13978"/>
-        <source>ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13979"/>
-        <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using &apos;Help&gt;Save Settings&apos; and &apos;Help&gt;Load Settings&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13980"/>
-        <source>Enjoy using ArtisanViewer,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13982"/>
-        <source>One time message about ArtisanViewer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16623"/>
-        <source>Alarms on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16626"/>
-        <source>Alarms off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16635"/>
-        <source>autoCHARGE on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16638"/>
-        <source>autoCHARGE off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16647"/>
-        <source>autoDROP on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16650"/>
-        <source>autoDROP off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26791"/>
-        <source>Save Graph as</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42198"/>
-        <source>Yocto IR attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20765"/>
-        <source>Batch Counter</source>
-        <translation type="unfinished">شمارنده مقدار</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20768"/>
-        <source>Load Settings canceled</source>
-        <translation type="unfinished"></translation>
+        <location filename="." line="1"/>
+        <source>Value</source>
+        <translation type="obsolete">Värde</translation>
     </message>
 </context>
 <context>
@@ -7730,6 +7738,4603 @@ Proceed?</source>
         <location filename="../plus/sync.py" line="290"/>
         <source>Updated data received from artisan.plus</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Q3Accel</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>%1, %2 not defined</source>
+        <translation type="obsolete">%1, %2 är inte definierad</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Ambiguous %1 not handled</source>
+        <translation type="obsolete">Tvetydigt %1 hanteras inte</translation>
+    </message>
+</context>
+<context>
+    <name>Q3DataTable</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>True</source>
+        <translation type="obsolete">Sant</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>False</source>
+        <translation type="obsolete">Falskt</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Insert</source>
+        <translation type="obsolete">Infoga</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Update</source>
+        <translation type="obsolete">Uppdatera</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Delete</source>
+        <translation type="obsolete">Ta bort</translation>
+    </message>
+</context>
+<context>
+    <name>Q3FileDialog</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>Copy or Move a File</source>
+        <translation type="obsolete">Kopiera eller ta bort en fil</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Read: %1</source>
+        <translation type="obsolete">Läs: %1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Write: %1</source>
+        <translation type="obsolete">Skriv: %1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>All Files (*)</source>
+        <translation type="obsolete">Alla filer (*)</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Name</source>
+        <translation type="obsolete">Namn</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Size</source>
+        <translation type="obsolete">Storlek</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Type</source>
+        <translation type="obsolete">Typ</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Date</source>
+        <translation type="obsolete">Datum</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Attributes</source>
+        <translation type="obsolete">Attribut</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;OK</source>
+        <translation type="obsolete">&amp;OK</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Look &amp;in:</source>
+        <translation type="obsolete">Leta &amp;i:</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>File &amp;name:</source>
+        <translation type="obsolete">Fil&amp;namn:</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>File &amp;type:</source>
+        <translation type="obsolete">Fil&amp;typ:</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Back</source>
+        <translation type="obsolete">Tillbaka</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>One directory up</source>
+        <translation type="obsolete">En katalog uppåt</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Create New Folder</source>
+        <translation type="obsolete">Skapa ny mapp</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>List View</source>
+        <translation type="obsolete">Listvy</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Detail View</source>
+        <translation type="obsolete">Detaljvy</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Preview File Info</source>
+        <translation type="obsolete">Förhandsgranska filinformation</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Preview File Contents</source>
+        <translation type="obsolete">Förhandsgranska filinnehåll</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Read-write</source>
+        <translation type="obsolete">Läs-skriv</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Read-only</source>
+        <translation type="obsolete">Skrivskyddad</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Write-only</source>
+        <translation type="obsolete">Lässkyddad</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Inaccessible</source>
+        <translation type="obsolete">Otillgänglig</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Symlink to File</source>
+        <translation type="obsolete">Symbolisk länk till fil</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Symlink to Directory</source>
+        <translation type="obsolete">Symbolisk länk till katalog</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Symlink to Special</source>
+        <translation type="obsolete">Symbolisk länk till special</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>File</source>
+        <translation type="obsolete">Fil</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Dir</source>
+        <translation type="obsolete">Katalog</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Special</source>
+        <translation type="obsolete">Special</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Open</source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Save As</source>
+        <translation type="obsolete">Spara som</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Open</source>
+        <translation type="obsolete">&amp;Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Save</source>
+        <translation type="obsolete">&amp;Spara</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Rename</source>
+        <translation type="obsolete">&amp;Byt namn</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Delete</source>
+        <translation type="obsolete">&amp;Ta bort</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>R&amp;eload</source>
+        <translation type="obsolete">Uppdat&amp;era</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Sort by &amp;Name</source>
+        <translation type="obsolete">Sortera efter &amp;namn</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Sort by &amp;Size</source>
+        <translation type="obsolete">Sortera efter &amp;storlek</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Sort by &amp;Date</source>
+        <translation type="obsolete">Sortera efter &amp;datum</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Unsorted</source>
+        <translation type="obsolete">&amp;Osorterad</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Sort</source>
+        <translation type="obsolete">Sortera</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Show &amp;hidden files</source>
+        <translation type="obsolete">Visa &amp;dolda filer</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>the file</source>
+        <translation type="obsolete">filen</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>the directory</source>
+        <translation type="obsolete">katalogen</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>the symlink</source>
+        <translation type="obsolete">symboliska länken</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Delete %1</source>
+        <translation type="obsolete">Ta bort %1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&lt;qt&gt;Are you sure you wish to delete %1 &quot;%2&quot;?&lt;/qt&gt;</source>
+        <translation type="obsolete">&lt;qt&gt;Är du säker på att du vill ta bort %1 &quot;%2&quot;?&lt;/qt&gt;</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Yes</source>
+        <translation type="obsolete">&amp;Ja</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;No</source>
+        <translation type="obsolete">&amp;Nej</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>New Folder 1</source>
+        <translation type="obsolete">Ny mapp 1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>New Folder</source>
+        <translation type="obsolete">Ny mapp</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>New Folder %1</source>
+        <translation type="obsolete">Ny mapp %1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Find Directory</source>
+        <translation type="obsolete">Hitta katalog</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Directories</source>
+        <translation type="obsolete">Kataloger</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Directory:</source>
+        <translation type="obsolete">Katalog:</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Error</source>
+        <translation type="obsolete">Fel</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>%1
+File not found.
+Check path and filename.</source>
+        <translation type="obsolete">%1
+Filen hittades inte. 
+Kontrollera sökväg och filnamn.</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>All Files (*.*)</source>
+        <translation type="obsolete">Alla filer (*.*)</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Open </source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Select a Directory</source>
+        <translation type="obsolete">Välj en katalog</translation>
+    </message>
+</context>
+<context>
+    <name>Q3LocalFs</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>Could not read directory
+%1</source>
+        <translation type="obsolete">Kunde inte läsa katalogen
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Could not create directory
+%1</source>
+        <translation type="obsolete">Kunde inte skapa katalogen 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Could not remove file or directory
+%1</source>
+        <translation type="obsolete">Kunde inte ta bort filen eller katalogen 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Could not rename
+%1
+to
+%2</source>
+        <translation type="obsolete">Kunde inte byta namn på 
+%1 
+till 
+%2</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Could not open
+%1</source>
+        <translation type="obsolete">Kunde inte öppna 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Could not write
+%1</source>
+        <translation type="obsolete">Kunde inte skriva till 
+%1</translation>
+    </message>
+</context>
+<context>
+    <name>Q3MainWindow</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>Line up</source>
+        <translation type="obsolete">Rada upp</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Customize...</source>
+        <translation type="obsolete">Anpassa...</translation>
+    </message>
+</context>
+<context>
+    <name>Q3NetworkProtocol</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>Operation stopped by the user</source>
+        <translation type="obsolete">Åtgärden stoppades av användaren</translation>
+    </message>
+</context>
+<context>
+    <name>Q3ProgressDialog</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+</context>
+<context>
+    <name>Q3TabDialog</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Apply</source>
+        <translation type="obsolete">Verkställ</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Help</source>
+        <translation type="obsolete">Hjälp</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Defaults</source>
+        <translation type="obsolete">Standardvärden</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+</context>
+<context>
+    <name>Q3TextEdit</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Undo</source>
+        <translation type="obsolete">&amp;Ångra</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Redo</source>
+        <translation type="obsolete">&amp;Gör om</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Cu&amp;t</source>
+        <translation type="obsolete">Klipp u&amp;t</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Copy</source>
+        <translation type="obsolete">&amp;Kopiera</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Paste</source>
+        <translation type="obsolete">Klistra &amp;in</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Clear</source>
+        <translation type="obsolete">Töm</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Select All</source>
+        <translation type="obsolete">Markera alla</translation>
+    </message>
+</context>
+<context>
+    <name>Q3TitleBar</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>System</source>
+        <translation type="obsolete">System</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Restore up</source>
+        <translation type="obsolete">Återställ uppåt</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Minimize</source>
+        <translation type="obsolete">Minimera</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Restore down</source>
+        <translation type="obsolete">Återställ nedåt</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Maximize</source>
+        <translation type="obsolete">Maximera</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Contains commands to manipulate the window</source>
+        <translation type="obsolete">Innehåller kommandon för att manipulera fönstret</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Puts a minimized back to normal</source>
+        <translation type="obsolete">Återställer ett minimerat till normalt</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Moves the window out of the way</source>
+        <translation type="obsolete">Flyttar fönstret ur vägen</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Puts a maximized window back to normal</source>
+        <translation type="obsolete">Återställer ett maximerat fönster tillbaka till normalt</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Makes the window full screen</source>
+        <translation type="obsolete">Gör fönstret till helskärm</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Closes the window</source>
+        <translation type="obsolete">Stänger fönstret</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Displays the name of the window and contains controls to manipulate it</source>
+        <translation type="obsolete">Visar namnet på fönstret och innehåller kontroller för att manipulera det</translation>
+    </message>
+</context>
+<context>
+    <name>Q3ToolBar</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>More...</source>
+        <translation type="obsolete">Mer...</translation>
+    </message>
+</context>
+<context>
+    <name>Q3UrlOperator</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>The protocol `%1&apos; is not supported</source>
+        <translation type="obsolete">Protokollet \&quot;%\&quot; stöds inte</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>The protocol `%1&apos; does not support listing directories</source>
+        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att lista kataloger</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>The protocol `%1&apos; does not support creating new directories</source>
+        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att skapa nya kataloger</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>The protocol `%1&apos; does not support removing files or directories</source>
+        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att ta bort filer eller kataloger</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>The protocol `%1&apos; does not support renaming files or directories</source>
+        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att byta namn på filer eller kataloger</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>The protocol `%1&apos; does not support getting files</source>
+        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att hämta filer</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>The protocol `%1&apos; does not support putting files</source>
+        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att lämna filer</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>The protocol `%1&apos; does not support copying or moving files or directories</source>
+        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att kopiera eller flytta filer eller kataloger</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>(unknown)</source>
+        <translation type="obsolete">(okänt)</translation>
+    </message>
+</context>
+<context>
+    <name>Q3Wizard</name>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Cancel</source>
+        <translation type="obsolete">&amp;Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&lt; &amp;Back</source>
+        <translation type="obsolete">&lt; Till&amp;baka</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Next &gt;</source>
+        <translation type="obsolete">&amp;Nästa &gt;</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Finish</source>
+        <translation type="obsolete">&amp;Färdig</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>&amp;Help</source>
+        <translation type="obsolete">&amp;Hjälp</translation>
+    </message>
+</context>
+<context>
+    <name>QAbstractSocket</name>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qabstractsocket.cpp" line="2195"/>
+        <source>Socket operation timed out</source>
+        <translation type="obsolete">Tidsgräns för uttagsåtgärd överstegs</translation>
+    </message>
+    <message>
+        <location filename="." line="26"/>
+        <source>Host not found</source>
+        <translation type="obsolete">Värden hittades inte</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qsocks5socketengine.cpp" line="4"/>
+        <source>Connection refused</source>
+        <translation type="obsolete">Anslutningen nekades</translation>
+    </message>
+    <message>
+        <location filename="." line="129"/>
+        <source>Connection timed out</source>
+        <translation type="obsolete">Tidsgränsen för anslutning överstegs</translation>
+    </message>
+    <message>
+        <location filename="." line="864"/>
+        <source>Socket is not connected</source>
+        <translation type="obsolete">Uttaget är inte anslutet</translation>
+    </message>
+    <message>
+        <location filename="." line="864"/>
+        <source>Network unreachable</source>
+        <translation type="obsolete">Nätverket är inte nåbart</translation>
+    </message>
+</context>
+<context>
+    <name>QAbstractSpinBox</name>
+    <message>
+        <location filename="." line="6"/>
+        <source>&amp;Step up</source>
+        <translation type="obsolete">&amp;Stega uppåt</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Step &amp;down</source>
+        <translation type="obsolete">Stega &amp;nedåt</translation>
+    </message>
+</context>
+<context>
+    <name>QAccessibleActionInterface</name>
+    <message>
+        <location filename="../../qtbase/src/gui/accessible/qaccessible.cpp" line="2812"/>
+        <source>Press</source>
+        <translation type="obsolete">Tryck</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Toggle</source>
+        <translation type="obsolete">Växla</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Scroll Left</source>
+        <translation type="obsolete">Rulla vänster</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Scroll Right</source>
+        <translation type="obsolete">Rulla höger</translation>
+    </message>
+</context>
+<context>
+    <name>QAndroidPlatformTheme</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/platforms/android/qandroidplatformtheme.cpp" line="501"/>
+        <source>Yes</source>
+        <translation type="obsolete">Ja</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>No</source>
+        <translation type="obsolete">Nej</translation>
+    </message>
+</context>
+<context>
+    <name>QApplication</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qmessagebox.h" line="320"/>
+        <source>Executable &apos;%1&apos; requires Qt %2, found Qt %3.</source>
+        <translation type="obsolete">Binären \&quot;%1\&quot; kräver Qt %2, hittade Qt %3.</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Incompatible Qt Library Error</source>
+        <translation type="obsolete">Inkompatibelt Qt-biblioteksfel</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Activate</source>
+        <translation type="obsolete">Aktivera</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Activates the program&apos;s main window</source>
+        <translation type="obsolete">Aktiverar programmets huvudfönster</translation>
+    </message>
+</context>
+<context>
+    <name>QAxSelect</name>
+    <message>
+        <location filename="." line="2"/>
+        <source>Select ActiveX Control</source>
+        <translation type="obsolete">Välj ActiveX Control</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>&amp;Cancel</source>
+        <translation type="obsolete">&amp;Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>COM &amp;Object:</source>
+        <translation type="obsolete">COM-&amp;objekt:</translation>
+    </message>
+</context>
+<context>
+    <name>QCheckBox</name>
+    <message>
+        <location filename="." line="2"/>
+        <source>Uncheck</source>
+        <translation type="obsolete">Avkryssa</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Check</source>
+        <translation type="obsolete">Kryssa</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Toggle</source>
+        <translation type="obsolete">Växla</translation>
+    </message>
+</context>
+<context>
+    <name>QCocoaMenuItem</name>
+    <message>
+        <location filename="." line="2"/>
+        <source>About Qt</source>
+        <translation type="obsolete">Om Qt</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Select All</source>
+        <translation type="obsolete">Markera alla</translation>
+    </message>
+</context>
+<context>
+    <name>QCocoaTheme</name>
+    <message>
+        <location filename="." line="7"/>
+        <source>Don&apos;t Save</source>
+        <translation type="obsolete">Spara inte</translation>
+    </message>
+</context>
+<context>
+    <name>QColorDialog</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qcolordialog.cpp" line="1474"/>
+        <source>Hu&amp;e:</source>
+        <translation type="obsolete">Nya&amp;ns:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Sat:</source>
+        <translation type="obsolete">&amp;Mättnad:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Val:</source>
+        <translation type="obsolete">&amp;Ljushet:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Red:</source>
+        <translation type="obsolete">&amp;Röd:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Green:</source>
+        <translation type="obsolete">&amp;Grön:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Bl&amp;ue:</source>
+        <translation type="obsolete">Bl&amp;å:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A&amp;lpha channel:</source>
+        <translation type="obsolete">Alfa&amp;kanal:</translation>
+    </message>
+    <message>
+        <location filename="." line="190"/>
+        <source>&amp;Basic colors</source>
+        <translation type="obsolete">&amp;Basfärger</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Custom colors</source>
+        <translation type="obsolete">&amp;Anpassade färger</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Add to Custom Colors</source>
+        <translation type="obsolete">&amp;Lägg till i anpassade färger</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Define Custom Colors &gt;&gt;</source>
+        <translation type="obsolete">&amp;Definiera anpassade färger &gt;&gt;</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Select color</source>
+        <translation type="obsolete">Välj färg</translation>
+    </message>
+</context>
+<context>
+    <name>QComboBox</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/itemviews/qitemeditorfactory.cpp" line="613"/>
+        <source>False</source>
+        <translation type="obsolete">Falskt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>True</source>
+        <translation type="obsolete">Sant</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Open</source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+</context>
+<context>
+    <name>QDB2Driver</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/sqldrivers/db2/qsql_db2.cpp" line="1338"/>
+        <source>Unable to connect</source>
+        <translation type="obsolete">Kunde inte ansluta</translation>
+    </message>
+    <message>
+        <location filename="." line="306"/>
+        <source>Unable to commit transaction</source>
+        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to rollback transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="16"/>
+        <source>Unable to set autocommit</source>
+        <translation type="obsolete">Kunde inte ställa in automatisk verkställning</translation>
+    </message>
+</context>
+<context>
+    <name>QDB2Result</name>
+    <message>
+        <location filename="." line="242"/>
+        <source>Unable to execute statement</source>
+        <translation type="obsolete">Kunde inte köra frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="242"/>
+        <source>Unable to prepare statement</source>
+        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="194"/>
+        <source>Unable to bind variable</source>
+        <translation type="obsolete">Kunde inte binda variabel</translation>
+    </message>
+    <message>
+        <location filename="." line="90"/>
+        <source>Unable to fetch record %1</source>
+        <translation type="obsolete">Kunde inte hämta posten %1</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Unable to fetch next</source>
+        <translation type="obsolete">Kunde inte hämta nästa</translation>
+    </message>
+    <message>
+        <location filename="." line="22"/>
+        <source>Unable to fetch first</source>
+        <translation type="obsolete">Kunde inte hämta första</translation>
+    </message>
+</context>
+<context>
+    <name>QDBusTrayIcon</name>
+    <message>
+        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+</context>
+<context>
+    <name>QDateTimeEdit</name>
+    <message>
+        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
+        <source>AM</source>
+        <translation type="obsolete">AM</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
+        <source>am</source>
+        <translation type="obsolete">am</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
+        <source>PM</source>
+        <translation type="obsolete">PM</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
+        <source>pm</source>
+        <translation type="obsolete">pm</translation>
+    </message>
+</context>
+<context>
+    <name>QDateTimeParser</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/widgets/qdatetimeedit.cpp" line="2311"/>
+        <source>AM</source>
+        <translation type="obsolete">AM</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>am</source>
+        <translation type="obsolete">am</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>PM</source>
+        <translation type="obsolete">PM</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>pm</source>
+        <translation type="obsolete">pm</translation>
+    </message>
+</context>
+<context>
+    <name>QDialog</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qdialog.cpp" line="691"/>
+        <source>What&apos;s This?</source>
+        <translation type="obsolete">Vad är det här?</translation>
+    </message>
+</context>
+<context>
+    <name>QDialogButtonBox</name>
+    <message>
+        <location filename="." line="446"/>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Save</source>
+        <translation type="obsolete">Spara</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>&amp;Save</source>
+        <translation type="obsolete">&amp;Spara</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Open</source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>&amp;Cancel</source>
+        <translation type="obsolete">&amp;Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>&amp;Close</source>
+        <translation type="obsolete">&amp;Stäng</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Apply</source>
+        <translation type="obsolete">Verkställ</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Reset</source>
+        <translation type="obsolete">Återställ</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Help</source>
+        <translation type="obsolete">Hjälp</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Don&apos;t Save</source>
+        <translation type="obsolete">Spara inte</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Discard</source>
+        <translation type="obsolete">Förkasta</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>&amp;Yes</source>
+        <translation type="obsolete">&amp;Ja</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Yes to &amp;All</source>
+        <translation type="obsolete">Ja till &amp;alla</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>&amp;No</source>
+        <translation type="obsolete">&amp;Nej</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>N&amp;o to All</source>
+        <translation type="obsolete">N&amp;ej till alla</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Save All</source>
+        <translation type="obsolete">Spara alla</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Abort</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Retry</source>
+        <translation type="obsolete">Försök igen</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Ignore</source>
+        <translation type="obsolete">Ignorera</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>Restore Defaults</source>
+        <translation type="obsolete">Återställ standardvärden</translation>
+    </message>
+    <message>
+        <location filename="." line="446"/>
+        <source>&amp;OK</source>
+        <translation type="obsolete">&amp;OK</translation>
+    </message>
+</context>
+<context>
+    <name>QDirModel</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/itemviews/qdirmodel.cpp" line="440"/>
+        <source>Name</source>
+        <translation type="obsolete">Namn</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Size</source>
+        <translation type="obsolete">Storlek</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Kind</source>
+        <comment>Match OS X Finder</comment>
+        <translation type="obsolete">Sort</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Type</source>
+        <comment>All other platforms</comment>
+        <translation type="obsolete">Typ</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Date Modified</source>
+        <translation type="obsolete">Ändringsdatum</translation>
+    </message>
+</context>
+<context>
+    <name>QDnsLookupRunnable</name>
+    <message>
+        <location filename="." line="5"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QDockWidget</name>
+    <message>
+        <location filename="." line="8"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+</context>
+<context>
+    <name>QDoubleSpinBox</name>
+    <message>
+        <location filename="." line="1"/>
+        <source>More</source>
+        <translation type="obsolete">Mer</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Less</source>
+        <translation type="obsolete">Mindre</translation>
+    </message>
+</context>
+<context>
+    <name>QErrorMessage</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qerrormessage.cpp" line="175"/>
+        <source>Debug Message:</source>
+        <translation type="obsolete">Felsökningsmeddelande:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Warning:</source>
+        <translation type="obsolete">Varning:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Fatal Error:</source>
+        <translation type="obsolete">Ödesdigert fel:</translation>
+    </message>
+    <message>
+        <location filename="." line="207"/>
+        <source>&amp;Show this message again</source>
+        <translation type="obsolete">&amp;Visa detta meddelande igen</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;OK</source>
+        <translation type="obsolete">&amp;OK</translation>
+    </message>
+</context>
+<context>
+    <name>QFileDialog</name>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <source>All Files (*)</source>
+        <translation type="obsolete">Alla filer (*)</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <source>Back</source>
+        <translation type="obsolete">Tillbaka</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <source>Forward</source>
+        <translation type="obsolete">Framåt</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <source>Parent Directory</source>
+        <translation type="obsolete">Föräldrakatalog</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <source>Create New Folder</source>
+        <translation type="obsolete">Skapa ny mapp</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <source>List View</source>
+        <translation type="obsolete">Listvy</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <source>Detail View</source>
+        <translation type="obsolete">Detaljerad vy</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <source>Files of type:</source>
+        <translation type="obsolete">Filer av typen:</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qfiledialog.cpp" line="593"/>
+        <source>Find Directory</source>
+        <translation type="obsolete">Hitta katalog</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Open</source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Save As</source>
+        <translation type="obsolete">Spara som</translation>
+    </message>
+    <message>
+        <location filename="." line="27"/>
+        <source>Directory:</source>
+        <translation type="obsolete">Katalog:</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>File &amp;name:</source>
+        <translation type="obsolete">Fil&amp;namn:</translation>
+    </message>
+    <message>
+        <location filename="." line="16"/>
+        <source>&amp;Open</source>
+        <translation type="obsolete">&amp;Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>&amp;Save</source>
+        <translation type="obsolete">&amp;Spara</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>&amp;Rename</source>
+        <translation type="obsolete">&amp;Byt namn</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Delete</source>
+        <translation type="obsolete">&amp;Ta bort</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Show &amp;hidden files</source>
+        <translation type="obsolete">Visa &amp;dolda filer</translation>
+    </message>
+    <message>
+        <location filename="." line="180"/>
+        <source>Directories</source>
+        <translation type="obsolete">Kataloger</translation>
+    </message>
+    <message>
+        <location filename="." line="1038"/>
+        <source>%1
+Directory not found.
+Please verify the correct directory name was given.</source>
+        <translation type="obsolete">%1 
+Katalogen hittades inte. 
+Kontrollera att det korrekta katalognamnet angavs.</translation>
+    </message>
+    <message>
+        <location filename="." line="1038"/>
+        <source>%1 already exists.
+Do you want to replace it?</source>
+        <translation type="obsolete">%1 finns redan. 
+Vill du ersätta den?</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>%1
+File not found.
+Please verify the correct file name was given.</source>
+        <translation type="obsolete">%1 
+Filen hittades inte. 
+Kontrollera att det korrekta filnamnet angavs.</translation>
+    </message>
+    <message>
+        <location filename="." line="627"/>
+        <source>New Folder</source>
+        <translation type="obsolete">Ny mapp</translation>
+    </message>
+    <message>
+        <location filename="." line="627"/>
+        <source>&apos;%1&apos; is write protected.
+Do you want to delete it anyway?</source>
+        <translation type="obsolete">\&quot;%1\&quot; är skrivskyddad. 
+Vill du ta bort den ändå?</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Could not delete directory.</source>
+        <translation type="obsolete">Kunde inte ta bort katalogen.</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/widgets/itemviews/qdirmodel.cpp" line="405"/>
+        <source>My Computer</source>
+        <translation type="obsolete">Min dator</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/widgets/itemviews/qfileiconprovider.cpp" line="304"/>
+        <source>Drive</source>
+        <translation type="obsolete">Enhet</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>File</source>
+        <translation type="obsolete">Fil</translation>
+    </message>
+    <message>
+        <location filename="." line="7"/>
+        <source>Unknown</source>
+        <translation type="obsolete">Okänt</translation>
+    </message>
+    <message>
+        <location filename="." line="7"/>
+        <source>
+File not found.
+Please verify the correct file name was given</source>
+        <translation type="obsolete">
+Filen hittades inte. 
+Kontrollera att det korrekta filnamnet angavs</translation>
+    </message>
+    <message>
+        <location filename="." line="7"/>
+        <source>Are sure you want to delete &apos;%1&apos;?</source>
+        <translation type="obsolete">Är du säker på att du vill ta bort \&quot;%1\&quot;?</translation>
+    </message>
+    <message>
+        <location filename="." line="7"/>
+        <source>All Files (*.*)</source>
+        <translation type="obsolete">Alla filer (*.*)</translation>
+    </message>
+</context>
+<context>
+    <name>QFileSystemModel</name>
+    <message>
+        <location filename="." line="100"/>
+        <source>Name</source>
+        <translation type="obsolete">Namn</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Size</source>
+        <translation type="obsolete">Storlek</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Kind</source>
+        <comment>Match OS X Finder</comment>
+        <translation type="obsolete">Sort</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Type</source>
+        <comment>All other platforms</comment>
+        <translation type="obsolete">Typ</translation>
+    </message>
+    <message>
+        <location filename="." line="7"/>
+        <source>Date Modified</source>
+        <translation type="obsolete">Ändringsdatum</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qfilesystemmodel_p.h" line="272"/>
+        <source>My Computer</source>
+        <translation type="obsolete">Min dator</translation>
+    </message>
+</context>
+<context>
+    <name>QFontDialog</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qfontdialog.cpp" line="179"/>
+        <source>Select Font</source>
+        <translation type="obsolete">Välj typsnitt</translation>
+    </message>
+    <message>
+        <location filename="." line="591"/>
+        <source>&amp;Font</source>
+        <translation type="obsolete">&amp;Typsnitt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Font st&amp;yle</source>
+        <translation type="obsolete">T&amp;ypsnittsstil</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Size</source>
+        <translation type="obsolete">&amp;Storlek</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Effects</source>
+        <translation type="obsolete">Effekter</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Stri&amp;keout</source>
+        <translation type="obsolete">Genomstru&amp;ken</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Underline</source>
+        <translation type="obsolete">&amp;Understruken</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Sample</source>
+        <translation type="obsolete">Test</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Wr&amp;iting System</source>
+        <translation type="obsolete">Skr&amp;ivsystem</translation>
+    </message>
+</context>
+<context>
+    <name>QFtp</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qftp.cpp" line="844"/>
+        <source>Not connected</source>
+        <translation type="obsolete">Inte ansluten</translation>
+    </message>
+    <message>
+        <location filename="." line="79"/>
+        <source>Host %1 not found</source>
+        <translation type="obsolete">Värden %1 hittades inte</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Connection refused to host %1</source>
+        <translation type="obsolete">Anslutningen till värden %1 vägrades</translation>
+    </message>
+    <message>
+        <location filename="." line="106"/>
+        <source>Connected to host %1</source>
+        <translation type="obsolete">Ansluten till värden %1</translation>
+    </message>
+    <message>
+        <location filename="." line="180"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+    <message>
+        <location filename="." line="943"/>
+        <source>Connecting to host failed:
+%1</source>
+        <translation type="obsolete">Anslutning till värden misslyckades: 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Login failed:
+%1</source>
+        <translation type="obsolete">Inloggning misslyckades: 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Listing directory failed:
+%1</source>
+        <translation type="obsolete">Listning av katalogen misslyckades: 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Changing directory failed:
+%1</source>
+        <translation type="obsolete">Byte av katalog misslyckades: 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Downloading file failed:
+%1</source>
+        <translation type="obsolete">Nedladdningen av filen misslyckades: 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Uploading file failed:
+%1</source>
+        <translation type="obsolete">Uppladdningen av filen misslyckades: 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Removing file failed:
+%1</source>
+        <translation type="obsolete">Borttagning av filen misslyckades: 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Creating directory failed:
+%1</source>
+        <translation type="obsolete">Skapandet av katalogen misslyckades: 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Removing directory failed:
+%1</source>
+        <translation type="obsolete">Borttagning av katalogen misslyckades: 
+%1</translation>
+    </message>
+    <message>
+        <location filename="." line="28"/>
+        <source>Connection closed</source>
+        <translation type="obsolete">Anslutningen stängd</translation>
+    </message>
+    <message>
+        <location filename="." line="28"/>
+        <source>Connection refused for data connection</source>
+        <translation type="obsolete">Anslutning vägrades för dataanslutning</translation>
+    </message>
+    <message>
+        <location filename="." line="28"/>
+        <source>Host %1 found</source>
+        <translation type="obsolete">Värden %1 hittades</translation>
+    </message>
+    <message>
+        <location filename="." line="28"/>
+        <source>Connection to %1 closed</source>
+        <translation type="obsolete">Anslutningen till %1 stängdes</translation>
+    </message>
+    <message>
+        <location filename="." line="28"/>
+        <source>Host found</source>
+        <translation type="obsolete">Värden hittades</translation>
+    </message>
+    <message>
+        <location filename="." line="28"/>
+        <source>Connected to host</source>
+        <translation type="obsolete">Ansluten till värden</translation>
+    </message>
+</context>
+<context>
+    <name>QGnomeTheme</name>
+    <message>
+        <location filename="../../qtbase/src/platformsupport/themes/genericunix/qgenericunixthemes.cpp" line="822"/>
+        <source>&amp;OK</source>
+        <translation type="obsolete">&amp;OK</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>&amp;Save</source>
+        <translation type="obsolete">&amp;Spara</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>&amp;Cancel</source>
+        <translation type="obsolete">&amp;Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>&amp;Close</source>
+        <translation type="obsolete">&amp;Stäng</translation>
+    </message>
+</context>
+<context>
+    <name>QGuiApplication</name>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qguiapplication.cpp" line="225"/>
+        <source>QT_LAYOUT_DIRECTION</source>
+        <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+        <translation type="obsolete">LTR</translation>
+    </message>
+</context>
+<context>
+    <name>QHostInfo</name>
+    <message>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_p.h" line="146"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QHostInfoAgent</name>
+    <message>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="26"/>
+        <source>Unknown address type</source>
+        <translation type="obsolete">Okänd adresstyp</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="26"/>
+        <source>Host not found</source>
+        <translation type="obsolete">Värden hittades inte</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="4"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QHttp</name>
+    <message>
+        <location filename="." line="2"/>
+        <source>Host %1 not found</source>
+        <translation type="obsolete">Värden %1 hittades inte</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Connection refused</source>
+        <translation type="obsolete">Anslutningen nekades</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Connection closed</source>
+        <translation type="obsolete">Anslutningen stängd</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Request aborted</source>
+        <translation type="obsolete">Begäran avbröts</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>No server set to connect to</source>
+        <translation type="obsolete">Ingen server inställd att ansluta till</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Wrong content length</source>
+        <translation type="obsolete">Fel innehållslängd</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Server closed connection unexpectedly</source>
+        <translation type="obsolete">Servern stängde oväntat anslutningen</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>HTTP request failed</source>
+        <translation type="obsolete">HTTP-begäran misslyckades</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Invalid HTTP response header</source>
+        <translation type="obsolete">Ogiltig HTTP-svarshuvud</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Invalid HTTP chunked body</source>
+        <translation type="obsolete">Ogiltig HTTP chunked body</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Host %1 found</source>
+        <translation type="obsolete">Värden %1 hittades</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Connected to host %1</source>
+        <translation type="obsolete">Ansluten till värden %1</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Connection to %1 closed</source>
+        <translation type="obsolete">Anslutningen till %1 stängdes</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Host found</source>
+        <translation type="obsolete">Värden hittades</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <source>Connected to host</source>
+        <translation type="obsolete">Ansluten till värd</translation>
+    </message>
+</context>
+<context>
+    <name>QIBaseDriver</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/sqldrivers/ibase/qsql_ibase.cpp" line="1545"/>
+        <source>Error opening database</source>
+        <translation type="obsolete">Fel vid öppning av databas</translation>
+    </message>
+    <message>
+        <location filename="." line="57"/>
+        <source>Could not start transaction</source>
+        <translation type="obsolete">Kunde inte starta transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="14"/>
+        <source>Unable to commit transaction</source>
+        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="14"/>
+        <source>Unable to rollback transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+</context>
+<context>
+    <name>QIBaseResult</name>
+    <message>
+        <location filename="." line="14"/>
+        <source>Unable to create BLOB</source>
+        <translation type="obsolete">Kunde inte skapa BLOB</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Unable to write BLOB</source>
+        <translation type="obsolete">Kunde inte skriva BLOB</translation>
+    </message>
+    <message>
+        <location filename="." line="14"/>
+        <source>Unable to open BLOB</source>
+        <translation type="obsolete">Kunde inte öppna BLOB</translation>
+    </message>
+    <message>
+        <location filename="." line="16"/>
+        <source>Unable to read BLOB</source>
+        <translation type="obsolete">Kunde inte läsa BLOB</translation>
+    </message>
+    <message>
+        <location filename="." line="188"/>
+        <source>Could not find array</source>
+        <translation type="obsolete">Kunde inte hitta kedja</translation>
+    </message>
+    <message>
+        <location filename="." line="188"/>
+        <source>Could not get array data</source>
+        <translation type="obsolete">Kunde inte få kedjedata</translation>
+    </message>
+    <message>
+        <location filename="." line="211"/>
+        <source>Could not get query info</source>
+        <translation type="obsolete">Kunde inte gå frågesatsinformation</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Could not start transaction</source>
+        <translation type="obsolete">Kunde inte starta transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="19"/>
+        <source>Unable to commit transaction</source>
+        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="37"/>
+        <source>Could not allocate statement</source>
+        <translation type="obsolete">Kunde inte allokera frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="5"/>
+        <source>Could not prepare statement</source>
+        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="11"/>
+        <source>Could not describe input statement</source>
+        <translation type="obsolete">Kunde inte beskriva inmatningsfrågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="14"/>
+        <source>Could not describe statement</source>
+        <translation type="obsolete">Kunde inte beskriva frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="120"/>
+        <source>Unable to close statement</source>
+        <translation type="obsolete">Kunde inte stänga frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="8"/>
+        <source>Unable to execute query</source>
+        <translation type="obsolete">Kunde inte köra frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="47"/>
+        <source>Could not fetch next item</source>
+        <translation type="obsolete">Kunde inte hämta nästa post</translation>
+    </message>
+    <message>
+        <location filename="." line="205"/>
+        <source>Could not get statement info</source>
+        <translation type="obsolete">Kunde inte få frågesatsinformation</translation>
+    </message>
+</context>
+<context>
+    <name>QIODevice</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/io/qiodevice.cpp" line="2106"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/kernel/qsystemerror.cpp" line="121"/>
+        <source>Permission denied</source>
+        <translation type="obsolete">Åtkomst nekad</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Too many open files</source>
+        <translation type="obsolete">För många öppna filer</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>No such file or directory</source>
+        <translation type="obsolete">Ingen sådan fil eller katalog</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>No space left on device</source>
+        <translation type="obsolete">Inget ledigt utrymme på enheten</translation>
+    </message>
+</context>
+<context>
+    <name>QImageReader</name>
+    <message>
+        <location filename="." line="195"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QImageWriter</name>
+    <message>
+        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QInputContext</name>
+    <message>
+        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
+        <source>XIM</source>
+        <translation type="obsolete">XIM</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
+        <source>XIM input method</source>
+        <translation type="obsolete">XIM-inmatningsmetod</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
+        <source>Windows input method</source>
+        <translation type="obsolete">Windows-inmatningsmetod</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
+        <source>Mac OS X input method</source>
+        <translation type="obsolete">Mac OS X-inmatningsmetod</translation>
+    </message>
+</context>
+<context>
+    <name>QJsonParseError</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/serialization/qjsonparser.cpp" line="66"/>
+        <source>no error occurred</source>
+        <translation type="obsolete">inga fel inträffade</translation>
+    </message>
+</context>
+<context>
+    <name>QLibrary</name>
+    <message>
+        <location filename="." line="312"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+    <message>
+        <location filename="." line="50"/>
+        <source>QLibrary::load_sys: Cannot load %1 (%2)</source>
+        <translation type="obsolete">QLibrary::load_sys: Kan inte läsa in %1 (%2)</translation>
+    </message>
+    <message>
+        <location filename="." line="50"/>
+        <source>QLibrary::unload_sys: Cannot unload %1 (%2)</source>
+        <translation type="obsolete">QLibrary::unload_sys: Kan inte läsa ur %1 (%2)</translation>
+    </message>
+    <message>
+        <location filename="." line="50"/>
+        <source>QLibrary::resolve_sys: Symbol &quot;%1&quot; undefined in %2 (%3)</source>
+        <translation type="obsolete">QLibrary::resolve_sys: Symbolen &quot;%1&quot; är inte definierad i %2 (%3)</translation>
+    </message>
+</context>
+<context>
+    <name>QLineEdit</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/widgets/qlineedit.cpp" line="2175"/>
+        <source>&amp;Undo</source>
+        <translation type="obsolete">&amp;Ångra</translation>
+    </message>
+    <message>
+        <location filename="." line="5"/>
+        <source>&amp;Redo</source>
+        <translation type="obsolete">&amp;Gör om</translation>
+    </message>
+    <message>
+        <location filename="." line="10"/>
+        <source>Cu&amp;t</source>
+        <translation type="obsolete">Klipp &amp;ut</translation>
+    </message>
+    <message>
+        <location filename="." line="7"/>
+        <source>&amp;Copy</source>
+        <translation type="obsolete">&amp;Kopiera</translation>
+    </message>
+    <message>
+        <location filename="." line="7"/>
+        <source>&amp;Paste</source>
+        <translation type="obsolete">Klistra &amp;in</translation>
+    </message>
+    <message>
+        <location filename="." line="8"/>
+        <source>Delete</source>
+        <translation type="obsolete">Ta bort</translation>
+    </message>
+    <message>
+        <location filename="." line="9"/>
+        <source>Select All</source>
+        <translation type="obsolete">Markera alla</translation>
+    </message>
+</context>
+<context>
+    <name>QMYSQLDriver</name>
+    <message>
+        <location filename="." line="10"/>
+        <source>Unable to connect</source>
+        <translation type="obsolete">Kunde inte ansluta</translation>
+    </message>
+    <message>
+        <location filename="." line="168"/>
+        <source>Unable to begin transaction</source>
+        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to commit transaction</source>
+        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to rollback transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to open database &apos;</source>
+        <translation type="obsolete">Kunde inte öppna databasen \&quot;</translation>
+    </message>
+</context>
+<context>
+    <name>QMYSQLResult</name>
+    <message>
+        <location filename="." line="32"/>
+        <source>Unable to fetch data</source>
+        <translation type="obsolete">Kunde inte hämta data</translation>
+    </message>
+    <message>
+        <location filename="." line="179"/>
+        <source>Unable to execute query</source>
+        <translation type="obsolete">Kunde inte köra frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Unable to store result</source>
+        <translation type="obsolete">Kunde inte lagra resultat</translation>
+    </message>
+    <message>
+        <location filename="." line="8"/>
+        <source>Unable to prepare statement</source>
+        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="38"/>
+        <source>Unable to reset statement</source>
+        <translation type="obsolete">Kunde inte återställa frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="91"/>
+        <source>Unable to bind value</source>
+        <translation type="obsolete">Kunde inte binda värde</translation>
+    </message>
+    <message>
+        <location filename="." line="11"/>
+        <source>Unable to execute statement</source>
+        <translation type="obsolete">Kunde inte köra frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="21"/>
+        <source>Unable to bind outvalues</source>
+        <translation type="obsolete">Kunde inte binda utvärden</translation>
+    </message>
+    <message>
+        <location filename="." line="21"/>
+        <source>Unable to store statement results</source>
+        <translation type="obsolete">Kunde inte lagra resultat från frågesats</translation>
+    </message>
+</context>
+<context>
+    <name>QMdiSubWindow</name>
+    <message>
+        <location filename="." line="1"/>
+        <source>%1 - [%2]</source>
+        <translation type="obsolete">%1 - [%2]</translation>
+    </message>
+    <message>
+        <location filename="." line="51"/>
+        <source>Minimize</source>
+        <translation type="obsolete">Minimera</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Maximize</source>
+        <translation type="obsolete">Maximera</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Restore Down</source>
+        <translation type="obsolete">Återställ nedåt</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Help</source>
+        <translation type="obsolete">Hjälp</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Menu</source>
+        <translation type="obsolete">Meny</translation>
+    </message>
+    <message>
+        <location filename="." line="702"/>
+        <source>&amp;Restore</source>
+        <translation type="obsolete">Åte&amp;rställ</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>&amp;Move</source>
+        <translation type="obsolete">&amp;Flytta</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>&amp;Size</source>
+        <translation type="obsolete">&amp;Storlek</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Mi&amp;nimize</source>
+        <translation type="obsolete">Mi&amp;nimera</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Ma&amp;ximize</source>
+        <translation type="obsolete">Ma&amp;ximera</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Stay on &amp;Top</source>
+        <translation type="obsolete">Stanna kvar övers&amp;t</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>&amp;Close</source>
+        <translation type="obsolete">&amp;Stäng</translation>
+    </message>
+</context>
+<context>
+    <name>QMenu</name>
+    <message>
+        <location filename="." line="3"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Open</source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="3"/>
+        <source>Execute</source>
+        <translation type="obsolete">Kör</translation>
+    </message>
+</context>
+<context>
+    <name>QMenuBar</name>
+    <message>
+        <location filename="." line="3"/>
+        <source>About Qt</source>
+        <translation type="obsolete">Om Qt</translation>
+    </message>
+</context>
+<context>
+    <name>QMessageBox</name>
+    <message>
+        <location filename="." line="3"/>
+        <source>Show Details...</source>
+        <translation type="obsolete">Visa detaljer...</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Hide Details...</source>
+        <translation type="obsolete">Dölj detaljer,,,</translation>
+    </message>
+    <message>
+        <location filename="." line="27"/>
+        <source>About Qt</source>
+        <translation type="obsolete">Om Qt</translation>
+    </message>
+    <message>
+        <location filename="." line="27"/>
+        <source>Help</source>
+        <translation type="obsolete">Hjälp</translation>
+    </message>
+    <message>
+        <location filename="." line="27"/>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <location filename="." line="27"/>
+        <source>&lt;p&gt;This program uses Qt version %1.&lt;/p&gt;</source>
+        <translation type="obsolete">&lt;p&gt;Detta program använder Qt version %1.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="." line="27"/>
+        <source>&lt;h3&gt;About Qt&lt;/h3&gt;%1&lt;p&gt;Qt is a C++ toolkit for cross-platform application development.&lt;/p&gt;&lt;p&gt;Qt provides single-source portability across MS&amp;nbsp;Windows, Mac&amp;nbsp;OS&amp;nbsp;X, Linux, and all major commercial Unix variants. Qt is also available for embedded devices as Qtopia Core.&lt;/p&gt;&lt;p&gt;Qt is a Trolltech product. See &lt;a href=&quot;http://qt.nokia.com/&quot;&gt;qt.nokia.com&lt;/a&gt; for more information.&lt;/p&gt;</source>
+        <translation type="obsolete">&lt;h3&gt;Om Qt&lt;/h3&gt;%1&lt;p&gt;Qt är ett C++-verktygssamling för utveckling av krossplattformsprogram.&lt;/p&gt;&lt;p&gt;Qt tillhandahåller portabilitet för samma källkod mellan MS&amp;nbsp;Windows, Mac&amp;nbsp;OS&amp;nbsp;X, Linux, och alla andra stora kommersiella Unix-varianter. Qt finns också tillgängligt för inbäddade enheter som Qtopia Core.&lt;/p&gt;&lt;p&gt;Qt är en produkt från Trolltech. Se &lt;a href=&quot;http://qt.nokia.com/&quot;&gt;qt.nokia.com&lt;/a&gt; för mer information.&lt;/p&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QMultiInputContext</name>
+    <message>
+        <location filename="." line="27"/>
+        <source>Select IM</source>
+        <translation type="obsolete">Välj inmatningsmetod</translation>
+    </message>
+</context>
+<context>
+    <name>QMultiInputContextPlugin</name>
+    <message>
+        <location filename="." line="27"/>
+        <source>Multiple input method switcher</source>
+        <translation type="obsolete">Växlare för flera inmatningsmetoder</translation>
+    </message>
+    <message>
+        <location filename="." line="27"/>
+        <source>Multiple input method switcher that uses the context menu of the text widgets</source>
+        <translation type="obsolete">Växlare för flera inmatningsmetoder som använder sammanhangsmenyn för textwidgar</translation>
+    </message>
+</context>
+<context>
+    <name>QNativeSocketEngine</name>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="1519"/>
+        <source>Unable to initialize non-blocking socket</source>
+        <translation type="obsolete">Kunde inte initiera icke-blockerande uttag</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Unable to initialize broadcast socket</source>
+        <translation type="obsolete">Kunde inte initiera uttag för broadcast</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="4"/>
+        <source>Attempt to use IPv6 socket on a platform with no IPv6 support</source>
+        <translation type="obsolete">Försök att använda IPv6-uttag på en plattform som saknar IPv6-stöd</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>The remote host closed the connection</source>
+        <translation type="obsolete">Fjärrvärden stängde anslutningen</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Network operation timed out</source>
+        <translation type="obsolete">Tidsgräns för nätverksåtgärd överstegs</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Out of resources</source>
+        <translation type="obsolete">Slut på resurser</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Unsupported socket operation</source>
+        <translation type="obsolete">Uttagsåtgärden stöds inte</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Protocol type not supported</source>
+        <translation type="obsolete">Protokolltypen stöds inte</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Invalid socket descriptor</source>
+        <translation type="obsolete">Ogiltig uttagsbeskrivare</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Host unreachable</source>
+        <translation type="obsolete">Värden är inte nåbar</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Network unreachable</source>
+        <translation type="obsolete">Nätverket är inte nåbart</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Permission denied</source>
+        <translation type="obsolete">Åtkomst nekad</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Connection timed out</source>
+        <translation type="obsolete">Tidsgränsen för anslutning överstegs</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Connection refused</source>
+        <translation type="obsolete">Anslutningen vägrades</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>The bound address is already in use</source>
+        <translation type="obsolete">Bindningsadress används redan</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>The address is not available</source>
+        <translation type="obsolete">Adressen är inte tillgänglig</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>The address is protected</source>
+        <translation type="obsolete">Adressen är skyddad</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Datagram was too large to send</source>
+        <translation type="obsolete">Datagram för för stor för att skicka</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Unable to send a message</source>
+        <translation type="obsolete">Kunde inte skicka ett meddelande</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Unable to receive a message</source>
+        <translation type="obsolete">Kunde inte ta emot ett meddelande</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Unable to write</source>
+        <translation type="obsolete">Kunde inte skriva</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Network error</source>
+        <translation type="obsolete">Nätverksfel</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Another socket is already listening on the same port</source>
+        <translation type="obsolete">Ett annat uttag lyssnar redan på samma port</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Operation on non-socket</source>
+        <translation type="obsolete">Åtgärd på icke-uttag</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QOCIDriver</name>
+    <message>
+        <location filename="." line="146"/>
+        <source>Unable to logon</source>
+        <translation type="obsolete">Kunde inte logga in</translation>
+    </message>
+    <message>
+        <location filename="." line="73"/>
+        <source>Unable to begin transaction</source>
+        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Unable to commit transaction</source>
+        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="20"/>
+        <source>Unable to rollback transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+</context>
+<context>
+    <name>QOCIResult</name>
+    <message>
+        <location filename="." line="15"/>
+        <source>Unable to bind column for batch execute</source>
+        <translation type="obsolete">Kunde inte binda kolumn för satskörning</translation>
+    </message>
+    <message>
+        <location filename="." line="15"/>
+        <source>Unable to execute batch statement</source>
+        <translation type="obsolete">Kunde inte köra satsfråga</translation>
+    </message>
+    <message>
+        <location filename="." line="329"/>
+        <source>Unable to goto next</source>
+        <translation type="obsolete">Kunde inte gå till nästa</translation>
+    </message>
+    <message>
+        <location filename="." line="61"/>
+        <source>Unable to alloc statement</source>
+        <translation type="obsolete">Kunde inte allokera frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="15"/>
+        <source>Unable to prepare statement</source>
+        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="15"/>
+        <source>Unable to bind value</source>
+        <translation type="obsolete">Kunde inte binda värde</translation>
+    </message>
+    <message>
+        <location filename="." line="19"/>
+        <source>Unable to execute statement</source>
+        <translation type="obsolete">Kunde inte köra frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="19"/>
+        <source>Unable to execute select statement</source>
+        <translation type="obsolete">Kunde inte köra \&quot;select\&quot;-frågesats</translation>
+    </message>
+</context>
+<context>
+    <name>QODBCDriver</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/sqldrivers/odbc/qsql_odbc.cpp" line="1984"/>
+        <source>Unable to connect</source>
+        <translation type="obsolete">Kunde inte ansluta</translation>
+    </message>
+    <message>
+        <location filename="." line="282"/>
+        <source>Unable to disable autocommit</source>
+        <translation type="obsolete">Kunde inte inaktivera automatisk verkställning</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to commit transaction</source>
+        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to rollback transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="16"/>
+        <source>Unable to enable autocommit</source>
+        <translation type="obsolete">Kunde inte aktivera automatisk verkställning</translation>
+    </message>
+    <message>
+        <location filename="." line="16"/>
+        <source>Unable to connect - Driver doesn&apos;t support all needed functionality</source>
+        <translation type="obsolete">Kunde inte ansluta - Drivrutinen har inte stöd för all nödvändig funktionalitet</translation>
+    </message>
+</context>
+<context>
+    <name>QODBCResult</name>
+    <message>
+        <location filename="." line="348"/>
+        <source>QODBCResult::reset: Unable to set &apos;SQL_CURSOR_STATIC&apos; as statement attribute. Please check your ODBC driver configuration</source>
+        <translation type="obsolete">QODBCResult::reset: Kunde inte ställa in \&quot;SQL_CURSOR_STATIC\&quot; som frågesatsattribut. Kontrollera konfigurationen för din ODBC-drivrutin</translation>
+    </message>
+    <message>
+        <location filename="." line="631"/>
+        <source>Unable to execute statement</source>
+        <translation type="obsolete">Kunde inte köra frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="23"/>
+        <source>Unable to fetch next</source>
+        <translation type="obsolete">Kunde inte hämta nästa</translation>
+    </message>
+    <message>
+        <location filename="." line="23"/>
+        <source>Unable to fetch first</source>
+        <translation type="obsolete">Kunde inte hämta första</translation>
+    </message>
+    <message>
+        <location filename="." line="23"/>
+        <source>Unable to prepare statement</source>
+        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="274"/>
+        <source>Unable to bind variable</source>
+        <translation type="obsolete">Kunde inte binda variabel</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="." line="274"/>
+        <source>Home</source>
+        <translation type="obsolete">Home</translation>
+    </message>
+</context>
+<context>
+    <name>QPPDOptionsModel</name>
+    <message>
+        <location filename="." line="274"/>
+        <source>Name</source>
+        <translation type="obsolete">Namn</translation>
+    </message>
+    <message>
+        <location filename="." line="274"/>
+        <source>Value</source>
+        <translation type="obsolete">Värde</translation>
+    </message>
+</context>
+<context>
+    <name>QPSQLDriver</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/sqldrivers/psql/qsql_psql.cpp" line="1249"/>
+        <source>Unable to connect</source>
+        <translation type="obsolete">Kunde inte ansluta</translation>
+    </message>
+    <message>
+        <location filename="." line="52"/>
+        <source>Could not begin transaction</source>
+        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="29"/>
+        <source>Could not commit transaction</source>
+        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Could not rollback transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+</context>
+<context>
+    <name>QPSQLResult</name>
+    <message>
+        <location filename="." line="33"/>
+        <source>Unable to create query</source>
+        <translation type="obsolete">Kunde inte skapa fråga</translation>
+    </message>
+    <message>
+        <location filename="." line="33"/>
+        <source>Unable to prepare statement</source>
+        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+    </message>
+</context>
+<context>
+    <name>QPageSetupWidget</name>
+    <message>
+        <location filename="." line="33"/>
+        <source>Page size:</source>
+        <translation type="obsolete">Sidstorlek:</translation>
+    </message>
+    <message>
+        <location filename="." line="33"/>
+        <source>Paper source:</source>
+        <translation type="obsolete">Papperskälla:</translation>
+    </message>
+    <message>
+        <location filename="." line="33"/>
+        <source>Portrait</source>
+        <translation type="obsolete">Stående</translation>
+    </message>
+    <message>
+        <location filename="." line="33"/>
+        <source>Landscape</source>
+        <translation type="obsolete">Liggande</translation>
+    </message>
+</context>
+<context>
+    <name>QPlatformTheme</name>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qplatformtheme.cpp" line="706"/>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Save</source>
+        <translation type="obsolete">Spara</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Save All</source>
+        <translation type="obsolete">Spara alla</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Open</source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>&amp;Yes</source>
+        <translation type="obsolete">&amp;Ja</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Yes to &amp;All</source>
+        <translation type="obsolete">Ja till &amp;alla</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>&amp;No</source>
+        <translation type="obsolete">&amp;Nej</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>N&amp;o to All</source>
+        <translation type="obsolete">N&amp;ej till alla</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Abort</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Retry</source>
+        <translation type="obsolete">Försök igen</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Ignore</source>
+        <translation type="obsolete">Ignorera</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Discard</source>
+        <translation type="obsolete">Förkasta</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Help</source>
+        <translation type="obsolete">Hjälp</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Apply</source>
+        <translation type="obsolete">Verkställ</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Reset</source>
+        <translation type="obsolete">Återställ</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Restore Defaults</source>
+        <translation type="obsolete">Återställ standardvärden</translation>
+    </message>
+</context>
+<context>
+    <name>QPluginLoader</name>
+    <message>
+        <location filename="." line="123"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QPrintDialog</name>
+    <message>
+        <location filename="../../qtbase/src/printsupport/dialogs/qprintdialog_win.cpp" line="264"/>
+        <source>Print</source>
+        <translation type="obsolete">Skriv ut</translation>
+    </message>
+    <message>
+        <location filename="." line="47"/>
+        <source>Print To File ...</source>
+        <translation type="obsolete">Skriv ut till fil ...</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>File %1 is not writable.
+Please choose a different file name.</source>
+        <translation type="obsolete">Filen %1 är inte skrivbar. 
+Välj ett annat filnamn.</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>%1 already exists.
+Do you want to overwrite it?</source>
+        <translation type="obsolete">%1 finns redan. 
+Vill du skriva över den?</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>locally connected</source>
+        <translation type="obsolete">lokalt ansluten</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Aliases: %1</source>
+        <translation type="obsolete">Alias: %1</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>unknown</source>
+        <translation type="obsolete">okänt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Portrait</source>
+        <translation type="obsolete">Stående</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Landscape</source>
+        <translation type="obsolete">Liggande</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A0 (841 x 1189 mm)</source>
+        <translation type="obsolete">A0 (841 x 1189 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A1 (594 x 841 mm)</source>
+        <translation type="obsolete">A1 (594 x 841 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A2 (420 x 594 mm)</source>
+        <translation type="obsolete">A2 (420 x 594 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A3 (297 x 420 mm)</source>
+        <translation type="obsolete">A3 (297 x 420 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A4 (210 x 297 mm, 8.26 x 11.7 inches)</source>
+        <translation type="obsolete">A4 (210 x 297 mm, 8.26 x 11.7 tum)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A5 (148 x 210 mm)</source>
+        <translation type="obsolete">A5 (148 x 210 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A6 (105 x 148 mm)</source>
+        <translation type="obsolete">A6 (105 x 148 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A7 (74 x 105 mm)</source>
+        <translation type="obsolete">A7 (74 x 105 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A8 (52 x 74 mm)</source>
+        <translation type="obsolete">A8 (52 x 74 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>A9 (37 x 52 mm)</source>
+        <translation type="obsolete">A9 (37 x 52 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B0 (1000 x 1414 mm)</source>
+        <translation type="obsolete">B0 (1000 x 1414 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B1 (707 x 1000 mm)</source>
+        <translation type="obsolete">B1 (707 x 1000 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B2 (500 x 707 mm)</source>
+        <translation type="obsolete">B2 (500 x 707 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B3 (353 x 500 mm)</source>
+        <translation type="obsolete">B3 (353 x 500 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B4 (250 x 353 mm)</source>
+        <translation type="obsolete">B4 (250 x 353 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B5 (176 x 250 mm, 6.93 x 9.84 inches)</source>
+        <translation type="obsolete">B5 (176 x 250 mm, 6.93 x 9.84 tum)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B6 (125 x 176 mm)</source>
+        <translation type="obsolete">B6 (125 x 176 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B7 (88 x 125 mm)</source>
+        <translation type="obsolete">B7 (88 x 125 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B8 (62 x 88 mm)</source>
+        <translation type="obsolete">B8 (62 x 88 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B9 (44 x 62 mm)</source>
+        <translation type="obsolete">B9 (44 x 62 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>B10 (31 x 44 mm)</source>
+        <translation type="obsolete">B10 (31 x 44 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>C5E (163 x 229 mm)</source>
+        <translation type="obsolete">C5E (163 x 229 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>DLE (110 x 220 mm)</source>
+        <translation type="obsolete">DLE (110 x 220 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Executive (7.5 x 10 inches, 191 x 254 mm)</source>
+        <translation type="obsolete">Executive (7.5 x 10 tum, 191 x 254 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Folio (210 x 330 mm)</source>
+        <translation type="obsolete">Folio (210 x 330 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Ledger (432 x 279 mm)</source>
+        <translation type="obsolete">Ledger (432 x 279 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Legal (8.5 x 14 inches, 216 x 356 mm)</source>
+        <translation type="obsolete">Legal (8.5 x 14 tum, 216 x 356 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Letter (8.5 x 11 inches, 216 x 279 mm)</source>
+        <translation type="obsolete">Letter (8.5 x 11 tum, 216 x 279 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Tabloid (279 x 432 mm)</source>
+        <translation type="obsolete">Tabloid (279 x 432 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>US Common #10 Envelope (105 x 241 mm)</source>
+        <translation type="obsolete">US Common #10 Envelope (105 x 241 mm)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Page size:</source>
+        <translation type="obsolete">Sidstorlek:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Orientation:</source>
+        <translation type="obsolete">Orientering:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Paper source:</source>
+        <translation type="obsolete">Papperskälla:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>File</source>
+        <translation type="obsolete">Fil</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Printer</source>
+        <translation type="obsolete">Skrivare</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Print dialog</source>
+        <translation type="obsolete">Utskriftsdialog</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Paper format</source>
+        <translation type="obsolete">Pappersformat</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Size:</source>
+        <translation type="obsolete">Storlek:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Properties</source>
+        <translation type="obsolete">Egenskaper</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Printer info:</source>
+        <translation type="obsolete">Skrivarinformation:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Browse</source>
+        <translation type="obsolete">Bläddra</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Print to file</source>
+        <translation type="obsolete">Skriv ut till fil</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Print range</source>
+        <translation type="obsolete">Skriv ut intervall</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Print all</source>
+        <translation type="obsolete">Skriv ut alla</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Pages from</source>
+        <translation type="obsolete">Sidor från</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>to</source>
+        <translation type="obsolete">till</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Selection</source>
+        <translation type="obsolete">Val</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Copies</source>
+        <translation type="obsolete">Kopior</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Number of copies:</source>
+        <translation type="obsolete">Antal kopior:</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Collate</source>
+        <translation type="obsolete">Sortera</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Print last page first</source>
+        <translation type="obsolete">Skriv ut sista sidan först</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Other</source>
+        <translation type="obsolete">Annat</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Print in color if available</source>
+        <translation type="obsolete">Skriv ut i färg om möjligt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Double side printing</source>
+        <translation type="obsolete">Dubbelsidig utskrift</translation>
+    </message>
+</context>
+<context>
+    <name>QPrintPreviewDialog</name>
+    <message>
+        <location filename="." line="6"/>
+        <source>Portrait</source>
+        <translation type="obsolete">Stående</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Landscape</source>
+        <translation type="obsolete">Liggande</translation>
+    </message>
+    <message>
+        <location filename="." line="147"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+</context>
+<context>
+    <name>QPrintPropertiesDialog</name>
+    <message>
+        <location filename="." line="1"/>
+        <source>PPD Properties</source>
+        <translation type="obsolete">PPD-egenskaper</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Save</source>
+        <translation type="obsolete">Spara</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+</context>
+<context>
+    <name>QPrintSettingsOutput</name>
+    <message>
+        <location filename="." line="1"/>
+        <source>Copies</source>
+        <translation type="obsolete">Kopior</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Print range</source>
+        <translation type="obsolete">Skriv ut intervall</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Print all</source>
+        <translation type="obsolete">Skriv ut alla</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Pages from</source>
+        <translation type="obsolete">Sidor från</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>to</source>
+        <translation type="obsolete">till</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Selection</source>
+        <translation type="obsolete">Val</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Collate</source>
+        <translation type="obsolete">Sortera</translation>
+    </message>
+</context>
+<context>
+    <name>QPrintWidget</name>
+    <message>
+        <location filename="." line="1"/>
+        <source>Printer</source>
+        <translation type="obsolete">Skrivare</translation>
+    </message>
+</context>
+<context>
+    <name>QProgressDialog</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qprogressdialog.cpp" line="182"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+</context>
+<context>
+    <name>QPushButton</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qprogressdialog.cpp" line="182"/>
+        <source>Open</source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+</context>
+<context>
+    <name>QRadioButton</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qprogressdialog.cpp" line="182"/>
+        <source>Check</source>
+        <translation type="obsolete">Kryssa</translation>
+    </message>
+</context>
+<context>
+    <name>QRegExp</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/tools/qregexp.cpp" line="65"/>
+        <source>no error occurred</source>
+        <translation type="obsolete">inga fel inträffade</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>disabled feature used</source>
+        <translation type="obsolete">inaktiverad funktion används</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>bad char class syntax</source>
+        <translation type="obsolete">felaktig teckenklasssyntax</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>bad lookahead syntax</source>
+        <translation type="obsolete">felaktig seframåtsyntax</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>bad repetition syntax</source>
+        <translation type="obsolete">felaktig upprepningssyntax</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>invalid octal value</source>
+        <translation type="obsolete">ogiltigt oktalt värde</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>missing left delim</source>
+        <translation type="obsolete">saknar vänster avgränsare</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>unexpected end</source>
+        <translation type="obsolete">oväntat slut</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>met internal limit</source>
+        <translation type="obsolete">nådde intern gräns</translation>
+    </message>
+</context>
+<context>
+    <name>QSQLite2Driver</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/sqldrivers/sqlite2/qsql_sqlite2.cpp" line="435"/>
+        <source>Error opening database</source>
+        <translation type="obsolete">Fel vid öppning av databas</translation>
+    </message>
+    <message>
+        <location filename="." line="43"/>
+        <source>Unable to begin transaction</source>
+        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to commit transaction</source>
+        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to rollback transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Error to open database</source>
+        <translation type="obsolete">Fel vid öppning av databas</translation>
+    </message>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to rollback Transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+</context>
+<context>
+    <name>QSQLite2Result</name>
+    <message>
+        <location filename="." line="18"/>
+        <source>Unable to fetch results</source>
+        <translation type="obsolete">Kunde inte hämta resultat</translation>
+    </message>
+    <message>
+        <location filename="." line="145"/>
+        <source>Unable to execute statement</source>
+        <translation type="obsolete">Kunde inte köra frågesats</translation>
+    </message>
+</context>
+<context>
+    <name>QSQLiteDriver</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/sqldrivers/sqlite/qsql_sqlite.cpp" line="790"/>
+        <source>Error opening database</source>
+        <translation type="obsolete">Fel vid öppning av databas</translation>
+    </message>
+    <message>
+        <location filename="." line="28"/>
+        <source>Error closing database</source>
+        <translation type="obsolete">Fel vid stängning av databas</translation>
+    </message>
+    <message>
+        <location filename="." line="19"/>
+        <source>Unable to begin transaction</source>
+        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="15"/>
+        <source>Unable to commit transaction</source>
+        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="15"/>
+        <source>Unable to rollback transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+    <message>
+        <location filename="." line="15"/>
+        <source>Unable to roll back transaction</source>
+        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+</context>
+<context>
+    <name>QSQLiteResult</name>
+    <message>
+        <location filename="." line="8"/>
+        <source>Unable to fetch row</source>
+        <translation type="obsolete">Kunde inte hämta rad</translation>
+    </message>
+    <message>
+        <location filename="." line="127"/>
+        <source>Unable to execute statement</source>
+        <translation type="obsolete">Kunde inte köra frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="44"/>
+        <source>Unable to reset statement</source>
+        <translation type="obsolete">Kunde inte återställa frågesats</translation>
+    </message>
+    <message>
+        <location filename="." line="97"/>
+        <source>Unable to bind parameters</source>
+        <translation type="obsolete">Kunde inte binda parametrar</translation>
+    </message>
+    <message>
+        <location filename="." line="7"/>
+        <source>Parameter count mismatch</source>
+        <translation type="obsolete">Parameterantal stämmer inte</translation>
+    </message>
+</context>
+<context>
+    <name>QScrollBar</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/widgets/qscrollbar.cpp" line="403"/>
+        <source>Scroll here</source>
+        <translation type="obsolete">Rulla här</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Left edge</source>
+        <translation type="obsolete">Vänsterkant</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Top</source>
+        <translation type="obsolete">Överkant</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Right edge</source>
+        <translation type="obsolete">Högerkant</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Bottom</source>
+        <translation type="obsolete">Nederkant</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Page left</source>
+        <translation type="obsolete">Sida vänster</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Page up</source>
+        <translation type="obsolete">Sida uppåt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Page right</source>
+        <translation type="obsolete">Sida höger</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Page down</source>
+        <translation type="obsolete">Sida nedåt</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Scroll left</source>
+        <translation type="obsolete">Rulla vänster</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Scroll up</source>
+        <translation type="obsolete">Rulla uppåt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Scroll right</source>
+        <translation type="obsolete">Rulla höger</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Scroll down</source>
+        <translation type="obsolete">Rulla nedåt</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Line up</source>
+        <translation type="obsolete">Rada upp</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Position</source>
+        <translation type="obsolete">Position</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Line down</source>
+        <translation type="obsolete">Rad nedåt</translation>
+    </message>
+</context>
+<context>
+    <name>QSctpSocket</name>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qsctpsocket.cpp" line="191"/>
+        <source>The remote host closed the connection</source>
+        <translation type="obsolete">Fjärrvärden stängde anslutningen</translation>
+    </message>
+</context>
+<context>
+    <name>QShortcut</name>
+    <message>
+        <location filename="../../qtbase/src/gui/kernel/qkeysequence.cpp" line="425"/>
+        <source>Space</source>
+        <translation type="obsolete">Mellanslag</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Esc</source>
+        <translation type="obsolete">Esc</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Tab</source>
+        <translation type="obsolete">Tab</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Backtab</source>
+        <translation type="obsolete">Backtab</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Backspace</source>
+        <translation type="obsolete">Backsteg</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Return</source>
+        <translation type="obsolete">Return</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Enter</source>
+        <translation type="obsolete">Enter</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Ins</source>
+        <translation type="obsolete">Ins</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Del</source>
+        <translation type="obsolete">Del</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Pause</source>
+        <translation type="obsolete">Pause</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Print</source>
+        <translation type="obsolete">Print</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>SysReq</source>
+        <translation type="obsolete">SysReq</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Home</source>
+        <translation type="obsolete">Home</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>End</source>
+        <translation type="obsolete">End</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Left</source>
+        <translation type="obsolete">Vänster</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Up</source>
+        <translation type="obsolete">Upp</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Right</source>
+        <translation type="obsolete">Höger</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Down</source>
+        <translation type="obsolete">Ned</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>PgUp</source>
+        <translation type="obsolete">PgUp</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>PgDown</source>
+        <translation type="obsolete">PgDown</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>CapsLock</source>
+        <translation type="obsolete">CapsLock</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>NumLock</source>
+        <translation type="obsolete">NumLock</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>ScrollLock</source>
+        <translation type="obsolete">ScrollLock</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Menu</source>
+        <translation type="obsolete">Meny</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Help</source>
+        <translation type="obsolete">Hjälp</translation>
+    </message>
+    <message>
+        <location filename="." line="5"/>
+        <source>Back</source>
+        <translation type="obsolete">Bakåt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Forward</source>
+        <translation type="obsolete">Framåt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Stop</source>
+        <translation type="obsolete">Stoppa</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Refresh</source>
+        <translation type="obsolete">Uppdatera</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Volume Down</source>
+        <translation type="obsolete">Sänk volym</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Volume Mute</source>
+        <translation type="obsolete">Volym tyst</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Volume Up</source>
+        <translation type="obsolete">Höj volym</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Bass Boost</source>
+        <translation type="obsolete">Förstärk bas</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Bass Up</source>
+        <translation type="obsolete">Höj bas</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Bass Down</source>
+        <translation type="obsolete">Sänk bas</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Treble Up</source>
+        <translation type="obsolete">Höj diskant</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Treble Down</source>
+        <translation type="obsolete">Sänk diskant</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Media Play</source>
+        <translation type="obsolete">Media spela upp</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Media Stop</source>
+        <translation type="obsolete">Media stopp</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Media Previous</source>
+        <translation type="obsolete">Media föregående</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Media Next</source>
+        <translation type="obsolete">Media nästa</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Media Record</source>
+        <translation type="obsolete">Media spela in</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Home Page</source>
+        <translation type="obsolete">Hemsida</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Favorites</source>
+        <translation type="obsolete">Favoriter</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Search</source>
+        <translation type="obsolete">Sök</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Standby</source>
+        <translation type="obsolete">Avvakta</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Open URL</source>
+        <translation type="obsolete">Öppna url</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch Mail</source>
+        <translation type="obsolete">Starta e-post</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch Media</source>
+        <translation type="obsolete">Starta media</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (0)</source>
+        <translation type="obsolete">Starta (0)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (1)</source>
+        <translation type="obsolete">Starta (1)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (2)</source>
+        <translation type="obsolete">Starta (2)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (3)</source>
+        <translation type="obsolete">Starta (3)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (4)</source>
+        <translation type="obsolete">Starta (4)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (5)</source>
+        <translation type="obsolete">Starta (5)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (6)</source>
+        <translation type="obsolete">Starta (6)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (7)</source>
+        <translation type="obsolete">Starta (7)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (8)</source>
+        <translation type="obsolete">Starta (8)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (9)</source>
+        <translation type="obsolete">Starta (9)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (A)</source>
+        <translation type="obsolete">Starta (A)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (B)</source>
+        <translation type="obsolete">Starta (B)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (C)</source>
+        <translation type="obsolete">Starta (C)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (D)</source>
+        <translation type="obsolete">Starta (D)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (E)</source>
+        <translation type="obsolete">Starta (E)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Launch (F)</source>
+        <translation type="obsolete">Starta (F)</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Clear</source>
+        <translation type="obsolete">Töm</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Save</source>
+        <translation type="obsolete">Spara</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Open</source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Undo</source>
+        <translation type="obsolete">Ångra</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Redo</source>
+        <translation type="obsolete">Gör om</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Print Screen</source>
+        <translation type="obsolete">Print Screen</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Page Up</source>
+        <translation type="obsolete">Page Up</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Page Down</source>
+        <translation type="obsolete">Page Down</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Caps Lock</source>
+        <translation type="obsolete">Caps Lock</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Num Lock</source>
+        <translation type="obsolete">Num Lock</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Number Lock</source>
+        <translation type="obsolete">Number Lock</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Scroll Lock</source>
+        <translation type="obsolete">Scroll Lock</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Insert</source>
+        <translation type="obsolete">Insert</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Delete</source>
+        <translation type="obsolete">Delete</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Escape</source>
+        <translation type="obsolete">Escape</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>System Request</source>
+        <translation type="obsolete">System Request</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Select</source>
+        <translation type="obsolete">Välj</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Yes</source>
+        <translation type="obsolete">Ja</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>No</source>
+        <translation type="obsolete">Nej</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Context1</source>
+        <translation type="obsolete">Sammanhang1</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Context2</source>
+        <translation type="obsolete">Sammanhang2</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Context3</source>
+        <translation type="obsolete">Sammanhang3</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Context4</source>
+        <translation type="obsolete">Sammanhang4</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Call</source>
+        <translation type="obsolete">Ring upp</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Hangup</source>
+        <translation type="obsolete">Lägg på</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Flip</source>
+        <translation type="obsolete">Vänd</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Printer</source>
+        <translation type="obsolete">Skrivare</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Execute</source>
+        <translation type="obsolete">Kör</translation>
+    </message>
+    <message>
+        <location filename="." line="169"/>
+        <source>Ctrl</source>
+        <translation type="obsolete">Ctrl</translation>
+    </message>
+    <message>
+        <location filename="." line="172"/>
+        <source>Shift</source>
+        <translation type="obsolete">Shift</translation>
+    </message>
+    <message>
+        <location filename="." line="169"/>
+        <source>Alt</source>
+        <translation type="obsolete">Alt</translation>
+    </message>
+    <message>
+        <location filename="." line="164"/>
+        <source>Meta</source>
+        <translation type="obsolete">Meta</translation>
+    </message>
+    <message>
+        <location filename="." line="164"/>
+        <source>+</source>
+        <translation type="obsolete">+</translation>
+    </message>
+    <message>
+        <location filename="." line="93"/>
+        <source>F%1</source>
+        <translation type="obsolete">F%1</translation>
+    </message>
+</context>
+<context>
+    <name>QSlider</name>
+    <message>
+        <location filename="." line="93"/>
+        <source>Page left</source>
+        <translation type="obsolete">Sida vänster</translation>
+    </message>
+    <message>
+        <location filename="." line="93"/>
+        <source>Page up</source>
+        <translation type="obsolete">Sida uppåt</translation>
+    </message>
+    <message>
+        <location filename="." line="93"/>
+        <source>Position</source>
+        <translation type="obsolete">Position</translation>
+    </message>
+    <message>
+        <location filename="." line="93"/>
+        <source>Page right</source>
+        <translation type="obsolete">Sida höger</translation>
+    </message>
+    <message>
+        <location filename="." line="93"/>
+        <source>Page down</source>
+        <translation type="obsolete">Sida nedåt</translation>
+    </message>
+</context>
+<context>
+    <name>QSocks5SocketEngine</name>
+    <message>
+        <location filename="." line="696"/>
+        <source>Network operation timed out</source>
+        <translation type="obsolete">Tidsgräns för nätverksåtgärd överstegs</translation>
+    </message>
+    <message>
+        <location filename="." line="696"/>
+        <source>Socks5 timeout error connecting to socks server</source>
+        <translation type="obsolete">Tidsgräns för Socks5 överstigen vid anslutningen till socks-server</translation>
+    </message>
+</context>
+<context>
+    <name>QSpiAccessibleBridge</name>
+    <message>
+        <location filename="." line="2"/>
+        <source>unknown</source>
+        <translation type="obsolete">okänt</translation>
+    </message>
+</context>
+<context>
+    <name>QSpinBox</name>
+    <message>
+        <location filename="." line="2"/>
+        <source>More</source>
+        <translation type="obsolete">Mer</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Less</source>
+        <translation type="obsolete">Mindre</translation>
+    </message>
+</context>
+<context>
+    <name>QSql</name>
+    <message>
+        <location filename="." line="2"/>
+        <source>Delete</source>
+        <translation type="obsolete">Ta bort</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Delete this record?</source>
+        <translation type="obsolete">Ta bort denna post?</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Yes</source>
+        <translation type="obsolete">Ja</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>No</source>
+        <translation type="obsolete">Nej</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Insert</source>
+        <translation type="obsolete">Infoga</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Update</source>
+        <translation type="obsolete">Uppdatera</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Save edits?</source>
+        <translation type="obsolete">Spara redigeringar?</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Confirm</source>
+        <translation type="obsolete">Bekräfta</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Cancel your edits?</source>
+        <translation type="obsolete">Avbryt dina redigeringar?</translation>
+    </message>
+</context>
+<context>
+    <name>QSslSocket</name>
+    <message>
+        <location filename="." line="3"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QStandardPaths</name>
+    <message>
+        <location filename="." line="2"/>
+        <source>Home</source>
+        <translation type="obsolete">Home</translation>
+    </message>
+</context>
+<context>
+    <name>QStateMachine</name>
+    <message>
+        <location filename="." line="4"/>
+        <source>Unknown error</source>
+        <translation type="obsolete">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QTDSDriver</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/sqldrivers/tds/qsql_tds.cpp" line="642"/>
+        <source>Unable to open connection</source>
+        <translation type="obsolete">Kunde inte öppna anslutning</translation>
+    </message>
+    <message>
+        <location filename="." line="5"/>
+        <source>Unable to use database</source>
+        <translation type="obsolete">Kunde inte använda databasen</translation>
+    </message>
+</context>
+<context>
+    <name>QTabBar</name>
+    <message>
+        <location filename="." line="5"/>
+        <source>Scroll Left</source>
+        <translation type="obsolete">Rulla vänster</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>Scroll Right</source>
+        <translation type="obsolete">Rulla höger</translation>
+    </message>
+</context>
+<context>
+    <name>QTcpServer</name>
+    <message>
+        <location filename="." line="122"/>
+        <source>Socket operation unsupported</source>
+        <translation type="obsolete">Uttagsåtgärd stöds inte</translation>
+    </message>
+</context>
+<context>
+    <name>QTextControl</name>
+    <message>
+        <location filename="." line="122"/>
+        <source>&amp;Undo</source>
+        <translation type="obsolete">&amp;Ångra</translation>
+    </message>
+    <message>
+        <location filename="." line="122"/>
+        <source>&amp;Redo</source>
+        <translation type="obsolete">&amp;Gör om</translation>
+    </message>
+    <message>
+        <location filename="." line="122"/>
+        <source>Cu&amp;t</source>
+        <translation type="obsolete">Klipp u&amp;t</translation>
+    </message>
+    <message>
+        <location filename="." line="122"/>
+        <source>&amp;Copy</source>
+        <translation type="obsolete">&amp;Kopiera</translation>
+    </message>
+    <message>
+        <location filename="." line="122"/>
+        <source>Copy &amp;Link Location</source>
+        <translation type="obsolete">Kopiera &amp;länkplats</translation>
+    </message>
+    <message>
+        <location filename="." line="122"/>
+        <source>&amp;Paste</source>
+        <translation type="obsolete">Klistra &amp;in</translation>
+    </message>
+    <message>
+        <location filename="." line="122"/>
+        <source>Delete</source>
+        <translation type="obsolete">Ta bort</translation>
+    </message>
+    <message>
+        <location filename="." line="122"/>
+        <source>Select All</source>
+        <translation type="obsolete">Markera alla</translation>
+    </message>
+</context>
+<context>
+    <name>QToolButton</name>
+    <message>
+        <location filename="." line="4"/>
+        <source>Press</source>
+        <translation type="obsolete">Tryck</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>Open</source>
+        <translation type="obsolete">Öppna</translation>
+    </message>
+</context>
+<context>
+    <name>QUdpSocket</name>
+    <message>
+        <location filename="." line="160"/>
+        <source>This platform does not support IPv6</source>
+        <translation type="obsolete">Denna plattform saknar stöd för IPv6</translation>
+    </message>
+</context>
+<context>
+    <name>QUndoGroup</name>
+    <message>
+        <location filename="." line="0"/>
+        <source>Undo</source>
+        <comment>Default text for undo action</comment>
+        <translation type="obsolete">Ångra</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Redo</source>
+        <comment>Default text for redo action</comment>
+        <translation type="obsolete">Gör om</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Undo</source>
+        <translation type="obsolete">Ångra</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Redo</source>
+        <translation type="obsolete">Gör om</translation>
+    </message>
+</context>
+<context>
+    <name>QUndoModel</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/util/qundoview.cpp" line="99"/>
+        <source>&lt;empty&gt;</source>
+        <translation type="obsolete">&lt;tom&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QUndoStack</name>
+    <message>
+        <location filename="." line="0"/>
+        <source>Undo</source>
+        <comment>Default text for undo action</comment>
+        <translation type="obsolete">Ångra</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Redo</source>
+        <comment>Default text for redo action</comment>
+        <translation type="obsolete">Gör om</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Undo</source>
+        <translation type="obsolete">Ångra</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Redo</source>
+        <translation type="obsolete">Gör om</translation>
+    </message>
+</context>
+<context>
+    <name>QUnicodeControlCharacterMenu</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/widgets/qwidgettextcontrol.cpp" line="3286"/>
+        <source>LRM Left-to-right mark</source>
+        <translation type="obsolete">U+200E</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>RLM Right-to-left mark</source>
+        <translation type="obsolete">U+200F</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>ZWJ Zero width joiner</source>
+        <translation type="obsolete">U+200D</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>ZWNJ Zero width non-joiner</source>
+        <translation type="obsolete">U+200C</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>ZWSP Zero width space</source>
+        <translation type="obsolete">U+200B</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>LRE Start of left-to-right embedding</source>
+        <translation type="obsolete">U+202A</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>RLE Start of right-to-left embedding</source>
+        <translation type="obsolete">U+202B</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>LRO Start of left-to-right override</source>
+        <translation type="obsolete">U+202D</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>RLO Start of right-to-left override</source>
+        <translation type="obsolete">U+202E</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>PDF Pop directional formatting</source>
+        <translation type="obsolete">U+202C</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Insert Unicode control character</source>
+        <translation type="obsolete">Infoga unicode-kontrolltecken</translation>
+    </message>
+</context>
+<context>
+    <name>QWebPage</name>
+    <message>
+        <location filename="." line="6"/>
+        <source>Reset</source>
+        <comment>default label for Reset buttons in forms on web pages</comment>
+        <translation type="obsolete">Återställ</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Stop</source>
+        <comment>Stop context menu item</comment>
+        <translation type="obsolete">Stoppa</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Ignore</source>
+        <comment>Ignore Spelling context menu item</comment>
+        <translation type="obsolete">Ignorera</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Ignore</source>
+        <comment>Ignore Grammar context menu item</comment>
+        <translation type="obsolete">Ignorera</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Unknown</source>
+        <comment>Unknown filesize FTP directory listing item</comment>
+        <translation type="obsolete">Okänt</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Scroll here</source>
+        <translation type="obsolete">Rulla här</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Left edge</source>
+        <translation type="obsolete">Vänsterkant</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Top</source>
+        <translation type="obsolete">Överkant</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Right edge</source>
+        <translation type="obsolete">Högerkant</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Bottom</source>
+        <translation type="obsolete">Nederkant</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Page left</source>
+        <translation type="obsolete">Sida vänster</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Page up</source>
+        <translation type="obsolete">Sida uppåt</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Page right</source>
+        <translation type="obsolete">Sida höger</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Page down</source>
+        <translation type="obsolete">Sida nedåt</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Scroll left</source>
+        <translation type="obsolete">Rulla vänster</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Scroll up</source>
+        <translation type="obsolete">Rulla uppåt</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Scroll right</source>
+        <translation type="obsolete">Rulla höger</translation>
+    </message>
+    <message>
+        <location filename="." line="6"/>
+        <source>Scroll down</source>
+        <translation type="obsolete">Rulla nedåt</translation>
+    </message>
+</context>
+<context>
+    <name>QWhatsThisAction</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/kernel/qwhatsthis.cpp" line="506"/>
+        <source>What&apos;s This?</source>
+        <translation type="obsolete">Vad är det här?</translation>
+    </message>
+</context>
+<context>
+    <name>QWidget</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/kernel/qwidget.cpp" line="6088"/>
+        <source>*</source>
+        <translation type="obsolete">*</translation>
+    </message>
+</context>
+<context>
+    <name>QWidgetTextControl</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/kernel/qwidget.cpp" line="6088"/>
+        <source>&amp;Undo</source>
+        <translation type="obsolete">&amp;Ångra</translation>
+    </message>
+    <message>
+        <location filename="." line="4"/>
+        <source>&amp;Redo</source>
+        <translation type="obsolete">&amp;Gör om</translation>
+    </message>
+    <message>
+        <location filename="." line="9"/>
+        <source>&amp;Copy</source>
+        <translation type="obsolete">&amp;Kopiera</translation>
+    </message>
+    <message>
+        <location filename="." line="9"/>
+        <source>Copy &amp;Link Location</source>
+        <translation type="obsolete">Kopiera &amp;länkplats</translation>
+    </message>
+    <message>
+        <location filename="." line="8"/>
+        <source>&amp;Paste</source>
+        <translation type="obsolete">Klistra &amp;in</translation>
+    </message>
+    <message>
+        <location filename="." line="9"/>
+        <source>Select All</source>
+        <translation type="obsolete">Markera alla</translation>
+    </message>
+</context>
+<context>
+    <name>QWizard</name>
+    <message>
+        <location filename="." line="0"/>
+        <source>&lt; &amp;Back</source>
+        <translation type="obsolete">&lt; Till&amp;baka</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>&amp;Next &gt;</source>
+        <translation type="obsolete">&amp;Nästa &gt;</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>&amp;Finish</source>
+        <translation type="obsolete">&amp;Färdig</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Cancel</source>
+        <translation type="obsolete">Avbryt</translation>
+    </message>
+    <message>
+        <location filename="." line="2"/>
+        <source>Help</source>
+        <translation type="obsolete">Hjälp</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>&amp;Help</source>
+        <translation type="obsolete">&amp;Hjälp</translation>
+    </message>
+</context>
+<context>
+    <name>QWorkspace</name>
+    <message>
+        <location filename="." line="0"/>
+        <source>&amp;Restore</source>
+        <translation type="obsolete">Åte&amp;rställ</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>&amp;Move</source>
+        <translation type="obsolete">&amp;Flytta</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>&amp;Size</source>
+        <translation type="obsolete">&amp;Storlek</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Mi&amp;nimize</source>
+        <translation type="obsolete">Mi&amp;nimera</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Ma&amp;ximize</source>
+        <translation type="obsolete">Ma&amp;ximera</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>&amp;Close</source>
+        <translation type="obsolete">&amp;Stäng</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Stay on &amp;Top</source>
+        <translation type="obsolete">Stanna kvar övers&amp;t</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Sh&amp;ade</source>
+        <translation type="obsolete">Skugg&amp;a</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>%1 - [%2]</source>
+        <translation type="obsolete">%1 - [%2]</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Minimize</source>
+        <translation type="obsolete">Minimera</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Restore Down</source>
+        <translation type="obsolete">Återställ nedåt</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>Close</source>
+        <translation type="obsolete">Stäng</translation>
+    </message>
+    <message>
+        <location filename="." line="0"/>
+        <source>&amp;Unshade</source>
+        <translation type="obsolete">A&amp;vskugga</translation>
+    </message>
+</context>
+<context>
+    <name>QXml</name>
+    <message>
+        <location filename="../../qtbase/src/xml/sax/qxml.cpp" line="62"/>
+        <source>no error occurred</source>
+        <translation type="obsolete">inga fel inträffade</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>error triggered by consumer</source>
+        <translation type="obsolete">fel utlöstes av konsument</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>unexpected end of file</source>
+        <translation type="obsolete">oväntat slut på filen</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>more than one document type definition</source>
+        <translation type="obsolete">fler än en dokumenttypsdefinition</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>error occurred while parsing element</source>
+        <translation type="obsolete">fel inträffade vid tolkning av element</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>tag mismatch</source>
+        <translation type="obsolete">tagg stämmer inte</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>error occurred while parsing content</source>
+        <translation type="obsolete">fel inträffade vid tolkning av innehåll</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>unexpected character</source>
+        <translation type="obsolete">oväntat tecken</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>invalid name for processing instruction</source>
+        <translation type="obsolete">ogiltigt namn för behandlingsinstruktion</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>version expected while reading the XML declaration</source>
+        <translation type="obsolete">version förväntades vid läsning av XML-deklareringen</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>wrong value for standalone declaration</source>
+        <translation type="obsolete">fel värde för fristående deklarering</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>encoding declaration or standalone declaration expected while reading the XML declaration</source>
+        <translation type="obsolete">kodningsdeklarering eller fristående deklarering förväntades vid läsning av XML-deklareringen</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>standalone declaration expected while reading the XML declaration</source>
+        <translation type="obsolete">fristående deklarering förväntades vid läsning av XML-deklarering</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>error occurred while parsing document type definition</source>
+        <translation type="obsolete">fel inträffade vid tolkning av dokumenttypsdefinition</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>letter is expected</source>
+        <translation type="obsolete">bokstav förväntades</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>error occurred while parsing comment</source>
+        <translation type="obsolete">fel inträffade vid tolkning av kommentar</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>error occurred while parsing reference</source>
+        <translation type="obsolete">fel inträffade vid tolkning av referens</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>internal general entity reference not allowed in DTD</source>
+        <translation type="obsolete">intern allmän entitetsreferens tillåts inte i DTD</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>external parsed general entity reference not allowed in attribute value</source>
+        <translation type="obsolete">extern tolkad allmän entitetsreferens tillåts inte i attributvärde</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>external parsed general entity reference not allowed in DTD</source>
+        <translation type="obsolete">extern tolkad allmän entitetsreferens tillåts inte i DTD</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>unparsed entity reference in wrong context</source>
+        <translation type="obsolete">otolkad entitetsreferens i fel sammanhang</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>recursive entities</source>
+        <translation type="obsolete">rekursiva entiteter</translation>
+    </message>
+    <message>
+        <location filename="." line="1"/>
+        <source>error in the text declaration of an external entity</source>
+        <translation type="obsolete">fel i textdeklareringen av en extern entitet</translation>
     </message>
 </context>
 <context>
@@ -8184,12 +12789,12 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="37417"/>
         <source>Events</source>
-        <translation type="unfinished">رخداد</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37420"/>
         <source>Data</source>
-        <translation type="unfinished">داده</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37414"/>
@@ -8224,12 +12829,12 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="45975"/>
         <source>ET/BT</source>
-        <translation type="unfinished">دمای اگزوز\دمای.دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="51093"/>
         <source>Extra</source>
-        <translation type="unfinished">اضافی</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44573"/>
@@ -8249,7 +12854,7 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="44582"/>
         <source>Color</source>
-        <translation type="unfinished">رنگ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45978"/>
@@ -8322,22 +12927,22 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="37771"/>
         <source>FC START</source>
-        <translation type="unfinished">شروع ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37774"/>
         <source>FC END</source>
-        <translation type="unfinished">پایان ترق اول</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37777"/>
         <source>SC START</source>
-        <translation type="unfinished">شروع ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37780"/>
         <source>SC END</source>
-        <translation type="unfinished">پایان ترق دوم</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37783"/>
@@ -8347,7 +12952,7 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="37786"/>
         <source>COOL</source>
-        <translation type="unfinished">سرد کردن</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30014"/>
@@ -8357,7 +12962,7 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="49489"/>
         <source>Time</source>
-        <translation type="unfinished">زمان</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30016"/>
@@ -8407,12 +13012,12 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="37712"/>
         <source>ET</source>
-        <translation type="unfinished">دمای اگزوز</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37713"/>
         <source>BT</source>
-        <translation type="unfinished">دمای دانه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37790"/>
@@ -8432,17 +13037,17 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="37641"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Typ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49489"/>
         <source>Value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Värde</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33066"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Namn</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33066"/>
@@ -8472,12 +13077,12 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="48525"/>
         <source>Color</source>
-        <translation type="unfinished">رنگ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35882"/>
         <source>Text Color</source>
-        <translation type="unfinished">رنگ نوشته</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="46069"/>
@@ -8597,7 +13202,7 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="48525"/>
         <source>Properties</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Egenskaper</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48525"/>
@@ -8612,7 +13217,7 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="48525"/>
         <source>Projection</source>
-        <translation type="unfinished">پروژه</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48525"/>
@@ -8637,7 +13242,7 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="49489"/>
         <source>If Alarm</source>
-        <translation type="unfinished">زنگ خطر</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49489"/>
@@ -8662,7 +13267,7 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="49489"/>
         <source>Beep</source>
-        <translation type="unfinished">بوق</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50398"/>
@@ -8767,7 +13372,7 @@ Concentration</source>
     <message>
         <location filename="../artisanlib/main.py" line="671"/>
         <source>Other</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Annat</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="672"/>
@@ -8790,7 +13395,7 @@ Pungency</source>
     <message>
         <location filename="../artisanlib/main.py" line="675"/>
         <source>Sweet</source>
-        <translation type="unfinished">شیرین</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="677"/>
@@ -8912,6 +13517,11 @@ Pungency</source>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10497"/>
+        <source>Connect to plus service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="10497"/>
         <source>Reset original view</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8933,11 +13543,6 @@ Pungency</source>
     <message>
         <location filename="../artisanlib/main.py" line="10497"/>
         <source>Zoom to rectangle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10497"/>
-        <source>Connect to plus service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8973,7 +13578,7 @@ Pungency</source>
     <message>
         <location filename="../artisanlib/main.py" line="13148"/>
         <source>Reset</source>
-        <translation type="unfinished">تنظیم مجدد</translation>
+        <translation type="unfinished">Återställ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13158"/>
@@ -9222,6 +13827,11 @@ nearest: y value of the nearest point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="33267"/>
+        <source>Save image alongside .alog profiles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="33284"/>
         <source>Sets the directory to store batch profiles when using the letter [a]</source>
         <translation type="unfinished"></translation>
@@ -9259,6 +13869,16 @@ nearest: y value of the nearest point</source>
     <message>
         <location filename="../artisanlib/main.py" line="33511"/>
         <source>Automatically set time axis min and max from profile CHARGE/DROP events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="33545"/>
+        <source>Show time grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="33548"/>
+        <source>Show temperature grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9417,33 +14037,18 @@ nearest: y value of the nearest point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="48282"/>
-        <source>Sets Wheel graph to view mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../artisanlib/main.py" line="48278"/>
         <source>open wheel graph file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="48282"/>
+        <source>Sets Wheel graph to view mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="48878"/>
         <source>Clear alarms table</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33267"/>
-        <source>Save image alongside .alog profiles</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33545"/>
-        <source>Show time grid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33548"/>
-        <source>Show temperature grid</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -45,4 +45,4 @@ TRANSLATIONS = \
 	translations/artisan_pl.ts \
 	translations/artisan_id.ts \
 	translations/artisan_th.ts \
-	translations/artisan_fa.ts 
+	translations/artisan_fa.ts

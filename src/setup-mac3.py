@@ -97,6 +97,10 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_tr.qm"]),
     ("../translations", [r"translations/artisan_th.qm"]),
     ("../translations", [r"translations/artisan_id.qm"]),
+    ("../translations", [r"translations/qtbase_fa.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
+    ("../translations", [r"translations/qtbase_pt.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
+    ("../translations", [r"translations/qtbase_sv.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
+    ("../translations", [r"translations/qtbase_zh_CN.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../Resources", [r"qt.conf"]),
     ("../Resources", [r"artisanProfile.icns"]),
     ("../Resources", [r"artisanAlarms.icns"]),

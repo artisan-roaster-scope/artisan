@@ -567,6 +567,8 @@ elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "
 #find Qt default translations in Mac binary
 elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/../translations"):
     app.installTranslator(qtTranslator)
+elif qtTranslator.load("qtbase_" + locale, "translations"):
+    app.installTranslator(qtTranslator)
 
 #load Artisan translations
 appTranslator = QTranslator()
