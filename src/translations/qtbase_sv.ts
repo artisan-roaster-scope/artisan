@@ -1,8635 +1,1046 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="sv_SE" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="sv_SE">
 <context>
-    <name>About</name>
+    <name>CloseButton</name>
     <message>
-        <location filename="../artisanlib/main.py" line="25353"/>
-        <source>About</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25353"/>
-        <source>Core Developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25353"/>
-        <source>Contributors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25353"/>
-        <source>License</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>AddlInfo</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="6010"/>
-        <source>Roast of the Day</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6035"/>
-        <source>Bean Temp</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6051"/>
-        <source>Charge Weight</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6053"/>
-        <source>Weight Loss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6057"/>
-        <source>Charge Density</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6059"/>
-        <source>Density Loss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6063"/>
-        <source>Charge Volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6065"/>
-        <source>Volume Gain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6079"/>
-        <source>Screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6084"/>
-        <source>Moisture Green</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6086"/>
-        <source>Moisture Roasted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6091"/>
-        <source>Whole Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6093"/>
-        <source>Ground Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Button</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="13066"/>
-        <source>ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13083"/>
-        <source>START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6861"/>
-        <source>OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13101"/>
-        <source>FC
-START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13109"/>
-        <source>FC
-END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13117"/>
-        <source>SC
-START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13125"/>
-        <source>SC
-END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13137"/>
-        <source>RESET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13154"/>
-        <source>CHARGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13163"/>
-        <source>DROP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13172"/>
-        <source>Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13190"/>
-        <source>EVENT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13199"/>
-        <source>SV +5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13208"/>
-        <source>SV +10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13217"/>
-        <source>SV +20</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13226"/>
-        <source>SV -20</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13235"/>
-        <source>SV -10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13244"/>
-        <source>SV -5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13253"/>
-        <source>HUD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13268"/>
-        <source>DRY
-END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13277"/>
-        <source>COOL
-END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48546"/>
-        <source>Update</source>
-        <translation type="unfinished">Uppdatera</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="62"/>
-        <source>OK</source>
-        <translation type="unfinished">OK</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="63"/>
-        <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28076"/>
-        <source>Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28098"/>
-        <source>Plot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28101"/>
-        <source>Data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47608"/>
-        <source>Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28109"/>
-        <source>ET/BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36978"/>
-        <source>Save Image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49259"/>
-        <source>Help</source>
-        <translation type="unfinished">Hjälp</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28200"/>
-        <source>Info</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53510"/>
-        <source>Set</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29483"/>
-        <source>unit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30826"/>
-        <source>in</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30836"/>
-        <source>out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30433"/>
-        <source>Cluster</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48877"/>
-        <source>Clear</source>
-        <translation type="unfinished">Töm</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30443"/>
-        <source>Create Alarms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30448"/>
-        <source>Order</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48844"/>
-        <source>Add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48855"/>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30630"/>
-        <source>calc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30852"/>
-        <source>scan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30863"/>
-        <source>update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33281"/>
-        <source>Path</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33512"/>
-        <source>Calc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47795"/>
-        <source>Defaults</source>
-        <translation type="unfinished">Standardvärden</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48849"/>
-        <source>Insert</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34529"/>
-        <source>&lt;&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34531"/>
-        <source>&gt;&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53676"/>
-        <source>Save</source>
-        <translation type="unfinished">Spara</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53673"/>
-        <source>Load</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34851"/>
-        <source>Apply</source>
-        <translation type="unfinished">Verkställ</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36701"/>
-        <source>Default Temperatures</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36975"/>
-        <source>Del</source>
-        <translation type="unfinished">Del</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37238"/>
-        <source>Align</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37274"/>
-        <source>Up</source>
-        <translation type="unfinished">Upp</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37276"/>
-        <source>Down</source>
-        <translation type="unfinished">Ned</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37278"/>
-        <source>Left</source>
-        <translation type="unfinished">Vänster</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37280"/>
-        <source>Right</source>
-        <translation type="unfinished">Höger</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45155"/>
-        <source>Reset</source>
-        <translation type="unfinished">Återställ</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44019"/>
-        <source>Scan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44848"/>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48548"/>
-        <source>Select</source>
-        <translation type="unfinished">Välj</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47362"/>
-        <source>ET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47369"/>
-        <source>BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47391"/>
-        <source>Extra</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47417"/>
-        <source>Grid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47431"/>
-        <source>Y Label</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47438"/>
-        <source>X Label</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47445"/>
-        <source>Drying Phase</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47452"/>
-        <source>Maillard Phase</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47459"/>
-        <source>Finishing Phase</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47466"/>
-        <source>Cooling Phase</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47473"/>
-        <source>Bars Bkgnd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47480"/>
-        <source>Markers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47487"/>
-        <source>Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47494"/>
-        <source>Watermarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47501"/>
-        <source>Time Guide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47508"/>
-        <source>AUC Guide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47515"/>
-        <source>AUC Area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47522"/>
-        <source>Legend bkgnd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47529"/>
-        <source>Legend border</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47539"/>
-        <source>Canvas</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47546"/>
-        <source>SpecialEvent Marker</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47553"/>
-        <source>SpecialEvent Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47560"/>
-        <source>Bkgd Event Marker</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47567"/>
-        <source>Bkgd Event Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47574"/>
-        <source>MET Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47581"/>
-        <source>MET Box</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47596"/>
-        <source>Digits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47617"/>
-        <source>B/W</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47797"/>
-        <source>Grey</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48205"/>
-        <source>Reset Parents</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48286"/>
-        <source>Close</source>
-        <translation type="unfinished">Stäng</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48211"/>
-        <source>Reverse Hierarchy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48224"/>
-        <source>+</source>
-        <translation type="unfinished">+</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48227"/>
-        <source>-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48242"/>
-        <source>Line Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48245"/>
-        <source>Text Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48258"/>
-        <source>&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48261"/>
-        <source>&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48267"/>
-        <source>Save File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48272"/>
-        <source>Save Img</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48287"/>
-        <source>Open</source>
-        <translation type="unfinished">Öppna</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48571"/>
-        <source>Set Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48838"/>
-        <source>All On</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48841"/>
-        <source>All Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49729"/>
-        <source>Read Ra/So values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50554"/>
-        <source>RampSoak ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50556"/>
-        <source>RampSoak OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50559"/>
-        <source>PID OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50561"/>
-        <source>PID ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50693"/>
-        <source>Write SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49762"/>
-        <source>Read SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49777"/>
-        <source>Set p</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49779"/>
-        <source>Set i</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49781"/>
-        <source>Set d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50845"/>
-        <source>Autotune ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50847"/>
-        <source>Autotune OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49799"/>
-        <source>Read PID Values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53854"/>
-        <source>Read</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50917"/>
-        <source>Set ET PID to 1 decimal point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50919"/>
-        <source>Set BT PID to 1 decimal point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50546"/>
-        <source>Write All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50550"/>
-        <source>Read RS values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50552"/>
-        <source>Write RS values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50629"/>
-        <source>Write SV1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50631"/>
-        <source>Write SV2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50633"/>
-        <source>Write SV3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50635"/>
-        <source>Write SV4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50637"/>
-        <source>Write SV5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50639"/>
-        <source>Write SV6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50641"/>
-        <source>Write SV7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50722"/>
-        <source>Read SV (7-0)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50724"/>
-        <source>Write SV (7-0)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50827"/>
-        <source>pid 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50829"/>
-        <source>pid 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50831"/>
-        <source>pid 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50833"/>
-        <source>pid 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50835"/>
-        <source>pid 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50837"/>
-        <source>pid 6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50839"/>
-        <source>pid 7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50841"/>
-        <source>Read PIDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50843"/>
-        <source>Write PIDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50921"/>
-        <source>Set ET PID to MM:SS time units</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53698"/>
-        <source>On</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53700"/>
-        <source>Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53855"/>
-        <source>Write</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CheckBox</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="30782"/>
-        <source>Heavy FC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30785"/>
-        <source>Low FC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30788"/>
-        <source>Light Cut</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30791"/>
-        <source>Dark Cut</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30794"/>
-        <source>Drops</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30797"/>
-        <source>Oily</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30800"/>
-        <source>Uneven</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30802"/>
-        <source>Tipping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30804"/>
-        <source>Scorching</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30806"/>
-        <source>Divots</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27722"/>
-        <source>Optimal Smoothing Post Roast</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27736"/>
-        <source>Smooth Spikes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27741"/>
-        <source>Drop Spikes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27930"/>
-        <source>Limits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27775"/>
-        <source>Projection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44989"/>
-        <source>Swap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27868"/>
-        <source>Decimal Places</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37213"/>
-        <source>Show</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28216"/>
-        <source>TP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37319"/>
-        <source>Beep</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28400"/>
-        <source>Alarm Popups</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30423"/>
-        <source>Delete roast properties on RESET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30426"/>
-        <source>Open on CHARGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30477"/>
-        <source>Show Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33154"/>
-        <source>Serial Log ON/OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33261"/>
-        <source>Autosave [a]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33265"/>
-        <source>Save also</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33350"/>
-        <source>Batch Counter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33499"/>
-        <source>Expand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33503"/>
-        <source>Lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33507"/>
-        <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37830"/>
-        <source>Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33547"/>
-        <source>Temp</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34198"/>
-        <source>Button</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37214"/>
-        <source>Annotations</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34204"/>
-        <source>Show on BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34212"/>
-        <source>Snap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34215"/>
-        <source>Descr.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34227"/>
-        <source>Mini Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34450"/>
-        <source>Auto CHARGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34455"/>
-        <source>Auto DROP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34460"/>
-        <source>Mark TP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34464"/>
-        <source>Mark MET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34468"/>
-        <source>Show Time Guide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34546"/>
-        <source>Switch Using Number Keys + Cmd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34937"/>
-        <source>CHARGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42894"/>
-        <source>DRY END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42896"/>
-        <source>FC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42898"/>
-        <source>FC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42900"/>
-        <source>SC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42902"/>
-        <source>SC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34991"/>
-        <source>DROP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35000"/>
-        <source>COOL END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36676"/>
-        <source>Auto Adjusted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36679"/>
-        <source>From Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36682"/>
-        <source>Watermarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36684"/>
-        <source>Phases LCDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36686"/>
-        <source>Auto DRY</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36688"/>
-        <source>Auto FCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37980"/>
-        <source>Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37215"/>
-        <source>Events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44983"/>
-        <source>ET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44986"/>
-        <source>BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37315"/>
-        <source>Playback Aid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37323"/>
-        <source>Playback Events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37327"/>
-        <source>Playback DROP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37831"/>
-        <source>Bar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37832"/>
-        <source>/min</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37833"/>
-        <source>AUC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37834"/>
-        <source>Evaluation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37835"/>
-        <source>Characteristics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37836"/>
-        <source>Summary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37971"/>
-        <source>From Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37984"/>
-        <source>Guide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37986"/>
-        <source>LCD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37989"/>
-        <source>Show Area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44840"/>
-        <source>Fct. 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44843"/>
-        <source>Fct. 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45042"/>
-        <source>Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45080"/>
-        <source>PID Duty/Power LCDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45083"/>
-        <source>Modbus Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45117"/>
-        <source>PID Firmware</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48882"/>
-        <source>Load from profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48884"/>
-        <source>Load from background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50601"/>
-        <source>Follow Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53629"/>
-        <source>Start PID on CHARGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53684"/>
-        <source>Load Ramp/Soak table from profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ComboBox</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="22456"/>
-        <source>Air</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="22456"/>
-        <source>Drum</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="22456"/>
-        <source>Damper</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="22456"/>
-        <source>Burner</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28188"/>
-        <source>linear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27777"/>
-        <source>newton</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29392"/>
-        <source>metrics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29394"/>
-        <source>thermal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27980"/>
-        <source>classic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27980"/>
-        <source>xkcd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27992"/>
-        <source>Default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27992"/>
-        <source>Humor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27992"/>
-        <source>Comic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28188"/>
-        <source>cubic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28188"/>
-        <source>nearest</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49336"/>
-        <source>ET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49337"/>
-        <source>BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33466"/>
-        <source>upper right</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33467"/>
-        <source>upper left</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33468"/>
-        <source>lower left</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33469"/>
-        <source>lower right</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33470"/>
-        <source>right</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33471"/>
-        <source>center left</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33472"/>
-        <source>center right</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33473"/>
-        <source>lower center</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33474"/>
-        <source>upper center</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33475"/>
-        <source>center</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33520"/>
-        <source>1 minute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33521"/>
-        <source>2 minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33522"/>
-        <source>3 minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33523"/>
-        <source>4 minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33524"/>
-        <source>5 minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33525"/>
-        <source>10 minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33526"/>
-        <source>30 minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33527"/>
-        <source>1 hour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33569"/>
-        <source>solid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33570"/>
-        <source>dashed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33571"/>
-        <source>dashed-dot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33572"/>
-        <source>dotted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33573"/>
-        <source>None</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33919"/>
-        <source>Event #0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33921"/>
-        <source>Event #{0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33959"/>
-        <source>liter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33960"/>
-        <source>gallon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33961"/>
-        <source>quart</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33962"/>
-        <source>pint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33963"/>
-        <source>cup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33964"/>
-        <source>cm^3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34233"/>
-        <source>Flag</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34234"/>
-        <source>Bar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34235"/>
-        <source>Step</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34236"/>
-        <source>Step+</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34237"/>
-        <source>Combo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Serial Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Modbus Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>DTA Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>Call Program</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Hottop Heater</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Hottop Fan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Hottop Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Fuji Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>PWM Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>VOUT Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>IO Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>S7 Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Aillio R1 Heater</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Aillio R1 Fan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Aillio R1 Drum</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Artisan Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>RC Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>p-i-d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Aillio R1 Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49367"/>
-        <source>ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35944"/>
-        <source>Multiple Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36716"/>
-        <source>Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36717"/>
-        <source>Percentage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36718"/>
-        <source>Temp</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43887"/>
-        <source>bytes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43891"/>
-        <source>words</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48562"/>
-        <source>Flat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48562"/>
-        <source>Perpendicular</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48562"/>
-        <source>Radial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>CHARGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49367"/>
-        <source>TP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49367"/>
-        <source>DRY END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49367"/>
-        <source>FC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49367"/>
-        <source>FC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49367"/>
-        <source>SC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49367"/>
-        <source>SC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>DROP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49367"/>
-        <source>COOL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49367"/>
-        <source>If Alarm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49395"/>
-        <source>below</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49395"/>
-        <source>above</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>Pop Up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>Event Button</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>Slider</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>DRY</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>FCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>FCe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>SCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>SCe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>COOL END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>RampSoak ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>RampSoak OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>PID ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>PID OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49406"/>
-        <source>SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Contextual Menu</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="9515"/>
-        <source>Add point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9519"/>
-        <source>Remove point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9525"/>
-        <source>Load points</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9529"/>
-        <source>Save points</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9535"/>
-        <source>Reset Designer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9539"/>
-        <source>Config...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10173"/>
-        <source>Add to Cupping Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10177"/>
-        <source>Add to Roasting Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10183"/>
-        <source>Edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Directory</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="26776"/>
-        <source>profiles</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26766"/>
-        <source>other</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Error Message</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="53766"/>
-        <source>Exception:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6802"/>
-        <source>Exception: PhidgetManager couldn&apos;t be started. Verify that the Phidget driver is correctly installed!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42823"/>
-        <source>Value Error:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9042"/>
-        <source>Error in lnRegression:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17818"/>
-        <source>Error:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48725"/>
-        <source>IO Error:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23032"/>
-        <source>Error</source>
-        <translation type="unfinished">Fel</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24099"/>
-        <source>Exception (probably due to an empty profile):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28820"/>
-        <source>Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28937"/>
-        <source>ln(): no profile data available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28953"/>
-        <source>xxvar(): no profile data available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28967"/>
-        <source>Univariate: no profile data available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29188"/>
-        <source>Polyfit: no profile data available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32721"/>
-        <source>Unable to move CHARGE to a value that does not exist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="39688"/>
-        <source>Serial Exception:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="38664"/>
-        <source>F80h Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="38674"/>
-        <source>CRC16 data corruption ERROR. TX does not match RX. Check wiring</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="38677"/>
-        <source>No RX data received</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="38828"/>
-        <source>DTAcommand(): {0} bytes received but 15 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="38893"/>
-        <source>callprogram() received:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="39482"/>
-        <source>Extech755pressure(): conversion error, {0} bytes received</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="39496"/>
-        <source>Extech755pressure(): {0} bytes received but 10 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="39688"/>
-        <source>Unable to open serial port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="39813"/>
-        <source>MS6514temperature(): {0} bytes received but 18 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="39861"/>
-        <source>DT301temperature(): {0} bytes received but 11 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="39980"/>
-        <source>HH806AUtemperature(): {0} bytes received</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40025"/>
-        <source>HH806Wtemperature(): Unable to initiate device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40217"/>
-        <source>HH506RAGetID: {0} bytes received but 5 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40236"/>
-        <source>HH506RAtemperature(): Unable to get id from HH506RA device </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40257"/>
-        <source>HH506RAtemperature(): {0} bytes received but 14 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40305"/>
-        <source>CENTER302temperature(): {0} bytes received but 7 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40366"/>
-        <source>CENTER303temperature(): {0} bytes received but 8 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40407"/>
-        <source>VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40451"/>
-        <source>VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40514"/>
-        <source>CENTER306temperature(): {0} bytes received but 10 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40594"/>
-        <source>CENTER309temperature(): {0} bytes received but 45 needed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42434"/>
-        <source>Arduino could not set channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42443"/>
-        <source>Arduino could not set temperature unit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42453"/>
-        <source>Arduino could not set filters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44776"/>
-        <source>Serial Exception: invalid comm port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44781"/>
-        <source>Serial Exception: timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53236"/>
-        <source>Segment values could not be written into PID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52871"/>
-        <source>RampSoak could not be changed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53291"/>
-        <source>pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Flavor Scope Label</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="24935"/>
-        <source>OK</source>
-        <translation type="unfinished">OK</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24936"/>
-        <source>Grassy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24937"/>
-        <source>Leathery</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24938"/>
-        <source>Toasty</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24939"/>
-        <source>Bready</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24940"/>
-        <source>Acidic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24941"/>
-        <source>Flat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24942"/>
-        <source>Fracturing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24943"/>
-        <source>Sweet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24944"/>
-        <source>Less Sweet</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Form Caption</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="27678"/>
-        <source>Curves</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29439"/>
-        <source>Volume Calculator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29810"/>
-        <source>Symbolic Device Assignment Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29875"/>
-        <source>Plotter Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29958"/>
-        <source>Plotter Data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30231"/>
-        <source>Roast Properties</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32967"/>
-        <source>Tare Setup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33100"/>
-        <source>Artisan Platform</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33153"/>
-        <source>Serial Log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33196"/>
-        <source>Error Log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33231"/>
-        <source>Message History</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33258"/>
-        <source>Autosave</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33309"/>
-        <source>AutoSave Path</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33335"/>
-        <source>Batch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33411"/>
-        <source>Axes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33899"/>
-        <source>Roast Calculator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34191"/>
-        <source>Events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36616"/>
-        <source>Roast Phases</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36951"/>
-        <source>Cup Profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37200"/>
-        <source>Profile Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37827"/>
-        <source>Statistics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42888"/>
-        <source>Designer Config</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43430"/>
-        <source>Add Point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43475"/>
-        <source>Manual Temperature Logger</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43595"/>
-        <source>Ports Configuration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44819"/>
-        <source>Scan Modbus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44969"/>
-        <source>Device Assignment</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47314"/>
-        <source>Colors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48196"/>
-        <source>Wheel Graph Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48822"/>
-        <source>Alarms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49702"/>
-        <source>Fuji PXR PID Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50482"/>
-        <source>Fuji PXG PID Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50484"/>
-        <source>Fuji PXF PID Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53330"/>
-        <source>PID Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53847"/>
-        <source>Delta DTA PID Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GroupBox</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="27892"/>
-        <source>Rate of Rise Curves</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27894"/>
-        <source>Rate of Rise LCDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27900"/>
-        <source>Head Up Display</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27922"/>
-        <source>Input Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27927"/>
-        <source>Curve Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27963"/>
-        <source>Rate of Rise Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28267"/>
-        <source>Interpolate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28273"/>
-        <source>Univariate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28281"/>
-        <source>ln()</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28292"/>
-        <source>x^3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28316"/>
-        <source>Polyfit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28365"/>
-        <source>Appearance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28375"/>
-        <source>Resolution</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28424"/>
-        <source>WebLCDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28440"/>
-        <source>Rename ET and BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33673"/>
-        <source>Time Axis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33675"/>
-        <source>Temperature Axis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33677"/>
-        <source>Axis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33679"/>
-        <source>Legend Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33681"/>
-        <source>Grid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34040"/>
-        <source>Rate of Change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34042"/>
-        <source>Temperature Conversion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34044"/>
-        <source>Weight Conversion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34046"/>
-        <source>Volume Conversion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34048"/>
-        <source>Extraction Yield</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34915"/>
-        <source>Event Types</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35102"/>
-        <source>Default Buttons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35113"/>
-        <source>Sampling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35166"/>
-        <source>Management</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37948"/>
-        <source>Evaluation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="38009"/>
-        <source>AUC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="38011"/>
-        <source>Display</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43139"/>
-        <source>Initial Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44443"/>
-        <source>Registers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44460"/>
-        <source>Commands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45858"/>
-        <source>PID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44182"/>
-        <source>Input 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44190"/>
-        <source>Input 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44198"/>
-        <source>Input 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44206"/>
-        <source>Input 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44214"/>
-        <source>Input 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44222"/>
-        <source>Input 6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44998"/>
-        <source>Curves</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45008"/>
-        <source>LCDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45745"/>
-        <source>Network</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45776"/>
-        <source>Async</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45778"/>
-        <source>IR</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45885"/>
-        <source>Arduino TC4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45897"/>
-        <source>External Program</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45905"/>
-        <source>Symbolic Assignments</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47736"/>
-        <source>Timer LCD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47745"/>
-        <source>ET LCD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47748"/>
-        <source>BT LCD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47751"/>
-        <source>Extra Devices / PID SV LCD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48295"/>
-        <source>Label Properties</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53338"/>
-        <source>p-i-d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53471"/>
-        <source>Target</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53601"/>
-        <source>Set Value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53618"/>
-        <source>Duty</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>HTML Report Template</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Ambient:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24295"/>
-        <source>Profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23342"/>
-        <source>Roast Batches</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24290"/>
-        <source>Batch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23342"/>
-        <source>Date</source>
-        <translation type="unfinished">Datum</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23455"/>
-        <source>Beans</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23458"/>
-        <source>In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23460"/>
-        <source>Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24318"/>
-        <source>Loss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23495"/>
-        <source>SUM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24284"/>
-        <source>Production Report</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24292"/>
-        <source>Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24175"/>
-        <source>Roast Ranking</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24298"/>
-        <source>Load</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24300"/>
-        <source>Charge</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24304"/>
-        <source>FCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24308"/>
-        <source>DROP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24310"/>
-        <source>DRY</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24312"/>
-        <source>MAI</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24314"/>
-        <source>DEV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24316"/>
-        <source>AUC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24320"/>
-        <source>Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24322"/>
-        <source>Cup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24401"/>
-        <source>AVG</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Roasting Report</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Date:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Beans:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Weight:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Degree:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Volume:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Roaster:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Operator:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Cupping:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Color:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>CHARGE:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Size:</source>
-        <translation type="unfinished">Storlek:</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Density:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Moisture:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>TP:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>DRY:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>FCs:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>FCe:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>SCs:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>SCe:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>DROP:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>COOL:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>MET:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>CM:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Drying:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Maillard:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Finishing:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Cooling:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Background:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Alarms:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>RoR:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>AUC:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Roasting Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24589"/>
-        <source>Cupping Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Label</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="2415"/>
-        <source>at</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42891"/>
-        <source>CHARGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37955"/>
-        <source>DRY END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37956"/>
-        <source>FC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30347"/>
-        <source>FC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30362"/>
-        <source>SC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30377"/>
-        <source>SC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42904"/>
-        <source>DROP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30408"/>
-        <source>COOL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="2441"/>
-        <source>EVENT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49334"/>
-        <source>ET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49335"/>
-        <source>BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37883"/>
-        <source>min</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10637"/>
-        <source>/min</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5195"/>
-        <source>BackgroundXT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9413"/>
-        <source>BackgroundET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9417"/>
-        <source>BackgroundBT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5247"/>
-        <source>BackgroundDeltaET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5251"/>
-        <source>BackgroundDeltaBT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5945"/>
-        <source>BTprojection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5950"/>
-        <source>ETprojection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5956"/>
-        <source>AUCguide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="5961"/>
-        <source>TIMEguide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30770"/>
-        <source>Drum Speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17860"/>
-        <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15535"/>
-        <source>AUC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8545"/>
-        <source>RoR</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8544"/>
-        <source>MET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8551"/>
-        <source>CM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8553"/>
-        <source>FC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9409"/>
-        <source>Designer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10005"/>
-        <source>BT {0} {1}/min for {2}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10021"/>
-        <source>ET {0} {1}/min for {2}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42919"/>
-        <source>Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13374"/>
-        <source>PID SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13378"/>
-        <source>PID %</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13435"/>
-        <source>Event #&lt;b&gt;0 &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37954"/>
-        <source>TP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37243"/>
-        <source>DRY</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37244"/>
-        <source>FCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53519"/>
-        <source>Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14517"/>
-        <source>Markers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48223"/>
-        <source>Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14523"/>
-        <source>Time Guide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14526"/>
-        <source>Background ET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14529"/>
-        <source>Background BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14538"/>
-        <source>Background Extra</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14541"/>
-        <source>X Label</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14547"/>
-        <source>Canvas</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14544"/>
-        <source>Y Label</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47424"/>
-        <source>Title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14550"/>
-        <source>SpecialEventText</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14550"/>
-        <source>SpecialEventBox</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14553"/>
-        <source>Bg SpecialEventText</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14553"/>
-        <source>Bg SpecialEventBox</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46409"/>
-        <source>Legend bkgnd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14568"/>
-        <source>MET Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14571"/>
-        <source>MET Box</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14575"/>
-        <source>Timer LCD Digits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14575"/>
-        <source>Timer LCD Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14584"/>
-        <source>ET LCD Digits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14584"/>
-        <source>ET LCD Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14587"/>
-        <source>BT LCD Digits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14587"/>
-        <source>BT LCD Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14590"/>
-        <source>Extra/PID LCD Digits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14590"/>
-        <source>Extra/PID LCD Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34763"/>
-        <source>Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53527"/>
-        <source>Slider</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36060"/>
-        <source>Event button</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36060"/>
-        <source>its text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15161"/>
-        <source>AUC FCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15584"/>
-        <source>ALL FINISHING MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15759"/>
-        <source>DEV%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15832"/>
-        <source>DRY%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15783"/>
-        <source>TIME MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15787"/>
-        <source>PERCENTAGE MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15680"/>
-        <source>RAMP%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15791"/>
-        <source>TEMP MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="19121"/>
-        <source>Start recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="19135"/>
-        <source>Charge the beans</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24508"/>
-        <source>/m</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24534"/>
-        <source>greens</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24539"/>
-        <source>roasted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26193"/>
-        <source>City</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26195"/>
-        <source>City+</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26197"/>
-        <source>Full City</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26199"/>
-        <source>Full City+</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26201"/>
-        <source>Light French</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26203"/>
-        <source>French</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26862"/>
-        <source>{0} to reach ET {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26873"/>
-        <source> at {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26875"/>
-        <source>{0} to reach BT {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26885"/>
-        <source>{0} after FCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26892"/>
-        <source>{0} after FCe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26925"/>
-        <source>ET - BT = {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26973"/>
-        <source>ET - BT = {0}{1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27617"/>
-        <source>Keep ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27690"/>
-        <source>HUD Button</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27694"/>
-        <source>ET Target 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27696"/>
-        <source>BT Target 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27698"/>
-        <source>ET Target 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27700"/>
-        <source>BT Target 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53515"/>
-        <source>Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27704"/>
-        <source>ET p-i-d 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27713"/>
-        <source>Smooth Deltas</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27727"/>
-        <source>Smooth Curves</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37884"/>
-        <source>max</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27786"/>
-        <source>Delta Span</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27966"/>
-        <source>Path Effects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33567"/>
-        <source>Style</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27985"/>
-        <source>Font</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28023"/>
-        <source>Y(x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28024"/>
-        <source>P1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28025"/>
-        <source>P2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28026"/>
-        <source>P3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28027"/>
-        <source>P4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28028"/>
-        <source>P5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28029"/>
-        <source>P6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28030"/>
-        <source>P7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28031"/>
-        <source>P8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28032"/>
-        <source>P9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44289"/>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28237"/>
-        <source>End</source>
-        <translation type="unfinished">End</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45677"/>
-        <source>Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34580"/>
-        <source>Unit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29480"/>
-        <source>ml</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29573"/>
-        <source>Unit Weight</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29578"/>
-        <source>g</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30546"/>
-        <source>Weight</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30578"/>
-        <source>Volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30547"/>
-        <source>Green</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30703"/>
-        <source>Roasted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29962"/>
-        <source>Data precision</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30009"/>
-        <source>No plotter data found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30481"/>
-        <source>Date</source>
-        <translation type="unfinished">Datum</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30492"/>
-        <source>Batch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30683"/>
-        <source>Beans</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30591"/>
-        <source> %</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30605"/>
-        <source>Density</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30648"/>
-        <source>Screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30662"/>
-        <source>18/64u2033</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34347"/>
-        <source>Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30665"/>
-        <source>Whole</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30671"/>
-        <source>Ground</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30694"/>
-        <source>Moisture</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30724"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30722"/>
-        <source>Ambient Conditions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30766"/>
-        <source>Machine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30768"/>
-        <source>Operator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30771"/>
-        <source>Roasting Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30776"/>
-        <source>Cupping Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30862"/>
-        <source>Ambient Source</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30947"/>
-        <source>Stock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30948"/>
-        <source>Store</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30949"/>
-        <source>Blend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="31322"/>
-        <source>Template</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32643"/>
-        <source>organic loss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33213"/>
-        <source>Number of errors found {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33359"/>
-        <source>Prefix</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33362"/>
-        <source>Counter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53593"/>
-        <source>Max</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53585"/>
-        <source>Min</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35045"/>
-        <source>RESET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33559"/>
-        <source>Step</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33577"/>
-        <source>Width</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47396"/>
-        <source>Opaqueness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33906"/>
-        <source>Enter two times along profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33909"/>
-        <source>Start (00:00)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33910"/>
-        <source>End (00:00)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33929"/>
-        <source>Fahrenheit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33930"/>
-        <source>Celsius</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33984"/>
-        <source>Yield (%)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33985"/>
-        <source>Grounds (g)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33986"/>
-        <source>TDS (%)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33987"/>
-        <source>Coffee (g)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34092"/>
-        <source>Time syntax error. Time not valid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34096"/>
-        <source>Error: End time smaller than Start time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34113"/>
-        <source>Best approximation was made from {0} to {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34114"/>
-        <source>&lt;b&gt;{0}&lt;/b&gt; {1}/sec, &lt;b&gt;{2}&lt;/b&gt; {3}/min</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34118"/>
-        <source>No profile found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34231"/>
-        <source>Events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34349"/>
-        <source>Text Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42917"/>
-        <source>Marker</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34353"/>
-        <source>Thickness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34355"/>
-        <source>Opacity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34357"/>
-        <source>Size</source>
-        <translation type="unfinished">Storlek</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34485"/>
-        <source>Max buttons per row</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34521"/>
-        <source>Color Pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34533"/>
-        <source>palette #</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34537"/>
-        <source>current palette</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34564"/>
-        <source>Action</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34566"/>
-        <source>Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34568"/>
-        <source>Offset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44292"/>
-        <source>Factor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34771"/>
-        <source>Coarse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34578"/>
-        <source>Temp</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53376"/>
-        <source>Source</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34854"/>
-        <source>Cluster</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44450"/>
-        <source>ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44447"/>
-        <source>OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35053"/>
-        <source>START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37879"/>
-        <source>Drying</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37880"/>
-        <source>Maillard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37881"/>
-        <source>Finishing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36720"/>
-        <source>Phases
-LCDs Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36722"/>
-        <source>Phases
-LCDs All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36957"/>
-        <source>Default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36990"/>
-        <source>Aspect Ratio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37245"/>
-        <source>FCe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37246"/>
-        <source>SCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37247"/>
-        <source>SCe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37249"/>
-        <source>ALL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37262"/>
-        <source>Extra</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37307"/>
-        <source>by time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37308"/>
-        <source>by BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37309"/>
-        <source>by ET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37331"/>
-        <source>Text Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37332"/>
-        <source>sec</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37882"/>
-        <source>Cooling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37951"/>
-        <source>From</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37962"/>
-        <source>Base</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37975"/>
-        <source>Target</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43063"/>
-        <source>Curviness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43435"/>
-        <source>temp</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43440"/>
-        <source>time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44080"/>
-        <source>Comm Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44084"/>
-        <source>Baud Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44090"/>
-        <source>Byte Size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44096"/>
-        <source>Parity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44103"/>
-        <source>Stopbits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44109"/>
-        <source>Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43630"/>
-        <source>Settings for non-Modbus devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44821"/>
-        <source>Slave</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44827"/>
-        <source>Register</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43677"/>
-        <source>Decode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43678"/>
-        <source>Function</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43679"/>
-        <source>Divider</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43885"/>
-        <source>little-endian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45501"/>
-        <source>Type</source>
-        <translation type="unfinished">Typ</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45670"/>
-        <source>Host</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53851"/>
-        <source>SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44387"/>
-        <source>SV Multiplier</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44394"/>
-        <source>p-i-d Multiplier</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50740"/>
-        <source>P</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50746"/>
-        <source>I</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50752"/>
-        <source>D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44069"/>
-        <source>Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44275"/>
-        <source>Rack</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44281"/>
-        <source>Slot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44368"/>
-        <source>Area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44374"/>
-        <source>DB#</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44316"/>
-        <source>Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45011"/>
-        <source>Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45056"/>
-        <source>Control ET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45064"/>
-        <source>Read BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45069"/>
-        <source>RS485 Unit ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45088"/>
-        <source>ET Channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45091"/>
-        <source>BT Channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45111"/>
-        <source>AT Channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45120"/>
-        <source>Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45136"/>
-        <source>ET Y(x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45137"/>
-        <source>BT Y(x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45654"/>
-        <source>Async</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45656"/>
-        <source>Change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45655"/>
-        <source>Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45728"/>
-        <source>Emissivity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45409"/>
-        <source>Gain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45502"/>
-        <source>Wiring</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45533"/>
-        <source>Power</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48216"/>
-        <source>Ratio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45673"/>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45680"/>
-        <source>Remote Only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45726"/>
-        <source>VirtualHub</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45819"/>
-        <source>MASL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45820"/>
-        <source>Temperature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45821"/>
-        <source>Humidity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45822"/>
-        <source>Pressure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45823"/>
-        <source>Elevation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47321"/>
-        <source>Profile Colors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47323"/>
-        <source>Background Profile Colors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48230"/>
-        <source>Edge</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48236"/>
-        <source>Line</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48248"/>
-        <source>Color pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48556"/>
-        <source> dg</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48893"/>
-        <source>PopUp TimeOut</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49044"/>
-        <source>Enter description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49707"/>
-        <source>Ramp Soak HH:MM&lt;BR&gt;(1-4)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49711"/>
-        <source>Ramp Soak HH:MM&lt;BR&gt;(5-8)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49712"/>
-        <source>Ramp/Soak Pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50695"/>
-        <source>SV Buttons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50698"/>
-        <source>SV Slider</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49771"/>
-        <source>WARNING</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49767"/>
-        <source>Writing eeprom memory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49767"/>
-        <source>&lt;u&gt;Max life&lt;/u&gt; 10,000 writes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49767"/>
-        <source>Infinite read life.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49771"/>
-        <source>After &lt;u&gt;writing&lt;/u&gt; an adjustment,&lt;br&gt;never power down the pid&lt;br&gt;for the next 5 seconds &lt;br&gt;or the pid may never recover.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49771"/>
-        <source>Read operations manual</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50882"/>
-        <source>NOTE: BT Thermocouple type is not stored in the Artisan settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50923"/>
-        <source>Artisan uses 1 decimal point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53500"/>
-        <source>Lookahead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51039"/>
-        <source>ET Thermocouple type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51046"/>
-        <source>BT Thermocouple type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50492"/>
-        <source>Ramp Soak (MM:SS)&lt;br&gt;(1-7)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50498"/>
-        <source>Ramp Soak (MM:SS)&lt;br&gt;(8-16)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50548"/>
-        <source>Pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50620"/>
-        <source>SV (7-0)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50758"/>
-        <source>Write</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50706"/>
-        <source>SV min</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50713"/>
-        <source>SV max</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50925"/>
-        <source>Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50927"/>
-        <source>Artisan Fuji PXF uses MINUTES:SECONDS units in Ramp/Soaks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53400"/>
-        <source>Cycle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53440"/>
-        <source>Positive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53446"/>
-        <source>Negative</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53458"/>
-        <source>Invert Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53508"/>
-        <source>Steps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53517"/>
-        <source>Manual</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53518"/>
-        <source>Ramp/Soak</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53524"/>
-        <source>Buttons</source>
+        <location filename="../../qtbase/src/widgets/widgets/qtabbar.cpp" line="+2649"/>
+        <source>Close Tab</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
-        <location filename="../../qtbase/src/plugins/platforms/cocoa/messages.cpp" line="56"/>
+        <location filename="../../qtbase/src/plugins/platforms/cocoa/messages.cpp" line="+56"/>
         <source>About %1</source>
-        <translation type="obsolete">Om %1</translation>
+        <translation type="unfinished">Om %1</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="41"/>
+        <location line="+1"/>
         <source>Preferences...</source>
         <translation type="unfinished">Inställningar…</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="37"/>
+        <location line="+1"/>
         <source>Services</source>
         <translation type="unfinished">Tjänster</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Hide %1</source>
-        <translation type="obsolete">Göm %1</translation>
+        <translation type="unfinished">Göm %1</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="39"/>
+        <location line="+1"/>
         <source>Hide Others</source>
         <translation type="unfinished">Göm övriga</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="40"/>
+        <location line="+1"/>
         <source>Show All</source>
         <translation type="unfinished">Visa alla</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Quit %1</source>
-        <translation type="obsolete">Avsluta %1</translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="38"/>
-        <source>Hide {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="72"/>
-        <source>Quit {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="179"/>
-        <source>About {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Marker</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="34302"/>
-        <source>Circle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34303"/>
-        <source>Square</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34304"/>
-        <source>Pentagon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34305"/>
-        <source>Diamond</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34306"/>
-        <source>Star</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34307"/>
-        <source>Hexagon 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34308"/>
-        <source>Hexagon 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34309"/>
-        <source>+</source>
-        <translation type="unfinished">+</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34310"/>
-        <source>x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34311"/>
-        <source>None</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Menu</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="11892"/>
-        <source>Artisan CSV...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11896"/>
-        <source>Artisan JSON...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11803"/>
-        <source>Aillio Roastime...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11807"/>
-        <source>HH506RA...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11811"/>
-        <source>K202...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11815"/>
-        <source>K204...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11902"/>
-        <source>Probat Pilot...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11906"/>
-        <source>RoastLogger...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="67"/>
-        <source>Excel...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11876"/>
-        <source>Fahrenheit...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11880"/>
-        <source>Celsius...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11912"/>
-        <source>PNG...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11916"/>
-        <source>JPEG...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11920"/>
-        <source>BMP...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11924"/>
-        <source>SVG...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="11928"/>
-        <source>PDF...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14475"/>
-        <source>Load Theme...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="46"/>
-        <source>File</source>
-        <translation type="unfinished">Fil</translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="49"/>
-        <source>New</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="50"/>
-        <source>Open...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="51"/>
-        <source>Open Recent</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="52"/>
-        <source>Import</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="53"/>
-        <source>Save</source>
-        <translation type="unfinished">Spara</translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="54"/>
-        <source>Save As...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="55"/>
-        <source>Save a Copy As...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="56"/>
-        <source>Export</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="57"/>
-        <source>Convert To</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="58"/>
-        <source>Save Graph</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="59"/>
-        <source>Full Size...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="60"/>
-        <source>Large (1200x?)...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="61"/>
-        <source>Report</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="83"/>
-        <source>Roast</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="63"/>
-        <source>Batches</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="64"/>
-        <source>Ranking</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="65"/>
-        <source>Web...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="66"/>
-        <source>CSV...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="68"/>
-        <source>Print...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="75"/>
-        <source>Edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="78"/>
-        <source>Cut</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="79"/>
-        <source>Copy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="80"/>
-        <source>Paste</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="86"/>
-        <source>Properties...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="87"/>
-        <source>Background...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="88"/>
-        <source>Cup Profile...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="89"/>
-        <source>Convert to Fahrenheit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="90"/>
-        <source>Convert to Celsius</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="91"/>
-        <source>Fahrenheit Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="92"/>
-        <source>Celsius Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="93"/>
-        <source>Switch Profiles</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="94"/>
-        <source>Switch ET&lt;-&gt;BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="97"/>
-        <source>Config</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="100"/>
-        <source>Machine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="101"/>
-        <source>Themes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="102"/>
-        <source>Device...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="103"/>
-        <source>Port...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="104"/>
-        <source>Sampling Interval...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="106"/>
-        <source>Oversampling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="107"/>
-        <source>Colors...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="108"/>
-        <source>Controls</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="109"/>
-        <source>Readings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="110"/>
-        <source>Buttons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="111"/>
-        <source>Sliders</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="112"/>
-        <source>Phases...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="113"/>
-        <source>Events...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="114"/>
-        <source>Curves...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="115"/>
-        <source>Statistics...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="116"/>
-        <source>Axes...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="117"/>
-        <source>Autosave...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="118"/>
-        <source>Batch...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="119"/>
-        <source>Alarms...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="120"/>
-        <source>Temperature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="121"/>
-        <source>Language</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="151"/>
-        <source>Tools</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="154"/>
-        <source>Designer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="155"/>
-        <source>Calculator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="156"/>
-        <source>Wheel Graph</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="157"/>
-        <source>LCDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="161"/>
-        <source>Load Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="162"/>
-        <source>Load Recent Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="163"/>
-        <source>Save Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="164"/>
-        <source>Save Theme...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="168"/>
-        <source>View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="171"/>
-        <source>Full Screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="174"/>
-        <source>Help</source>
-        <translation type="unfinished">Hjälp</translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="180"/>
-        <source>About Qt</source>
-        <translation type="unfinished">Om Qt</translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="181"/>
-        <source>Documentation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="183"/>
-        <source>Keyboard Shortcuts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="184"/>
-        <source>Errors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="185"/>
-        <source>Messages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="186"/>
-        <source>Serial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="190"/>
-        <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="191"/>
-        <source>Platform</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../const/UIconst.py" line="192"/>
-        <source>Factory Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Message</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="2298"/>
-        <source>seconds before FCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="2300"/>
-        <source>seconds after FCs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="2890"/>
-        <source>HUD OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="2902"/>
-        <source>HUD ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="3032"/>
-        <source>Alarm {0} triggered</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="3041"/>
-        <source>Alarm notice</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="3077"/>
-        <source>Alarm is calling: {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="3079"/>
-        <source>Calling alarm failed on {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="3089"/>
-        <source>Alarm trigger button error, description &apos;{0}&apos; not a number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="3118"/>
-        <source>Alarm trigger slider error, description &apos;{0}&apos; not a valid number [0-100]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="3206"/>
-        <source>Alarm trigger SV slider error, description &apos;{0}&apos; not a valid number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="3941"/>
-        <source>Save the profile, Discard the profile (Reset), or Cancel?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="3942"/>
-        <source>Profile unsaved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14427"/>
-        <source>Action canceled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="4046"/>
-        <source>Scope has been reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6237"/>
-        <source>Time format error encountered</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6407"/>
-        <source>Convert profile data to Fahrenheit?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6502"/>
-        <source>Convert Profile Temperature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6451"/>
-        <source>Profile changed to Fahrenheit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6454"/>
-        <source>Unable to comply. You already are in Fahrenheit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6504"/>
-        <source>Profile not changed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6463"/>
-        <source>Convert profile data to Celsius?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6502"/>
-        <source>Unable to comply. You already are in Celsius</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6509"/>
-        <source>Profile changed to Celsius</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6514"/>
-        <source>Convert Profile Scale</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6514"/>
-        <source>No profile data found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6536"/>
-        <source>Colors set to defaults</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6525"/>
-        <source>Colors set to Default Theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6540"/>
-        <source>Colors set to grey</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6852"/>
-        <source>Scope monitoring...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6917"/>
-        <source>Scope stopped</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="6999"/>
-        <source>Humidity: {}%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7005"/>
-        <source>Temperature: {}{}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7009"/>
-        <source>Pressure: {}hPa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7158"/>
-        <source>Scope recording...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7229"/>
-        <source>Scope recording stopped</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7301"/>
-        <source>Not enough data collected yet. Try again in a few seconds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8075"/>
-        <source>Scope is OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7366"/>
-        <source>Roast time starts now 00:00 BT = {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7392"/>
-        <source>[TP] recorded at {0} BT = {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7481"/>
-        <source>[DRY END] recorded at {0} BT = {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7572"/>
-        <source>[FC START] recorded at {0} BT = {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7654"/>
-        <source>[FC END] recorded at {0} BT = {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7740"/>
-        <source>[SC START] recorded at {0} BT = {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7826"/>
-        <source>[SC END] recorded at {0} BT = {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7949"/>
-        <source>Roast ended at {0} BT = {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8115"/>
-        <source>[COOL END] recorded at {0} BT = {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8331"/>
-        <source>Event # {0} recorded at BT = {1} Time = {2}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8349"/>
-        <source>Timer is OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8381"/>
-        <source>Computer Event # {0} recorded at BT = {1} Time = {2}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8602"/>
-        <source>Statistics cancelled: need complete profile [CHARGE] + [DROP]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8851"/>
-        <source>Unable to move background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8910"/>
-        <source>No finished profile found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8928"/>
-        <source>Polynomial coefficients (Horner form):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8931"/>
-        <source>Knots:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8934"/>
-        <source>Residual:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8937"/>
-        <source>Roots:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="8941"/>
-        <source>Profile information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9250"/>
-        <source>Designer Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9250"/>
-        <source>Importing a profile in to Designer will decimate all data except the main [points].
-Continue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9278"/>
-        <source>Save Points</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9288"/>
-        <source>Points saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9297"/>
-        <source>Load Points</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9310"/>
-        <source>Points loaded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9347"/>
-        <source>Designer Init</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9347"/>
-        <source>Unable to start designer.
-Profile missing [CHARGE] or [DROP]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9625"/>
-        <source>[ CHARGE ]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9628"/>
-        <source>[ DRY END ]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9631"/>
-        <source>[ FC START ]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9634"/>
-        <source>[ FC END ]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9637"/>
-        <source>[ SC START ]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9640"/>
-        <source>[ SC END ]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9643"/>
-        <source>[ DROP ]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="9946"/>
-        <source>New profile created</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48729"/>
-        <source>Open Wheel Graph</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10135"/>
-        <source> added to cupping notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10144"/>
-        <source> added to roasting notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10405"/>
-        <source>Mouse Cross ON: move mouse around</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10417"/>
-        <source>Mouse cross OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10579"/>
-        <source>follow on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10581"/>
-        <source>follow off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13973"/>
-        <source>Welcome to the ArtisanViewer!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13974"/>
-        <source>This is a one time message to introduce you to the ArtisanViewer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13975"/>
-        <source>The ArtisanViewer opens whenever a copy of Artisan is already running.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13976"/>
-        <source>Only one instance of Artisan able to record profiles may be open.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13977"/>
-        <source>Multiple instances of ArtisanViewer can be open at the same time.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13978"/>
-        <source>ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13979"/>
-        <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using &apos;Help&gt;Save Settings&apos; and &apos;Help&gt;Load Settings&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13980"/>
-        <source>Enjoy using ArtisanViewer,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13981"/>
-        <source>The Artisan Team</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13982"/>
-        <source>One time message about ArtisanViewer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14400"/>
-        <source>Configure for {0}?&lt;br&gt;Your current settings will be overwritten!&lt;br&gt;&lt;br&gt;It is advisable to save your current settings beforehand via menu Help &gt;&gt; Save Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14402"/>
-        <source>Adjust Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14411"/>
-        <source>Artisan configured for {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14421"/>
-        <source>Machine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14421"/>
-        <source>Network name or IP address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14451"/>
-        <source>Port Configuration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14451"/>
-        <source>Comm Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25905"/>
-        <source>Load theme {0}?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25906"/>
-        <source>Adjust Theme Related Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25913"/>
-        <source>Loaded theme {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14681"/>
-        <source>Detected a color pair that may be hard to see: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15146"/>
-        <source>super on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15148"/>
-        <source>super off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16623"/>
-        <source>Alarms on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16626"/>
-        <source>Alarms off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16635"/>
-        <source>autoCHARGE on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16638"/>
-        <source>autoCHARGE off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16647"/>
-        <source>autoDROP on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16650"/>
-        <source>autoDROP off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16954"/>
-        <source>Do you want to reset all settings?&lt;br&gt; ArtisanViewer has to be restarted!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16956"/>
-        <source>Do you want to reset all settings?&lt;br&gt; Artisan has to be restarted!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="16957"/>
-        <source>Factory Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17389"/>
-        <source>Load Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49155"/>
-        <source>Load Alarms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17433"/>
-        <source>PID Mode: Ramp/Soak</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17435"/>
-        <source>PID Mode: Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17431"/>
-        <source>PID Mode: Manual</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17449"/>
-        <source>PID Lookahead: {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17477"/>
-        <source>Exit Designer?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17478"/>
-        <source>Designer Mode ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17705"/>
-        <source>Keyboard moves turned ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17713"/>
-        <source>Keyboard moves turned OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17797"/>
-        <source>Profile {0} saved in: {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17812"/>
-        <source>Autosave path does not exist. Autosave failed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17814"/>
-        <source>Empty path or box unchecked in Autosave</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17821"/>
-        <source>&lt;table&gt;&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[ENTER]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Turns ON/OFF Keyboard Shortcuts&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17822"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[SPACE]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Choses current button&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17823"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[LEFT,RIGHT,UP,DOWN]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Move background or key focus&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17824"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[a]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Autosave&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17825"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[CRTL N]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Autosave + Reset + START&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17826"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[t]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Toggle mouse cross lines&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17827"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[d]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Toggle xy scale (T/Delta)&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17828"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[c]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Shows/Hides Controls&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17829"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[x]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Shows/Hides LCD Readings&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17830"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[m]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Shows/Hides Event Buttons&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17831"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[b]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Shows/Hides Extra Event Buttons&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17832"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[s]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Shows/Hides Event Sliders&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17835"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[p]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Toggle PID mode&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17836"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[h]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Load background profile&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17837"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[l]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Load alarms&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17838"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[+,-]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Inc/dec PID lookahead&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17839"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[CRTL 0-9]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Changes Event Button Palettes&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17840"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[;]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Application ScreenShot&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17841"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[:]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Desktop ScreenShot&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17842"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[q,w,e,r + &lt;i&gt;nn&lt;/i&gt;]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Quick Custom Event&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17843"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[v + &lt;i&gt;nnn&lt;/i&gt;]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Quick PID SV&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17844"/>
-        <source>&lt;tr&gt;&lt;td align=&apos;right&apos;&gt;&lt;b&gt;[f]&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Full Screen Mode&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17847"/>
-        <source>Keyboard Shortcuts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17930"/>
-        <source>Event #{0}:  {1} has been updated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="17993"/>
-        <source>Select</source>
-        <translation type="unfinished">Välj</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18003"/>
-        <source>Open</source>
-        <translation type="unfinished">Öppna</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18013"/>
-        <source>Save</source>
-        <translation type="unfinished">Spara</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18022"/>
-        <source>Select Directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18060"/>
-        <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18065"/>
-        <source>NEW ROAST canceled: incomplete profile lacking DROP found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18076"/>
-        <source>{0} has been saved. New roast has started</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18381"/>
-        <source>Invalid artisan format</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18124"/>
-        <source>{0}  loaded </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18373"/>
-        <source>Background {0} loaded successfully {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18498"/>
-        <source>Artisan CSV file loaded successfully</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27666"/>
-        <source>Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="18642"/>
-        <source>The Probat Shop Pilot Software expects files named &lt;Name&gt;_&lt;Index&gt;.xml like in Test_0.xml on import</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="19497"/>
-        <source>To fully load this profile the extra device configuration needs to modified?
-Modify your setup?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26572"/>
-        <source>Found a different number of curves</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20473"/>
-        <source>Save Profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20490"/>
-        <source>Profile saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25963"/>
-        <source>Cancelled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20520"/>
-        <source>Readings exported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20528"/>
-        <source>Export Excel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20531"/>
-        <source>Export CSV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20534"/>
-        <source>Export JSON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20537"/>
-        <source>Export RoastLogger</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20540"/>
-        <source>Export Probat Pilot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20694"/>
-        <source>Converting...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20713"/>
-        <source>Target file {0} exists. {1} not converted.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20729"/>
-        <source>Readings imported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20737"/>
-        <source>Import CSV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20740"/>
-        <source>Import JSON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20743"/>
-        <source>Import RoastLogger</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20765"/>
-        <source>Batch Counter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="20768"/>
-        <source>Load Settings canceled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23507"/>
-        <source>Excel Production Report exported to {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23948"/>
-        <source>Ranking Report</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23948"/>
-        <source>Ranking graphs are only generated up to {0} profiles</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24120"/>
-        <source>Profile missing Dry event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24134"/>
-        <source>Profile missing phase events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24444"/>
-        <source>Excel Ranking Report exported to {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25412"/>
-        <source>Oversampling is only active with a sampling interval equal or larger than 3s.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25605"/>
-        <source>Hottop control turned off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25619"/>
-        <source>Hottop control turned on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25622"/>
-        <source>To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25636"/>
-        <source>PID Standby ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25641"/>
-        <source>PID Standby OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25869"/>
-        <source>Settings not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25811"/>
-        <source>artisan-settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25812"/>
-        <source>Save Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25815"/>
-        <source>Settings saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25875"/>
-        <source>artisan-theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25876"/>
-        <source>Save Theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25879"/>
-        <source>Theme saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25903"/>
-        <source>Load Theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="25930"/>
-        <source>Theme loaded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26107"/>
-        <source>Alarm Config</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26107"/>
-        <source>Alarms are not available for device None</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26158"/>
-        <source>Switching the language needs a restart. Restart now?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26159"/>
-        <source>Restart</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26207"/>
-        <source>Import K202 CSV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26260"/>
-        <source>K202 file loaded successfully</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26274"/>
-        <source>Import K204 CSV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26341"/>
-        <source>K204 file loaded successfully</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26374"/>
-        <source>Import Probat Recipe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26531"/>
-        <source>Probat Pilot data imported successfully</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26542"/>
-        <source>Import Probat Pilot failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26547"/>
-        <source>Import Aillio Roastime JSON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26571"/>
-        <source>To load this profile the extra devices configuration needs to be changed.
-Continue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26657"/>
-        <source>Warning! Deleted an event that occurs after the end of profile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26680"/>
-        <source>Imported {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26682"/>
-        <source>Unable to import. Inconsistent number of samples</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26696"/>
-        <source>Import HH506RA CSV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26748"/>
-        <source>HH506RA file loaded successfully</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26791"/>
-        <source>Save Graph as</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26815"/>
-        <source>{0}  size({1},{2}) saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26824"/>
-        <source>Save Graph as PDF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26826"/>
-        <source>Save Graph as SVG</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="26835"/>
-        <source>{0} saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27032"/>
-        <source>Wheel {0} loaded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27035"/>
-        <source>Invalid Wheel graph format</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27416"/>
-        <source>Save Palettes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27420"/>
-        <source>Palettes saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27482"/>
-        <source>Invalid palettes file format</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27485"/>
-        <source>Palettes loaded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35350"/>
-        <source>Load Palettes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27519"/>
-        <source>Alarms loaded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27614"/>
-        <source>Sampling Interval</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27666"/>
-        <source>A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28686"/>
-        <source>Assignment problem</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29207"/>
-        <source>Interpolation failed: no profile available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29216"/>
-        <source>Sound turned ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29220"/>
-        <source>Sound turned OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29418"/>
-        <source>[ET target 1 = {0}] [BT target 1 = {1}] [ET target 2 = {2}] [BT target 2 = {3}]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29878"/>
-        <source>Return the absolute value of x.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29879"/>
-        <source>Return the arc cosine (measured in radians) of x.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29880"/>
-        <source>Return the arc sine (measured in radians) of x.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29881"/>
-        <source>Return the arc tangent (measured in radians) of x.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29882"/>
-        <source>Return the cosine of x (measured in radians).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29883"/>
-        <source>Convert angle x from radians to degrees.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29884"/>
-        <source>Return e raised to the power of x.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29885"/>
-        <source>Return the logarithm of x to the given base. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29886"/>
-        <source>Return the base 10 logarithm of x.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29887"/>
-        <source>Return the minimum of x and y.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29888"/>
-        <source>Return the maximum of x and y.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29889"/>
-        <source>Return x**y (x to the power of y).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29890"/>
-        <source>Convert angle x from degrees to radians.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29891"/>
-        <source>Return the sine of x (measured in radians).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29892"/>
-        <source>Return the square root of x.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29893"/>
-        <source>Return the tangent of x (measured in radians).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29831"/>
-        <source>Actual value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29899"/>
-        <source>ET value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29900"/>
-        <source>BT value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29834"/>
-        <source>Extra Device #1 T1 value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29835"/>
-        <source>Extra Device #1 T2 value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29836"/>
-        <source>Extra Device #2 T1 value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29837"/>
-        <source>Extra Device #2 T2 value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29839"/>
-        <source>ET background </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29915"/>
-        <source>BT background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29841"/>
-        <source>Extra background #1-A</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29842"/>
-        <source>Extra background #1-B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29843"/>
-        <source>Extra background #2-A</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29845"/>
-        <source>ET tare value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29846"/>
-        <source>BT tare value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29847"/>
-        <source>Extra Device #1 channel 1 tare value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29848"/>
-        <source>Extra Device #1 channel 2 tare value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29850"/>
-        <source>Math formulas are evaluated in order</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29851"/>
-        <source>(extra devices before the main device)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29935"/>
-        <source>MATHEMATICAL FUNCTIONS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29937"/>
-        <source>SYMBOLIC VARIABLES</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29897"/>
-        <source>Factor to scale from C/min to C axis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29898"/>
-        <source>Offset to align from C/min to C axis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29901"/>
-        <source>Extra #1 T1 value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29902"/>
-        <source>Extra #1 T2 value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29903"/>
-        <source>Extra #2 T1 value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29904"/>
-        <source>Extra #2 T2 value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29905"/>
-        <source>ET value delayed by 2 index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29906"/>
-        <source>BT value index advanced once</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29907"/>
-        <source>Extra #2 T2 advanced 1 index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29908"/>
-        <source>Time one index ahead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29909"/>
-        <source>Time three indexes delayed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29910"/>
-        <source>Last expression result. Feedback of same expression</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29911"/>
-        <source>Third last expression result (Feedback)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29912"/>
-        <source>Gets results from Plot #1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29913"/>
-        <source>Gets results from Plot #3 delayed by 2 indexes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29914"/>
-        <source>ET background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29916"/>
-        <source>ExtraBackground #1-A</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29917"/>
-        <source>ExtraBackground #1-B shifted 6 indexes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29918"/>
-        <source>ExtraBackground #2-A shifted 2 indexes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29919"/>
-        <source>Event type 1. Event types are 1-4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29920"/>
-        <source>Event type 4.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29923"/>
-        <source>Comments out plot. It does not evaluate. Use as first character.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29924"/>
-        <source>Hides plot. It evaluates. Hides intermediate results for cascading plots</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29925"/>
-        <source>Plotter uses the left Y-coordinate as units. To use right, use multiplying factor: left-max/right-max</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29927"/>
-        <source>Makes a nottation. annotate(text,time,temperatue,fontsize)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29928"/>
-        <source>Example: annotate(HELLO,03:00,200,10)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29929"/>
-        <source>Supports mathematical formulas with TeX markup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29930"/>
-        <source>Example:annotate(annotate($integral-symbol = int_{t=0}^infty<byte value="xc"/>rac{log(t)*dt}{3}$,02:00,200,20)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="29939"/>
-        <source>MISC./COMMANDS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30888"/>
-        <source>The recorded CHARGE time ({0}) does not match the post roast calculated CHARGE time. ({1})</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30891"/>
-        <source>The recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32417"/>
-        <source>Alarms from events #{0} created</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32490"/>
-        <source>No events found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32444"/>
-        <source>Event #{0} added</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32447"/>
-        <source>No profile found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32478"/>
-        <source> Events #{0} deleted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32484"/>
-        <source> Event #{0} deleted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="32952"/>
-        <source>Roast properties updated but profile not saved to disk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33317"/>
-        <source>Autosave ON. Prefix: {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33321"/>
-        <source>Autosave OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33870"/>
-        <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35406"/>
-        <source>&lt;b&gt;Event&lt;/b&gt; hide or show the corresponding slider</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35407"/>
-        <source>&lt;b&gt;Action&lt;/b&gt; Perform an action on slider release</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35408"/>
-        <source>&lt;b&gt;Command&lt;/b&gt; depends on the action type&lt;br&gt;(&apos;{}&apos; is replaced by &lt;i&gt;value&lt;/i&gt;*&lt;i&gt;factor&lt;/i&gt; + &lt;i&gt;offset&lt;/i&gt;)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35409"/>
-        <source>&lt;ul&gt;&lt;li&gt;Serial Command: ASCII serial command or binary a2b_uu(serial command)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36585"/>
-        <source>&lt;LI&gt;Modbus Command: &lt;ul&gt;&lt;li&gt;&lt;b&gt;write&lt;/b&gt;([slaveId,register,value],..,[slaveId,register,value])&lt;br&gt;write register: &lt;i&gt;MODBUS function 6 (int) or function 16 (float)&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36586"/>
-        <source>&lt;li&gt;&lt;b&gt;wcoil&lt;/b&gt;(slaveId,register,&amp;lt;bool&amp;gt;)&lt;br&gt;write coil: &lt;i&gt;MODBUS function 5&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36587"/>
-        <source>&lt;li&gt;&lt;b&gt;wcoils&lt;/b&gt;(slaveId,register,[&amp;lt;bool&amp;gt;,..,&amp;lt;bool&amp;gt;])&lt;br&gt;write coils: &lt;i&gt;MODBUS function 15&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36588"/>
-        <source>&lt;li&gt;&lt;b&gt;mwrite&lt;/b&gt;(slaveId,register,andMask,orMask)&lt;br&gt;mask write register: &lt;i&gt;MODBUS function 22&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36589"/>
-        <source>&lt;li&gt;&lt;b&gt;writem&lt;/b&gt;(slaveId,register,value) or &lt;b&gt;writem&lt;/b&gt;(slaveId,register,[&amp;lt;int&amp;gt;,..,&amp;lt;int&amp;gt;])&lt;br&gt;write registers: &lt;i&gt;MODBUS function 16&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35415"/>
-        <source>&lt;li&gt;&lt;b&gt;writeBCD&lt;/b&gt;(slaveId,register,value) or &lt;b&gt;writeBCD&lt;/b&gt;(slaveId,register,[&amp;lt;int&amp;gt;,..,&amp;lt;int&amp;gt;])&lt;br&gt;write BCD encoded int register: &lt;i&gt;MODBUS function 16 (BCD)&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36590"/>
-        <source>&lt;/ul&gt;writes values to the registers in slaves specified by the given id</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35417"/>
-        <source>&lt;li&gt;DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35418"/>
-        <source>&lt;b&gt;Offset&lt;/b&gt; added as offset to the slider value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35419"/>
-        <source>&lt;b&gt;Factor&lt;/b&gt; multiplicator of the slider value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35421"/>
-        <source>Event custom sliders</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36557"/>
-        <source>Event configuration saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36560"/>
-        <source>Found empty event type box</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36575"/>
-        <source>&lt;small&gt;&lt;b&gt;Button Label&lt;/b&gt; Enter \n to create labels with multiple lines.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36576"/>
-        <source> \t is substituted by the event type.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36577"/>
-        <source>&lt;b&gt;Event Description&lt;/b&gt; Description of the Event to be recorded.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36578"/>
-        <source>&lt;b&gt;Event type&lt;/b&gt; Type of event to be recorded.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36579"/>
-        <source>&lt;b&gt;Event value&lt;/b&gt; Value of event (1-100) to be recorded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36580"/>
-        <source>&lt;b&gt;Action&lt;/b&gt; Perform an action at the time of the event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36581"/>
-        <source>&lt;b&gt;Documentation&lt;/b&gt; depends on the action type (&apos;{}&apos; is replaced by the event value):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36582"/>
-        <source>&lt;UL&gt;&lt;LI&gt;Serial Command: ASCII serial command or binary a2b_uu(serial command)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36583"/>
-        <source>&lt;LI&gt;Call Program: A program/script path (absolute or relative)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36584"/>
-        <source>&lt;LI&gt;Multiple Event: Adds events of other button numbers separated by a comma: 1,2,..</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36591"/>
-        <source>&lt;LI&gt;S7 Command: &lt;ul&gt;&lt;li&gt;&lt;b&gt;getDBint&lt;/b&gt;(&amp;lt;dbnumber&amp;gt;,&amp;lt;start&amp;gt;): read int from S7 DB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36592"/>
-        <source>&lt;li&gt;&lt;b&gt;getDBfloat&lt;/b&gt;(&amp;lt;dbnumber&amp;gt;,&amp;lt;start&amp;gt;): read float from S7 DB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36593"/>
-        <source>&lt;li&gt;&lt;b&gt;setDBint&lt;/b&gt;(&amp;lt;dbnumber&amp;gt;,&amp;lt;start&amp;gt;,&amp;lt;value&amp;gt;): write int to S7 DB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36594"/>
-        <source>&lt;li&gt;&lt;b&gt;setDBfloat&lt;/b&gt;(&amp;lt;dbnumber&amp;gt;,&amp;lt;start&amp;gt;,&amp;lt;value&amp;gt;): write float to S7 DB&lt;/ul&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36595"/>
-        <source>&lt;LI&gt;DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36596"/>
-        <source>&lt;LI&gt;IO Command: set(n,0), set(n,1), toggle(n), pulse(n,t) to set Phidget IO digital output n</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36597"/>
-        <source>&lt;LI&gt;PWM Command: out(n,v), toggle(n), pulse(n,t) set digital output channel n to PWM value v (0-100) on a Phidget OUT1100; outhub(n,v), togglehub(n), pulsehub(n,t) on a Phidget HUB0000</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36598"/>
-        <source>&lt;LI&gt;VOUT Command: out(n,v) set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V) on a Phidget OUT1000/OUT1001/OUT1002</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36599"/>
-        <source>&lt;LI&gt;Hottop Heater: sets heater to value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36600"/>
-        <source>&lt;LI&gt;Hottop Fan: sets fan to value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36601"/>
-        <source>&lt;LI&gt;Hottop Command: motor(n),solenoid(n),stirrer(n),heater(h),fan(f) with n={0,1},h={0,..100},f={0,..10}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36602"/>
-        <source>&lt;LI&gt;p-i-d: configures PID to the values &amp;lt;p&amp;gt;;&amp;lt;i&amp;gt;;&amp;lt;d&amp;gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36603"/>
-        <source>&lt;b&gt;Button Visibility&lt;/b&gt; Hides/shows individual button&lt;/small&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36605"/>
-        <source>Event custom buttons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="36934"/>
-        <source>Phases changed to {0} default: {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37084"/>
-        <source>Background profile not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37089"/>
-        <source>Background does not match number of labels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37462"/>
-        <source>Playback Events set ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37473"/>
-        <source>Playback DROP set ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37491"/>
-        <source>Playback Aid set ON at {0} secs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37609"/>
-        <source>Reading background profile...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="39419"/>
-        <source>Probat Middleware disconnected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40703"/>
-        <source>Phidget Temperature Sensor IR attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40706"/>
-        <source>Phidget Temperature Sensor 1-input attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40709"/>
-        <source>Phidget Isolated Thermocouple 1-input attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40712"/>
-        <source>Phidget VINT RTD 1-input attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40722"/>
-        <source>Phidget Temperature Sensor IR detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40724"/>
-        <source>Phidget Temperature Sensor 1-input detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40726"/>
-        <source>Phidget Isolated Thermocouple 1-input detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40728"/>
-        <source>Phidget VINT RTD 1-input detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40959"/>
-        <source>Phidget Temperature Sensor 4-input attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="40969"/>
-        <source>Phidget Temperature Sensor 4-input detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41237"/>
-        <source>Phidget Bridge 4-input attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41247"/>
-        <source>Phidget Bridge 4-input detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41928"/>
-        <source>Phidget IO 2/2/2 attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41930"/>
-        <source>Phidget IO 6/6/6 attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41932"/>
-        <source>Phidget IO 8/8/8 attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41934"/>
-        <source>Phidget DAQ1400 attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41936"/>
-        <source>Phidget IO attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41947"/>
-        <source>Phidget IO 2/2/2 detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41949"/>
-        <source>Phidget IO 6/6/6 detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41951"/>
-        <source>Phidget IO 8/8/8 detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41953"/>
-        <source>Phidget DAQ1400 detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="41955"/>
-        <source>Phidget IO detached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42196"/>
-        <source>Yocto Thermocouple attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42198"/>
-        <source>Yocto IR attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42241"/>
-        <source>Yocto PT100 attached</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="42457"/>
-        <source>TC4 initialized</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43157"/>
-        <source>Not enough time points for an ET curviness of {0}. Set curviness to {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43387"/>
-        <source>Designer Config</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43164"/>
-        <source>Not enough time points for an BT curviness of {0}. Set curviness to {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43379"/>
-        <source>CHARGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43380"/>
-        <source>DRY END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43381"/>
-        <source>FC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43382"/>
-        <source>FC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43383"/>
-        <source>SC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43384"/>
-        <source>SC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43385"/>
-        <source>DROP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43179"/>
-        <source>Incorrect time format. Please recheck {0} time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43386"/>
-        <source>Times need to be in ascending order. Please recheck {0} time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="43351"/>
-        <source>Designer has been reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44609"/>
-        <source>The MODBUS device corresponds to input channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44610"/>
-        <source>1 and 2.. The MODBUS_34 extra device adds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44611"/>
-        <source> input channels 3 and 4.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44612"/>
-        <source>Inputs with slave id set to 0 are turned off.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44613"/>
-        <source>Modbus function 3 &apos;read holding register&apos; is the standard.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44614"/>
-        <source> Modbus function 4 triggers the use of &apos;read </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44615"/>
-        <source> input register&apos;. Input registers (fct 4) usually</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44616"/>
-        <source> are from 30000-39999.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44617"/>
-        <source>Most devices hold data in 2 byte integer registers. A temperature of 145.2C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44618"/>
-        <source> is often sent as 1452. In that case you have to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44619"/>
-        <source> set the divider to &apos;x/10&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44620"/>
-        <source>Few devices hold data as 4 byte floats in two registers.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44621"/>
-        <source> Tick the Float flag in this case.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44624"/>
-        <source>MODBUS Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44774"/>
-        <source>Serial Port Settings: {0}, {1}, {2}, {3}, {4}, {5}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46188"/>
-        <source>External program</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46429"/>
-        <source>Device not set</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46500"/>
-        <source>PID to control ET set to {0} {1} ; PID to read BT set to {2} {3}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46711"/>
-        <source>Device set to {0}. Now, check Serial Port settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47056"/>
-        <source>Device set to {0}. Now, chose serial port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46564"/>
-        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46618"/>
-        <source>Device set to {0}, which is equivalent to CENTER 309. Now, chose serial port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46645"/>
-        <source>Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46627"/>
-        <source>Device set to {0}, which is equivalent to CENTER 306. Now, chose serial port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46654"/>
-        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, chose serial port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46754"/>
-        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, chose serial port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47035"/>
-        <source>Device set to {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46684"/>
-        <source>Device set to {0}{1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46736"/>
-        <source>Device set to {0}. Now, chose Modbus serial port or IP address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46745"/>
-        <source>Device set to {0}, which is equivalent to CENTER 302. Now, chose serial port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48051"/>
-        <source>Color of {0} set to {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48028"/>
-        <source>Config LCD colors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48719"/>
-        <source>Save Wheel graph</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48723"/>
-        <source>Wheel Graph saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49199"/>
-        <source>Error loading alarm file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49203"/>
-        <source>Save Alarms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49246"/>
-        <source>&lt;b&gt;Nr:&lt;/b&gt; alarm number for reference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49247"/>
-        <source>&lt;b&gt;Status:&lt;/b&gt; activate or deactive alarm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49248"/>
-        <source>&lt;b&gt;If Alarm:&lt;/b&gt; alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49249"/>
-        <source>&lt;b&gt;But Not:&lt;/b&gt; alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49250"/>
-        <source>&lt;b&gt;From:&lt;/b&gt; alarm only triggered after the given event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49251"/>
-        <source>&lt;b&gt;Time:&lt;/b&gt; if not 00:00, alarm is triggered mm:ss after the event &apos;From&apos; happend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49252"/>
-        <source>&lt;b&gt;Source:&lt;/b&gt; the observed temperature source</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49253"/>
-        <source>&lt;b&gt;Condition:&lt;/b&gt; alarm is triggered if source rises above or below the specified temperature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49254"/>
-        <source>&lt;b&gt;Temp:&lt;/b&gt; the specified temperature limit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49255"/>
-        <source>&lt;b&gt;Action:&lt;/b&gt; the action to be triggered if all conditions are fulfilled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49256"/>
-        <source>&lt;b&gt;Description:&lt;/b&gt; the text of the popup, the name of the program, the number of the event button, the new value of the slider or the program to call</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49257"/>
-        <source>&lt;b&gt;NOTE:&lt;/b&gt; each alarm is only triggered once</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52017"/>
-        <source>OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52010"/>
-        <source>CONTINUOUS CONTROL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52023"/>
-        <source>ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52022"/>
-        <source>STANDBY MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50250"/>
-        <source>The rampsoak-mode tells how to start and end the ramp/soak</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50251"/>
-        <source>Your rampsoak mode in this pid is:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50252"/>
-        <source>Mode = {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50254"/>
-        <source>Start to run from PV value: {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50255"/>
-        <source>End output status at the end of ramp/soak: {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50256"/>
-        <source>Output status while ramp/soak operation set to OFF: {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50257"/>
-        <source>
-Repeat Operation at the end: {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50259"/>
-        <source>Recomended Mode = 0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50260"/>
-        <source>If you need to change it, change it now and come back later</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50261"/>
-        <source>Use the Parameter Loader Software by Fuji if you need to
-
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50262"/>
-        <source>Continue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52176"/>
-        <source>Ramp Soak start-end mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51115"/>
-        <source>Load PID Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51200"/>
-        <source>Save PID Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51389"/>
-        <source>Current sv = {0}. Change now to sv = {1}?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51455"/>
-        <source>Change svN</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51454"/>
-        <source>Current pid = {0}. Change now to pid ={1}?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52117"/>
-        <source>Pattern changed to {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52119"/>
-        <source>Pattern did not changed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52122"/>
-        <source>Ramp/Soak was found ON! Turn it off before changing the pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52124"/>
-        <source>Ramp/Soak was found in Hold! Turn it off before changing the pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52744"/>
-        <source>Activate PID front buttons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52744"/>
-        <source>Remember SV memory has a finite
-life of ~10,000 writes.
-
-Proceed?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52863"/>
-        <source>RS ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52866"/>
-        <source>RS OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52868"/>
-        <source>RS on HOLD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52987"/>
-        <source>PXG/PXF sv#{0} set to {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53009"/>
-        <source>PXR sv set to {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53044"/>
-        <source>SV{0} changed from {1} to {2})</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53052"/>
-        <source>Unable to set sv{0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53063"/>
-        <source>SV changed from {0} to {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53071"/>
-        <source>Unable to set sv</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53073"/>
-        <source>Unable to set new sv</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53728"/>
-        <source>Load Ramp/Soak Table</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53748"/>
-        <source>Save Ramp/Soak Table</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="54066"/>
-        <source>PID turned on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="54108"/>
-        <source>PID turned off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="54380"/>
-        <source>p-i-d values updated</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avsluta %1</translation>
     </message>
 </context>
 <context>
     <name>PPDOptionsModel</name>
     <message>
-        <location filename="." line="1"/>
         <source>Name</source>
         <translation type="obsolete">Namn</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Value</source>
         <translation type="obsolete">Värde</translation>
     </message>
 </context>
 <context>
-    <name>Plus</name>
+    <name>Print Device Input Slot</name>
     <message>
-        <location filename="../plus/controller.py" line="128"/>
-        <source>Keyring error: Ensure that gnome-keyring is installed.</source>
+        <location filename="../../qtbase/src/printsupport/kernel/qplatformprintdevice.cpp" line="+292"/>
+        <source>Automatic</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>Print Device Output Bin</name>
     <message>
-        <location filename="../plus/controller.py" line="131"/>
-        <source>Login aborted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="136"/>
-        <source>authentified</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="137"/>
-        <source>Connected to artisan.plus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="175"/>
-        <source>artisan.plus turned off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="147"/>
-        <source>Authentication failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="157"/>
-        <source>Couldn&apos;t connect to artisan.plus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/controller.py" line="177"/>
-        <source>artisan.plus disconnected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="40"/>
-        <source>Register</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="42"/>
-        <source>Reset Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="46"/>
-        <source>Email</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="52"/>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="55"/>
-        <source>Remember</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/queue.py" line="165"/>
-        <source>Queuing roast for upload to artisan.plus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/stock.py" line="172"/>
-        <source>bag</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/stock.py" line="173"/>
-        <source>box</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/stock.py" line="174"/>
-        <source>barrel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/stock.py" line="177"/>
-        <source>bags</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/stock.py" line="178"/>
-        <source>boxes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/stock.py" line="179"/>
-        <source>barrels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../plus/sync.py" line="290"/>
-        <source>Updated data received from artisan.plus</source>
+        <location line="+20"/>
+        <source>Automatic</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>Q3Accel</name>
     <message>
-        <location filename="." line="20"/>
         <source>%1, %2 not defined</source>
-        <translation type="obsolete">%1, %2 är inte definierad</translation>
+        <translation type="vanished">%1, %2 är inte definierad</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Ambiguous %1 not handled</source>
-        <translation type="obsolete">Tvetydigt %1 hanteras inte</translation>
+        <translation type="vanished">Tvetydigt %1 hanteras inte</translation>
     </message>
 </context>
 <context>
     <name>Q3DataTable</name>
     <message>
-        <location filename="." line="20"/>
         <source>True</source>
-        <translation type="obsolete">Sant</translation>
+        <translation type="vanished">Sant</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>False</source>
-        <translation type="obsolete">Falskt</translation>
+        <translation type="vanished">Falskt</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Insert</source>
-        <translation type="obsolete">Infoga</translation>
+        <translation type="vanished">Infoga</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Update</source>
-        <translation type="obsolete">Uppdatera</translation>
+        <translation type="vanished">Uppdatera</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Delete</source>
-        <translation type="obsolete">Ta bort</translation>
+        <translation type="vanished">Ta bort</translation>
     </message>
 </context>
 <context>
     <name>Q3FileDialog</name>
     <message>
-        <location filename="." line="20"/>
         <source>Copy or Move a File</source>
-        <translation type="obsolete">Kopiera eller ta bort en fil</translation>
+        <translation type="vanished">Kopiera eller ta bort en fil</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Read: %1</source>
-        <translation type="obsolete">Läs: %1</translation>
+        <translation type="vanished">Läs: %1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Write: %1</source>
-        <translation type="obsolete">Skriv: %1</translation>
+        <translation type="vanished">Skriv: %1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="vanished">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>All Files (*)</source>
-        <translation type="obsolete">Alla filer (*)</translation>
+        <translation type="vanished">Alla filer (*)</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Name</source>
-        <translation type="obsolete">Namn</translation>
+        <translation type="vanished">Namn</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Size</source>
-        <translation type="obsolete">Storlek</translation>
+        <translation type="vanished">Storlek</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Type</source>
-        <translation type="obsolete">Typ</translation>
+        <translation type="vanished">Typ</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Date</source>
-        <translation type="obsolete">Datum</translation>
+        <translation type="vanished">Datum</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Attributes</source>
-        <translation type="obsolete">Attribut</translation>
+        <translation type="vanished">Attribut</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="vanished">&amp;OK</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Look &amp;in:</source>
-        <translation type="obsolete">Leta &amp;i:</translation>
+        <translation type="vanished">Leta &amp;i:</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>File &amp;name:</source>
-        <translation type="obsolete">Fil&amp;namn:</translation>
+        <translation type="vanished">Fil&amp;namn:</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>File &amp;type:</source>
-        <translation type="obsolete">Fil&amp;typ:</translation>
+        <translation type="vanished">Fil&amp;typ:</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Back</source>
-        <translation type="obsolete">Tillbaka</translation>
+        <translation type="vanished">Tillbaka</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>One directory up</source>
-        <translation type="obsolete">En katalog uppåt</translation>
+        <translation type="vanished">En katalog uppåt</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Create New Folder</source>
-        <translation type="obsolete">Skapa ny mapp</translation>
+        <translation type="vanished">Skapa ny mapp</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>List View</source>
-        <translation type="obsolete">Listvy</translation>
+        <translation type="vanished">Listvy</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Detail View</source>
-        <translation type="obsolete">Detaljvy</translation>
+        <translation type="vanished">Detaljvy</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Preview File Info</source>
-        <translation type="obsolete">Förhandsgranska filinformation</translation>
+        <translation type="vanished">Förhandsgranska filinformation</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Preview File Contents</source>
-        <translation type="obsolete">Förhandsgranska filinnehåll</translation>
+        <translation type="vanished">Förhandsgranska filinnehåll</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Read-write</source>
-        <translation type="obsolete">Läs-skriv</translation>
+        <translation type="vanished">Läs-skriv</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Read-only</source>
-        <translation type="obsolete">Skrivskyddad</translation>
+        <translation type="vanished">Skrivskyddad</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Write-only</source>
-        <translation type="obsolete">Lässkyddad</translation>
+        <translation type="vanished">Lässkyddad</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Inaccessible</source>
-        <translation type="obsolete">Otillgänglig</translation>
+        <translation type="vanished">Otillgänglig</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Symlink to File</source>
-        <translation type="obsolete">Symbolisk länk till fil</translation>
+        <translation type="vanished">Symbolisk länk till fil</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Symlink to Directory</source>
-        <translation type="obsolete">Symbolisk länk till katalog</translation>
+        <translation type="vanished">Symbolisk länk till katalog</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Symlink to Special</source>
-        <translation type="obsolete">Symbolisk länk till special</translation>
+        <translation type="vanished">Symbolisk länk till special</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>File</source>
-        <translation type="obsolete">Fil</translation>
+        <translation type="vanished">Fil</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Dir</source>
-        <translation type="obsolete">Katalog</translation>
+        <translation type="vanished">Katalog</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Special</source>
-        <translation type="obsolete">Special</translation>
+        <translation type="vanished">Special</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Open</source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="vanished">Öppna</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Save As</source>
-        <translation type="obsolete">Spara som</translation>
+        <translation type="vanished">Spara som</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Open</source>
-        <translation type="obsolete">&amp;Öppna</translation>
+        <translation type="vanished">&amp;Öppna</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Save</source>
-        <translation type="obsolete">&amp;Spara</translation>
+        <translation type="vanished">&amp;Spara</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Rename</source>
-        <translation type="obsolete">&amp;Byt namn</translation>
+        <translation type="vanished">&amp;Byt namn</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Delete</source>
-        <translation type="obsolete">&amp;Ta bort</translation>
+        <translation type="vanished">&amp;Ta bort</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>R&amp;eload</source>
-        <translation type="obsolete">Uppdat&amp;era</translation>
+        <translation type="vanished">Uppdat&amp;era</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Sort by &amp;Name</source>
-        <translation type="obsolete">Sortera efter &amp;namn</translation>
+        <translation type="vanished">Sortera efter &amp;namn</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Sort by &amp;Size</source>
-        <translation type="obsolete">Sortera efter &amp;storlek</translation>
+        <translation type="vanished">Sortera efter &amp;storlek</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Sort by &amp;Date</source>
-        <translation type="obsolete">Sortera efter &amp;datum</translation>
+        <translation type="vanished">Sortera efter &amp;datum</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Unsorted</source>
-        <translation type="obsolete">&amp;Osorterad</translation>
+        <translation type="vanished">&amp;Osorterad</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Sort</source>
-        <translation type="obsolete">Sortera</translation>
+        <translation type="vanished">Sortera</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Show &amp;hidden files</source>
-        <translation type="obsolete">Visa &amp;dolda filer</translation>
+        <translation type="vanished">Visa &amp;dolda filer</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>the file</source>
-        <translation type="obsolete">filen</translation>
+        <translation type="vanished">filen</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>the directory</source>
-        <translation type="obsolete">katalogen</translation>
+        <translation type="vanished">katalogen</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>the symlink</source>
-        <translation type="obsolete">symboliska länken</translation>
+        <translation type="vanished">symboliska länken</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Delete %1</source>
-        <translation type="obsolete">Ta bort %1</translation>
+        <translation type="vanished">Ta bort %1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&lt;qt&gt;Are you sure you wish to delete %1 &quot;%2&quot;?&lt;/qt&gt;</source>
-        <translation type="obsolete">&lt;qt&gt;Är du säker på att du vill ta bort %1 &quot;%2&quot;?&lt;/qt&gt;</translation>
+        <translation type="vanished">&lt;qt&gt;Är du säker på att du vill ta bort %1 &quot;%2&quot;?&lt;/qt&gt;</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Yes</source>
-        <translation type="obsolete">&amp;Ja</translation>
+        <translation type="vanished">&amp;Ja</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;No</source>
-        <translation type="obsolete">&amp;Nej</translation>
+        <translation type="vanished">&amp;Nej</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>New Folder 1</source>
-        <translation type="obsolete">Ny mapp 1</translation>
+        <translation type="vanished">Ny mapp 1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>New Folder</source>
-        <translation type="obsolete">Ny mapp</translation>
+        <translation type="vanished">Ny mapp</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>New Folder %1</source>
-        <translation type="obsolete">Ny mapp %1</translation>
+        <translation type="vanished">Ny mapp %1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Find Directory</source>
-        <translation type="obsolete">Hitta katalog</translation>
+        <translation type="vanished">Hitta katalog</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Directories</source>
-        <translation type="obsolete">Kataloger</translation>
+        <translation type="vanished">Kataloger</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Directory:</source>
-        <translation type="obsolete">Katalog:</translation>
+        <translation type="vanished">Katalog:</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Error</source>
-        <translation type="obsolete">Fel</translation>
+        <translation type="vanished">Fel</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>%1
 File not found.
 Check path and filename.</source>
-        <translation type="obsolete">%1
+        <translation type="vanished">%1
 Filen hittades inte. 
 Kontrollera sökväg och filnamn.</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>All Files (*.*)</source>
-        <translation type="obsolete">Alla filer (*.*)</translation>
+        <translation type="vanished">Alla filer (*.*)</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Open </source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="vanished">Öppna</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Select a Directory</source>
-        <translation type="obsolete">Välj en katalog</translation>
+        <translation type="vanished">Välj en katalog</translation>
     </message>
 </context>
 <context>
     <name>Q3LocalFs</name>
     <message>
-        <location filename="." line="20"/>
         <source>Could not read directory
 %1</source>
-        <translation type="obsolete">Kunde inte läsa katalogen
+        <translation type="vanished">Kunde inte läsa katalogen
 %1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Could not create directory
 %1</source>
-        <translation type="obsolete">Kunde inte skapa katalogen 
+        <translation type="vanished">Kunde inte skapa katalogen 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Could not remove file or directory
 %1</source>
-        <translation type="obsolete">Kunde inte ta bort filen eller katalogen 
+        <translation type="vanished">Kunde inte ta bort filen eller katalogen 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Could not rename
 %1
 to
 %2</source>
-        <translation type="obsolete">Kunde inte byta namn på 
+        <translation type="vanished">Kunde inte byta namn på 
 %1 
 till 
 %2</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Could not open
 %1</source>
-        <translation type="obsolete">Kunde inte öppna 
+        <translation type="vanished">Kunde inte öppna 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Could not write
 %1</source>
-        <translation type="obsolete">Kunde inte skriva till 
+        <translation type="vanished">Kunde inte skriva till 
 %1</translation>
     </message>
 </context>
 <context>
     <name>Q3MainWindow</name>
     <message>
-        <location filename="." line="20"/>
         <source>Line up</source>
-        <translation type="obsolete">Rada upp</translation>
+        <translation type="vanished">Rada upp</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Customize...</source>
-        <translation type="obsolete">Anpassa...</translation>
+        <translation type="vanished">Anpassa...</translation>
     </message>
 </context>
 <context>
     <name>Q3NetworkProtocol</name>
     <message>
-        <location filename="." line="20"/>
         <source>Operation stopped by the user</source>
-        <translation type="obsolete">Åtgärden stoppades av användaren</translation>
+        <translation type="vanished">Åtgärden stoppades av användaren</translation>
     </message>
 </context>
 <context>
     <name>Q3ProgressDialog</name>
     <message>
-        <location filename="." line="20"/>
         <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="vanished">Avbryt</translation>
     </message>
 </context>
 <context>
     <name>Q3TabDialog</name>
     <message>
-        <location filename="." line="20"/>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Apply</source>
-        <translation type="obsolete">Verkställ</translation>
+        <translation type="vanished">Verkställ</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Help</source>
-        <translation type="obsolete">Hjälp</translation>
+        <translation type="vanished">Hjälp</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Defaults</source>
-        <translation type="obsolete">Standardvärden</translation>
+        <translation type="vanished">Standardvärden</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="vanished">Avbryt</translation>
     </message>
 </context>
 <context>
     <name>Q3TextEdit</name>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Undo</source>
-        <translation type="obsolete">&amp;Ångra</translation>
+        <translation type="vanished">&amp;Ångra</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Redo</source>
-        <translation type="obsolete">&amp;Gör om</translation>
+        <translation type="vanished">&amp;Gör om</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Cu&amp;t</source>
-        <translation type="obsolete">Klipp u&amp;t</translation>
+        <translation type="vanished">Klipp u&amp;t</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Copy</source>
-        <translation type="obsolete">&amp;Kopiera</translation>
+        <translation type="vanished">&amp;Kopiera</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Paste</source>
-        <translation type="obsolete">Klistra &amp;in</translation>
+        <translation type="vanished">Klistra &amp;in</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Clear</source>
-        <translation type="obsolete">Töm</translation>
+        <translation type="vanished">Töm</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Select All</source>
-        <translation type="obsolete">Markera alla</translation>
+        <translation type="vanished">Markera alla</translation>
     </message>
 </context>
 <context>
     <name>Q3TitleBar</name>
     <message>
-        <location filename="." line="20"/>
         <source>System</source>
-        <translation type="obsolete">System</translation>
+        <translation type="vanished">System</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Restore up</source>
-        <translation type="obsolete">Återställ uppåt</translation>
+        <translation type="vanished">Återställ uppåt</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Minimize</source>
-        <translation type="obsolete">Minimera</translation>
+        <translation type="vanished">Minimera</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Restore down</source>
-        <translation type="obsolete">Återställ nedåt</translation>
+        <translation type="vanished">Återställ nedåt</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Maximize</source>
-        <translation type="obsolete">Maximera</translation>
+        <translation type="vanished">Maximera</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Close</source>
-        <translation type="obsolete">Stäng</translation>
+        <translation type="vanished">Stäng</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Contains commands to manipulate the window</source>
-        <translation type="obsolete">Innehåller kommandon för att manipulera fönstret</translation>
+        <translation type="vanished">Innehåller kommandon för att manipulera fönstret</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Puts a minimized back to normal</source>
-        <translation type="obsolete">Återställer ett minimerat till normalt</translation>
+        <translation type="vanished">Återställer ett minimerat till normalt</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Moves the window out of the way</source>
-        <translation type="obsolete">Flyttar fönstret ur vägen</translation>
+        <translation type="vanished">Flyttar fönstret ur vägen</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Puts a maximized window back to normal</source>
-        <translation type="obsolete">Återställer ett maximerat fönster tillbaka till normalt</translation>
+        <translation type="vanished">Återställer ett maximerat fönster tillbaka till normalt</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Makes the window full screen</source>
-        <translation type="obsolete">Gör fönstret till helskärm</translation>
+        <translation type="vanished">Gör fönstret till helskärm</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Closes the window</source>
-        <translation type="obsolete">Stänger fönstret</translation>
+        <translation type="vanished">Stänger fönstret</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>Displays the name of the window and contains controls to manipulate it</source>
-        <translation type="obsolete">Visar namnet på fönstret och innehåller kontroller för att manipulera det</translation>
+        <translation type="vanished">Visar namnet på fönstret och innehåller kontroller för att manipulera det</translation>
     </message>
 </context>
 <context>
     <name>Q3ToolBar</name>
     <message>
-        <location filename="." line="20"/>
         <source>More...</source>
-        <translation type="obsolete">Mer...</translation>
+        <translation type="vanished">Mer...</translation>
     </message>
 </context>
 <context>
     <name>Q3UrlOperator</name>
     <message>
-        <location filename="." line="20"/>
         <source>The protocol `%1&apos; is not supported</source>
-        <translation type="obsolete">Protokollet \&quot;%\&quot; stöds inte</translation>
+        <translation type="vanished">Protokollet \&quot;%\&quot; stöds inte</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>The protocol `%1&apos; does not support listing directories</source>
-        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att lista kataloger</translation>
+        <translation type="vanished">Protokollet \&quot;%1\&quot; har inte stöd för att lista kataloger</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>The protocol `%1&apos; does not support creating new directories</source>
-        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att skapa nya kataloger</translation>
+        <translation type="vanished">Protokollet \&quot;%1\&quot; har inte stöd för att skapa nya kataloger</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>The protocol `%1&apos; does not support removing files or directories</source>
-        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att ta bort filer eller kataloger</translation>
+        <translation type="vanished">Protokollet \&quot;%1\&quot; har inte stöd för att ta bort filer eller kataloger</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>The protocol `%1&apos; does not support renaming files or directories</source>
-        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att byta namn på filer eller kataloger</translation>
+        <translation type="vanished">Protokollet \&quot;%1\&quot; har inte stöd för att byta namn på filer eller kataloger</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>The protocol `%1&apos; does not support getting files</source>
-        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att hämta filer</translation>
+        <translation type="vanished">Protokollet \&quot;%1\&quot; har inte stöd för att hämta filer</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>The protocol `%1&apos; does not support putting files</source>
-        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att lämna filer</translation>
+        <translation type="vanished">Protokollet \&quot;%1\&quot; har inte stöd för att lämna filer</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>The protocol `%1&apos; does not support copying or moving files or directories</source>
-        <translation type="obsolete">Protokollet \&quot;%1\&quot; har inte stöd för att kopiera eller flytta filer eller kataloger</translation>
+        <translation type="vanished">Protokollet \&quot;%1\&quot; har inte stöd för att kopiera eller flytta filer eller kataloger</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>(unknown)</source>
-        <translation type="obsolete">(okänt)</translation>
+        <translation type="vanished">(okänt)</translation>
     </message>
 </context>
 <context>
     <name>Q3Wizard</name>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
+        <translation type="vanished">&amp;Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&lt; &amp;Back</source>
-        <translation type="obsolete">&lt; Till&amp;baka</translation>
+        <translation type="vanished">&lt; Till&amp;baka</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Next &gt;</source>
-        <translation type="obsolete">&amp;Nästa &gt;</translation>
+        <translation type="vanished">&amp;Nästa &gt;</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Finish</source>
-        <translation type="obsolete">&amp;Färdig</translation>
+        <translation type="vanished">&amp;Färdig</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
         <source>&amp;Help</source>
-        <translation type="obsolete">&amp;Hjälp</translation>
+        <translation type="vanished">&amp;Hjälp</translation>
     </message>
 </context>
 <context>
     <name>QAbstractSocket</name>
     <message>
-        <location filename="../../qtbase/src/network/socket/qabstractsocket.cpp" line="2195"/>
+        <location filename="../../qtbase/src/network/access/qhttpnetworkconnection.cpp" line="+896"/>
+        <location filename="../../qtbase/src/network/socket/qabstractsocket.cpp" line="+2195"/>
         <source>Socket operation timed out</source>
-        <translation type="obsolete">Tidsgräns för uttagsåtgärd överstegs</translation>
+        <translation type="unfinished">Tidsgräns för uttagsåtgärd överstegs</translation>
     </message>
     <message>
-        <location filename="." line="26"/>
+        <location filename="../../qtbase/src/network/socket/qabstractsocket.cpp" line="-1552"/>
+        <location line="+1069"/>
+        <location line="+229"/>
+        <source>Operation on socket is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-896"/>
+        <location filename="../../qtbase/src/network/socket/qhttpsocketengine.cpp" line="+677"/>
+        <location filename="../../qtbase/src/network/socket/qsocks5socketengine.cpp" line="+649"/>
+        <location line="+26"/>
         <source>Host not found</source>
-        <translation type="obsolete">Värden hittades inte</translation>
+        <translation type="unfinished">Värden hittades inte</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qsocks5socketengine.cpp" line="4"/>
+        <location line="+47"/>
+        <location filename="../../qtbase/src/network/socket/qhttpsocketengine.cpp" line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qsocks5socketengine.cpp" line="+4"/>
         <source>Connection refused</source>
-        <translation type="obsolete">Anslutningen nekades</translation>
+        <translation type="unfinished">Anslutningen nekades</translation>
     </message>
     <message>
-        <location filename="." line="129"/>
+        <location line="+129"/>
         <source>Connection timed out</source>
-        <translation type="obsolete">Tidsgränsen för anslutning överstegs</translation>
+        <translation type="unfinished">Tidsgränsen för anslutning överstegs</translation>
     </message>
     <message>
-        <location filename="." line="864"/>
+        <location line="+461"/>
+        <source>Trying to connect while connection is in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+864"/>
         <source>Socket is not connected</source>
-        <translation type="obsolete">Uttaget är inte anslutet</translation>
+        <translation type="unfinished">Uttaget är inte anslutet</translation>
     </message>
     <message>
-        <location filename="." line="864"/>
+        <location filename="../../qtbase/src/network/socket/qsocks5socketengine.cpp" line="-8"/>
         <source>Network unreachable</source>
-        <translation type="obsolete">Nätverket är inte nåbart</translation>
+        <translation type="unfinished">Nätverket är inte nåbart</translation>
     </message>
 </context>
 <context>
     <name>QAbstractSpinBox</name>
     <message>
-        <location filename="." line="6"/>
-        <source>&amp;Step up</source>
-        <translation type="obsolete">&amp;Stega uppåt</translation>
+        <location filename="../../qtbase/src/widgets/widgets/qabstractspinbox.cpp" line="+1321"/>
+        <source>&amp;Select All</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+6"/>
+        <source>&amp;Step up</source>
+        <translation type="unfinished">&amp;Stega uppåt</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Step &amp;down</source>
-        <translation type="obsolete">Stega &amp;nedåt</translation>
+        <translation type="unfinished">Stega &amp;nedåt</translation>
     </message>
 </context>
 <context>
     <name>QAccessibleActionInterface</name>
     <message>
-        <location filename="../../qtbase/src/gui/accessible/qaccessible.cpp" line="2812"/>
+        <location filename="../../qtbase/src/gui/accessible/qaccessible.cpp" line="+2812"/>
         <source>Press</source>
-        <translation type="obsolete">Tryck</translation>
+        <translation type="unfinished">Tryck</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
+        <source>Increase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Decrease</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>ShowMenu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>SetFocus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Toggle</source>
-        <translation type="obsolete">Växla</translation>
+        <translation type="unfinished">Växla</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Scroll Left</source>
-        <translation type="obsolete">Rulla vänster</translation>
+        <translation type="unfinished">Rulla vänster</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Scroll Right</source>
-        <translation type="obsolete">Rulla höger</translation>
+        <translation type="unfinished">Rulla höger</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Scroll Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Scroll Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Previous Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Next Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Triggers the action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Increase the value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Decrease the value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Shows the menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Sets the focus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Toggles the state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Scrolls to the left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Scrolls to the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Scrolls up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Scrolls down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Goes back a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Goes to the next page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QAndroidPlatformTheme</name>
     <message>
-        <location filename="../../qtbase/src/plugins/platforms/android/qandroidplatformtheme.cpp" line="501"/>
+        <location filename="../../qtbase/src/plugins/platforms/android/qandroidplatformtheme.cpp" line="+501"/>
         <source>Yes</source>
-        <translation type="obsolete">Ja</translation>
+        <translation type="unfinished">Ja</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
+        <source>Yes to All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>No</source>
-        <translation type="obsolete">Nej</translation>
+        <translation type="unfinished">Nej</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No to All</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qmessagebox.h" line="320"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qmessagebox.h" line="+320"/>
         <source>Executable &apos;%1&apos; requires Qt %2, found Qt %3.</source>
-        <translation type="obsolete">Binären \&quot;%1\&quot; kräver Qt %2, hittade Qt %3.</translation>
+        <translation type="unfinished">Binären \&quot;%1\&quot; kräver Qt %2, hittade Qt %3.</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Incompatible Qt Library Error</source>
-        <translation type="obsolete">Inkompatibelt Qt-biblioteksfel</translation>
+        <translation type="unfinished">Inkompatibelt Qt-biblioteksfel</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Activate</source>
-        <translation type="obsolete">Aktivera</translation>
+        <translation type="vanished">Aktivera</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Activates the program&apos;s main window</source>
-        <translation type="obsolete">Aktiverar programmets huvudfönster</translation>
+        <translation type="vanished">Aktiverar programmets huvudfönster</translation>
     </message>
 </context>
 <context>
     <name>QAxSelect</name>
     <message>
-        <location filename="." line="2"/>
         <source>Select ActiveX Control</source>
-        <translation type="obsolete">Välj ActiveX Control</translation>
+        <translation type="vanished">Välj ActiveX Control</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
+        <translation type="vanished">&amp;Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>COM &amp;Object:</source>
-        <translation type="obsolete">COM-&amp;objekt:</translation>
+        <translation type="vanished">COM-&amp;objekt:</translation>
     </message>
 </context>
 <context>
     <name>QCheckBox</name>
     <message>
-        <location filename="." line="2"/>
         <source>Uncheck</source>
-        <translation type="obsolete">Avkryssa</translation>
+        <translation type="vanished">Avkryssa</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Check</source>
-        <translation type="obsolete">Kryssa</translation>
+        <translation type="vanished">Kryssa</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Toggle</source>
-        <translation type="obsolete">Växla</translation>
+        <translation type="vanished">Växla</translation>
     </message>
 </context>
 <context>
     <name>QCocoaMenuItem</name>
     <message>
-        <location filename="." line="2"/>
+        <location filename="../../qtbase/src/plugins/platforms/cocoa/messages.cpp" line="-11"/>
         <source>About Qt</source>
-        <translation type="obsolete">Om Qt</translation>
+        <translation type="unfinished">Om Qt</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+29"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Config</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Preference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Quit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Select All</source>
-        <translation type="obsolete">Markera alla</translation>
+        <translation type="unfinished">Markera alla</translation>
     </message>
 </context>
 <context>
     <name>QCocoaTheme</name>
     <message>
-        <location filename="." line="7"/>
+        <location line="+7"/>
         <source>Don&apos;t Save</source>
-        <translation type="obsolete">Spara inte</translation>
+        <translation type="unfinished">Spara inte</translation>
     </message>
 </context>
 <context>
     <name>QColorDialog</name>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qcolordialog.cpp" line="1474"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qcolordialog.cpp" line="+1474"/>
         <source>Hu&amp;e:</source>
-        <translation type="obsolete">Nya&amp;ns:</translation>
+        <translation type="unfinished">Nya&amp;ns:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Sat:</source>
-        <translation type="obsolete">&amp;Mättnad:</translation>
+        <translation type="unfinished">&amp;Mättnad:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Val:</source>
-        <translation type="obsolete">&amp;Ljushet:</translation>
+        <translation type="unfinished">&amp;Ljushet:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Red:</source>
-        <translation type="obsolete">&amp;Röd:</translation>
+        <translation type="unfinished">&amp;Röd:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Green:</source>
-        <translation type="obsolete">&amp;Grön:</translation>
+        <translation type="unfinished">&amp;Grön:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Bl&amp;ue:</source>
-        <translation type="obsolete">Bl&amp;å:</translation>
+        <translation type="unfinished">Bl&amp;å:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>A&amp;lpha channel:</source>
-        <translation type="obsolete">Alfa&amp;kanal:</translation>
+        <translation type="unfinished">Alfa&amp;kanal:</translation>
     </message>
     <message>
-        <location filename="." line="190"/>
+        <location line="+1"/>
+        <source>&amp;HTML:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+164"/>
+        <source>Cursor at %1, %2
+Press ESC to cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Select Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+190"/>
         <source>&amp;Basic colors</source>
-        <translation type="obsolete">&amp;Basfärger</translation>
+        <translation type="unfinished">&amp;Basfärger</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Custom colors</source>
-        <translation type="obsolete">&amp;Anpassade färger</translation>
+        <translation type="unfinished">&amp;Anpassade färger</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Add to Custom Colors</source>
-        <translation type="obsolete">&amp;Lägg till i anpassade färger</translation>
+        <translation type="unfinished">&amp;Lägg till i anpassade färger</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
+        <source>&amp;Pick Screen Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Define Custom Colors &gt;&gt;</source>
         <translation type="obsolete">&amp;Definiera anpassade färger &gt;&gt;</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>OK</source>
         <translation type="obsolete">OK</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Cancel</source>
         <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Select color</source>
         <translation type="obsolete">Välj färg</translation>
     </message>
@@ -8637,258 +1048,474 @@ till
 <context>
     <name>QComboBox</name>
     <message>
-        <location filename="../../qtbase/src/widgets/itemviews/qitemeditorfactory.cpp" line="613"/>
+        <location filename="../../qtbase/src/widgets/accessible/complexwidgets.cpp" line="+380"/>
+        <source>Open the combo box selection popup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/widgets/itemviews/qitemeditorfactory.cpp" line="+613"/>
         <source>False</source>
-        <translation type="obsolete">Falskt</translation>
+        <translation type="unfinished">Falskt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>True</source>
-        <translation type="obsolete">Sant</translation>
+        <translation type="unfinished">Sant</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Open</source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="vanished">Öppna</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Close</source>
         <translation type="obsolete">Stäng</translation>
+    </message>
+</context>
+<context>
+    <name>QCommandLineParser</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/tools/qcommandlineparser.cpp" line="+412"/>
+        <source>Displays version information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Displays this help.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+92"/>
+        <source>Unknown option &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Unknown options: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+132"/>
+        <source>Missing value after &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Unexpected value after &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+439"/>
+        <source>[options]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Usage: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Arguments:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QCoreApplication</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/kernel/qsystemsemaphore_posix.cpp" line="+73"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsystemsemaphore_systemv.cpp" line="+77"/>
+        <source>%1: key is empty</source>
+        <comment>QSystemSemaphore</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/kernel/qsystemsemaphore_systemv.cpp" line="+18"/>
+        <source>%1: unable to make key</source>
+        <comment>QSystemSemaphore</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>%1: ftok failed</source>
+        <comment>QSystemSemaphore</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QCupsJobWidget</name>
+    <message>
+        <location filename="../../qtbase/src/printsupport/widgets/qcupsjobwidget.ui"/>
+        <source>Job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Job Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Scheduled printing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Billing information:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Job priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Banner Pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>End:</source>
+        <comment>Banner page at end</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start:</source>
+        <comment>Banner page at start</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/printsupport/widgets/qcupsjobwidget.cpp" line="+119"/>
+        <source>Print Immediately</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hold Indefinitely</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Day (06:00 to 17:59)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Night (18:00 to 05:59)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Second Shift (16:00 to 23:59)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Third Shift (00:00 to 07:59)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Weekend (Saturday to Sunday)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Specific Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+90"/>
+        <location line="+8"/>
+        <source>None</source>
+        <comment>CUPS Banner page</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <location line="+8"/>
+        <source>Standard</source>
+        <comment>CUPS Banner page</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <location line="+8"/>
+        <source>Unclassified</source>
+        <comment>CUPS Banner page</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <location line="+8"/>
+        <source>Confidential</source>
+        <comment>CUPS Banner page</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <location line="+8"/>
+        <source>Classified</source>
+        <comment>CUPS Banner page</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <location line="+8"/>
+        <source>Secret</source>
+        <comment>CUPS Banner page</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <location line="+8"/>
+        <source>Top Secret</source>
+        <comment>CUPS Banner page</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QCupsPrinterSupport</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/printsupport/cups/qcupsprintersupport.cpp" line="+83"/>
+        <source>Authentication Needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Authentication needed to use %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Authentication needed to use %1 on %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Username:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Password:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QDB2Driver</name>
     <message>
-        <location filename="../../qtbase/src/plugins/sqldrivers/db2/qsql_db2.cpp" line="1338"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/db2/qsql_db2.cpp" line="+1338"/>
         <source>Unable to connect</source>
-        <translation type="obsolete">Kunde inte ansluta</translation>
+        <translation type="unfinished">Kunde inte ansluta</translation>
     </message>
     <message>
-        <location filename="." line="306"/>
+        <location line="+306"/>
         <source>Unable to commit transaction</source>
-        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+        <translation type="unfinished">Kunde inte verkställa transaktion</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
+        <location line="+18"/>
         <source>Unable to rollback transaction</source>
-        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+        <translation type="unfinished">Kunde inte rulla tillbaka transaktion</translation>
     </message>
     <message>
-        <location filename="." line="16"/>
+        <location line="+16"/>
         <source>Unable to set autocommit</source>
-        <translation type="obsolete">Kunde inte ställa in automatisk verkställning</translation>
+        <translation type="unfinished">Kunde inte ställa in automatisk verkställning</translation>
     </message>
 </context>
 <context>
     <name>QDB2Result</name>
     <message>
-        <location filename="." line="242"/>
+        <location line="-1046"/>
+        <location line="+242"/>
         <source>Unable to execute statement</source>
-        <translation type="obsolete">Kunde inte köra frågesats</translation>
+        <translation type="unfinished">Kunde inte köra frågesats</translation>
     </message>
     <message>
-        <location filename="." line="242"/>
+        <location line="-204"/>
         <source>Unable to prepare statement</source>
-        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+        <translation type="unfinished">Kunde inte förbereda frågesats</translation>
     </message>
     <message>
-        <location filename="." line="194"/>
+        <location line="+194"/>
         <source>Unable to bind variable</source>
-        <translation type="obsolete">Kunde inte binda variabel</translation>
+        <translation type="unfinished">Kunde inte binda variabel</translation>
     </message>
     <message>
-        <location filename="." line="90"/>
+        <location line="+90"/>
         <source>Unable to fetch record %1</source>
-        <translation type="obsolete">Kunde inte hämta posten %1</translation>
+        <translation type="unfinished">Kunde inte hämta posten %1</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
+        <location line="+20"/>
         <source>Unable to fetch next</source>
-        <translation type="obsolete">Kunde inte hämta nästa</translation>
+        <translation type="unfinished">Kunde inte hämta nästa</translation>
     </message>
     <message>
-        <location filename="." line="22"/>
+        <location line="+22"/>
         <source>Unable to fetch first</source>
-        <translation type="obsolete">Kunde inte hämta första</translation>
+        <translation type="unfinished">Kunde inte hämta första</translation>
     </message>
 </context>
 <context>
     <name>QDBusTrayIcon</name>
     <message>
-        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
+        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="+303"/>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="unfinished">OK</translation>
     </message>
 </context>
 <context>
     <name>QDateTimeEdit</name>
     <message>
-        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
         <source>AM</source>
-        <translation type="obsolete">AM</translation>
+        <translation type="vanished">AM</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
         <source>am</source>
-        <translation type="obsolete">am</translation>
+        <translation type="vanished">am</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
         <source>PM</source>
-        <translation type="obsolete">PM</translation>
+        <translation type="vanished">PM</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/platformsupport/themes/genericunix/dbustray/qdbustrayicon.cpp" line="303"/>
         <source>pm</source>
-        <translation type="obsolete">pm</translation>
+        <translation type="vanished">pm</translation>
     </message>
 </context>
 <context>
     <name>QDateTimeParser</name>
     <message>
-        <location filename="../../qtbase/src/widgets/widgets/qdatetimeedit.cpp" line="2311"/>
+        <location filename="../../qtbase/src/widgets/widgets/qdatetimeedit.cpp" line="+2311"/>
         <source>AM</source>
-        <translation type="obsolete">AM</translation>
+        <translation type="unfinished">AM</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>am</source>
-        <translation type="obsolete">am</translation>
+        <translation type="unfinished">am</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>PM</source>
-        <translation type="obsolete">PM</translation>
+        <translation type="unfinished">PM</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>pm</source>
-        <translation type="obsolete">pm</translation>
+        <translation type="unfinished">pm</translation>
     </message>
 </context>
 <context>
     <name>QDialog</name>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qdialog.cpp" line="691"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qdialog.cpp" line="+691"/>
         <source>What&apos;s This?</source>
-        <translation type="obsolete">Vad är det här?</translation>
+        <translation type="unfinished">Vad är det här?</translation>
     </message>
 </context>
 <context>
     <name>QDialogButtonBox</name>
     <message>
-        <location filename="." line="446"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qmessagebox.cpp" line="+2028"/>
+        <location line="+446"/>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Save</source>
         <translation type="obsolete">Spara</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>&amp;Save</source>
         <translation type="obsolete">&amp;Spara</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Open</source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="vanished">Öppna</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Cancel</source>
         <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>&amp;Cancel</source>
         <translation type="obsolete">&amp;Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Close</source>
         <translation type="obsolete">Stäng</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>&amp;Close</source>
         <translation type="obsolete">&amp;Stäng</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Apply</source>
-        <translation type="obsolete">Verkställ</translation>
+        <translation type="vanished">Verkställ</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Reset</source>
-        <translation type="obsolete">Återställ</translation>
+        <translation type="vanished">Återställ</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Help</source>
-        <translation type="obsolete">Hjälp</translation>
+        <translation type="vanished">Hjälp</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Don&apos;t Save</source>
-        <translation type="obsolete">Spara inte</translation>
+        <translation type="vanished">Spara inte</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Discard</source>
-        <translation type="obsolete">Förkasta</translation>
+        <translation type="vanished">Förkasta</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>&amp;Yes</source>
-        <translation type="obsolete">&amp;Ja</translation>
+        <translation type="vanished">&amp;Ja</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Yes to &amp;All</source>
-        <translation type="obsolete">Ja till &amp;alla</translation>
+        <translation type="vanished">Ja till &amp;alla</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>&amp;No</source>
-        <translation type="obsolete">&amp;Nej</translation>
+        <translation type="vanished">&amp;Nej</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>N&amp;o to All</source>
-        <translation type="obsolete">N&amp;ej till alla</translation>
+        <translation type="vanished">N&amp;ej till alla</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Save All</source>
-        <translation type="obsolete">Spara alla</translation>
+        <translation type="vanished">Spara alla</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Abort</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="vanished">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Retry</source>
-        <translation type="obsolete">Försök igen</translation>
+        <translation type="vanished">Försök igen</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Ignore</source>
-        <translation type="obsolete">Ignorera</translation>
+        <translation type="vanished">Ignorera</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>Restore Defaults</source>
-        <translation type="obsolete">Återställ standardvärden</translation>
+        <translation type="vanished">Återställ standardvärden</translation>
     </message>
     <message>
-        <location filename="." line="446"/>
         <source>&amp;OK</source>
         <translation type="obsolete">&amp;OK</translation>
     </message>
@@ -8896,251 +1523,783 @@ till
 <context>
     <name>QDirModel</name>
     <message>
-        <location filename="../../qtbase/src/widgets/itemviews/qdirmodel.cpp" line="440"/>
+        <location filename="../../qtbase/src/widgets/itemviews/qdirmodel.cpp" line="+440"/>
         <source>Name</source>
-        <translation type="obsolete">Namn</translation>
+        <translation type="unfinished">Namn</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Size</source>
-        <translation type="obsolete">Storlek</translation>
+        <translation type="unfinished">Storlek</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>Kind</source>
         <comment>Match OS X Finder</comment>
-        <translation type="obsolete">Sort</translation>
+        <translation type="unfinished">Sort</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Type</source>
         <comment>All other platforms</comment>
-        <translation type="obsolete">Typ</translation>
+        <translation type="unfinished">Typ</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
+        <location line="+6"/>
         <source>Date Modified</source>
-        <translation type="obsolete">Ändringsdatum</translation>
+        <translation type="unfinished">Ändringsdatum</translation>
+    </message>
+</context>
+<context>
+    <name>QDnsLookup</name>
+    <message>
+        <location filename="../../qtbase/src/network/kernel/qdnslookup.cpp" line="+487"/>
+        <source>Operation cancelled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QDnsLookupRunnable</name>
     <message>
-        <location filename="." line="5"/>
+        <location line="-328"/>
+        <source>IPv6 addresses for nameservers are currently not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+849"/>
+        <source>Invalid domain name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/kernel/qdnslookup_android.cpp" line="+52"/>
+        <source>Not yet supported on Android</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/kernel/qdnslookup_unix.cpp" line="+152"/>
+        <source>Resolver functions not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Resolver initialization failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+75"/>
+        <location filename="../../qtbase/src/network/kernel/qdnslookup_win.cpp" line="+81"/>
+        <source>Server could not process query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../qtbase/src/network/kernel/qdnslookup_win.cpp" line="+4"/>
+        <source>Server failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../qtbase/src/network/kernel/qdnslookup_win.cpp" line="+4"/>
+        <source>Non existent domain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../qtbase/src/network/kernel/qdnslookup_win.cpp" line="+4"/>
+        <source>Server refused to answer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location line="+7"/>
+        <source>Invalid reply received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+11"/>
+        <source>Could not expand domain name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Invalid IPv4 address record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Invalid IPv6 address record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Invalid canonical name record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Invalid name server record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Invalid pointer record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Invalid mail exchange record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Invalid service record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Invalid text record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Resolver library can&apos;t be loaded: No runtime library loading support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/kernel/qdnslookup_winrt.cpp" line="+81"/>
+        <source>No hostname given</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Invalid hostname</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Host %1 could not be found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
     </message>
 </context>
 <context>
     <name>QDockWidget</name>
     <message>
-        <location filename="." line="8"/>
+        <location filename="../../qtbase/src/widgets/widgets/qdockwidget.cpp" line="+745"/>
+        <source>Float</source>
+        <extracomment>Accessible name for button undocking a dock widget (floating state)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Undocks and re-attaches the dock widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Close</source>
-        <translation type="obsolete">Stäng</translation>
+        <extracomment>Accessible name for button closing a dock widget</extracomment>
+        <translation type="unfinished">Stäng</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Closes the dock widget</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QDoubleSpinBox</name>
     <message>
-        <location filename="." line="1"/>
         <source>More</source>
         <translation type="obsolete">Mer</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Less</source>
         <translation type="obsolete">Mindre</translation>
     </message>
 </context>
 <context>
+    <name>QDtls</name>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qdtls.cpp" line="+383"/>
+        <source>Invalid (empty) secret</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Multicast and broadcast addresses are not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+198"/>
+        <source>Cannot set peer after handshake started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Invalid address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>Cannot set verification name after handshake started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+134"/>
+        <source>Cannot set configuration after handshake started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+62"/>
+        <source>Cannot start/continue handshake, invalid handshake state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <location line="+38"/>
+        <location line="+42"/>
+        <location line="+24"/>
+        <location line="+27"/>
+        <location line="+75"/>
+        <location line="+24"/>
+        <source>Invalid (nullptr) socket</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-224"/>
+        <source>To start a handshake you must set peer&apos;s address and port first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>To start a handshake, DTLS server requires non-empty datagram (client hello)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Cannot start handshake, already done/in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>A valid QUdpSocket and non-empty datagram are needed to continue the handshake</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Cannot continue handshake, not in InProgress state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Cannot resume, not in VerificationError state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>No handshake in progress, nothing to abort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Cannot send shutdown alert, not encrypted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+75"/>
+        <source>Cannot write a datagram, not in encrypted state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>Cannot read a datagram, not in encrypted state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qdtls_openssl.cpp" line="+710"/>
+        <source>%1 failed</source>
+        <extracomment>%1: Some function</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Invalid SslMode, SslServerMode or SslClientMode expected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Invalid protocol version, DTLS protocol expected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+234"/>
+        <source>BIO_ADD_new failed, cannot start handshake</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Cannot start the handshake, verified client hello expected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+91"/>
+        <source>Peer verification failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+111"/>
+        <source>The DTLS connection has been closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Error while writing: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+49"/>
+        <source>The DTLS connection has been shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Error while reading: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QDtlsClientVerifier</name>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qdtls.cpp" line="-570"/>
+        <source>A valid UDP socket, non-empty datagram, valid address/port were expected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qdtls_openssl.cpp" line="-377"/>
+        <source>BIO_ADDR_new failed, ignoring client hello</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QErrorMessage</name>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qerrormessage.cpp" line="175"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qerrormessage.cpp" line="+175"/>
         <source>Debug Message:</source>
-        <translation type="obsolete">Felsökningsmeddelande:</translation>
+        <translation type="unfinished">Felsökningsmeddelande:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Warning:</source>
-        <translation type="obsolete">Varning:</translation>
+        <translation type="unfinished">Varning:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
+        <source>Critical Error:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Fatal Error:</source>
-        <translation type="obsolete">Ödesdigert fel:</translation>
+        <translation type="unfinished">Ödesdigert fel:</translation>
     </message>
     <message>
-        <location filename="." line="207"/>
+        <location line="+1"/>
+        <source>Information:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+207"/>
         <source>&amp;Show this message again</source>
-        <translation type="obsolete">&amp;Visa detta meddelande igen</translation>
+        <translation type="unfinished">&amp;Visa detta meddelande igen</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+</context>
+<context>
+    <name>QFile</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/io/qfile.cpp" line="+579"/>
+        <source>Destination file is the same file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Source file does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <location line="+194"/>
+        <source>Destination file exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-163"/>
+        <location line="+7"/>
+        <source>Error while renaming: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-5"/>
+        <source>Unable to restore from %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Will not rename sequential file using block copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Cannot remove source file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Cannot open destination file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+113"/>
+        <source>Cannot open %1 for input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Cannot open for output: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Failure to write block</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Cannot create %1 for output</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QFileDevice</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/io/qfiledevice.cpp" line="+739"/>
+        <source>No file engine available or engine does not support UnMapExtension</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+61"/>
+        <source>No file engine available</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QFileDialog</name>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="+646"/>
         <source>All Files (*)</source>
-        <translation type="obsolete">Alla filer (*)</translation>
+        <translation type="unfinished">Alla filer (*)</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qfiledialog.ui"/>
+        <source>Look in:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Back</source>
-        <translation type="obsolete">Tillbaka</translation>
+        <translation type="unfinished">Tillbaka</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <location/>
+        <source>Go back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Alt+Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Forward</source>
-        <translation type="obsolete">Framåt</translation>
+        <translation type="unfinished">Framåt</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <location/>
+        <source>Go forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Alt+Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Parent Directory</source>
-        <translation type="obsolete">Föräldrakatalog</translation>
+        <translation type="unfinished">Föräldrakatalog</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <location/>
+        <source>Go to the parent directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Alt+Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Create New Folder</source>
-        <translation type="obsolete">Skapa ny mapp</translation>
+        <translation type="unfinished">Skapa ny mapp</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <location/>
+        <source>Create a New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>List View</source>
-        <translation type="obsolete">Listvy</translation>
+        <translation type="unfinished">Listvy</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <location/>
+        <source>Change to list view mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Detail View</source>
-        <translation type="obsolete">Detaljerad vy</translation>
+        <translation type="unfinished">Detaljerad vy</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qplatformdialoghelper.cpp" line="646"/>
+        <location/>
+        <source>Change to detail view mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sidebar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>List of places and bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Files of type:</source>
-        <translation type="obsolete">Filer av typen:</translation>
+        <translation type="unfinished">Filer av typen:</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qfiledialog.cpp" line="593"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qfiledialog.cpp" line="+593"/>
         <source>Find Directory</source>
-        <translation type="obsolete">Hitta katalog</translation>
+        <translation type="unfinished">Hitta katalog</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Open</source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="unfinished">Öppna</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>Save As</source>
-        <translation type="obsolete">Spara som</translation>
+        <translation type="unfinished">Spara som</translation>
     </message>
     <message>
-        <location filename="." line="27"/>
+        <location line="+27"/>
         <source>Directory:</source>
-        <translation type="obsolete">Katalog:</translation>
+        <translation type="unfinished">Katalog:</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>File &amp;name:</source>
-        <translation type="obsolete">Fil&amp;namn:</translation>
+        <translation type="unfinished">Fil&amp;namn:</translation>
     </message>
     <message>
-        <location filename="." line="16"/>
+        <location line="+17"/>
+        <location line="+16"/>
         <source>&amp;Open</source>
-        <translation type="obsolete">&amp;Öppna</translation>
+        <translation type="unfinished">&amp;Öppna</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
+        <location line="-5"/>
+        <source>&amp;Choose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>&amp;Save</source>
-        <translation type="obsolete">&amp;Spara</translation>
+        <translation type="unfinished">&amp;Spara</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+29"/>
+        <source>Show </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>&amp;Rename</source>
-        <translation type="obsolete">&amp;Byt namn</translation>
+        <translation type="unfinished">&amp;Byt namn</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Delete</source>
-        <translation type="obsolete">&amp;Ta bort</translation>
+        <translation type="unfinished">&amp;Ta bort</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Show &amp;hidden files</source>
-        <translation type="obsolete">Visa &amp;dolda filer</translation>
+        <translation type="unfinished">Visa &amp;dolda filer</translation>
     </message>
     <message>
-        <location filename="." line="180"/>
+        <location line="+1"/>
+        <source>&amp;New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+868"/>
+        <source>All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+180"/>
         <source>Directories</source>
-        <translation type="obsolete">Kataloger</translation>
+        <translation type="unfinished">Kataloger</translation>
     </message>
     <message>
-        <location filename="." line="1038"/>
+        <location line="+1033"/>
+        <location line="+1038"/>
         <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-        <translation type="obsolete">%1 
+        <translation type="unfinished">%1 
 Katalogen hittades inte. 
 Kontrollera att det korrekta katalognamnet angavs.</translation>
     </message>
     <message>
-        <location filename="." line="1038"/>
+        <location line="-1004"/>
         <source>%1 already exists.
 Do you want to replace it?</source>
-        <translation type="obsolete">%1 finns redan. 
+        <translation type="unfinished">%1 finns redan. 
 Vill du ersätta den?</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
+        <location line="+20"/>
         <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-        <translation type="obsolete">%1 
+        <translation type="unfinished">%1 
 Filen hittades inte. 
 Kontrollera att det korrekta filnamnet angavs.</translation>
     </message>
     <message>
-        <location filename="." line="627"/>
+        <location line="+627"/>
         <source>New Folder</source>
-        <translation type="obsolete">Ny mapp</translation>
+        <translation type="unfinished">Ny mapp</translation>
     </message>
     <message>
-        <location filename="." line="627"/>
+        <location line="+127"/>
+        <location line="+5"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-4"/>
         <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-        <translation type="obsolete">\&quot;%1\&quot; är skrivskyddad. 
+        <translation type="unfinished">\&quot;%1\&quot; är skrivskyddad. 
 Vill du ta bort den ändå?</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
+        <location line="+5"/>
+        <source>Are you sure you want to delete &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+18"/>
         <source>Could not delete directory.</source>
-        <translation type="obsolete">Kunde inte ta bort katalogen.</translation>
+        <translation type="unfinished">Kunde inte ta bort katalogen.</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/widgets/itemviews/qdirmodel.cpp" line="405"/>
+        <location line="+451"/>
+        <source>Recent Places</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qsidebar.cpp" line="+448"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/widgets/itemviews/qdirmodel.cpp" line="+405"/>
         <source>My Computer</source>
-        <translation type="obsolete">Min dator</translation>
+        <translation type="unfinished">Min dator</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/widgets/itemviews/qfileiconprovider.cpp" line="304"/>
+        <location filename="../../qtbase/src/widgets/itemviews/qfileiconprovider.cpp" line="+304"/>
         <source>Drive</source>
-        <translation type="obsolete">Enhet</translation>
+        <translation type="unfinished">Enhet</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+4"/>
+        <source>%1 File</source>
+        <extracomment>%1 is a file name suffix, for example txt</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>File</source>
-        <translation type="obsolete">Fil</translation>
+        <translation type="unfinished">Fil</translation>
     </message>
     <message>
-        <location filename="." line="7"/>
+        <location line="+5"/>
+        <source>File Folder</source>
+        <comment>Match Windows Explorer</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Folder</source>
+        <comment>All other platforms</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Alias</source>
+        <comment>OS X Finder</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Shortcut</source>
+        <comment>All other platforms</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Unknown</source>
-        <translation type="obsolete">Okänt</translation>
+        <translation type="unfinished">Okänt</translation>
     </message>
     <message>
-        <location filename="." line="7"/>
         <source>
 File not found.
 Please verify the correct file name was given</source>
@@ -9149,566 +2308,1247 @@ Filen hittades inte.
 Kontrollera att det korrekta filnamnet angavs</translation>
     </message>
     <message>
-        <location filename="." line="7"/>
         <source>Are sure you want to delete &apos;%1&apos;?</source>
-        <translation type="obsolete">Är du säker på att du vill ta bort \&quot;%1\&quot;?</translation>
+        <translation type="vanished">Är du säker på att du vill ta bort \&quot;%1\&quot;?</translation>
     </message>
     <message>
-        <location filename="." line="7"/>
         <source>All Files (*.*)</source>
-        <translation type="obsolete">Alla filer (*.*)</translation>
+        <translation type="vanished">Alla filer (*.*)</translation>
     </message>
 </context>
 <context>
     <name>QFileSystemModel</name>
     <message>
-        <location filename="." line="100"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qfilesystemmodel.cpp" line="+864"/>
+        <source>&lt;b&gt;The name &quot;%1&quot; cannot be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuation marks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Invalid filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+100"/>
         <source>Name</source>
-        <translation type="obsolete">Namn</translation>
+        <translation type="unfinished">Namn</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Size</source>
-        <translation type="obsolete">Storlek</translation>
+        <translation type="unfinished">Storlek</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Kind</source>
         <comment>Match OS X Finder</comment>
-        <translation type="obsolete">Sort</translation>
+        <translation type="unfinished">Sort</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Type</source>
         <comment>All other platforms</comment>
-        <translation type="obsolete">Typ</translation>
+        <translation type="unfinished">Typ</translation>
     </message>
     <message>
-        <location filename="." line="7"/>
+        <location line="+7"/>
         <source>Date Modified</source>
-        <translation type="obsolete">Ändringsdatum</translation>
+        <translation type="unfinished">Ändringsdatum</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qfilesystemmodel_p.h" line="272"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qfilesystemmodel_p.h" line="+272"/>
         <source>My Computer</source>
-        <translation type="obsolete">Min dator</translation>
+        <translation type="unfinished">Min dator</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QFontDatabase</name>
+    <message>
+        <location filename="../../qtbase/src/gui/text/qfontdatabase.cpp" line="+133"/>
+        <location line="+1198"/>
+        <source>Normal</source>
+        <comment>The Normal or Regular font weight</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1196"/>
+        <location line="+1176"/>
+        <source>Bold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1173"/>
+        <location line="+1175"/>
+        <source>Demi Bold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1173"/>
+        <location line="+1175"/>
+        <source>Medium</source>
+        <comment>The Medium font weight</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1173"/>
+        <location line="+1165"/>
+        <source>Black</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1163"/>
+        <location line="+1178"/>
+        <source>Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1175"/>
+        <location line="+1171"/>
+        <source>Thin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1169"/>
+        <location line="+1171"/>
+        <source>Extra Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1169"/>
+        <location line="+1158"/>
+        <source>Extra Bold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1153"/>
+        <source>Extra</source>
+        <extracomment>The word for &quot;Extra&quot; as in &quot;Extra Bold, Extra Thin&quot; used as a pattern for string searches</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Demi</source>
+        <extracomment>The word for &quot;Demi&quot; as in &quot;Demi Bold&quot; used as a pattern for string searches</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+95"/>
+        <location line="+1072"/>
+        <source>Italic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1070"/>
+        <location line="+1072"/>
+        <source>Oblique</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+746"/>
+        <source>Any</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Latin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Greek</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Cyrillic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Armenian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Hebrew</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Arabic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Syriac</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Thaana</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Devanagari</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Bengali</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Gurmukhi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Gujarati</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Oriya</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Tamil</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Telugu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Kannada</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Malayalam</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Sinhala</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Thai</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Lao</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Tibetan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Myanmar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Georgian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Khmer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Simplified Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Japanese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Korean</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Vietnamese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Symbol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Ogham</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Runic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>N&apos;Ko</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QFontDialog</name>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qfontdialog.cpp" line="179"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qfontdialog.cpp" line="+179"/>
         <source>Select Font</source>
-        <translation type="obsolete">Välj typsnitt</translation>
+        <translation type="unfinished">Välj typsnitt</translation>
     </message>
     <message>
-        <location filename="." line="591"/>
+        <location line="+591"/>
         <source>&amp;Font</source>
-        <translation type="obsolete">&amp;Typsnitt</translation>
+        <translation type="unfinished">&amp;Typsnitt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Font st&amp;yle</source>
-        <translation type="obsolete">T&amp;ypsnittsstil</translation>
+        <translation type="unfinished">T&amp;ypsnittsstil</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Size</source>
-        <translation type="obsolete">&amp;Storlek</translation>
+        <translation type="unfinished">&amp;Storlek</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Effects</source>
-        <translation type="obsolete">Effekter</translation>
+        <translation type="unfinished">Effekter</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Stri&amp;keout</source>
-        <translation type="obsolete">Genomstru&amp;ken</translation>
+        <translation type="unfinished">Genomstru&amp;ken</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Underline</source>
-        <translation type="obsolete">&amp;Understruken</translation>
+        <translation type="unfinished">&amp;Understruken</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Sample</source>
-        <translation type="obsolete">Test</translation>
+        <translation type="unfinished">Test</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Wr&amp;iting System</source>
-        <translation type="obsolete">Skr&amp;ivsystem</translation>
+        <translation type="unfinished">Skr&amp;ivsystem</translation>
     </message>
 </context>
 <context>
     <name>QFtp</name>
     <message>
-        <location filename="../../qtbase/src/network/access/qftp.cpp" line="844"/>
+        <location filename="../../qtbase/src/network/access/qftp.cpp" line="+844"/>
         <source>Not connected</source>
-        <translation type="obsolete">Inte ansluten</translation>
+        <translation type="unfinished">Inte ansluten</translation>
     </message>
     <message>
-        <location filename="." line="79"/>
+        <location line="+79"/>
         <source>Host %1 not found</source>
-        <translation type="obsolete">Värden %1 hittades inte</translation>
+        <translation type="unfinished">Värden %1 hittades inte</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Connection refused to host %1</source>
-        <translation type="obsolete">Anslutningen till värden %1 vägrades</translation>
+        <translation type="unfinished">Anslutningen till värden %1 vägrades</translation>
     </message>
     <message>
-        <location filename="." line="106"/>
+        <location line="+4"/>
+        <source>Connection timed out to host %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+106"/>
         <source>Connected to host %1</source>
-        <translation type="obsolete">Ansluten till värden %1</translation>
+        <translation type="unfinished">Ansluten till värden %1</translation>
     </message>
     <message>
-        <location filename="." line="180"/>
+        <location line="+213"/>
+        <source>Data Connection refused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+180"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
     </message>
     <message>
-        <location filename="." line="943"/>
+        <location line="+943"/>
         <source>Connecting to host failed:
 %1</source>
-        <translation type="obsolete">Anslutning till värden misslyckades: 
+        <translation type="unfinished">Anslutning till värden misslyckades: 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Login failed:
 %1</source>
-        <translation type="obsolete">Inloggning misslyckades: 
+        <translation type="unfinished">Inloggning misslyckades: 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Listing directory failed:
 %1</source>
-        <translation type="obsolete">Listning av katalogen misslyckades: 
+        <translation type="unfinished">Listning av katalogen misslyckades: 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Changing directory failed:
 %1</source>
-        <translation type="obsolete">Byte av katalog misslyckades: 
+        <translation type="unfinished">Byte av katalog misslyckades: 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Downloading file failed:
 %1</source>
-        <translation type="obsolete">Nedladdningen av filen misslyckades: 
+        <translation type="unfinished">Nedladdningen av filen misslyckades: 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Uploading file failed:
 %1</source>
-        <translation type="obsolete">Uppladdningen av filen misslyckades: 
+        <translation type="unfinished">Uppladdningen av filen misslyckades: 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Removing file failed:
 %1</source>
-        <translation type="obsolete">Borttagning av filen misslyckades: 
+        <translation type="unfinished">Borttagning av filen misslyckades: 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Creating directory failed:
 %1</source>
-        <translation type="obsolete">Skapandet av katalogen misslyckades: 
+        <translation type="unfinished">Skapandet av katalogen misslyckades: 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Removing directory failed:
 %1</source>
-        <translation type="obsolete">Borttagning av katalogen misslyckades: 
+        <translation type="unfinished">Borttagning av katalogen misslyckades: 
 %1</translation>
     </message>
     <message>
-        <location filename="." line="28"/>
+        <location line="+28"/>
         <source>Connection closed</source>
-        <translation type="obsolete">Anslutningen stängd</translation>
+        <translation type="unfinished">Anslutningen stängd</translation>
     </message>
     <message>
-        <location filename="." line="28"/>
         <source>Connection refused for data connection</source>
-        <translation type="obsolete">Anslutning vägrades för dataanslutning</translation>
+        <translation type="vanished">Anslutning vägrades för dataanslutning</translation>
     </message>
     <message>
-        <location filename="." line="28"/>
         <source>Host %1 found</source>
-        <translation type="obsolete">Värden %1 hittades</translation>
+        <translation type="vanished">Värden %1 hittades</translation>
     </message>
     <message>
-        <location filename="." line="28"/>
         <source>Connection to %1 closed</source>
-        <translation type="obsolete">Anslutningen till %1 stängdes</translation>
+        <translation type="vanished">Anslutningen till %1 stängdes</translation>
     </message>
     <message>
-        <location filename="." line="28"/>
         <source>Host found</source>
-        <translation type="obsolete">Värden hittades</translation>
+        <translation type="vanished">Värden hittades</translation>
     </message>
     <message>
-        <location filename="." line="28"/>
         <source>Connected to host</source>
-        <translation type="obsolete">Ansluten till värden</translation>
+        <translation type="vanished">Ansluten till värden</translation>
     </message>
 </context>
 <context>
     <name>QGnomeTheme</name>
     <message>
-        <location filename="../../qtbase/src/platformsupport/themes/genericunix/qgenericunixthemes.cpp" line="822"/>
+        <location filename="../../qtbase/src/platformsupport/themes/genericunix/qgenericunixthemes.cpp" line="+822"/>
         <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>&amp;Save</source>
-        <translation type="obsolete">&amp;Spara</translation>
+        <translation type="unfinished">&amp;Spara</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
+        <translation type="unfinished">&amp;Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Stäng</translation>
+        <translation type="unfinished">&amp;Stäng</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Close without Saving</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QGuiApplication</name>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qguiapplication.cpp" line="225"/>
+        <location filename="../../qtbase/src/gui/kernel/qguiapplication.cpp" line="+225"/>
         <source>QT_LAYOUT_DIRECTION</source>
         <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-        <translation type="obsolete">LTR</translation>
+        <translation type="unfinished">LTR</translation>
     </message>
 </context>
 <context>
     <name>QHostInfo</name>
     <message>
-        <location filename="../../qtbase/src/network/kernel/qhostinfo_p.h" line="146"/>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo.cpp" line="+249"/>
+        <location line="+376"/>
+        <source>No host name given</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_p.h" line="+146"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
     </message>
 </context>
 <context>
     <name>QHostInfoAgent</name>
     <message>
-        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="26"/>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_unix.cpp" line="+237"/>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="+123"/>
+        <source>No host name given</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="+0"/>
+        <source>Invalid hostname</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="+26"/>
         <source>Unknown address type</source>
-        <translation type="obsolete">Okänd adresstyp</translation>
+        <translation type="unfinished">Okänd adresstyp</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="26"/>
+        <location line="+13"/>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="-83"/>
         <source>Host not found</source>
-        <translation type="obsolete">Värden hittades inte</translation>
+        <translation type="unfinished">Värden hittades inte</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="4"/>
+        <location filename="../../qtbase/src/network/kernel/qhostinfo_win.cpp" line="+4"/>
+        <source>Unknown error (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="vanished">Okänt fel</translation>
     </message>
 </context>
 <context>
     <name>QHttp</name>
     <message>
-        <location filename="." line="2"/>
+        <location filename="../../qtbase/src/network/access/qhttpnetworkconnection.cpp" line="-11"/>
+        <location line="+2"/>
         <source>Host %1 not found</source>
-        <translation type="obsolete">Värden %1 hittades inte</translation>
+        <translation type="unfinished">Värden %1 hittades inte</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>Connection refused</source>
-        <translation type="obsolete">Anslutningen nekades</translation>
+        <translation type="unfinished">Anslutningen nekades</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>Connection closed</source>
-        <translation type="obsolete">Anslutningen stängd</translation>
+        <translation type="unfinished">Anslutningen stängd</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
+        <location line="+6"/>
+        <source>Proxy requires authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Host requires authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Data corrupted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Unknown protocol specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>SSL handshake failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Too many redirects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="+1192"/>
+        <source>Insecure redirect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="vanished">Okänt fel</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Request aborted</source>
-        <translation type="obsolete">Begäran avbröts</translation>
+        <translation type="vanished">Begäran avbröts</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>No server set to connect to</source>
-        <translation type="obsolete">Ingen server inställd att ansluta till</translation>
+        <translation type="vanished">Ingen server inställd att ansluta till</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Wrong content length</source>
-        <translation type="obsolete">Fel innehållslängd</translation>
+        <translation type="vanished">Fel innehållslängd</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Server closed connection unexpectedly</source>
-        <translation type="obsolete">Servern stängde oväntat anslutningen</translation>
+        <translation type="vanished">Servern stängde oväntat anslutningen</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>HTTP request failed</source>
-        <translation type="obsolete">HTTP-begäran misslyckades</translation>
+        <translation type="vanished">HTTP-begäran misslyckades</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Invalid HTTP response header</source>
-        <translation type="obsolete">Ogiltig HTTP-svarshuvud</translation>
+        <translation type="vanished">Ogiltig HTTP-svarshuvud</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Invalid HTTP chunked body</source>
-        <translation type="obsolete">Ogiltig HTTP chunked body</translation>
+        <translation type="vanished">Ogiltig HTTP chunked body</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Host %1 found</source>
-        <translation type="obsolete">Värden %1 hittades</translation>
+        <translation type="vanished">Värden %1 hittades</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Connected to host %1</source>
-        <translation type="obsolete">Ansluten till värden %1</translation>
+        <translation type="vanished">Ansluten till värden %1</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Connection to %1 closed</source>
-        <translation type="obsolete">Anslutningen till %1 stängdes</translation>
+        <translation type="vanished">Anslutningen till %1 stängdes</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Host found</source>
-        <translation type="obsolete">Värden hittades</translation>
+        <translation type="vanished">Värden hittades</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="1192"/>
         <source>Connected to host</source>
-        <translation type="obsolete">Ansluten till värd</translation>
+        <translation type="vanished">Ansluten till värd</translation>
+    </message>
+</context>
+<context>
+    <name>QHttpSocketEngine</name>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qhttpsocketengine.cpp" line="-114"/>
+        <source>Did not receive HTTP response from proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+53"/>
+        <source>Error parsing authentication request from proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>Authentication required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Proxy denied connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Error communicating with HTTP proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+55"/>
+        <source>Proxy server not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Proxy connection refused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Proxy server connection timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Proxy connection closed prematurely</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QIBaseDriver</name>
     <message>
-        <location filename="../../qtbase/src/plugins/sqldrivers/ibase/qsql_ibase.cpp" line="1545"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/ibase/qsql_ibase.cpp" line="+1545"/>
         <source>Error opening database</source>
-        <translation type="obsolete">Fel vid öppning av databas</translation>
+        <translation type="unfinished">Fel vid öppning av databas</translation>
     </message>
     <message>
-        <location filename="." line="57"/>
+        <location line="+57"/>
         <source>Could not start transaction</source>
-        <translation type="obsolete">Kunde inte starta transaktion</translation>
+        <translation type="unfinished">Kunde inte starta transaktion</translation>
     </message>
     <message>
-        <location filename="." line="14"/>
+        <location line="+14"/>
         <source>Unable to commit transaction</source>
-        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+        <translation type="unfinished">Kunde inte verkställa transaktion</translation>
     </message>
     <message>
-        <location filename="." line="14"/>
+        <location line="+14"/>
         <source>Unable to rollback transaction</source>
-        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+        <translation type="unfinished">Kunde inte rulla tillbaka transaktion</translation>
     </message>
 </context>
 <context>
     <name>QIBaseResult</name>
     <message>
-        <location filename="." line="14"/>
+        <location line="-1173"/>
         <source>Unable to create BLOB</source>
-        <translation type="obsolete">Kunde inte skapa BLOB</translation>
+        <translation type="unfinished">Kunde inte skapa BLOB</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
+        <location line="+6"/>
         <source>Unable to write BLOB</source>
-        <translation type="obsolete">Kunde inte skriva BLOB</translation>
+        <translation type="unfinished">Kunde inte skriva BLOB</translation>
     </message>
     <message>
-        <location filename="." line="14"/>
+        <location line="+14"/>
         <source>Unable to open BLOB</source>
-        <translation type="obsolete">Kunde inte öppna BLOB</translation>
+        <translation type="unfinished">Kunde inte öppna BLOB</translation>
     </message>
     <message>
-        <location filename="." line="16"/>
+        <location line="+16"/>
         <source>Unable to read BLOB</source>
-        <translation type="obsolete">Kunde inte läsa BLOB</translation>
+        <translation type="unfinished">Kunde inte läsa BLOB</translation>
     </message>
     <message>
-        <location filename="." line="188"/>
+        <location line="+126"/>
+        <location line="+188"/>
         <source>Could not find array</source>
-        <translation type="obsolete">Kunde inte hitta kedja</translation>
+        <translation type="unfinished">Kunde inte hitta kedja</translation>
     </message>
     <message>
-        <location filename="." line="188"/>
+        <location line="-156"/>
         <source>Could not get array data</source>
-        <translation type="obsolete">Kunde inte få kedjedata</translation>
+        <translation type="unfinished">Kunde inte få kedjedata</translation>
     </message>
     <message>
-        <location filename="." line="211"/>
+        <location line="+211"/>
         <source>Could not get query info</source>
-        <translation type="obsolete">Kunde inte gå frågesatsinformation</translation>
+        <translation type="unfinished">Kunde inte gå frågesatsinformation</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
+        <location line="+20"/>
         <source>Could not start transaction</source>
-        <translation type="obsolete">Kunde inte starta transaktion</translation>
+        <translation type="unfinished">Kunde inte starta transaktion</translation>
     </message>
     <message>
-        <location filename="." line="19"/>
+        <location line="+19"/>
         <source>Unable to commit transaction</source>
-        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+        <translation type="unfinished">Kunde inte verkställa transaktion</translation>
     </message>
     <message>
-        <location filename="." line="37"/>
+        <location line="+37"/>
         <source>Could not allocate statement</source>
-        <translation type="obsolete">Kunde inte allokera frågesats</translation>
+        <translation type="unfinished">Kunde inte allokera frågesats</translation>
     </message>
     <message>
-        <location filename="." line="5"/>
+        <location line="+5"/>
         <source>Could not prepare statement</source>
-        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+        <translation type="unfinished">Kunde inte förbereda frågesats</translation>
     </message>
     <message>
-        <location filename="." line="11"/>
+        <location line="+5"/>
+        <location line="+11"/>
         <source>Could not describe input statement</source>
-        <translation type="obsolete">Kunde inte beskriva inmatningsfrågesats</translation>
+        <translation type="unfinished">Kunde inte beskriva inmatningsfrågesats</translation>
     </message>
     <message>
-        <location filename="." line="14"/>
+        <location line="+14"/>
         <source>Could not describe statement</source>
-        <translation type="obsolete">Kunde inte beskriva frågesats</translation>
+        <translation type="unfinished">Kunde inte beskriva frågesats</translation>
     </message>
     <message>
-        <location filename="." line="120"/>
+        <location line="+120"/>
         <source>Unable to close statement</source>
-        <translation type="obsolete">Kunde inte stänga frågesats</translation>
+        <translation type="unfinished">Kunde inte stänga frågesats</translation>
     </message>
     <message>
-        <location filename="." line="8"/>
+        <location line="+8"/>
         <source>Unable to execute query</source>
-        <translation type="obsolete">Kunde inte köra frågesats</translation>
+        <translation type="unfinished">Kunde inte köra frågesats</translation>
     </message>
     <message>
-        <location filename="." line="47"/>
+        <location line="+47"/>
         <source>Could not fetch next item</source>
-        <translation type="obsolete">Kunde inte hämta nästa post</translation>
+        <translation type="unfinished">Kunde inte hämta nästa post</translation>
     </message>
     <message>
-        <location filename="." line="205"/>
+        <location line="+205"/>
         <source>Could not get statement info</source>
-        <translation type="obsolete">Kunde inte få frågesatsinformation</translation>
+        <translation type="unfinished">Kunde inte få frågesatsinformation</translation>
     </message>
 </context>
 <context>
     <name>QIODevice</name>
     <message>
-        <location filename="../../qtbase/src/corelib/io/qiodevice.cpp" line="2106"/>
+        <location filename="../../qtbase/src/corelib/io/qfsfileengine_unix.cpp" line="+99"/>
+        <source>file to open is a directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/io/qiodevice.cpp" line="+2106"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/corelib/kernel/qsystemerror.cpp" line="121"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsystemerror.cpp" line="+121"/>
         <source>Permission denied</source>
-        <translation type="obsolete">Åtkomst nekad</translation>
+        <translation type="unfinished">Åtkomst nekad</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>Too many open files</source>
-        <translation type="obsolete">För många öppna filer</translation>
+        <translation type="unfinished">För många öppna filer</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>No such file or directory</source>
-        <translation type="obsolete">Ingen sådan fil eller katalog</translation>
+        <translation type="unfinished">Ingen sådan fil eller katalog</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>No space left on device</source>
-        <translation type="obsolete">Inget ledigt utrymme på enheten</translation>
+        <translation type="unfinished">Inget ledigt utrymme på enheten</translation>
     </message>
 </context>
 <context>
     <name>QImageReader</name>
     <message>
-        <location filename="." line="195"/>
+        <location filename="../../qtbase/src/gui/image/qimagereader.cpp" line="+508"/>
+        <source>Invalid device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>File not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Unsupported image format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+714"/>
+        <source>Unable to read image data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+195"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
     </message>
 </context>
 <context>
     <name>QImageWriter</name>
     <message>
-        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
+        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="+282"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Device is not set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Cannot open device for writing: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Device not writable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location line="+519"/>
+        <source>Unsupported image format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-75"/>
+        <source>Image is empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QInputContext</name>
     <message>
-        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
         <source>XIM</source>
-        <translation type="obsolete">XIM</translation>
+        <translation type="vanished">XIM</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
         <source>XIM input method</source>
-        <translation type="obsolete">XIM-inmatningsmetod</translation>
+        <translation type="vanished">XIM-inmatningsmetod</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
         <source>Windows input method</source>
-        <translation type="obsolete">Windows-inmatningsmetod</translation>
+        <translation type="vanished">Windows-inmatningsmetod</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/gui/image/qimagewriter.cpp" line="282"/>
         <source>Mac OS X input method</source>
-        <translation type="obsolete">Mac OS X-inmatningsmetod</translation>
+        <translation type="vanished">Mac OS X-inmatningsmetod</translation>
+    </message>
+</context>
+<context>
+    <name>QInputDialog</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/dialogs/qinputdialog.cpp" line="+244"/>
+        <source>Enter a value:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QJsonParseError</name>
     <message>
-        <location filename="../../qtbase/src/corelib/serialization/qjsonparser.cpp" line="66"/>
+        <location filename="../../qtbase/src/corelib/serialization/qjsonparser.cpp" line="+66"/>
         <source>no error occurred</source>
-        <translation type="obsolete">inga fel inträffade</translation>
+        <translation type="unfinished">inga fel inträffade</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unterminated object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>missing name separator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unterminated array</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>missing value separator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>illegal value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid termination by number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>illegal number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid escape sequence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid UTF8 string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unterminated string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>object is missing after a comma</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>too deeply nested document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>too large document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>garbage at the end of the document</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QKeySequenceEdit</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/widgets/qkeysequenceedit.cpp" line="+103"/>
+        <source>Press shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+194"/>
+        <source>%1, ...</source>
+        <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QLibrary</name>
     <message>
-        <location filename="." line="312"/>
-        <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <location filename="../../qtbase/src/corelib/plugin/qelfparser_p.cpp" line="+74"/>
+        <source>&apos;%1&apos; is not an ELF object (%2)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="." line="50"/>
+        <location line="+0"/>
+        <location filename="../../qtbase/src/corelib/plugin/qmachparser.cpp" line="+103"/>
+        <location line="+9"/>
+        <source>file too small</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>&apos;%1&apos; is not an ELF object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location line="+10"/>
+        <location line="+6"/>
+        <location line="+20"/>
+        <location line="+12"/>
+        <location line="+14"/>
+        <location line="+14"/>
+        <location line="+11"/>
+        <location line="+22"/>
+        <location line="+14"/>
+        <location line="+13"/>
+        <source>&apos;%1&apos; is an invalid ELF object (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-136"/>
+        <source>odd cpu architecture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>wrong cpu architecture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>odd endianness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>unexpected e_shsize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>unexpected e_shentsize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location line="+12"/>
+        <source>announced %n section(s), each %1 byte(s), exceed file size</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>shstrtab section header seems to be at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>string table seems to be at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>section name %1 of %2 behind end of file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>empty .rodata. not a library.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>missing section data. This is not a library.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/plugin/qlibrary.cpp" line="+334"/>
+        <source>Failed to extract plugin meta data from &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+172"/>
+        <location line="+230"/>
+        <location line="+18"/>
+        <source>The shared library was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The file &apos;%1&apos; is not a valid Qt plugin.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>The plugin &apos;%1&apos; uses incompatible Qt library. (%2.%3.%4) [%5]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>The plugin &apos;%1&apos; uses incompatible Qt library. (Cannot mix debug and release libraries.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+312"/>
+        <source>Unknown error</source>
+        <translation type="unfinished">Okänt fel</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/plugin/qlibrary_unix.cpp" line="+249"/>
+        <location filename="../../qtbase/src/corelib/plugin/qlibrary_win.cpp" line="+118"/>
+        <source>Cannot load library %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/corelib/plugin/qlibrary_win.cpp" line="+36"/>
+        <source>Cannot unload library %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <location filename="../../qtbase/src/corelib/plugin/qlibrary_win.cpp" line="+12"/>
+        <source>Cannot resolve symbol &quot;%1&quot; in %2: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/plugin/qmachparser.cpp" line="-25"/>
+        <source>&apos;%1&apos; is not a valid Mach-O binary (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>file is corrupt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+46"/>
+        <source>no suitable architecture in fat binary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>invalid magic %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>wrong architecture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>not a dynamic library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <source>&apos;%1&apos; is not a Qt plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>QLibrary::load_sys: Cannot load %1 (%2)</source>
         <translation type="obsolete">QLibrary::load_sys: Kan inte läsa in %1 (%2)</translation>
     </message>
     <message>
-        <location filename="." line="50"/>
         <source>QLibrary::unload_sys: Cannot unload %1 (%2)</source>
         <translation type="obsolete">QLibrary::unload_sys: Kan inte läsa ur %1 (%2)</translation>
     </message>
     <message>
-        <location filename="." line="50"/>
         <source>QLibrary::resolve_sys: Symbol &quot;%1&quot; undefined in %2 (%3)</source>
         <translation type="obsolete">QLibrary::resolve_sys: Symbolen &quot;%1&quot; är inte definierad i %2 (%3)</translation>
     </message>
@@ -9716,212 +3556,370 @@ Kontrollera att det korrekta filnamnet angavs</translation>
 <context>
     <name>QLineEdit</name>
     <message>
-        <location filename="../../qtbase/src/widgets/widgets/qlineedit.cpp" line="2175"/>
+        <location filename="../../qtbase/src/widgets/widgets/qlineedit.cpp" line="+2175"/>
         <source>&amp;Undo</source>
-        <translation type="obsolete">&amp;Ångra</translation>
+        <translation type="unfinished">&amp;Ångra</translation>
     </message>
     <message>
-        <location filename="." line="5"/>
+        <location line="+5"/>
         <source>&amp;Redo</source>
-        <translation type="obsolete">&amp;Gör om</translation>
+        <translation type="unfinished">&amp;Gör om</translation>
     </message>
     <message>
-        <location filename="." line="10"/>
+        <location line="+10"/>
         <source>Cu&amp;t</source>
-        <translation type="obsolete">Klipp &amp;ut</translation>
+        <translation type="unfinished">Klipp &amp;ut</translation>
     </message>
     <message>
-        <location filename="." line="7"/>
+        <location line="+7"/>
         <source>&amp;Copy</source>
-        <translation type="obsolete">&amp;Kopiera</translation>
+        <translation type="unfinished">&amp;Kopiera</translation>
     </message>
     <message>
-        <location filename="." line="7"/>
+        <location line="+7"/>
         <source>&amp;Paste</source>
-        <translation type="obsolete">Klistra &amp;in</translation>
+        <translation type="unfinished">Klistra &amp;in</translation>
     </message>
     <message>
-        <location filename="." line="8"/>
+        <location line="+8"/>
         <source>Delete</source>
-        <translation type="obsolete">Ta bort</translation>
+        <translation type="unfinished">Ta bort</translation>
     </message>
     <message>
-        <location filename="." line="9"/>
+        <location line="+9"/>
         <source>Select All</source>
-        <translation type="obsolete">Markera alla</translation>
+        <translation type="unfinished">Markera alla</translation>
+    </message>
+</context>
+<context>
+    <name>QLocalServer</name>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qlocalserver.cpp" line="+335"/>
+        <location filename="../../qtbase/src/network/socket/qlocalserver_unix.cpp" line="+323"/>
+        <source>%1: Name error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qlocalserver_unix.cpp" line="-8"/>
+        <source>%1: Permission denied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1: Address in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>%1: Unknown error %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QLocalSocket</name>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_tcp.cpp" line="+135"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+140"/>
+        <source>%1: Connection refused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+3"/>
+        <source>%1: Remote closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_win.cpp" line="+72"/>
+        <location line="+64"/>
+        <source>%1: Invalid name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+3"/>
+        <source>%1: Socket access error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+3"/>
+        <source>%1: Socket resource error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+3"/>
+        <source>%1: Socket operation timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+3"/>
+        <source>%1: Datagram too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_win.cpp" line="-69"/>
+        <source>%1: Connection error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+3"/>
+        <source>%1: The socket operation is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+3"/>
+        <source>%1: Operation not permitted when socket is in this state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>%1: Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+58"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_win.cpp" line="+58"/>
+        <source>Trying to connect while connection is in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_unix.cpp" line="+4"/>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_win.cpp" line="-43"/>
+        <source>%1: Unknown error %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/socket/qlocalsocket_win.cpp" line="-5"/>
+        <source>%1: Access denied</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QMYSQLDriver</name>
     <message>
-        <location filename="." line="10"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/mysql/qsql_mysql.cpp" line="+1382"/>
+        <source>Unable to allocate a MYSQL object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>Unable to open database &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Unable to connect</source>
-        <translation type="obsolete">Kunde inte ansluta</translation>
+        <translation type="unfinished">Kunde inte ansluta</translation>
     </message>
     <message>
-        <location filename="." line="168"/>
+        <location line="+168"/>
         <source>Unable to begin transaction</source>
-        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+        <translation type="unfinished">Kunde inte påbörja transaktion</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
+        <location line="+18"/>
         <source>Unable to commit transaction</source>
-        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+        <translation type="unfinished">Kunde inte verkställa transaktion</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
+        <location line="+18"/>
         <source>Unable to rollback transaction</source>
-        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+        <translation type="unfinished">Kunde inte rulla tillbaka transaktion</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
         <source>Unable to open database &apos;</source>
-        <translation type="obsolete">Kunde inte öppna databasen \&quot;</translation>
+        <translation type="vanished">Kunde inte öppna databasen \&quot;</translation>
     </message>
 </context>
 <context>
     <name>QMYSQLResult</name>
     <message>
-        <location filename="." line="32"/>
+        <location line="-1092"/>
+        <location line="+32"/>
         <source>Unable to fetch data</source>
-        <translation type="obsolete">Kunde inte hämta data</translation>
+        <translation type="unfinished">Kunde inte hämta data</translation>
     </message>
     <message>
-        <location filename="." line="179"/>
+        <location line="+179"/>
         <source>Unable to execute query</source>
-        <translation type="obsolete">Kunde inte köra frågesats</translation>
+        <translation type="unfinished">Kunde inte köra frågesats</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
+        <location line="+6"/>
         <source>Unable to store result</source>
-        <translation type="obsolete">Kunde inte lagra resultat</translation>
+        <translation type="unfinished">Kunde inte lagra resultat</translation>
     </message>
     <message>
-        <location filename="." line="8"/>
+        <location line="+117"/>
+        <source>Unable to execute next query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Unable to store next result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+72"/>
+        <location line="+8"/>
         <source>Unable to prepare statement</source>
-        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+        <translation type="unfinished">Kunde inte förbereda frågesats</translation>
     </message>
     <message>
-        <location filename="." line="38"/>
+        <location line="+38"/>
         <source>Unable to reset statement</source>
-        <translation type="obsolete">Kunde inte återställa frågesats</translation>
+        <translation type="unfinished">Kunde inte återställa frågesats</translation>
     </message>
     <message>
-        <location filename="." line="91"/>
+        <location line="+91"/>
         <source>Unable to bind value</source>
-        <translation type="obsolete">Kunde inte binda värde</translation>
+        <translation type="unfinished">Kunde inte binda värde</translation>
     </message>
     <message>
-        <location filename="." line="11"/>
+        <location line="+11"/>
         <source>Unable to execute statement</source>
-        <translation type="obsolete">Kunde inte köra frågesats</translation>
+        <translation type="unfinished">Kunde inte köra frågesats</translation>
     </message>
     <message>
-        <location filename="." line="21"/>
+        <location line="+14"/>
+        <location line="+21"/>
         <source>Unable to bind outvalues</source>
-        <translation type="obsolete">Kunde inte binda utvärden</translation>
+        <translation type="unfinished">Kunde inte binda utvärden</translation>
     </message>
     <message>
-        <location filename="." line="21"/>
+        <location line="-12"/>
         <source>Unable to store statement results</source>
-        <translation type="obsolete">Kunde inte lagra resultat från frågesats</translation>
+        <translation type="unfinished">Kunde inte lagra resultat från frågesats</translation>
+    </message>
+</context>
+<context>
+    <name>QMdiArea</name>
+    <message>
+        <location filename="../../qtbase/src/widgets/widgets/qmdiarea.cpp" line="+288"/>
+        <source>(Untitled)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QMdiSubWindow</name>
     <message>
-        <location filename="." line="1"/>
+        <location filename="../../qtbase/src/widgets/widgets/qmdisubwindow.cpp" line="+278"/>
+        <source>- [%1]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>%1 - [%2]</source>
-        <translation type="obsolete">%1 - [%2]</translation>
+        <translation type="unfinished">%1 - [%2]</translation>
     </message>
     <message>
-        <location filename="." line="51"/>
+        <location line="+51"/>
         <source>Minimize</source>
-        <translation type="obsolete">Minimera</translation>
+        <translation type="unfinished">Minimera</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>Maximize</source>
-        <translation type="obsolete">Maximera</translation>
+        <translation type="unfinished">Maximera</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+3"/>
+        <source>Unshade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Shade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Restore Down</source>
-        <translation type="obsolete">Återställ nedåt</translation>
+        <translation type="unfinished">Återställ nedåt</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+2"/>
+        <source>Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Close</source>
-        <translation type="obsolete">Stäng</translation>
+        <translation type="unfinished">Stäng</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>Help</source>
-        <translation type="obsolete">Hjälp</translation>
+        <translation type="unfinished">Hjälp</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>Menu</source>
-        <translation type="obsolete">Meny</translation>
+        <translation type="unfinished">Meny</translation>
     </message>
     <message>
-        <location filename="." line="702"/>
+        <location line="+702"/>
         <source>&amp;Restore</source>
-        <translation type="obsolete">Åte&amp;rställ</translation>
+        <translation type="unfinished">Åte&amp;rställ</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>&amp;Move</source>
-        <translation type="obsolete">&amp;Flytta</translation>
+        <translation type="unfinished">&amp;Flytta</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>&amp;Size</source>
-        <translation type="obsolete">&amp;Storlek</translation>
+        <translation type="unfinished">&amp;Storlek</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Mi&amp;nimize</source>
-        <translation type="obsolete">Mi&amp;nimera</translation>
+        <translation type="unfinished">Mi&amp;nimera</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Ma&amp;ximize</source>
-        <translation type="obsolete">Ma&amp;ximera</translation>
+        <translation type="unfinished">Ma&amp;ximera</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Stay on &amp;Top</source>
-        <translation type="obsolete">Stanna kvar övers&amp;t</translation>
+        <translation type="unfinished">Stanna kvar övers&amp;t</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
+        <location line="+3"/>
         <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Stäng</translation>
+        <translation type="unfinished">&amp;Stäng</translation>
     </message>
 </context>
 <context>
     <name>QMenu</name>
     <message>
-        <location filename="." line="3"/>
         <source>Close</source>
-        <translation type="obsolete">Stäng</translation>
+        <translation type="vanished">Stäng</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
         <source>Open</source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="vanished">Öppna</translation>
     </message>
     <message>
-        <location filename="." line="3"/>
         <source>Execute</source>
-        <translation type="obsolete">Kör</translation>
+        <translation type="vanished">Kör</translation>
     </message>
 </context>
 <context>
     <name>QMenuBar</name>
     <message>
-        <location filename="." line="3"/>
         <source>About Qt</source>
         <translation type="obsolete">Om Qt</translation>
     </message>
@@ -9929,37 +3927,44 @@ Kontrollera att det korrekta filnamnet angavs</translation>
 <context>
     <name>QMessageBox</name>
     <message>
-        <location filename="." line="3"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qmessagebox.cpp" line="-2302"/>
         <source>Show Details...</source>
-        <translation type="obsolete">Visa detaljer...</translation>
+        <translation type="unfinished">Visa detaljer...</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>Hide Details...</source>
-        <translation type="obsolete">Dölj detaljer,,,</translation>
+        <translation type="unfinished">Dölj detaljer,,,</translation>
     </message>
     <message>
-        <location filename="." line="27"/>
+        <location line="+1693"/>
+        <source>&lt;h3&gt;About Qt&lt;/h3&gt;&lt;p&gt;This program uses Qt version %1.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>&lt;p&gt;Qt is a C++ toolkit for cross-platform application development.&lt;/p&gt;&lt;p&gt;Qt provides single-source portability across all major desktop operating systems. It is also available for embedded Linux and other embedded and mobile operating systems.&lt;/p&gt;&lt;p&gt;Qt is available under multiple licensing options designed to accommodate the needs of our various users.&lt;/p&gt;&lt;p&gt;Qt licensed under our commercial license agreement is appropriate for development of proprietary/commercial software where you do not want to share any source code with third parties or otherwise cannot comply with the terms of GNU (L)GPL.&lt;/p&gt;&lt;p&gt;Qt licensed under GNU (L)GPL is appropriate for the development of Qt&amp;nbsp;applications provided you can comply with the terms and conditions of the respective licenses.&lt;/p&gt;&lt;p&gt;Please see &lt;a href=&quot;http://%2/&quot;&gt;%2&lt;/a&gt; for an overview of Qt licensing.&lt;/p&gt;&lt;p&gt;Copyright (C) %1 The Qt Company Ltd and other contributors.&lt;/p&gt;&lt;p&gt;Qt and the Qt logo are trademarks of The Qt Company Ltd.&lt;/p&gt;&lt;p&gt;Qt is The Qt Company Ltd product developed as an open source project. See &lt;a href=&quot;http://%3/&quot;&gt;%3&lt;/a&gt; for more information.&lt;/p&gt;</source>
+        <extracomment>Leave this text untranslated or include a verbatim copy of it below and note that it is the authoritative version in case of doubt.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+27"/>
         <source>About Qt</source>
-        <translation type="obsolete">Om Qt</translation>
+        <translation type="unfinished">Om Qt</translation>
     </message>
     <message>
-        <location filename="." line="27"/>
         <source>Help</source>
-        <translation type="obsolete">Hjälp</translation>
+        <translation type="vanished">Hjälp</translation>
     </message>
     <message>
-        <location filename="." line="27"/>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
-        <location filename="." line="27"/>
         <source>&lt;p&gt;This program uses Qt version %1.&lt;/p&gt;</source>
         <translation type="obsolete">&lt;p&gt;Detta program använder Qt version %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="." line="27"/>
         <source>&lt;h3&gt;About Qt&lt;/h3&gt;%1&lt;p&gt;Qt is a C++ toolkit for cross-platform application development.&lt;/p&gt;&lt;p&gt;Qt provides single-source portability across MS&amp;nbsp;Windows, Mac&amp;nbsp;OS&amp;nbsp;X, Linux, and all major commercial Unix variants. Qt is also available for embedded devices as Qtopia Core.&lt;/p&gt;&lt;p&gt;Qt is a Trolltech product. See &lt;a href=&quot;http://qt.nokia.com/&quot;&gt;qt.nokia.com&lt;/a&gt; for more information.&lt;/p&gt;</source>
         <translation type="obsolete">&lt;h3&gt;Om Qt&lt;/h3&gt;%1&lt;p&gt;Qt är ett C++-verktygssamling för utveckling av krossplattformsprogram.&lt;/p&gt;&lt;p&gt;Qt tillhandahåller portabilitet för samma källkod mellan MS&amp;nbsp;Windows, Mac&amp;nbsp;OS&amp;nbsp;X, Linux, och alla andra stora kommersiella Unix-varianter. Qt finns också tillgängligt för inbäddade enheter som Qtopia Core.&lt;/p&gt;&lt;p&gt;Qt är en produkt från Trolltech. Se &lt;a href=&quot;http://qt.nokia.com/&quot;&gt;qt.nokia.com&lt;/a&gt; för mer information.&lt;/p&gt;</translation>
     </message>
@@ -9967,214 +3972,476 @@ Kontrollera att det korrekta filnamnet angavs</translation>
 <context>
     <name>QMultiInputContext</name>
     <message>
-        <location filename="." line="27"/>
         <source>Select IM</source>
-        <translation type="obsolete">Välj inmatningsmetod</translation>
+        <translation type="vanished">Välj inmatningsmetod</translation>
     </message>
 </context>
 <context>
     <name>QMultiInputContextPlugin</name>
     <message>
-        <location filename="." line="27"/>
         <source>Multiple input method switcher</source>
-        <translation type="obsolete">Växlare för flera inmatningsmetoder</translation>
+        <translation type="vanished">Växlare för flera inmatningsmetoder</translation>
     </message>
     <message>
-        <location filename="." line="27"/>
         <source>Multiple input method switcher that uses the context menu of the text widgets</source>
-        <translation type="obsolete">Växlare för flera inmatningsmetoder som använder sammanhangsmenyn för textwidgar</translation>
+        <translation type="vanished">Växlare för flera inmatningsmetoder som använder sammanhangsmenyn för textwidgar</translation>
     </message>
 </context>
 <context>
     <name>QNativeSocketEngine</name>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="1519"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine.cpp" line="+235"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+1519"/>
         <source>Unable to initialize non-blocking socket</source>
-        <translation type="obsolete">Kunde inte initiera icke-blockerande uttag</translation>
+        <translation type="unfinished">Kunde inte initiera icke-blockerande uttag</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Unable to initialize broadcast socket</source>
-        <translation type="obsolete">Kunde inte initiera uttag för broadcast</translation>
+        <translation type="unfinished">Kunde inte initiera uttag för broadcast</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="4"/>
+        <location line="+4"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+4"/>
         <source>Attempt to use IPv6 socket on a platform with no IPv6 support</source>
-        <translation type="obsolete">Försök att använda IPv6-uttag på en plattform som saknar IPv6-stöd</translation>
+        <translation type="unfinished">Försök att använda IPv6-uttag på en plattform som saknar IPv6-stöd</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>The remote host closed the connection</source>
-        <translation type="obsolete">Fjärrvärden stängde anslutningen</translation>
+        <translation type="unfinished">Fjärrvärden stängde anslutningen</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Network operation timed out</source>
-        <translation type="obsolete">Tidsgräns för nätverksåtgärd överstegs</translation>
+        <translation type="unfinished">Tidsgräns för nätverksåtgärd överstegs</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Out of resources</source>
-        <translation type="obsolete">Slut på resurser</translation>
+        <translation type="unfinished">Slut på resurser</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Unsupported socket operation</source>
-        <translation type="obsolete">Uttagsåtgärden stöds inte</translation>
+        <translation type="unfinished">Uttagsåtgärden stöds inte</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Protocol type not supported</source>
-        <translation type="obsolete">Protokolltypen stöds inte</translation>
+        <translation type="unfinished">Protokolltypen stöds inte</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Invalid socket descriptor</source>
-        <translation type="obsolete">Ogiltig uttagsbeskrivare</translation>
+        <translation type="unfinished">Ogiltig uttagsbeskrivare</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Host unreachable</source>
-        <translation type="obsolete">Värden är inte nåbar</translation>
+        <translation type="unfinished">Värden är inte nåbar</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Network unreachable</source>
-        <translation type="obsolete">Nätverket är inte nåbart</translation>
+        <translation type="unfinished">Nätverket är inte nåbart</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Permission denied</source>
-        <translation type="obsolete">Åtkomst nekad</translation>
+        <translation type="unfinished">Åtkomst nekad</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Connection timed out</source>
-        <translation type="obsolete">Tidsgränsen för anslutning överstegs</translation>
+        <translation type="unfinished">Tidsgränsen för anslutning överstegs</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Connection refused</source>
-        <translation type="obsolete">Anslutningen vägrades</translation>
+        <translation type="unfinished">Anslutningen vägrades</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>The bound address is already in use</source>
-        <translation type="obsolete">Bindningsadress används redan</translation>
+        <translation type="unfinished">Bindningsadress används redan</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>The address is not available</source>
-        <translation type="obsolete">Adressen är inte tillgänglig</translation>
+        <translation type="unfinished">Adressen är inte tillgänglig</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>The address is protected</source>
-        <translation type="obsolete">Adressen är skyddad</translation>
+        <translation type="unfinished">Adressen är skyddad</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Datagram was too large to send</source>
-        <translation type="obsolete">Datagram för för stor för att skicka</translation>
+        <translation type="unfinished">Datagram för för stor för att skicka</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Unable to send a message</source>
-        <translation type="obsolete">Kunde inte skicka ett meddelande</translation>
+        <translation type="unfinished">Kunde inte skicka ett meddelande</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Unable to receive a message</source>
-        <translation type="obsolete">Kunde inte ta emot ett meddelande</translation>
+        <translation type="unfinished">Kunde inte ta emot ett meddelande</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Unable to write</source>
-        <translation type="obsolete">Kunde inte skriva</translation>
+        <translation type="unfinished">Kunde inte skriva</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Network error</source>
-        <translation type="obsolete">Nätverksfel</translation>
+        <translation type="unfinished">Nätverksfel</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Another socket is already listening on the same port</source>
-        <translation type="obsolete">Ett annat uttag lyssnar redan på samma port</translation>
+        <translation type="unfinished">Ett annat uttag lyssnar redan på samma port</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Operation on non-socket</source>
-        <translation type="obsolete">Åtgärd på icke-uttag</translation>
+        <translation type="unfinished">Åtgärd på icke-uttag</translation>
     </message>
     <message>
-        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="3"/>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
+        <source>The proxy type is invalid for this operation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
+        <source>Temporary error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Network dropped connection on reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Connection reset by peer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../qtbase/src/network/socket/qnativesocketengine_winrt.cpp" line="+3"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkAccessCacheBackend</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkaccesscachebackend.cpp" line="+65"/>
+        <source>Error opening %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkAccessDataBackend</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplydataimpl.cpp" line="+88"/>
+        <source>Invalid URI: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkAccessDebugPipeBackend</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkaccessdebugpipebackend.cpp" line="+200"/>
+        <source>Write error writing to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+60"/>
+        <source>Socket error on %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Remote host closed the connection prematurely on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkAccessFileBackend</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkaccessfilebackend.cpp" line="+121"/>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyfileimpl.cpp" line="+90"/>
+        <source>Request for opening non-local file %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <location filename="../../qtbase/src/network/access/qnetworkfile.cpp" line="+74"/>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyfileimpl.cpp" line="+57"/>
+        <source>Error opening %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <source>Write error writing to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+42"/>
+        <location filename="../../qtbase/src/network/access/qnetworkfile.cpp" line="-8"/>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyfileimpl.cpp" line="-12"/>
+        <source>Cannot open %1: Path is a directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Read error reading from %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkAccessFtpBackend</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkaccessftpbackend.cpp" line="+137"/>
+        <source>No suitable proxy found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Cannot open %1: is a directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+105"/>
+        <source>Logging in to %1 failed: authentication required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Error while downloading %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Error while uploading %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkAccessManager</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyimpl.cpp" line="+1132"/>
+        <source>Network access is disabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkReply</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qhttpthreaddelegate.cpp" line="+521"/>
+        <location line="+26"/>
+        <source>Error transferring %1 - server replied: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="+673"/>
+        <location line="+219"/>
+        <location line="+15"/>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyimpl.cpp" line="-1009"/>
+        <location line="+203"/>
+        <location line="+15"/>
+        <source>Network session error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-212"/>
+        <location line="+226"/>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyimpl.cpp" line="-243"/>
+        <location line="+257"/>
+        <source>Background request not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-205"/>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyimpl.cpp" line="-225"/>
+        <source>backend start error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+291"/>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyimpl.cpp" line="+679"/>
+        <source>Temporary network failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyimpl.cpp" line="-723"/>
+        <source>Protocol &quot;%1&quot; is unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkReplyHttpImpl</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyhttpimpl.cpp" line="-1923"/>
+        <location line="+16"/>
+        <source>Operation canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+388"/>
+        <source>No suitable proxy found</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkReplyImpl</name>
+    <message>
+        <location filename="../../qtbase/src/network/access/qnetworkreplyimpl.cpp" line="+855"/>
+        <location line="+29"/>
+        <source>Operation canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkSession</name>
+    <message>
+        <location filename="../../qtbase/src/network/bearer/qnetworksession.cpp" line="+468"/>
+        <source>Invalid configuration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QNetworkSessionPrivateImpl</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/bearer/qnetworksession_impl.cpp" line="+252"/>
+        <source>Unknown session error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The session was aborted by the user or system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The requested operation is not supported by the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The specified configuration cannot be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Roaming was aborted or is not possible.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QOCIDriver</name>
     <message>
-        <location filename="." line="146"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/oci/qsql_oci.cpp" line="+2169"/>
+        <source>Unable to initialize</source>
+        <comment>QOCIDriver</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+146"/>
         <source>Unable to logon</source>
-        <translation type="obsolete">Kunde inte logga in</translation>
+        <translation type="unfinished">Kunde inte logga in</translation>
     </message>
     <message>
-        <location filename="." line="73"/>
+        <location line="+73"/>
         <source>Unable to begin transaction</source>
-        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+        <translation type="unfinished">Kunde inte påbörja transaktion</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
+        <location line="+20"/>
         <source>Unable to commit transaction</source>
-        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+        <translation type="unfinished">Kunde inte verkställa transaktion</translation>
     </message>
     <message>
-        <location filename="." line="20"/>
+        <location line="+20"/>
         <source>Unable to rollback transaction</source>
-        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+        <translation type="unfinished">Kunde inte rulla tillbaka transaktion</translation>
     </message>
 </context>
 <context>
     <name>QOCIResult</name>
     <message>
-        <location filename="." line="15"/>
+        <location line="-1044"/>
+        <location line="+193"/>
+        <location line="+15"/>
         <source>Unable to bind column for batch execute</source>
-        <translation type="obsolete">Kunde inte binda kolumn för satskörning</translation>
+        <translation type="unfinished">Kunde inte binda kolumn för satskörning</translation>
     </message>
     <message>
-        <location filename="." line="15"/>
+        <location line="+15"/>
         <source>Unable to execute batch statement</source>
-        <translation type="obsolete">Kunde inte köra satsfråga</translation>
+        <translation type="unfinished">Kunde inte köra satsfråga</translation>
     </message>
     <message>
-        <location filename="." line="329"/>
+        <location line="+329"/>
         <source>Unable to goto next</source>
-        <translation type="obsolete">Kunde inte gå till nästa</translation>
+        <translation type="unfinished">Kunde inte gå till nästa</translation>
     </message>
     <message>
-        <location filename="." line="61"/>
+        <location line="+61"/>
         <source>Unable to alloc statement</source>
-        <translation type="obsolete">Kunde inte allokera frågesats</translation>
+        <translation type="unfinished">Kunde inte allokera frågesats</translation>
     </message>
     <message>
-        <location filename="." line="15"/>
+        <location line="+15"/>
         <source>Unable to prepare statement</source>
-        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+        <translation type="unfinished">Kunde inte förbereda frågesats</translation>
     </message>
     <message>
-        <location filename="." line="15"/>
+        <location line="+27"/>
+        <source>Unable to get statement type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
         <source>Unable to bind value</source>
-        <translation type="obsolete">Kunde inte binda värde</translation>
+        <translation type="unfinished">Kunde inte binda värde</translation>
     </message>
     <message>
-        <location filename="." line="19"/>
+        <location line="+19"/>
         <source>Unable to execute statement</source>
-        <translation type="obsolete">Kunde inte köra frågesats</translation>
+        <translation type="unfinished">Kunde inte köra frågesats</translation>
     </message>
     <message>
-        <location filename="." line="19"/>
         <source>Unable to execute select statement</source>
         <translation type="obsolete">Kunde inte köra \&quot;select\&quot;-frågesats</translation>
     </message>
@@ -10182,73 +4449,95 @@ Kontrollera att det korrekta filnamnet angavs</translation>
 <context>
     <name>QODBCDriver</name>
     <message>
-        <location filename="../../qtbase/src/plugins/sqldrivers/odbc/qsql_odbc.cpp" line="1984"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/odbc/qsql_odbc.cpp" line="+1984"/>
         <source>Unable to connect</source>
-        <translation type="obsolete">Kunde inte ansluta</translation>
+        <translation type="unfinished">Kunde inte ansluta</translation>
     </message>
     <message>
-        <location filename="." line="282"/>
+        <location line="+7"/>
+        <source>Unable to connect - Driver doesn&apos;t support all functionality required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+282"/>
         <source>Unable to disable autocommit</source>
-        <translation type="obsolete">Kunde inte inaktivera automatisk verkställning</translation>
+        <translation type="unfinished">Kunde inte inaktivera automatisk verkställning</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
+        <location line="+18"/>
         <source>Unable to commit transaction</source>
-        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+        <translation type="unfinished">Kunde inte verkställa transaktion</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
+        <location line="+18"/>
         <source>Unable to rollback transaction</source>
-        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+        <translation type="unfinished">Kunde inte rulla tillbaka transaktion</translation>
     </message>
     <message>
-        <location filename="." line="16"/>
+        <location line="+16"/>
         <source>Unable to enable autocommit</source>
-        <translation type="obsolete">Kunde inte aktivera automatisk verkställning</translation>
+        <translation type="unfinished">Kunde inte aktivera automatisk verkställning</translation>
     </message>
     <message>
-        <location filename="." line="16"/>
         <source>Unable to connect - Driver doesn&apos;t support all needed functionality</source>
-        <translation type="obsolete">Kunde inte ansluta - Drivrutinen har inte stöd för all nödvändig funktionalitet</translation>
+        <translation type="vanished">Kunde inte ansluta - Drivrutinen har inte stöd för all nödvändig funktionalitet</translation>
     </message>
 </context>
 <context>
     <name>QODBCResult</name>
     <message>
-        <location filename="." line="348"/>
+        <location line="-1298"/>
+        <location line="+348"/>
         <source>QODBCResult::reset: Unable to set &apos;SQL_CURSOR_STATIC&apos; as statement attribute. Please check your ODBC driver configuration</source>
-        <translation type="obsolete">QODBCResult::reset: Kunde inte ställa in \&quot;SQL_CURSOR_STATIC\&quot; som frågesatsattribut. Kontrollera konfigurationen för din ODBC-drivrutin</translation>
+        <translation type="unfinished">QODBCResult::reset: Kunde inte ställa in \&quot;SQL_CURSOR_STATIC\&quot; som frågesatsattribut. Kontrollera konfigurationen för din ODBC-drivrutin</translation>
     </message>
     <message>
-        <location filename="." line="631"/>
+        <location line="-338"/>
+        <location line="+631"/>
         <source>Unable to execute statement</source>
-        <translation type="obsolete">Kunde inte köra frågesats</translation>
+        <translation type="unfinished">Kunde inte köra frågesats</translation>
     </message>
     <message>
-        <location filename="." line="23"/>
+        <location line="-576"/>
+        <source>Unable to fetch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
         <source>Unable to fetch next</source>
-        <translation type="obsolete">Kunde inte hämta nästa</translation>
+        <translation type="unfinished">Kunde inte hämta nästa</translation>
     </message>
     <message>
-        <location filename="." line="23"/>
+        <location line="+23"/>
         <source>Unable to fetch first</source>
-        <translation type="obsolete">Kunde inte hämta första</translation>
+        <translation type="unfinished">Kunde inte hämta första</translation>
     </message>
     <message>
-        <location filename="." line="23"/>
+        <location line="+20"/>
+        <source>Unable to fetch previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <location line="+618"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/db2/qsql_db2.cpp" line="+195"/>
+        <source>Unable to fetch last</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-422"/>
         <source>Unable to prepare statement</source>
-        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+        <translation type="unfinished">Kunde inte förbereda frågesats</translation>
     </message>
     <message>
-        <location filename="." line="274"/>
+        <location line="+274"/>
         <source>Unable to bind variable</source>
-        <translation type="obsolete">Kunde inte binda variabel</translation>
+        <translation type="unfinished">Kunde inte binda variabel</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="." line="274"/>
         <source>Home</source>
         <translation type="obsolete">Home</translation>
     </message>
@@ -10256,12 +4545,10 @@ Kontrollera att det korrekta filnamnet angavs</translation>
 <context>
     <name>QPPDOptionsModel</name>
     <message>
-        <location filename="." line="274"/>
         <source>Name</source>
         <translation type="obsolete">Namn</translation>
     </message>
     <message>
-        <location filename="." line="274"/>
         <source>Value</source>
         <translation type="obsolete">Värde</translation>
     </message>
@@ -10269,491 +4556,1360 @@ Kontrollera att det korrekta filnamnet angavs</translation>
 <context>
     <name>QPSQLDriver</name>
     <message>
-        <location filename="../../qtbase/src/plugins/sqldrivers/psql/qsql_psql.cpp" line="1249"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/psql/qsql_psql.cpp" line="+1249"/>
         <source>Unable to connect</source>
-        <translation type="obsolete">Kunde inte ansluta</translation>
+        <translation type="unfinished">Kunde inte ansluta</translation>
     </message>
     <message>
-        <location filename="." line="52"/>
+        <location line="+52"/>
         <source>Could not begin transaction</source>
-        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+        <translation type="unfinished">Kunde inte påbörja transaktion</translation>
     </message>
     <message>
-        <location filename="." line="29"/>
+        <location line="+29"/>
         <source>Could not commit transaction</source>
-        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+        <translation type="unfinished">Kunde inte verkställa transaktion</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
+        <location line="+18"/>
         <source>Could not rollback transaction</source>
-        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+        <translation type="unfinished">Kunde inte rulla tillbaka transaktion</translation>
+    </message>
+    <message>
+        <location line="+272"/>
+        <source>Unable to subscribe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Unable to unsubscribe</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QPSQLResult</name>
     <message>
-        <location filename="." line="33"/>
-        <source>Unable to create query</source>
-        <translation type="obsolete">Kunde inte skapa fråga</translation>
+        <location line="-1310"/>
+        <source>Query results lost - probably discarded on executing another SQL query.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="." line="33"/>
+        <location line="+33"/>
+        <source>Unable to create query</source>
+        <translation type="unfinished">Kunde inte skapa fråga</translation>
+    </message>
+    <message>
+        <location line="+193"/>
+        <location line="+19"/>
+        <source>Unable to get result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+169"/>
+        <location line="+192"/>
+        <source>Unable to send query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-29"/>
         <source>Unable to prepare statement</source>
-        <translation type="obsolete">Kunde inte förbereda frågesats</translation>
+        <translation type="unfinished">Kunde inte förbereda frågesats</translation>
     </message>
 </context>
 <context>
     <name>QPageSetupWidget</name>
     <message>
-        <location filename="." line="33"/>
+        <location filename="../../qtbase/src/printsupport/dialogs/qpagesetupwidget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Paper</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Page size:</source>
-        <translation type="obsolete">Sidstorlek:</translation>
+        <translation type="unfinished">Sidstorlek:</translation>
     </message>
     <message>
-        <location filename="." line="33"/>
+        <location/>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Paper source:</source>
-        <translation type="obsolete">Papperskälla:</translation>
+        <translation type="unfinished">Papperskälla:</translation>
     </message>
     <message>
-        <location filename="." line="33"/>
+        <location/>
+        <source>Orientation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Portrait</source>
-        <translation type="obsolete">Stående</translation>
+        <translation type="unfinished">Stående</translation>
     </message>
     <message>
-        <location filename="." line="33"/>
+        <location/>
         <source>Landscape</source>
-        <translation type="obsolete">Liggande</translation>
+        <translation type="unfinished">Liggande</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reverse landscape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reverse portrait</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Margins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>top margin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>left margin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>right margin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>bottom margin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Page Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Page order:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pages per sheet:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/printsupport/dialogs/qpagesetupdialog_unix.cpp" line="+297"/>
+        <source>Millimeters (mm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Inches (in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Points (pt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Pica (P̸)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Didot (DD)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cicero (CC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+66"/>
+        <location line="+11"/>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+66"/>
+        <source>mm</source>
+        <extracomment>Unit &apos;Millimeter&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>pt</source>
+        <extracomment>Unit &apos;Points&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>in</source>
+        <extracomment>Unit &apos;Inch&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>P̸</source>
+        <extracomment>Unit &apos;Pica&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>DD</source>
+        <extracomment>Unit &apos;Didot&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>CC</source>
+        <extracomment>Unit &apos;Cicero&apos;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QPageSize</name>
+    <message>
+        <location filename="../../qtbase/src/gui/painting/qpagesize.cpp" line="+480"/>
+        <source>Custom (%1mm x %2mm)</source>
+        <extracomment>Custom size name in millimeters</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Custom (%1pt x %2pt)</source>
+        <extracomment>Custom size name in points</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Custom (%1in x %2in)</source>
+        <extracomment>Custom size name in inches</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Custom (%1pc x %2pc)</source>
+        <extracomment>Custom size name in picas</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Custom (%1DD x %2DD)</source>
+        <extracomment>Custom size name in didots</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Custom (%1CC x %2CC)</source>
+        <extracomment>Custom size name in ciceros</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+989"/>
+        <source>%1 x %2 in</source>
+        <extracomment>Page size in &apos;Inch&apos;.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>A0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Executive (7.5 x 10 in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Executive (7.25 x 10.5 in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Folio (8.27 x 13 in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Legal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Letter / ANSI A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Tabloid / ANSI B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Ledger / ANSI B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A3 Extra</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A4 Extra</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A4 Plus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A4 Small</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A5 Extra</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>B5 Extra</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>JIS B10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>ANSI C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>ANSI D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>ANSI E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Legal Extra</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Letter Extra</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Letter Plus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Letter Small</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Tabloid Extra</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Architect A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Architect B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Architect C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Architect D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Architect E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Quarto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Statement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Super A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Super B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Postcard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Double Postcard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>PRC 16K</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>PRC 32K</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>PRC 32K Big</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Fan-fold US (14.875 x 11 in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Fan-fold German (8.5 x 12 in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Fan-fold German Legal (8.5 x 13 in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope B4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope B5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope B6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope C0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope C1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope C2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope C3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope C4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope C5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope C6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope C65</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope C7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope DL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope US 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope US 10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope US 11</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope US 12</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope US 14</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope Monarch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope Personal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope Chou 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope Chou 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope Invite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope Italian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope Kaku 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope Kaku 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope PRC 10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Envelope You 4</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QPlatformTheme</name>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qplatformtheme.cpp" line="706"/>
+        <location filename="../../qtbase/src/gui/kernel/qplatformtheme.cpp" line="+706"/>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Save</source>
-        <translation type="obsolete">Spara</translation>
+        <translation type="unfinished">Spara</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Save All</source>
-        <translation type="obsolete">Spara alla</translation>
+        <translation type="unfinished">Spara alla</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Open</source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="unfinished">Öppna</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>&amp;Yes</source>
-        <translation type="obsolete">&amp;Ja</translation>
+        <translation type="unfinished">&amp;Ja</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Yes to &amp;All</source>
-        <translation type="obsolete">Ja till &amp;alla</translation>
+        <translation type="unfinished">Ja till &amp;alla</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>&amp;No</source>
-        <translation type="obsolete">&amp;Nej</translation>
+        <translation type="unfinished">&amp;Nej</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>N&amp;o to All</source>
-        <translation type="obsolete">N&amp;ej till alla</translation>
+        <translation type="unfinished">N&amp;ej till alla</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Abort</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="unfinished">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Retry</source>
-        <translation type="obsolete">Försök igen</translation>
+        <translation type="unfinished">Försök igen</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Ignore</source>
-        <translation type="obsolete">Ignorera</translation>
+        <translation type="unfinished">Ignorera</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Close</source>
-        <translation type="obsolete">Stäng</translation>
+        <translation type="unfinished">Stäng</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="unfinished">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Discard</source>
-        <translation type="obsolete">Förkasta</translation>
+        <translation type="unfinished">Förkasta</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Help</source>
-        <translation type="obsolete">Hjälp</translation>
+        <translation type="unfinished">Hjälp</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Apply</source>
-        <translation type="obsolete">Verkställ</translation>
+        <translation type="unfinished">Verkställ</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Reset</source>
-        <translation type="obsolete">Återställ</translation>
+        <translation type="unfinished">Återställ</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Restore Defaults</source>
-        <translation type="obsolete">Återställ standardvärden</translation>
+        <translation type="unfinished">Återställ standardvärden</translation>
     </message>
 </context>
 <context>
     <name>QPluginLoader</name>
     <message>
-        <location filename="." line="123"/>
+        <location filename="../../qtbase/src/corelib/plugin/qpluginloader.cpp" line="+267"/>
+        <source>The plugin was not loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+123"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
     </message>
 </context>
 <context>
     <name>QPrintDialog</name>
     <message>
-        <location filename="../../qtbase/src/printsupport/dialogs/qprintdialog_win.cpp" line="264"/>
+        <location filename="../../qtbase/src/printsupport/dialogs/qabstractprintdialog.cpp" line="+105"/>
+        <location line="+16"/>
+        <location filename="../../qtbase/src/printsupport/dialogs/qprintdialog_win.cpp" line="+264"/>
         <source>Print</source>
-        <translation type="obsolete">Skriv ut</translation>
+        <translation type="unfinished">Skriv ut</translation>
     </message>
     <message>
-        <location filename="." line="47"/>
+        <location filename="../../qtbase/src/printsupport/dialogs/qpagesetupdialog_unix.cpp" line="-153"/>
+        <source>Left to Right, Top to Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Left to Right, Bottom to Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Right to Left, Bottom to Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Right to Left, Top to Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Bottom to Top, Left to Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Bottom to Top, Right to Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Top to Bottom, Left to Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Top to Bottom, Right to Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>1 (1x1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>2 (2x1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>4 (2x2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>6 (2x3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>9 (3x3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>16 (4x4)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/printsupport/dialogs/qprintdialog_unix.cpp" line="+636"/>
+        <source>All Pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Odd Pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Even Pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location line="+296"/>
+        <source>&amp;Options &gt;&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-291"/>
+        <source>&amp;Print</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+295"/>
+        <source>&amp;Options &lt;&lt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+146"/>
+        <source>Invalid Pages Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>%1 does not follow the correct syntax. Please use &apos;,&apos; to separate ranges and pages, &apos;-&apos; to define ranges and make sure ranges do not intersect with each other.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Duplex Settings Conflicts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>There are conflicts in duplex settings. Do you want to fix them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+76"/>
+        <source>Print to File (PDF)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <source>Local file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Write PDF file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+47"/>
         <source>Print To File ...</source>
-        <translation type="obsolete">Skriv ut till fil ...</translation>
+        <translation type="unfinished">Skriv ut till fil ...</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+22"/>
+        <source>%1 is a directory.
+Please choose a different file name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>File %1 is not writable.
 Please choose a different file name.</source>
-        <translation type="obsolete">Filen %1 är inte skrivbar. 
+        <translation type="unfinished">Filen %1 är inte skrivbar. 
 Välj ett annat filnamn.</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>%1 already exists.
 Do you want to overwrite it?</source>
-        <translation type="obsolete">%1 finns redan. 
+        <translation type="unfinished">%1 finns redan. 
 Vill du skriva över den?</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+23"/>
+        <source>Options &apos;Pages Per Sheet&apos; and &apos;Page Set&apos; cannot be used together.
+Please turn one of those options off.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/printsupport/dialogs/qprintdialog_win.cpp" line="+1"/>
+        <source>The &apos;From&apos; value cannot be greater than the &apos;To&apos; value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>locally connected</source>
-        <translation type="obsolete">lokalt ansluten</translation>
+        <translation type="vanished">lokalt ansluten</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Aliases: %1</source>
-        <translation type="obsolete">Alias: %1</translation>
+        <translation type="vanished">Alias: %1</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>unknown</source>
-        <translation type="obsolete">okänt</translation>
+        <translation type="vanished">okänt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Portrait</source>
         <translation type="obsolete">Stående</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Landscape</source>
         <translation type="obsolete">Liggande</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A0 (841 x 1189 mm)</source>
-        <translation type="obsolete">A0 (841 x 1189 mm)</translation>
+        <translation type="vanished">A0 (841 x 1189 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A1 (594 x 841 mm)</source>
-        <translation type="obsolete">A1 (594 x 841 mm)</translation>
+        <translation type="vanished">A1 (594 x 841 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A2 (420 x 594 mm)</source>
-        <translation type="obsolete">A2 (420 x 594 mm)</translation>
+        <translation type="vanished">A2 (420 x 594 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A3 (297 x 420 mm)</source>
-        <translation type="obsolete">A3 (297 x 420 mm)</translation>
+        <translation type="vanished">A3 (297 x 420 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A4 (210 x 297 mm, 8.26 x 11.7 inches)</source>
-        <translation type="obsolete">A4 (210 x 297 mm, 8.26 x 11.7 tum)</translation>
+        <translation type="vanished">A4 (210 x 297 mm, 8.26 x 11.7 tum)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A5 (148 x 210 mm)</source>
-        <translation type="obsolete">A5 (148 x 210 mm)</translation>
+        <translation type="vanished">A5 (148 x 210 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A6 (105 x 148 mm)</source>
-        <translation type="obsolete">A6 (105 x 148 mm)</translation>
+        <translation type="vanished">A6 (105 x 148 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A7 (74 x 105 mm)</source>
-        <translation type="obsolete">A7 (74 x 105 mm)</translation>
+        <translation type="vanished">A7 (74 x 105 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A8 (52 x 74 mm)</source>
-        <translation type="obsolete">A8 (52 x 74 mm)</translation>
+        <translation type="vanished">A8 (52 x 74 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>A9 (37 x 52 mm)</source>
-        <translation type="obsolete">A9 (37 x 52 mm)</translation>
+        <translation type="vanished">A9 (37 x 52 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B0 (1000 x 1414 mm)</source>
-        <translation type="obsolete">B0 (1000 x 1414 mm)</translation>
+        <translation type="vanished">B0 (1000 x 1414 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B1 (707 x 1000 mm)</source>
-        <translation type="obsolete">B1 (707 x 1000 mm)</translation>
+        <translation type="vanished">B1 (707 x 1000 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B2 (500 x 707 mm)</source>
-        <translation type="obsolete">B2 (500 x 707 mm)</translation>
+        <translation type="vanished">B2 (500 x 707 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B3 (353 x 500 mm)</source>
-        <translation type="obsolete">B3 (353 x 500 mm)</translation>
+        <translation type="vanished">B3 (353 x 500 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B4 (250 x 353 mm)</source>
-        <translation type="obsolete">B4 (250 x 353 mm)</translation>
+        <translation type="vanished">B4 (250 x 353 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B5 (176 x 250 mm, 6.93 x 9.84 inches)</source>
-        <translation type="obsolete">B5 (176 x 250 mm, 6.93 x 9.84 tum)</translation>
+        <translation type="vanished">B5 (176 x 250 mm, 6.93 x 9.84 tum)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B6 (125 x 176 mm)</source>
-        <translation type="obsolete">B6 (125 x 176 mm)</translation>
+        <translation type="vanished">B6 (125 x 176 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B7 (88 x 125 mm)</source>
-        <translation type="obsolete">B7 (88 x 125 mm)</translation>
+        <translation type="vanished">B7 (88 x 125 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B8 (62 x 88 mm)</source>
-        <translation type="obsolete">B8 (62 x 88 mm)</translation>
+        <translation type="vanished">B8 (62 x 88 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B9 (44 x 62 mm)</source>
-        <translation type="obsolete">B9 (44 x 62 mm)</translation>
+        <translation type="vanished">B9 (44 x 62 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>B10 (31 x 44 mm)</source>
-        <translation type="obsolete">B10 (31 x 44 mm)</translation>
+        <translation type="vanished">B10 (31 x 44 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>C5E (163 x 229 mm)</source>
-        <translation type="obsolete">C5E (163 x 229 mm)</translation>
+        <translation type="vanished">C5E (163 x 229 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>DLE (110 x 220 mm)</source>
-        <translation type="obsolete">DLE (110 x 220 mm)</translation>
+        <translation type="vanished">DLE (110 x 220 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Executive (7.5 x 10 inches, 191 x 254 mm)</source>
-        <translation type="obsolete">Executive (7.5 x 10 tum, 191 x 254 mm)</translation>
+        <translation type="vanished">Executive (7.5 x 10 tum, 191 x 254 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Folio (210 x 330 mm)</source>
-        <translation type="obsolete">Folio (210 x 330 mm)</translation>
+        <translation type="vanished">Folio (210 x 330 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Ledger (432 x 279 mm)</source>
-        <translation type="obsolete">Ledger (432 x 279 mm)</translation>
+        <translation type="vanished">Ledger (432 x 279 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Legal (8.5 x 14 inches, 216 x 356 mm)</source>
-        <translation type="obsolete">Legal (8.5 x 14 tum, 216 x 356 mm)</translation>
+        <translation type="vanished">Legal (8.5 x 14 tum, 216 x 356 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Letter (8.5 x 11 inches, 216 x 279 mm)</source>
-        <translation type="obsolete">Letter (8.5 x 11 tum, 216 x 279 mm)</translation>
+        <translation type="vanished">Letter (8.5 x 11 tum, 216 x 279 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Tabloid (279 x 432 mm)</source>
-        <translation type="obsolete">Tabloid (279 x 432 mm)</translation>
+        <translation type="vanished">Tabloid (279 x 432 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>US Common #10 Envelope (105 x 241 mm)</source>
-        <translation type="obsolete">US Common #10 Envelope (105 x 241 mm)</translation>
+        <translation type="vanished">US Common #10 Envelope (105 x 241 mm)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Cancel</source>
         <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Page size:</source>
         <translation type="obsolete">Sidstorlek:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Orientation:</source>
         <translation type="obsolete">Orientering:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Paper source:</source>
         <translation type="obsolete">Papperskälla:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>File</source>
         <translation type="obsolete">Fil</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Printer</source>
         <translation type="obsolete">Skrivare</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Print dialog</source>
         <translation type="obsolete">Utskriftsdialog</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Paper format</source>
         <translation type="obsolete">Pappersformat</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Size:</source>
         <translation type="obsolete">Storlek:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Properties</source>
         <translation type="obsolete">Egenskaper</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Printer info:</source>
         <translation type="obsolete">Skrivarinformation:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Browse</source>
         <translation type="obsolete">Bläddra</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Print to file</source>
         <translation type="obsolete">Skriv ut till fil</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Print range</source>
-        <translation type="obsolete">Skriv ut intervall</translation>
+        <translation type="vanished">Skriv ut intervall</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Print all</source>
-        <translation type="obsolete">Skriv ut alla</translation>
+        <translation type="vanished">Skriv ut alla</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Pages from</source>
         <translation type="obsolete">Sidor från</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>to</source>
         <translation type="obsolete">till</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Selection</source>
         <translation type="obsolete">Val</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Copies</source>
         <translation type="obsolete">Kopior</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Number of copies:</source>
         <translation type="obsolete">Antal kopior:</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Collate</source>
         <translation type="obsolete">Sortera</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Print last page first</source>
         <translation type="obsolete">Skriv ut sista sidan först</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Other</source>
         <translation type="obsolete">Annat</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Print in color if available</source>
         <translation type="obsolete">Skriv ut i färg om möjligt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Double side printing</source>
         <translation type="obsolete">Dubbelsidig utskrift</translation>
     </message>
@@ -10761,17 +5917,104 @@ Vill du skriva över den?</translation>
 <context>
     <name>QPrintPreviewDialog</name>
     <message>
-        <location filename="." line="6"/>
+        <location filename="../../qtbase/src/printsupport/dialogs/qpagesetupdialog_unix.cpp" line="+382"/>
+        <location line="+8"/>
+        <location filename="../../qtbase/src/printsupport/dialogs/qpagesetupdialog_win.cpp" line="+54"/>
+        <location line="+7"/>
+        <source>Page Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/printsupport/dialogs/qprintpreviewdialog.cpp" line="+256"/>
+        <source>%1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+81"/>
+        <source>Print Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>Next page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Previous page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>First page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Last page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Fit width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fit page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Zoom in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Zoom out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Portrait</source>
-        <translation type="obsolete">Stående</translation>
+        <translation type="unfinished">Stående</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Landscape</source>
-        <translation type="obsolete">Liggande</translation>
+        <translation type="unfinished">Liggande</translation>
     </message>
     <message>
-        <location filename="." line="147"/>
+        <location line="+10"/>
+        <source>Show single page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show facing pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show overview of all pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Print</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Page setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+147"/>
+        <source>Export to PDF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Close</source>
         <translation type="obsolete">Stäng</translation>
     </message>
@@ -10779,214 +6022,1213 @@ Vill du skriva över den?</translation>
 <context>
     <name>QPrintPropertiesDialog</name>
     <message>
-        <location filename="." line="1"/>
+        <location filename="../../qtbase/src/printsupport/dialogs/qprintdialog_unix.cpp" line="-1050"/>
+        <source>Printer Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Job Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+62"/>
+        <source>Page Setup Conflicts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>There are conflicts in page setup options. Do you want to fix them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Advanced Option Conflicts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>There are conflicts in some advanced options. Do you want to fix them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>PPD Properties</source>
         <translation type="obsolete">PPD-egenskaper</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>Save</source>
         <translation type="obsolete">Spara</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
         <source>OK</source>
         <translation type="obsolete">OK</translation>
     </message>
 </context>
 <context>
+    <name>QPrintPropertiesWidget</name>
+    <message>
+        <location filename="../../qtbase/src/printsupport/dialogs/qprintpropertieswidget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>There are conflicts in some options. Please fix them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QPrintSettingsOutput</name>
     <message>
-        <location filename="." line="1"/>
+        <location filename="../../qtbase/src/printsupport/dialogs/qprintsettingsoutput.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Copies</source>
-        <translation type="obsolete">Kopior</translation>
+        <translation type="unfinished">Kopior</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location/>
         <source>Print range</source>
-        <translation type="obsolete">Skriv ut intervall</translation>
+        <translation type="unfinished">Skriv ut intervall</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location/>
         <source>Print all</source>
-        <translation type="obsolete">Skriv ut alla</translation>
+        <translation type="unfinished">Skriv ut alla</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location/>
         <source>Pages from</source>
-        <translation type="obsolete">Sidor från</translation>
+        <translation type="unfinished">Sidor från</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location/>
         <source>to</source>
-        <translation type="obsolete">till</translation>
+        <translation type="unfinished">till</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location/>
+        <source>Pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Specify pages or ranges separated by commas. Ranges are specified by two numbers separated by a hyphen. E.g: 3,5-7,9 prints pages 3, 5, 6, 7 and 9.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Current Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Selection</source>
-        <translation type="obsolete">Val</translation>
+        <translation type="unfinished">Val</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location/>
+        <source>Page Set:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Copies:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Collate</source>
-        <translation type="obsolete">Sortera</translation>
+        <translation type="unfinished">Sortera</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reverse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Color Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Grayscale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Duplex Printing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Long side</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Short side</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QPrintWidget</name>
     <message>
-        <location filename="." line="1"/>
+        <location filename="../../qtbase/src/printsupport/dialogs/qprintwidget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Printer</source>
-        <translation type="obsolete">Skrivare</translation>
+        <translation type="unfinished">Skrivare</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>P&amp;roperties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output &amp;file:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QProcess</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/io/qprocess.cpp" line="+969"/>
+        <source>Process failed to start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Process crashed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Process operation timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Error reading from process</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Error writing to process</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1111"/>
+        <location line="+27"/>
+        <location line="+63"/>
+        <location line="+155"/>
+        <source>No program defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/io/qprocess_unix.cpp" line="+280"/>
+        <location line="+13"/>
+        <location filename="../../qtbase/src/corelib/io/qprocess_win.cpp" line="+267"/>
+        <source>Could not open input redirection for reading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+187"/>
+        <source>Resource error (fork failure): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/io/qprocess_win.cpp" line="+21"/>
+        <source>Could not open output redirection for writing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+240"/>
+        <location line="+49"/>
+        <source>Process failed to start: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QProgressDialog</name>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qprogressdialog.cpp" line="182"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qprogressdialog.cpp" line="+182"/>
         <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="unfinished">Avbryt</translation>
     </message>
 </context>
 <context>
     <name>QPushButton</name>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qprogressdialog.cpp" line="182"/>
         <source>Open</source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="vanished">Öppna</translation>
     </message>
 </context>
 <context>
     <name>QRadioButton</name>
     <message>
-        <location filename="../../qtbase/src/widgets/dialogs/qprogressdialog.cpp" line="182"/>
         <source>Check</source>
-        <translation type="obsolete">Kryssa</translation>
+        <translation type="vanished">Kryssa</translation>
     </message>
 </context>
 <context>
     <name>QRegExp</name>
     <message>
-        <location filename="../../qtbase/src/corelib/tools/qregexp.cpp" line="65"/>
+        <location filename="../../qtbase/src/corelib/tools/qregexp.cpp" line="+65"/>
         <source>no error occurred</source>
-        <translation type="obsolete">inga fel inträffade</translation>
+        <translation type="unfinished">inga fel inträffade</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>disabled feature used</source>
-        <translation type="obsolete">inaktiverad funktion används</translation>
+        <translation type="unfinished">inaktiverad funktion används</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>bad char class syntax</source>
-        <translation type="obsolete">felaktig teckenklasssyntax</translation>
+        <translation type="unfinished">felaktig teckenklasssyntax</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>bad lookahead syntax</source>
-        <translation type="obsolete">felaktig seframåtsyntax</translation>
+        <translation type="unfinished">felaktig seframåtsyntax</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
+        <source>lookbehinds not supported, see QTBUG-2371</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>bad repetition syntax</source>
-        <translation type="obsolete">felaktig upprepningssyntax</translation>
+        <translation type="unfinished">felaktig upprepningssyntax</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>invalid octal value</source>
-        <translation type="obsolete">ogiltigt oktalt värde</translation>
+        <translation type="unfinished">ogiltigt oktalt värde</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>missing left delim</source>
-        <translation type="obsolete">saknar vänster avgränsare</translation>
+        <translation type="unfinished">saknar vänster avgränsare</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>unexpected end</source>
-        <translation type="obsolete">oväntat slut</translation>
+        <translation type="unfinished">oväntat slut</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>met internal limit</source>
-        <translation type="obsolete">nådde intern gräns</translation>
+        <translation type="unfinished">nådde intern gräns</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid category</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QRegularExpression</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/tools/qregularexpression.cpp" line="+1648"/>
+        <location line="+1204"/>
+        <location line="+90"/>
+        <source>no error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-89"/>
+        <source>\ at end of pattern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>\c at end of pattern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unrecognized character follows \</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>numbers out of order in {} quantifier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>number too big in {} quantifier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>missing terminating ] for character class</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid escape sequence in character class</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>range out of order in character class</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>quantifier does not follow a repeatable item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>internal error: unexpected repeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unrecognized character after (? or (?-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>POSIX named classes are supported only within a class</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>POSIX collating elements are not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>missing closing parenthesis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>reference to non-existent subpattern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>pattern passed as NULL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unrecognised compile-time option bit(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>missing ) after (?# comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>parentheses are too deeply nested</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>regular expression is too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>failed to allocate heap memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unmatched closing parenthesis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>internal error: code overflow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>letter or underscore expected after (?&lt; or (?&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>lookbehind assertion is not fixed length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>malformed number or name after (?(</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>conditional group contains more than two branches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>assertion expected after (?( or (?(?C)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>(?R or (?[+-]digits must be followed by )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unknown POSIX class name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>internal error in pcre2_study(): should not occur</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>this version of PCRE2 does not have Unicode support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>parentheses are too deeply nested (stack check)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>character code point value in \x{} or \o{} is too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid condition (?(0)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>\C is not allowed in a lookbehind assertion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>PCRE does not support \L, \l, \N{name}, \U, or \u</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>number after (?C is greater than 255</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>closing parenthesis for (?C expected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid escape sequence in (*VERB) name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unrecognized character after (?P</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>syntax error in subpattern name (missing terminator)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>two named subpatterns have the same name (PCRE2_DUPNAMES not set)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>group name must start with a non-digit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>this version of PCRE2 does not have support for \P, \p, or \X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>malformed \P or \p sequence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unknown property name after \P or \p</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>subpattern name is too long (maximum 10000 characters)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>too many named subpatterns (maximum 256)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid range in character class</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>octal value is greater than \377 in 8-bit non-UTF-8 mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>internal error: overran compiling workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>internal error: previously-checked referenced subpattern not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>DEFINE group contains more than one branch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>missing opening brace after \o</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>internal error: unknown newline setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>\g is not followed by a braced, angle-bracketed, or quoted name/number or by a plain number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>a numbered reference must not be zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>an argument is not allowed for (*ACCEPT), (*FAIL), or (*COMMIT)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>(*VERB) not recognized or malformed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>number is too big</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>subpattern name expected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>digit expected after (?+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>non-octal character in \o{} (closing brace missing?)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>different names for subpatterns of the same number are not allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>(*MARK) must have an argument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>non-hex character in \x{} (closing brace missing?)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>\c must be followed by a printable ASCII character</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>\c must be followed by a letter or one of [\]^_?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>\k is not followed by a braced, angle-bracketed, or quoted name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>internal error: unknown opcode in find_fixedlength()</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>\N is not supported in a class</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>SPARE ERROR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>disallowed Unicode code point (&gt;= 0xd800 &amp;&amp; &lt;= 0xdfff)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>using UTF is disabled by the application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>using UCP is disabled by the application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>name is too long in (*MARK), (*PRUNE), (*SKIP), or (*THEN)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>character code point value in \u.... sequence is too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>digits missing in \x{} or \o{}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>syntax error in (?(VERSION condition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>internal error: unknown opcode in auto_possessify()</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>missing terminating delimiter for callout with string argument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unrecognized string delimiter follows (?C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>using \C is disabled by the application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>(?| and/or (?J: or (?x: parentheses are too deeply nested</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>using \C is disabled in this PCRE2 library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>regular expression is too complicated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>lookbehind assertion is too long</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>pattern string is longer than the limit set by the application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>no match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>partial match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: 1 byte missing at end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: 2 bytes missing at end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: 3 bytes missing at end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: 4 bytes missing at end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: 5 bytes missing at end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: byte 2 top bits not 0x80</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: byte 3 top bits not 0x80</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: byte 4 top bits not 0x80</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: byte 5 top bits not 0x80</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: byte 6 top bits not 0x80</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: 5-byte character is not allowed (RFC 3629)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: 6-byte character is not allowed (RFC 3629)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: code points greater than 0x10ffff are not defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: code points 0xd800-0xdfff are not defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: overlong 2-byte sequence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: overlong 3-byte sequence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: overlong 4-byte sequence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: overlong 5-byte sequence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: overlong 6-byte sequence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: isolated byte with 0x80 bit set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-8 error: illegal byte (0xfe or 0xff)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-16 error: missing low surrogate at end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-16 error: invalid low surrogate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-16 error: isolated low surrogate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-32 error: code points 0xd800-0xdfff are not defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UTF-32 error: code points greater than 0x10ffff are not defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>bad data value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>patterns do not all use the same character tables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>magic number missing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>pattern compiled in wrong mode: 8/16/32-bit error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>bad offset value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>bad option value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid replacement string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>bad offset into UTF string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>callout error code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>invalid data in workspace for DFA restart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>too much recursion for DFA matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>backreference condition or recursion test is not supported for DFA matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>function is not supported for DFA matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>pattern contains an item that is not supported for DFA matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>workspace size exceeded in DFA matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>internal error - pattern overwritten?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>bad JIT option</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>JIT stack limit reached</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>match limit exceeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>no more memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>unknown substring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>non-unique substring name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>NULL argument passed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>nested recursion at the same subject position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>recursion limit exceeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>requested value is not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>requested value is not set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>offset limit set without PCRE2_USE_OFFSET_LIMIT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>bad escape sequence in replacement string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>expected closing curly bracket in replacement string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>bad substitution in replacement string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>match with end before start is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>too many replacements (more than INT_MAX)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QSQLite2Driver</name>
     <message>
-        <location filename="../../qtbase/src/plugins/sqldrivers/sqlite2/qsql_sqlite2.cpp" line="435"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/sqlite2/qsql_sqlite2.cpp" line="+435"/>
         <source>Error opening database</source>
-        <translation type="obsolete">Fel vid öppning av databas</translation>
+        <translation type="unfinished">Fel vid öppning av databas</translation>
     </message>
     <message>
-        <location filename="." line="43"/>
+        <location line="+43"/>
         <source>Unable to begin transaction</source>
-        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+        <translation type="unfinished">Kunde inte påbörja transaktion</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
+        <location line="+18"/>
         <source>Unable to commit transaction</source>
-        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+        <translation type="unfinished">Kunde inte verkställa transaktion</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
+        <location line="+18"/>
         <source>Unable to rollback transaction</source>
-        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+        <translation type="unfinished">Kunde inte rulla tillbaka transaktion</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
         <source>Error to open database</source>
-        <translation type="obsolete">Fel vid öppning av databas</translation>
+        <translation type="vanished">Fel vid öppning av databas</translation>
     </message>
     <message>
-        <location filename="." line="18"/>
         <source>Unable to rollback Transaction</source>
-        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+        <translation type="vanished">Kunde inte rulla tillbaka transaktion</translation>
     </message>
 </context>
 <context>
     <name>QSQLite2Result</name>
     <message>
-        <location filename="." line="18"/>
+        <location line="-335"/>
         <source>Unable to fetch results</source>
-        <translation type="obsolete">Kunde inte hämta resultat</translation>
+        <translation type="unfinished">Kunde inte hämta resultat</translation>
     </message>
     <message>
-        <location filename="." line="145"/>
+        <location line="+145"/>
         <source>Unable to execute statement</source>
-        <translation type="obsolete">Kunde inte köra frågesats</translation>
+        <translation type="unfinished">Kunde inte köra frågesats</translation>
     </message>
 </context>
 <context>
     <name>QSQLiteDriver</name>
     <message>
-        <location filename="../../qtbase/src/plugins/sqldrivers/sqlite/qsql_sqlite.cpp" line="790"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/sqlite/qsql_sqlite.cpp" line="+790"/>
         <source>Error opening database</source>
-        <translation type="obsolete">Fel vid öppning av databas</translation>
+        <translation type="unfinished">Fel vid öppning av databas</translation>
     </message>
     <message>
-        <location filename="." line="28"/>
+        <location line="+28"/>
         <source>Error closing database</source>
-        <translation type="obsolete">Fel vid stängning av databas</translation>
+        <translation type="unfinished">Fel vid stängning av databas</translation>
     </message>
     <message>
-        <location filename="." line="19"/>
+        <location line="+19"/>
         <source>Unable to begin transaction</source>
-        <translation type="obsolete">Kunde inte påbörja transaktion</translation>
+        <translation type="unfinished">Kunde inte påbörja transaktion</translation>
     </message>
     <message>
-        <location filename="." line="15"/>
+        <location line="+15"/>
         <source>Unable to commit transaction</source>
-        <translation type="obsolete">Kunde inte verkställa transaktion</translation>
+        <translation type="unfinished">Kunde inte verkställa transaktion</translation>
     </message>
     <message>
-        <location filename="." line="15"/>
+        <location line="+15"/>
         <source>Unable to rollback transaction</source>
-        <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
+        <translation type="unfinished">Kunde inte rulla tillbaka transaktion</translation>
     </message>
     <message>
-        <location filename="." line="15"/>
         <source>Unable to roll back transaction</source>
         <translation type="obsolete">Kunde inte rulla tillbaka transaktion</translation>
     </message>
@@ -10994,667 +7236,1606 @@ Vill du skriva över den?</translation>
 <context>
     <name>QSQLiteResult</name>
     <message>
-        <location filename="." line="8"/>
+        <location line="-587"/>
+        <location line="+63"/>
+        <location line="+8"/>
         <source>Unable to fetch row</source>
-        <translation type="obsolete">Kunde inte hämta rad</translation>
+        <translation type="unfinished">Kunde inte hämta rad</translation>
     </message>
     <message>
-        <location filename="." line="127"/>
+        <location line="-70"/>
+        <source>No query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+127"/>
         <source>Unable to execute statement</source>
-        <translation type="obsolete">Kunde inte köra frågesats</translation>
+        <translation type="unfinished">Kunde inte köra frågesats</translation>
     </message>
     <message>
-        <location filename="." line="44"/>
+        <location line="+5"/>
+        <source>Unable to execute multiple statements at a time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+44"/>
         <source>Unable to reset statement</source>
-        <translation type="obsolete">Kunde inte återställa frågesats</translation>
+        <translation type="unfinished">Kunde inte återställa frågesats</translation>
     </message>
     <message>
-        <location filename="." line="97"/>
+        <location line="+97"/>
         <source>Unable to bind parameters</source>
-        <translation type="obsolete">Kunde inte binda parametrar</translation>
+        <translation type="unfinished">Kunde inte binda parametrar</translation>
     </message>
     <message>
-        <location filename="." line="7"/>
+        <location line="+7"/>
         <source>Parameter count mismatch</source>
-        <translation type="obsolete">Parameterantal stämmer inte</translation>
+        <translation type="unfinished">Parameterantal stämmer inte</translation>
+    </message>
+</context>
+<context>
+    <name>QSaveFile</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/io/qsavefile.cpp" line="+214"/>
+        <source>Existing file %1 is not writable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Filename refers to a directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <source>QSaveFile cannot open &apos;%1&apos; without direct write fallback enabled: path contains an Alternate Data Stream specifier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+126"/>
+        <source>Writing canceled by application</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QScrollBar</name>
     <message>
-        <location filename="../../qtbase/src/widgets/widgets/qscrollbar.cpp" line="403"/>
+        <location filename="../../qtbase/src/widgets/widgets/qscrollbar.cpp" line="+403"/>
         <source>Scroll here</source>
-        <translation type="obsolete">Rulla här</translation>
+        <translation type="unfinished">Rulla här</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Left edge</source>
-        <translation type="obsolete">Vänsterkant</translation>
+        <translation type="unfinished">Vänsterkant</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>Top</source>
-        <translation type="obsolete">Överkant</translation>
+        <translation type="unfinished">Överkant</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Right edge</source>
-        <translation type="obsolete">Högerkant</translation>
+        <translation type="unfinished">Högerkant</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>Bottom</source>
-        <translation type="obsolete">Nederkant</translation>
+        <translation type="unfinished">Nederkant</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Page left</source>
-        <translation type="obsolete">Sida vänster</translation>
+        <translation type="unfinished">Sida vänster</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>Page up</source>
-        <translation type="obsolete">Sida uppåt</translation>
+        <translation type="unfinished">Sida uppåt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Page right</source>
-        <translation type="obsolete">Sida höger</translation>
+        <translation type="unfinished">Sida höger</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>Page down</source>
-        <translation type="obsolete">Sida nedåt</translation>
+        <translation type="unfinished">Sida nedåt</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Scroll left</source>
-        <translation type="obsolete">Rulla vänster</translation>
+        <translation type="unfinished">Rulla vänster</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>Scroll up</source>
-        <translation type="obsolete">Rulla uppåt</translation>
+        <translation type="unfinished">Rulla uppåt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Scroll right</source>
-        <translation type="obsolete">Rulla höger</translation>
+        <translation type="unfinished">Rulla höger</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>Scroll down</source>
-        <translation type="obsolete">Rulla nedåt</translation>
+        <translation type="unfinished">Rulla nedåt</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Line up</source>
-        <translation type="obsolete">Rada upp</translation>
+        <translation type="vanished">Rada upp</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Position</source>
-        <translation type="obsolete">Position</translation>
+        <translation type="vanished">Position</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Line down</source>
-        <translation type="obsolete">Rad nedåt</translation>
+        <translation type="vanished">Rad nedåt</translation>
     </message>
 </context>
 <context>
     <name>QSctpSocket</name>
     <message>
-        <location filename="../../qtbase/src/network/socket/qsctpsocket.cpp" line="191"/>
+        <location filename="../../qtbase/src/network/socket/qsctpsocket.cpp" line="+191"/>
         <source>The remote host closed the connection</source>
-        <translation type="obsolete">Fjärrvärden stängde anslutningen</translation>
+        <translation type="unfinished">Fjärrvärden stängde anslutningen</translation>
+    </message>
+</context>
+<context>
+    <name>QSharedMemory</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory.cpp" line="+253"/>
+        <source>%1: unable to set key on lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+100"/>
+        <source>%1: create size is less then 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+167"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_p.h" line="+149"/>
+        <source>%1: unable to lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>%1: unable to unlock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_posix.cpp" line="+69"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_systemv.cpp" line="+79"/>
+        <source>%1: key is empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <location line="+44"/>
+        <source>%1: bad name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_systemv.cpp" line="+7"/>
+        <source>%1: UNIX key file doesn&apos;t exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>%1: ftok failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_win.cpp" line="+98"/>
+        <source>%1: unable to make key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>%1: system-imposed size restrictions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <source>%1: not attached</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_unix.cpp" line="+85"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_win.cpp" line="-17"/>
+        <source>%1: permission denied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_win.cpp" line="-17"/>
+        <source>%1: already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_win.cpp" line="+4"/>
+        <source>%1: doesn&apos;t exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_win.cpp" line="+9"/>
+        <source>%1: out of resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_win.cpp" line="+7"/>
+        <source>%1: unknown error %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/corelib/kernel/qsharedmemory_win.cpp" line="-12"/>
+        <source>%1: invalid size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+59"/>
+        <source>%1: key error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+39"/>
+        <source>%1: size query failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QShortcut</name>
     <message>
-        <location filename="../../qtbase/src/gui/kernel/qkeysequence.cpp" line="425"/>
+        <location filename="../../qtbase/src/gui/kernel/qkeysequence.cpp" line="+425"/>
         <source>Space</source>
-        <translation type="obsolete">Mellanslag</translation>
+        <extracomment>This and all following &quot;incomprehensible&quot; strings in QShortcut context are key names. Please use the localized names appearing on actual keyboards or whatever is commonly used.</extracomment>
+        <translation type="unfinished">Mellanslag</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Esc</source>
-        <translation type="obsolete">Esc</translation>
+        <translation type="unfinished">Esc</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Tab</source>
-        <translation type="obsolete">Tab</translation>
+        <translation type="unfinished">Tab</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Backtab</source>
-        <translation type="obsolete">Backtab</translation>
+        <translation type="unfinished">Backtab</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Backspace</source>
-        <translation type="obsolete">Backsteg</translation>
+        <translation type="unfinished">Backsteg</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Return</source>
-        <translation type="obsolete">Return</translation>
+        <translation type="unfinished">Return</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Enter</source>
-        <translation type="obsolete">Enter</translation>
+        <translation type="unfinished">Enter</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Ins</source>
-        <translation type="obsolete">Ins</translation>
+        <translation type="unfinished">Ins</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Del</source>
-        <translation type="obsolete">Del</translation>
+        <translation type="unfinished">Del</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Pause</source>
-        <translation type="obsolete">Pause</translation>
+        <translation type="unfinished">Pause</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Print</source>
-        <translation type="obsolete">Print</translation>
+        <translation type="unfinished">Print</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>SysReq</source>
-        <translation type="obsolete">SysReq</translation>
+        <translation type="unfinished">SysReq</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Home</source>
-        <translation type="obsolete">Home</translation>
+        <translation type="unfinished">Home</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>End</source>
-        <translation type="obsolete">End</translation>
+        <translation type="unfinished">End</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Left</source>
-        <translation type="obsolete">Vänster</translation>
+        <translation type="unfinished">Vänster</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Up</source>
-        <translation type="obsolete">Upp</translation>
+        <translation type="unfinished">Upp</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Right</source>
-        <translation type="obsolete">Höger</translation>
+        <translation type="unfinished">Höger</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Down</source>
-        <translation type="obsolete">Ned</translation>
+        <translation type="unfinished">Ned</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>PgUp</source>
-        <translation type="obsolete">PgUp</translation>
+        <translation type="unfinished">PgUp</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>PgDown</source>
-        <translation type="obsolete">PgDown</translation>
+        <translation type="unfinished">PgDown</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>CapsLock</source>
-        <translation type="obsolete">CapsLock</translation>
+        <translation type="unfinished">CapsLock</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>NumLock</source>
-        <translation type="obsolete">NumLock</translation>
+        <translation type="unfinished">NumLock</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>ScrollLock</source>
-        <translation type="obsolete">ScrollLock</translation>
+        <translation type="unfinished">ScrollLock</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Menu</source>
-        <translation type="obsolete">Meny</translation>
+        <translation type="unfinished">Meny</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Help</source>
-        <translation type="obsolete">Hjälp</translation>
+        <translation type="unfinished">Hjälp</translation>
     </message>
     <message>
-        <location filename="." line="5"/>
+        <location line="+5"/>
         <source>Back</source>
-        <translation type="obsolete">Bakåt</translation>
+        <translation type="unfinished">Bakåt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Forward</source>
-        <translation type="obsolete">Framåt</translation>
+        <translation type="unfinished">Framåt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Stop</source>
-        <translation type="obsolete">Stoppa</translation>
+        <translation type="unfinished">Stoppa</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Refresh</source>
-        <translation type="obsolete">Uppdatera</translation>
+        <translation type="unfinished">Uppdatera</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Volume Down</source>
-        <translation type="obsolete">Sänk volym</translation>
+        <translation type="unfinished">Sänk volym</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Volume Mute</source>
-        <translation type="obsolete">Volym tyst</translation>
+        <translation type="unfinished">Volym tyst</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Volume Up</source>
-        <translation type="obsolete">Höj volym</translation>
+        <translation type="unfinished">Höj volym</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Bass Boost</source>
-        <translation type="obsolete">Förstärk bas</translation>
+        <translation type="unfinished">Förstärk bas</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Bass Up</source>
-        <translation type="obsolete">Höj bas</translation>
+        <translation type="unfinished">Höj bas</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Bass Down</source>
-        <translation type="obsolete">Sänk bas</translation>
+        <translation type="unfinished">Sänk bas</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Treble Up</source>
-        <translation type="obsolete">Höj diskant</translation>
+        <translation type="unfinished">Höj diskant</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Treble Down</source>
-        <translation type="obsolete">Sänk diskant</translation>
+        <translation type="unfinished">Sänk diskant</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Media Play</source>
-        <translation type="obsolete">Media spela upp</translation>
+        <translation type="unfinished">Media spela upp</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Media Stop</source>
-        <translation type="obsolete">Media stopp</translation>
+        <translation type="unfinished">Media stopp</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Media Previous</source>
-        <translation type="obsolete">Media föregående</translation>
+        <translation type="unfinished">Media föregående</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Media Next</source>
-        <translation type="obsolete">Media nästa</translation>
+        <translation type="unfinished">Media nästa</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Media Record</source>
-        <translation type="obsolete">Media spela in</translation>
+        <translation type="unfinished">Media spela in</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+2"/>
+        <source>Media Pause</source>
+        <extracomment>Media player pause button</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Toggle Media Play/Pause</source>
+        <extracomment>Media player button to toggle between playing and paused</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Home Page</source>
-        <translation type="obsolete">Hemsida</translation>
+        <translation type="unfinished">Hemsida</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Favorites</source>
-        <translation type="obsolete">Favoriter</translation>
+        <translation type="unfinished">Favoriter</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Search</source>
-        <translation type="obsolete">Sök</translation>
+        <translation type="unfinished">Sök</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Standby</source>
-        <translation type="obsolete">Avvakta</translation>
+        <translation type="unfinished">Avvakta</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Open URL</source>
-        <translation type="obsolete">Öppna url</translation>
+        <translation type="unfinished">Öppna url</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch Mail</source>
-        <translation type="obsolete">Starta e-post</translation>
+        <translation type="unfinished">Starta e-post</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch Media</source>
-        <translation type="obsolete">Starta media</translation>
+        <translation type="unfinished">Starta media</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (0)</source>
-        <translation type="obsolete">Starta (0)</translation>
+        <translation type="unfinished">Starta (0)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (1)</source>
-        <translation type="obsolete">Starta (1)</translation>
+        <translation type="unfinished">Starta (1)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (2)</source>
-        <translation type="obsolete">Starta (2)</translation>
+        <translation type="unfinished">Starta (2)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (3)</source>
-        <translation type="obsolete">Starta (3)</translation>
+        <translation type="unfinished">Starta (3)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (4)</source>
-        <translation type="obsolete">Starta (4)</translation>
+        <translation type="unfinished">Starta (4)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (5)</source>
-        <translation type="obsolete">Starta (5)</translation>
+        <translation type="unfinished">Starta (5)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (6)</source>
-        <translation type="obsolete">Starta (6)</translation>
+        <translation type="unfinished">Starta (6)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (7)</source>
-        <translation type="obsolete">Starta (7)</translation>
+        <translation type="unfinished">Starta (7)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (8)</source>
-        <translation type="obsolete">Starta (8)</translation>
+        <translation type="unfinished">Starta (8)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (9)</source>
-        <translation type="obsolete">Starta (9)</translation>
+        <translation type="unfinished">Starta (9)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (A)</source>
-        <translation type="obsolete">Starta (A)</translation>
+        <translation type="unfinished">Starta (A)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (B)</source>
-        <translation type="obsolete">Starta (B)</translation>
+        <translation type="unfinished">Starta (B)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (C)</source>
-        <translation type="obsolete">Starta (C)</translation>
+        <translation type="unfinished">Starta (C)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (D)</source>
-        <translation type="obsolete">Starta (D)</translation>
+        <translation type="unfinished">Starta (D)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (E)</source>
-        <translation type="obsolete">Starta (E)</translation>
+        <translation type="unfinished">Starta (E)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Launch (F)</source>
-        <translation type="obsolete">Starta (F)</translation>
+        <translation type="unfinished">Starta (F)</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
+        <source>Monitor Brightness Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Monitor Brightness Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Keyboard Light On/Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Keyboard Brightness Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Keyboard Brightness Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Power Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wake Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Eject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Screensaver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>WWW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sleep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>LightBulb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Shop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Add Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hot Links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Adjust Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Finance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Community</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Media Rewind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Back Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Application Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Application Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Book</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Calculator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Clear</source>
-        <translation type="obsolete">Töm</translation>
+        <translation type="unfinished">Töm</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
+        <source>Clear Grab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Close</source>
-        <translation type="obsolete">Stäng</translation>
+        <translation type="unfinished">Stäng</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>DOS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Documents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Spreadsheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Game</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Go</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>iTouch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Logoff</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Market</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Meeting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Keyboard Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Menu PB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>My Sites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>News</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Home Office</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Option</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Phone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Reply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rotate Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rotation PB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rotation KB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Save</source>
-        <translation type="obsolete">Spara</translation>
+        <translation type="unfinished">Spara</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
+        <source>Send</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Spellchecker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Split Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Task Panel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Terminal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Travel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Word Processor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>XFer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Away</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Messenger</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>WebCam</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mail Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Pictures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Battery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Bluetooth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wireless</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Ultra Wide Band</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Media Fast Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Audio Repeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Audio Random Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Subtitle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Audio Cycle Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hibernate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Top Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Power Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Suspend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Microphone Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Channel Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Channel Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Microphone Volume Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Microphone Volume Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Open</source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="unfinished">Öppna</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
+        <source>Find</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Undo</source>
-        <translation type="obsolete">Ångra</translation>
+        <translation type="unfinished">Ångra</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Redo</source>
-        <translation type="obsolete">Gör om</translation>
+        <translation type="unfinished">Gör om</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Print Screen</source>
-        <translation type="obsolete">Print Screen</translation>
+        <translation type="unfinished">Print Screen</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Page Up</source>
-        <translation type="obsolete">Page Up</translation>
+        <translation type="unfinished">Page Up</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Page Down</source>
-        <translation type="obsolete">Page Down</translation>
+        <translation type="unfinished">Page Down</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Caps Lock</source>
-        <translation type="obsolete">Caps Lock</translation>
+        <translation type="unfinished">Caps Lock</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Num Lock</source>
-        <translation type="obsolete">Num Lock</translation>
+        <translation type="unfinished">Num Lock</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Number Lock</source>
-        <translation type="obsolete">Number Lock</translation>
+        <translation type="unfinished">Number Lock</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Scroll Lock</source>
-        <translation type="obsolete">Scroll Lock</translation>
+        <translation type="unfinished">Scroll Lock</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Insert</source>
-        <translation type="obsolete">Insert</translation>
+        <translation type="unfinished">Insert</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Delete</source>
-        <translation type="obsolete">Delete</translation>
+        <translation type="unfinished">Delete</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Escape</source>
-        <translation type="obsolete">Escape</translation>
+        <translation type="unfinished">Escape</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>System Request</source>
-        <translation type="obsolete">System Request</translation>
+        <translation type="unfinished">System Request</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Select</source>
-        <translation type="obsolete">Välj</translation>
+        <translation type="unfinished">Välj</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Yes</source>
-        <translation type="obsolete">Ja</translation>
+        <translation type="unfinished">Ja</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>No</source>
-        <translation type="obsolete">Nej</translation>
+        <translation type="unfinished">Nej</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>Context1</source>
-        <translation type="obsolete">Sammanhang1</translation>
+        <translation type="unfinished">Sammanhang1</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Context2</source>
-        <translation type="obsolete">Sammanhang2</translation>
+        <translation type="unfinished">Sammanhang2</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Context3</source>
-        <translation type="obsolete">Sammanhang3</translation>
+        <translation type="unfinished">Sammanhang3</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Context4</source>
-        <translation type="obsolete">Sammanhang4</translation>
+        <translation type="unfinished">Sammanhang4</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Call</source>
-        <translation type="obsolete">Ring upp</translation>
+        <extracomment>Button to start a call (note: a separate button is used to end the call)</extracomment>
+        <translation type="unfinished">Ring upp</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Hangup</source>
-        <translation type="obsolete">Lägg på</translation>
+        <extracomment>Button to end a call (note: a separate button is used to start the call)</extracomment>
+        <translation type="unfinished">Lägg på</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+2"/>
+        <source>Toggle Call/Hangup</source>
+        <extracomment>Button that will hang up if we&apos;re in call, or make a call if we&apos;re not.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Flip</source>
-        <translation type="obsolete">Vänd</translation>
+        <translation type="unfinished">Vänd</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+2"/>
+        <source>Voice Dial</source>
+        <extracomment>Button to trigger voice dialing</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Last Number Redial</source>
+        <extracomment>Button to redial the last number called</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Camera Shutter</source>
+        <extracomment>Button to trigger the camera shutter (take a picture)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Camera Focus</source>
+        <extracomment>Button to focus the camera</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Kanji</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Muhenkan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Henkan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Romaji</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hiragana</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Katakana</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hiragana Katakana</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Zenkaku</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hankaku</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Zenkaku Hankaku</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Touroku</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Massyo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Kana Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Kana Shift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Eisu Shift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Eisu toggle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Code input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Multiple Candidate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Previous Candidate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Hangul</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul Hanja</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul Jamo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul Romaja</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul Jeonja</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul Banja</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul PreHanja</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul PostHanja</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hangul Special</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="unfinished">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Printer</source>
-        <translation type="obsolete">Skrivare</translation>
+        <translation type="unfinished">Skrivare</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Execute</source>
-        <translation type="obsolete">Kör</translation>
+        <translation type="unfinished">Kör</translation>
     </message>
     <message>
-        <location filename="." line="169"/>
+        <location line="+1"/>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Touchpad Toggle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Touchpad On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Touchpad Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+408"/>
+        <location line="+169"/>
         <source>Ctrl</source>
-        <translation type="obsolete">Ctrl</translation>
+        <translation type="unfinished">Ctrl</translation>
     </message>
     <message>
-        <location filename="." line="172"/>
+        <location line="-168"/>
+        <location line="+172"/>
         <source>Shift</source>
-        <translation type="obsolete">Shift</translation>
+        <translation type="unfinished">Shift</translation>
     </message>
     <message>
-        <location filename="." line="169"/>
+        <location line="-171"/>
+        <location line="+169"/>
         <source>Alt</source>
-        <translation type="obsolete">Alt</translation>
+        <translation type="unfinished">Alt</translation>
     </message>
     <message>
-        <location filename="." line="164"/>
+        <location line="-168"/>
+        <location line="+164"/>
         <source>Meta</source>
-        <translation type="obsolete">Meta</translation>
+        <translation type="unfinished">Meta</translation>
     </message>
     <message>
-        <location filename="." line="164"/>
+        <location line="-163"/>
+        <location line="+172"/>
+        <source>Num</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-58"/>
         <source>+</source>
-        <translation type="obsolete">+</translation>
+        <extracomment>Key separator in shortcut string</extracomment>
+        <translation type="unfinished">+</translation>
     </message>
     <message>
-        <location filename="." line="93"/>
+        <location line="+93"/>
         <source>F%1</source>
-        <translation type="obsolete">F%1</translation>
+        <translation type="unfinished">F%1</translation>
     </message>
 </context>
 <context>
     <name>QSlider</name>
     <message>
-        <location filename="." line="93"/>
         <source>Page left</source>
-        <translation type="obsolete">Sida vänster</translation>
+        <translation type="vanished">Sida vänster</translation>
     </message>
     <message>
-        <location filename="." line="93"/>
         <source>Page up</source>
-        <translation type="obsolete">Sida uppåt</translation>
+        <translation type="vanished">Sida uppåt</translation>
     </message>
     <message>
-        <location filename="." line="93"/>
         <source>Position</source>
-        <translation type="obsolete">Position</translation>
+        <translation type="vanished">Position</translation>
     </message>
     <message>
-        <location filename="." line="93"/>
         <source>Page right</source>
-        <translation type="obsolete">Sida höger</translation>
+        <translation type="vanished">Sida höger</translation>
     </message>
     <message>
-        <location filename="." line="93"/>
         <source>Page down</source>
-        <translation type="obsolete">Sida nedåt</translation>
+        <translation type="vanished">Sida nedåt</translation>
     </message>
 </context>
 <context>
     <name>QSocks5SocketEngine</name>
     <message>
-        <location filename="." line="696"/>
-        <source>Network operation timed out</source>
-        <translation type="obsolete">Tidsgräns för nätverksåtgärd överstegs</translation>
+        <location filename="../../qtbase/src/network/socket/qsocks5socketengine.cpp" line="-67"/>
+        <source>Connection to proxy refused</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="." line="696"/>
+        <location line="+4"/>
+        <source>Connection to proxy closed prematurely</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Proxy host not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Connection to proxy timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Proxy authentication failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Proxy authentication failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>SOCKS version 5 protocol error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>General SOCKSv5 server failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Connection not allowed by SOCKSv5 server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>TTL expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>SOCKSv5 command not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Address type not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Unknown SOCKSv5 proxy error code 0x%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+696"/>
+        <source>Network operation timed out</source>
+        <translation type="unfinished">Tidsgräns för nätverksåtgärd överstegs</translation>
+    </message>
+    <message>
         <source>Socks5 timeout error connecting to socks server</source>
         <translation type="obsolete">Tidsgräns för Socks5 överstigen vid anslutningen till socks-server</translation>
     </message>
@@ -11662,131 +8843,1249 @@ Vill du skriva över den?</translation>
 <context>
     <name>QSpiAccessibleBridge</name>
     <message>
-        <location filename="." line="2"/>
+        <location filename="../../qtbase/src/platformsupport/linuxaccessibility/bridge.cpp" line="+120"/>
+        <source>invalid role</source>
+        <extracomment>Role of an accessible object - the object is in an invalid state or could not be constructed</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>title bar</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>menu bar</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>scroll bar</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>grip</source>
+        <extracomment>Role of an accessible object - the grip is usually used for resizing another object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>sound</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>cursor</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>text caret</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>alert message</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+20"/>
+        <source>frame</source>
+        <extracomment>Role of an accessible object: a window with frame and title
+----------
+Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-18"/>
+        <source>filler</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>popup menu</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>menu item</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>tool tip</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>application</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>document</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+8"/>
+        <source>panel</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <source>chart</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>dialog</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>separator</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>tool bar</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>status bar</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>table</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>column header</source>
+        <extracomment>Role of an accessible object - part of a table</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>row header</source>
+        <extracomment>Role of an accessible object - part of a table</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>column</source>
+        <extracomment>Role of an accessible object - part of a table</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>row</source>
+        <extracomment>Role of an accessible object - part of a table</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>cell</source>
+        <extracomment>Role of an accessible object - part of a table</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>link</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>help balloon</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>assistant</source>
+        <extracomment>Role of an accessible object - a helper dialog</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>list</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>list item</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>tree</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>tree item</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>page tab</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>property page</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>indicator</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>graphic</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>label</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>text</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>push button</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>check box</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>radio button</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>combo box</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>progress bar</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>dial</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>hotkey field</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>slider</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>spin box</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>canvas</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>animation</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>equation</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>button with drop down</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>button menu</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>button with drop down grid</source>
+        <extracomment>Role of an accessible object - a button that expands a grid.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>space</source>
+        <extracomment>Role of an accessible object - blank space between other objects.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>page tab list</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>clock</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>splitter</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>layered pane</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>web document</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>paragraph</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>section</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>color chooser</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>footer</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>form</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>heading</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>note</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>complementary content</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>terminal</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>desktop</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>unknown</source>
-        <translation type="obsolete">okänt</translation>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation type="unfinished">okänt</translation>
     </message>
 </context>
 <context>
     <name>QSpinBox</name>
     <message>
-        <location filename="." line="2"/>
         <source>More</source>
-        <translation type="obsolete">Mer</translation>
+        <translation type="vanished">Mer</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Less</source>
-        <translation type="obsolete">Mindre</translation>
+        <translation type="vanished">Mindre</translation>
     </message>
 </context>
 <context>
     <name>QSql</name>
     <message>
-        <location filename="." line="2"/>
         <source>Delete</source>
-        <translation type="obsolete">Ta bort</translation>
+        <translation type="vanished">Ta bort</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Delete this record?</source>
-        <translation type="obsolete">Ta bort denna post?</translation>
+        <translation type="vanished">Ta bort denna post?</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Yes</source>
-        <translation type="obsolete">Ja</translation>
+        <translation type="vanished">Ja</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>No</source>
-        <translation type="obsolete">Nej</translation>
+        <translation type="vanished">Nej</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Insert</source>
-        <translation type="obsolete">Infoga</translation>
+        <translation type="vanished">Infoga</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Update</source>
-        <translation type="obsolete">Uppdatera</translation>
+        <translation type="vanished">Uppdatera</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Save edits?</source>
-        <translation type="obsolete">Spara redigeringar?</translation>
+        <translation type="vanished">Spara redigeringar?</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="vanished">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Confirm</source>
-        <translation type="obsolete">Bekräfta</translation>
+        <translation type="vanished">Bekräfta</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
         <source>Cancel your edits?</source>
-        <translation type="obsolete">Avbryt dina redigeringar?</translation>
+        <translation type="vanished">Avbryt dina redigeringar?</translation>
+    </message>
+</context>
+<context>
+    <name>QSslDiffieHellmanParameter</name>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qssldiffiehellmanparameters.cpp" line="+269"/>
+        <source>No error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Invalid input data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The given Diffie-Hellman parameters are deemed unsafe</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QSslSocket</name>
     <message>
-        <location filename="." line="3"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_openssl.cpp" line="+54"/>
+        <source>Error when setting the OpenSSL configuration (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+228"/>
+        <source>Expecting QByteArray for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>An error occurred attempting to set %1 to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Wrong value for %1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Unrecognized command %1 = %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>SSL_CONF_finish() failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>SSL_CONF_CTX_new() failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="+398"/>
+        <source>OpenSSL version too old, need at least v1.0.2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_openssl11.cpp" line="+76"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="-325"/>
+        <source>Error when setting the elliptic curves (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+65"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="+117"/>
+        <location filename="../../qtbase/src/network/ssl/qsslsocket_schannel.cpp" line="+756"/>
+        <location line="+82"/>
+        <source>Error creating SSL context (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="+1"/>
+        <source>unsupported protocol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+95"/>
+        <source>Error while setting the minimal protocol version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Error while setting the maximum protocol version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <location line="+10"/>
+        <location line="+7"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="+30"/>
+        <source>Invalid or empty cipher list (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="+36"/>
+        <source>Cannot provide a certificate with no key, %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="+7"/>
+        <source>Error loading local certificate, %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="+24"/>
+        <source>Error loading private key, %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="+9"/>
+        <source>Private key does not certify public key, %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+47"/>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="+47"/>
+        <source>Diffie-Hellman parameters are not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>OpenSSL version with disabled elliptic curves</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qsslcontext_opensslpre11.cpp" line="-168"/>
+        <source>DTLS server requires a &apos;VerifyNone&apos; mode with your version of OpenSSL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qsslerror.cpp" line="+233"/>
+        <source>No error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The issuer certificate could not be found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The certificate signature could not be decrypted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The public key in the certificate could not be read</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The signature of the certificate is invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The certificate is not yet valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The certificate has expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The certificate&apos;s notBefore field contains an invalid time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The certificate&apos;s notAfter field contains an invalid time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The certificate is self-signed, and untrusted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The root certificate of the certificate chain is self-signed, and untrusted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The issuer certificate of a locally looked up certificate could not be found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>No certificates could be verified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>One of the CA certificates is invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The basicConstraints path length parameter has been exceeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The supplied certificate is unsuitable for this purpose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The root CA certificate is not trusted for this purpose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The root CA certificate is marked to reject the specified purpose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The current candidate issuer certificate was rejected because its subject name did not match the issuer name of the current certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The current candidate issuer certificate was rejected because its issuer name and serial number was present and did not match the authority key identifier of the current certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The peer did not present any certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The host name did not match any of the valid hosts for this certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>The peer certificate is blacklisted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>No OCSP status response found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The OCSP status request had invalid syntax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OCSP response contains an unexpected number of SingleResponse structures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OCSP responder reached an inconsistent internal state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OCSP responder was unable to return a status for the requested certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The server requires the client to sign the OCSP request in order to construct a response</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The client is not authorized to request OCSP status from this server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OCSP responder&apos;s identity cannot be verified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The identity of a certificate in an OCSP response cannot be established</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The certificate status response has expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The certificate&apos;s status is unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qsslsocket.cpp" line="+464"/>
+        <location line="+40"/>
+        <location line="+1382"/>
+        <location line="+47"/>
+        <source>TLS initialization failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+246"/>
+        <source>Attempted to use an unsupported protocol.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qsslsocket_mac.cpp" line="+601"/>
+        <location filename="../../qtbase/src/network/ssl/qsslsocket_openssl.cpp" line="+1028"/>
+        <location filename="../../qtbase/src/network/ssl/qsslsocket_schannel.cpp" line="-630"/>
+        <location line="+643"/>
+        <location line="+93"/>
+        <source>The TLS/SSL connection has been closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qsslsocket_openssl.cpp" line="-531"/>
+        <source>Error creating SSL session, %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <location filename="../../qtbase/src/network/ssl/qsslsocket_winrt.cpp" line="+453"/>
+        <source>Error creating SSL session: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Server-side QSslSocket does not support OCSP stapling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Failed to enable OCSP stapling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Client-side sockets do not send OCSP responses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+218"/>
+        <location line="+14"/>
+        <source>Unable to init SSL Context: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+53"/>
+        <source>Unable to write data: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+73"/>
+        <source>Unable to decrypt data: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+93"/>
+        <location line="+12"/>
+        <source>Error while reading: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+59"/>
+        <source>Error during SSL handshake: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+370"/>
+        <source>Failed to decode OCSP response</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Failed to extract basic OCSP response</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>No certificate verification store, cannot verify OCSP response</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <source>Failed to decode a SingleResponse from OCSP status response</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+53"/>
+        <source>Failed to extract &apos;this update time&apos; from the SingleResponse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../qtbase/src/network/ssl/qsslsocket_schannel.cpp" line="-776"/>
+        <source>Insufficient memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Internal error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>An internal handle was invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>An internal token was invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Access denied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No authority could be contacted for authorization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No credentials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The target is unknown or unreachable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>An unsupported function was requested</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The hostname provided does not match the one received from the peer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No common protocol exists between the client and the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Unexpected or badly-formatted message received</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The data could not be encrypted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No cipher suites in common</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The credentials were not recognized / Invalid argument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The message was tampered with, damaged or out of sequence.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A message was received out of sequence.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Unknown error occurred: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+373"/>
+        <source>Invalid protocol chosen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>The certificate provided cannot be used for a client.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The certificate provided cannot be used for a server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+315"/>
+        <source>Server did not accept any certificate we could present.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Algorithm mismatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Handshake failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Failed to query the TLS context: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Did not get the required attributes for the connection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Unwanted protocol was negotiated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+115"/>
+        <source>Renegotiation was unsuccessful: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+88"/>
+        <source>Schannel failed to encrypt data: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+439"/>
+        <source>Cannot provide a certificate with no key</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QStandardPaths</name>
     <message>
-        <location filename="." line="2"/>
+        <location filename="../../qtbase/src/corelib/io/qstandardpaths.cpp" line="+580"/>
+        <source>Desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Documents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Applications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Pictures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Temporary Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Home</source>
-        <translation type="obsolete">Home</translation>
+        <translation type="unfinished">Home</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Shared Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Runtime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Shared Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Shared Cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Application Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Application Configuration</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QStateMachine</name>
     <message>
-        <location filename="." line="4"/>
+        <location filename="../../qtbase/src/corelib/statemachine/qstatemachine.cpp" line="+1469"/>
+        <source>Missing initial state in compound state &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Missing default state in history state &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>No common ancestor for targets and source of transition from state &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Unknown error</source>
-        <translation type="obsolete">Okänt fel</translation>
+        <translation type="unfinished">Okänt fel</translation>
+    </message>
+</context>
+<context>
+    <name>QSystemSemaphore</name>
+    <message>
+        <location filename="../../qtbase/src/corelib/kernel/qsystemsemaphore_unix.cpp" line="+76"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsystemsemaphore_win.cpp" line="+69"/>
+        <source>%1: permission denied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>%1: already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>%1: does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsystemsemaphore_win.cpp" line="-4"/>
+        <source>%1: out of resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../qtbase/src/corelib/kernel/qsystemsemaphore_win.cpp" line="+7"/>
+        <source>%1: unknown error %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QTDSDriver</name>
     <message>
-        <location filename="../../qtbase/src/plugins/sqldrivers/tds/qsql_tds.cpp" line="642"/>
+        <location filename="../../qtbase/src/plugins/sqldrivers/tds/qsql_tds.cpp" line="+642"/>
         <source>Unable to open connection</source>
-        <translation type="obsolete">Kunde inte öppna anslutning</translation>
+        <translation type="unfinished">Kunde inte öppna anslutning</translation>
     </message>
     <message>
-        <location filename="." line="5"/>
+        <location line="+5"/>
         <source>Unable to use database</source>
-        <translation type="obsolete">Kunde inte använda databasen</translation>
+        <translation type="unfinished">Kunde inte använda databasen</translation>
     </message>
 </context>
 <context>
     <name>QTabBar</name>
     <message>
-        <location filename="." line="5"/>
+        <location filename="../../qtbase/src/widgets/widgets/qtabbar.cpp" line="-2222"/>
         <source>Scroll Left</source>
-        <translation type="obsolete">Rulla vänster</translation>
+        <translation type="unfinished">Rulla vänster</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>Scroll Right</source>
-        <translation type="obsolete">Rulla höger</translation>
+        <translation type="unfinished">Rulla höger</translation>
     </message>
 </context>
 <context>
     <name>QTcpServer</name>
     <message>
-        <location filename="." line="122"/>
+        <location filename="../../qtbase/src/network/socket/qtcpserver.cpp" line="+314"/>
+        <location line="+122"/>
+        <source>Operation on socket is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Socket operation unsupported</source>
         <translation type="obsolete">Uttagsåtgärd stöds inte</translation>
     </message>
@@ -11794,277 +10093,352 @@ Vill du skriva över den?</translation>
 <context>
     <name>QTextControl</name>
     <message>
-        <location filename="." line="122"/>
         <source>&amp;Undo</source>
-        <translation type="obsolete">&amp;Ångra</translation>
+        <translation type="vanished">&amp;Ångra</translation>
     </message>
     <message>
-        <location filename="." line="122"/>
         <source>&amp;Redo</source>
-        <translation type="obsolete">&amp;Gör om</translation>
+        <translation type="vanished">&amp;Gör om</translation>
     </message>
     <message>
-        <location filename="." line="122"/>
         <source>Cu&amp;t</source>
-        <translation type="obsolete">Klipp u&amp;t</translation>
+        <translation type="vanished">Klipp u&amp;t</translation>
     </message>
     <message>
-        <location filename="." line="122"/>
         <source>&amp;Copy</source>
-        <translation type="obsolete">&amp;Kopiera</translation>
+        <translation type="vanished">&amp;Kopiera</translation>
     </message>
     <message>
-        <location filename="." line="122"/>
         <source>Copy &amp;Link Location</source>
-        <translation type="obsolete">Kopiera &amp;länkplats</translation>
+        <translation type="vanished">Kopiera &amp;länkplats</translation>
     </message>
     <message>
-        <location filename="." line="122"/>
         <source>&amp;Paste</source>
-        <translation type="obsolete">Klistra &amp;in</translation>
+        <translation type="vanished">Klistra &amp;in</translation>
     </message>
     <message>
-        <location filename="." line="122"/>
         <source>Delete</source>
-        <translation type="obsolete">Ta bort</translation>
+        <translation type="vanished">Ta bort</translation>
     </message>
     <message>
-        <location filename="." line="122"/>
         <source>Select All</source>
-        <translation type="obsolete">Markera alla</translation>
+        <translation type="vanished">Markera alla</translation>
+    </message>
+</context>
+<context>
+    <name>QTgaFile</name>
+    <message>
+        <location filename="../../qtimageformats/src/plugins/imageformats/tga/qtgafile.cpp" line="+138"/>
+        <source>Could not read image data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Sequential device (eg socket) for image read not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Seek file/device for image read failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Image header read failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Image type not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Image depth not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Image size exceeds limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Could not seek to image read footer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Could not read footer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Image type (non-TrueVision 2.0) not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Could not reset to read data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QToolButton</name>
     <message>
-        <location filename="." line="4"/>
         <source>Press</source>
-        <translation type="obsolete">Tryck</translation>
+        <translation type="vanished">Tryck</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
         <source>Open</source>
-        <translation type="obsolete">Öppna</translation>
+        <translation type="vanished">Öppna</translation>
     </message>
 </context>
 <context>
     <name>QUdpSocket</name>
     <message>
-        <location filename="." line="160"/>
+        <location filename="../../qtbase/src/network/socket/qudpsocket.cpp" line="+363"/>
+        <source>Unable to send a datagram</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+160"/>
+        <source>No datagram available for reading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>This platform does not support IPv6</source>
-        <translation type="obsolete">Denna plattform saknar stöd för IPv6</translation>
+        <translation type="vanished">Denna plattform saknar stöd för IPv6</translation>
     </message>
 </context>
 <context>
     <name>QUndoGroup</name>
     <message>
-        <location filename="." line="0"/>
+        <location filename="../../qtbase/src/widgets/util/qundogroup.cpp" line="+385"/>
+        <source>Undo %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
         <source>Undo</source>
         <comment>Default text for undo action</comment>
-        <translation type="obsolete">Ångra</translation>
+        <translation type="unfinished">Ångra</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+31"/>
+        <source>Redo %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
         <source>Redo</source>
         <comment>Default text for redo action</comment>
-        <translation type="obsolete">Gör om</translation>
+        <translation type="unfinished">Gör om</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Undo</source>
-        <translation type="obsolete">Ångra</translation>
+        <translation type="vanished">Ångra</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Redo</source>
-        <translation type="obsolete">Gör om</translation>
+        <translation type="vanished">Gör om</translation>
     </message>
 </context>
 <context>
     <name>QUndoModel</name>
     <message>
-        <location filename="../../qtbase/src/widgets/util/qundoview.cpp" line="99"/>
+        <location filename="../../qtbase/src/widgets/util/qundoview.cpp" line="+99"/>
         <source>&lt;empty&gt;</source>
-        <translation type="obsolete">&lt;tom&gt;</translation>
+        <translation type="unfinished">&lt;tom&gt;</translation>
     </message>
 </context>
 <context>
     <name>QUndoStack</name>
     <message>
-        <location filename="." line="0"/>
+        <location filename="../../qtbase/src/widgets/util/qundostack.cpp" line="+1087"/>
+        <source>Undo %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
         <source>Undo</source>
         <comment>Default text for undo action</comment>
-        <translation type="obsolete">Ångra</translation>
+        <translation type="unfinished">Ångra</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+30"/>
+        <source>Redo %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
         <source>Redo</source>
         <comment>Default text for redo action</comment>
-        <translation type="obsolete">Gör om</translation>
+        <translation type="unfinished">Gör om</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Undo</source>
-        <translation type="obsolete">Ångra</translation>
+        <translation type="vanished">Ångra</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Redo</source>
-        <translation type="obsolete">Gör om</translation>
+        <translation type="vanished">Gör om</translation>
     </message>
 </context>
 <context>
     <name>QUnicodeControlCharacterMenu</name>
     <message>
-        <location filename="../../qtbase/src/widgets/widgets/qwidgettextcontrol.cpp" line="3286"/>
+        <location filename="../../qtbase/src/widgets/widgets/qwidgettextcontrol.cpp" line="+3286"/>
         <source>LRM Left-to-right mark</source>
-        <translation type="obsolete">U+200E</translation>
+        <translation type="unfinished">U+200E</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>RLM Right-to-left mark</source>
-        <translation type="obsolete">U+200F</translation>
+        <translation type="unfinished">U+200F</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>ZWJ Zero width joiner</source>
-        <translation type="obsolete">U+200D</translation>
+        <translation type="unfinished">U+200D</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>ZWNJ Zero width non-joiner</source>
-        <translation type="obsolete">U+200C</translation>
+        <translation type="unfinished">U+200C</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>ZWSP Zero width space</source>
-        <translation type="obsolete">U+200B</translation>
+        <translation type="unfinished">U+200B</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>LRE Start of left-to-right embedding</source>
-        <translation type="obsolete">U+202A</translation>
+        <translation type="unfinished">U+202A</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>RLE Start of right-to-left embedding</source>
-        <translation type="obsolete">U+202B</translation>
+        <translation type="unfinished">U+202B</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>LRO Start of left-to-right override</source>
-        <translation type="obsolete">U+202D</translation>
+        <translation type="unfinished">U+202D</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>RLO Start of right-to-left override</source>
-        <translation type="obsolete">U+202E</translation>
+        <translation type="unfinished">U+202E</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>PDF Pop directional formatting</source>
-        <translation type="obsolete">U+202C</translation>
+        <translation type="unfinished">U+202C</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
+        <location line="+1"/>
+        <source>LRI Left-to-right isolate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>RLI Right-to-left isolate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>FSI First strong isolate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>PDI Pop directional isolate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Insert Unicode control character</source>
-        <translation type="obsolete">Infoga unicode-kontrolltecken</translation>
+        <translation type="unfinished">Infoga unicode-kontrolltecken</translation>
     </message>
 </context>
 <context>
     <name>QWebPage</name>
     <message>
-        <location filename="." line="6"/>
         <source>Reset</source>
         <comment>default label for Reset buttons in forms on web pages</comment>
         <translation type="obsolete">Återställ</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Stop</source>
         <comment>Stop context menu item</comment>
         <translation type="obsolete">Stoppa</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Ignore</source>
         <comment>Ignore Spelling context menu item</comment>
         <translation type="obsolete">Ignorera</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Ignore</source>
         <comment>Ignore Grammar context menu item</comment>
         <translation type="obsolete">Ignorera</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Unknown</source>
         <comment>Unknown filesize FTP directory listing item</comment>
         <translation type="obsolete">Okänt</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Scroll here</source>
         <translation type="obsolete">Rulla här</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Left edge</source>
         <translation type="obsolete">Vänsterkant</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Top</source>
         <translation type="obsolete">Överkant</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Right edge</source>
         <translation type="obsolete">Högerkant</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Bottom</source>
         <translation type="obsolete">Nederkant</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Page left</source>
         <translation type="obsolete">Sida vänster</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Page up</source>
         <translation type="obsolete">Sida uppåt</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Page right</source>
         <translation type="obsolete">Sida höger</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Page down</source>
         <translation type="obsolete">Sida nedåt</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Scroll left</source>
         <translation type="obsolete">Rulla vänster</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Scroll up</source>
         <translation type="obsolete">Rulla uppåt</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Scroll right</source>
         <translation type="obsolete">Rulla höger</translation>
     </message>
     <message>
-        <location filename="." line="6"/>
         <source>Scroll down</source>
         <translation type="obsolete">Rulla nedåt</translation>
     </message>
@@ -12072,1983 +10446,513 @@ Vill du skriva över den?</translation>
 <context>
     <name>QWhatsThisAction</name>
     <message>
-        <location filename="../../qtbase/src/widgets/kernel/qwhatsthis.cpp" line="506"/>
+        <location filename="../../qtbase/src/widgets/kernel/qwhatsthis.cpp" line="+506"/>
         <source>What&apos;s This?</source>
-        <translation type="obsolete">Vad är det här?</translation>
+        <translation type="unfinished">Vad är det här?</translation>
     </message>
 </context>
 <context>
     <name>QWidget</name>
     <message>
-        <location filename="../../qtbase/src/widgets/kernel/qwidget.cpp" line="6088"/>
+        <location filename="../../qtbase/src/widgets/kernel/qwidget.cpp" line="+6088"/>
         <source>*</source>
-        <translation type="obsolete">*</translation>
+        <translation type="unfinished">*</translation>
     </message>
 </context>
 <context>
     <name>QWidgetTextControl</name>
     <message>
-        <location filename="../../qtbase/src/widgets/kernel/qwidget.cpp" line="6088"/>
+        <location filename="../../qtbase/src/widgets/widgets/qwidgettextcontrol.cpp" line="-1043"/>
         <source>&amp;Undo</source>
-        <translation type="obsolete">&amp;Ångra</translation>
+        <translation type="unfinished">&amp;Ångra</translation>
     </message>
     <message>
-        <location filename="." line="4"/>
+        <location line="+4"/>
         <source>&amp;Redo</source>
-        <translation type="obsolete">&amp;Gör om</translation>
+        <translation type="unfinished">&amp;Gör om</translation>
     </message>
     <message>
-        <location filename="." line="9"/>
+        <location line="+7"/>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>&amp;Copy</source>
-        <translation type="obsolete">&amp;Kopiera</translation>
+        <translation type="unfinished">&amp;Kopiera</translation>
     </message>
     <message>
-        <location filename="." line="9"/>
+        <location line="+9"/>
         <source>Copy &amp;Link Location</source>
-        <translation type="obsolete">Kopiera &amp;länkplats</translation>
+        <translation type="unfinished">Kopiera &amp;länkplats</translation>
     </message>
     <message>
-        <location filename="." line="8"/>
+        <location line="+8"/>
         <source>&amp;Paste</source>
-        <translation type="obsolete">Klistra &amp;in</translation>
+        <translation type="unfinished">Klistra &amp;in</translation>
     </message>
     <message>
-        <location filename="." line="9"/>
+        <location line="+5"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Select All</source>
-        <translation type="obsolete">Markera alla</translation>
+        <translation type="unfinished">Markera alla</translation>
+    </message>
+</context>
+<context>
+    <name>QWindowsDirect2DIntegration</name>
+    <message>
+        <location filename="../../qtbase/src/plugins/platforms/direct2d/qwindowsdirect2dintegration.cpp" line="+123"/>
+        <source>Qt cannot load the direct2d platform plugin because the Direct2D version on this system is too old. The minimum system requirement for this platform plugin is Windows 7 SP1 with Platform Update.
+
+The minimum Direct2D version required is %1. The Direct2D version on this system is %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Cannot load direct2d platform plugin</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QWizard</name>
     <message>
-        <location filename="." line="0"/>
+        <location filename="../../qtbase/src/widgets/dialogs/qwizard.cpp" line="+699"/>
+        <source>Go Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
         <source>&lt; &amp;Back</source>
-        <translation type="obsolete">&lt; Till&amp;baka</translation>
+        <translation type="unfinished">&lt; Till&amp;baka</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+3"/>
+        <source>Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>&amp;Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
         <source>&amp;Next &gt;</source>
-        <translation type="obsolete">&amp;Nästa &gt;</translation>
+        <translation type="unfinished">&amp;Nästa &gt;</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+2"/>
+        <source>Commit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
         <source>&amp;Finish</source>
-        <translation type="obsolete">&amp;Färdig</translation>
+        <translation type="unfinished">&amp;Färdig</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="unfinished">Avbryt</translation>
     </message>
     <message>
-        <location filename="." line="2"/>
+        <location line="+2"/>
         <source>Help</source>
-        <translation type="obsolete">Hjälp</translation>
+        <translation type="unfinished">Hjälp</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
+        <location line="+0"/>
         <source>&amp;Help</source>
-        <translation type="obsolete">&amp;Hjälp</translation>
+        <translation type="unfinished">&amp;Hjälp</translation>
     </message>
 </context>
 <context>
     <name>QWorkspace</name>
     <message>
-        <location filename="." line="0"/>
         <source>&amp;Restore</source>
-        <translation type="obsolete">Åte&amp;rställ</translation>
+        <translation type="vanished">Åte&amp;rställ</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>&amp;Move</source>
-        <translation type="obsolete">&amp;Flytta</translation>
+        <translation type="vanished">&amp;Flytta</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>&amp;Size</source>
-        <translation type="obsolete">&amp;Storlek</translation>
+        <translation type="vanished">&amp;Storlek</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Mi&amp;nimize</source>
-        <translation type="obsolete">Mi&amp;nimera</translation>
+        <translation type="vanished">Mi&amp;nimera</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Ma&amp;ximize</source>
-        <translation type="obsolete">Ma&amp;ximera</translation>
+        <translation type="vanished">Ma&amp;ximera</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Stäng</translation>
+        <translation type="vanished">&amp;Stäng</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Stay on &amp;Top</source>
-        <translation type="obsolete">Stanna kvar övers&amp;t</translation>
+        <translation type="vanished">Stanna kvar övers&amp;t</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Sh&amp;ade</source>
-        <translation type="obsolete">Skugg&amp;a</translation>
+        <translation type="vanished">Skugg&amp;a</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>%1 - [%2]</source>
-        <translation type="obsolete">%1 - [%2]</translation>
+        <translation type="vanished">%1 - [%2]</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Minimize</source>
-        <translation type="obsolete">Minimera</translation>
+        <translation type="vanished">Minimera</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Restore Down</source>
-        <translation type="obsolete">Återställ nedåt</translation>
+        <translation type="vanished">Återställ nedåt</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>Close</source>
-        <translation type="obsolete">Stäng</translation>
+        <translation type="vanished">Stäng</translation>
     </message>
     <message>
-        <location filename="." line="0"/>
         <source>&amp;Unshade</source>
-        <translation type="obsolete">A&amp;vskugga</translation>
+        <translation type="vanished">A&amp;vskugga</translation>
     </message>
 </context>
 <context>
     <name>QXml</name>
     <message>
-        <location filename="../../qtbase/src/xml/sax/qxml.cpp" line="62"/>
+        <location filename="../../qtbase/src/xml/sax/qxml.cpp" line="+62"/>
         <source>no error occurred</source>
-        <translation type="obsolete">inga fel inträffade</translation>
+        <translation type="unfinished">inga fel inträffade</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>error triggered by consumer</source>
-        <translation type="obsolete">fel utlöstes av konsument</translation>
+        <translation type="unfinished">fel utlöstes av konsument</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>unexpected end of file</source>
-        <translation type="obsolete">oväntat slut på filen</translation>
+        <translation type="unfinished">oväntat slut på filen</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>more than one document type definition</source>
-        <translation type="obsolete">fler än en dokumenttypsdefinition</translation>
+        <translation type="unfinished">fler än en dokumenttypsdefinition</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>error occurred while parsing element</source>
-        <translation type="obsolete">fel inträffade vid tolkning av element</translation>
+        <translation type="unfinished">fel inträffade vid tolkning av element</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>tag mismatch</source>
-        <translation type="obsolete">tagg stämmer inte</translation>
+        <translation type="unfinished">tagg stämmer inte</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>error occurred while parsing content</source>
-        <translation type="obsolete">fel inträffade vid tolkning av innehåll</translation>
+        <translation type="unfinished">fel inträffade vid tolkning av innehåll</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>unexpected character</source>
-        <translation type="obsolete">oväntat tecken</translation>
+        <translation type="unfinished">oväntat tecken</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>invalid name for processing instruction</source>
-        <translation type="obsolete">ogiltigt namn för behandlingsinstruktion</translation>
+        <translation type="unfinished">ogiltigt namn för behandlingsinstruktion</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>version expected while reading the XML declaration</source>
-        <translation type="obsolete">version förväntades vid läsning av XML-deklareringen</translation>
+        <translation type="unfinished">version förväntades vid läsning av XML-deklareringen</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>wrong value for standalone declaration</source>
-        <translation type="obsolete">fel värde för fristående deklarering</translation>
+        <translation type="unfinished">fel värde för fristående deklarering</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>encoding declaration or standalone declaration expected while reading the XML declaration</source>
-        <translation type="obsolete">kodningsdeklarering eller fristående deklarering förväntades vid läsning av XML-deklareringen</translation>
+        <translation type="unfinished">kodningsdeklarering eller fristående deklarering förväntades vid läsning av XML-deklareringen</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>standalone declaration expected while reading the XML declaration</source>
-        <translation type="obsolete">fristående deklarering förväntades vid läsning av XML-deklarering</translation>
+        <translation type="unfinished">fristående deklarering förväntades vid läsning av XML-deklarering</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>error occurred while parsing document type definition</source>
-        <translation type="obsolete">fel inträffade vid tolkning av dokumenttypsdefinition</translation>
+        <translation type="unfinished">fel inträffade vid tolkning av dokumenttypsdefinition</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>letter is expected</source>
-        <translation type="obsolete">bokstav förväntades</translation>
+        <translation type="unfinished">bokstav förväntades</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>error occurred while parsing comment</source>
-        <translation type="obsolete">fel inträffade vid tolkning av kommentar</translation>
+        <translation type="unfinished">fel inträffade vid tolkning av kommentar</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>error occurred while parsing reference</source>
-        <translation type="obsolete">fel inträffade vid tolkning av referens</translation>
+        <translation type="unfinished">fel inträffade vid tolkning av referens</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>internal general entity reference not allowed in DTD</source>
-        <translation type="obsolete">intern allmän entitetsreferens tillåts inte i DTD</translation>
+        <translation type="unfinished">intern allmän entitetsreferens tillåts inte i DTD</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>external parsed general entity reference not allowed in attribute value</source>
-        <translation type="obsolete">extern tolkad allmän entitetsreferens tillåts inte i attributvärde</translation>
+        <translation type="unfinished">extern tolkad allmän entitetsreferens tillåts inte i attributvärde</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>external parsed general entity reference not allowed in DTD</source>
-        <translation type="obsolete">extern tolkad allmän entitetsreferens tillåts inte i DTD</translation>
+        <translation type="unfinished">extern tolkad allmän entitetsreferens tillåts inte i DTD</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>unparsed entity reference in wrong context</source>
-        <translation type="obsolete">otolkad entitetsreferens i fel sammanhang</translation>
+        <translation type="unfinished">otolkad entitetsreferens i fel sammanhang</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>recursive entities</source>
-        <translation type="obsolete">rekursiva entiteter</translation>
+        <translation type="unfinished">rekursiva entiteter</translation>
     </message>
     <message>
-        <location filename="." line="1"/>
+        <location line="+1"/>
         <source>error in the text declaration of an external entity</source>
-        <translation type="obsolete">fel i textdeklareringen av en extern entitet</translation>
+        <translation type="unfinished">fel i textdeklareringen av en extern entitet</translation>
     </message>
 </context>
 <context>
-    <name>Radio Button</name>
+    <name>QXmlStream</name>
     <message>
-        <location filename="../artisanlib/main.py" line="45015"/>
-        <source>Meter</source>
+        <location filename="../../qtbase/src/corelib/serialization/qxmlstream.cpp" line="+614"/>
+        <location filename="../../qtbase/src/corelib/serialization/qxmlstream_p.h" line="+1778"/>
+        <source>Extra content at end of document.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="45016"/>
-        <source>PID</source>
+        <location line="+278"/>
+        <source>Invalid entity value.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="45017"/>
-        <source>TC4</source>
+        <location line="+110"/>
+        <source>Invalid XML character.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="45018"/>
-        <source>Prog</source>
+        <location line="+263"/>
+        <source>Sequence &apos;]]&gt;&apos; not allowed in content.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Scope Annotation</name>
     <message>
-        <location filename="../artisanlib/main.py" line="7312"/>
-        <source>CHARGE</source>
+        <location line="+279"/>
+        <location filename="../../qtbase/src/corelib/serialization/qxmlstream_p.h" line="-692"/>
+        <source>Encountered incorrectly encoded content.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7380"/>
-        <source>TP {0}</source>
+        <location line="+30"/>
+        <source>Namespace prefix &apos;%1&apos; not declared</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7440"/>
-        <source>DE {0}</source>
+        <location line="+33"/>
+        <location line="+12"/>
+        <location filename="../../qtbase/src/corelib/serialization/qxmlstream_p.h" line="+613"/>
+        <location line="+53"/>
+        <source>Illegal namespace declaration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7525"/>
-        <source>FCs {0}</source>
+        <location line="+33"/>
+        <source>Attribute &apos;%1&apos; redefined.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7611"/>
-        <source>FCe {0}</source>
+        <location line="+115"/>
+        <source>Unexpected character &apos;%1&apos; in public id literal.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7691"/>
-        <source>SCs {0}</source>
+        <location line="+28"/>
+        <source>Invalid XML version string.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7777"/>
-        <source>SCe {0}</source>
+        <location line="+2"/>
+        <source>Unsupported XML version.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7872"/>
-        <source>DROP {0}</source>
+        <location line="+20"/>
+        <source>The standalone pseudo attribute must appear after the encoding.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8063"/>
-        <source>CE {0}</source>
+        <location line="+2"/>
+        <source>%1 is an invalid encoding name.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Scope Title</name>
     <message>
-        <location filename="../artisanlib/main.py" line="31815"/>
-        <source>Roaster Scope</source>
+        <location line="+7"/>
+        <source>Encoding %1 is unsupported</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>StatusBar</name>
     <message>
-        <location filename="../artisanlib/main.py" line="37465"/>
-        <source>Playback Events set OFF</source>
+        <location line="+16"/>
+        <source>Standalone accepts only yes or no.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37476"/>
-        <source>Playback DROP set OFF</source>
+        <location line="+2"/>
+        <source>Invalid attribute in XML declaration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="37494"/>
-        <source>Playback Aid set OFF</source>
+        <location line="+16"/>
+        <source>Premature end of document.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="49574"/>
-        <source>Decimal position successfully set to 1</source>
+        <location line="+2"/>
+        <source>Invalid document.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="49577"/>
-        <source>Problem setting decimal position</source>
+        <location line="+36"/>
+        <source>&apos;%1&apos;</source>
+        <comment>expected</comment>
+        <extracomment>&apos;&lt;first option&gt;&apos;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="49623"/>
-        <source>Thermocouple type successfully set</source>
+        <location line="+3"/>
+        <source>%1 or &apos;%2&apos;</source>
+        <comment>expected</comment>
+        <extracomment>&lt;first option&gt;, &apos;&lt;second option&gt;&apos;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="49626"/>
-        <source>Problem setting thermocouple type</source>
+        <location line="+5"/>
+        <source>%1, &apos;%2&apos;</source>
+        <comment>expected</comment>
+        <extracomment>&lt;options so far&gt;, &apos;&lt;next option&gt;&apos;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="50487"/>
-        <source>Ready</source>
+        <location line="+3"/>
+        <source>%1, or &apos;%2&apos;</source>
+        <comment>expected</comment>
+        <extracomment>&lt;options so far&gt;, or &apos;&lt;final option&gt;&apos;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52166"/>
-        <source>setting autotune...</source>
+        <location line="+2"/>
+        <source>Expected %1, but got &apos;%2&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52193"/>
-        <source>Autotune successfully turned OFF</source>
+        <location line="+2"/>
+        <source>Unexpected &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52196"/>
-        <source>Autotune successfully turned ON</source>
+        <location line="+222"/>
+        <source>Expected character data.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52130"/>
-        <source>wait...</source>
+        <location filename="../../qtbase/src/corelib/serialization/qxmlstream_p.h" line="-973"/>
+        <source>Recursive entity detected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="50090"/>
-        <source>PID OFF</source>
+        <location line="+520"/>
+        <source>Start tag expected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="50092"/>
-        <source>PID ON</source>
+        <location line="+191"/>
+        <source>NDATA in parameter entity declaration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="50121"/>
-        <source>SV successfully set to {0}</source>
+        <location line="+30"/>
+        <source>XML declaration not at start of document.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="50132"/>
-        <source>Empty SV box</source>
+        <location line="+3"/>
+        <source>%1 is an invalid processing instruction name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="50142"/>
-        <source>Unable to read SV</source>
+        <location line="+12"/>
+        <source>Invalid processing instruction name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52054"/>
-        <source>Ramp/Soak operation cancelled</source>
+        <location line="+114"/>
+        <source>%1 is an invalid PUBLIC identifier.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52057"/>
-        <source>No RX data</source>
+        <location line="+118"/>
+        <source>Invalid XML name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52075"/>
-        <source>RS ON</source>
+        <location line="+23"/>
+        <source>Opening and ending tag mismatch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52063"/>
-        <source>Need to change pattern mode...</source>
+        <location line="+5"/>
+        <location line="+61"/>
+        <location line="+40"/>
+        <source>Entity &apos;%1&apos; not declared.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52066"/>
-        <source>Pattern has been changed. Wait 5 secs.</source>
+        <location line="-88"/>
+        <source>Reference to unparsed entity &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52068"/>
-        <source>Pattern could not be changed</source>
+        <location line="+62"/>
+        <source>Reference to external entity &apos;%1&apos; in attribute value.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="52095"/>
-        <source>RampSoak could not be changed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52098"/>
-        <source>RS OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52150"/>
-        <source>Reading Ramp/Soak {0} ...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52155"/>
-        <source>problem reading Ramp/Soak</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52158"/>
-        <source>Finished reading Ramp/Soak val.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50379"/>
-        <source>Finished reading pid values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52319"/>
-        <source>Ramp/Soak successfully written</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51257"/>
-        <source>Time Units successfully set to MM:SS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51260"/>
-        <source>Problem setting time units</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51406"/>
-        <source>SV{0} set to {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51410"/>
-        <source>Problem setting SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51412"/>
-        <source>Cancelled svN change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51430"/>
-        <source>PID already using sv{0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51433"/>
-        <source>setNsv(): bad response</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51470"/>
-        <source>pid changed to {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51473"/>
-        <source>setNpid(): bad confirmation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51477"/>
-        <source>Cancelled pid change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51502"/>
-        <source>PID was already using pid {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51505"/>
-        <source>setNpid(): Unable to set pid {0} </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51600"/>
-        <source>SV{0} successfully set to {1}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51608"/>
-        <source>setsv(): Unable to set SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52602"/>
-        <source>pid #{0} successfully set to ({1},{2},{3})</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52609"/>
-        <source>pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51752"/>
-        <source>sending commands for p{0} i{1} d{2}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51823"/>
-        <source>getallpid(): Unable to read pid values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51851"/>
-        <source>PID is using pid = {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51854"/>
-        <source>getallpid(): Unable to read current sv</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51923"/>
-        <source>PID is using SV = {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52134"/>
-        <source>PID set to OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52136"/>
-        <source>PID set to ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52139"/>
-        <source>Unable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52140"/>
-        <source>No data received</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52175"/>
-        <source>Current pid = {0}. Proceed with autotune command?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52179"/>
-        <source>Autotune cancelled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52198"/>
-        <source>UNABLE to set Autotune</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52248"/>
-        <source>SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52248"/>
-        <source>Ramp (MM:SS)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52248"/>
-        <source>Soak (MM:SS)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52677"/>
-        <source>{0} successfully sent to pid </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="52686"/>
-        <source>setpid(): There was a problem setting {0}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53850"/>
-        <source>Work in Progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Tab</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="47784"/>
-        <source>Graph</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28455"/>
-        <source>RoR</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28460"/>
-        <source>Filters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28465"/>
-        <source>HUD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28470"/>
-        <source>Plotter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28475"/>
-        <source>Math</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28480"/>
-        <source>UI</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53867"/>
-        <source>General</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="31202"/>
-        <source>Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37417"/>
-        <source>Events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37420"/>
-        <source>Data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37414"/>
-        <source>Config</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35323"/>
-        <source>Buttons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35328"/>
-        <source>Sliders</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35331"/>
-        <source>Quantifiers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35334"/>
-        <source>Palettes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35340"/>
-        <source>Style</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45975"/>
-        <source>ET/BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51093"/>
-        <source>Extra</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44573"/>
-        <source>Modbus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44576"/>
-        <source>S7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44579"/>
-        <source>Scale</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44582"/>
-        <source>Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45978"/>
-        <source>Extra Devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45981"/>
-        <source>Symb ET/BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45984"/>
-        <source>Phidgets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45987"/>
-        <source>Yoctopuce</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="45990"/>
-        <source>Ambient</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47781"/>
-        <source>Curves</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="47787"/>
-        <source>LCDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51081"/>
-        <source>RS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51084"/>
-        <source>SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53715"/>
-        <source>PID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="51090"/>
-        <source>Set RS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="53718"/>
-        <source>Ramp/Soak</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Table</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="37768"/>
-        <source>DRY END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37771"/>
-        <source>FC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37774"/>
-        <source>FC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37777"/>
-        <source>SC START</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37780"/>
-        <source>SC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37783"/>
-        <source>DROP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37786"/>
-        <source>COOL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30014"/>
-        <source>t</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30016"/>
-        <source>P1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30017"/>
-        <source>P2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30018"/>
-        <source>P3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30019"/>
-        <source>P4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30020"/>
-        <source>P5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30021"/>
-        <source>P6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30022"/>
-        <source>P7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30023"/>
-        <source>P8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="30024"/>
-        <source>P9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37712"/>
-        <source>ET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37713"/>
-        <source>BT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37790"/>
-        <source>#{0} {1}{2}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37765"/>
-        <source>CHARGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37641"/>
-        <source>Type</source>
-        <translation type="unfinished">Typ</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>Value</source>
-        <translation type="unfinished">Värde</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33066"/>
-        <source>Name</source>
-        <translation type="unfinished">Namn</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33066"/>
-        <source>Weight</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48346"/>
-        <source>Label</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>Action</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35882"/>
-        <source>Documentation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35882"/>
-        <source>Visibility</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35882"/>
-        <source>Text Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44652"/>
-        <source>Comm Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44652"/>
-        <source>Baud Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44652"/>
-        <source>Byte Size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44652"/>
-        <source>Parity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44652"/>
-        <source>Stopbits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44652"/>
-        <source>Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>Color 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>Color 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>Label 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>Label 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>y1(x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>y2(x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>LCD 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>LCD 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>Curve 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46069"/>
-        <source>Curve 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48346"/>
-        <source>Parent</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48346"/>
-        <source>Width</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48346"/>
-        <source>Opaqueness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Delete Wheel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Edit Labels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Update Labels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Properties</source>
-        <translation type="unfinished">Egenskaper</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Radius</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Starting angle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Projection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Text Size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48525"/>
-        <source>Color Pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>Nr</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>Status</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>If Alarm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>But Not</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>From</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>Source</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>Condition</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="49489"/>
-        <source>Beep</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50398"/>
-        <source>SV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50398"/>
-        <source>Ramp HH:MM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="50398"/>
-        <source>Soak HH:MM</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Textbox</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="742"/>
-        <source>Acidity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="741"/>
-        <source>Aftertaste</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="690"/>
-        <source>Clean Cup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="653"/>
-        <source>Head</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="729"/>
-        <source>Fragrance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="721"/>
-        <source>Sweetness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="738"/>
-        <source>Aroma</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="745"/>
-        <source>Balance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="743"/>
-        <source>Body</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="663"/>
-        <source>Sour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="708"/>
-        <source>Flavor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="665"/>
-        <source>Critical
-Stimulus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="667"/>
-        <source>Bitter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="668"/>
-        <source>Astringency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="669"/>
-        <source>Solubles
-Concentration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="716"/>
-        <source>Mouthfeel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="671"/>
-        <source>Other</source>
-        <translation type="unfinished">Annat</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="672"/>
-        <source>Aromatic
-Complexity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="673"/>
-        <source>Roast
-Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="674"/>
-        <source>Aromatic
-Pungency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="675"/>
-        <source>Sweet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="677"/>
-        <source>pH</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="680"/>
-        <source>Fragance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="687"/>
-        <source>Dry Fragrance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="688"/>
-        <source>Uniformity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="689"/>
-        <source>Complexity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="724"/>
-        <source>Finish</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="695"/>
-        <source>Brightness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="696"/>
-        <source>Wet Aroma</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="700"/>
-        <source>Taste</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="701"/>
-        <source>Nose</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="706"/>
-        <source>Fragrance-Aroma</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="740"/>
-        <source>Flavour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="726"/>
-        <source>Roast Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="727"/>
-        <source>Crema Texture</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="728"/>
-        <source>Crema Volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="732"/>
-        <source>Bitterness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="733"/>
-        <source>Defects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="734"/>
-        <source>Aroma Intensity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="735"/>
-        <source>Aroma Persistence</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="747"/>
-        <source>Overall</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Tooltip</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="6862"/>
-        <source>Stop monitoring</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13068"/>
-        <source>Start monitoring</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="7163"/>
-        <source>Stop recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10497"/>
-        <source>Connect to plus service</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10497"/>
-        <source>Reset original view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10497"/>
-        <source>Back to  previous view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10497"/>
-        <source>Forward to next view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10497"/>
-        <source>Pan axes with left mouse, zoom with right</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10497"/>
-        <source>Zoom to rectangle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="10521"/>
-        <source>Edit axis and curve parameters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13085"/>
-        <source>Start recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13105"/>
-        <source>First Crack Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13113"/>
-        <source>First Crack End</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13121"/>
-        <source>Second Crack Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13129"/>
-        <source>Second Crack End</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13148"/>
-        <source>Reset</source>
-        <translation type="unfinished">Återställ</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13158"/>
-        <source>Charge</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13167"/>
-        <source>Drop</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13194"/>
-        <source>Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13204"/>
-        <source>Increases the current SV value by 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13213"/>
-        <source>Increases the current SV value by 10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13222"/>
-        <source>Increases the current SV value by 20</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13231"/>
-        <source>Decreases the current SV value by 20</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13240"/>
-        <source>Decreases the current SV value by 10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13249"/>
-        <source>Decreases the current SV value by 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13259"/>
-        <source>Turns ON/OFF the HUD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13272"/>
-        <source>Dry End</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13281"/>
-        <source>Cool End</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13343"/>
-        <source>Timer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13344"/>
-        <source>ET Temperature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13345"/>
-        <source>BT Temperature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13346"/>
-        <source>ET/time (degrees/min)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13347"/>
-        <source>BT/time (degrees/min)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13348"/>
-        <source>Value of SV in PID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13349"/>
-        <source>PID power %</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13440"/>
-        <source>Number of events found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13450"/>
-        <source>Type of event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13457"/>
-        <source>Value of event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13469"/>
-        <source>Updates the event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="13718"/>
-        <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14099"/>
-        <source>Syncing with artisan.plus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14109"/>
-        <source>Disconnect artisan.plus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14106"/>
-        <source>Upload to artisan.plus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="14112"/>
-        <source>Connect artisan.plus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15579"/>
-        <source>Phase LCDs
-Currently in ALL FINISHING MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15617"/>
-        <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
-Currently in TIME MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15631"/>
-        <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
-Currently in PERCENTAGE MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="15645"/>
-        <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
-Currently in TEMP MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27248"/>
-        <source>&lt;b&gt;Label&lt;/b&gt;= </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27249"/>
-        <source>&lt;b&gt;Description &lt;/b&gt;= </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27250"/>
-        <source>&lt;b&gt;Type &lt;/b&gt;= </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27252"/>
-        <source>&lt;b&gt;Value &lt;/b&gt;= </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27254"/>
-        <source>&lt;b&gt;Documentation &lt;/b&gt;= </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27255"/>
-        <source>&lt;b&gt;Button# &lt;/b&gt;= </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="27723"/>
-        <source>Use an optimal smoothing algorithm (only applicable offline, after recording)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28103"/>
-        <source>Shows data table of plots</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28108"/>
-        <source>Set P1 as ET background B1
-Set P2 as BT background B2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28112"/>
-        <source>Add P1 and P2 as:
-
-1 to Extra device virtual if a profile is loaded
-2 or set to ET and BT if profile is not loaded
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48273"/>
-        <source>Save image using current graph size to a png format</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="28191"/>
-        <source>linear: linear interpolation
-cubic: 3rd order spline interpolation
-nearest: y value of the nearest point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33155"/>
-        <source>ON/OFF logs serial communication</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33260"/>
-        <source>Automatic generated name = This text + date + time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33263"/>
-        <source>ON/OFF of automatic saving when pressing keyboard letter [a]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33267"/>
-        <source>Save image alongside .alog profiles</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33284"/>
-        <source>Sets the directory to store batch profiles when using the letter [a]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33337"/>
-        <source>Batch prefix</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33352"/>
-        <source>ON/OFF batch counter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33487"/>
-        <source>Time axis max on RESET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33496"/>
-        <source>Time axis min on RESET</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33501"/>
-        <source>Automatically extend the time axis by 3min on need</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33505"/>
-        <source>Do not set time axis min and max from profile on load</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33511"/>
-        <source>Automatically set time axis min and max from profile CHARGE/DROP events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33545"/>
-        <source>Show time grid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="33548"/>
-        <source>Show temperature grid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34228"/>
-        <source>Allows to enter a description of the last event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34498"/>
-        <source>Add new extra Event button</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34503"/>
-        <source>Delete the last extra Event button</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48873"/>
-        <source>Show help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34555"/>
-        <source>Backup all palettes to a text file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34556"/>
-        <source>Restore all palettes from a text file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35055"/>
-        <source>Action Type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34727"/>
-        <source>Slider steps in multiple of 10 otherwise 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34743"/>
-        <source>Slider values interpreted as temperatures</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="34756"/>
-        <source>Unit to be added to generated event descriptions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35060"/>
-        <source>Action String</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="35035"/>
-        <source>Interval</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48218"/>
-        <source>Aspect Ratio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="37264"/>
-        <source>For loaded backgrounds with extra devices only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44449"/>
-        <source>OFF Action String</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44452"/>
-        <source>ON Action String</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="44020"/>
-        <source>Scan MODBUS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46120"/>
-        <source>Example: 100 + 2*x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="46121"/>
-        <source>Example: 100 + x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48212"/>
-        <source>Sets graph hierarchy child-&gt;parent instead of parent-&gt;child</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48225"/>
-        <source>Increase size of text in all the graph</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48228"/>
-        <source>Decrease size of text in all the graph</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48232"/>
-        <source>Decorative edge beween wheels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48238"/>
-        <source>Line thickness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48243"/>
-        <source>Line color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48246"/>
-        <source>Text color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48250"/>
-        <source>Apply color pattern to whole graph</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48256"/>
-        <source>Add new wheel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48259"/>
-        <source>Rotate graph 1 degree counter clockwise</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48262"/>
-        <source>Rotate graph 1 degree clockwise</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48269"/>
-        <source>Save graph to a text file.wg</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48278"/>
-        <source>open wheel graph file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48282"/>
-        <source>Sets Wheel graph to view mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="48878"/>
-        <source>Clear alarms table</source>
+        <location line="+40"/>
+        <source>Invalid character reference.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
