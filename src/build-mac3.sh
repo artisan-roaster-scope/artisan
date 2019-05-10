@@ -8,7 +8,7 @@ set -e
 if [ ! -z $TRAVIS ]; then
     # Travis CI builds
     export PYTHON=/usr/local
-    export PYTHONPATH=$PYTHON/lib/python3.6
+    export PYTHONPATH=$PYTHON/lib/python3.7
     export PYTHON_V=3.7
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=${QT_PATH}
