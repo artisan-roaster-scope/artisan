@@ -73,7 +73,7 @@ DATA_FILES = [
     ("../translations", [QTDIR + r'/translations/qtbase_ru.qm']),
 #    ("../translations", [QTDIR + r'/translations/qtbase_sv.qm']),    # empty/missing
 #    ("../translations", [QTDIR + r'/translations/qtbase_zh_CN.qm']), # empty/missing
-#    ("../translations", [QTDIR + r'/translations/qtbase_zh_TW.qm']), # empty/missing (will be added for Qt 5.13)
+    ("../translations", [QTDIR + r'/translations/qtbase_zh_TW.qm']),
     ("../translations", [r'translations/artisan_ar.qm']), 
     ("../translations", [r"translations/artisan_de.qm"]),
     ("../translations", [r"translations/artisan_es.qm"]),

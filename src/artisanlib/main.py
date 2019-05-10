@@ -1195,6 +1195,7 @@ class tgraphcanvas(FigureCanvas):
         
         self.replayType = 0 # 0: by time, 1: by BT, 2: by ET
         self.replayedBackgroundEvents = [] # set of BackgroundEvent indicies that have already been replayed (cleared in ClearMeasurements)
+        self.beepedBackgroundEvents = [] # set of BackgroundEvent indicies that have already been beeped for (cleared in ClearMeasurements)
 
         self.roastpropertiesflag = 1  #resets roast properties if not zero
         self.roastpropertiesAutoOpenFlag = 0  #open roast properties dialog if not zero
@@ -1313,6 +1314,7 @@ class tgraphcanvas(FigureCanvas):
         self.backmoveflag = 1 # aligns background on redraw if 1
         self.detectBackgroundEventTime = 20 #seconds
         self.backgroundReproduce = False
+        self.backgroundReproduceBeep = False
         self.backgroundPlaybackEvents = False
         self.backgroundPlaybackDROP = False
         self.Betypes = [QApplication.translate("ComboBox", "Air",None),
@@ -1392,6 +1394,7 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaBTflag = True
         self.DeltaETlcdflag = False
         self.DeltaBTlcdflag = True
+        self.swapdeltalcds = False
         self.HUDbuttonflag = False
         self.PIDbuttonflag = True # TC4 PID firmware available?
         self.Controlbuttonflag = False # PID Control active (either internal/external or Fuji)
@@ -2538,24 +2541,24 @@ class tgraphcanvas(FigureCanvas):
                             lcdformat = "%.1f"
                         else:
                             lcdformat = "%.0f"
+                        etstr = "--"
                         try: # if self.temp1 is None, which should never be the case, this fails
                             if len(self.temp1) and -100 < self.temp1[-1] < 1000:
-                                aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
+                                etstr = lcdformat%float(self.temp1[-1])            # ET
                             elif self.LCDdecimalplaces and len(self.temp1) and -10000 < self.temp1[-1] < 100000:
-                                aw.lcd2.display("%.0f"%float(self.temp1[-1]))
-                            else:
-                                aw.lcd2.display("--")
+                                etstr = "%.0f"%float(self.temp1[-1])
                         except:
                             pass
+                        aw.lcd2.display(etstr)
+                        btstr = "--"
                         try:
                             if len(self.temp2) and -100 < self.temp2[-1] < 1000:
-                                aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
+                                btstr = lcdformat%float(self.temp2[-1])            # BT
                             elif self.LCDdecimalplaces and len(self.temp2) and -10000 < self.temp2[-1] < 100000:
-                                aw.lcd3.display("%.0f"%float(self.temp2[-1]))
-                            else:
-                                aw.lcd3.display("--")
+                                btstr = "%.0f"%float(self.temp2[-1])
                         except:
                             pass
+                        aw.lcd3.display(btstr)
                         try:
                             if -100 < self.rateofchange1 < 1000:                    
                                 aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
@@ -2612,9 +2615,6 @@ class tgraphcanvas(FigureCanvas):
                         timestr = None
                         if not self.flagstart:
                             timestr = "00:00"
-                        digits = (1 if aw.qmc.LCDdecimalplaces else 0)
-                        btstr = str(aw.float2float(self.temp2[-1],digits))
-                        etstr = str(aw.float2float(self.temp1[-1],digits))
                         if aw.WebLCDs:                       
                             self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
                         if aw.largeLCDs_dialog:
@@ -2717,16 +2717,28 @@ class tgraphcanvas(FigureCanvas):
 #                                        aw.qmc.ax.draw_artist(self.l_eventtype3dots)
 #                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
                                     # draw delta lines
-                                    if self.DeltaETflag and self.l_delta1 is not None:
-                                        try:
-                                            aw.qmc.ax.draw_artist(self.l_delta1)
-                                        except:
-                                            pass
-                                    if self.DeltaBTflag and self.l_delta2 is not None:
-                                        try:
-                                            aw.qmc.ax.draw_artist(self.l_delta2)
-                                        except:
-                                            pass
+                                    if aw.qmc.swapdeltalcds:
+                                        if self.DeltaBTflag and self.l_delta2 is not None:
+                                            try:
+                                                aw.qmc.ax.draw_artist(self.l_delta2)
+                                            except:
+                                                pass
+                                        if self.DeltaETflag and self.l_delta1 is not None:
+                                            try:
+                                                aw.qmc.ax.draw_artist(self.l_delta1)
+                                            except:
+                                                pass
+                                    else:
+                                        if self.DeltaETflag and self.l_delta1 is not None:
+                                            try:
+                                                aw.qmc.ax.draw_artist(self.l_delta1)
+                                            except:
+                                                pass
+                                        if self.DeltaBTflag and self.l_delta2 is not None:
+                                            try:
+                                                aw.qmc.ax.draw_artist(self.l_delta2)
+                                            except:
+                                                pass
                                     # draw extra curves
                                     xtra_dev_lines1 = 0
                                     xtra_dev_lines2 = 0
@@ -3237,16 +3249,19 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             delta = 1 # don't trigger this one
                         if reproducing is None and aw.qmc.backgroundReproduce and timed > 0 and timed < self.detectBackgroundEventTime:
+                            if i not in aw.qmc.beepedBackgroundEvents and aw.qmc.backgroundReproduceBeep:
+                                aw.qmc.beepedBackgroundEvents.append(i)
+                                QApplication.beep()
                             #write text message
                             message = "> " + " [" + u(self.Betypesf(self.backgroundEtypes[i]))
-                            message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " +  self.stringfromseconds(timed) + " : " + self.backgroundEStrings[i]  
+                            message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : <b>" +  self.stringfromseconds(timed) + "</b> : " + self.backgroundEStrings[i]  
                             #rotate colors to get attention
-                            if timed%2:
+                            if int(round(timed))%2:
                                 style = "background-color:'transparent';"
                             else:
                                 style = "background-color:'yellow';"
                                 
-                            aw.sendmessage(message,style)
+                            aw.sendmessage(message,style=style)
                             reproducing = i
     
                         if delta <= 0:
@@ -3293,6 +3308,7 @@ class tgraphcanvas(FigureCanvas):
                                 # we move sliders only after processing all pending events (from the collected dict)
                                 #aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
                                 #aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event
+
                             aw.qmc.replayedBackgroundEvents.append(i) # in any case we mark this event as processed
 
                 # now move the sliders to the new values (if any)     
@@ -3952,6 +3968,7 @@ class tgraphcanvas(FigureCanvas):
                 self.extractimex1[i],self.extractimex2[i],self.extractemp1[i],self.extractemp2[i] = [],[],[],[]
                 
             self.replayedBackgroundEvents=[]
+            self.beepedBackgroundEvents=[]
             self.specialevents=[]
             aw.lcd1.display("00:00")
             if aw.WebLCDs:
@@ -4818,6 +4835,18 @@ class tgraphcanvas(FigureCanvas):
         self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
             linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
+            
+    def drawDeltaET(self,trans):
+        if self.DeltaETflag:
+            self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+            linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "ET", None)))                    
+    
+    def drawDeltaBT(self,trans):
+        if self.DeltaBTflag:
+            self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+            linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None)))    
     
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
@@ -5719,14 +5748,12 @@ class tgraphcanvas(FigureCanvas):
                     if self.delta_ax:
                         if len(self.timex) == len(self.delta1) and len(self.timex)  == len(self.delta2):
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
-                            if self.DeltaETflag:
-                                self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "ET", None)))                    
-                            if self.DeltaBTflag:
-                                self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None)))    
+                            if aw.qmc.swapdeltalcds:
+                                self.drawDeltaET(trans)
+                                self.drawDeltaBT(trans)
+                            else:
+                                self.drawDeltaBT(trans)
+                                self.drawDeltaET(trans)
     
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
@@ -17197,8 +17224,8 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDframe2[i].setVisible(False)
         aw.LCD2frame.setVisible((aw.qmc.BTlcd if aw.qmc.swaplcds else aw.qmc.ETlcd))
         aw.LCD3frame.setVisible((aw.qmc.ETlcd if aw.qmc.swaplcds else aw.qmc.BTlcd))
-        aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)        
-        aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
+        aw.LCD4frame.setVisible((aw.qmc.DeltaBTlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaETlcdflag))
+        aw.LCD5frame.setVisible((aw.qmc.DeltaETlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaBTlcdflag))
         if aw.largeLCDs_dialog:
             try:
                 aw.largeLCDs_dialog.lcd2.setVisible(aw.qmc.ETlcd)
@@ -20884,6 +20911,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.detectBackgroundEventTime = toInt(settings.value("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime))
             if settings.contains("backgroundReproduce"):
                 self.qmc.backgroundReproduce = bool(toBool(settings.value("backgroundReproduce",self.qmc.backgroundReproduce)))
+            if settings.contains("backgroundReproduceBeep"):
+                self.qmc.backgroundReproduceBeep = bool(toBool(settings.value("backgroundReproduceBeep",self.qmc.backgroundReproduceBeep)))
             if settings.contains("backgroundPlaybackEvents"):
                 self.qmc.backgroundPlaybackEvents = bool(toBool(settings.value("backgroundPlaybackEvents",self.qmc.backgroundPlaybackEvents)))
             if settings.contains("backgroundPlaybackDROP"):
@@ -21412,9 +21441,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.DeltaETlcdflag = bool(toBool(settings.value("DeltaETlcd",self.qmc.DeltaETlcdflag)))
             if settings.contains("DeltaBTlcd"):
                 self.qmc.DeltaBTlcdflag = bool(toBool(settings.value("DeltaBTlcd",self.qmc.DeltaBTlcdflag)))
-            settings.endGroup()
-            settings.beginGroup("GraphOthers")
-            settings.endGroup()    
+            if settings.contains("swapdeltalcds"):
+                self.qmc.swapdeltalcds = bool(toBool(settings.value("swapdeltalcds",self.qmc.swapdeltalcds)))
+            settings.endGroup()   
             if settings.contains("curvefilter"):
                 self.qmc.curvefilter = toInt(settings.value("curvefilter",self.qmc.curvefilter))
 #            if settings.contains("smoothingwindowsize"):
@@ -22385,6 +22414,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("fmt_data_RoR",self.qmc.fmt_data_RoR)
             settings.setValue("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime)
             settings.setValue("backgroundReproduce",self.qmc.backgroundReproduce)
+            settings.setValue("backgroundReproduceBeep",self.qmc.backgroundReproduceBeep)
             settings.setValue("backgroundPlaybackEvents",self.qmc.backgroundPlaybackEvents)
             settings.setValue("backgroundPlaybackDROP",self.qmc.backgroundPlaybackDROP)
             settings.setValue("replayType",self.qmc.replayType)
@@ -22651,8 +22681,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaSpan",self.qmc.deltaspan)
             settings.setValue("LCDdecimalplaces",self.qmc.LCDdecimalplaces)
             settings.setValue("statisticsmode",self.qmc.statisticsmode)
-            settings.endGroup()
-            settings.beginGroup("GraphOthers")
+            settings.setValue("swapdeltalcds",self.qmc.swapdeltalcds)
             settings.endGroup()
             settings.setValue("curvefilter",self.qmc.curvefilter)
 #            settings.setValue("smoothingwindowsize",self.qmc.smoothingwindowsize)
@@ -27831,6 +27860,8 @@ class HUDDlg(ArtisanDialog):
         DeltaETlcdLabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET",None))
         self.DeltaBTlcd = QCheckBox()
         self.DeltaBTlcd.setChecked(aw.qmc.DeltaBTlcdflag)
+        self.swapdeltalcds = QCheckBox(QApplication.translate("CheckBox", "Swap",None))
+        self.swapdeltalcds.setChecked(aw.qmc.swapdeltalcds)
         DeltaBTlcdLabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "BT",None))
         self.DecimalPlaceslcd = QCheckBox(QApplication.translate("CheckBox", "Decimal Places",None))
         self.DecimalPlaceslcd.setChecked(aw.qmc.LCDdecimalplaces)
@@ -27844,6 +27875,7 @@ class HUDDlg(ArtisanDialog):
         lcdsLayout.addWidget(self.DeltaBTlcd)
         lcdsLayout.addWidget(DeltaBTlcdLabel)
         lcdsLayout.addStretch()
+        lcdsLayout.addWidget(self.swapdeltalcds)
         sensitivityLayout = QHBoxLayout()
         sensitivityLayout.addWidget(filterlabel)
         sensitivityLayout.addWidget(self.DeltaFilter)
@@ -29213,11 +29245,9 @@ class HUDDlg(ArtisanDialog):
 
     def changeDeltaETlcd(self):
         aw.qmc.DeltaETlcdflag = not aw.qmc.DeltaETlcdflag
-        aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)
 
     def changeDeltaBTlcd(self):
         aw.qmc.DeltaBTlcdflag = not aw.qmc.DeltaBTlcdflag
-        aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
         
     def changePathEffects(self):
         try:
@@ -29336,6 +29366,17 @@ class HUDDlg(ArtisanDialog):
 
     #button OK
     def updatetargets(self):
+        swap = self.swapdeltalcds.isChecked()
+        # swap DeltaBT/ET lcds on leaving this dialog
+        if aw.qmc.swapdeltalcds != swap:
+            tmp = QWidget()
+            tmp.setLayout(aw.LCD4frame.layout())
+            aw.LCD4frame.setLayout(aw.LCD5frame.layout())
+            aw.LCD5frame.setLayout(tmp.layout())
+        aw.qmc.swapdeltalcds = swap
+        aw.LCD4frame.setVisible((aw.qmc.DeltaBTlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaETlcdflag))
+        aw.LCD5frame.setVisible((aw.qmc.DeltaETlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaBTlcdflag))
+            
         aw.qmc.RoRlimitFlag = self.rorFilter.isChecked()
         aw.qmc.RoRlimitm = int(self.rorminLimit.value())
         aw.qmc.RoRlimit = int(self.rormaxLimit.value())
@@ -37273,6 +37314,10 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundReproduce.setChecked(aw.qmc.backgroundReproduce)
         self.backgroundReproduce.setFocusPolicy(Qt.NoFocus)
         self.backgroundReproduce.stateChanged.connect(lambda _:self.setreproduce())
+        self.backgroundReproduceBeep = QCheckBox(QApplication.translate("CheckBox","Beep",None))
+        self.backgroundReproduceBeep.setChecked(aw.qmc.backgroundReproduce)
+        self.backgroundReproduceBeep.setFocusPolicy(Qt.NoFocus)
+        self.backgroundReproduceBeep.stateChanged.connect(lambda _:self.setreproduceBeep())
         self.backgroundPlaybackEvents = QCheckBox(QApplication.translate("CheckBox","Playback Events",None))
         self.backgroundPlaybackEvents.setChecked(aw.qmc.backgroundPlaybackEvents)
         self.backgroundPlaybackEvents.setFocusPolicy(Qt.NoFocus)
@@ -37334,7 +37379,9 @@ class backgroundDlg(ArtisanDialog):
         alignButtonBoxed.addWidget(self.alignComboBox)
         tab4content = QHBoxLayout()
         tab4content.addWidget(self.backgroundReproduce)
-        tab4content.addSpacing(15)
+        tab4content.addSpacing(10)
+        tab4content.addWidget(self.backgroundReproduceBeep)
+        tab4content.addSpacing(10)
         tab4content.addWidget(etimelabel)
         tab4content.addWidget(self.etimeSpinBox)
         tab4content.addWidget(etimeunit)
@@ -37428,6 +37475,12 @@ class backgroundDlg(ArtisanDialog):
             s = "background-color:'transparent';"
         aw.sendmessage(msg, style=s)
                 
+    def setreproduceBeep(self):
+        if self.backgroundReproduceBeep.isChecked():
+            aw.qmc.backgroundReproduceBeep = True
+        else:
+            aw.qmc.backgroundReproduceBeep = False
+
     def setreproduce(self):
         aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
         s = None
@@ -39093,8 +39146,11 @@ class serialport(object):
     
     def VICTOR86B(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t = self.VICTOR86Btemperature()
-        return tx,-1,t
+        t,_= self.HHM28multimeter()  #NOTE: val and symbols are type strings
+        if "L" in t:  #L = Out of Range
+            return tx, -1, -1
+        else:
+            return tx,-1,float(t)
 
     def S7(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -40470,139 +40526,6 @@ class serialport(object):
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER306: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
-
-    # by Lewis, Li Ching 6 May 2019 Github: https://github.com/lewisliching
-    def VICTOR86Btemperature(self, retry=1):
-        try:
-            command = str2cmd("\x41") #this comand makes the meter answer back with 14 bytes
-            r = ""
-            if not self.SP.isOpen():
-                self.openport()
-                libtime.sleep(.3)
-            if self.SP.isOpen():
-#                self.SP.reset_input_buffer()
-#                self.SP.reset_output_buffer()
-                self.SP.write(command)
-#                self.SP.flush()
-#                libtime.sleep(.01)
-                r = self.SP.read(14)
-                if len(r) == 14:
-                    if r[13] != 226 :
-                        #Not switch to Thermometer mode
-                        aw.qmc.adderror(QApplication.translate("Error Message","VICTOR86Btemperatures(): not in thermometer mode",None))            
-                        return -1
-                    else:
-                        digit = [0, 0, 0, 0]
-                        
-                        # Digit in tenth (with Decimal point in front)
-                        if r[7] == 139 and r[8] == 159 :
-                            digit[3] = 9
-                        elif  r[7] == 143 and r[8] == 159 :
-                            digit[3] = 8
-                        elif  r[7] == 137 and r[8] == 149 :
-                            digit[3] = 7
-                        elif  r[7] == 143 and r[8] == 158 :
-                            digit[3] = 6
-                        elif  r[7] == 139 and r[8] == 158 :
-                            digit[3] = 5
-                        elif  r[7] == 138 and r[8] == 151 :
-                            digit[3] = 4
-                        elif  r[7] == 137  and r[8] == 159 :
-                            digit[3] = 3
-                        elif  r[7] == 141 and r[8] == 155 :
-                            digit[3] = 2
-                        elif  r[7] == 136 and r[8] == 149 :
-                            digit[3] = 1
-                        elif  r[7] == 143  and r[8] == 157 :
-                            digit[3] = 0
-                
-                        # Digit in ones
-                        if r[5] == 99 and r[6] == 127 :
-                            digit[2] = 9
-                        elif  r[5] == 103 and r[6] == 127 :
-                            digit[2] = 8
-                        elif  r[5] == 97 and r[6] == 117 :
-                            digit[2] = 7
-                        elif  r[5] == 103 and r[6] == 126 :
-                            digit[2] = 6
-                        elif  r[5] == 99 and r[6] == 126 :
-                            digit[2] = 5
-                        elif  r[5] == 98 and r[6] == 119 :
-                            digit[2] = 4
-                        elif  r[5] == 97  and r[6] == 127 :
-                            digit[2] = 3
-                        elif  r[5] == 101 and r[6] == 123 :
-                            digit[2] = 2
-                        elif  r[5] == 96 and r[6] == 117 :
-                            digit[2] = 1
-                        elif  r[5] == 103  and r[6] == 125 :
-                            digit[2] = 0
-                
-                        # Digit in tens
-                        if r[3] == 67 and r[4] == 95 :
-                            digit[1] = 9
-                        elif  r[3] == 71 and r[4] == 95 :
-                            digit[1] = 8
-                        elif  r[3] == 65 and r[4] == 85 :
-                            digit[1] = 7
-                        elif  r[3] == 71 and r[4] == 94 :
-                            digit[1] = 6
-                        elif  r[3] == 67 and r[4] == 94 :
-                            digit[1] = 5
-                        elif  r[3] == 66 and r[4] == 87 :
-                            digit[1] = 4
-                        elif  r[3] == 65  and r[4] == 95 :
-                            digit[1] = 3
-                        elif  r[3] == 69 and r[4] == 91 :
-                            digit[1] = 2
-                        elif  r[3] == 64 and r[4] == 85 :
-                            digit[1] = 1
-                        elif  r[3] == 71  and r[4] == 93 :
-                            digit[1] = 0
-                
-                        # Digit in hundreds
-                        if r[1] == 35 and r[2] == 63 :
-                            digit[0] = 9
-                        elif  r[1] == 39 and r[2] == 63 :
-                            digit[0] = 8
-                        elif  r[1] == 33 and r[2] == 53 :
-                            digit[0] = 7
-                        elif  r[1] == 39 and r[2] == 62 :
-                            digit[0] = 6
-                        elif  r[1] == 35 and r[2] == 62 :
-                            digit[0] = 5
-                        elif  r[1] == 34 and r[2] == 55 :
-                            digit[0] = 4
-                        elif  r[1] == 33  and r[2] == 63 :
-                            digit[0] = 3
-                        elif  r[1] == 37 and r[2] == 59 :
-                            digit[0] = 2
-                        elif  r[1] == 32 and r[2] == 53 :
-                            digit[0] = 1
-                        elif  r[1] == 39  and r[2] == 61 :
-                            digit[0] = 0
-                
-                        return digit[3]/10. + digit[2] + digit[1]*10 + digit[0]*100
-
-                else:
-                    if retry:
-                        return self.VICTORtemperatures(retry=retry-1)
-                    else:
-                        nbytes = len(r)
-                        aw.qmc.adderror(QApplication.translate("Error Message","VICTOR86Btemperatures(): {0} bytes received but 14 needed",None).format(nbytes))            
-                        return -1
-            else:
-                return -1
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " VICTOR86Btemperatures() {0}").format(str(ex)),exc_tb.tb_lineno)
-            self.closeport()
-            return -1
-        finally:
-            #note: logged chars should be unicode not binary
-            if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("VICTOR86B: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def CENTER309temperature(self, retry=1):
         ##    command = "\x4B" returns 4 bytes . Model number.
@@ -47290,7 +47213,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.BTlcd = self.BTlcd.isChecked()
             
             swap = self.swaplcds.isChecked()            
-            # swap BT/ET lcds on startup
+            # swap BT/ET lcds on leaving the dialog
             if aw.qmc.swaplcds != swap:
                 tmp = QWidget()
                 tmp.setLayout(aw.LCD2frame.layout())
@@ -48171,10 +48094,9 @@ class LargeLCDs(ArtisanDialog):
                 lcd.setVisible(aw.qmc.ETlcd)
             elif s == "bt":
                 lcd.setVisible(aw.qmc.BTlcd)
-        lcd.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
+        lcd.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
         return lcd
-        
-    # tight 0: leading space on lcd2 and lcd 1, 1: leading space on lcd3, 2: no leading spaces
+    
     def makeLCDs(self,tight=False):
         # time LCD
         self.lcd1 = self.makeLCD("timer",False) # time
@@ -54644,7 +54566,12 @@ def main():
         tmp.setLayout(aw.LCD2frame.layout())
         aw.LCD2frame.setLayout(aw.LCD3frame.layout())
         aw.LCD3frame.setLayout(tmp.layout())
-        
+    # swap DeltaBT/ET lcds on startup
+    if aw.qmc.swapdeltalcds:
+        tmp = QWidget()
+        tmp.setLayout(aw.LCD4frame.layout())
+        aw.LCD4frame.setLayout(aw.LCD5frame.layout())
+        aw.LCD5frame.setLayout(tmp.layout())        
     aw.show()    
     
     try:
