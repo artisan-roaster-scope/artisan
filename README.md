@@ -30,7 +30,9 @@ If you think Artisan is useful to you, contribute financially to its further dev
 
 ![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover-small.png?raw=true)
 
-![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover-.png?raw=true,s=200)
+![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover.png?raw=true)
+
+<img src="https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover.png?raw" width="100">
 
 
 [Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)

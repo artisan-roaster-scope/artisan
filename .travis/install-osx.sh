@@ -8,7 +8,7 @@ set -ex # reduced logging
 #brew update # this seems to help to work around some homebrew issues
 
 # for Python 3.7:
-#brew upgrade python
+brew upgrade python
 
 # following https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew/51125014#51125014
 # to install Python 3.6.5
