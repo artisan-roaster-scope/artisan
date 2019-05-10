@@ -26,11 +26,11 @@ The Yocto-PT100 can be used with PT100 probes using 2, 3 or 4 wires. The type of
 The Yocto-PT100 features a built-in galvanic isolation between the USB control part and the PT100 measure circuit. It is therefore possible to use non-isolated PT100 probes, which are often more reactive and less expensive.
 
 
-## [Yocotopuce](http://www.yoctopuce.com/EN/products/category/usb-environmental-sensors) IR module
+## [Yoctopuce Temperature IR](http://www.yoctopuce.com/EN/products/category/usb-environmental-sensors)
 
-not yet released
+The Yocto IR module features an infrared sensor and communicates as all other Yocto modules via a fast USB connection. The Emissivity factor of the material observed can be configured for this sensor under menu ```Config >> Device```, in the ```Yoctopuce``` tab.
 
 
-## [Yocotopuce Meteo](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-meteo-v2)
+## [Yoctopuce Meteo](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-meteo-v2)
 
 The Yocto Meteo board adds ambient data (temperature, pressure and humidity) automatically to each roast profile. Set the correct MASL for your location under menu Config >> Device, Ambient tab and select this sensor from the popups.

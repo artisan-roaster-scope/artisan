@@ -112,17 +112,22 @@ Those 4 channel meters in the list below are all basically identical. Just that 
  
 ## Multi Meters
 
-Multi-meters allow to read different types of sensors by measuring a voltage or current input. Artisan supports two devices that feature a communication interface. The TE VA18B also supports one temperature channel connecting to a K-Type probe.
+Multi-meters allow to read different types of sensors by measuring a voltage or current input. Artisan supports two devices that feature a communication interface. The TE VA18B and the Victor 86B also support one temperature channel connecting to a K-Type thermocouple.
 
 * [Omega HHM28](http://www.omega.com/pptst/HHM10_20_30.html)
   - AC/DC volts and current
   - RS232 Interface (2400-8N1)
   - 9V Battery only
 * [TE VA18B](http://www.mastech.com.cn/html/en/products-va18b.htm)
-  - single K-Type
+  - single K-Type TC
   - AC/DC volts and current
   - optical-isolated USB Interface (2400-8N1)
   - 9V Battery only
+* [DMM Victor 86B](http://www.victor-multimeter.com/products/digital-multimeter/victor-86b-digital-multimeter-648.html)
+  - single K-type TC
+  - AC/DC volts, current, temperature
+  - Built in UBS to serial converter (CP210x driver, 2400-8N1)
+  - 3x 1.5V Battery only
 
 
 ## Others
