@@ -4185,10 +4185,8 @@ class tgraphcanvas(FigureCanvas):
                     # reset color of last pressed button
                     if aw.lastbuttonpressed != -1:
                         normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],aw.extraeventbuttoncolor[aw.lastbuttonpressed])
-#dave90  start...
                         buttonstyle = "min-width:75px;border-style:solid; border-radius:3;border-color:grey; border-width:1;"
                         normalstyle = "QPushButton {" + buttonstyle + "font-size: 10pt; font-weight: bold; color: %s; background: %s}"%(aw.extraeventbuttontextcolor[aw.lastbuttonpressed],self.createGradient(aw.extraeventbuttoncolor[aw.lastbuttonpressed]))
-#dave90  ...end
                         aw.buttonlist[aw.lastbuttonpressed].setStyleSheet(normalstyle)
                     # reset lastbuttonpressed
                     aw.lastbuttonpressed = -1
@@ -6833,10 +6831,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
             except Exception:
                 pass
-#dave90  start...
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-#            aw.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(aw.lcdpaletteF["timer"],aw.createGradient(aw.lcdpaletteB["timer"])))
-#dave90  ...end
             
             #reset alarms
             self.temporaryalarmflag = -3
@@ -6852,8 +6847,6 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Scope monitoring...", None))
             #disable RESET button:
             aw.button_7.setEnabled(False)
-#dave99
-#            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_7.setVisible(False)
             QApplication.processEvents()
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])
@@ -7157,15 +7150,11 @@ class tgraphcanvas(FigureCanvas):
             aw.disableSaveActions()
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None))
             aw.button_2.setEnabled(False)
-#dave99
-#            aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_2.setGraphicsEffect(None)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None))
             aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
             #disable RESET button:
             aw.button_7.setEnabled(False)
-#dave99
-#            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_18.setEnabled(True)
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
             aw.shadow_18 = QGraphicsDropShadowEffect(self)
@@ -7207,8 +7196,6 @@ class tgraphcanvas(FigureCanvas):
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"]) 
             aw.button_7.setEnabled(True)
-#dave99
-#            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_18.setEnabled(False)
             aw.button_18.setGraphicsEffect(None)
             self.updateLCDtime()
@@ -13648,7 +13635,6 @@ class ApplicationWindow(QMainWindow):
         TP2DRYlayout.setContentsMargins(3,0,3,0)
         self.TP2DRYframe = QFrame()
         self.TP2DRYframe.setLayout(TP2DRYlayout)
-#        self.TP2DRYframe.setToolTip(QApplication.translate("Tooltip","Projected time from TP to DRY", None))  #dave
 
         # DRY
         self.DRYlabel = QLabel()
@@ -13688,8 +13674,7 @@ class ApplicationWindow(QMainWindow):
 #        self.AUClcdFrame.setFrameStyle(QFrame.Plain)
         self.AUClcd.setNumDigits(3)
         self.AUClcd.setMinimumWidth(65)
-#        self.AUClcdFrame.setStyleSheet("border-radius: 4; background-color: rgb(230,230,230);")
-        self.AUClcdFrame.setStyleSheet("QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}") #dave99
+        self.AUClcdFrame.setStyleSheet("QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}")
         
         AUCLayout = QHBoxLayout()
         AUCLayout.addSpacing(20)
@@ -15497,8 +15482,7 @@ class ApplicationWindow(QMainWindow):
         LCDVbox.addWidget(lcd)
         LCDVbox.setSpacing(0)
         LCDVbox.setContentsMargins(0, 0, 0, 0)
-#        frame.setStyleSheet("border-radius:4; background-color: rgb(230,230,230);")  #dave99
-        frame.setStyleSheet("QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}") #dave99
+        frame.setStyleSheet("QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}")
 #        frame.setFrameShadow(QFrame.Sunken)
 #        frame.setLineWidth(1)
 #        frame.setFrameShape(QFrame.Panel)
@@ -17676,8 +17660,6 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
         else:
-            #dave99  watch out for this one where there is no Enabled(False)
-            #aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             pass
 
     def ignoreFlatButtons(self,moveindex):
@@ -21068,14 +21050,6 @@ class ApplicationWindow(QMainWindow):
                 for (k, v) in list(toMap(settings.value("LEDColors")).items()):
                     self.lcdpaletteF[str(k)] = s2a(toString(v))
             #restore colors
-#dave90  start...
-#            self.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["timer"],aw.createGradient(self.lcdpaletteB["timer"])))
-#            self.lcd2.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["et"],aw.createGradient(self.lcdpaletteB["et"])))
-#            self.lcd3.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["bt"],aw.createGradient(self.lcdpaletteB["bt"])))
-#            self.lcd4.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltaet"],aw.createGradient(self.lcdpaletteB["deltaet"])))
-#            self.lcd5.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltabt"],aw.createGradient(self.lcdpaletteB["deltabt"])))
-#            self.lcd6.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
-#            self.lcd7.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],aw.createGradient(self.lcdpaletteB["sv"])))
             self.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
             self.lcd2.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
             self.lcd3.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
@@ -21083,7 +21057,7 @@ class ApplicationWindow(QMainWindow):
             self.lcd5.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
             self.lcd6.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.lcd7.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-#dave90  ...end
+
             #restore flavors
             self.qmc.flavorlabels = toStringList(settings.value("Flavors",self.qmc.flavorlabels))
             self.qmc.flavors = [5.]*len(self.qmc.flavorlabels)
@@ -35826,7 +35800,6 @@ class EventsDlg(ArtisanDialog):
         #Text Color
         tcolor = ["yellow"]*nbuttons
 
-        #dave99 check around this point +- against UIDev + WIP main.py
         #Apply Colors in Right Oder
         for i in range(nbuttons):
             visualIndex = self.eventbuttontable.visualRow(i)
@@ -36024,7 +35997,6 @@ class EventsDlg(ArtisanDialog):
             except Exception:
                 pass
 
-    #dave99  CHeck this routine against UIDev + Wip main.py
     def setbuttoncolor(self,i):
         if i < len(self.extraeventbuttoncolor):
             colorf = aw.colordialog(QColor(self.extraeventbuttoncolor[i]))
