@@ -11467,6 +11467,7 @@ class EventActionThread(QThread):
 
 
 class ApplicationWindow(QMainWindow):
+    global locale
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
 #PLUS
@@ -11509,9 +11510,14 @@ class ApplicationWindow(QMainWindow):
         # renamed via setText to link them to artisan translations (which hopefully provides those translations)
 
         self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","ru","artisan_zh_TW"] + ["fa","pt","sv","zh_CN"]
-        if locale is None:
-            locale = "en"
-        self.locale = locale
+        
+        try:
+            if locale is None:
+                self.locale = "en"
+            else:
+                self.locale = locale
+        except Exception as e:
+            self.locale = "en"
 
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
