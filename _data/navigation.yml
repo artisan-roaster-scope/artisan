@@ -34,6 +34,8 @@ machines:
         url: /machines/hottop/
       - title: "IMF"
         url: /machines/imf/
+      - title: "Kaldi"
+        url: /machines/kaldi/
       - title: "Kirsch & Mausser"
         url: /machines/kirsch/
       - title: "Loring"

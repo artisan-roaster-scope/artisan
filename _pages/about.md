@@ -51,6 +51,11 @@ gallery:
     image_path: /assets/images/diedrich-logo.png
     alt: "Diedrich Roasters"
     title: "Diedrich Roasters"
+  - url: http://www.kaldi.co.kr
+    image_path: /assets/images/kaldi-logo.jpg
+    alt: "KALDI Coffee Roaster"
+    title: "KALDI Coffee Roaster"
+
 ---
 
 
