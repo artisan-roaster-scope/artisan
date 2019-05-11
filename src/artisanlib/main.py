@@ -515,7 +515,7 @@ global locale
 
 if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
     locale = toString(QSettings().value('locale'))
-    if locale == "en_US":
+    if locale is None or locale == "en_US":
         locale = "en"
 else:
     locale = ""
@@ -556,6 +556,8 @@ if len(locale) == 0:
     if locale in supported_languages:
         QSettings().setValue('locale', locale)
 
+if locale is None or len(locale) == 0:
+    locale = "en"
 
 #load Qt default translations from QLibrary
 qtTranslator = QTranslator()
@@ -567,6 +569,7 @@ elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "
 #find Qt default translations in Mac binary
 elif qtTranslator.load("qtbase_" + locale, QApplication.applicationDirPath() + "/../translations"):
     app.installTranslator(qtTranslator)
+# qtbase_ translations added to the Artisan source as they are not in the official Qt builds
 elif qtTranslator.load("qtbase_" + locale, "translations"):
     app.installTranslator(qtTranslator)
 
@@ -11505,7 +11508,9 @@ class ApplicationWindow(QMainWindow):
         # for other locales standard OK/Cancel buttons created in dialogs via QDialogButtonBoxes should be
         # renamed via setText to link them to artisan translations (which hopefully provides those translations)
 
-        self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","ru"]
+        self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","ru","artisan_zh_TW"] + ["fa","pt","sv","zh_CN"]
+        if locale is None:
+            locale = "en"
         self.locale = locale
 
         #############################  Define variables that need to exist before calling settingsload()
@@ -11570,7 +11575,7 @@ class ApplicationWindow(QMainWindow):
 
         ####      create Matplotlib canvas widget
         #resolution
-        self.defaultdpi = 90
+        self.defaultdpi = 100
         self.dpi = self.defaultdpi
         
         #mpl.rc_context({'toolbar': None}) # this does not work to remove the default toolbar
@@ -48173,9 +48178,10 @@ class WheelDlg(ArtisanDialog):
         self.labeltable = QTableWidget()
 
         self.subdialogbuttons = QDialogButtonBox(QDialogButtonBox.Close | QDialogButtonBox.RestoreDefaults, Qt.Horizontal)
+        aw.locale = None
         if aw.locale not in aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Reset Parents", None))
-            self.dialogbuttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close",None))
+            self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Reset Parents", None))
+            self.subdialogbuttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close",None))
         self.subdialogbuttons.rejected.connect(lambda :self.closelabels())
         self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(lambda _:self.resetlabelparents())
         
@@ -48255,8 +48261,8 @@ class WheelDlg(ArtisanDialog):
         viewModeButton.clicked.connect(lambda _:self.viewmode())
         
         if aw.locale not in aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close", None))
-            self.dialogbuttons.button(QDialogButtonBox.Open).setText(QApplication.translate("Button","Open",None))
+            self.main_buttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close", None))
+            self.main_buttons.button(QDialogButtonBox.Open).setText(QApplication.translate("Button","Open",None))
         
         aw.qmc.drawWheel()
         label1layout = QVBoxLayout()
