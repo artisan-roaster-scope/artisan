@@ -56,6 +56,7 @@ gallery:
     alt: "KALDI Coffee Roaster"
     title: "KALDI Coffee Roaster"
 
+
 ---
 
 
