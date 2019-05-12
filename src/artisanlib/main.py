@@ -11512,7 +11512,7 @@ class ApplicationWindow(QMainWindow):
         self.qtbase_locales = ["ar","de","en","es","fi","fr","he","hu","it","ja","ko","pl","ru","artisan_zh_TW"] + ["fa","pt","sv","zh_CN"]
         
         try:
-            if locale is None:
+            if locale is None or locale == "None": 
                 self.locale = "en"
             else:
                 self.locale = locale
@@ -48184,7 +48184,6 @@ class WheelDlg(ArtisanDialog):
         self.labeltable = QTableWidget()
 
         self.subdialogbuttons = QDialogButtonBox(QDialogButtonBox.Close | QDialogButtonBox.RestoreDefaults, Qt.Horizontal)
-        aw.locale = None
         if aw.locale not in aw.qtbase_locales:
             self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Reset Parents", None))
             self.subdialogbuttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close",None))
