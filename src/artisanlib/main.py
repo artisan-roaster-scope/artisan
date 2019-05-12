@@ -13968,9 +13968,7 @@ class ApplicationWindow(QMainWindow):
         if artisanviewerFirstStart:
             string =  QApplication.translate("Message","Welcome to the ArtisanViewer!", None).format(__version__) + "\n\n"
             string += QApplication.translate("Message","This is a one time message to introduce you to the ArtisanViewer.", None) + "\n\n"
-            string += QApplication.translate("Message","The ArtisanViewer opens whenever a copy of Artisan is already running.", None) + "  "
-            string += QApplication.translate("Message","Only one instance of Artisan able to record profiles may be open.", None) + "  "
-            string += QApplication.translate("Message","Multiple instances of ArtisanViewer can be open at the same time.", None) + "\n\n"  
+            string += QApplication.translate("Message","The ArtisanViewer opens whenever a copy of Artisan is already running.", None) + "\n\n"
             string += QApplication.translate("Message","ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.", None) + "\n\n"
             string += QApplication.translate("Message","Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
             string += QApplication.translate("Message","Enjoy using ArtisanViewer,", None) +"\n"
