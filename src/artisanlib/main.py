@@ -54559,6 +54559,13 @@ def main():
         aw.LCD5frame.setLayout(tmp.layout())        
     aw.show()    
     
+    # Workaround for the interaction between QGraphicsDropShadowEffect, cut off menus, and PyQt 5.12.2 on Windows.
+    if platf == 'Windows': 
+        import pyautogui
+        pyautogui.hotkey('alt', 'h')
+        pyautogui.typewrite(['left', 'left', 'left', 'left', 'left', 'left'])  
+        pyautogui.press('esc')
+
     try:
         if sys.argv and len(sys.argv) > 1:
             argv_file = sys.argv[1]
