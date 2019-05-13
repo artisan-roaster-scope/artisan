@@ -46,10 +46,10 @@ for lan in de es fi fr he hu it ja ko pl ru; do
      QTBASE_FILE=$QT_PATH/translations/qtbase_${lan}.qm
      QT_FILE=$QT_PATH/translations/qt_${lan}.qm
      if [ -e ${QTBASE_FILE} ]
-          cp ${QTBASE_FILE} dist/translations
+          then cp ${QTBASE_FILE} dist/translations
      fi
      if [ -e ${QT_FILE} ] 
-          cp ${QT_FILE} dist/translations
+          then cp ${QT_FILE} dist/translations
      fi
 done
 
