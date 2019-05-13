@@ -167,7 +167,7 @@ OPTIONS = {
 #                    'QtHelp','QtMultimedia',
 #                    'QtOpenGL','QtScript','QtScriptTools',
 #                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
-#    'packages': ['yoctopuce','gevent','openpyxl','certifi'],
+    'packages': ['yoctopuce','gevent','openpyxl','certifi'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
