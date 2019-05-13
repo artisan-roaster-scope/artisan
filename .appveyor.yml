@@ -10,8 +10,8 @@ environment:
   UPLOADTOOL_BODY:
     "WARNING: pre-release builds may not work. Use at your own risk."
   matrix:
-    - PYTHON: "C:\\Python36-x64"
-      PYTHON_VERSION: 3.6
+    - PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: 3.7
       ARTISAN_VERSION: 1.6.99
 
 install:
