@@ -31152,7 +31152,7 @@ class editGraphDlg(ArtisanDialog):
         self.tab1aLayout.addLayout(ambientGrid)
         tab1Layout = QVBoxLayout()
 #        tab1Layout.addStretch()
-        tab1Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
+        tab1Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom
         tab1Layout.addLayout(self.tab1aLayout)
         tab1Layout.setSpacing(0)
         tab1Layout.addStretch()
@@ -31163,17 +31163,17 @@ class editGraphDlg(ArtisanDialog):
         #tab 2
         tab2Layout = QVBoxLayout()
         tab2Layout.addLayout(anotationLayout)
-        tab2Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
+        tab2Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom
         #tab3 events
         tab3Layout = QVBoxLayout()
         tab3Layout.addLayout(timeLayoutBox)
         tab3Layout.addWidget(self.eventtable)
         tab3Layout.addLayout(eventbuttonLayout)
-        tab3Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
+        tab3Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom
         #tab 4 data
         tab4Layout = QVBoxLayout()
         tab4Layout.addWidget(self.datatable) 
-        tab4Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom 
+        tab4Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom 
         #tabwidget
         self.TabWidget = QTabWidget()
         self.TabWidget.setContentsMargins(0,0,0,0)
