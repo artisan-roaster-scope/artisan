@@ -178,7 +178,7 @@ def getRoast():
             
         # if profile is already saved, that modification date is send along to the server instead the timestamp
         # of the moment the record is queued
-        if not aw.curFile is None:
+        if aw.curFile is not None:
             d["modified_at"] = util.epoch2ISO8601(util.getModificationDate(aw.curFile))
         
     except Exception as e:
