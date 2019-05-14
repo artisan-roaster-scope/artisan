@@ -87,7 +87,7 @@ port=502
 stopbits=1
 timeout=1
 type=3
-wordorderLittle=true
+wordorderLittle=false
 
 [RoastProperties]
 roastertype=CTE Silon ZR7

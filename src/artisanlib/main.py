@@ -38608,6 +38608,8 @@ class serialport(object):
                                    self.BEHMOR_BTET,          #101
                                    self.BEHMOR_34,            #102
                                    self.VICTOR86B,            #103
+                                   self.BEHMOR_56,            #104
+                                   self.BEHMOR_78,            #105
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -39125,6 +39127,16 @@ class serialport(object):
     def BEHMOR_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.BEHMORtemperatures(10,11)
+        return tx,t1,t2 # time, chan2, chan1
+
+    def BEHMOR_56(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.BEHMORtemperatures(1,2)
+        return tx,t1,t2 # time, chan2, chan1
+
+    def BEHMOR_78(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.BEHMORtemperatures(3,4)
         return tx,t1,t2 # time, chan2, chan1
     
     def VICTOR86B(self):
@@ -47035,7 +47047,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
-                
+                ##########################
+                ####  DEVICE 104 Behmor 56 channel 5 and 6
+                ##########################
+                ##########################
+                ####  DEVICE 105 Behmor 78 channel 7 and 8
+                ##########################
+
                 # ADD DEVICE:
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -47154,6 +47172,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 9, # 101
                 9, # 102
                 5, # 103
+                9, # 104
+                9, # 105
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -54559,7 +54579,7 @@ def main():
     
     # Workaround for the interaction between QGraphicsDropShadowEffect, cut off menus, and PyQt 5.12.2 on Windows.
     if platf == 'Windows': 
-        import pyautogui
+        import pyautogui  # @UnresolvedImport @UnusedImport
         pyautogui.hotkey('alt', 'h')
         pyautogui.typewrite(['left', 'left', 'left', 'left', 'left', 'left'])  
         pyautogui.press('esc')
