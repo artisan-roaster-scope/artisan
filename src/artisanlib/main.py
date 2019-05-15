@@ -6637,7 +6637,8 @@ class tgraphcanvas(FigureCanvas):
     
             #delete degrees ticks to anotate flavor characteristics 
             for tick in self.ax1.xaxis.get_major_ticks():
-                tick.label1On = False
+                #tick.label1On = False
+                tick.label1.set_visible(False)
             
             fontprop_small = aw.mpl_fontproperties.copy()
             fontprop_small.set_size("x-small")
@@ -10216,7 +10217,8 @@ class tgraphcanvas(FigureCanvas):
 
             #delete degrees ticks 
             for tick in self.ax2.xaxis.get_major_ticks():
-                tick.label1On = False
+                #tick.label1On = False
+                tick.label1.set_visible(False)
             #delete yaxis 
             locs = self.ax2.get_yticks()
             labels = [""]*len(locs)
@@ -15255,10 +15257,10 @@ class ApplicationWindow(QMainWindow):
                         # still above the limit
                         # retrieve corresponding values from the background (is always smoothed)
                         # first compute closest index at that time point in the background data
-                        j = aw.qmc.backgroundtime2index((aw.qmc.timex[i] - dropTimeDelta))                                                                        
-                        etb = aw.qmc.temp1B[j]
-                        etb = aw.qmc.backgroundETat(aw.qmc.timex[i] - dropTimeDelta)
+                        #j = aw.qmc.backgroundtime2index((aw.qmc.timex[i] - dropTimeDelta))                                                                        
+                        #etb = aw.qmc.temp1B[j]
                         #btb = aw.qmc.temp2B[j]
+                        etb = aw.qmc.backgroundETat(aw.qmc.timex[i] - dropTimeDelta)
                         btb = aw.qmc.backgroundBTat(aw.qmc.timex[i] - dropTimeDelta)
                         det = (et - etb)
                         totalQuadraticDeltaET += det * det

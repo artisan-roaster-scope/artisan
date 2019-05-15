@@ -151,8 +151,8 @@ def getRoast():
             
         if "computed" in p:
             cp = p["computed"]
-            util.addNum2dict(cp,"det",d,"CM_ETD",0,100,1)
-            util.addNum2dict(cp,"dbt",d,"CM_BTD",0,100,1)                              
+            util.addTemp2dict(cp,"det",d,"CM_ETD")
+            util.addTemp2dict(cp,"dbt",d,"CM_BTD")                             
 
         if aw.qmc.plus_store:
             d["location"] = aw.qmc.plus_store
