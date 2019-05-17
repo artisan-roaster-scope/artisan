@@ -15491,6 +15491,7 @@ class ApplicationWindow(QMainWindow):
         LCDVbox = QVBoxLayout()
         LCDVbox.addWidget(label)
         LCDVbox.addWidget(lcd)
+        LCDVbox.addSpacing(5)
         LCDVbox.setSpacing(0)
         LCDVbox.setContentsMargins(0, 0, 0, 0)
         frame.setStyleSheet("QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}")
