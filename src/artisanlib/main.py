@@ -16067,9 +16067,6 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.HUDflag:
             self.qmc.hudresizeflag = True
         super(ApplicationWindow,self).resizeEvent(event)
-
-#    def setdpi(self,dpi,moveWindow=True):
-#        QTimer.singleShot(1,lambda : aw.setdpi_internal(dpi,True))
         
     def setdpi(self,dpi,moveWindow=True):
         if aw:
