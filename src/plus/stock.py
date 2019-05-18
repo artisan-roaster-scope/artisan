@@ -49,7 +49,6 @@ import threading
 # updates the stock cache
 
 def update():
-    #QTimer.singleShot(2,lambda : update_blocking()) # QThread seems to block dialogs
     update_thread = threading.Thread(target=update_blocking)
     update_thread.start()
     
@@ -283,7 +282,7 @@ def getCoffeesLabels(coffees):
 def coffee2beans(coffee):
     c = getCoffeeCoffeeDict(coffee)
     if "origin" in c:
-        origin = c["origin"]
+        origin = QApplication.translate("Countries", c["origin"],None)
     else:
         origin = ""
     if "label" in c:
@@ -332,7 +331,7 @@ def getCoffees(weight_unit_idx,store=None):
                 try:
                     origin = ""
                     if "origin" in c:
-                        origin = c["origin"]
+                        origin = QApplication.translate("Countries", c["origin"],None)
                         if "crop_date" in c:
                             cy = c["crop_date"]
                             picked = None

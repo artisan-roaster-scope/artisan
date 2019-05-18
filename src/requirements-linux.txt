@@ -3,7 +3,7 @@ gevent-websocket==0.10.1
 numpy==1.16.2
 colorspacious==1.1.2
 scipy==1.2.1
-matplotlib==3.0.3
+matplotlib==3.1.0
 PyQt5==5.12.2
 pyinstaller==3.4
 #jeepney==0.4

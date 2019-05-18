@@ -19,7 +19,8 @@ SOURCES = \
     plus/login.py \
     plus/queue.py \
     plus/stock.py \
-    plus/sync.py
+    plus/sync.py \
+    plus/countries.py
     
 TRANSLATIONS = \
 	translations/artisan_de.ts \
