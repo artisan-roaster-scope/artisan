@@ -66,29 +66,34 @@ post_compression_threshold = 500 # in bytes (data smaller than this are always s
 stock_cache_expiration = 1*60 # expiration period in seconds
 
 queue_start_delay = 5 # startup time of queue in seconds
-queue_task_delay = 2 # delay between tasks in seconds
+queue_task_delay = 0.7 # delay between tasks in seconds (cycling interval of the queue)
 queue_retries = 2 # number of retries (should be >=0)
 queue_retry_delay = 30 # time between retries in seconds
+queue_put_timeout = 0.5 # number of seconds to wait on putting a new item into the queue (unused for now)
 
 
 # AppData
 
 # the stock cache reflects the current coffee stock of the account and gets automatically synced with the cloud
+# Note: the cache file is shared between the main Artisan and the ArtisanViewer app, protected by a filelock
 stock_cache = "cache"
 
 # the uuid register that associates UUIDs with local filepaths where to locate the corresponding Artisan profiles
 uuid_cache = "uuids"
 
 # the account register that associates account ids with a local running account number
+# Note: the account_cache file is shared between the main Artisan and the ArtisanViewer app, protected by a filelock
 account_cache = "account"
 
 # the account nr locally assocated to the current account, or None
 account_nr = None
 
 # the sync register that associates UUIDs with last known modification dates modified_at for profiles uploaded/synced automatially
+# Note: the sync_cache file is shared between the main Artisan and the ArtisanViewer app, protected by a filelock
 sync_cache = "sync"
 
 # the outbox queues the outgoing PUSH/PUT data requests
+# Note: the outbox_cache file is shared between the main Artisan and the ArtisanViewer app, NOT protected by ab extra filelock
 outbox_cache = "outbox"
 
 # the log_file logs communication and other important events

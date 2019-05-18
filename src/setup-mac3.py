@@ -186,7 +186,7 @@ OPTIONS = {
                  'PyQt5.QtBluetooth',
                  'PyQt5.QtConcurrent',
                  ],
-    'excludes' :  ['tkinter','curses','sqlite3',
+    'excludes' :  ['tkinter','curses', # 'sqlite3',
                 ],
     'plist'    : plist}
 

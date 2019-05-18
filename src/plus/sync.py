@@ -25,11 +25,13 @@
 
 import shelve
 import portalocker
+import requests
 
 from PyQt5.QtCore import QSemaphore, QTimer
 from PyQt5.QtWidgets import QApplication
 
 from plus import config, util, connection, controller, roast
+
 
 
 #### Sync Cache
@@ -342,6 +344,10 @@ def fetchServerUpdate(uuid,file=None):
                     config.logger.debug("sync: -> file last_modified epoch: %s",file_last_modified)
                     config.logger.debug("sync: -> server last_modified epoch: %s",util.ISO86012epoch(r["modified_at"]))
                     config.logger.debug("sync: -> server last_modified date: %s",r["modified_at"])
+    except requests.exceptions.ConnectionError as e: # more general: requests.exceptions.RequestException
+        config.logger.debug("sync: -> connection error in fetchServerUpdate(), disconnecting: %s",e)
+        # we disconnect, but keep the queue running to let it automatically reconnect if possible
+        controller.disconnect(remove_credentials = False, stop_queue=False)
     except Exception as e:
         import sys
         _, _, exc_tb = sys.exc_info()

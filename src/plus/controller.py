@@ -55,6 +55,12 @@ def is_connected():
         if connect_semaphore.available() < 1:
             connect_semaphore.release(1)
 
+# artisan.plus is on as soon as an account id has been established
+# Note that artisan.plus might be on, while not being connected due to connectivity issues
+def is_on():
+    aw = config.app_window
+    return aw.plus_account is not None
+
 # returns True if current profile is under sync (i.e. in the sync-cache) or no profile is loaded currently
 def is_synced():
     aw = config.app_window
@@ -87,9 +93,9 @@ def toggle(app_window):
         else:
             connect(True) # we try to re-connect and disconnect on failure
 
-def connect(clear_on_failure = False):
-    config.logger.info("controller:connect(%s)",clear_on_failure)
-    if not config.connected:
+def connect(clear_on_failure=False,interactive=True):
+    if not is_connected():
+        config.logger.info("controller:connect(%s,%s)",clear_on_failure,interactive)
         try:
             connect_semaphore.acquire(1)
             if config.app_window is not None:
@@ -104,7 +110,7 @@ def connect(clear_on_failure = False):
                             config.logger.debug("controller: -> keyring passwd received")
                     except Exception as e:
                         config.logger.error("controller: keyring Exception %s",e)
-                if config.app_window.plus_account is None or config.passwd is None: # @UndefinedVariable
+                if interactive and (config.app_window.plus_account is None or config.passwd is None): # @UndefinedVariable
                     # ask user for credentials
                     import plus.login
                     login,passwd,remember = plus.login.plus_login(config.app_window,config.app_window.plus_email,config.app_window.plus_remember_credentials) # @UndefinedVariable
@@ -128,7 +134,8 @@ def connect(clear_on_failure = False):
                                 config.app_window.sendmessage(QApplication.translate("Plus","Keyring error: Ensure that gnome-keyring is installed.",None)) # @UndefinedVariable 
                     config.passwd = passwd # remember password in memory for this session
             if config.app_window.plus_account is None: # @UndefinedVariable
-                config.app_window.sendmessage(QApplication.translate("Plus","Login aborted",None)) # @UndefinedVariable
+                if interactive:
+                    config.app_window.sendmessage(QApplication.translate("Plus","Login aborted",None)) # @UndefinedVariable
             else:
                 success = connection.authentify()
                 if success:
@@ -143,27 +150,31 @@ def connect(clear_on_failure = False):
                     if clear_on_failure:
                         connection.clearCredentials()
                         config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None))  # @UndefinedVariable
-                    else:
+                    elif interactive:
                         message = QApplication.translate("Plus","Authentication failed",None)
                         if not config.app_window.plus_account is None: # @UndefinedVariable
                             message = config.app_window.plus_account + " " + message # @UndefinedVariable
                         config.app_window.sendmessage(message) # @UndefinedVariable
         except Exception as e:
-            config.logger.error("controller: connect Exception %s",e)
+            if interactive:
+                config.logger.error("controller: connect Exception %s",e)
             if clear_on_failure:
                 connection.clearCredentials()
-                config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None)) # @UndefinedVariable
+                if interactive:
+                    config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None)) # @UndefinedVariable
             else:
-                config.app_window.sendmessage(QApplication.translate("Plus","Couldn't connect to artisan.plus",None)) # @UndefinedVariable
+                if interactive:
+                    config.app_window.sendmessage(QApplication.translate("Plus","Couldn't connect to artisan.plus",None)) # @UndefinedVariable
                 config.connected = False
         finally:
             if connect_semaphore.available() < 1:
                 connect_semaphore.release(1)
         config.app_window.updatePlusStatus() # @UndefinedVariable
-        stock.update()
+        if interactive and is_connected():
+        	stock.update()
 
-def disconnect(remove_credentials = True):
-    config.logger.info("controller:disconnect(%s)",remove_credentials)
+def disconnect(remove_credentials = True, stop_queue = True):
+    config.logger.info("controller:disconnect(%s,%s)",remove_credentials,stop_queue)
     if is_connected():
         try:
             connect_semaphore.acquire(1)
@@ -175,7 +186,8 @@ def disconnect(remove_credentials = True):
                 config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None)) # @UndefinedVariable              
             else:
                 config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus disconnected",None)) # @UndefinedVariable
-            queue.stop() # stop the outbox queue
+            if stop_queue:
+                queue.stop() # stop the outbox queue
         finally:
             if connect_semaphore.available() < 1:
                 connect_semaphore.release(1)
@@ -192,15 +204,15 @@ def reconnected():
                 connect_semaphore.release(1)
         config.app_window.updatePlusStatus() # @UndefinedVariable
         if is_connected():
-            queue.start() # stop the outbox queue
+            queue.start() # restart the outbox queue
 
-# if connected and synced, computes the sync record hash, updates the sync record cache and returns the sync record hash
+# if on and synced, computes the sync record hash, updates the sync record cache and returns the sync record hash
 # otherwise return None
 # this function is called by filesave() and returns the sync_record hash to be added to the saved file
 def updateSyncRecordHashAndSync():
     try:
         config.logger.info("controller:updateSyncRecordHashAndSync()")
-        if is_connected():
+        if is_on():
             roast_record = roast.getRoast()
             sync_record,sync_record_hash = roast.getSyncRecord(roast_record)
             if is_synced():
@@ -208,9 +220,9 @@ def updateSyncRecordHashAndSync():
                 if server_updates_modified_at is not None and "roast_id" in roast_record:
                     sync.addSync(roast_record["roast_id"],server_updates_modified_at)
                     sync.setApplidedServerUpdatesModifiedAt(None)        
-                # we are connected and the profile is under sync
+                # artisan.plus is ON and the profile is under sync
                 if sync.syncRecordUpdated(roast_record):
-                    # we push updates on the sync record back to the server
+                    # we push updates on the sync record back to the server via the queue
                     queue.addRoast(sync_record)
             return sync_record_hash
         else:

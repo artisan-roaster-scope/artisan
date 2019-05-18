@@ -13147,8 +13147,6 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setMinimumHeight(self.standard_button_height)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
         self.button_7.clicked.connect(lambda _: self.qmc.resetButtonAction())
-        if app.artisanviewerMode:
-            self.button_7.setVisible(False)
 
         #create CHARGE button
         self.button_8 = QPushButton(QApplication.translate("Button", "CHARGE", None))

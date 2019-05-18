@@ -23,18 +23,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from persistqueue import Queue
+import persistqueue
 import threading
 import time
+from requests.exceptions import ConnectionError
 
+from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QApplication
 
 from plus import config, util, roast, connection, sync, controller
 
-queue_path = util.getDirectory(config.outbox_cache)
+queue_path = util.getDirectory(config.outbox_cache,share=True)
 
+app = QCoreApplication.instance()
 
-queue = Queue(queue_path)
+queue = persistqueue.SQLiteQueue(queue_path,multithreading=True)
 
 # queue entries are dictionaries with entries
 #   url   : the URL to send the request to
@@ -51,6 +54,16 @@ class Concur(threading.Thread):
         self.paused = False  # start out non-paused
         self.state = threading.Condition()
 
+    def addSyncItem(self,item):
+        # successfully transmitted, we add/update the roasts UUID sync-cache
+        if "roast_id" in item["data"] and "modified_at" in item["data"]:
+            # we update the plus status icon if the given roast_id was not yet in the sync cache and thus new
+            if sync.getSync(item["data"]["roast_id"]) is None:
+                sync.addSync(item["data"]["roast_id"],util.ISO86012epoch(item["data"]["modified_at"]))
+                config.app_window.updatePlusStatusSignal.emit() # @UndefinedVariable
+            else:
+                sync.addSync(item["data"]["roast_id"],util.ISO86012epoch(item["data"]["modified_at"]))
+        
     def run(self):
         global queue
         config.logger.debug("queue:run()")
@@ -62,48 +75,63 @@ class Concur(threading.Thread):
             with self.state:
                 if self.paused:
                     self.state.wait() # block until notified
+            config.logger.debug("queue: -> qsize: %s",queue.qsize())
             config.logger.debug("queue: looking for next item to be fetched")
-            if item is None:
-                item = queue.get()
-            time.sleep(config.queue_task_delay)
-            config.logger.debug("queue: -> worker processing item: %s",item)
-            iters = config.queue_retries + 1
-            keepTask = False
-            while iters > 0:
-                config.logger.debug("queue: -> remaining iterations: %s",iters)
-                r = None
-                try:
-                    r = connection.sendData(item["url"],item["data"],item["verb"])
-                    r.raise_for_status()
-                    iters = 0
-                    # successfully transmitted, we add/update the roasts UUID sync-cache
-                    if "roast_id" in item["data"] and "modified_at" in item["data"]:
-                        # we update the plus status icon if the given roast_id was not yet in the sync cache and thus new
-                        if sync.getSync(item["data"]["roast_id"]) is None:
-                            sync.addSync(item["data"]["roast_id"],util.ISO86012epoch(item["data"]["modified_at"]))
-                            config.app_window.updatePlusStatusSignal.emit() # @UndefinedVariable
-                        else:
-                            sync.addSync(item["data"]["roast_id"],util.ISO86012epoch(item["data"]["modified_at"]))
-                except Exception as e:
-                    config.logger.debug("queue: -> task failed: %s",e)
-                    if r is not None:
-                        config.logger.debug("queue: -> status code %s",r.status_code)
-                    if r is not None and r.status_code == 401: # authentication failed
-                        controller.disconnect(remove_credentials = False)
-                        iters = 0 # we don't retry and keep the task item
+            try:
+                if item is None:
+                    item = queue.get()
+                time.sleep(config.queue_task_delay)
+                config.logger.debug("queue: -> worker processing item: %s",item)
+                iters = config.queue_retries + 1
+                keepTask = False
+                syncItemAdded = False # set to True if sync item was added due to a connection error already once
+                while iters > 0:
+                    config.logger.debug("queue: -> remaining iterations: %s",iters)
+                    r = None
+                    try:
+                        controller.connect(clear_on_failure=False,interactive=False)
+                        r = connection.sendData(item["url"],item["data"],item["verb"])
+                        r.raise_for_status()
+                        iters = 0
+                        # successfully transmitted, we add/update the roasts UUID sync-cache
+                        self.addSyncItem(item)
+                    except ConnectionError as e:
+                        config.logger.debug("queue: -> connection error, disconnecting: %s",e)
+                        # we disconnect, but keep the queue running to let it automatically reconnect if possible
+                        controller.disconnect(remove_credentials = False, stop_queue=False)
                         keepTask = True
-                    elif r is not None and r.status_code == 409: # conflict
-                        iters = 0 # we don't retry, but remove the task as it is faulty
-                    else: # 500 internal server error, 429 Client Error: Too Many Requests, 404 Client Error: Not Found or others
-                        # something went wrong we don't mark this task as done and retry
-                        iters = iters - 1
-                        time.sleep(config.queue_retry_delay)                        
-            if not keepTask:
-                # we call task_done to remove the item from the queue
-                queue.task_done()
-                item = None
-                config.logger.debug("queue: -> task done")                
-            config.logger.debug("queue: end of run:while paused=%s",self.paused)
+                        # not yet transmitted due to connection issues, we still add/update the roasts UUID sync-cache
+                        if not syncItemAdded:
+                            self.addSyncItem(item)
+                            syncItemAdded = True
+                        # we don't change the iter, but retry to connect after a delay in the next iteration
+                        time.sleep(config.queue_retry_delay)
+                    except Exception as e:
+                        config.logger.debug("queue: -> task failed: %s",e)
+                        if r is not None:
+                            config.logger.debug("queue: -> status code %s",r.status_code)
+                        else:
+                            config.logger.debug("queue: -> no status code")
+                        if r is not None and r.status_code == 401: # authentication failed
+                            controller.disconnect(remove_credentials = False)
+                            iters = 0 # we don't retry and keep the task item
+                            keepTask = True
+                            # not yet transmitted due to credentials issues, we still add/update the roasts UUID sync-cache
+                            self.addSyncItem(item)
+                        elif r is not None and r.status_code == 409: # conflict
+                            iters = 0 # we don't retry, but remove the task as it is faulty
+                        else: # 500 internal server error, 429 Client Error: Too Many Requests, 404 Client Error: Not Found or others
+                            # something went wrong we don't mark this task as done and retry
+                            iters = iters - 1
+                            time.sleep(config.queue_retry_delay)                        
+                if not keepTask:
+                    # we call task_done to remove the item from the queue
+                    queue.task_done()
+                    item = None
+                    config.logger.debug("queue: -> task done")                
+                config.logger.debug("queue: end of run:while paused=%s",self.paused)
+            except Exception as e:
+                pass
 
     def resume(self):
         config.logger.info("queue:resume()")
@@ -118,21 +146,25 @@ class Concur(threading.Thread):
    
         
 def start():
-    global queue
-    global worker_thread    
-    config.logger.info("queue:start()")
-    config.logger.debug("queue: -> qsize: %s",queue.qsize())
-    if worker_thread is None:
-        worker_thread = Concur()
-        worker_thread.setDaemon(True) # a daemon thread is automatically killed on program exit
-        worker_thread.start()
+    if app.artisanviewerMode:
+        config.logger.info("queue:start(): queue not started in ArtisanViewer mode")
     else:
-        worker_thread.resume()
+        global queue
+        global worker_thread   
+        config.logger.info("queue:start()")
+        config.logger.debug("queue: -> qsize: %s",queue.qsize())
+        if worker_thread is None:
+            worker_thread = Concur()
+            worker_thread.setDaemon(True) # a daemon thread is automatically killed on program exit
+            worker_thread.start()
+        else:
+            worker_thread.resume()
     
 # the queue worker thread cannot really be stopped, but we can pause it
 def stop():
-    config.logger.info("queue:stop()")
-    worker_thread.pause()
+    if not app.artisanviewerMode:
+        config.logger.info("queue:stop()")
+        worker_thread.pause()
 
 
 ################
@@ -166,7 +198,9 @@ def addRoast(roast_record = None):
             queue.put({
                 "url": config.roast_url,
                 "data": r,
-                "verb": "POST"})
+                "verb": "POST"},
+#                timeout=config.queue_put_timeout # sql queue does not feature a timeout
+                )
             config.logger.debug("queue: -> roast queued up")
             config.logger.debug("queue: -> qsize: %s",queue.qsize())
             sync.setSyncRecordHash(r)

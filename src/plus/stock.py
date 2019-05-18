@@ -102,7 +102,7 @@ def fetch():
 #        tr=traceback.format_exc()
 #        aw = config.app_window
 #        aw.qmc.adderror(str(tr))
-        #controller.disconnect(False) # don't disconnect on failure
+        controller.disconnect(remove_credentials = False, stop_queue = False)
         return False
             
 
