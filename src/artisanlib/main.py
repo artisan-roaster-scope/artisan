@@ -1405,10 +1405,13 @@ class tgraphcanvas(FigureCanvas):
         self.Controlbuttonflag = False # PID Control active (either internal/external or Fuji)
         # user filter values x are translated as follows to internal filter values: y = x*2 + 1 (to go the other direction: x = y/2)
         # this is to ensure, that only uneven window values are used and no wrong shift is happening through smoothing
-        self.deltafilter = 17 # => corresponds to 2 on the user interface
+        self.deltaETfilter = 17 # => corresponds to 2 on the user interface
+        self.deltaBTfilter = 17 # => corresponds to 2 on the user interface
         self.curvefilter = 3 # => corresponds to 1 on the user interface
-        self.deltaspan = 6 # the time period taken to compute one deltaBT/ET value (1-15sec)
-        self.deltasamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
+        self.deltaETspan = 6 # the time period taken to compute one deltaET value (1-30sec)
+        self.deltaBTspan = 6 # the time period taken to compute one deltaBT value (1-30sec)
+        self.deltaETsamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
+        self.deltaBTsamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
         self.profile_sampling_interval = None # will be updated on loading a profile
         self.background_profile_sampling_interval = None # will be updated on loading a profile into the background
         
@@ -2048,14 +2051,15 @@ class tgraphcanvas(FigureCanvas):
     #################################    FUNCTIONS    ###################################
     #####################################################################################
     
-    # update the aw.qmc.deltaspan from the given sampling interval and aw.qmc.deltasamples
+    # update the aw.qmc.deltaBTspan and deltaETspan from the given sampling interval, aw.qmc.deltaETsamples and aw.qmc.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
     def updateDeltaSamples(self):
         if self.flagstart or self.profile_sampling_interval is None:
             interval = self.delay / 1000.
         else:
             interval = self.profile_sampling_interval
-        self.deltasamples = int(max(1,self.deltaspan / interval))
+        self.deltaBTsamples = int(max(1,self.deltaBTspan / interval))
+        self.deltaETsamples = int(max(1,self.deltaETspan / interval))
     
     # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
     # NOTE: this hack slows down redraw!
@@ -4610,7 +4614,7 @@ class tgraphcanvas(FigureCanvas):
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
     # timex_lin: a linear spaced version of timex
-    def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True,timex_lin=None,deltasamples=None):
+    def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True,timex_lin=None,deltaETsamples=None,deltaBTsamples=None):
         try:
             tx = numpy.array(timex)
             if CHARGEidx > -1:
@@ -4623,10 +4627,14 @@ class tgraphcanvas(FigureCanvas):
                 roast_end_idx = len(tx)
             tx_roast = numpy.array(timex) # just the part from CHARGE TO DROP
             lt = len(tx_roast)
-            if deltasamples is None:
-                ds = aw.qmc.deltasamples
+            if deltaBTsamples is None:
+                dsBT = aw.qmc.deltaBTsamples
             else:
-                ds = deltasamples
+                dsBT = deltaBTsamples
+            if deltaETsamples is None:
+                dsET = aw.qmc.deltaETsamples
+            else:
+                dsET = deltaETsamples
             if timex_lin is not None:
                 if len(timex_lin) == len(timex):
                     timex_lin = numpy.array(timex_lin) # just the part from CHARGE TO DROP
@@ -4635,7 +4643,7 @@ class tgraphcanvas(FigureCanvas):
             if t1 is not None:
                 with numpy.errstate(divide='ignore'):
                     nt1 = numpy.array([0 if x is None else x for x in t1]) # ERROR None Type object not scriptable! t==None on ON
-                    z1 = (nt1[ds:] - nt1[:-ds]) / ((tx_roast[ds:] - tx_roast[:-ds])/60.)
+                    z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
                     ld1 = len(z1)
                     
                 # make lists equal in length
@@ -4643,9 +4651,9 @@ class tgraphcanvas(FigureCanvas):
                     z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
 #                    z1 = numpy.append([None]*(lt - ld1),z1)
                 if optimalSmoothing:
-                    user_filter = self.deltafilter
+                    user_filter = self.deltaETfilter
                 else:
-                    user_filter = int(round(self.deltafilter/2.))
+                    user_filter = int(round(self.deltaETfilter/2.))
                 delta1 = self.smooth_list(tx_roast,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
                 delta1 = delta1[roast_start_idx:roast_end_idx]
                 # add None for parts before and after CHARGE/DROP
@@ -4662,16 +4670,16 @@ class tgraphcanvas(FigureCanvas):
             if t2 is not None:
                 with numpy.errstate(divide='ignore'):
                     nt2 = numpy.array([0 if x is None else x for x in t2])
-                    z2 = (nt2[ds:] - nt2[:-ds]) / ((tx_roast[ds:] - tx_roast[:-ds])/60.)
+                    z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
                     ld2 = len(z2)
                 # make lists equal in length
                 if lt > ld2:
                     z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
 #                    z2 = numpy.append([None]*(lt - ld2),z2)
                 if optimalSmoothing:
-                    user_filter = self.deltafilter
+                    user_filter = self.deltaBTfilter
                 else:
-                    user_filter = int(round(self.deltafilter/2.))
+                    user_filter = int(round(self.deltaBTfilter/2.))
                 delta2 = self.smooth_list(tx_roast,z2,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
                 delta2 = delta2[roast_start_idx:roast_end_idx]
                 # add None for parts before and after CHARGE/DROP
@@ -5236,10 +5244,14 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 RoRstart = -1
                             if aw.qmc.background_profile_sampling_interval is None:
-                                ds = None
+                                dsET = None
                             else:
-                                ds = int(max(1,aw.qmc.deltaspan / aw.qmc.background_profile_sampling_interval))
-                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltasamples=ds)
+                                dsET = int(max(1,aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
+                            if aw.qmc.background_profile_sampling_interval is None:
+                                dsBT = None
+                            else:
+                                dsBT = int(max(1,aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
+                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
                         
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
@@ -11062,8 +11074,8 @@ class SampleThread(QThread):
                                 aw.qmc.rateofchange1 = 0.
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(aw.qmc.ctimex1),max(2,(aw.qmc.deltasamples + 1)))
-                            timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltasamples readings
+                            left_index = min(len(aw.qmc.ctimex1),max(2,(aw.qmc.deltaETsamples + 1)))
+                            timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
                             aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                         # compute T2 RoR
                         if t2_final == -1:  # we repeat the last RoR if underlying temperature dropped
@@ -11073,8 +11085,8 @@ class SampleThread(QThread):
                                 aw.qmc.rateofchange2 = 0.
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(aw.qmc.ctimex2),max(2,(aw.qmc.deltasamples + 1)))
-                            timed = aw.qmc.ctimex2[-1] - aw.qmc.ctimex2[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
+                            left_index = min(len(aw.qmc.ctimex2),max(2,(aw.qmc.deltaBTsamples + 1)))
+                            timed = aw.qmc.ctimex2[-1] - aw.qmc.ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings                                
                             aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
 
                         aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
@@ -11082,14 +11094,18 @@ class SampleThread(QThread):
                         
                         #######   filter deltaBT deltaET
                         # decay smoothing
-                        if aw.qmc.deltafilter:
-                            user_filter = int(round(aw.qmc.deltafilter/2.))
-                            if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
+                        if aw.qmc.deltaETfilter:
+                            user_filter = int(round(aw.qmc.deltaETfilter/2.))
+                            if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
                                     self.decay_weights = numpy.arange(1,user_filter+1)
                                 aw.qmc.rateofchange1 = self.decay_average(aw.qmc.timex,aw.qmc.unfiltereddelta1,self.decay_weights)
-                                aw.qmc.rateofchange2 = self.decay_average(aw.qmc.timex,aw.qmc.unfiltereddelta2,self.decay_weights)
-                                
+                        if aw.qmc.deltaBTfilter:
+                            user_filter = int(round(aw.qmc.deltaBTfilter/2.))
+                            if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta2) > user_filter):
+                                if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
+                                    self.decay_weights = numpy.arange(1,user_filter+1)
+                                aw.qmc.rateofchange2 = self.decay_average(aw.qmc.timex,aw.qmc.unfiltereddelta2,self.decay_weights)                                
                         if aw.qmc.timeindex[6]:
                             rateofchange1plot = None
                             rateofchange2plot = None
@@ -11127,11 +11143,13 @@ class SampleThread(QThread):
                     if local_flagstart:
                         # only after CHARGE and we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
                         # and only 7 readings after CHARGE
-                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltafilter/2.)) + max(2,(aw.qmc.deltasamples + 1)):
+                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltaETfilter/2.)) + max(2,(aw.qmc.deltaETsamples + 1)):
                             aw.qmc.delta1.append(rateofchange1plot)
-                            aw.qmc.delta2.append(rateofchange2plot)
                         else:
                             aw.qmc.delta1.append(None)
+                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltaBTfilter/2.)) + max(2,(aw.qmc.deltaBTsamples + 1)):
+                            aw.qmc.delta2.append(rateofchange2plot)
+                        else:
                             aw.qmc.delta2.append(None)
                     else:
                         if len(aw.qmc.delta1) > 0:
@@ -19932,7 +19950,7 @@ class ApplicationWindow(QMainWindow):
 #            if "externaloutprogram" in profile:
 #                self.ser.externaloutprogram = d(profile["externaloutprogram"])
             if "samplinginterval" in profile:
-                # derive aw.qmc.deltasamples from aw.qmc.deltaspan and the sampling interval of the profile
+                # derive aw.qmc.deltaBTsamples from aw.qmc.deltaBTspan and the sampling interval of the profile
                 self.qmc.profile_sampling_interval = profile["samplinginterval"]
                 self.qmc.updateDeltaSamples()
             # Ramp/Soak Profiles
@@ -21414,9 +21432,17 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoC")
             self.qmc.DeltaETflag = bool(toBool(settings.value("DeltaET",self.qmc.DeltaETflag)))
             self.qmc.DeltaBTflag = bool(toBool(settings.value("DeltaBT",self.qmc.DeltaBTflag)))
-            self.qmc.deltafilter = toInt(settings.value("deltafilter",self.qmc.deltafilter))
+            self.qmc.deltaBTfilter = toInt(settings.value("deltafilter",self.qmc.deltaBTfilter))
+            if settings.contains("deltaETfilter"):
+                self.qmc.deltaETfilter = toInt(settings.value("deltaETfilter",self.qmc.deltaETfilter))
+            else:
+                self.qmc.deltaETfilter = self.qmc.deltaBTfilter
             if settings.contains("DeltaSpan"):
-                self.qmc.deltaspan = toInt(settings.value("DeltaSpan",self.qmc.deltaspan))
+                self.qmc.deltaBTspan = toInt(settings.value("DeltaSpan",self.qmc.deltaBTspan))
+                if settings.contains("DeltaETspan"):
+                    self.qmc.deltaETspan = toInt(settings.value("DeltaETspan",self.qmc.deltaETspan))
+                else:
+                    self.qmc.deltaETspan = self.qmc.deltaBTspan
             self.qmc.LCDdecimalplaces = toInt(settings.value("LCDdecimalplaces",self.qmc.LCDdecimalplaces))
             if settings.contains("statisticsmode"):
                 self.qmc.statisticsmode = toInt(settings.value("statisticsmode",self.qmc.statisticsmode))
@@ -22660,8 +22686,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaBT",self.qmc.DeltaBTflag)
             settings.setValue("DeltaETlcd",self.qmc.DeltaETlcdflag)
             settings.setValue("DeltaBTlcd",self.qmc.DeltaBTlcdflag)
-            settings.setValue("deltafilter",self.qmc.deltafilter)
-            settings.setValue("DeltaSpan",self.qmc.deltaspan)
+            settings.setValue("deltaETfilter",self.qmc.deltaETfilter)
+            settings.setValue("deltafilter",self.qmc.deltaBTfilter)
+            settings.setValue("DeltaETspan",self.qmc.deltaETspan)
+            settings.setValue("DeltaSpan",self.qmc.deltaBTspan)
             settings.setValue("LCDdecimalplaces",self.qmc.LCDdecimalplaces)
             settings.setValue("statisticsmode",self.qmc.statisticsmode)
             settings.setValue("swapdeltalcds",self.qmc.swapdeltalcds)
@@ -27691,14 +27719,20 @@ class HUDDlg(ArtisanDialog):
         self.DeltaBT = QCheckBox()
         self.DeltaBT.setChecked(aw.qmc.DeltaBTflag)
         DeltaBTlabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "BT",None))
-        filterlabel = QLabel(QApplication.translate("Label", "Smooth Deltas",None))
+        filterlabel = QLabel(QApplication.translate("Label", "Smoothing",None))
         #DeltaFilter holds the number of pads in filter
-        self.DeltaFilter = QSpinBox()
-        self.DeltaFilter.setSingleStep(1)
-        self.DeltaFilter.setRange(0,40)
-        self.DeltaFilter.setAlignment(Qt.AlignRight)
-        self.DeltaFilter.setValue(aw.qmc.deltafilter/2)
-        self.DeltaFilter.editingFinished.connect(lambda :self.changeDeltaFilter())
+        self.DeltaETfilter = QSpinBox()
+        self.DeltaETfilter.setSingleStep(1)
+        self.DeltaETfilter.setRange(0,40)
+        self.DeltaETfilter.setAlignment(Qt.AlignRight)
+        self.DeltaETfilter.setValue(aw.qmc.deltaETfilter/2)
+        self.DeltaETfilter.editingFinished.connect(lambda :self.changeDeltaETfilter())
+        self.DeltaBTfilter = QSpinBox()
+        self.DeltaBTfilter.setSingleStep(1)
+        self.DeltaBTfilter.setRange(0,40)
+        self.DeltaBTfilter.setAlignment(Qt.AlignRight)
+        self.DeltaBTfilter.setValue(aw.qmc.deltaBTfilter/2)
+        self.DeltaBTfilter.editingFinished.connect(lambda :self.changeDeltaBTfilter())
 
         self.OptimalSmoothingFlag = QCheckBox(QApplication.translate("CheckBox", "Optimal Smoothing Post Roast",None))
         self.OptimalSmoothingFlag.setToolTip(QApplication.translate("Tooltip", "Use an optimal smoothing algorithm (only applicable offline, after recording)", None))        
@@ -27765,14 +27799,21 @@ class HUDDlg(ArtisanDialog):
         self.projectCheck.stateChanged.connect(lambda _:self.changeProjection()) #toggle
         
         deltaSpanLabel = QLabel(QApplication.translate("Label", "Delta Span",None))
-        self.deltaSpan = QComboBox()
         self.spanitems = range(1,31)
-        self.deltaSpan.addItems([str(i) + "s" for i in self.spanitems])
+        self.deltaBTspan = QComboBox()
+        self.deltaBTspan.addItems([str(i) + "s" for i in self.spanitems])
         try:
-            self.deltaSpan.setCurrentIndex(self.spanitems.index(aw.qmc.deltaspan))
+            self.deltaBTspan.setCurrentIndex(self.spanitems.index(aw.qmc.deltaBTspan))
         except Exception:
             pass
-        self.deltaSpan.currentIndexChanged.connect(lambda i=0:self.changeDeltaSpan(i))  #toggle
+        self.deltaBTspan.currentIndexChanged.connect(lambda i=0:self.changeDeltaBTspan(i))  #toggle
+        self.deltaETspan = QComboBox()
+        self.deltaETspan.addItems([str(i) + "s" for i in self.spanitems])
+        try:
+            self.deltaETspan.setCurrentIndex(self.spanitems.index(aw.qmc.deltaETspan))
+        except Exception:
+            pass
+        self.deltaETspan.currentIndexChanged.connect(lambda i=0:self.changeDeltaETspan(i))  #toggle
 
         self.modeComboBox = QComboBox()
         self.modeComboBox.setMaximumWidth(100)
@@ -27859,12 +27900,22 @@ class HUDDlg(ArtisanDialog):
         lcdsLayout.addWidget(DeltaBTlcdLabel)
         lcdsLayout.addStretch()
         lcdsLayout.addWidget(self.swapdeltalcds)
+        DeltaETfilterLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "ET",None))
+        DeltaBTfilterLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "BT",None))
+        sensitivityGrid = QGridLayout()
+        sensitivityGrid.addWidget(DeltaETfilterLabel,0,1,Qt.AlignHCenter)
+        sensitivityGrid.addWidget(DeltaBTfilterLabel,0,2,Qt.AlignHCenter)
+        sensitivityGrid.addWidget(deltaSpanLabel,1,0)
+        sensitivityGrid.addWidget(self.deltaETspan,1,1)
+        sensitivityGrid.addWidget(self.deltaBTspan,1,2)
+        sensitivityGrid.addWidget(filterlabel,2,0)
+        sensitivityGrid.addWidget(self.DeltaETfilter,2,1)
+        sensitivityGrid.addWidget(self.DeltaBTfilter,2,2)
         sensitivityLayout = QHBoxLayout()
-        sensitivityLayout.addWidget(filterlabel)
-        sensitivityLayout.addWidget(self.DeltaFilter)
         sensitivityLayout.addStretch()
-        sensitivityLayout.addWidget(deltaSpanLabel)
-        sensitivityLayout.addWidget(self.deltaSpan)
+        sensitivityLayout.addLayout(sensitivityGrid)
+        sensitivityLayout.addStretch()
+        
         spikesLayout = QHBoxLayout()
         spikesLayout.addWidget(curvefilterlabel)
         spikesLayout.addWidget(self.Filter)
@@ -27938,9 +27989,9 @@ class HUDDlg(ArtisanDialog):
         rorFilterHBox.addWidget(rormaxlabel)
         rorFilterHBox.addWidget(self.rormaxLimit)
         rorFilterVBox = QVBoxLayout()
-        rorFilterVBox.addLayout(rorFilterHBox)
         rorFilterVBox.addLayout(sensitivityLayout)
         rorFilterVBox.addLayout(rorRoRAlgo)  
+        rorFilterVBox.addLayout(rorFilterHBox)
         rorFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Filter",None))
         rorFilterGroupLayout.setLayout(rorFilterVBox)
         # path effects
@@ -29206,9 +29257,15 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.togglecrosslines() # turn crossmarks off to adjust for new coordinate system
         aw.qmc.redraw(recomputeAllDeltas=True)
         
-    def changeDeltaSpan(self,i):
-        if aw.qmc.deltaspan != self.spanitems[i]:
-            aw.qmc.deltaspan = self.spanitems[i]
+    def changeDeltaBTspan(self,i):
+        if aw.qmc.deltaBTspan != self.spanitems[i]:
+            aw.qmc.deltaBTspan = self.spanitems[i]
+            aw.qmc.updateDeltaSamples()
+            aw.qmc.redraw(recomputeAllDeltas=True)
+            
+    def changeDeltaETspan(self,i):
+        if aw.qmc.deltaETspan != self.spanitems[i]:
+            aw.qmc.deltaETspan = self.spanitems[i]
             aw.qmc.updateDeltaSamples()
             aw.qmc.redraw(recomputeAllDeltas=True)
         
@@ -29255,22 +29312,39 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.graphfont = n
         aw.setFonts()
 
-    def changeDeltaFilter(self):
+    def changeDeltaBTfilter(self):
         try:
-            v = self.DeltaFilter.value()*2 + 1
-            if v != aw.qmc.deltafilter:
-                self.DeltaFilter.setDisabled(True)
-                self.DeltaFilter.blockSignals(True)
+            v = self.DeltaBTfilter.value()*2 + 1
+            if v != aw.qmc.deltaBTfilter:
+                self.DeltaBTfilter.setDisabled(True)
+                self.DeltaBTfilter.blockSignals(True)
                 try:
-                    aw.qmc.deltafilter = v
+                    aw.qmc.deltaBTfilter = v
                     aw.qmc.redraw(recomputeAllDeltas=True)
                 except Exception:
                     pass
-                self.DeltaFilter.setDisabled(False)
-                self.DeltaFilter.blockSignals(False)
+                self.DeltaBTfilter.setDisabled(False)
+                self.DeltaBTfilter.blockSignals(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaFilter(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaBTfilter(): {0}").format(str(e)),exc_tb.tb_lineno)
+
+    def changeDeltaETfilter(self):
+        try:
+            v = self.DeltaETfilter.value()*2 + 1
+            if v != aw.qmc.deltaETfilter:
+                self.DeltaETfilter.setDisabled(True)
+                self.DeltaETfilter.blockSignals(True)
+                try:
+                    aw.qmc.deltaETfilter = v
+                    aw.qmc.redraw(recomputeAllDeltas=True)
+                except Exception:
+                    pass
+                self.DeltaETfilter.setDisabled(False)
+                self.DeltaETfilter.blockSignals(False)
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaETfilter(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def changeOptimalSmoothingFlag(self):
         aw.qmc.optimalSmoothing = not aw.qmc.optimalSmoothing

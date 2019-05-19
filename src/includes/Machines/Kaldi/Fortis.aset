@@ -1,5 +1,5 @@
 [General]
-Delay=3000
+Delay=2000
 
 [Device]
 id=29
@@ -16,18 +16,18 @@ PIDmultiplier=0
 SVmultiplier=0
 baudrate=9600
 bytesize=8
-comport=COM5
+comport=/dev/slave
 host=127.0.0.1
 input1bcd=false
 input1code=4
-input1div=0
+input1div=1
 input1float=false
 input1mode=C
 input1register=1000
 input1slave=1
 input2bcd=false
 input2code=4
-input2div=0
+input2div=1
 input2float=false
 input2mode=C
 input2register=1000
@@ -61,9 +61,9 @@ input6mode=C
 input6register=0
 input6slave=0
 littleEndianFloats=false
-parity=N
+parity=O
 port=502
-stopbits=2
+stopbits=1
 timeout=1
 type=0
 wordorderLittle=true
