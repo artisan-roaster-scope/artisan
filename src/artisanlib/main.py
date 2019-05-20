@@ -4594,16 +4594,30 @@ class tgraphcanvas(FigureCanvas):
                     
                     #do water mark if FCs, but no FCe nor SCs nor SCe
                     if timeindex[2] and not timeindex[3] and not timeindex[4] and not timeindex[5] and not timeindex2 and self.watermarksflag:
-                        self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
+                        fc_artist = self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
+                        try:
+                            fc_artist.set_in_layout(False) # remove title from tight_layout calculation
+                        except: # set_in_layout not available in mpl<3.x
+                            pass
                     #do water mark if SCs, but no SCe
                     if timeindex[4] and not timeindex[5] and not timeindex2 and self.watermarksflag:
-                        self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
+                        sc_artist = self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
+                        try:
+                            sc_artist.set_in_layout(False) # remove title from tight_layout calculation
+                        except: # set_in_layout not available in mpl<3.x
+                            pass                        
                 # add COOL mark
                 if timeindex[7] and not timeindex2:
                     tidx = timeindex[7]
-                    endidx = self.ax.get_xlim()[1] # or timex[-1]
+                    # as the right most data value of the axis in self.ax.get_xlim()[1] is only correctly set after the initial draw,
+                    # we simply set it to twice as wide and trust that the clipping will cut of the part not within the axis system
+                    endidx = 2*max(aw.qmc.timex[-1],aw.qmc.endofx,self.ax.get_xlim()[0],self.ax.get_xlim()[1])
                     if timex[tidx] < endidx and self.watermarksflag:
-                        self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None)#,lod=False)                        
+                        cool_mark = self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=True, lw=None)#,lod=False)                        
+                        try:
+                            cool_mark.set_in_layout(False) # remove title from tight_layout calculation
+                        except: # set_in_layout not available in mpl<3.x
+                            pass
                 aw.qmc.l_annotations = anno_artists
         except Exception as e:
 #            import traceback
@@ -32586,7 +32600,7 @@ class editGraphDlg(ArtisanDialog):
                 percent = aw.weight_loss(float(aw.comma2dot(str(self.bean_density_in_edit.text()))),float(aw.comma2dot(str(self.bean_density_out_edit.text()))))
         except Exception:
             pass
-        if percent == 0:
+        if percent <= 0:
             self.densitypercentlabel.setText("")
         else:
             percentstring =  "-%.1f" %(percent) + "%"
@@ -32600,7 +32614,7 @@ class editGraphDlg(ArtisanDialog):
                 percent = float(aw.comma2dot(str(self.moisture_greens_edit.text()))) - m_roasted
         except Exception:
             pass
-        if percent == 0:
+        if percent <= 0:
             self.moisturepercentlabel.setText("")
         else:
             percentstring =  "-%.1f" %(percent) + "%"
