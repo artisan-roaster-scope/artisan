@@ -5397,6 +5397,84 @@ class tgraphcanvas(FigureCanvas):
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
                                                                               
+                        if len(self.backgroundEvents) > 0:
+                            if self.eventsGraphflag == 4:
+                                # we prepare copies of the background Evalues
+                                Bevalues = [self.E1backgroundvalues[:],self.E2backgroundvalues[:],self.E3backgroundvalues[:],self.E4backgroundvalues[:]]
+                            for i in range(len(self.backgroundEvents)):
+                                if self.backgroundEtypes[i] == 4 or self.eventsGraphflag in [0,3,4]:
+                                    if self.backgroundEtypes[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.backgroundEStrings[i].strip()) == 0):
+                                        Betype = self.Betypesf(self.backgroundEtypes[i])
+                                        firstletter = u(Betype[0])
+                                        secondletter = self.eventsvaluesShort(self.backgroundEvalues[i])
+                                    else:
+                                        firstletter = self.backgroundEStrings[i].strip()[:4]
+                                        if firstletter == "":
+                                            firstletter = "E"
+                                        secondletter = ""
+                                    if self.mode == "F":
+                                        height = 50
+                                    else:
+                                        height = 20
+                                        
+                                    if self.eventsGraphflag == 4 and self.backgroundEtypes[i] < 4 and aw.qmc.showEtypes[self.backgroundEtypes[i]]:
+                                        Btemp = Bevalues[self.backgroundEtypes[i]][0]
+                                        Bevalues[self.backgroundEtypes[i]] = Bevalues[self.backgroundEtypes[i]][1:]
+                                    else:
+                                        Btemp = None 
+
+                                    if Btemp != None and aw.qmc.showEtypes[self.backgroundEtypes[i]]:
+                                        if self.backgroundEtypes[i] == 0:
+                                            boxstyle = 'roundtooth,pad=0.4'
+                                            boxcolor = self.EvalueColor[0]
+                                            textcolor = self.EvalueTextColor[0]
+                                        elif self.backgroundEtypes[i] == 1:
+                                            boxstyle = 'round,pad=0.3,rounding_size=0.8'
+                                            boxcolor = self.EvalueColor[1]
+                                            textcolor = self.EvalueTextColor[1]
+                                        elif self.backgroundEtypes[i] == 2:
+                                            boxstyle = 'sawtooth,pad=0.3,tooth_size=0.2'
+                                            boxcolor = self.EvalueColor[2]
+                                            textcolor = self.EvalueTextColor[2]
+                                        elif self.backgroundEtypes[i] == 3:
+                                            boxstyle = 'round4,pad=0.3,rounding_size=0.15'
+                                            boxcolor = self.EvalueColor[3]
+                                            textcolor = self.EvalueTextColor[3]
+                                        elif self.backgroundEtypes[i] == 4:
+                                            boxstyle = 'square,pad=0.1'
+                                            boxcolor = self.palette["specialeventbox"]
+                                            textcolor = self.palette["specialeventtext"]
+                                        if self.eventsGraphflag in [0,3] or self.backgroundEtypes[i] > 3:
+                                            anno = self.ax.annotate(firstletter + secondletter, xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
+                                                         xytext=(self.timeB[int(self.backgroundEvents[i])],Btemp+height),
+                                                         alpha=0.7,
+                                                         color=aw.qmc.palette["bgeventtext"],
+                                                         va="center", ha="center",
+                                                         arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4), # ,relpos=(0,0)
+                                                         bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none', alpha=aw.qmc.backgroundalpha),
+                                                         fontproperties=fontprop_small,
+                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
+                                                         )
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                        elif self.eventsGraphflag == 4:
+                                            anno = self.ax.annotate(firstletter + secondletter, xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
+                                                         xytext=(self.timeB[int(self.backgroundEvents[i])],Btemp),
+                                                         alpha=0.7,
+                                                         color=aw.qmc.palette["bgeventtext"],
+                                                         va="center", ha="center",
+                                                         bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none',alpha=aw.qmc.backgroundalpha),
+                                                         fontproperties=fontprop_small,
+                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
+                                                         )
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass                          
+
+                                                                              
                     #check backgroundDetails flag
                     if self.backgroundDetails:
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min 
@@ -38283,7 +38361,7 @@ class scaleport(extraserialport):
             "None" : None,
             "KERN NDE" : self.readKERN_NDE,
             "acaia" : self.readAcaia,
-            "Shore 930" : self.readShore930,
+            #"Shore 930" : self.readShore930,
         }
 
     def closeport(self):
