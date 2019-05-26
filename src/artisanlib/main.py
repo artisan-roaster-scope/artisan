@@ -12605,30 +12605,6 @@ class ApplicationWindow(QMainWindow):
         #create a Label object to display program status information
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(6)
-
-#        self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
-#                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
-#                                     "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
-#                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
-#                                     "ON":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red }",
-#                                     "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-#                                     "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-#                                     "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-#                                     "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-#                                     "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-#                                     "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-#                                     "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-#                                     "RESET":"QPushButton {font-size: 14pt; font-weight: bold; color: black; background-color: white }",
-#                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #bbbeec }",
-#                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff }",
-#                                     "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
-#                                     "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-#                                     "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
-#                                     "PIDactive":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
-#                                     "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
-#                                     "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
-#                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
-#                                     }
         # set a few broad style parameters
         if locale == "es":
             self.button_font_size_pt = 11
@@ -13142,16 +13118,58 @@ class ApplicationWindow(QMainWindow):
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small_selected + """;
                     font-weight: bold;
-                    color: #e687a8;
-                    background:""" + self.createGradient('#147bb3') + """ ;
+                    color: white;
+                    background:""" + self.createGradient('#d4336a') + """ ;
+                }
+                QPushButton:flat{
+                    color: darkgrey;
+                    background-color: #f9e2ea;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #F5F5F5;
+                    background-color: #e687a8;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #d4336a;
                 }
                 QPushButton:pressed {
-                    color: #f0b7cb;
+                    color: white;
                     background:""" + self.createGradient('#147bb3') + """ ;
                 }
                 QPushButton:hover:!pressed {
-                    color: #f0b7cb;
+                    color: white;
+                    background:""" + self.createGradient('#cc0f50') + """ ;
+                }
+            """,
+            "SELECTED_MAIN":     """
+                QPushButton {
+                    min-width:75px;
+                    """ + border_modern + """
+                    font-size: """ + self.ooss_font_size_small_selected + """;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#c00b40') + """ ;
+                }
+                QPushButton:flat{
+                    color: darkgrey;
+                    background-color: #f0b7cb;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #F5F5F5;
+                    background-color: #db5785;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #cc0f50;
+                }
+                QPushButton:pressed {
+                    color: white;
                     background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#c70d49') + """ ;
                 }
             """
             }
@@ -17831,7 +17849,10 @@ class ApplicationWindow(QMainWindow):
                 else:
                     nextcmd = self.nextActiveButton(self.keyboardmoveindex)
                 # activate the button at index nextcmd
-                self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                if self.keyboardButtonStyles[nextcmd] in ["CHARGE","DROP"]:
+                    self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED_MAIN"])
+                else:
+                    self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED"])
                 # deactivate the button at index self.keyboardmoveindex
                 if self.keyboardmoveindex == 1: # we make an exception to respect the state of the HUD button
                     if self.qmc.HUDflag:
@@ -31469,13 +31490,13 @@ class editGraphDlg(ArtisanDialog):
             line = u(QApplication.translate("Label", "Template",None)) + ": " + line
         self.template_line.setText(line)
             
-    def updatePlusSelectedLine(self):
+    def updatePlusSelecwtedLine(self):
         try:
             line = ""
             if self.plus_coffee_selected is not None and self.plus_coffee_selected_label:
                 line = '<a href="{0}">{1}</a>'.format(plus.util.coffeeLink(self.plus_coffee_selected),self.plus_coffee_selected_label)
             elif self.plus_blend_selected_spec and self.plus_blend_selected_spec_labels:
-                for i,l in zip(self.plus_blend_selected_spec["ingredients"],self.plus_blend_selected_spec_labels):
+                for i,l in sorted(zip(self.plus_blend_selected_spec["ingredients"],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]["ratio"],reverse = True):
                     if line:
                         line = line + ", "
                     c = '<a href="{0}">{1}</a>'.format(plus.util.coffeeLink(i["coffee"]),l)

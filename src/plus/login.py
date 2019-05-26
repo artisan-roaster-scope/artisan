@@ -68,7 +68,7 @@ class Login(QDialog):
         # add additional CMD-. shortcut to close the dialog
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setShortcut(QKeySequence("Ctrl+."))
         # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self, triggered=lambda _:self.restoreState())
+        cancelAction = QAction(self, triggered=lambda _:self.reject())
         try:
             cancelAction.setShortcut(QKeySequence.Cancel)
         except:
