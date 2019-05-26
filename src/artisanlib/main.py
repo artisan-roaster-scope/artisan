@@ -2261,7 +2261,8 @@ class tgraphcanvas(FigureCanvas):
         self.ax_background = None
 
     def onpick(self,event):
-        if self.legend is not None and event.artist != self.legend and (isinstance(event.artist, matplotlib.lines.Line2D) or isinstance(event.artist, matplotlib.text.Text)):
+        if self.legend is not None and event.artist != self.legend and (isinstance(event.artist, matplotlib.lines.Line2D) or isinstance(event.artist, matplotlib.text.Text)) and \
+            event.artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
             idx = None
             # deltaLabelMathPrefix (legend label)
             # deltaLabelUTF8 (artist)
