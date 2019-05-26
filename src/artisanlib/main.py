@@ -13146,7 +13146,7 @@ class ApplicationWindow(QMainWindow):
                 QPushButton {
                     min-width:75px;
                     """ + border_modern + """
-                    font-size: """ + self.ooss_font_size_small_selected + """;
+                    font-size: """ + self.button_font_size_small_selected + """;
                     font-weight: bold;
                     color: white;
                     background:""" + self.createGradient('#c00b40') + """ ;
