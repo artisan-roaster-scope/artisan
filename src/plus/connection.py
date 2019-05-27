@@ -141,7 +141,7 @@ def setKeyring():
                 pass               
         #config.logger.debug("keyring: %s",str(keyring.get_keyring()))
     except Exception as e:
-        import sys
+        import sys # @Reimport
         _, _, exc_tb = sys.exc_info()
         config.logger.error("controller: keyring Exception %s (line %s)",e,exc_tb.tb_lineno)
     

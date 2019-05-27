@@ -171,7 +171,7 @@ def connect(clear_on_failure=False,interactive=True):
                 connect_semaphore.release(1)
         config.app_window.updatePlusStatus() # @UndefinedVariable
         if interactive and is_connected():
-        	stock.update()
+            stock.update()
 
 def disconnect(remove_credentials = True, stop_queue = True):
     config.logger.info("controller:disconnect(%s,%s)",remove_credentials,stop_queue)
