@@ -5119,7 +5119,7 @@ class tgraphcanvas(FigureCanvas):
                     jump = 20
                     for i in range(4):
                         if aw.qmc.showEtypes[3-i]:                   
-                            rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.15)
+                            rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect5"],alpha=.15)
                             self.ax.add_patch(rectEvent)
                         if self.mode == "C":
                             jump -= 10
