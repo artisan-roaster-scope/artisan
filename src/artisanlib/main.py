@@ -25464,7 +25464,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
         contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeye Coffee), Moshe Spinell")
         contributors += u(", Morris Beume (Morris.Coffee), Michael Herbert, Bill (San Franciscan Roaster), Chistopher Feran")
-        contributors += u(", Coffed, Bono Gargolov, Rodrigo Ramos, Nico Bigler<br>")
+        contributors += u(", Coffed, Bono Gargolov, Rodrigo Ramos, Nico Bigler, Saeed Abdinasab, Lewis Li<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -26237,48 +26237,54 @@ class ApplicationWindow(QMainWindow):
     def switchLanguageFlag(self,locale,value):
         if locale == "en" or locale == "en_US":
             self.EnglishLanguage.setChecked(value)
+        elif locale == "ar":
+            self.ArabicLanguage.setChecked(value)
         elif locale == "de":
             self.GermanLanguage.setChecked(value)
-        elif locale == "fr":
-            self.FrenchLanguage.setChecked(value)
-        elif locale == "es":
-            self.SpanishLanguage.setChecked(value)
-        elif locale == "sv":
-            self.SwedishLanguage.setChecked(value)
-        elif locale == "it":
-            self.ItalianLanguage.setChecked(value)
-        elif locale == "zh_CH":
-            self.ChineseChinaLanguage.setChecked(value)
-        elif locale == "zh_TW":
-            self.ChineseTaiwanLanguage.setChecked(value)
         elif locale == "el":
             self.GreekLanguage.setChecked(value)
-        elif locale == "no":
-            self.NorwegianLanguage.setChecked(value)
-        elif locale == "nl":
-            self.DutchLanguage.setChecked(value)
+        elif locale == "es":
+            self.SpanishLanguage.setChecked(value)
+        elif locale == "fa":
+            self.FarsiLanguage.setChecked(value)
+        elif locale == "fi":
+            self.FinishLanguage.setChecked(value)
+        elif locale == "fr":
+            self.FrenchLanguage.setChecked(value)
+        elif locale == "he":
+            self.HebrewLanguage.setChecked(value)
+        elif locale == "hu":
+            self.HungarianLanguage.setChecked(value)
+        elif locale == "id":
+            self.IndonesianLanguage.setChecked(value)
+        elif locale == "it":
+            self.ItalianLanguage.setChecked(value)
+        elif locale == "ja":
+            self.JapaneseLanguage.setChecked(value)
         elif locale == "ko":
             self.KoreanLanguage.setChecked(value)
+        elif locale == "nl":
+            self.DutchLanguage.setChecked(value)
+        elif locale == "no":
+            self.NorwegianLanguage.setChecked(value)
         elif locale == "pt":
             self.PortugueseLanguage.setChecked(value)
         elif locale == "pt_BR":
             self.PortugueseBrasilLanguage.setChecked(value)
+        elif locale == "pl":
+            self.PolishLanguage.setChecked(value)
         elif locale == "ru":
             self.RussianLanguage.setChecked(value)
-        elif locale == "ar":
-            self.ArabicLanguage.setChecked(value)
-        elif locale == "fi":
-            self.FinishLanguage.setChecked(value)
+        elif locale == "sv":
+            self.SwedishLanguage.setChecked(value)
+        elif locale == "th":
+            self.ThaiLanguage.setChecked(value)
         elif locale == "tr":
             self.TurkishLanguage.setChecked(value)
-        elif locale == "ja":
-            self.JapaneseLanguage.setChecked(value)
-        elif locale == "hu":
-            self.HungarianLanguage.setChecked(value)
-        elif locale == "he":
-            self.PolishLanguage.setChecked(value)
-        elif locale == "pl":
-            self.HebrewLanguage.setChecked(value)
+        elif locale == "zh_CH":
+            self.ChineseChinaLanguage.setChecked(value)
+        elif locale == "zh_TW":
+            self.ChineseTaiwanLanguage.setChecked(value)
                                
     def changelocale(self,languagelocale):
         if locale != languagelocale:
@@ -26294,6 +26300,8 @@ class ApplicationWindow(QMainWindow):
                 settings = QSettings()
                 settings.setValue('locale', languagelocale)
                 self.close()
+            else:
+                self.switchLanguageFlag(languagelocale,False)
                                     
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loss in percentage as float
@@ -31495,7 +31503,7 @@ class editGraphDlg(ArtisanDialog):
             line = u(QApplication.translate("Label", "Template",None)) + ": " + line
         self.template_line.setText(line)
             
-    def updatePlusSelecwtedLine(self):
+    def updatePlusSelectedLine(self):
         try:
             line = ""
             if self.plus_coffee_selected is not None and self.plus_coffee_selected_label:
