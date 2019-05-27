@@ -5308,7 +5308,7 @@ class tgraphcanvas(FigureCanvas):
                                                     fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["bgeventtext"],
                                                     arrowprops=dict(arrowstyle='wedge',color=self.palette["bgeventmarker"],
                                                                     alpha=self.backgroundalpha),#relpos=(0,0)),
-                                                    alpha=self.backgroundalpha)
+                                                    alpha=min(self.backgroundalpha + 0.1, 1.0))
                                 try:
                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                 except: # mpl before v3.0 do not have this set_in_layout() function
@@ -5363,7 +5363,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                                             picker=2,
                                                                             #markevery=every,
-                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
+                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(0,True))                            
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if cool exists and last event was earlier
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -5374,7 +5374,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                                             picker=2,
                                                                             #markevery=every,
-                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
+                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(1,True))
                             if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if cool exists and last event was earlier
                                     self.E3backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -5385,7 +5385,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                                             picker=2,
                                                                             #markevery=every,
-                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
+                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(2,True))
                             if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if cool exists and last event was earlier
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -5396,7 +5396,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                                             picker=2,
                                                                             #markevery=every,
-                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
+                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(3,True))
                                                                               
                         if len(self.backgroundEvents) > 0:
                             if self.eventsGraphflag == 4:
@@ -5448,10 +5448,10 @@ class tgraphcanvas(FigureCanvas):
                                         if self.eventsGraphflag in [0,3] or self.backgroundEtypes[i] > 3:
                                             anno = self.ax.annotate(firstletter + secondletter, xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
                                                          xytext=(self.timeB[int(self.backgroundEvents[i])],Btemp+height),
-                                                         alpha=0.7,
+                                                         alpha=min(aw.qmc.backgroundalpha + 0.1, 1.0),
                                                          color=aw.qmc.palette["bgeventtext"],
                                                          va="center", ha="center",
-                                                         arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4), # ,relpos=(0,0)
+                                                         arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=aw.qmc.backgroundalpha), # ,relpos=(0,0)
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none', alpha=aw.qmc.backgroundalpha),
                                                          fontproperties=fontprop_small,
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
@@ -5463,7 +5463,7 @@ class tgraphcanvas(FigureCanvas):
                                         elif self.eventsGraphflag == 4:
                                             anno = self.ax.annotate(firstletter + secondletter, xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
                                                          xytext=(self.timeB[int(self.backgroundEvents[i])],Btemp),
-                                                         alpha=0.7,
+                                                         alpha=min(aw.qmc.backgroundalpha + 0.1, 1.0),
                                                          color=aw.qmc.palette["bgeventtext"],
                                                          va="center", ha="center",
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none',alpha=aw.qmc.backgroundalpha),
