@@ -55,6 +55,10 @@ gallery:
     image_path: /assets/images/kaldi-logo.jpg
     alt: "KALDI Coffee Roaster"
     title: "KALDI Coffee Roaster"
+  - url: http://www.hasgaranti.com.tr
+    image_path: /assets/images/hasgaranti-logo.jpg
+    alt: "Has Garanti"
+    title: "Has Garanti"
 
 
 ---

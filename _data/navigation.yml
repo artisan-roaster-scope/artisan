@@ -30,6 +30,8 @@ machines:
         url: /machines/diedrich/
       - title: "Giesen"
         url: /machines/giesen/
+      - title: "Has Garanti"
+        url: /machines/hasgaranti/
       - title: "Hottop"
         url: /machines/hottop/
       - title: "IMF"
