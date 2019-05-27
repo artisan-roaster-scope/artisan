@@ -5599,7 +5599,7 @@ class tgraphcanvas(FigureCanvas):
                                     anno = self.ax.annotate(firstletter + secondletter, 
                                                      xy=(self.timex[int(self.specialevents[i])], 
                                                      temps[int(self.specialevents[i])]),
-                                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]+2.5),
+                                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]+4.5),
                                                      alpha=1.,
                                                      va="center", ha="left",
                                                      bbox=dict(boxstyle='square,pad=0.1', fc=self.palette["specialeventbox"], ec='none'),
