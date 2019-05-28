@@ -31,3 +31,6 @@ toc: false
 
   * By John Uriarte
       - [Coffee Insanity - Modifying your Behmor 1600+ with probes and using Artisan to record your roasts](https://www.youtube.com/watch?v=EwqifxjkXgc&feature=youtu.be)
+
+  * By Alan
+      - [Using Artisan Designer](https://www.youtube.com/watch?v=_Xw_vNcmhR8)
