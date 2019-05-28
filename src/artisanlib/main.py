@@ -9331,8 +9331,10 @@ class tgraphcanvas(FigureCanvas):
             if line:
                 error = error + "@line " + str(line)
             self.errorlog.append(timez + " " + error)
-            #aw.sendmessage(error) # don't send message here, but cache it and send it from updategraphics from within the GUI thread
-            self.temporary_error = error
+            if self.flagon: # don't send message here, but cache it and send it from updategraphics from within the GUI thread
+                self.temporary_error = error
+            else:
+                aw.sendmessage(error) 
         except Exception:
             pass
         finally:

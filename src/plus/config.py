@@ -75,7 +75,6 @@ queue_put_timeout = 0.5 # number of seconds to wait on putting a new item into t
 # AppData
 
 # the stock cache reflects the current coffee stock of the account and gets automatically synced with the cloud
-# Note: the cache file is shared between the main Artisan and the ArtisanViewer app, protected by a filelock
 stock_cache = "cache"
 
 # the uuid register that associates UUIDs with local filepaths where to locate the corresponding Artisan profiles

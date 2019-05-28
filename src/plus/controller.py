@@ -212,7 +212,8 @@ def reconnected():
 def updateSyncRecordHashAndSync():
     try:
         config.logger.info("controller:updateSyncRecordHashAndSync()")
-        if is_on():
+        aw = config.app_window
+        if is_on() and bool(aw.curFile):
             roast_record = roast.getRoast()
             sync_record,sync_record_hash = roast.getSyncRecord(roast_record)
             if is_synced():
@@ -224,6 +225,10 @@ def updateSyncRecordHashAndSync():
                 if sync.syncRecordUpdated(roast_record):
                     # we push updates on the sync record back to the server via the queue
                     queue.addRoast(sync_record)
+            elif "roast_id" in roast_record and queue.full_roast_in_queue(roast_record["roast_id"]):
+                # in case this roast is not yet in sync cache as it has not been successfully uploaded, but a corresponding full roast
+                # record is already in the uploading queue we add this updating sync_record also to the queue
+                queue.addRoast(sync_record)
             return sync_record_hash
         else:
             return None

@@ -37,7 +37,8 @@ queue_path = util.getDirectory(config.outbox_cache,share=True)
 
 app = QCoreApplication.instance()
 
-queue = persistqueue.SQLiteQueue(queue_path,multithreading=True)
+queue = persistqueue.SQLiteQueue(queue_path,multithreading=True,auto_commit=False)
+# auto_commit=False : we keep items in the queue if not explicit marked as task_done
 
 # queue entries are dictionaries with entries
 #   url   : the URL to send the request to
@@ -83,27 +84,29 @@ class Concur(threading.Thread):
                 time.sleep(config.queue_task_delay)
                 config.logger.debug("queue: -> worker processing item: %s",item)
                 iters = config.queue_retries + 1
-                keepTask = False
-                syncItemAdded = False # set to True if sync item was added due to a connection error already once
                 while iters > 0:
                     config.logger.debug("queue: -> remaining iterations: %s",iters)
                     r = None
                     try:
-                        controller.connect(clear_on_failure=False,interactive=False)
-                        r = connection.sendData(item["url"],item["data"],item["verb"])
-                        r.raise_for_status()
-                        iters = 0
-                        # successfully transmitted, we add/update the roasts UUID sync-cache
-                        self.addSyncItem(item)
-                    except ConnectionError as e:
-                        config.logger.debug("queue: -> connection error, disconnecting: %s",e)
-                        # we disconnect, but keep the queue running to let it automatically reconnect if possible
-                        controller.disconnect(remove_credentials = False, stop_queue=False)
-                        keepTask = True
-                        # not yet transmitted due to connection issues, we still add/update the roasts UUID sync-cache
-                        if not syncItemAdded:
+                        # we upload only full roast records, or partial updates in case the are under sync (registered in the sync cache)
+                        if is_full_roast_record(item["data"]) or ("roast_id" in item["data"] and sync.getSync(item["data"]["roast_id"])):
+                            controller.connect(clear_on_failure=False,interactive=False)
+                            r = connection.sendData(item["url"],item["data"],item["verb"])
+                            r.raise_for_status()
+                            # successfully transmitted, we add/update the roasts UUID sync-cache
+                            iters = 0
                             self.addSyncItem(item)
-                            syncItemAdded = True
+                        else:
+                            # partial sync updates for roasts not registered for syncing are ignored
+                            iters = 0
+                    except ConnectionError as e:
+                        try:
+                            if controller.is_connected():
+                                config.logger.debug("queue: -> connection error, disconnecting: %s",e)
+                                # we disconnect, but keep the queue running to let it automatically reconnect if possible
+                                controller.disconnect(remove_credentials = False, stop_queue=False)
+                        except:
+                            pass
                         # we don't change the iter, but retry to connect after a delay in the next iteration
                         time.sleep(config.queue_retry_delay)
                     except Exception as e:
@@ -113,22 +116,25 @@ class Concur(threading.Thread):
                         else:
                             config.logger.debug("queue: -> no status code")
                         if r is not None and r.status_code == 401: # authentication failed
-                            controller.disconnect(remove_credentials = False)
-                            iters = 0 # we don't retry and keep the task item
-                            keepTask = True
-                            # not yet transmitted due to credentials issues, we still add/update the roasts UUID sync-cache
-                            self.addSyncItem(item)
+                            try:
+                                if controller.is_connected():
+                                    config.logger.debug("queue: -> connection error, disconnecting: %s",e)
+                                    # we disconnect, but keep the queue running to let it automatically reconnect if possible
+                                    controller.disconnect(remove_credentials = False, stop_queue=False)
+                            except:
+                                pass
+                            # we don't change the iter, but retry to connect after a delay in the next iteration
+                            time.sleep(config.queue_retry_delay)
                         elif r is not None and r.status_code == 409: # conflict
                             iters = 0 # we don't retry, but remove the task as it is faulty
                         else: # 500 internal server error, 429 Client Error: Too Many Requests, 404 Client Error: Not Found or others
                             # something went wrong we don't mark this task as done and retry
                             iters = iters - 1
                             time.sleep(config.queue_retry_delay)                        
-                if not keepTask:
-                    # we call task_done to remove the item from the queue
-                    queue.task_done()
-                    item = None
-                    config.logger.debug("queue: -> task done")                
+                # we call task_done to remove the item from the queue
+                queue.task_done()
+                item = None
+                config.logger.debug("queue: -> task done")                
                 config.logger.debug("queue: end of run:while paused=%s",self.paused)
             except Exception as e:
                 pass
@@ -143,7 +149,7 @@ class Concur(threading.Thread):
         config.logger.info("queue:pause()")
         with self.state:
             self.paused = True  # make self block and wait
-   
+
         
 def start():
     if app.artisanviewerMode:
@@ -166,12 +172,32 @@ def stop():
         config.logger.info("queue:stop()")
         worker_thread.pause()
 
+# check if a full roast record (one with date) with roast_id is in the queue
+# this is used to add only items that
+def full_roast_in_queue(roast_id):
+    q = persistqueue.SQLiteQueue(queue_path,multithreading=True,auto_commit=False)
+    try:
+        while True:
+            item = q.get(block=False)
+            if "data" in item:
+                r = item["data"]
+                if is_full_roast_record(r) and roast_id == r["roast_id"]:
+                    # there is a full roast record already in queue
+                    break
+        del q
+        return True
+    except: # we reached the end of the queue
+        del q
+        return False
 
 ################
 
+# returns true if the given roast_record r is a full record containing all information (incl. the roast date) and not only an update
+def is_full_roast_record(r):
+    return "date" in r and r["date"] and "amount" in r and "roast_id" in r
 
 # called on completed roasts with roast data
-# if roast_record is given, we assume an update is queue, otherwise a new roast is queued
+# if roast_record is given, we assume an update is queued, otherwise a new roast is queued
 #   a full roast_record requires at least
 #      - roast_id
 #      - date
