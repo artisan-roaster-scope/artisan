@@ -5597,7 +5597,7 @@ class tgraphcanvas(FigureCanvas):
                                             temps = self.stemp2
 #                                    fcolor=self.EvalueColor[self.specialeventstype[i]]
                                     if platf == 'Windows':
-                                        vert_offset = 4.5
+                                        vert_offset = 5.0
                                     else:
                                         vert_offset = 2.5
                                     anno = self.ax.annotate(firstletter + secondletter, 
@@ -7018,6 +7018,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.button_7.setEnabled(True)
             aw.button_7.setVisible(True)
+            aw.keyboardmoveflag = 0  #disable keyboard navigation
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None))
             aw.sendmessage(QApplication.translate("Message","Scope stopped", None))
@@ -12629,8 +12630,6 @@ class ApplicationWindow(QMainWindow):
             self.button_font_size_tiny = str(self.button_font_size_pt - 5) + 'pt'
 
         border_modern = "border-style:solid; border-radius:4;border-color:grey; border-width:0;" # modernize
-#        border_modern_pressed = "border-style:solid; border-radius:4;border-color:black; border-width:0;" # modernize
-        # Can't find a way to use palette colors here i.e., aw.palette['canvas']  This needs to get solved.
         # parking this green shade in case we want to use it later #00d55a
         self.pushbuttonstyles = {
             "RESET":     """
@@ -38418,13 +38417,10 @@ class scaleport(extraserialport):
             if self.device is not None and self.device != "None" and self.device != "" and self.device != "acaia":
                 wei,den,moi = self.devicefunctionlist[u(self.device)]()
                 if moi is not None and moi > -1:
-    #                print("Moisture =",moi)  #dave99
                     return -1, -1, aw.float2float(moi)
                 elif den is not None and den > -1:
-    #                print("Density =",den)  #dave99
                     return -1, aw.float2float(den), -1
                 elif wei is not None and wei > -1:
-    #                print("Weight =",res)  #dave99
                     return aw.float2float(wei), -1, -1
                 else:
                     return -1,-1,-1
@@ -38472,43 +38468,35 @@ class scaleport(extraserialport):
                     self.openport()
                 if self.SP.isOpen():
                     line1 = self.SP.readline()
-#                    print("line1",line1)  #dave99
                     weight = re.search(r'Current Weight:',str(line1))
                     if weight:                    
                         w = re.findall(r'([0-9\.]+)',str(line1))
                         if len(w) == 1:
                             return toFloat(w[0]),-1,-1
                         else:
-#                            print("NOT GOOD Multiple results")  #dave99
                             return -1,-1,-1
 
                     density = re.search(r'Test Weight',str(line1))
                     if density:
                         line2 = self.SP.readline()
-#                        print("line2",line2)   #dave99
                         d = re.findall(r'[0-9\.\-]+',str(line2))
-#                        print("d",d)    #dave99
                         if len(d) == 1:
                             den = toFloat(d[0]) *12.8718597   # convert from LBS/BU to g/
                             return -1,toFloat(den),-1
                         else:
-#                            print("NOT GOOD Multiple results")  #dave99
                             return -1,-1,-1
 
                     moisture = re.search(r'Beans',str(line1))
                     if moisture:
                         line2 = self.SP.readline()
-#                        print("line2",line2)  #dave99
                         m = re.findall(r'[0-9\.\-]+',str(line2))
 #                        line3 = self.SP.readline() # unused!
                         if len(m) == 1:
                             return -1,-1,toFloat(m[0])
                         else:
-#                            print("NOT GOOD Multiple results")  #dave99
                             return -1,-1,-1
 
                     else:
-#                        print("DID NOT SEE ANYTHING")   #dave99
                         return -1,-1,-1
         except Exception:
             return -1,-1,-1
