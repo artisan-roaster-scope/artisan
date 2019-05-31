@@ -2,7 +2,46 @@ Detailed Release History
 ========================
 
 ----
+v2.0.0 (6/2019)
+------------------
 
+* New Features
+  - adds support for the [artisan.plus](https://artisan.plus/) inventory management service ([Issue #231](../../../issues/231) and [Issue #308](../../../issues/308))
+  - adds support for the [Coffee-Tech Engineering Silon ZR7](https://www.coffee-tech.com/products/shop-roasters/silon-zr-7-shop-roaster/)
+  - adds support for [Has Garanti HGS and HSR series](http://www.hasgaranti.com.tr/en/products/shop-type-products/shop-type-roasting-coffee-machine.html)
+  - adds support for [Kaldi Fortis](https://eng.homecaffe.net/product/kaldi-fortis-grande-coffee-roaster/126/category/223/display/1/) (Tron in preparation)
+  - adds support for [Behmor 1kg](https://behmor.com/jake-kilo-roaster/)
+  - adds support for the VICTOR 86B Digital Multimeter (by Lewis Li)
+  - adds support for Acaia scales via directly BLE communication without need for configuration or extra hardware (OS X only for now)
+  - adds sorting of custom event buttons table by drag-and-drop ([Issue 214](../../../issues/214), resolved by [PR #345](../../../pull/345) contributed by Phil)
+  - adds tick to swap Delta BT/ET LCDs and the corresponding curve z-order ([Issue 330](../../../issues/330))
+  - allows to set RoR smoothing for ET and BT separately
+  - adds beep to playback aid and noisy text messages
+  - adds Artisan Command actions to enable/disable AutoCHARGE and AutoDROP (`autoCHARGE(<b>)` and `autoDROP(<b>)`)
+  - adds Artisan Command `tare(<n>)` to tare channel `<n>` with `1 => ET, 2 => BT,..` ([Issue 331](../../../issues/331))
+  - renders values of background events in Combo mode ([Issue 274](../../../issues/272))
+  - adds translations for Farsi (thanks to Saeed Abdinasab)
+* Changes
+  - breaking feature: app domain changed to artisan-scope.org with the consequences that the app settings are now stored in a different location w.r.t. previous app versions
+  - new app icon
+  - new UI designs (buttons, LCDs,..)
+  - curves are now drawn in LCD order thus ET is drawn above BT by default. If swap LCDs is ticked under Config >> Devices, also BT is drawn on top of ET.
+  - hidden custom event button are interpreted as spacers to layout button groups
+  - lib updates on all platforms but RPi (Python 3.7.3, Qt 5.12.3, PyQt 5.12.2, pymodbus 2.2, Matplotlib 3.1)
+  - RESET button action disconnects serial, MODBUS and S7 connections
+  - removes roasted weight, volume, density and moisture as well as colors from recent roast menu items
+  - updated Chinese translations (thanks to Lewis Li)
+* Fixes
+  - fixes and error when starting designer ([Issue 340](../../../issues/340))
+  - adds back the missing ET RoR LCD ([Issue 343](../../../issues/343))
+  - fixes Update button in Roast Properties to harvest ambient sensors
+  - improved Yoctopuce async mode (adds 1s* averaging on device mode)
+  - fixes cross mouse rendering
+  - keeps PhidgetManager running on "Keep ON"
+  - improves the communication speed of several serial meters like the Voltcraft and Omega devices
+  - fixes regression that could lead to a potential hang caused by slow communicating devices
+
+----
 v1.6.1 (20.03.2019)
 ------------------
 
@@ -15,6 +54,7 @@ v1.6.1 (20.03.2019)
   - fixes regression that disabled the editing of roast properties event times
 
 
+----
 v1.6.1 (10.03.2019)
 ------------------
 
