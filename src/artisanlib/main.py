@@ -558,8 +558,8 @@ if len(locale) == 0:
         else:
             locale = langs.objectAtIndex_(0)[:2]
     else:
-        if langs.objectAtIndex_(0)[:3] == "zh_" or langs.objectAtIndex_(0)[:3] == "pt_":
-            locale = langs.objectAtIndex_(0)[:5]
+        if QLocale.system().name()[:2] == "zh_" or QLocale.system().name()[:2] == "pt_":
+            locale = QLocale.system().name()[:5]
         else:
             locale = QLocale.system().name()[:2]
     if locale in supported_languages:
