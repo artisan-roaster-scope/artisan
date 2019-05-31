@@ -19,7 +19,8 @@ v2.0.0 (6/2019)
   - adds beep to playback aid and noisy text messages
   - adds Artisan Command actions to enable/disable AutoCHARGE and AutoDROP (`autoCHARGE(<b>)` and `autoDROP(<b>)`)
   - adds Artisan Command `tare(<n>)` to tare channel `<n>` with `1 => ET, 2 => BT,..` ([Issue 331](../../../issues/331))
-  - renders values of background events in Combo mode ([Issue 274](../../../issues/272))
+  - renders values of background events in Combo mode ([Issue 274](../../../issues/274))
+  - adds background event marker and text settings to color configuration
   - adds translations for Farsi (thanks to Saeed Abdinasab)
 * Changes
   - breaking feature: app domain changed to artisan-scope.org with the consequences that the app settings are now stored in a different location w.r.t. previous app versions
