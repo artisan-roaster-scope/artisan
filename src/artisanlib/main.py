@@ -545,15 +545,23 @@ supported_languages = [
     "th",
     "tr",
     "zh",
+    "zh_CN",
+    "zh_TW",
 ]
 if len(locale) == 0:
     if platform.system() == 'Darwin':
         from Cocoa import NSUserDefaults # @UnresolvedImport
         defs = NSUserDefaults.standardUserDefaults()
         langs = defs.objectForKey_("AppleLanguages")
-        locale = langs.objectAtIndex_(0)[:2]
+        if langs.objectAtIndex_(0)[:3] == "zh_" or langs.objectAtIndex_(0)[:3] == "pt_":
+            locale = langs.objectAtIndex_(0)[:5]
+        else:
+            locale = langs.objectAtIndex_(0)[:2]
     else:
-        locale = QLocale.system().name()[:2]
+        if langs.objectAtIndex_(0)[:3] == "zh_" or langs.objectAtIndex_(0)[:3] == "pt_":
+            locale = langs.objectAtIndex_(0)[:5]
+        else:
+            locale = QLocale.system().name()[:2]
     if locale in supported_languages:
         QSettings().setValue('locale', locale)
 
@@ -585,8 +593,6 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 #find application translations in Mac binary
 elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
     app.installTranslator(appTranslator)
-
-
 
 
 from const import UIconst
@@ -18143,11 +18149,12 @@ class ApplicationWindow(QMainWindow):
  
     #the central ExistingDirectoryDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None),path=None):
+    def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None),path=None,copy=False):
         if path is None:
             path = self.getDefaultPath()
         f = u(QFileDialog.getExistingDirectory(self,msg,path))
-        self.setDefaultPath(f)
+        if not copy:
+            self.setDefaultPath(f)
         return f
 
     def newRoast(self):
@@ -20594,7 +20601,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     prefix = u("")
                 fname = path.absoluteFilePath(self.generateFilename(prefix=prefix))
-                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None), path=fname)
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None), path=fname, copy=copy)
             if filename:
                 #write
                 pf = self.getProfile()
@@ -20610,10 +20617,11 @@ class ApplicationWindow(QMainWindow):
                             pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
 
                     self.serialize(filename,pf)
-                    self.setCurrentFile(filename)
                     self.sendmessage(QApplication.translate("Message","Profile saved", None))
-                    aw.curFile = filename
-                    self.qmc.safesaveflag = False
+                    if not copy:
+                        self.setCurrentFile(filename)
+                        aw.curFile = filename
+                        self.qmc.safesaveflag = False
                     if self.qmc.autosaveimage:
                         if ".alog" in filename:
                             filename = filename[0:-5]
@@ -26280,7 +26288,7 @@ class ApplicationWindow(QMainWindow):
             self.ThaiLanguage.setChecked(value)
         elif locale == "tr":
             self.TurkishLanguage.setChecked(value)
-        elif locale == "zh_CH":
+        elif locale == "zh_CN":
             self.ChineseChinaLanguage.setChecked(value)
         elif locale == "zh_TW":
             self.ChineseTaiwanLanguage.setChecked(value)
