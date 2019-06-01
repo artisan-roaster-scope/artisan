@@ -14096,8 +14096,8 @@ class ApplicationWindow(QMainWindow):
             string += QApplication.translate("Message","This is a one time message to inform you about a change in Artisan.", None) + "\n\n"
             string += QApplication.translate("Message","If you never run older versions of Artisan you can skip this message, the change does not affect you.", None) + "  "
             string += QApplication.translate("Message","Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.", None) + "  "
-            string += QApplication.translate("Message","Beginning with release version v2.0, settings will not be automatically shared at start-up with versions before v2.0.", None) + "\n\n"  
-            string += QApplication.translate("Message","Do not worry, Artisan has already loaded your last used settings for you since this is the first time you opened this new version.", None) + "\n\n"
+            string += QApplication.translate("Message","Beginning with release v2.0, settings will no longer be automatically shared at start-up with versions before v2.0.", None) + "\n\n"  
+            string += QApplication.translate("Message","Do not worry. Since this is the first time you opened this new version Artisan has already loaded your last used settings.", None) + "\n\n"
             string += QApplication.translate("Message","To share settings between this version and Artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
             string += QApplication.translate("Message","Enjoy using Artisan, The Artisan Team", None)
             QMessageBox.information(aw,QApplication.translate("Message","One time message about loading settings at start-up", None),string)
@@ -54722,6 +54722,28 @@ if sys.platform.startswith("darwin"):
         def makeWindowControllers(self):
             pass
 
+def win_menu_monkey(i=0):
+    import win32gui  # @UnresolvedImport @UnusedImport
+    window_name = aw.windowTitle
+    class_name = None
+    hwnd = win32gui.FindWindow(class_name, window_name)
+    if hwnd:
+        win32gui.SetForegroundWindow(hwnd)
+        import pyautogui  # @UnresolvedImport @UnusedImport
+        pyautogui.press('esc')
+        pyautogui.press('alt')
+        for i in range(0,7):
+            pyautogui.press(['enter','esc','right'])
+#        pyautogui.press('esc')
+    else:
+        i += 1
+        print("No hwnd", i)
+        if i >= 100:   
+            aw.sendmessage(QApplication.translate("Error Message", "Startup error finding Artisan window", None))
+            return
+        QTimer.singleShot(100,lambda : win_menu_monkey(i))
+        
+    
 def main():
     global aw
     global app
@@ -54773,10 +54795,7 @@ def main():
     
     # Workaround for the interaction between QGraphicsDropShadowEffect, cut off menus, and PyQt 5.12.2 on Windows.
     if platf == 'Windows': 
-        import pyautogui  # @UnresolvedImport @UnusedImport
-        pyautogui.hotkey('alt', 'h')
-        pyautogui.typewrite(['left', 'left', 'left', 'left', 'left', 'left'])  
-        pyautogui.press('esc')
+        QTimer.singleShot(10,lambda : win_menu_monkey())
 
     try:
         if sys.argv and len(sys.argv) > 1:
