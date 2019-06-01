@@ -6408,12 +6408,12 @@ LCDs All</source>
         <translation>تفضيلات ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="72"/>
+        <location filename="../const/UIconst.py" line="42"/>
         <source>Quit {0}</source>
         <translation type="unfinished">توقف {0}</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="179"/>
+        <location filename="../const/UIconst.py" line="181"/>
         <source>About {0}</source>
         <translation type="unfinished">نيذة {0}</translation>
     </message>
@@ -6564,77 +6564,77 @@ LCDs All</source>
         <translation>إطبع ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="75"/>
+        <location filename="../const/UIconst.py" line="77"/>
         <source>Edit</source>
         <translation>تحرير</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="78"/>
+        <location filename="../const/UIconst.py" line="80"/>
         <source>Cut</source>
         <translation>قص</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="79"/>
+        <location filename="../const/UIconst.py" line="81"/>
         <source>Copy</source>
         <translation>نسخ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="80"/>
+        <location filename="../const/UIconst.py" line="82"/>
         <source>Paste</source>
         <translation>لزق</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="83"/>
+        <location filename="../const/UIconst.py" line="85"/>
         <source>Roast</source>
         <translation>حمص</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="86"/>
+        <location filename="../const/UIconst.py" line="88"/>
         <source>Properties...</source>
         <translation>خصائص ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="87"/>
+        <location filename="../const/UIconst.py" line="89"/>
         <source>Background...</source>
         <translation>خلفية ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="88"/>
+        <location filename="../const/UIconst.py" line="90"/>
         <source>Cup Profile...</source>
         <translation>تقييم التذوق...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="120"/>
+        <location filename="../const/UIconst.py" line="122"/>
         <source>Temperature</source>
         <translation>الحرارة</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="89"/>
+        <location filename="../const/UIconst.py" line="91"/>
         <source>Convert to Fahrenheit</source>
         <translation>تحويل لفهرنهايت</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="90"/>
+        <location filename="../const/UIconst.py" line="92"/>
         <source>Convert to Celsius</source>
         <translation>تحويل لسلسيوس</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="91"/>
+        <location filename="../const/UIconst.py" line="93"/>
         <source>Fahrenheit Mode</source>
         <translation>نظام الفهرنهايت</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="92"/>
+        <location filename="../const/UIconst.py" line="94"/>
         <source>Celsius Mode</source>
         <translation>نظام السلسيوس</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="97"/>
+        <location filename="../const/UIconst.py" line="99"/>
         <source>Config</source>
         <translation>إعداد</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="102"/>
+        <location filename="../const/UIconst.py" line="104"/>
         <source>Device...</source>
         <translation>الجهاز ...</translation>
     </message>
@@ -6644,67 +6644,67 @@ LCDs All</source>
         <translation type="obsolete">منفذ تسلسلي ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="104"/>
+        <location filename="../const/UIconst.py" line="106"/>
         <source>Sampling Interval...</source>
         <translation>فترة العينات ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="107"/>
+        <location filename="../const/UIconst.py" line="109"/>
         <source>Colors...</source>
         <translation>ألوان ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="112"/>
+        <location filename="../const/UIconst.py" line="114"/>
         <source>Phases...</source>
         <translation>مراحل ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="113"/>
+        <location filename="../const/UIconst.py" line="115"/>
         <source>Events...</source>
         <translation>أحداث ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="115"/>
+        <location filename="../const/UIconst.py" line="117"/>
         <source>Statistics...</source>
         <translation>إحصائيات ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="116"/>
+        <location filename="../const/UIconst.py" line="118"/>
         <source>Axes...</source>
         <translation>محاور ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="117"/>
+        <location filename="../const/UIconst.py" line="119"/>
         <source>Autosave...</source>
         <translation>حفظ تلقائي ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="119"/>
+        <location filename="../const/UIconst.py" line="121"/>
         <source>Alarms...</source>
         <translation>إنذارات ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="121"/>
+        <location filename="../const/UIconst.py" line="123"/>
         <source>Language</source>
         <translation>اللغة</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="151"/>
+        <location filename="../const/UIconst.py" line="153"/>
         <source>Tools</source>
         <translation>أدوات</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="154"/>
+        <location filename="../const/UIconst.py" line="156"/>
         <source>Designer</source>
         <translation>مصمم</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="155"/>
+        <location filename="../const/UIconst.py" line="157"/>
         <source>Calculator</source>
         <translation>حاسبة</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="156"/>
+        <location filename="../const/UIconst.py" line="158"/>
         <source>Wheel Graph</source>
         <translation>رسم العجلة</translation>
     </message>
@@ -6714,97 +6714,97 @@ LCDs All</source>
         <translation type="obsolete">إضافي ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="174"/>
+        <location filename="../const/UIconst.py" line="176"/>
         <source>Help</source>
         <translation>مساعدة</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="181"/>
+        <location filename="../const/UIconst.py" line="183"/>
         <source>Documentation</source>
         <translation>توثيق</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="183"/>
+        <location filename="../const/UIconst.py" line="185"/>
         <source>Keyboard Shortcuts</source>
         <translation>إختصارات المفاتيح</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="184"/>
+        <location filename="../const/UIconst.py" line="186"/>
         <source>Errors</source>
         <translation>أخطاء</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="185"/>
+        <location filename="../const/UIconst.py" line="187"/>
         <source>Messages</source>
         <translation>رسائل</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="186"/>
+        <location filename="../const/UIconst.py" line="188"/>
         <source>Serial</source>
         <translation>متسلسل</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="190"/>
+        <location filename="../const/UIconst.py" line="192"/>
         <source>Settings</source>
         <translation>إعدادات</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="191"/>
+        <location filename="../const/UIconst.py" line="193"/>
         <source>Platform</source>
         <translation>منصة</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="192"/>
+        <location filename="../const/UIconst.py" line="194"/>
         <source>Factory Reset</source>
         <translation>الإعدادات الأصلية</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="180"/>
+        <location filename="../const/UIconst.py" line="182"/>
         <source>About Qt</source>
         <translation>نبذة عن كيوتي</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="93"/>
+        <location filename="../const/UIconst.py" line="95"/>
         <source>Switch Profiles</source>
         <translation>إستبدال المسارات</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="106"/>
+        <location filename="../const/UIconst.py" line="108"/>
         <source>Oversampling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="157"/>
+        <location filename="../const/UIconst.py" line="159"/>
         <source>LCDs</source>
         <translation type="unfinished">شاشات</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="118"/>
+        <location filename="../const/UIconst.py" line="120"/>
         <source>Batch...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="161"/>
+        <location filename="../const/UIconst.py" line="163"/>
         <source>Load Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="162"/>
+        <location filename="../const/UIconst.py" line="164"/>
         <source>Load Recent Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="163"/>
+        <location filename="../const/UIconst.py" line="165"/>
         <source>Save Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="110"/>
+        <location filename="../const/UIconst.py" line="112"/>
         <source>Buttons</source>
         <translation type="unfinished">أزرّة</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="111"/>
+        <location filename="../const/UIconst.py" line="113"/>
         <source>Sliders</source>
         <translation type="unfinished">زلاجات</translation>
     </message>
@@ -6854,7 +6854,7 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="94"/>
+        <location filename="../const/UIconst.py" line="96"/>
         <source>Switch ET&lt;-&gt;BT</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6879,7 +6879,7 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="100"/>
+        <location filename="../const/UIconst.py" line="102"/>
         <source>Machine</source>
         <translation type="unfinished">آلة</translation>
     </message>
@@ -6894,42 +6894,42 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="108"/>
+        <location filename="../const/UIconst.py" line="110"/>
         <source>Controls</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="109"/>
+        <location filename="../const/UIconst.py" line="111"/>
         <source>Readings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="101"/>
+        <location filename="../const/UIconst.py" line="103"/>
         <source>Themes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="164"/>
+        <location filename="../const/UIconst.py" line="166"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="103"/>
+        <location filename="../const/UIconst.py" line="105"/>
         <source>Port...</source>
         <translation>منفذ تسلسلي ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="168"/>
+        <location filename="../const/UIconst.py" line="170"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="171"/>
+        <location filename="../const/UIconst.py" line="173"/>
         <source>Full Screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="114"/>
+        <location filename="../const/UIconst.py" line="116"/>
         <source>Curves...</source>
         <translation type="unfinished"></translation>
     </message>

@@ -6033,12 +6033,12 @@ LCDs All</source>
         <translation>การตั้งค่า...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="72"/>
+        <location filename="../const/UIconst.py" line="42"/>
         <source>Quit {0}</source>
         <translation>ออกจาก {0}</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="179"/>
+        <location filename="../const/UIconst.py" line="181"/>
         <source>About {0}</source>
         <translation>เกี่ยวกับ {0}</translation>
     </message>
@@ -6219,7 +6219,7 @@ LCDs All</source>
         <translation>รายงาน</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="83"/>
+        <location filename="../const/UIconst.py" line="85"/>
         <source>Roast</source>
         <translation>การคั่ว</translation>
     </message>
@@ -6249,82 +6249,82 @@ LCDs All</source>
         <translation>พิมพ์...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="75"/>
+        <location filename="../const/UIconst.py" line="77"/>
         <source>Edit</source>
         <translation>แก้ไข</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="78"/>
+        <location filename="../const/UIconst.py" line="80"/>
         <source>Cut</source>
         <translation>ตัด</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="79"/>
+        <location filename="../const/UIconst.py" line="81"/>
         <source>Copy</source>
         <translation>คัดลอก</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="80"/>
+        <location filename="../const/UIconst.py" line="82"/>
         <source>Paste</source>
         <translation>แปะ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="86"/>
+        <location filename="../const/UIconst.py" line="88"/>
         <source>Properties...</source>
         <translation>คุณสมบัติ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="87"/>
+        <location filename="../const/UIconst.py" line="89"/>
         <source>Background...</source>
         <translation>พื้นหลัง...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="88"/>
+        <location filename="../const/UIconst.py" line="90"/>
         <source>Cup Profile...</source>
         <translation>โปรไฟล์คัพ ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="120"/>
+        <location filename="../const/UIconst.py" line="122"/>
         <source>Temperature</source>
         <translation>อุณหภูมิ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="89"/>
+        <location filename="../const/UIconst.py" line="91"/>
         <source>Convert to Fahrenheit</source>
         <translation>แปลงเป็นฟาเรนไฮต์</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="90"/>
+        <location filename="../const/UIconst.py" line="92"/>
         <source>Convert to Celsius</source>
         <translation>แปลงเป็นเซลเซียส</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="91"/>
+        <location filename="../const/UIconst.py" line="93"/>
         <source>Fahrenheit Mode</source>
         <translation>โหมดฟาเรนไฮต์</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="92"/>
+        <location filename="../const/UIconst.py" line="94"/>
         <source>Celsius Mode</source>
         <translation>โหมดเซลเซียส</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="93"/>
+        <location filename="../const/UIconst.py" line="95"/>
         <source>Switch Profiles</source>
         <translation>สลับโปรไฟล์</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="94"/>
+        <location filename="../const/UIconst.py" line="96"/>
         <source>Switch ET&lt;-&gt;BT</source>
         <translation>สลับ อุณหภูมิอากาศ&lt;-&gt;อุณหภูมิเมล็ด ( ET&lt;-&gt;BT)</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="97"/>
+        <location filename="../const/UIconst.py" line="99"/>
         <source>Config</source>
         <translation>การตั้งค่า</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="102"/>
+        <location filename="../const/UIconst.py" line="104"/>
         <source>Device...</source>
         <translation>อุปกรณ์เครื่อง...</translation>
     </message>
@@ -6334,92 +6334,92 @@ LCDs All</source>
         <translation type="obsolete">ซีเรียลพอร์ท(Serial Port)...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="104"/>
+        <location filename="../const/UIconst.py" line="106"/>
         <source>Sampling Interval...</source>
         <translation>การสุ่มตัวอย่างช่วงเวลา...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="106"/>
+        <location filename="../const/UIconst.py" line="108"/>
         <source>Oversampling</source>
         <translation>การสุ่มตัวอย่าง</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="107"/>
+        <location filename="../const/UIconst.py" line="109"/>
         <source>Colors...</source>
         <translation>สี...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="110"/>
+        <location filename="../const/UIconst.py" line="112"/>
         <source>Buttons</source>
         <translation>ปุ่ม</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="111"/>
+        <location filename="../const/UIconst.py" line="113"/>
         <source>Sliders</source>
         <translation>แถบเลื่อน</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="112"/>
+        <location filename="../const/UIconst.py" line="114"/>
         <source>Phases...</source>
         <translation>ระยะ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="113"/>
+        <location filename="../const/UIconst.py" line="115"/>
         <source>Events...</source>
         <translation>เหตุการณ์...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="115"/>
+        <location filename="../const/UIconst.py" line="117"/>
         <source>Statistics...</source>
         <translation>ค่าคงที่...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="116"/>
+        <location filename="../const/UIconst.py" line="118"/>
         <source>Axes...</source>
         <translation>แกน...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="117"/>
+        <location filename="../const/UIconst.py" line="119"/>
         <source>Autosave...</source>
         <translation>บันทึกอัตโนมัติ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="118"/>
+        <location filename="../const/UIconst.py" line="120"/>
         <source>Batch...</source>
         <translation>ชุด...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="119"/>
+        <location filename="../const/UIconst.py" line="121"/>
         <source>Alarms...</source>
         <translation>สัญญาณแจ้งเตือน...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="121"/>
+        <location filename="../const/UIconst.py" line="123"/>
         <source>Language</source>
         <translation>ภาษา</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="151"/>
+        <location filename="../const/UIconst.py" line="153"/>
         <source>Tools</source>
         <translation>เครื่องมือ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="154"/>
+        <location filename="../const/UIconst.py" line="156"/>
         <source>Designer</source>
         <translation>การออกแบบ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="155"/>
+        <location filename="../const/UIconst.py" line="157"/>
         <source>Calculator</source>
         <translation>เครื่องคิดเลข</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="156"/>
+        <location filename="../const/UIconst.py" line="158"/>
         <source>Wheel Graph</source>
         <translation>วงล้อกราฟ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="157"/>
+        <location filename="../const/UIconst.py" line="159"/>
         <source>LCDs</source>
         <translation>จอแอลซีดี</translation>
     </message>
@@ -6434,67 +6434,67 @@ LCDs All</source>
         <translation type="obsolete">พิเศษ...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="161"/>
+        <location filename="../const/UIconst.py" line="163"/>
         <source>Load Settings...</source>
         <translation>โหลดการตั้งค่า...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="162"/>
+        <location filename="../const/UIconst.py" line="164"/>
         <source>Load Recent Settings</source>
         <translation>โหลดการตั้งค่าล่าสุด</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="163"/>
+        <location filename="../const/UIconst.py" line="165"/>
         <source>Save Settings...</source>
         <translation>บันทึกการตั้งค่า...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="174"/>
+        <location filename="../const/UIconst.py" line="176"/>
         <source>Help</source>
         <translation>ช่วยเหลือ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="180"/>
+        <location filename="../const/UIconst.py" line="182"/>
         <source>About Qt</source>
         <translation>เกี่ยวกับ Qt</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="181"/>
+        <location filename="../const/UIconst.py" line="183"/>
         <source>Documentation</source>
         <translation>เอกสารคู่มือ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="183"/>
+        <location filename="../const/UIconst.py" line="185"/>
         <source>Keyboard Shortcuts</source>
         <translation>แป้นพิมพ์ลัด</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="184"/>
+        <location filename="../const/UIconst.py" line="186"/>
         <source>Errors</source>
         <translation>ข้อผิดพลาด</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="185"/>
+        <location filename="../const/UIconst.py" line="187"/>
         <source>Messages</source>
         <translation>ข้อความ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="186"/>
+        <location filename="../const/UIconst.py" line="188"/>
         <source>Serial</source>
         <translation>ซีเรียล(Serial)</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="190"/>
+        <location filename="../const/UIconst.py" line="192"/>
         <source>Settings</source>
         <translation>การตั้งค่า</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="191"/>
+        <location filename="../const/UIconst.py" line="193"/>
         <source>Platform</source>
         <translation>แพลตฟอร์ม</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="192"/>
+        <location filename="../const/UIconst.py" line="194"/>
         <source>Factory Reset</source>
         <translation>ตั้งค่าเริ่มต้นใหม่</translation>
     </message>
@@ -6504,7 +6504,7 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="100"/>
+        <location filename="../const/UIconst.py" line="102"/>
         <source>Machine</source>
         <translation type="unfinished">เครื่อง</translation>
     </message>
@@ -6519,42 +6519,42 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="108"/>
+        <location filename="../const/UIconst.py" line="110"/>
         <source>Controls</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="109"/>
+        <location filename="../const/UIconst.py" line="111"/>
         <source>Readings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="101"/>
+        <location filename="../const/UIconst.py" line="103"/>
         <source>Themes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="164"/>
+        <location filename="../const/UIconst.py" line="166"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="103"/>
+        <location filename="../const/UIconst.py" line="105"/>
         <source>Port...</source>
         <translation>ซีเรียลพอร์ท(Serial Port)...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="168"/>
+        <location filename="../const/UIconst.py" line="170"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="171"/>
+        <location filename="../const/UIconst.py" line="173"/>
         <source>Full Screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="114"/>
+        <location filename="../const/UIconst.py" line="116"/>
         <source>Curves...</source>
         <translation type="unfinished"></translation>
     </message>

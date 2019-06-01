@@ -6298,12 +6298,12 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="72"/>
+        <location filename="../const/UIconst.py" line="42"/>
         <source>Quit {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="179"/>
+        <location filename="../const/UIconst.py" line="181"/>
         <source>About {0}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6449,77 +6449,77 @@ LCDs All</source>
         <translation type="unfinished">列印...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="75"/>
+        <location filename="../const/UIconst.py" line="77"/>
         <source>Edit</source>
         <translation>編輯</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="78"/>
+        <location filename="../const/UIconst.py" line="80"/>
         <source>Cut</source>
         <translation type="unfinished">剪下</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="79"/>
+        <location filename="../const/UIconst.py" line="81"/>
         <source>Copy</source>
         <translation>複製</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="80"/>
+        <location filename="../const/UIconst.py" line="82"/>
         <source>Paste</source>
         <translation type="unfinished">貼上</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="83"/>
+        <location filename="../const/UIconst.py" line="85"/>
         <source>Roast</source>
         <translation>烘焙</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="86"/>
+        <location filename="../const/UIconst.py" line="88"/>
         <source>Properties...</source>
         <translation type="unfinished">烘焙設定...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="87"/>
+        <location filename="../const/UIconst.py" line="89"/>
         <source>Background...</source>
         <translation type="unfinished">背景曲線...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="88"/>
+        <location filename="../const/UIconst.py" line="90"/>
         <source>Cup Profile...</source>
         <translation type="unfinished">杯測記錄...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="120"/>
+        <location filename="../const/UIconst.py" line="122"/>
         <source>Temperature</source>
         <translation>溫度</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="89"/>
+        <location filename="../const/UIconst.py" line="91"/>
         <source>Convert to Fahrenheit</source>
         <translation type="unfinished">轉換為華氏</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="90"/>
+        <location filename="../const/UIconst.py" line="92"/>
         <source>Convert to Celsius</source>
         <translation type="unfinished">轉換為攝氏</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="91"/>
+        <location filename="../const/UIconst.py" line="93"/>
         <source>Fahrenheit Mode</source>
         <translation type="unfinished">華氏模式</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="92"/>
+        <location filename="../const/UIconst.py" line="94"/>
         <source>Celsius Mode</source>
         <translation type="unfinished">攝氏模式</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="97"/>
+        <location filename="../const/UIconst.py" line="99"/>
         <source>Config</source>
         <translation type="unfinished">設置</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="102"/>
+        <location filename="../const/UIconst.py" line="104"/>
         <source>Device...</source>
         <translation type="unfinished">烘焙工具...</translation>
     </message>
@@ -6529,67 +6529,67 @@ LCDs All</source>
         <translation type="obsolete">串行端口...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="104"/>
+        <location filename="../const/UIconst.py" line="106"/>
         <source>Sampling Interval...</source>
         <translation type="unfinished">採樣間距...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="107"/>
+        <location filename="../const/UIconst.py" line="109"/>
         <source>Colors...</source>
         <translation>顏色...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="112"/>
+        <location filename="../const/UIconst.py" line="114"/>
         <source>Phases...</source>
         <translation>階段...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="113"/>
+        <location filename="../const/UIconst.py" line="115"/>
         <source>Events...</source>
         <translation>事件...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="115"/>
+        <location filename="../const/UIconst.py" line="117"/>
         <source>Statistics...</source>
         <translation>統計...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="116"/>
+        <location filename="../const/UIconst.py" line="118"/>
         <source>Axes...</source>
         <translation>軸...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="117"/>
+        <location filename="../const/UIconst.py" line="119"/>
         <source>Autosave...</source>
         <translation type="unfinished">自動儲存...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="119"/>
+        <location filename="../const/UIconst.py" line="121"/>
         <source>Alarms...</source>
         <translation type="unfinished">響鬧...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="121"/>
+        <location filename="../const/UIconst.py" line="123"/>
         <source>Language</source>
         <translation>語言</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="151"/>
+        <location filename="../const/UIconst.py" line="153"/>
         <source>Tools</source>
         <translation>工具</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="154"/>
+        <location filename="../const/UIconst.py" line="156"/>
         <source>Designer</source>
         <translation type="unfinished">烘焙範例</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="155"/>
+        <location filename="../const/UIconst.py" line="157"/>
         <source>Calculator</source>
         <translation type="unfinished">計算機</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="156"/>
+        <location filename="../const/UIconst.py" line="158"/>
         <source>Wheel Graph</source>
         <translation type="unfinished">風味輪</translation>
     </message>
@@ -6599,62 +6599,62 @@ LCDs All</source>
         <translation type="obsolete">額外...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="174"/>
+        <location filename="../const/UIconst.py" line="176"/>
         <source>Help</source>
         <translation type="unfinished">說明</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="181"/>
+        <location filename="../const/UIconst.py" line="183"/>
         <source>Documentation</source>
         <translation type="unfinished">文件</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="183"/>
+        <location filename="../const/UIconst.py" line="185"/>
         <source>Keyboard Shortcuts</source>
         <translation>快捷鍵</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="184"/>
+        <location filename="../const/UIconst.py" line="186"/>
         <source>Errors</source>
         <translation type="unfinished">錯誤記錄</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="185"/>
+        <location filename="../const/UIconst.py" line="187"/>
         <source>Messages</source>
         <translation type="unfinished">信息記錄</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="186"/>
+        <location filename="../const/UIconst.py" line="188"/>
         <source>Serial</source>
         <translation type="unfinished">串行端口記錄</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="190"/>
+        <location filename="../const/UIconst.py" line="192"/>
         <source>Settings</source>
         <translation type="unfinished">設定</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="191"/>
+        <location filename="../const/UIconst.py" line="193"/>
         <source>Platform</source>
         <translation type="unfinished">運行環境</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="192"/>
+        <location filename="../const/UIconst.py" line="194"/>
         <source>Factory Reset</source>
         <translation type="unfinished">回復原廠狀態</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="180"/>
+        <location filename="../const/UIconst.py" line="182"/>
         <source>About Qt</source>
         <translation type="unfinished">關於Qt</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="93"/>
+        <location filename="../const/UIconst.py" line="95"/>
         <source>Switch Profiles</source>
         <translation type="unfinished">切換烘焙曲線</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="106"/>
+        <location filename="../const/UIconst.py" line="108"/>
         <source>Oversampling</source>
         <translation type="unfinished">超採樣</translation>
     </message>
@@ -6734,87 +6734,87 @@ LCDs All</source>
         <translation type="unfinished">Excel...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="94"/>
+        <location filename="../const/UIconst.py" line="96"/>
         <source>Switch ET&lt;-&gt;BT</source>
         <translation type="unfinished">切換 ET&lt;-&gt;BT</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="100"/>
+        <location filename="../const/UIconst.py" line="102"/>
         <source>Machine</source>
         <translation type="unfinished">烘焙機器</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="101"/>
+        <location filename="../const/UIconst.py" line="103"/>
         <source>Themes</source>
         <translation type="unfinished">主題</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="103"/>
+        <location filename="../const/UIconst.py" line="105"/>
         <source>Port...</source>
         <translation type="unfinished">端口...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="108"/>
+        <location filename="../const/UIconst.py" line="110"/>
         <source>Controls</source>
         <translation type="unfinished">控制介面</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="109"/>
+        <location filename="../const/UIconst.py" line="111"/>
         <source>Readings</source>
         <translation type="unfinished">讀數介面</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="110"/>
+        <location filename="../const/UIconst.py" line="112"/>
         <source>Buttons</source>
         <translation type="unfinished">按鍵介面</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="111"/>
+        <location filename="../const/UIconst.py" line="113"/>
         <source>Sliders</source>
         <translation type="unfinished">滑動介面</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="118"/>
+        <location filename="../const/UIconst.py" line="120"/>
         <source>Batch...</source>
         <translation type="unfinished">批次號...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="157"/>
+        <location filename="../const/UIconst.py" line="159"/>
         <source>LCDs</source>
         <translation type="unfinished">輔助小螢幕</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="161"/>
+        <location filename="../const/UIconst.py" line="163"/>
         <source>Load Settings...</source>
         <translation type="unfinished">載入設定...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="162"/>
+        <location filename="../const/UIconst.py" line="164"/>
         <source>Load Recent Settings</source>
         <translation type="unfinished">載入最近設定</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="163"/>
+        <location filename="../const/UIconst.py" line="165"/>
         <source>Save Settings...</source>
         <translation type="unfinished">儲存設定...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="164"/>
+        <location filename="../const/UIconst.py" line="166"/>
         <source>Save Theme...</source>
         <translation type="unfinished">儲存主題...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="168"/>
+        <location filename="../const/UIconst.py" line="170"/>
         <source>View</source>
         <translation type="unfinished">檢視</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="171"/>
+        <location filename="../const/UIconst.py" line="173"/>
         <source>Full Screen</source>
         <translation type="unfinished">全螢幕顯示</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="114"/>
+        <location filename="../const/UIconst.py" line="116"/>
         <source>Curves...</source>
         <translation type="unfinished">曲線...</translation>
     </message>

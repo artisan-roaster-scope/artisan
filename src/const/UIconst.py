@@ -45,7 +45,7 @@ _mac_about = QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None)
 #File menu items
 FILE_MENU = QApplication.translate("Menu", "File", None)
 if platf != 'Darwin':
-    FILE_MENU = "&" + FILE_MENU
+    FILE_MENU = "&" + FILE_MENU # the & adds a short cut automatically
 FILE_MENU_NEW = QApplication.translate("Menu", "New", None)
 FILE_MENU_OPEN = QApplication.translate("Menu", "Open...", None)
 FILE_MENU_OPENRECENT = QApplication.translate("Menu", "Open Recent", None)
@@ -68,8 +68,10 @@ FILE_MENU_REPORT_EXCEL = QApplication.translate("Menu", "Excel...", None)
 FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None)
 if platf == 'Darwin':
     FILE_MENU_QUIT = "Quit"
-else:
-    FILE_MENU_QUIT = QApplication.translate("MAC_APPLICATION_MENU", "Quit {0}", None).format("Artisan")   
+    #FILE_MENU_QUIT = QApplication.translate("MAC_APPLICATION_MENU", "Quit {0}", None).format("Artisan")  
+else: 
+    FILE_MENU_QUIT = "Quit"
+    #FILE_MENU_QUIT = "&" + QApplication.translate("Menu", "Quit", None)
 
 #Edit menu items
 EDIT_MENU = QApplication.translate("Menu", "Edit", None)

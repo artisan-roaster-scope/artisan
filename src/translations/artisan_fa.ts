@@ -5878,12 +5878,12 @@ LCDs All</source>
         <translation>الویت</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="72"/>
+        <location filename="../const/UIconst.py" line="42"/>
         <source>Quit {0}</source>
         <translation>پایان</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="179"/>
+        <location filename="../const/UIconst.py" line="181"/>
         <source>About {0}</source>
         <translation>درباره</translation>
     </message>
@@ -6084,7 +6084,7 @@ LCDs All</source>
         <translation>گزارش</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="83"/>
+        <location filename="../const/UIconst.py" line="85"/>
         <source>Roast</source>
         <translation>برشته کاری</translation>
     </message>
@@ -6114,282 +6114,282 @@ LCDs All</source>
         <translation>پرینت</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="75"/>
+        <location filename="../const/UIconst.py" line="77"/>
         <source>Edit</source>
         <translation>ویرایش</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="78"/>
+        <location filename="../const/UIconst.py" line="80"/>
         <source>Cut</source>
         <translation>بریدن</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="79"/>
+        <location filename="../const/UIconst.py" line="81"/>
         <source>Copy</source>
         <translation>کپی</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="80"/>
+        <location filename="../const/UIconst.py" line="82"/>
         <source>Paste</source>
         <translation>چسباندن</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="86"/>
+        <location filename="../const/UIconst.py" line="88"/>
         <source>Properties...</source>
         <translation>تنظیمات</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="87"/>
+        <location filename="../const/UIconst.py" line="89"/>
         <source>Background...</source>
         <translation>پیش زمینه</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="88"/>
+        <location filename="../const/UIconst.py" line="90"/>
         <source>Cup Profile...</source>
         <translation>مشخصات کاپ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="89"/>
+        <location filename="../const/UIconst.py" line="91"/>
         <source>Convert to Fahrenheit</source>
         <translation>تغیر به فارنهایت</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="90"/>
+        <location filename="../const/UIconst.py" line="92"/>
         <source>Convert to Celsius</source>
         <translation>تغییر به سلسیوس</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="91"/>
+        <location filename="../const/UIconst.py" line="93"/>
         <source>Fahrenheit Mode</source>
         <translation>فارنهایت مد</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="92"/>
+        <location filename="../const/UIconst.py" line="94"/>
         <source>Celsius Mode</source>
         <translation>سلسیوس مد</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="93"/>
+        <location filename="../const/UIconst.py" line="95"/>
         <source>Switch Profiles</source>
         <translation>تغییر پروفایل</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="94"/>
+        <location filename="../const/UIconst.py" line="96"/>
         <source>Switch ET&lt;-&gt;BT</source>
         <translation>تغیر بی تی به ای تی</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="97"/>
+        <location filename="../const/UIconst.py" line="99"/>
         <source>Config</source>
         <translation>پیکربندی</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="100"/>
+        <location filename="../const/UIconst.py" line="102"/>
         <source>Machine</source>
         <translation>ماشین</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="101"/>
+        <location filename="../const/UIconst.py" line="103"/>
         <source>Themes</source>
         <translation>تم</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="102"/>
+        <location filename="../const/UIconst.py" line="104"/>
         <source>Device...</source>
         <translation>دستگاه</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="103"/>
+        <location filename="../const/UIconst.py" line="105"/>
         <source>Port...</source>
         <translation>پورت</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="104"/>
+        <location filename="../const/UIconst.py" line="106"/>
         <source>Sampling Interval...</source>
         <translation>نمونه فاصله</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="106"/>
+        <location filename="../const/UIconst.py" line="108"/>
         <source>Oversampling</source>
         <translation>پیش سمپل</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="107"/>
+        <location filename="../const/UIconst.py" line="109"/>
         <source>Colors...</source>
         <translation>رنگ</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="108"/>
+        <location filename="../const/UIconst.py" line="110"/>
         <source>Controls</source>
         <translation>کنترل</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="109"/>
+        <location filename="../const/UIconst.py" line="111"/>
         <source>Readings</source>
         <translation>خواندن</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="110"/>
+        <location filename="../const/UIconst.py" line="112"/>
         <source>Buttons</source>
         <translation>دکمه ها</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="111"/>
+        <location filename="../const/UIconst.py" line="113"/>
         <source>Sliders</source>
         <translation>اسلایدها</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="112"/>
+        <location filename="../const/UIconst.py" line="114"/>
         <source>Phases...</source>
         <translation>قسمت ها</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="113"/>
+        <location filename="../const/UIconst.py" line="115"/>
         <source>Events...</source>
         <translation>رویدادها</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="114"/>
+        <location filename="../const/UIconst.py" line="116"/>
         <source>Curves...</source>
         <translation>منحنی</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="115"/>
+        <location filename="../const/UIconst.py" line="117"/>
         <source>Statistics...</source>
         <translation>الکتریسیته ساکن</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="116"/>
+        <location filename="../const/UIconst.py" line="118"/>
         <source>Axes...</source>
         <translation>محور</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="117"/>
+        <location filename="../const/UIconst.py" line="119"/>
         <source>Autosave...</source>
         <translation>ذخیره خودکار</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="118"/>
+        <location filename="../const/UIconst.py" line="120"/>
         <source>Batch...</source>
         <translation>دسته</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="119"/>
+        <location filename="../const/UIconst.py" line="121"/>
         <source>Alarms...</source>
         <translation>هشدار</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="120"/>
+        <location filename="../const/UIconst.py" line="122"/>
         <source>Temperature</source>
         <translation>دما</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="121"/>
+        <location filename="../const/UIconst.py" line="123"/>
         <source>Language</source>
         <translation>زبان</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="151"/>
+        <location filename="../const/UIconst.py" line="153"/>
         <source>Tools</source>
         <translation>ابزار</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="154"/>
+        <location filename="../const/UIconst.py" line="156"/>
         <source>Designer</source>
         <translation>طراحی</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="155"/>
+        <location filename="../const/UIconst.py" line="157"/>
         <source>Calculator</source>
         <translation>ماشین حساب</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="156"/>
+        <location filename="../const/UIconst.py" line="158"/>
         <source>Wheel Graph</source>
         <translation>چرخه نمودار</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="157"/>
+        <location filename="../const/UIconst.py" line="159"/>
         <source>LCDs</source>
         <translation>ال سی دی</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="161"/>
+        <location filename="../const/UIconst.py" line="163"/>
         <source>Load Settings...</source>
         <translation>بازخوانی تنظیمات</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="162"/>
+        <location filename="../const/UIconst.py" line="164"/>
         <source>Load Recent Settings</source>
         <translation>بازخوانی تنظیمات قبلی</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="163"/>
+        <location filename="../const/UIconst.py" line="165"/>
         <source>Save Settings...</source>
         <translation>ذخیره تنظیمات</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="164"/>
+        <location filename="../const/UIconst.py" line="166"/>
         <source>Save Theme...</source>
         <translation>ذخیره تم ها</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="168"/>
+        <location filename="../const/UIconst.py" line="170"/>
         <source>View</source>
         <translation>نما</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="171"/>
+        <location filename="../const/UIconst.py" line="173"/>
         <source>Full Screen</source>
         <translation>صفحه نمایش کامل</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="174"/>
+        <location filename="../const/UIconst.py" line="176"/>
         <source>Help</source>
         <translation>همیاری</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="180"/>
+        <location filename="../const/UIconst.py" line="182"/>
         <source>About Qt</source>
         <translation>در مورد کیو تی</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="181"/>
+        <location filename="../const/UIconst.py" line="183"/>
         <source>Documentation</source>
         <translation>اسناد</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="183"/>
+        <location filename="../const/UIconst.py" line="185"/>
         <source>Keyboard Shortcuts</source>
         <translation>میانبرهای کیبرد</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="184"/>
+        <location filename="../const/UIconst.py" line="186"/>
         <source>Errors</source>
         <translation>خطا</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="185"/>
+        <location filename="../const/UIconst.py" line="187"/>
         <source>Messages</source>
         <translation>پیام ها</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="186"/>
+        <location filename="../const/UIconst.py" line="188"/>
         <source>Serial</source>
         <translation>کد</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="190"/>
+        <location filename="../const/UIconst.py" line="192"/>
         <source>Settings</source>
         <translation>تنظیمات</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="191"/>
+        <location filename="../const/UIconst.py" line="193"/>
         <source>Platform</source>
         <translation>برنامه ریزی</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="192"/>
+        <location filename="../const/UIconst.py" line="194"/>
         <source>Factory Reset</source>
         <translation>بازخوانی به حالت کارخانه</translation>
     </message>
