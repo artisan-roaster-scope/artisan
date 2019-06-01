@@ -2,14 +2,14 @@
 layout: single
 permalink: /machines/giesen/
 title: "Giesen"
-excerpt: "WPG/W1A/W6A/W15A"
+excerpt: "WPG1/W1A/W6A/W15A"
 header:
   overlay_image: /assets/images/giesen.jpg
   image: /assets/images/giesen.jpg
   teaser: assets/images/giesen.jpg
 ---
 * __Producer:__ [GIESEN coffee-roasters](http://www.giesencoffeeroasters.eu), The Netherlands
-* __Machines:__ W1A/W6A/W15A with networked PLC (6/2014 and later)
+* __Machines:__ WPG1/W1A/W6A/W15A with networked PLC (6/2014 and later)
 * __Connection:__ Siemens S7 network
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
@@ -21,7 +21,7 @@ The computer running Artisan must be on the same IP network as the Giesen roaste
 
 Other IP addresses of machines different from 192.168.2.180 that have been observed are
 
-* WPG: 172.30.30.10
+* WPG1: 172.30.30.10
 * W1: 172.30.30.30
 * W15: 172.30.30.50
 
