@@ -6398,7 +6398,7 @@ LCDs All</source>
         <translation>Tercihleri...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="42"/>
+        <location filename="../const/UIconst.py" line="74"/>
         <source>Quit {0}</source>
         <translation type="unfinished">Çık{0}</translation>
     </message>

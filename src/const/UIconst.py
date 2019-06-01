@@ -68,10 +68,10 @@ FILE_MENU_REPORT_EXCEL = QApplication.translate("Menu", "Excel...", None)
 FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None)
 if platf == 'Darwin':
     FILE_MENU_QUIT = "Quit"
-    #FILE_MENU_QUIT = QApplication.translate("MAC_APPLICATION_MENU", "Quit {0}", None).format("Artisan")  
+    #FILE_MENU_QUIT = QApplication.translate("MAC_APPLICATION_MENU", "Quit {0}", None).format("Artisan")
 else: 
-    FILE_MENU_QUIT = "Quit"
     #FILE_MENU_QUIT = "&" + QApplication.translate("Menu", "Quit", None)
+    FILE_MENU_QUIT = QApplication.translate("MAC_APPLICATION_MENU", "Quit {0}", None).format("Artisan")
 
 #Edit menu items
 EDIT_MENU = QApplication.translate("Menu", "Edit", None)

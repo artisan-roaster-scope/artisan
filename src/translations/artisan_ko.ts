@@ -6248,7 +6248,7 @@ LCDs All</source>
         <translation>설정...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="42"/>
+        <location filename="../const/UIconst.py" line="74"/>
         <source>Quit {0}</source>
         <translation>{0} 끝내기</translation>
     </message>

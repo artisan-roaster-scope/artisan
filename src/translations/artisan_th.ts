@@ -6033,7 +6033,7 @@ LCDs All</source>
         <translation>การตั้งค่า...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="42"/>
+        <location filename="../const/UIconst.py" line="74"/>
         <source>Quit {0}</source>
         <translation>ออกจาก {0}</translation>
     </message>

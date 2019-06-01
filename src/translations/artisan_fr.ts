@@ -6415,7 +6415,7 @@ Tous les LCDs</translation>
         <translation>Préférences...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="42"/>
+        <location filename="../const/UIconst.py" line="74"/>
         <source>Quit {0}</source>
         <translation>Quitter {0}</translation>
     </message>

@@ -6431,7 +6431,7 @@ Fases LCDs</translation>
         <translation>Preferências…</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="42"/>
+        <location filename="../const/UIconst.py" line="74"/>
         <source>Quit {0}</source>
         <translation>Encerrar {0}</translation>
     </message>

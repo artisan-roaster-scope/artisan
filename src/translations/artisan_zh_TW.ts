@@ -4262,7 +4262,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="24724"/>
         <source>Degree:</source>
-        <translation type="unfinished">溫度</translation>
+        <translation>溫度:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24724"/>
@@ -6295,17 +6295,17 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="38"/>
         <source>Hide {0}</source>
-        <translation type="unfinished"></translation>
+        <translation>隐藏 {0}</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="42"/>
+        <location filename="../const/UIconst.py" line="74"/>
         <source>Quit {0}</source>
-        <translation type="unfinished"></translation>
+        <translation>退出 {0}</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="181"/>
         <source>About {0}</source>
-        <translation type="unfinished"></translation>
+        <translation>關於 {0}</translation>
     </message>
 </context>
 <context>
@@ -6421,7 +6421,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="54"/>
         <source>Save As...</source>
-        <translation type="unfinished">另存新檔...</translation>
+        <translation type="unfinished">儲存為...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="56"/>
@@ -6516,7 +6516,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="99"/>
         <source>Config</source>
-        <translation type="unfinished">設置</translation>
+        <translation type="unfinished">配置</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="104"/>
@@ -6566,7 +6566,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="121"/>
         <source>Alarms...</source>
-        <translation type="unfinished">響鬧...</translation>
+        <translation type="unfinished">鬧鐘...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="123"/>
@@ -6606,7 +6606,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="183"/>
         <source>Documentation</source>
-        <translation type="unfinished">文件</translation>
+        <translation type="unfinished">使用說明書</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="185"/>
@@ -6616,7 +6616,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="186"/>
         <source>Errors</source>
-        <translation type="unfinished">錯誤記錄</translation>
+        <translation type="unfinished">故障記錄</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="187"/>
@@ -6841,7 +6841,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="55"/>
         <source>Save a Copy As...</source>
-        <translation type="unfinished">另存新檔...</translation>
+        <translation type="unfinished">新檔另存為...</translation>
     </message>
 </context>
 <context>

@@ -6469,7 +6469,7 @@ LCDs All</source>
         <translation>環境設定...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="42"/>
+        <location filename="../const/UIconst.py" line="74"/>
         <source>Quit {0}</source>
         <translation type="unfinished">{0} を終了</translation>
     </message>
