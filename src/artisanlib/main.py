@@ -54793,9 +54793,9 @@ def main():
                 w.set_foreground()
                 pyautogui.press('esc')
                 pyautogui.press('alt')
-                pyautogui.typewrite(['enter','up','up','up','right','esc','esc','right'])  #file reports sub menu
+                pyautogui.typewrite(['enter','up','up','up','enter','esc','esc','right'])  #file reports sub menu
                 for i in range(0,6):
-                    pyautogui.press(['enter','esc','right'])
+                    pyautogui.typewrite(['enter','esc','right'])
                 #pyautogui.press('esc')
             except:
                 i += 1
