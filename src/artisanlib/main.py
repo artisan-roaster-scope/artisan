@@ -54810,7 +54810,7 @@ def main():
                 print("Except")
                 i += 1
                 if i < 50:  #try for 5 seconds
-                    QTimer.singleShot(250,lambda : win_menu_monkey(i))
+                    QTimer.singleShot(100,lambda : win_menu_monkey(i))
                 else:
                     aw.qmc.adderror(QApplication.translate("Error Message", "Startup error finding Artisan window"))
         QTimer.singleShot(10,lambda : win_menu_monkey())
