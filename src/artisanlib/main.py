@@ -18140,11 +18140,12 @@ class ApplicationWindow(QMainWindow):
  
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
+    def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None,copy=False):
         if path is None:
             path = self.getDefaultPath()
         f = u(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
-        self.setDefaultPath(f)
+        if copy:
+            self.setDefaultPath(f)
         return f
  
     #the central ExistingDirectoryDialog function that should always be called. Besides triggering the file dialog it
@@ -54777,7 +54778,6 @@ def main():
     else:
         QApplication.setLayoutDirection(Qt.LeftToRight)
     aw.settingsLoad()
-    
 
     # swap BT/ET lcds on startup
     if aw.qmc.swaplcds:
