@@ -599,7 +599,6 @@ from const import UIconst
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 
-#PLUS-COMMENT
 # import artisan.plus module
 import plus.config
 import plus.util
@@ -4257,8 +4256,7 @@ class tgraphcanvas(FigureCanvas):
                 #check and turn off mouse cross marker
                 if self.crossmarker:
                     self.togglecrosslines()
-                    
-#PLUS-COMMENT
+
                 if aw is not None:
                     aw.updatePlusStatus()                                  
                     
@@ -10606,10 +10604,7 @@ def my_get_icon(name):
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
         self.toolitems = (
-
-#PLUS-COMMENT
                 ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
-                
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
                 ('Forward', QApplication.translate("Tooltip", 'Forward to next view', None), 'forward', 'forward'),
@@ -10654,7 +10649,6 @@ class VMToolbar(NavigationToolbar):
                         QToolButton:checked:hover {border:1px solid " + border_color + "; margin: 2px; padding: 2px; background-color:" + selected_canvas_color.name() + ";border-radius: 3px;} \
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
-#PLUS-COMMENT            
         if aw is not None:
             aw.updatePlusStatus(self)
 
@@ -18256,7 +18250,6 @@ class ApplicationWindow(QMainWindow):
                 message = u(QApplication.translate("Message","{0}  loaded ", None).format(u(filename)))
                 self.sendmessage(message)
 
-#PLUS-COMMENT   
                 if aw is not None:
                     aw.updatePlusStatus()
                     if aw.plus_account is not None:
@@ -20610,7 +20603,7 @@ class ApplicationWindow(QMainWindow):
                     # if the copy flag is set, we generate a new roastUUID
                     if copy:
                         pf["roastUUID"] = uuid.uuid4().hex # generate UUID
-#PLUS-COMMENT  
+
                     if aw.plus_account is not None:
                         sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
                         if sync_record_hash is not None:
@@ -20934,7 +20927,6 @@ class ApplicationWindow(QMainWindow):
             if filename is None and settings.contains("fullscreen"):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
-#PLUS-COMMENT
             if filename is None and settings.contains("plus_account"):
                 self.plus_account = settings.value("plus_account",self.plus_account)
                 if settings.contains("plus_remember_credentials"):
@@ -22148,7 +22140,6 @@ class ApplicationWindow(QMainWindow):
                 if platf != 'Darwin':
                     aw.fullscreenAction.setChecked(True)
             
-#PLUS-COMMENT
             if filename is None and self.plus_account is not None:
                 try:
                     plus.controller.start(aw)
@@ -54807,7 +54798,6 @@ def main():
                     pyautogui.press(['enter','esc','right'])
                 #pyautogui.press('esc')
             except:
-                print("Except")
                 i += 1
                 if i < 50:  #try for 5 seconds
                     QTimer.singleShot(100,lambda : win_menu_monkey(i))

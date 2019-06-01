@@ -6751,7 +6751,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="96"/>
         <source>Switch ET&lt;-&gt;BT</source>
-        <translation type="unfinished">切换 ET&lt;-&gt;BT</translation>
+        <translation type="unfinished">切换环境温度/豆温</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="102"/>

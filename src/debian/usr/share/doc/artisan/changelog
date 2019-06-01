@@ -1,9 +1,18 @@
+artisan (2.0.0-0) precise; urgency=low
+  * new upstream release
+  * changes since 1.6.2:
+   - new icon and new look!
+   - adds support for the artisan.plus inventory management service
+   - adds support for Coffee-Tech Engineering Silon ZR7, Has Garanti HGS and HSR series, Kaldi Fortis, and the forthcoming Behmor 1kg
+   - bug fixes
+ --  <marko.luther@gmx.net>  Tue, 4 Jun 2019 19:32:14 +0200
+
 artisan (1.6.2-0) precise; urgency=low
   * new upstream release
   * changes since 1.6.1:
    - fixes communication with Phidgets under the Mac OS X 10.14 security framework
    - bug fixes
- --  <marko.luther@gmx.net>  Sun, 10 Mar 2019 19:32:14 +0200
+ --  <marko.luther@gmx.net>  Wed, 20 Mar 2019 19:32:14 +0200
 
 artisan (1.6.1-0) precise; urgency=low
   * new upstream release
@@ -252,7 +261,7 @@ artisan (0.7.1-1) precise; urgency=low
    - serial default configurations for extra devices
    - fixes minieditor navigation
    - fixes early autoDRY and autoFCs
- --  <marko.luther@gmx.net>  Mo, 1 Dec 2013 19:32:14 +0200
+ --  <marko.luther@gmx.net>  Mon, 1 Dec 2013 19:32:14 +0200
 
 artisan (0.7.0-1) precise; urgency=low
 

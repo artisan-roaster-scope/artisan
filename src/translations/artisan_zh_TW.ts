@@ -6646,7 +6646,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="182"/>
         <source>About Qt</source>
-        <translation type="unfinished">關於Qt</translation>
+        <translation type="unfinished">關於 Qt</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="95"/>
@@ -6736,7 +6736,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="96"/>
         <source>Switch ET&lt;-&gt;BT</source>
-        <translation type="unfinished">切換 ET&lt;-&gt;BT</translation>
+        <translation type="unfinished">切換環境溫度/豆溫</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="102"/>
