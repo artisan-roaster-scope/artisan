@@ -54767,43 +54767,21 @@ def main():
     if platf == 'Windows': 
         import win32gui  # @UnresolvedImport @UnusedImport
         import pyautogui  # @UnresolvedImport @UnusedImport
-        class WindowMonkey:
-            #Encapsulates some calls to the winapi for window management
-            def __init__ (self):
-                self._handle = None
-            def find_window(self, class_name, window_name=None):
-                #find a window by its class_name#
-                self._handle = win32gui.FindWindow(class_name, window_name)
-            def _window_enum_callback(self, hwnd, wildcard):
-                #Pass to win32gui.EnumWindows() to check all the opened windows
-                if re.match(wildcard, str(win32gui.GetWindowText(hwnd))) is not None:
-                    self._handle = hwnd
-            def find_window_wildcard(self, wildcard):
-                #find a window whose title matches the wildcard regex
-                self._handle = None
-                win32gui.EnumWindows(self._window_enum_callback, wildcard)
-            def set_foreground(self):
-                #put the window in the foreground
-                win32gui.SetForegroundWindow(self._handle)        
-        def win_menu_monkey(i=0):
+        def win_menu_monkey():
             try:   
-                window_name = ".*" + aw.windowTitle + ".*"
-                w = WindowMonkey()
-                w.find_window_wildcard(window_name)
-                w.set_foreground()
-                pyautogui.press('esc')
-                pyautogui.press('alt')
-                pyautogui.typewrite(['enter','up','up','up','enter','esc','esc','right'])  #file reports sub menu
-                for i in range(0,6):
-                    pyautogui.typewrite(['enter','esc','right'])
-                #pyautogui.press('esc')
-            except:
-                i += 1
-                if i < 50:  #try for 5 seconds
-                    QTimer.singleShot(100,lambda : win_menu_monkey(i))
+                if re.match(".*" + aw.windowTitle + "$", win32gui.GetWindowText(win32gui.GetForegroundWindow())) is not None:
+                    pyautogui.press('esc')
+                    pyautogui.press('alt')
+                    pyautogui.typewrite(['enter','up','up','up','enter','esc','esc','right'])  #file reports sub menu
+                    for i in range(0,6):
+                        pyautogui.typewrite(['enter','esc','right'])
+                    #pyautogui.press('esc')
                 else:
-                    aw.qmc.adderror(QApplication.translate("Error Message", "Startup error finding Artisan window"))
+                    QTimer.singleShot(10,lambda : win_menu_monkey(i))
+            except:
+                pass
         QTimer.singleShot(10,lambda : win_menu_monkey())
+
 
     try:
         if sys.argv and len(sys.argv) > 1:
