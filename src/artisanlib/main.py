@@ -54777,7 +54777,7 @@ def main():
                         pyautogui.typewrite(['enter','esc','right'])
                     #pyautogui.press('esc')
                 else:
-                    QTimer.singleShot(10,lambda : win_menu_monkey(i))
+                    QTimer.singleShot(50,lambda : win_menu_monkey())
             except:
                 pass
         QTimer.singleShot(10,lambda : win_menu_monkey())
