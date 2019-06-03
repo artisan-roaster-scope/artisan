@@ -10,7 +10,7 @@ colorspacious==1.1.2 # depends on numpy thus needs to be put after
 scipy==1.2.1
 matplotlib==3.0.2
 #PyQt 5.7 is preinstalled
-pyinstaller==3.4
+pyinstaller==3.3.1
 cffi==1.12.2 # current 1.12.3 is not yet on pywheels.org)
 cryptography==2.5 #2.6.1 not yet on piwheels.org
 keyring==19.0.1
