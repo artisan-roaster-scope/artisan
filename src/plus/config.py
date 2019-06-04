@@ -37,12 +37,12 @@ uuid_tag         = "roastUUID"
 # Serivce URLs
 
 ## LOCAL SETUP
-api_base_url         = "https://localhost:62602/api/v1"
-web_base_url         = "https://localhost:8088"
+#api_base_url         = "https://localhost:62602/api/v1"
+#web_base_url         = "https://localhost:8088"
 
 ## CLOUD SETUP
-#api_base_url         = "https://artisan.plus/api/v1"
-#web_base_url         = "https://artisan.plus/"
+api_base_url         = "https://artisan.plus/api/v1"
+web_base_url         = "https://artisan.plus/"
 
 register_url     = web_base_url + "/register"
 reset_passwd_url = web_base_url + "/resetPassword"
@@ -52,8 +52,8 @@ roast_url        = api_base_url + "/aroast"
 
 # Connection configurations
 
-verify_ssl       = False
-#verify_ssl       = True
+#verify_ssl       = False
+verify_ssl       = True
 connect_timeout  = 2 # in seconds
 read_timeout     = 4 # in seconds
 min_passwd_len   = 4
