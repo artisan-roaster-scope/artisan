@@ -1,4 +1,4 @@
-version: '2.0.0.{build}'
+version: '2.0.1.{build}'
 
 branches:
   only:
@@ -12,7 +12,7 @@ environment:
   matrix:
     - PYTHON: "C:\\Python37-x64"
       PYTHON_VERSION: 3.7
-      ARTISAN_VERSION: 2.0.0
+      ARTISAN_VERSION: 2.0.1
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
