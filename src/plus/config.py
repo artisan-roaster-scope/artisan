@@ -104,10 +104,13 @@ log_file = "artisan_plus"
 log_file_path = util.getDirectory(log_file,".log")
 
 logger = logging.getLogger("plus")
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.NOTSET)
+logger.setLevel(logging.INFO)
 try:
     handler = RotatingFileHandler(log_file_path, maxBytes=200000, backupCount=1, encoding='utf-8')
-    handler.setLevel(logging.DEBUG)
+#    handler.setLevel(logging.DEBUG)
+    handler.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s') # - %(name)s 
     handler.setFormatter(formatter)
     logger.addHandler(handler)

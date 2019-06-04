@@ -17,12 +17,6 @@ lrelease -verbose artisan.pro
 # distribution
 rm -rf build dist
 
-#pyinstaller --noconfirm \
-#    --clean \
-#    --osx-bundle-identifier=com.google.code.p.Artisan \
-#    --windowed \
-#    artisan.spec
-#    --log-level=WARN \
 pyinstaller --runtime-hook rthook_pyqt4.py -D -n artisan -y -c --log-level=WARN "artisan.py"
 
 

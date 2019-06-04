@@ -60,7 +60,7 @@ with open('Info.plist', 'r+b') as fp:
     plist = plistlib.load(fp)
     plist['CFBundleDisplayName'] = 'Artisan'
     plist['CFBundleGetInfoString'] = 'Artisan, Roast Logger'
-    plist['CFBundleIdentifier'] = 'com.google.code.p.Artisan'
+    plist['CFBundleIdentifier'] = 'org.artisan-scope.artisan'
     plist['CFBundleShortVersionString'] = VERSION
     plist['CFBundleVersion'] = 'Artisan ' + VERSION
     plist['LSMinimumSystemVersion'] = '10.13'
@@ -75,7 +75,7 @@ with open('Info.plist', 'r+b') as fp:
 app = BUNDLE(exe,
           name='Artisan.app',
           icon='artisan.icns',
-          bundle_identifier='com.google.code.p.Artisan')
+          bundle_identifier='org.artisan-scope.artisan')
 
 
 import os

@@ -35,7 +35,7 @@ sleep .3 # sometimes it takes a little for dist to get really empty
 
 pyinstaller --noconfirm \
     --clean \
-    --osx-bundle-identifier=com.google.code.p.Artisan \
+    --osx-bundle-identifier=org.artisan-scope.artisan \
     --windowed \
     --log-level=WARN \
     artisan-mac.spec

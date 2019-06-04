@@ -99,9 +99,12 @@ try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 
     from PyQt5 import sip # @UnusedImport
 except:
     pass
-    
-import matplotlib as mpl
-from matplotlib import cm
+
+from artisanlib.suppress_errors import suppress_stdout_stderr
+
+with suppress_stdout_stderr():
+    import matplotlib as mpl
+    from matplotlib import cm
 
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
@@ -173,7 +176,6 @@ from unidecode import unidecode
 
 import artisanlib.arabic_reshaper
 from artisanlib.util import appFrozen, decs2string, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
-from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
