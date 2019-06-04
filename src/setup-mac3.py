@@ -55,6 +55,31 @@ DATA_FILES = [
     ("../Resources/qt_plugins/styles", [QTDIR + r'/plugins/styles/libqmacstyle.dylib']), # QT 5.10 and later requires this (not available on 5.8)
 #    ("../Resources/qt_plugins/platformthemes", [QTDIR + r'/plugins/platformthemes/libqflatpak.dylib']), # unclear what this is for (not available on 5.8; not available on 5.12+)
 #    ("../Resources/qt_plugins/platformthemes", [QTDIR + r'/plugins/platformthemes/libqxdgdesktopportal.dylib']), # unclear what this is for (not available before 5.12)
+
+# for now make a copy of the plugins in the default Qt directory to make Qt happy:
+    ("../PlugIns/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
+#    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqdds.dylib']),  # not on Qt5.8.x
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqicns.dylib']),
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqico.dylib']),
+#    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqjp2.dylib']),  # not on Qt5.6.x
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqmacjp2.dylib']),
+#    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqmng.dylib']), # not on Qt5.6.x
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqtga.dylib']),
+#    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),  # produces a strip error
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqwbmp.dylib']),
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqwebp.dylib']),
+    ("../PlugIns/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
+#    ("../PlugIns/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
+#    ("../PlugIns/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
+    ("../PlugIns/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # qt5/# standard
+    ("../PlugIns/styles", [QTDIR + r'/plugins/styles/libqmacstyle.dylib']), # QT 5.10 and later requires this (not available on 5.8)
+#    ("../PlugIns/platformthemes", [QTDIR + r'/plugins/platformthemes/libqflatpak.dylib']), # unclear what this is for (not available on 5.8; not available on 5.12+)
+#    ("../PlugIns/platformthemes", [QTDIR + r'/plugins/platformthemes/libqxdgdesktopportal.dylib']), # unclear what this is for (not available before 5.12)
+
+
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
     ("../translations", [QTDIR + r'/translations/qtbase_ar.qm']),
