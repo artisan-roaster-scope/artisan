@@ -3,6 +3,8 @@ main:
     url: /machines/index
   - title: "Supported Devices"
     url: /devices/index
+  - title: "Donate"
+    url: /donate/
   - title: "About"
     url: /about/
 

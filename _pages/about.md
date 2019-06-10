@@ -66,6 +66,7 @@ gallery:
 
 Artisan is an open-source software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
 
+[Donate](/donate/){: .btn .btn--success .btn--large} &emsp;
 [Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large}
 &emsp; [Documentation](/docs/quick-start-guide/){: .btn .btn--success .btn--large}
 &emsp; [Blog](https://artisan-roasterscope.blogspot.com/){: .btn .btn--success .btn--large}
@@ -85,6 +86,7 @@ There are also experimental builds for the Raspberry Pi platform.
 
 ## Notable Features
 
+- seemless integration into the [artisan.plus](https://artisan.plus) inventory management service
 - extensive [machine](/machines/) and [device](/devices/) support
 - unlimited number of curves
 - rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html), [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.de/2017/02/roast-phases-statistics-and-phases-lcds.html) calculations
