@@ -13607,6 +13607,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonlist = []
         self.lastbuttonpressed = -1
         self.buttonlistmaxlen = 11
+        self.buttonWidth = 60
         #10 palettes of buttons
         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]] # ,[],[],[],[],[]]
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
@@ -34620,6 +34621,14 @@ class EventsDlg(ArtisanDialog):
         self.nbuttonsSpinBox.setRange(6,30)
         self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
         self.nbuttonsSpinBox.valueChanged.connect(self.setbuttonlistmaxlen)
+        #minimum Size of Event Buttons
+        self.buttonWidthlabel = QLabel(QApplication.translate("Label","Button size", None))
+        self.buttonWidthSpinBox = QSpinBox()
+        self.buttonWidthSpinBox.setMaximumWidth(100)
+        self.buttonWidthSpinBox.setAlignment(Qt.AlignCenter)
+        self.buttonWidthSpinBox.setRange(60,260)
+        self.buttonWidthSpinBox.setValue(aw.buttonWidth)
+        self.buttonWidthSpinBox.valueChanged.connect(self.setbuttonWidth)
         #table for showing events
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
@@ -35263,7 +35272,10 @@ class EventsDlg(ArtisanDialog):
         nbuttonslayout.addWidget(self.nbuttonsSpinBox)
         nbuttonslayout.addWidget(colorpatternlabel)
         nbuttonslayout.addWidget(self.colorSpinBox)
+        nbuttonslayout.addWidget(self.buttonWidthlabel)
+        nbuttonslayout.addWidget(self.buttonWidthSpinBox)
         nbuttonslayout.addStretch()
+    
         tab2buttonlayout = QHBoxLayout()
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(self.insertButton)
@@ -35997,6 +36009,9 @@ class EventsDlg(ArtisanDialog):
 
     def setbuttonlistmaxlen(self):
         self.buttonlistmaxlen = self.nbuttonsSpinBox.value()
+        
+    def setbuttonWidth(self):
+        self.buttonWidth = self.buttonWidthSpinBox.value()
 
     def createEventbuttonTable(self):
         self.nbuttonsSpinBox.setValue(self.buttonlistmaxlen)
