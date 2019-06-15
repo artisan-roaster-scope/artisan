@@ -22064,9 +22064,8 @@ class ApplicationWindow(QMainWindow):
                 # if filename is None (ie. setting is not explicitly loaded from file, but from default location on app start),
                 # the dpi is set on creating the FigureCanvas
                 try:
-                    aw.dpi = toInt(settings.value("dpi",aw.dpi))
-                    if aw.dpi != aw.defaultdpi:
-                        aw.setdpi(aw.dpi,moveWindow=True)
+                    if aw.dpi != toInt(settings.value("dpi",aw.dpi)):
+                        aw.setdpi(toInt(settings.value("dpi",aw.dpi)),moveWindow=True)
                 except Exception as e:
                     pass
 
