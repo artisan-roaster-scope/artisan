@@ -13611,6 +13611,7 @@ class ApplicationWindow(QMainWindow):
         #10 palettes of buttons
         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]] # ,[],[],[],[],[]]
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
+        self.buttonpaletteWidth = [14]*10  #keeps the width of buttons per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
 
         self.eventbuttontablecolumnwidths = [] # custom event button table column widths
@@ -21962,6 +21963,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("extraeventsactions"):
                 if settings.contains("buttonlistmaxlen"):
                     self.buttonlistmaxlen = toInt(settings.value("buttonlistmaxlen",self.buttonlistmaxlen))
+                if settings.contains("buttonWidth"):
+                    self.buttonWidth = toInt(settings.value("buttonWidth",self.buttonWidth))
                 if settings.contains("extraeventsbuttonsflags"):
                     self.extraeventsbuttonsflags = [toInt(x) for x in toList(settings.value("extraeventsbuttonsflags",self.extraeventsbuttonsflags))]
                 self.extraeventstypes = [toInt(x) for x in toList(settings.value("extraeventstypes",self.extraeventstypes))]
@@ -21979,6 +21982,7 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventbuttontextcolor = ["black"]*len(self.extraeventstypes)
                 if settings.contains("buttonpalette"):
                     self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value("buttonpalettemaxlen",self.buttonpalettemaxlen))]
+                    self.buttonpaletteWidth = [min(60,max(260,toInt(x))) for x in toList(settings.value("buttonpaletteWidth",self.buttonpaletteWidth))]
                     self.buttonpalette = toList(settings.value("buttonpalette",self.buttonpalette))
                     if self.buttonpalette is None:
                         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]] # initialize empty palettes
@@ -22978,6 +22982,7 @@ class ApplicationWindow(QMainWindow):
             #custom event buttons
             settings.beginGroup("ExtraEventButtons")
             settings.setValue("buttonlistmaxlen",self.buttonlistmaxlen)
+            settings.setValue("buttonWidth",self.buttonWidth)
             settings.setValue("extraeventstypes",self.extraeventstypes)
             settings.setValue("extraeventsvalues",self.extraeventsvalues)
             settings.setValue("extraeventsactionstrings",self.extraeventsactionstrings)
@@ -22990,6 +22995,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraeventsbuttonsflags",self.extraeventsbuttonsflags)
             settings.setValue("buttonpalette",self.buttonpalette)
             settings.setValue("buttonpalettemaxlen",self.buttonpalettemaxlen)
+            settings.setValue("buttonpaletteWidth",self.buttonpaletteWidth)
             settings.setValue("buttonpalette_shortcuts",self.buttonpalette_shortcuts)
             settings.setValue("eventbuttontablecolumnwidths",self.eventbuttontablecolumnwidths)
             settings.endGroup()
@@ -27388,6 +27394,7 @@ class ApplicationWindow(QMainWindow):
               
         self.buttonpalette[pindex] = copy[:]
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
+        self.buttonpaletteWidth[pindex] = self.buttonWidth
         self.sendmessage(QApplication.translate("Message","Buttons copied to Palette #%i"%(pindex), None))
 
     #restores a palette number to current buttons
@@ -27467,6 +27474,7 @@ class ApplicationWindow(QMainWindow):
                 self.eventsliderunits = ["","","",""]
                 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
+            self.buttonWidth = self.buttonpaletteWidth[pindex]
             self.realignbuttons()
             self.updateSlidersProperties()
             self.lastbuttonpressed = -1
@@ -27497,6 +27505,7 @@ class ApplicationWindow(QMainWindow):
             key = str(i)
             palette[key] = self.encodeTreeStrings(pal[i])
         palette["maxlen"] = maxlen
+        palette["width"] = self.buttonWidth
         try:
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Palettes",None),ext="*.apal") 
             if filename:
@@ -27508,9 +27517,8 @@ class ApplicationWindow(QMainWindow):
             return
 
     def getPalettes(self,filename,pal):
-        maxlen = self.loadPalettes(filename,pal)
-        if maxlen is not None:
-            self.buttonpalettemaxlen = maxlen
+        self.loadPalettes(filename,pal)
+        
 
     def loadPalettes(self,filename,pal):
         try:
@@ -27522,7 +27530,15 @@ class ApplicationWindow(QMainWindow):
             if firstChar == "{":
                 f.close()
                 palette = self.deserialize(filename)
-                buttonpalettemaxlen = list(map(int,palette["maxlen"]))
+                
+                maxlen = list(map(int,palette["maxlen"]))
+                if maxlen is not None:
+                    self.buttonpalettemaxlen = maxlen
+                
+                width = list(map(int,palette["width"]))
+                if width is not None:
+                    self.buttonWidth = width
+                    
                 for i in range(10):  #10 palettes (0-9)
                     key = str(i)
                     nextpalette = [[], [], [], [], [], [], [], [], [], [], [], [], [], []]
@@ -35492,9 +35508,7 @@ class EventsDlg(ArtisanDialog):
     def restorepaletteeventbuttons(self):
         filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Palettes",None),path=aw.profilepath)
         if filename:
-            maxlen = aw.loadPalettes(filename,self.buttonpalette)
-            if maxlen is not None:
-                self.buttonpalettemaxlen = maxlen
+            aw.loadPalettes(filename,self.buttonpalette)
             
     def selectionChanged(self):
         selected = self.eventbuttontable.selectedRanges()
@@ -35848,6 +35862,7 @@ class EventsDlg(ArtisanDialog):
               
         self.buttonpalette[pindex] = copy
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
+        self.buttonpaletteWidth[pindex] = self.buttonWidth
 
     def localSetbuttonsfrom(self,pindex):
         copy = self.buttonpalette[pindex][:]
@@ -35925,6 +35940,7 @@ class EventsDlg(ArtisanDialog):
                 self.eventsliderunits = ["","","",""]
                 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
+            self.buttonWidth = self.buttonpaletteWidth[pindex]
             return 1  #success
         else:
             return 0  #failed
@@ -36249,6 +36265,7 @@ class EventsDlg(ArtisanDialog):
             aw.extraeventbuttontextcolor[visualIndex] = self.extraeventbuttontextcolor[i]
 
         aw.buttonlistmaxlen = self.buttonlistmaxlen
+        aw.buttonWidth = self.buttonWidth
         #Apply Event Button Changes
         aw.settooltip()
         aw.realignbuttons()
@@ -36542,6 +36559,7 @@ class EventsDlg(ArtisanDialog):
         self.extraeventbuttoncolor = aw.extraeventbuttoncolor[:]
         self.extraeventbuttontextcolor = aw.extraeventbuttontextcolor[:]
         self.buttonlistmaxlen = aw.buttonlistmaxlen
+        self.buttonWidth = aw.buttonWidth
         # sliders
         self.eventslidervisibilities = aw.eventslidervisibilities[:]
         self.eventslideractions = aw.eventslideractions[:]
@@ -36562,6 +36580,7 @@ class EventsDlg(ArtisanDialog):
         # palettes
         self.buttonpalette = aw.buttonpalette[:]
         self.buttonpalettemaxlen = aw.buttonpalettemaxlen
+        self.buttonpaletteWidth = aw.buttonpaletteWidth
         # styles
         self.EvalueColor = aw.qmc.EvalueColor[:]
         self.EvalueMarker = aw.qmc.EvalueMarker[:]
@@ -36633,6 +36652,7 @@ class EventsDlg(ArtisanDialog):
             # save palettes
             aw.buttonpalette = self.buttonpalette[:]
             aw.buttonpalettemaxlen = self.buttonpalettemaxlen
+            aw.buttonpaletteWidth = self.buttonpaletteWidth
             #
             aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
