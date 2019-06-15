@@ -17070,7 +17070,7 @@ class ApplicationWindow(QMainWindow):
         try:
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
-            if style is not None:
+            if style is not None and style != "":
                 aw.messagelabel.setStyleSheet(style)
             else:
                 aw.messagelabel.setStyleSheet("background-color:'transparent'; color: " + aw.qmc.palette["messages"] + ";")
