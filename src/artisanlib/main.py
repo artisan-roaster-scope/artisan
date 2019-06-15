@@ -27253,7 +27253,7 @@ class ApplicationWindow(QMainWindow):
                     buttonstyle = right_rounded_style
                     self.extraeventbuttonround.append(2)
             core_style = """
-                min-width:60px; 
+                min-width: """  + str(self.buttonWidth) + """px; 
                 margin: 0; 
                 padding: 0px; 
                 border-style: solid; 
@@ -27274,7 +27274,7 @@ class ApplicationWindow(QMainWindow):
                 buttonstyle + \
                 core_style%(self.extraeventbuttontextcolor[i],self.createGradient(QColor(self.extraeventbuttoncolor[i]).lighter(110).name()))
             p.setStyleSheet(plain_style + hover_style + pressed_style)
-            p.setMinimumHeight(30)
+            p.setMinimumHeight(self.buttonWidth*1.2)
             p.setCursor(QCursor(Qt.PointingHandCursor))
             
             l = self.extraeventslabels[i]
