@@ -330,7 +330,7 @@ def removeAll(l,s):
 
 platf = str(platform.system())
 
-    
+
 #######################################################################################
 #################### Main Application  ################################################
 #######################################################################################
@@ -2055,6 +2055,11 @@ class tgraphcanvas(FigureCanvas):
         self.handles = []   
         self.labels = []    
         
+        #used for picked event messages
+        self.eventmessage = ""
+        self.backgroundeventmessage = ""
+        self.eventmessagetimer = None
+
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
@@ -2137,7 +2142,7 @@ class tgraphcanvas(FigureCanvas):
         if len(self.Betypes) == 4:
             self.Betypes.append("--")
         if prefix and i < 4:
-            return '_nolegend_' #u("Background")+self.Betypes[i] # lines with _nolegend_ labels are hidden from the figureoptions dialog
+            return u("Background")+self.Betypes[i]
         else:
             return self.Betypes[i]
 
@@ -2268,118 +2273,126 @@ class tgraphcanvas(FigureCanvas):
         #self.fig.canvas.flush_events() # THIS prevents the black border on >Qt5.5, but slows down things (especially resizings) on redraw otherwise!!!
         self.ax_background = None
 
+    def sendeventmessage(self):
+        self.eventmessagetimer = None
+        if len(self.backgroundeventmessage) != 0:
+            aw.sendmessage(self.backgroundeventmessage,append=True)
+            self.backgroundeventmessage = ""
+            self.starteventmessagetimer(2)  #hack to ensure that the background event message is written first
+            return
+        if len(self.eventmessage) != 0:
+            aw.sendmessage(self.eventmessage,append=True)
+            self.eventmessage = ""
+
+    def starteventmessagetimer(self,time=120):
+        if self.eventmessagetimer:
+            self.eventmessagetimer.stop()
+            self.eventmessagetimer.deleteLater()
+        self.eventmessagetimer = QTimer()
+        self.eventmessagetimer.timeout.connect(self.sendeventmessage)
+        self.eventmessagetimer.setSingleShot(True)
+        self.eventmessagetimer.start(time)
+                
     def onpick(self,event):
-        if self.legend is not None and event.artist != self.legend and (isinstance(event.artist, matplotlib.lines.Line2D) or isinstance(event.artist, matplotlib.text.Text)) and \
-            event.artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
-            idx = None
-            # deltaLabelMathPrefix (legend label)
-            # deltaLabelUTF8 (artist)
-            if isinstance(event.artist, matplotlib.text.Text):
-                try:
-                    label = event.artist.get_text()
-                    idx = self.labels.index(label)
-                except Exception as e:
-                    pass
-                try:
-                    # toggle also the visibility of the legend handle
-                    clean_label = label.replace(deltaLabelMathPrefix,deltaLabelUTF8)
-                    artist = next((x for x in self.legend_lines if x.get_label() == clean_label), None)
-                    if artist:
-                        artist.set_visible(not artist.get_visible())
-                except:
-                    pass
-            elif isinstance(event.artist, matplotlib.lines.Line2D):
-                try:
-                    label = event.artist.get_label().replace(deltaLabelUTF8,deltaLabelMathPrefix)
-                    idx = self.labels.index(label)
-                except:
-                    pass
-                # toggle also the visibility of the legend handle
-                event.artist.set_visible(not event.artist.get_visible())
-            # toggle the visibility of the corresponding line
-            if idx is not None:
-                artist = self.handles[idx]
-                artist.set_visible(not artist.get_visible())
-            QApplication.processEvents() # this is needed to avoid redraw problems if legend uses "use_blit" option!
-#            self.fig.canvas.draw()
-            self.updateBackground()
-            QApplication.processEvents() # this is needed to avoid redraw problems if legend uses "use_blit" option!
-            
-        try:            
-            if self.showmet and event.artist in [self.met_annotate]:
+        try:
+            # display MET information by clicking on the MET marker
+            if isinstance(event.artist, matplotlib.text.Annotation) and self.showmet and event.artist in [self.met_annotate]:
                 message = u("")
-                message += u("MET ") + str(aw.float2float(self.met_timex_temp1_delta[1],1))
+                message += u("MET ") + str(aw.float2float(self.met_timex_temp1_delta[1],1)) + aw.qmc.mode
                 message += u(" @ ") + self.stringfromseconds(self.met_timex_temp1_delta[0])
-                if self.met_timex_temp1_delta[2] >= 0:   #met_delta
+                if self.met_timex_temp1_delta[2] is not None and self.met_timex_temp1_delta[2] >= 0:   #met_delta
                     message += u(", ") + str(self.met_timex_temp1_delta[2]) + u(" ") + QApplication.translate("Message","seconds before FCs", None)
-                elif self.met_timex_temp1_delta[2] < 0:   #met_delta
+                elif self.met_timex_temp1_delta[2] is not None and self.met_timex_temp1_delta[2] < 0:   #met_delta
                     message += u(", ") + str(-self.met_timex_temp1_delta[2]) + u(" ") + QApplication.translate("Message","seconds after FCs", None)
                 aw.sendmessage(message)
-                return
-            if isinstance(event.ind, (int)):
-                ind = event.ind
-            else:
-                if not len(event.ind): return
-                ind = event.ind[0]    
-            digits = (1 if aw.qmc.LCDdecimalplaces else 0)
-            if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
-                timex = self.backgroundtime2index(event.artist.get_xdata()[ind])
-                idxs = []
-                for i in range(len(self.backgroundEvents)):
-                    if self.backgroundEvents[i] == timex or self.backgroundEvents[i] -1 == timex or self.backgroundEvents[i] + 1 == timex:
-                        idxs.append(i)
-                message = u("")
-                event_times = []
-                event_temps = []
-                for i in idxs:
-                    if len(message) != 0:
-                        message += u(", ")
-                    else:
-                        message += u("Background: ")
-                    message += u(self.Betypesf(self.backgroundEtypes[i])) + " = " + self.eventsvalues(self.backgroundEvalues[i])
-                    event_times.append(self.timeB[self.backgroundEvents[i]])
-                    event_temps.append(str(aw.float2float(self.temp2B[self.backgroundEvents[i]],digits)))
-                    if self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
-                        message += u(" (") + u(self.backgroundEStrings[i]) + u(")")
-                if len(message) != 0:
-                    if aw.qmc.timeindex[0] != -1:
-                        start = aw.qmc.timex[aw.qmc.timeindex[0]]
-                    else:
-                        start = 0
-                    tx_string = ""
-                    for i in range(len(event_times)):
-                        tx_string += self.stringfromseconds(event_times[i] - start) + " " + event_temps[i] + aw.qmc.mode + ", "
-                    message += u(" @ ") + tx_string[:-2]
-                    aw.sendmessage(message,append=False)
-            elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
-                timex = self.time2index(event.artist.get_xdata()[ind])
-                idxs = []
-                for i in range(len(self.specialevents)):
-                    if self.specialevents[i] == timex or self.specialevents[i] + 1 == timex or self.specialevents[i] -1 == timex:
-                        idxs.append(i)
-                message = u("")
-                event_times = []
-                event_temps = []
-                for i in idxs:
-                    if len(message) != 0:
-                        message += u(", ")
-                    message += u(self.etypesf(self.specialeventstype[i])) + " = " + self.eventsvalues(self.specialeventsvalue[i])
-                    event_times.append(self.timex[self.specialevents[i]])
-                    event_temps.append(str(aw.float2float(self.temp2[self.specialevents[i]],digits)))
-                    if self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
-                        message += u(" (") + u(self.specialeventsStrings[i]) + u(")")
-                if len(message) != 0:
-                    if aw.qmc.timeindex[0] != -1:
-                        start = aw.qmc.timex[aw.qmc.timeindex[0]]
-                    else:
-                        start = 0
-                    tx_string = ""
-                    for i in range(len(event_times)):
-                        tx_string += self.stringfromseconds(event_times[i] - start) + " " + event_temps[i] + aw.qmc.mode + ", "
-                    message += u(" @ ") + tx_string[:-2]
-                    aw.sendmessage(message,append=False)
-        except Exception:
-            pass
+
+            # toggle visibility of graph lines by clicking on the legend 
+            elif self.legend is not None and event.artist != self.legend and (isinstance(event.artist, matplotlib.lines.Line2D) or isinstance(event.artist, matplotlib.text.Text)) \
+                and event.artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
+                and event.artist not in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
+                idx = None
+                # deltaLabelMathPrefix (legend label)
+                # deltaLabelUTF8 (artist)
+                if isinstance(event.artist, matplotlib.text.Text):
+                    try:
+                        label = event.artist.get_text()
+                        idx = self.labels.index(label)
+                    except Exception as e:
+                        pass
+                    try:
+                        # toggle also the visibility of the legend handle
+                        clean_label = label.replace(deltaLabelMathPrefix,deltaLabelUTF8)
+                        artist = next((x for x in self.legend_lines if x.get_label() == clean_label), None)
+                        if artist:
+                            artist.set_visible(not artist.get_visible())
+                    except:
+                        pass
+                elif isinstance(event.artist, matplotlib.lines.Line2D):
+                    try:
+                        label = event.artist.get_label().replace(deltaLabelUTF8,deltaLabelMathPrefix)
+                        idx = self.labels.index(label)
+                    except:
+                        pass
+                    # toggle also the visibility of the legend handle
+                    event.artist.set_visible(not event.artist.get_visible())
+                # toggle the visibility of the corresponding line
+                if idx is not None:
+                    artist = self.handles[idx]
+                    artist.set_visible(not artist.get_visible())
+                QApplication.processEvents() # this is needed to avoid redraw problems if legend uses "use_blit" option!
+    #            self.fig.canvas.draw()
+                self.updateBackground()
+                QApplication.processEvents() # this is needed to avoid redraw problems if legend uses "use_blit" option!
+            
+            # show event information by clicking on event lines in step, step+ and combo modes
+            elif isinstance(event.artist, matplotlib.lines.Line2D):
+                if isinstance(event.ind, (int)):
+                    ind = event.ind
+                else:
+                    if not len(event.ind): return
+                    ind = event.ind[0]    
+                digits = (1 if aw.qmc.LCDdecimalplaces else 0)
+                if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
+                    timex = self.backgroundtime2index(event.artist.get_xdata()[ind])
+                    for i in range(len(self.backgroundEvents)):
+                        if re.search('(Background'+self.Betypesf(self.backgroundEtypes[i])+')',str(event.artist))\
+                        and (self.backgroundEvents[i] == timex or self.backgroundEvents[i] -1 == timex or self.backgroundEvents[i] + 1 == timex):
+                            if aw.qmc.timeindex[0] != -1:
+                                start = aw.qmc.timex[aw.qmc.timeindex[0]]
+                            else:
+                                start = 0
+                            if len(self.backgroundeventmessage) != 0:
+                                self.backgroundeventmessage += u(" | ")
+                            else:
+                                self.backgroundeventmessage += u("Background: ")
+                            self.backgroundeventmessage += u(self.Betypesf(self.backgroundEtypes[i])) + u(" = ") + self.eventsvalues(self.backgroundEvalues[i])
+                            if aw.qmc.renderEventsDescr and self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
+                                self.backgroundeventmessage += u(" (") + u(self.backgroundEStrings[i].strip()[:aw.qmc.eventslabelschars]) + u(")")
+                            self.backgroundeventmessage += u(" @ ") + self.stringfromseconds(self.timeB[self.backgroundEvents[i]] - start) + " " + str(aw.float2float(self.temp2B[self.backgroundEvents[i]],digits)) + aw.qmc.mode
+                            self.starteventmessagetimer()
+                            break
+                elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
+                    timex = self.time2index(event.artist.get_xdata()[ind])
+                    for i in range(len(self.specialevents)):
+                        if re.search('('+self.etypesf(self.specialeventstype[i])+')',str(event.artist))\
+                        and (self.specialevents[i] == timex or self.specialevents[i] + 1 == timex or self.specialevents[i] -1 == timex):
+                            if aw.qmc.timeindex[0] != -1:
+                                start = aw.qmc.timex[aw.qmc.timeindex[0]]
+                            else:
+                                start = 0
+                            if len(self.eventmessage) != 0:
+                                self.eventmessage += u(" | ")
+                            self.eventmessage += u(self.etypesf(self.specialeventstype[i])) + u(" = ") + self.eventsvalues(self.specialeventsvalue[i])
+                            if aw.qmc.renderEventsDescr and self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
+                                self.eventmessage += u(" (") + u(self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars]) + u(")")
+                            self.eventmessage += u(" @ ") + self.stringfromseconds(self.timex[self.specialevents[i]] - start) + " " + str(aw.float2float(self.temp2[self.specialevents[i]],digits)) + aw.qmc.mode
+                            self.starteventmessagetimer()
+                            break
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onpick() {0}").format(str(e)),exc_tb.tb_lineno)
 
     def onrelease(self,event):     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
         try:
