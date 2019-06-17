@@ -31034,12 +31034,12 @@ class editGraphDlg(ArtisanDialog):
         timeLayout.addWidget(self.CCendedit,1,5,Qt.AlignHCenter)
         timeLayout.addWidget(self.dropedit,1,6,Qt.AlignHCenter)
         timeLayout.addWidget(self.cooledit,1,7,Qt.AlignHCenter)
-        if charge_str != "":
-            calc_chargestr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[0]]))
-            aw.sendmessage(QApplication.translate("Message","The recorded CHARGE time ({0}) does not match the post roast calculated CHARGE time. ({1})", None).format(charge_str, calc_chargestr))
-        if drop_str != "":
-            calc_dropstr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
-            aw.sendmessage(QApplication.translate("Message","The recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})", None).format(drop_str, calc_dropstr))
+#        if charge_str != "":
+#            calc_chargestr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[0]]))
+#            aw.sendmessage(QApplication.translate("Message","The recorded CHARGE time ({0}) does not match the post roast calculated CHARGE time. ({1})", None).format(charge_str, calc_chargestr))
+#        if drop_str != "":
+#            calc_dropstr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+#            aw.sendmessage(QApplication.translate("Message","The recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})", None).format(drop_str, calc_dropstr))
         textLayout = QGridLayout()
         textLayout.setHorizontalSpacing(3)
         textLayout.setVerticalSpacing(2)
