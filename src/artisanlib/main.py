@@ -27252,7 +27252,7 @@ class ApplicationWindow(QMainWindow):
                     buttonstyle = right_rounded_style
                     self.extraeventbuttonround.append(2)
             core_style = """
-                min-width: """  + str(self.buttonWidth) + """px; 
+                min-width: """  + str(aw.buttonWidth) + """px; 
                 margin: 0; 
                 padding: 0px; 
                 border-style: solid; 
@@ -27273,7 +27273,7 @@ class ApplicationWindow(QMainWindow):
                 buttonstyle + \
                 core_style%(self.extraeventbuttontextcolor[i],self.createGradient(QColor(self.extraeventbuttoncolor[i]).lighter(110).name()))
             p.setStyleSheet(plain_style + hover_style + pressed_style)
-            p.setMinimumHeight(self.buttonWidth*1.2)
+            p.setMinimumHeight(aw.buttonWidth*1.2)
             p.setCursor(QCursor(Qt.PointingHandCursor))
             
             l = self.extraeventslabels[i]
@@ -27474,7 +27474,6 @@ class ApplicationWindow(QMainWindow):
                 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.buttonWidth = self.buttonpaletteWidth[pindex]
-            self.realignbuttons()
             self.updateSlidersProperties()
             self.lastbuttonpressed = -1
             self.sendmessage(QApplication.translate("Message","Palette #%i restored"%(pindex), None))
@@ -27503,8 +27502,8 @@ class ApplicationWindow(QMainWindow):
         for i in range(len(pal)):
             key = str(i)
             palette[key] = self.encodeTreeStrings(pal[i])
-        palette["maxlen"] = maxlen
-        palette["width"] = self.buttonWidth
+        palette["maxlen"] = maxlen[:]
+        palette["width"] = self.buttonpaletteWidth[:]
         try:
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Palettes",None),ext="*.apal") 
             if filename:
@@ -27532,11 +27531,11 @@ class ApplicationWindow(QMainWindow):
                 
                 maxlen = list(map(int,palette["maxlen"]))
                 if maxlen is not None:
-                    self.buttonpalettemaxlen = maxlen
-                
+                    self.buttonpalettemaxlen = maxlen[:]
+                                    
                 width = list(map(int,palette["width"]))
                 if width is not None:
-                    self.buttonWidth = width
+                    self.buttonpaletteWidth = width[:]
                     
                 for i in range(10):  #10 palettes (0-9)
                     key = str(i)
@@ -27577,7 +27576,7 @@ class ApplicationWindow(QMainWindow):
                                     nextpalette[k] = pal[i][k]
                                 
                     pal[i] = nextpalette[:]
-                return buttonpalettemaxlen
+                return
             else:
                 message = QApplication.translate("Message","Invalid palettes file format", None)
                 self.sendmessage(message)
@@ -35508,6 +35507,10 @@ class EventsDlg(ArtisanDialog):
         filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Palettes",None),path=aw.profilepath)
         if filename:
             aw.loadPalettes(filename,self.buttonpalette)
+            #save palette Data in Dialog
+            self.buttonpaletteWidth = aw.buttonpaletteWidth[:] 
+            self.buttonpalettemaxlen = aw.buttonpalettemaxlen[:]
+            
             
     def selectionChanged(self):
         selected = self.eventbuttontable.selectedRanges()
@@ -36578,8 +36581,10 @@ class EventsDlg(ArtisanDialog):
         self.eventquantifiercoarse = aw.eventquantifiercoarse[:]
         # palettes
         self.buttonpalette = aw.buttonpalette[:]
-        self.buttonpalettemaxlen = aw.buttonpalettemaxlen
-        self.buttonpaletteWidth = aw.buttonpaletteWidth
+        self.buttonpalettemaxlen = aw.buttonpalettemaxlen[:]
+        self.buttonpaletteWidth = aw.buttonpaletteWidth[:]
+        
+        
         # styles
         self.EvalueColor = aw.qmc.EvalueColor[:]
         self.EvalueMarker = aw.qmc.EvalueMarker[:]
@@ -36650,8 +36655,8 @@ class EventsDlg(ArtisanDialog):
             self.saveQuantifierSettings()
             # save palettes
             aw.buttonpalette = self.buttonpalette[:]
-            aw.buttonpalettemaxlen = self.buttonpalettemaxlen
-            aw.buttonpaletteWidth = self.buttonpaletteWidth
+            aw.buttonpalettemaxlen = self.buttonpalettemaxlen[:]
+            aw.buttonpaletteWidth = self.buttonpaletteWidth[:]
             #
             aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
