@@ -6614,19 +6614,29 @@ class tgraphcanvas(FigureCanvas):
                             if nextra:
                                 for e in range(nextra):
                                     try:
-                                        aw.qmc.extratemp1[e][i] = self.fromFtoC(aw.qmc.extratemp1[e][i])
-                                        aw.qmc.extratemp2[e][i] = self.fromFtoC(aw.qmc.extratemp2[e][i])
+                                        if not (len(aw.qmc.extraNoneTempHint1) > e and aw.qmc.extraNoneTempHint1[e]):
+                                            aw.qmc.extratemp1[e][i] = self.fromFtoC(aw.qmc.extratemp1[e][i])
+                                        if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
+                                            aw.qmc.extratemp2[e][i] = self.fromFtoC(aw.qmc.extratemp2[e][i])
                                     except Exception:
                                         pass
 
                         if self.ambientTemp is not None and self.ambientTemp != 0:
                             self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
 
+                        #prevents accidentally deleting a modified profile. 
+                        self.safesaveflag = True
+
+                        #background
                         for i in range(len(self.timeB)):
                             self.temp1B[i] = self.fromFtoC(self.temp1B[i]) #ET B
                             self.temp2B[i] = self.fromFtoC(self.temp2B[i]) #BT B
                             self.stemp1B[i] = self.fromFtoC(self.stemp1B[i])
                             self.stemp2B[i] = self.fromFtoC(self.stemp2B[i])
+
+                        self.celsiusMode()
+                        if not silent:
+                            aw.sendmessage(QApplication.translate("Message","Profile changed to Celsius", None))
 
                     elif not silent:
                         QMessageBox.information(aw,QApplication.translate("Message", "Convert Profile Temperature",None),
@@ -6634,9 +6644,6 @@ class tgraphcanvas(FigureCanvas):
                         aw.sendmessage(QApplication.translate("Message","Profile not changed", None))
                         return
 
-                    self.celsiusMode()
-                    if not silent:
-                        aw.sendmessage(QApplication.translate("Message","Profile changed to Celsius", None))
             if not silent:
                 self.redraw(recomputeAllDeltas=True,smooth=True)
 
