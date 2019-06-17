@@ -13611,9 +13611,8 @@ class ApplicationWindow(QMainWindow):
         #10 palettes of buttons
         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]] # ,[],[],[],[],[]]
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
-        self.buttonpaletteWidth = [14]*10  #keeps the width of buttons per palette
+        self.buttonpaletteWidth = [60]*10  #keeps the width of buttons per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
-
         self.eventbuttontablecolumnwidths = [] # custom event button table column widths
 
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
@@ -21982,7 +21981,7 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventbuttontextcolor = ["black"]*len(self.extraeventstypes)
                 if settings.contains("buttonpalette"):
                     self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value("buttonpalettemaxlen",self.buttonpalettemaxlen))]
-                    self.buttonpaletteWidth = [min(60,max(260,toInt(x))) for x in toList(settings.value("buttonpaletteWidth",self.buttonpaletteWidth))]
+                    self.buttonpaletteWidth = [min(300,max(50,toInt(x))) for x in toList(settings.value("buttonpaletteWidth",self.buttonpaletteWidth))]                    
                     self.buttonpalette = toList(settings.value("buttonpalette",self.buttonpalette))
                     if self.buttonpalette is None:
                         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]] # initialize empty palettes
@@ -34638,11 +34637,11 @@ class EventsDlg(ArtisanDialog):
         self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
         self.nbuttonsSpinBox.valueChanged.connect(self.setbuttonlistmaxlen)
         #minimum Size of Event Buttons
-        self.buttonWidthlabel = QLabel(QApplication.translate("Label","Button size", None))
+        self.buttonWidthlabel = QLabel(QApplication.translate("Label","Button Size", None))
         self.buttonWidthSpinBox = QSpinBox()
         self.buttonWidthSpinBox.setMaximumWidth(100)
         self.buttonWidthSpinBox.setAlignment(Qt.AlignCenter)
-        self.buttonWidthSpinBox.setRange(60,260)
+        self.buttonWidthSpinBox.setRange(50,300)
         self.buttonWidthSpinBox.setValue(aw.buttonWidth)
         self.buttonWidthSpinBox.valueChanged.connect(self.setbuttonWidth)
         #table for showing events
