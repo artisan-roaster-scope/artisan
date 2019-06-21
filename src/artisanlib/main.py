@@ -6186,7 +6186,7 @@ class tgraphcanvas(FigureCanvas):
                     statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3])
                     if "roasted_density" in cp:
-                        statstr += '\n' + QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%"
+                        statstr += '\n' + QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(aw.float2float(aw.weight_loss(aw.qmc.density[0],cp["roasted_density"]),1)) + "%"
 
                 if aw.qmc.volume[0]:
                     statstr += skipline
@@ -32791,7 +32791,7 @@ class editGraphDlg(ArtisanDialog):
         self.moisture_percent()
         mloss, oloss = self.calc_organic_loss()
         if oloss > 0. and mloss > 0.:
-            self.organiclosslabel.setText(QApplication.translate("Label", "organic loss",None))
+            self.organiclosslabel.setText(QApplication.translate("Label", "organic material",None))
             self.organicpercentlabel.setText("-{}%".format(oloss))
         else:
             self.organiclosslabel.setText("")
