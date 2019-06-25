@@ -11,7 +11,7 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 You will find many roaster manufacturers are now supporting Artisan.  In 2.0, you will find simplified setup for the ones offering support.  See [Artisan Machines](https://artisan-scope.org/machines/).
 
-Under Config>Machine, Artisan 1.3 has direct support for:
+Under Config>Machine, Artisan 2.0 has direct support for:
 
 	• Aillio
 	• Atilla
