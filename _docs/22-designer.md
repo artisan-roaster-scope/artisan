@@ -10,7 +10,7 @@ toc: false
 
 Menu>Tools>Designer
 
-Designer allows you to create a model roast profile.
+Designer allows you to create a model roast profile.  Read the following description and then watch a [video](https://artisan-roasterscope.blogspot.com/2019/05/using-artisan-designer.html) on how to use it.  
 
 ![designer](/assets/images/gsg/Designer.png)
 
@@ -56,7 +56,7 @@ The next screen shows the point added.
 
 Left clicking over the point allows you to drag it upward, adjusting the BT curve and the ROR curve along with it. Grab icon is not shown.
 
-The process of creating a realistic curve for your roaster will likely involve inserting "in-between" points after where turning point is marked and dragging those points upward until the curve actually rises after TP. 
+The process of creating a realistic curve for your roaster will likely involve inserting "in-between" points after where turning point is marked and dragging those points upward until the curve actually rises after TP.
 
 ![designer 10](/assets/images/gsg/Designer 10.png)
 

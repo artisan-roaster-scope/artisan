@@ -56,7 +56,7 @@ Step will show you a plot (step) graph with no values.
 
 Step + shows you a plot graph plus your descriptors on the BT line (same choices as under Flag)
 
-Combo shows you a plot graph with the descriptors on the plot (step) graph.   
+Combo shows you a plot graph with the descriptors on the plot (step) graph. Background events are rendered too.  
 
 Here are examples:
 
