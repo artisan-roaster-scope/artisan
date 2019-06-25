@@ -213,7 +213,7 @@ def updateSyncRecordHashAndSync():
     try:
         config.logger.info("controller:updateSyncRecordHashAndSync()")
         aw = config.app_window
-        if is_on() and bool(aw.curFile):
+        if is_on():
             roast_record = roast.getRoast()
             sync_record,sync_record_hash = roast.getSyncRecord(roast_record)
             if is_synced():

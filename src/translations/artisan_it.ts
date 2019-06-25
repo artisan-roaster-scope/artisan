@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="it" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="it">
 <context>
     <name>About</name>
     <message>
@@ -2383,12 +2384,12 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="71"/>
         <source>Chad</source>
-        <translation></translation>
+        <translation>Ciad</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="72"/>
         <source>Chile</source>
-        <translation></translation>
+        <translation>Cile</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="73"/>
@@ -2498,7 +2499,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="94"/>
         <source>Eritrea</source>
-        <translation>l&apos;Eritrea</translation>
+        <translation>Eritrea</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="95"/>
@@ -2508,7 +2509,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="96"/>
         <source>Eswatini</source>
-        <translation></translation>
+        <translation>Swaziland</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="97"/>
@@ -2578,7 +2579,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="110"/>
         <source>Ghana</source>
-        <translation></translation>
+        <translation>Gana</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="111"/>
@@ -2603,7 +2604,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="115"/>
         <source>Guadeloupe</source>
-        <translation></translation>
+        <translation>Guadalupa</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="116"/>
@@ -2748,7 +2749,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="144"/>
         <source>North Korea</source>
-        <translation>Corea del nord</translation>
+        <translation>Corea del Nord</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="145"/>
@@ -2763,7 +2764,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="147"/>
         <source>Kyrgyzstan</source>
-        <translation></translation>
+        <translation>Kirghizistan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="148"/>
@@ -2893,7 +2894,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="173"/>
         <source>Monaco</source>
-        <translation></translation>
+        <translation>Principato di Monaco</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="174"/>
@@ -2923,7 +2924,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="179"/>
         <source>Myanmar</source>
-        <translation></translation>
+        <translation>Birmania</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="180"/>
@@ -3233,7 +3234,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="241"/>
         <source>Tajikistan</source>
-        <translation></translation>
+        <translation>Tagikistan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="242"/>
@@ -3253,7 +3254,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="245"/>
         <source>Togo</source>
-        <translation>Andare</translation>
+        <translation>Togo</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="246"/>
@@ -3387,12 +3388,12 @@ END</source>
     </message>
     <message>
         <location filename="../plus/countries.py" line="84"/>
-        <source>Cura&#xe7;ao</source>
+        <source>Curaçao</source>
         <translation type="obsolete">Curacao</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="208"/>
-        <source>R&#xe9;union</source>
+        <source>Réunion</source>
         <translation type="obsolete">Riunione</translation>
     </message>
 </context>
@@ -9945,7 +9946,7 @@ Modify your setup?</source>
     <message>
         <location filename="../artisanlib/main.py" line="7980"/>
         <source>DROP {0}</source>
-        <translation type="unfinished"></translation>
+        <translation>SCARICO {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8171"/>
@@ -11390,12 +11391,12 @@ nearest: y value of the nearest point</source>
     <message>
         <location filename="../artisanlib/main.py" line="13293"/>
         <source>Charge</source>
-        <translation type="unfinished"></translation>
+        <translation>Carico</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13302"/>
         <source>Drop</source>
-        <translation type="unfinished"></translation>
+        <translation>Scarico</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13329"/>
