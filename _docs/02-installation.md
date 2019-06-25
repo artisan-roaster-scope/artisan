@@ -13,6 +13,8 @@ Verify that your operating system fulfills the requirements listed under support
 
 Verify that your roasting machine and the devices you plan to operate with Artisan are among the [Supported Machines](https://artisan-scope.org/machines/index) or [Supported Devices](https://artisan-scope.org/devices/index).
 
+Note that Supported Machines are those manufactures that have chosen to support the development of Artisan, but if your manufacture is not listed the devices used may still work with Artisan and will have to be manually input.  
+
 ## Step 1: Download Artisan for your platform
 
 Find and [download](https://github.com/artisan-roaster-scope/artisan/releases/latest) the package of the latest release for your platform. The filenames are as follows, with `x.x.x` the version number.

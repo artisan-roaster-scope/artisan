@@ -2,13 +2,34 @@
 title: "Quick-Start Guide"
 permalink: /docs/quick-start-guide/
 excerpt: "How to quickly install and setup Artisan"
-last_modified_at: 2018-05-15T15:58:49-04:00
+last_modified_at: 2019-06-25T15:59:00-04:00
 toc: false
 ---
 
 ## Quick-Start Guide
 
-**If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.**  Artisan Quick-Start Guide is maintained by *Michael Herbert of EvergreenBuzzBuzz.*  If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the community mailing list on the [Community](https://artisan-scope.org/docs/community/) page.  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  
+**If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.**  Artisan Quick-Start Guide is maintained by *Michael Herbert of  CarefreeBuzzBuzz.*  If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the community mailing list on the [Community](https://artisan-scope.org/docs/community/) page.  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  
+
+
+Version 2.0 is a major milestone in the development of the artisan roast logger. It comes not only in a new look and with a new application icon, but also with support for the new Artisan.Plus inventory service described below.
+
+A note on upgrading from v1.x:
+Artisan 2 stores the application settings in a new location. On the initial start up of Artisan 2 the old settings are imported. From that moment on, changes to settings done with Artisan 2 will not be synchronized automatically back to previous versions. However, synchronizing settings via save/load settings (under menu Help) manually works across all versions. PLEASE EXPORT a working SETTINGS FILE and keep it saved to be able to track back in case changes do not work out as expected when upgrading.
+
+
+## Artisan.Plus
+
+Introduced as part of 2.0, this is an inventory management system which is not covered in the Quick Start Guide.  More information can be found at the Artisan Plus [website](https://artisan.plus/en/). Artisan v2 connects to the inventory management service. This service manages your stock of beans and automatically subtracts batches as you roast them. Beans can be specified to every detail and only essential meta data of roasts is stored online in the cloud. All roast profiles stay local just with you and are not shared with the platform.
+
+Additional popup menus in the Roast Properties dialog (menu Roast >> Properties) allow you to choose from your stock and have beans information filled in automatically.
+
+The service features support for
+•	multiple users, machines and stores
+•	blends & certifications
+•	charts, tax reports & predictions
+•	artisan integration support offline roasting
+
+
 
 ### Your first roast
 

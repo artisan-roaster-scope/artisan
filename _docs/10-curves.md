@@ -17,6 +17,8 @@ These are critical settings within Artisan and for most the first two tabs will 
 First you decide which ROR curves and LCD’s you want to display.
 ![curves ror](/assets/images/gsg/curves ror.png)
 
+The order of Delta LCDs can now be swapped too (the BT/ET LCDs can be swapped in the device config menu).The order curves are shown now respects the order of LCDs (from top to bottom). Thus if the DeltaET LCD is shown above the DeltaBT LCD, also the DeltaET curve is drawn above the DeltaBT curve (menu Config >> Curves, 1st tab RoR).
+
 Secondly you move to the filters tab to determine how you want the curves to display.  If you want the curves to be the same during and after the roast your settings will be different than if you want additional post roast filtering/smoothing. **These are critical settings so take your time here.  As you adjust the settings, consider if the results allow you to understand and interpret your results so that you can improve taste in the cup.  For some, to much variation in the curves becomes hard to interpret so they turn up the smoothing.**
 
 ![curves filters](/assets/images/gsg/curves-filters.png)
@@ -33,9 +35,9 @@ IMPORTANT NOTE:  These two filters above are applied directly on the incoming da
 
 *Filtering During the Roast – ROR*
 
-**Smooth Deltas** will impact only the delta curves and is applied after the Smooth Curves setting ONLY FOR THE DELTA CURVES during the roast.  This allows for further refinement of your Delta curve.  The value is proportional to the number of basic/core RoR values to be averaged over to compute the final RoR values used for predictions and rendering. This smoothing process produces a shift on the time axis if "Optimal Smoothing Post Roast" is not checked (see below).
+**Smooth Deltas** will impact only the delta curves and is applied after the Smooth Curves setting ONLY FOR THE DELTA CURVES during the roast.  This allows for further refinement of your Delta curve.  You can enter different values for the ET and BT curves.  The value is proportional to the number of basic/core RoR values to be averaged over to compute the final RoR values used for predictions and rendering. This smoothing process produces a shift on the time axis if "Optimal Smoothing Post Roast" is not checked (see below).
 
-**Delta Span** affects how far back in time Artisan looks when calculating a delta curve. Increasing this setting should smooth live-recording delta curves. Increasing this setting will not affect the standard temperature curves (ET/BT/etc.), only deltas. Delta Span is the period in seconds used to calculate basic/core RoR values by dividing the delta-temp/delta-time (so delta-time is the delta-span used for this). A Delta Span smaller than twice the sampling interval has no effect, larger Delta Spans lead to time shifts.
+**Delta Span** affects how far back in time Artisan looks when calculating a delta curve. You can enter different values for the ET and BT curves.   Increasing this setting should smooth live-recording delta curves. Increasing this setting will not affect the standard temperature curves (ET/BT/etc.), only deltas. Delta Span is the period in seconds used to calculate basic/core RoR values by dividing the delta-temp/delta-time (so delta-time is the delta-span used for this). A Delta Span smaller than twice the sampling interval has no effect, larger Delta Spans lead to time shifts.
 
 *Filtering During the Roast Of All Curves - Impacting the Delta Curve Rendering During Roast*
 
