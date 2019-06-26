@@ -71,6 +71,7 @@ You are also now able to add an event type that will show on the graph when you 
 
 
 *Buttons Configuration Sample*
+
 ![buttons config](/assets/images/gsg/buttons config.gif)
 
 The above screenshot shows the Button Label and Description, Type, Value, Action, Documentation, Visibility, Color and Text Color.  The Label is what shows on the button.  The Description is what shows on the graph.  The Value is from 0-100.  So you have to adjust your scale to that.  For example if you are using 2.0-3.5kPa for gas you might have values 20-35.  You can choose the button to trigger a machine control action such as change the Hottop heater.  You can have the buttons visible or not and choose their color and text.  You can drag and drop to change the order of the buttons.  
