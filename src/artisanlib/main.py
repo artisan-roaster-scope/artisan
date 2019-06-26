@@ -401,13 +401,13 @@ args = sys.argv
 if sys.platform.startswith("linux"):
     # avoid a GTK bug in Ubuntu Unity
     args = args + ['-style','Fusion']
-if platf == 'Windows':
-    # highDPI support must be set before creating the Application instance
-    try:
-        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-        QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-    except Exception as e:
-        pass
+#if platf == 'Windows':
+#    # highDPI support must be set before creating the Application instance
+#    try:
+#        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+#        QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+#    except Exception as e:
+#        pass
 app = Artisan(args)
 
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings 
@@ -458,13 +458,14 @@ app.setOrganizationDomain("artisan-scope.org")                          #needed 
     
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
-    try:
-        # activate scaling for hiDPI screen support on Windows
-        app.setAttribute(Qt.AA_EnableHighDpiScaling)
-        if hasattr(QStyleFactory, 'AA_UseHighDpiPixmaps'):
-            app.setAttribute(Qt.AA_UseHighDpiPixmaps)
-    except Exception as e:
-        pass
+#    try:
+#        # activate scaling for hiDPI screen support on Windows
+#        app.setAttribute(Qt.AA_EnableHighDpiScaling)
+#        if hasattr(QStyleFactory, 'AA_UseHighDpiPixmaps'):
+#            app.setAttribute(Qt.AA_UseHighDpiPixmaps)
+#    except Exception as e:
+#        pass
+
 
 deltaLabelPrefix = "<html>&Delta;&thinsp;</html>" # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
 if platf == 'Linux':
@@ -479,6 +480,8 @@ deltaLabelMathPrefix = u("$\Delta\/$")  # prefix for labels in matplibgraphs to 
 if sys.platform.startswith("darwin"):
     # control app napping on OS X >= 10.9
     import appnope
+    # import module to detect if OS X dark mode is active or not
+    import darkdetect
     # to establish a thread pool on OS X
     import objc  # @UnusedImport # pyobjc seems not to be needed anylonger
     import Foundation
@@ -11622,6 +11625,7 @@ class ApplicationWindow(QMainWindow):
     
     def __init__(self, parent = None):
     
+    
         self.superusermode = False
         
 #PLUS
@@ -11737,7 +11741,7 @@ class ApplicationWindow(QMainWindow):
             except:
                 pass                           
         
-        self.qmc = tgraphcanvas(self.main_widget,self.dpi)        
+        self.qmc = tgraphcanvas(self.main_widget,self.dpi)   
         
         #self.qmc.setAttribute(Qt.WA_NoSystemBackground)
         
@@ -12630,6 +12634,7 @@ class ApplicationWindow(QMainWindow):
         self.helpMenu.addAction(self.resetAction)
         
         self.displayonlymenus()
+        
 
         ############################## WIDGETS SECTION ########################################
 
@@ -14138,6 +14143,7 @@ class ApplicationWindow(QMainWindow):
         
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatus)
+        
 
     # this is important to have . as decimal separator independent of the systems locale
     def createCLocaleDoubleValidator(self,bot,top,dec,w):
@@ -30622,8 +30628,12 @@ class editGraphDlg(ArtisanDialog):
         self.titleedit.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed)
         self.titleedit.activated.connect(self.recentRoastActivated)
         self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
-        self.titleedit.setStyleSheet(
-            "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
+        if sys.platform.startswith("darwin") and darkdetect.isDark():
+            self.titleedit.setStyleSheet(
+                "QComboBox {font-weight: bold; background-color: " + QColor(aw.qmc.palette["title"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
+        else:
+            self.titleedit.setStyleSheet(
+                "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
         self.titleedit.setView(QListView())
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
         self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
@@ -30635,10 +30645,10 @@ class editGraphDlg(ArtisanDialog):
         dateedit = QLineEdit(date)
         dateedit.setFocusPolicy(Qt.NoFocus)
         dateedit.setReadOnly(True)
-        if sys.platform.startswith("darwin"):
-            dateedit.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+        if sys.platform.startswith("darwin") and darkdetect.isDark():
+            dateedit.setStyleSheet("background-color: #757575; color : white;")
         else:
-            dateedit.setStyleSheet("background-color:'lightgrey'")
+            dateedit.setStyleSheet("background-color: #eeeeee;")
         #Batch
         batchlabel = QLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
         if aw.superusermode and aw.qmc.batchcounter > -1:
@@ -30669,12 +30679,10 @@ class editGraphDlg(ArtisanDialog):
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + roastpos + u(" ")
             batchedit = QLineEdit(batch)
             batchedit.setReadOnly(True)
-            if False: # sys.platform.startswith("darwin"):
-                # since Qt5.11 the background color of QLineEdits only changes if also the broder is set
-                # fixed in 5.12.2
-                batchedit.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+            if sys.platform.startswith("darwin") and darkdetect.isDark():
+                batchedit.setStyleSheet("background-color: #757575; color : white;")
             else:
-                batchedit.setStyleSheet("background-color:'lightgrey'")
+                batchedit.setStyleSheet("background-color: #eeeeee;")
             batchedit.setFocusPolicy(Qt.NoFocus)
             
         #Beans
@@ -31640,23 +31648,24 @@ class editGraphDlg(ArtisanDialog):
     def markPlusCoffeeFields(self,b):
         # for QTextEdit
         if b:
-            self.beansedit.setStyleSheet("QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray;  }")
+            if sys.platform.startswith("darwin") and darkdetect.isDark():
+                self.beansedit.setStyleSheet("QTextEdit { background-color: #0c6aa6; selection-background-color: darkgray; }")
+            else:
+                self.beansedit.setStyleSheet("QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray;  }")
         else:
             self.beansedit.setStyleSheet("")
         # for QLineEdit
-        if False: #sys.platform.startswith("darwin"):
-            # since Qt5.11 the background color of QLineEdits only changes if also the broder is set
-            # fixed in 5.12.2
-            qlineedit_marked_style = "QLineEdit { border: 0.5px solid lightgrey; background-color: #e4f3f8; selection-background-color: darkgray; }"
-        else:
-            qlineedit_marked_style = "QLineEdit { background-color: #e4f3f8; selection-background-color: darkgray; }"
-        background_white_style = "" 
         if b:
+            if sys.platform.startswith("darwin") and darkdetect.isDark():
+                qlineedit_marked_style = "QLineEdit { background-color: #0c6aa6; selection-background-color: darkgray; }"
+            else:
+                qlineedit_marked_style = "QLineEdit { background-color: #e4f3f8; selection-background-color: #424242; }"
             self.bean_density_in_edit.setStyleSheet(qlineedit_marked_style)
             self.bean_size_min_edit.setStyleSheet(qlineedit_marked_style)
             self.bean_size_max_edit.setStyleSheet(qlineedit_marked_style)
             self.moisture_greens_edit.setStyleSheet(qlineedit_marked_style)
         else:
+            background_white_style = "" 
             self.bean_density_in_edit.setStyleSheet(background_white_style)
             self.bean_size_min_edit.setStyleSheet(background_white_style)
             self.bean_size_max_edit.setStyleSheet(background_white_style)
@@ -32660,9 +32669,12 @@ class editGraphDlg(ArtisanDialog):
             except:
                 pass       
         if enough:
-            self.weightinedit.setStyleSheet("""QLineEdit { color: black }""")
+            self.weightinedit.setStyleSheet("")
         else:
-            self.weightinedit.setStyleSheet("""QLineEdit { color: red }""")
+            if sys.platform.startswith("darwin") and darkdetect.isDark():
+                self.weightinedit.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
+            else:
+                self.weightinedit.setStyleSheet("""QLineEdit { color: red; }""")
         
     def weightineditChanged(self):
         self.weightinedit.setText(aw.comma2dot(str(self.weightinedit.text())))
@@ -54691,6 +54703,7 @@ def main():
     global app
     global artisanviewerFirstStart
     
+    
     # suppress all warnings
     warnings.filterwarnings('ignore')
     
@@ -54707,6 +54720,7 @@ def main():
     aw = ApplicationWindow()
     
     app.setActivationWindow(aw) # set the activation window for the QtSingleApplication
+    
     
 #    aw.setStyleSheet("QMainWindow {background: 'white';}")
     

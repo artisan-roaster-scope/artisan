@@ -10,4 +10,5 @@ scipy==1.2.1
 matplotlib==3.1.0
 PyQt5==5.12.2
 keyring==19.0.1
+darkdetect==0.1.1 # detect if dark mode is active
 

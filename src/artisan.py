@@ -7,6 +7,14 @@ import sys
 import os
 from platform import system
 
+# highDPI support must be set before creating the Application instance
+try:
+    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtCore import Qt
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+except Exception as e:
+    pass
         
 # on Qt5, the platform plugin cocoa/windows is not found in the plugin directory (dispite the qt.conf file) if we do not
 # extend the libraryPath accordingly
