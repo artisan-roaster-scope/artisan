@@ -54748,26 +54748,6 @@ def main():
         aw.LCD5frame.setLayout(tmp.layout())        
     aw.show()    
     
-    # Workaround for the interaction between QGraphicsDropShadowEffect, cut off menus, and PyQt 5.12.2 on Windows.
-    if platf == 'Windows': 
-        import win32gui  # @UnresolvedImport @UnusedImport
-        import pyautogui  # @UnresolvedImport @UnusedImport
-        def win_menu_monkey():
-            try:   
-                if re.match(".*" + aw.windowTitle + "$", win32gui.GetWindowText(win32gui.GetForegroundWindow())) is not None:
-                    pyautogui.press('esc')
-                    pyautogui.press('alt')
-                    pyautogui.typewrite(['enter','up','up','up','enter','esc','esc','right'])  #file reports sub menu
-                    for i in range(0,6):
-                        pyautogui.typewrite(['enter','esc','right'])
-                    #pyautogui.press('esc')
-                else:
-                    QTimer.singleShot(50,lambda : win_menu_monkey())
-            except:
-                pass
-        QTimer.singleShot(10,lambda : win_menu_monkey())
-
-
     try:
         if sys.argv and len(sys.argv) > 1:
             argv_file = sys.argv[1]
