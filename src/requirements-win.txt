@@ -8,4 +8,3 @@ PyQt5==5.12.3
 pyinstaller==3.4
 pywin32==224
 keyring==19.0.1
-pyautogui==0.9.42
