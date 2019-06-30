@@ -371,25 +371,39 @@ class Artisan(QtSingleApplication):
         else: # on raising another dialog/widget was open, reset timer
             self.sentToBackground = None
         
+    # takes a QUrl and interprets it as follows
+    # artisan://roast/<UUID> : loads profile from path associated with the given roast <UUID>
+    def open_url(self, url):
+        if not aw.qmc.flagon: # only if not yet monitoring
+            if url.scheme() == "artisan" and url.authority() == 'roast':
+                aw.sendmessage("in",url.toString())
+                roast_UUID = url.toString(QUrl.RemoveScheme | QUrl.RemoveAuthority | QUrl.RemoveQuery | QUrl.RemoveFragment | QUrl.StripTrailingSlash)[1:]
+                aw.sendmessage("roast_UUID " + roast_UUID)
+                profile_path = plus.register.getPath(roast_UUID)
+                if profile_path:
+                    aw.sendmessage(QApplication.translate("Message","URL open profile: {0}",None).format(profile_path))
+                    QTimer.singleShot(20,lambda : aw.loadFile(profile_path))
 
     def event(self, event):
         if event.type() == QEvent.FileOpen:
             try:
-                filename = u(event.file())
-                qfile = QFileInfo(filename)
-                file_suffix = u(qfile.suffix())
-                if file_suffix == "alog":
-                    # load Artisan profile on double-click on *.alog file
-                    if not aw.qmc.flagon: # only if not yet monitoring
-                        QTimer.singleShot(20,lambda : aw.loadFile(filename))
-                elif file_suffix == "alrm":
-                    # load Artisan alarms on double-click on *.alrm file
+                url = event.url()
+                if url.isValid():
+                    self.open_url(event.url())
+                else:
                     if not aw.qmc.flagstart:
-                        QTimer.singleShot(20,lambda : aw.loadAlarms(filename))
-                elif file_suffix == "apal":
-                    # load Artisan palettes on double-click on *.apal file
-                    if not aw.qmc.flagstart:
-                        QTimer.singleShot(20,lambda : aw.getPalettes(filename,aw.buttonpalette))
+                        filename = u(event.file())
+                        qfile = QFileInfo(filename)
+                        file_suffix = u(qfile.suffix())
+                        if file_suffix == "alog":
+                            # load Artisan profile on double-click on *.alog file
+                            QTimer.singleShot(20,lambda : aw.loadFile(filename))
+                        elif file_suffix == "alrm":
+                            # load Artisan alarms on double-click on *.alrm file
+                            QTimer.singleShot(20,lambda : aw.loadAlarms(filename))
+                        elif file_suffix == "apal":
+                            # load Artisan palettes on double-click on *.apal file
+                            QTimer.singleShot(20,lambda : aw.getPalettes(filename,aw.buttonpalette))
             except Exception:
                 pass
             return 1
@@ -54696,7 +54710,15 @@ if sys.platform.startswith("darwin"):
 #            return None #"Document"
         def makeWindowControllers(self):
             pass
-        
+
+#def open_desktopservices_url(url):
+#    print("url",url.toString())
+#
+#class URLHandler(QObject):
+#    def handleURL(self, link):
+#        open_desktopservices_url (url)
+#        print("link",link.toString())
+
     
 def main():
     global aw
@@ -54714,6 +54736,11 @@ def main():
         if not viewersettings.contains("Mode"):
             artisanviewerFirstStart = True
         del viewersettings
+    
+    #QDesktopServices.setUrlHandler('artisan', open_desktopservices_url)
+    # Set URL handler to warn before opening url
+    # handler = URLHandler()
+    # QDesktopServices.setUrlHandler("artisan", handler.handleURL) 
     
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
@@ -54794,6 +54821,7 @@ def main():
 #            sys.stderr = sys.stdout
 #        except:
 #            pass
+
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
