@@ -30644,10 +30644,10 @@ class editGraphDlg(ArtisanDialog):
         self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
         if sys.platform.startswith("darwin") and darkdetect.isDark():
             self.titleedit.setStyleSheet(
-                "QComboBox {font-weight: bold; background-color: " + QColor(aw.qmc.palette["title"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
+                "QComboBox {font-weight: bold; background-color: " + QColor(aw.qmc.palette["title"]).name() + "; color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
         else:
             self.titleedit.setStyleSheet(
-                "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
+                "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + "; background-color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
         self.titleedit.setView(QListView())
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
         self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
@@ -54837,8 +54837,7 @@ def main():
             mxOpenKey = QSettings("HKEY_CLASSES_ROOT\\artisan\\shell\\open\\command", QSettings.NativeFormat)
             cmdLine = "\"" + application_path + "\" \"%1\""
             mxOpenKey.setValue(".", cmdLine)
-        except Exception as e:
-            aw.sendmessage("error: " + str(e))
+        except:
             pass
 
 #    if platf == 'Windows' and appFrozen():
