@@ -54820,19 +54820,25 @@ def main():
         # register URL handler in Windows registry
         try:
             # first we dig out the path of the artisan.exe file
-            import os.path as op
             if getattr(sys, 'frozen', False):
-                application_path = getattr(sys, '_MEIPASS', op.dirname(sys.executable))
+                application_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+                # application_path = "C:\Program Files\Artisan"
             else:
                 try:
                     this_file = __file__
                 except NameError:
                     this_file = sys.argv[0]
-                this_file = op.abspath(this_file)
-                application_path = op.dirname(this_file)
-                
-            aw.sendmessage("app exe: " + str(application_path))
-        except:
+                this_file = os.path.abspath(this_file)
+                application_path = os.path.dirname(this_file)
+                exe_name = 'artisan.exe'
+                application_path = os.path.join(application_path, exe_name)
+            mxKey = QSettings("HKEY_CLASSES_ROOT\\artisan", QSettings.NativeFormat)
+            mxKey.setValue("URL Protocol", "")
+            mxOpenKey = QSettings("HKEY_CLASSES_ROOT\\artisan\\shell\\open\\command", QSettings.NativeFormat)
+            cmdLine = "\"" + application_path + "\" \"%1\""
+            mxOpenKey.setValue(".", cmdLine)
+        except Exception as e:
+            aw.sendmessage("error: " + str(e))
             pass
 
 #    if platf == 'Windows' and appFrozen():
