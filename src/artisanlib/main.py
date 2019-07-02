@@ -376,13 +376,13 @@ class Artisan(QtSingleApplication):
     def open_url(self, url):
         if not aw.qmc.flagon: # only if not yet monitoring
             if url.scheme() == "artisan" and url.authority() == 'roast':
-                aw.sendmessage("in",url.toString())
                 roast_UUID = url.toString(QUrl.RemoveScheme | QUrl.RemoveAuthority | QUrl.RemoveQuery | QUrl.RemoveFragment | QUrl.StripTrailingSlash)[1:]
-                aw.sendmessage("roast_UUID " + roast_UUID)
-                profile_path = plus.register.getPath(roast_UUID)
-                if profile_path:
-                    aw.sendmessage(QApplication.translate("Message","URL open profile: {0}",None).format(profile_path))
-                    QTimer.singleShot(20,lambda : aw.loadFile(profile_path))
+                if aw.qmc.roastUUID is None or aw.qmc.roastUUID != roast_UUID:
+                    # not yet open, lets try to find the path to that roastUUID and open it
+                    profile_path = plus.register.getPath(roast_UUID)
+                    if profile_path:
+                        aw.sendmessage(QApplication.translate("Message","URL open profile: {0}",None).format(profile_path))
+                        QTimer.singleShot(20,lambda : aw.loadFile(profile_path))
 
     def event(self, event):
         if event.type() == QEvent.FileOpen:
@@ -54815,6 +54815,25 @@ def main():
                     aw.qmc.backgroundprofile = None
     except Exception:
         pass
+    
+    if platf == 'Windows':
+        # register URL handler in Windows registry
+        try:
+            # first we dig out the path of the artisan.exe file
+            import os.path as op
+            if getattr(sys, 'frozen', False):
+                application_path = getattr(sys, '_MEIPASS', op.dirname(sys.executable))
+            else:
+                try:
+                    this_file = __file__
+                except NameError:
+                    this_file = sys.argv[0]
+                this_file = op.abspath(this_file)
+                application_path = op.dirname(this_file)
+                
+            aw.sendmessage("app exe: " + str(application_path))
+        except:
+            pass
 
 #    if platf == 'Windows' and appFrozen():
 #        try:

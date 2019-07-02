@@ -42,7 +42,7 @@ uuid_tag         = "roastUUID"
 
 ## CLOUD SETUP
 api_base_url         = "https://artisan.plus/api/v1"
-web_base_url         = "https://artisan.plus/"
+web_base_url         = "https://artisan.plus"
 
 register_url     = web_base_url + "/register"
 reset_passwd_url = web_base_url + "/resetPassword"
