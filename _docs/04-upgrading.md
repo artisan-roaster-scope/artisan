@@ -12,7 +12,7 @@ Download and install the latest version of [Artisan](https://github.com/artisan-
 
 The installer, on a MAC or PC, will first remove your prior version but this won’t remove your prior settings if you have them. You can also downgrade to a previous version by just uninstalling the current version and re-installing the old version without losing any settings.    
 
-To ensure no issues, save your stable settings before changing any settings or installing a new version (Help>Save Settings). ![save settings](/assets/images/gsg/save settings.png)
+To ensure no issues, save your stable settings before changing any settings or installing a new version (Help>Save Settings). ![save settings](/assets/images/gsg/load settings.png)
 
 
 ## A note on upgrading to 2.0 from v1.x:
