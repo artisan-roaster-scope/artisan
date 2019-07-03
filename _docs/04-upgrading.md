@@ -14,7 +14,7 @@ The installer, on a MAC or PC, will first remove your prior version but this won
 
 To ensure no issues, save your stable settings before changing any settings or installing a new version (Help>Save Settings).
 
-![Save Settings](/assets/images/gsg/save settings.png)
+![save settings](/assets/images/gsg/save settings.png)
 
 ## A note on upgrading to 2.0 from v1.x:
 
