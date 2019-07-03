@@ -16,6 +16,7 @@ To ensure no issues, save your stable settings before changing any settings or i
 
 ![save settings](/assets/images/gsg/save settings.png)
 
+
 ## A note on upgrading to 2.0 from v1.x:
 
 Artisan 2 stores the application settings in a new location. On the initial start up of Artisan 2 the old settings are imported. From that moment on, changes to settings done with Artisan 2 will not be synchronized automatically back to previous versions. However, synchronizing settings via save/load settings (under menu Help) manually works across all versions. PLEASE EXPORT a working SETTINGS FILE and keep it saved to be able to track back in case changes do not work out as expected when upgrading.
