@@ -31497,17 +31497,21 @@ class editGraphDlg(ArtisanDialog):
             
     def updatePlusSelectedLine(self):
         try:
+            if sys.platform.startswith("darwin") and darkdetect.isDark():
+                dark_mode_link_color = " style=\"color: #e5e9ec;\""
+            else:
+                dark_mode_link_color = ""
             line = ""
             if self.plus_coffee_selected is not None and self.plus_coffee_selected_label:
-                line = '<a href="{0}">{1}</a>'.format(plus.util.coffeeLink(self.plus_coffee_selected),self.plus_coffee_selected_label)
+                line = '<a href="{0}"{2}>{1}</a>'.format(plus.util.coffeeLink(self.plus_coffee_selected),self.plus_coffee_selected_label,dark_mode_link_color)
             elif self.plus_blend_selected_spec and self.plus_blend_selected_spec_labels:
                 for i,l in sorted(zip(self.plus_blend_selected_spec["ingredients"],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]["ratio"],reverse = True):
                     if line:
                         line = line + ", "
-                    c = '<a href="{0}">{1}</a>'.format(plus.util.coffeeLink(i["coffee"]),l)
+                    c = '<a href="{0}"{2}>{1}</a>'.format(plus.util.coffeeLink(i["coffee"]),l,dark_mode_link_color)
                     line = line + str(int(round(i["ratio"]*100))) + "% " + c
             if line and len(line)>0 and self.plus_store_selected is not None and self.plus_store_selected_label is not None:
-                line = line + ', <a href="{0}">{1}</a>'.format(plus.util.storeLink(self.plus_store_selected),self.plus_store_selected_label)
+                line = line + ', <a href="{0}"{2}>{1}</a>'.format(plus.util.storeLink(self.plus_store_selected),self.plus_store_selected_label,dark_mode_link_color)
             self.plus_selected_line.setText(line)
         except Exception:
             pass
@@ -31663,7 +31667,7 @@ class editGraphDlg(ArtisanDialog):
         # for QTextEdit
         if b:
             if sys.platform.startswith("darwin") and darkdetect.isDark():
-                self.beansedit.setStyleSheet("QTextEdit { background-color: #0c6aa6; selection-background-color: darkgray; }")
+                self.beansedit.setStyleSheet("QTextEdit { background-color: #0D658F; selection-background-color: darkgray; }")
             else:
                 self.beansedit.setStyleSheet("QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray;  }")
         else:
@@ -31671,7 +31675,7 @@ class editGraphDlg(ArtisanDialog):
         # for QLineEdit
         if b:
             if sys.platform.startswith("darwin") and darkdetect.isDark():
-                qlineedit_marked_style = "QLineEdit { background-color: #0c6aa6; selection-background-color: darkgray; }"
+                qlineedit_marked_style = "QLineEdit { background-color: #0D658F; selection-background-color: darkgray; }"
             else:
                 qlineedit_marked_style = "QLineEdit { background-color: #e4f3f8; selection-background-color: #424242; }"
             self.bean_density_in_edit.setStyleSheet(qlineedit_marked_style)
