@@ -6860,7 +6860,8 @@ class tgraphcanvas(FigureCanvas):
             
             self.ax1.fill_between(angles,0,plotf, facecolor='#1985ba', alpha=0.1, interpolate=True)
     
-            self.fig.canvas.draw()
+            #self.fig.canvas.draw()
+            self.fig.canvas.draw_idle()
         except Exception:
             pass
         
@@ -6951,7 +6952,10 @@ class tgraphcanvas(FigureCanvas):
             if self.phidgetManager is None:
                 try:
                     self.phidgetManager = PhidgetManager()
-                    libtime.sleep(0.3)
+                    if self.phidgetRemoteFlag:
+                        libtime.sleep(0.9)
+                    else:
+                        libtime.sleep(0.3)
                 except Exception as e:
                     if aw.qmc.device in aw.qmc.phidgetDevices:
                         aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
@@ -37304,7 +37308,7 @@ class flavorDlg(ArtisanDialog):
     def setvalue(self,_,x):
         valueSpinBox = self.flavortable.cellWidget(x,1)
         aw.qmc.flavors[x] = valueSpinBox.value()
-        aw.qmc.flavorchart()
+        QTimer.singleShot(0,lambda : aw.qmc.flavorchart())
 
     def setdefault(self):
         if self.lastcomboboxIndex == 10:
@@ -41843,7 +41847,7 @@ class serialport(object):
 #     move(ch,pos) # sets position, enables servo, disables servo once target position is reached
 
     def phidgetRCattach(self,channel):
-        if not aw.ser.PhidgetRCServo and aw.qmc.phidgetManager is not None:
+        if not aw.ser.PhidgetRCServo:
             aw.qmc.startPhidgetManager()
             # try to attach an Phidget RCC1000 module
             ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_RCC1000,
@@ -41873,7 +41877,10 @@ class serialport(object):
                         rcservo.setIsLocal(False)
         try:
             if not aw.ser.PhidgetRCServo[channel].getAttached():
-                aw.ser.PhidgetRCServo[channel].openWaitForAttachment(1000)
+                if aw.qmc.phidgetRemoteFlag:
+                    aw.ser.PhidgetRCServo[channel].openWaitForAttachment(3000)
+                else:
+                    aw.ser.PhidgetRCServo[channel].openWaitForAttachment(1500)
         except:
             pass
 
@@ -48951,6 +48958,14 @@ class MyQDoubleSpinBox(QDoubleSpinBox):
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
             return QDoubleSpinBox.wheelEvent(self, *args, **kwargs)
+    
+    # we re-direct the mouse double-click event to the standard mouse press event and add
+    # the (at least in PyQt 5.12.2/5.12.3) missing mouse release event
+    # which had the effect that a double click an DoubleSpinBox arrow in the Cup Profile dialog
+    # leads to a non-terminating sequence of setvalue() calls until the end of the spinner is reached.
+    def mouseDoubleClickEvent(self, event):
+        super(MyQDoubleSpinBox, self).mousePressEvent(event)
+        super(MyQDoubleSpinBox, self).mouseReleaseEvent(event)
             
 class MyTableWidgetItemQLineEdit(QTableWidgetItem):
     def __init__(self, sortKey):

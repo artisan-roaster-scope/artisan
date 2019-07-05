@@ -210,6 +210,7 @@ class PhidgetManager():
 
     # returns the first matching Phidget channel and reserves it
     def getFirstMatchingPhidget(self,phidget_class_name,device_id,channel=None,remote=False,remoteOnly=False):
+#        print("getFirstMatchingPhidget",phidget_class_name,device_id,channel,remote,remoteOnly)
         try:
             self.managersemaphore.acquire(1)
             if device_id in [
