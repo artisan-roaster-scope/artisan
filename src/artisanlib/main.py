@@ -37308,7 +37308,7 @@ class flavorDlg(ArtisanDialog):
     def setvalue(self,_,x):
         valueSpinBox = self.flavortable.cellWidget(x,1)
         aw.qmc.flavors[x] = valueSpinBox.value()
-        QTimer.singleShot(0,lambda : aw.qmc.flavorchart())
+        aw.qmc.flavorchart()
 
     def setdefault(self):
         if self.lastcomboboxIndex == 10:
@@ -48958,15 +48958,17 @@ class MyQDoubleSpinBox(QDoubleSpinBox):
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
             return QDoubleSpinBox.wheelEvent(self, *args, **kwargs)
-    
+            
     # we re-direct the mouse double-click event to the standard mouse press event and add
     # the (at least in PyQt 5.12.2/5.12.3) missing mouse release event
     # which had the effect that a double click an DoubleSpinBox arrow in the Cup Profile dialog
     # leads to a non-terminating sequence of setvalue() calls until the end of the spinner is reached.
+    # Note: a triple click still has this effect
     def mouseDoubleClickEvent(self, event):
-        super(MyQDoubleSpinBox, self).mousePressEvent(event)
         super(MyQDoubleSpinBox, self).mouseReleaseEvent(event)
-            
+        super(MyQDoubleSpinBox, self).mouseDoubleClickEvent(event)
+        super(MyQDoubleSpinBox, self).mouseReleaseEvent(event)
+
 class MyTableWidgetItemQLineEdit(QTableWidgetItem):
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
