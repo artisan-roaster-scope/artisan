@@ -21955,11 +21955,11 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("batchcounter"):
                 if updateBatchCounter:
                     aw.qmc.batchcounter = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
-                    aw.qmc.batchprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
-                    if filename is None:
-                        # we do not load those two from setting files!
-                        aw.qmc.batchsequence = toInt(settings.value("batchsequence",aw.qmc.batchsequence))
-                        aw.qmc.lastroastepoch = toInt(settings.value("lastroastepoch",aw.qmc.lastroastepoch))
+                aw.qmc.batchprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
+                if filename is None:
+                    # we do not load those two from setting files!
+                    aw.qmc.batchsequence = toInt(settings.value("batchsequence",aw.qmc.batchsequence))
+                    aw.qmc.lastroastepoch = toInt(settings.value("lastroastepoch",aw.qmc.lastroastepoch))
             settings.endGroup()
             self.computeLinespaces()
             self.updateSlidersProperties()
