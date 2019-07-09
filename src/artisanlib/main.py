@@ -9380,6 +9380,12 @@ class tgraphcanvas(FigureCanvas):
             if line:
                 error = error + "@line " + str(line)
             self.errorlog.append(timez + " " + error)
+            # truncate to first line for window message line
+            try:
+                # only show first line in 
+                error = error.splitlines()[0]
+            except:
+                pass
             if self.flagon: # don't send message here, but cache it and send it from updategraphics from within the GUI thread
                 self.temporary_error = error
             else:
@@ -54708,7 +54714,7 @@ def excepthook(excType, excValue, tracebackobj):
     sections = [timeString, separator, errmsg]
     msg = '\n'.join(sections)
     detailedmsg = '\n'.join([tbinfo, separator, variables])
-    aw.qmc.adderror(msg)
+    aw.qmc.adderror("Error: " + detailedmsg)
     try:
         f = open(logFile, "w", encoding='utf-8')
         f.write(msg)
