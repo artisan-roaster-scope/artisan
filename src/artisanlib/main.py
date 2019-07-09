@@ -30650,8 +30650,12 @@ class editGraphDlg(ArtisanDialog):
             self.titleedit.setStyleSheet(
                 "QComboBox {font-weight: bold; background-color: " + QColor(aw.qmc.palette["title"]).name() + "; color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
         else:
-            self.titleedit.setStyleSheet(
-                "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + "; background-color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
+            if aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"] == "None":
+                self.titleedit.setStyleSheet(
+                    "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
+            else:
+                self.titleedit.setStyleSheet(
+                    "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + "; background-color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
         self.titleedit.setView(QListView())
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
         self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
@@ -37979,7 +37983,7 @@ class backgroundDlg(ArtisanDialog):
             self.datatable.setItem(i,3,deltaET)
             self.datatable.setItem(i,4,deltaBT)
             
-            if xtcurve: # an XT column is availble, fill it with data
+            if xtcurve and len(aw.qmc.temp1BX[n3]) > i: # an XT column is availble, fill it with data
                 if aw.qmc.xtcurveidx % 2:
                     XT = QTableWidgetItem("%.0f"%aw.qmc.temp1BX[n3][i])
                 else:
@@ -54706,7 +54710,7 @@ def excepthook(excType, excValue, tracebackobj):
     detailedmsg = '\n'.join([tbinfo, separator, variables])
     aw.qmc.adderror(msg)
     try:
-        f = open(logFile, "w")
+        f = open(logFile, "w", encoding='utf-8')
         f.write(msg)
         f.write(detailedmsg)
         f.write(versionInfo)
