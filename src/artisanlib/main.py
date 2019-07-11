@@ -23373,14 +23373,14 @@ class ApplicationWindow(QMainWindow):
         title_html = ds["title"]
         beans_html = ds["beans"]
         try:
-            if "roastUUID" in data and data["roastUUID"] is not None:
+            if "roastUUID" in data and data["roastUUID"] is not None and data["roastUUID"] != "":
                 uuid = data["roastUUID"]
                 if plus.register.getPath(uuid):
                     batch_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,batch_html)
                     title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
                 if bool(plus.sync.getSync(uuid)):
                     time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
-                beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(uuid),beans_html)
+                beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(data["plus_coffee"]),beans_html)
         except:
             pass
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -24761,13 +24761,13 @@ class ApplicationWindow(QMainWindow):
             datetime_html=u(self.qmc.roastdate.date().toString()) + ", " + u(self.qmc.roastdate.time().toString()[:-3])
             # add artisan or artisan.plus links to title, background and beans if possible
             title_html = u(cgi.escape(batch)) + u(cgi.escape(self.qmc.title))
-            if aw.qmc.roastUUID is not None:
+            if aw.qmc.roastUUID is not None and aw.qmc.roastUUID != "":
                 if plus.register.getPath(aw.qmc.roastUUID):
-                    title_html = '<a href="artisan://roast/"' + aw.qmc.roastUUID + ">" + title_html + "</a>"
+                    title_html = '<a href="artisan://roast/' + aw.qmc.roastUUID + '">' + title_html + "</a>"
                 if bool(plus.sync.getSync(aw.qmc.roastUUID)):
                     datetime_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(aw.qmc.roastUUID),datetime_html)
             if aw.qmc.background and aw.qmc.titleB is not None and aw.qmc.titleB != "" and aw.qmc.backgroundUUID is not None and plus.register.getPath(aw.qmc.backgroundUUID):
-                background_html = '<a href="artisan://roast/"' + aw.qmc.backgroundUUID + ">" + background_html + "</a>"                            
+                background_html = '<a href="artisan://roast/' + aw.qmc.backgroundUUID + '">' + background_html + "</a>"                            
             if beans_html is not None and beans_html is not "" and aw.qmc.plus_coffee is not None:
                 beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(aw.qmc.plus_coffee),beans_html)
                 # note that blends are hard to link back as it requires to link component by component
