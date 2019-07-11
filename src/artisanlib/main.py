@@ -16786,11 +16786,11 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                             # tare(<n>) tare channel <n> with 1 => ET, 2 => BT, 3 => E1c1, 4: E1c2,..
-                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                            elif cs.startswith('tare') and cs.endswith(")"): # in seconds
                                 try:
                                     cmds = eval(cs[len('tare'):])
                                     if isinstance(cmds,int):
-                                        aw.setTare(cmds)
+                                        aw.setTare(cmds-1)
                                 except Exception:
                                     pass
                 elif action == 21: # RC Command
