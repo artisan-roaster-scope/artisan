@@ -173,6 +173,10 @@ def authentify():
                         nickname = res["result"]["user"]["nickname"]
                     else:
                         nickname = None
+                    if "language" in res["result"]["user"] and isinstance(res["result"]["user"]["language"], str) and res["result"]["user"]["language"] != "":
+                        config.app_window.plus_language = res["result"]["user"]["language"]
+                    else:
+                        config.app_window.plus_language = "en"
                     setToken(res["result"]["user"]["token"],nickname)
                     if "account_id" in res["result"]["user"] and "_id" in res["result"]["user"]["account_id"]:
                         account_nr = account.setAccount(res["result"]["user"]["account_id"]["_id"])

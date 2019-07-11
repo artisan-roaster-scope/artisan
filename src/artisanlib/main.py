@@ -6956,7 +6956,7 @@ class tgraphcanvas(FigureCanvas):
                         libtime.sleep(0.9)
                     else:
                         libtime.sleep(0.3)
-                except Exception as e:
+                except Exception:
                     if aw.qmc.device in aw.qmc.phidgetDevices:
                         aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
 #                        _, _, exc_tb = sys.exc_info()
@@ -11656,6 +11656,8 @@ class ApplicationWindow(QMainWindow):
         self.plus_account = None # if set to a login string, Artisan plus features are enabled
         self.plus_remember_credentials = True # store plus account credentials in systems keychain
         self.plus_email = None # if self.plus_remember_credentials is ticked, we remember here the login to be pre-set as plus_account in the dialog
+        self.plus_language = "en" # one of {"en", "de", "it"} indicates the language setting of the plus_account used on the artisan.plus platform,
+                # used in links back to objects on the platform (see plus/util.py#storeLink() and similars)
         
         self.appearance = ""
         
@@ -11687,7 +11689,7 @@ class ApplicationWindow(QMainWindow):
                 self.locale = "en"
             else:
                 self.locale = locale
-        except Exception as e:
+        except Exception:
             self.locale = "en"
 
         #############################  Define variables that need to exist before calling settingsload()
@@ -18499,7 +18501,7 @@ class ApplicationWindow(QMainWindow):
                     message =  u(QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(u(filename),u("")))                    
                 self.sendmessage(message)
                 self.qmc.backgroundpath = u(filename)
-                if "UUID" in profile:
+                if "roastUUID" in profile:
                     self.qmc.backgroundUUID = profile["roastUUID"]
                 else:
                     self.qmc.backgroundUUID = None
@@ -20690,7 +20692,7 @@ class ApplicationWindow(QMainWindow):
                         dumper(fconv)
                     else:
                         aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(ext)))
-                except Exception as e:
+                except Exception:
                     pass
                 i += 1
                 aw.qmc.reset(soundOn=False)
@@ -20934,6 +20936,8 @@ class ApplicationWindow(QMainWindow):
                     self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
                 if settings.contains("plus_email"):
                     self.plus_email = settings.value("plus_email",self.plus_email)
+                if settings.contains("plus_language"):
+                    self.plus_language = settings.value("plus_language",self.plus_language)
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -22116,7 +22120,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     if aw.dpi != toInt(settings.value("dpi",aw.dpi)):
                         aw.setdpi(toInt(settings.value("dpi",aw.dpi)),moveWindow=True)
-                except Exception as e:
+                except Exception:
                     pass
 
             #restore geometry
@@ -22149,7 +22153,7 @@ class ApplicationWindow(QMainWindow):
 #            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
             # but with this one in place, the window size is not properly set (just the position!?)
                             
-        except Exception as e:
+        except Exception:
             res = False
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -22468,6 +22472,7 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("plus_account",self.plus_account)
                 settings.setValue("plus_remember_credentials",self.plus_remember_credentials)
                 settings.setValue("plus_email",self.plus_email)
+                settings.setValue("plus_language",self.plus_language)
                 
             #on OS X we prevent the reopening of windows
             # as done by defaults write com.google.code.p.Artisan NSQuitAlwaysKeepsWindows -bool false
@@ -23363,12 +23368,27 @@ class ApplicationWindow(QMainWindow):
 <td sorttable_customkey=\"$loss_num\">$weightloss</td>
 </tr>""")
         ds = self.productionData2string(data)
+        batch_html = ds["id"]
+        time_html = ds["time"]
+        title_html = ds["title"]
+        beans_html = ds["beans"]
+        try:
+            if "roastUUID" in data and data["roastUUID"] is not None:
+                uuid = data["roastUUID"]
+                if plus.register.getPath(uuid):
+                    batch_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,batch_html)
+                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
+                if bool(plus.sync.getSync(uuid)):
+                    time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
+                beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(uuid),beans_html)
+        except:
+            pass
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             batch_num = ds["nr"],
-            batch = ds["id"],
-            time = ds["time"],
-            title = ds["title"],
-            beans = ds["beans"],
+            batch = batch_html,
+            time = time_html,
+            title = title_html,
+            beans = beans_html,
             weightin = ds["weight_in"],
             weightout = ds["weight_out"],
             weightloss = ds["weight_loss"],
@@ -23396,6 +23416,12 @@ class ApplicationWindow(QMainWindow):
             res["batchnr"] = int(profile["roastbatchnr"])
         else:
             res["batchnr"] = 0
+        # UUID
+        if "roastUUID" in profile:
+            res["roastUUID"] = profile["roastUUID"]
+        # plus_coffee
+        if "plus_coffee" in profile:
+            res["plus_coffee"] = profile["plus_coffee"]
         # title
         if "title" in profile:
             res["title"] = d(profile["title"])
@@ -23787,12 +23813,25 @@ class ApplicationWindow(QMainWindow):
         if plot_color is not None:
             batch_color = [x * 100 for x in plot_color[0:3]]
             batch_color.append(0.7)
-            batch_td_color = u(' style="background-color: rgba(' + '%,'.join(map(str, batch_color)) + ')"')        
+            batch_td_color = u(' style="background-color: rgba(' + '%,'.join(map(str, batch_color)) + ')"')
+        batch_html = pd["id"]
+        time_html = pd["time"]
+        title_html = pd["title"]
+        try:
+            if "roastUUID" in production_data and production_data["roastUUID"] is not None:
+                uuid = production_data["roastUUID"]
+                if plus.register.getPath(uuid):
+                    batch_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,batch_html)
+                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
+                if bool(plus.sync.getSync(uuid)):
+                    time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
+        except:
+            pass
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             color_code = batch_td_color,
-            batch = pd["id"],
-            time = pd["time"],
-            title = pd["title"],
+            batch = batch_html,
+            time = time_html,
+            title = title_html,
             in_num = '{0:.0f}'.format(pd["weight_in_num"]),
             weightin = pd["weight_in"],
             charge_temp_num = '{0:.1f}'.format(rd["charge_temp_num"]),
@@ -24110,6 +24149,13 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.ax.lines.remove(a)
                                 except:
                                     pass
+                        
+                        # we also have to remove those extra event annotations if in combo mode
+                        if aw.qmc.eventsGraphflag == 4:
+                            for child in aw.qmc.ax.get_children():
+                                if isinstance(child, matplotlib.text.Annotation):
+                                    aw.qmc.ax.texts.remove(child)
+        
                     except:
                         pass
 
@@ -24381,13 +24427,13 @@ class ApplicationWindow(QMainWindow):
                                 rd["color"],
                                 rd["cupping"],
                                 ])
-                        except Exception as e:
+                        except Exception:
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             pass
                     # close file
                     outfile.close()
-                except Exception as e:
+                except Exception:
                     pass
                     
                     
@@ -24580,9 +24626,9 @@ class ApplicationWindow(QMainWindow):
             rcParams['path.effects'] = []
             with open(u(self.getResourcePath() + 'roast-template.htm'), 'r') as myfile:
                 HTML_REPORT_TEMPLATE=myfile.read()
-            beans = u(cgi.escape(self.qmc.beans))
-            if len(beans) > 43:
-                beans = u(beans[:41] + "&hellip;")
+            beans_html = u(cgi.escape(self.qmc.beans))
+            if len(beans_html) > 43:
+                beans_html = u(beans_html[:41] + "&hellip;")
                 
             cp = aw.computedProfileInformation()
             
@@ -24697,13 +24743,13 @@ class ApplicationWindow(QMainWindow):
             else:
                 cm = u("--")
             if aw.qmc.titleB is None or aw.qmc.titleB == "":
-                background = u("--")
+                background_html = u("--")
             else:
                 if aw.qmc.roastbatchnrB == 0:
                     titleB = u(aw.qmc.titleB)
                 else:
                     titleB = aw.qmc.roastbatchprefixB + u(aw.qmc.roastbatchnrB) + u(" ") + u(aw.qmc.titleB)
-                background = u(titleB)
+                background_html = u(titleB)
             if aw.qmc.alarmsfile:
                 alarms = u(os.path.basename(aw.qmc.alarmsfile))
             else:
@@ -24712,14 +24758,27 @@ class ApplicationWindow(QMainWindow):
                 batch = u("")
             else:
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + u(" ")
+            datetime_html=u(self.qmc.roastdate.date().toString()) + ", " + u(self.qmc.roastdate.time().toString()[:-3])
+            # add artisan or artisan.plus links to title, background and beans if possible
+            title_html = u(cgi.escape(batch)) + u(cgi.escape(self.qmc.title))
+            if aw.qmc.roastUUID is not None:
+                if plus.register.getPath(aw.qmc.roastUUID):
+                    title_html = '<a href="artisan://roast/"' + aw.qmc.roastUUID + ">" + title_html + "</a>"
+                if bool(plus.sync.getSync(aw.qmc.roastUUID)):
+                    datetime_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(aw.qmc.roastUUID),datetime_html)
+            if aw.qmc.background and aw.qmc.titleB is not None and aw.qmc.titleB != "" and aw.qmc.backgroundUUID is not None and plus.register.getPath(aw.qmc.backgroundUUID):
+                background_html = '<a href="artisan://roast/"' + aw.qmc.backgroundUUID + ">" + background_html + "</a>"                            
+            if beans_html is not None and beans_html is not "" and aw.qmc.plus_coffee is not None:
+                beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(aw.qmc.plus_coffee),beans_html)
+                # note that blends are hard to link back as it requires to link component by component
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
-                title=u(cgi.escape(batch)) + u(cgi.escape(self.qmc.title)),
+                title=title_html,
                 titlecolor=QColor(aw.qmc.palette["title"]).name(),
                 doc=u(QApplication.translate("HTML Report Template", "Roasting Report", None)),                
                 datatime_label=u(QApplication.translate("HTML Report Template", "Date:", None)),
-                datetime=u(self.qmc.roastdate.date().toString()) + ", " + u(self.qmc.roastdate.time().toString()[:-3]), 
+                datetime=datetime_html, 
                 beans_label=u(QApplication.translate("HTML Report Template", "Beans:", None)),
-                beans=beans,
+                beans=beans_html,
                 weight_label=u(QApplication.translate("HTML Report Template", "Weight:", None)),
                 weight=weight,
                 degree_label=u(QApplication.translate("HTML Report Template", "Degree:", None)),
@@ -24773,7 +24832,7 @@ class ApplicationWindow(QMainWindow):
                 cool_phase_label=u(QApplication.translate("HTML Report Template", "Cooling:", None)),
                 cool_phase=coolphase,
                 background_label=u(QApplication.translate("HTML Report Template", "Background:", None)),
-                background=background,
+                background=background_html,
                 alarms_label=u(QApplication.translate("HTML Report Template", "Alarms:", None)),
                 alarms=alarms,
                 ror_label=u(QApplication.translate("HTML Report Template", "RoR:", None)),
@@ -30298,7 +30357,7 @@ class equDataDlg(ArtisanDialog):
             header.setSectionResizeMode(4, QHeaderView.Fixed)
             header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
             self.datatable.resizeColumnsToContents()
-        except Exception as e:
+        except:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -30473,7 +30532,7 @@ class editGraphDlg(ArtisanDialog):
         chargelabel.setBuddy(self.chargeedit)
         self.charge_idx = 0
         self.drop_idx = 0
-        charge_str = ""
+        #charge_str = ""
         drop_str = ""
         if len(aw.qmc.timex):
             TP_index = aw.findTP()
@@ -30485,12 +30544,12 @@ class editGraphDlg(ArtisanDialog):
                 dryEndIndex = aw.findDryEnd(TP_index)
             self.charge_idx = aw.findBTbreak(0,dryEndIndex,offset=0.5)
             self.drop_idx = aw.findBTbreak(dryEndIndex,offset=0.2)
-            if self.charge_idx != 0 and self.charge_idx != aw.qmc.timeindex[0]:
-                if aw.qmc.timeindex[0] == -1:
-                    time_diff = int(round(aw.qmc.timex[self.charge_idx]))
-                else:
-                    time_diff = int(round(aw.qmc.timex[self.charge_idx] - aw.qmc.timex[aw.qmc.timeindex[0]]))
-                charge_str = aw.qmc.stringfromseconds(time_diff)
+#            if self.charge_idx != 0 and self.charge_idx != aw.qmc.timeindex[0]:
+#                if aw.qmc.timeindex[0] == -1:
+#                    time_diff = int(round(aw.qmc.timex[self.charge_idx]))
+#                else:
+#                    time_diff = int(round(aw.qmc.timex[self.charge_idx] - aw.qmc.timex[aw.qmc.timeindex[0]]))
+#                charge_str = aw.qmc.stringfromseconds(time_diff)
             if self.drop_idx != 0 and self.drop_idx != aw.qmc.timeindex[6]:
                 drop_str = aw.qmc.stringfromseconds(int(aw.qmc.timex[self.drop_idx]-aw.qmc.timex[aw.qmc.timeindex[0]]))
 #        self.chargeestimate = QLabel(charge_str)
@@ -30656,12 +30715,8 @@ class editGraphDlg(ArtisanDialog):
             self.titleedit.setStyleSheet(
                 "QComboBox {font-weight: bold; background-color: " + QColor(aw.qmc.palette["title"]).name() + "; color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
         else:
-            if aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"] == "None":
-                self.titleedit.setStyleSheet(
-                    "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
-            else:
-                self.titleedit.setStyleSheet(
-                    "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + "; background-color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
+            self.titleedit.setStyleSheet(
+                "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + "; background-color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
         self.titleedit.setView(QListView())
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
         self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
@@ -39608,7 +39663,7 @@ class serialport(object):
                             aw.qmc.ProbatMiddleware_drum = roastData["drumSpeed"]
                         if "exhaustFanSpeed" in roastData:
                             aw.qmc.ProbatMiddleware_fan = roastData["exhaustFanSpeed"]
-                    except Exception as e:
+                    except:
                         aw.qmc.probatManager.disconnect()
                         aw.sendmessage(QApplication.translate("Message","Probat Middleware disconnected",None))
         return tx,t2,t1
@@ -41099,7 +41154,7 @@ class serialport(object):
 #                    res = numpy.average(outliers_removed)
 
                     self.Phidget1048values[channel] = self.Phidget1048values[channel][-round((aw.qmc.delay/aw.qmc.phidget1048_dataRate)):]                
-            except Exception as e:
+            except:
                 self.Phidget1048values[channel] = []
             finally:
                 if self.Phidget1048semaphores[channel].available() < 1:
@@ -41358,7 +41413,7 @@ class serialport(object):
             v = self.bridgeValue2Temperature(i,bv)
             if aw.qmc.mode == "F" and aw.qmc.phidget1046_formula[i] != 2:
                 v = aw.qmc.fromCtoF(v)
-        except Exception as e:
+        except:
             v = -1
         return v
                         
@@ -41371,7 +41426,7 @@ class serialport(object):
                 if len(self.Phidget1046values[channel]) > 0:
                     res = numpy.average(self.Phidget1046values[channel])
                     self.Phidget1046values[channel] = self.Phidget1046values[channel][-round((aw.qmc.delay/aw.qmc.phidget1046_dataRate)):] 
-            except Exception as e:
+            except:
                 self.Phidget1046values[channel] = []
             finally:
                 if self.Phidget1046semaphores[channel].available() < 1:
@@ -41988,7 +42043,7 @@ class serialport(object):
                     if len(self.PhidgetIOvalues[i]) > 0:
                         res = numpy.average(self.PhidgetIOvalues[i])
                         self.PhidgetIOvalues[i] = self.PhidgetIOvalues[i][-round((aw.qmc.delay/aw.qmc.phidget1018_dataRates[i])):] 
-                except Exception as e:
+                except Exception:
                     self.PhidgetIOvalues[i] = []
                 finally:
                     if self.PhidgetIOsemaphores[i].available() < 1:

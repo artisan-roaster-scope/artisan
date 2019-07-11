@@ -1,4 +1,7 @@
 import os
+import sys
+
+# from https://stackoverflow.com/questions/11130156/suppress-stdout-stderr-print-from-python-functions
 
 # Define a context manager to suppress stdout and stderr.
 class suppress_stdout_stderr(object):
@@ -15,20 +18,26 @@ class suppress_stdout_stderr(object):
         # Open a pair of null files
         self.null_fds =  [os.open(os.devnull,os.O_RDWR) for _ in range(2)]
         # Save the actual stdout (1) and stderr (2) file descriptors.
-        self.save_fds = [os.dup(1), os.dup(2)]
+        try:
+            #self.save_fds = [os.dup(1), os.dup(2)] # fails on Windows 7 under Python 3.7.4 with "OSError: [WinError 87] The parameter is incorrect"
+            self.save_fds = [os.dup(sys.stdout.fileno()), os.dup(sys.stderr.fileno())]
+        except:
+            self.save_fds = None
 
     def __enter__(self):
         # Assign the null pointers to stdout and stderr.
-        os.dup2(self.null_fds[0],1)
-        os.dup2(self.null_fds[1],2)
+        if self.save_fds != None:
+            os.dup2(self.null_fds[0],1)
+            os.dup2(self.null_fds[1],2)
 
     def __exit__(self, *_):
         # Re-assign the real stdout/stderr back to (1) and (2)
-        os.dup2(self.save_fds[0],1)
-        os.dup2(self.save_fds[1],2)
-        # Close all file descriptors
-        for fd in self.null_fds + self.save_fds:
-            os.close(fd)
+        if self.save_fds != None:
+            os.dup2(self.save_fds[0],1)
+            os.dup2(self.save_fds[1],2)
+            # Close all file descriptors
+            for fd in self.null_fds + self.save_fds:
+                os.close(fd)
 
 # with Python 3.5:
 #

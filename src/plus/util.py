@@ -222,17 +222,22 @@ def add2dict(dict_source,key_source,dict_target,key_target):
         dict_target[key_target] = dict_source[key_source]
 
 
+def getLanguage():
+    if config.app_window is not None and config.app_window.plus_account is not None:
+        return config.app_window.plus_language
+    else:
+        return "en"
         
 ## Open Web Links
 
 def storeLink(plus_store):
-    return config.web_base_url + "/stores;id=" + str(plus_store)
+    return config.web_base_url + "/" + getLanguage() + "/stores;id=" + str(plus_store)
     
 def coffeeLink(plus_coffee):
-    return config.web_base_url + "/coffees;id=" + str(plus_coffee)
+    return config.web_base_url + "/" + getLanguage()  + "/coffees;id=" + str(plus_coffee)
 
 def blendLink(plus_blend):
-    return config.web_base_url + "/blends;id=" + str(plus_blend)
+    return config.web_base_url + "/" + getLanguage()  + "/blends;id=" + str(plus_blend)
 
 def roastLink(plus_roast):
-    return config.web_base_url + "/roasts;id=" + str(plus_roast)
+    return config.web_base_url + "/" + getLanguage() + "/roasts;id=" + str(plus_roast)
