@@ -14169,7 +14169,12 @@ class ApplicationWindow(QMainWindow):
         
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatus)
-        
+    
+    # c a QColor instance, returns the standard W3C value for the perceived brightness of an RGB color in the range of 0-255, ignoring the alpha channel
+    # see https://www.w3.org/TR/AERT/#color-contrast
+    def QColorBrightness(self,c):
+        r,g,b,_ = c.getRgb()
+        return ((r*299) + (g*587) + (b*114)) / 1000
 
     # this is important to have . as decimal separator independent of the systems locale
     def createCLocaleDoubleValidator(self,bot,top,dec,w):
@@ -19619,7 +19624,7 @@ class ApplicationWindow(QMainWindow):
     def setProfile(self,filename,profile,quiet=False):
         try:
             #extra devices load and check
-            if "extratimex" in profile and len(profile["extratimex"]) > 0:
+            if "extratimex" in profile:
                 if "extradevices" in profile:
                     if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
                         string = u(QApplication.translate("Message","To fully load this profile the extra device configuration needs to modified?\nModify your setup?",None))
@@ -20799,7 +20804,7 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.reset(redraw=False,soundOn=False)
                         self.setProfile(f,self.deserialize(f),quiet=True)
                         self.qmc.redraw()
-                        aw.qmc.fig.savefig(fconv,transparent=True,facecolor='none', edgecolor='none',frameon=True) # transparent=True is need to get the delta curves and legend drawn
+                        aw.qmc.fig.savefig(fconv,transparent=True,facecolor='none', edgecolor='none') # transparent=True is need to get the delta curves and legend drawn
                     else:
                         aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(ext)))
                 except:
@@ -27022,7 +27027,7 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 if extension not in filename:
                     filename += extension
-                aw.qmc.fig.savefig(filename,transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),facecolor=str(aw.qmc.palette["canvas"]),edgecolor=None,frameon=True) # transparent=True is need to get the delta curves and legend drawn
+                aw.qmc.fig.savefig(filename,transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),facecolor=str(aw.qmc.palette["canvas"]),edgecolor=None) # transparent=True is need to get the delta curves and legend drawn
                 aw.qmc.updateBackground() # that redraw is needed to avoid the "transparent flicker"
                                 
                 self.sendmessage(QApplication.translate("Message","{0} saved", None).format(str(filename)))
@@ -30712,11 +30717,30 @@ class editGraphDlg(ArtisanDialog):
         self.titleedit.activated.connect(self.recentRoastActivated)
         self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
         if sys.platform.startswith("darwin") and darkdetect.isDark():
+            if aw.qmc.palette["canvas"] == None or aw.qmc.palette["canvas"] == "None":
+                canvas_color = "white"
+            else:
+                canvas_color = aw.qmc.palette["canvas"]
+            brightness_title = aw.QColorBrightness(QColor(aw.qmc.palette["title"]))
+            brightness_canvas = aw.QColorBrightness(QColor(canvas_color))
+            # in dark mode we choose the darker color as background
+            if brightness_title > brightness_canvas:
+                backgroundcolor = QColor(canvas_color).name()
+                color = QColor(aw.qmc.palette["title"]).name()
+            else:
+                backgroundcolor = QColor(aw.qmc.palette["title"]).name()
+                color = QColor(canvas_color).name()
             self.titleedit.setStyleSheet(
-                "QComboBox {font-weight: bold; background-color: " + QColor(aw.qmc.palette["title"]).name() + "; color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
+                "QComboBox {font-weight: bold; background-color: " + backgroundcolor + "; color: " + color + ";} QComboBox QAbstractItemView {font-weight: normal;}")
         else:
+            color = ""
+            if aw.qmc.palette["title"] != None and aw.qmc.palette["title"] != "None":
+                color = " color: " + QColor(aw.qmc.palette["title"]).name() + ";"
+            backgroundcolor = ""
+            if aw.qmc.palette["canvas"] != None and aw.qmc.palette["canvas"] != "None":
+                backgroundcolor = " background-color: " + QColor(aw.qmc.palette["canvas"]).name() + ";"
             self.titleedit.setStyleSheet(
-                "QComboBox {font-weight: bold; color: " + QColor(aw.qmc.palette["title"]).name() + "; background-color: " + QColor(aw.qmc.palette["canvas"]).name() + ";} QComboBox QAbstractItemView {font-weight: normal;}")
+                "QComboBox {font-weight: bold;" + color + backgroundcolor + "} QComboBox QAbstractItemView {font-weight: normal;}")
         self.titleedit.setView(QListView())
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
         self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
