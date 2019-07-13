@@ -17641,7 +17641,7 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.movebackground("down",aw.qmc.backgroundmovespeed)
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
                 elif key == 65:                     #letter A (automatic save)
-                    if not app.artisanviewerMode:
+                    if not app.artisanviewerMode and self.qmc.flagon:
                         self.automaticsave()
                 elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
                     self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
