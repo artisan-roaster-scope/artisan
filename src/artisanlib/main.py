@@ -42279,7 +42279,7 @@ class serialport(object):
                             ch1 = VoltageRatioInput()
                         else:
                             ch1 = VoltageInput()
-                        if aw.qmc.phidget1018_ratio[mode*2+1 and deviceType != DeviceID.PHIDID_DAQ1400]:
+                        if aw.qmc.phidget1018_ratio[mode*2+1] and deviceType != DeviceID.PHIDID_DAQ1400:
                             ch2 = VoltageRatioInput()
                         else:
                             ch2 = VoltageInput()
@@ -45304,13 +45304,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     dev.pop(i)              #note: pop() makes the list smaller that's why there are 2 FOR statements
                     break 
         self.sorted_devices = sorted(dev)        
-        self.devicetypeComboBox = QComboBox()
+        self.devicetypeComboBox = MyQComboBox()
         
 #        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 #        self.devicetypeComboBox.view().setTextElideMode(Qt.ElideNone)
         # HACK: only needed for the macintosh UI on Qt 5.12 onwords; without long items get cutted in the popup
         #  note the -7 as the width of the popup is too large if given the correct maximum characters
-#        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
+        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
 
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(aw.ser.externalprogram)
