@@ -3587,12 +3587,11 @@ class tgraphcanvas(FigureCanvas):
                     elif mathexpression[i] == "E":
                         if i+1 < mlen:                          #check for out of range
                             if mathexpression[i+1].isdigit():
-                                nint = int(mathexpression[i+1])-1              #Enumber int                                
+                                nint = int(mathexpression[i+1])-1              #Enumber int 
                                 #find right most occurrence before index of given event type
                                 if nint in self.specialeventstype and nint < 4: 
                                     spevtylen = len(self.specialeventstype)-1
-                                    for eee in range(spevtylen):
-                                        iii = spevtylen - eee
+                                    for iii in range(spevtylen,-1,-1):
                                         if self.specialeventstype[iii] == nint and index >= self.specialevents[iii]:
                                             break  #index found
                                     val = self.eventsInternal2ExternalValue(self.specialeventsvalue[iii])  
@@ -11558,7 +11557,7 @@ class SampleThread(QThread):
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
 
             interval = aw.qmc.delay/1000.
-            next_tx = libtime.perf_counter()+interval
+            next_tx = libtime.perf_counter()
             while True:
                 if aw.qmc.flagon:
                     # if we are already beyond 1/4 of the next sampling we skip this one
@@ -11605,15 +11604,16 @@ class Athreadserver(QWidget):
         super(Athreadserver,self).__init__(parent)
 
     def createSampleThread(self):
-        sthread = SampleThread(self)
-        sthread.decay_weights = None
-        sthread.temp_decay_weights = None
-        #QApplication.processEvents()
+        if not aw.qmc.flagsamplingthreadrunning: # we only start a new sampling thread if none is running yet
+            sthread = SampleThread(self)
+            sthread.decay_weights = None
+            sthread.temp_decay_weights = None
+            #QApplication.processEvents()
 
-        #connect graphics to GUI thread
-        sthread.updategraphics.connect(aw.qmc.updategraphics)
-        sthread.start(QThread.TimeCriticalPriority) # QThread.HighPriority, QThread.HighestPriority
-        sthread.wait(300)    #needed in some Win OS
+            #connect graphics to GUI thread
+            sthread.updategraphics.connect(aw.qmc.updategraphics)
+            sthread.start(QThread.TimeCriticalPriority) # QThread.HighPriority, QThread.HighestPriority
+            sthread.wait(300)    #needed in some Win OS
 
 
 #########################################################################################################
