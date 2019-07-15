@@ -3485,8 +3485,25 @@ class tgraphcanvas(FigureCanvas):
             #if background
             if self.background and "B" in mathexpression:
                 bindex = self.backgroundtime2index(t)         #use background time
-    
-            #under work: index for: self.extratimex, self.extratimexB, and mixP#
+            
+            #symbolic variables holding the index of main events from self.timeindex to be used to retrieve time and temp data from the corresponding t and Y variables
+            #using the absolute access symbolic variables t{<i>} and Y{<i>} defined below
+            #those variable are set to None if no index is yet available
+            
+            main_events = ["CHARGE","DRY","FCs","FCe","SCs","SCe","DROP", "COOL"]
+            for i,v in enumerate(main_events):
+                if (i == 0 and self.timeindex[i] > -1) or (self.timeindex[i] > 0):
+                    mathdictionary[v] = self.timeindex[i]
+                else:
+                    mathdictionary[v] = None
+            
+            if self.background:
+                background_main_events = ["bCHARGE","bDRY","bFCs","bFCe","bSCs","bSCe","bDROP", "bCOOL"]
+                for i,v in enumerate(background_main_events):
+                    if (i == 0 and self.timeindexB[i] > -1) or (self.timeindexB[i] > 0):
+                        mathdictionary[v] = self.timeindexB[i]
+                    else:
+                        mathdictionary[v] = None
                         
             #timeshift working vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
@@ -7271,11 +7288,14 @@ class tgraphcanvas(FigureCanvas):
     def ToggleMonitor(self):
         #turn ON
         if not self.flagon:
-            if not self.checkSaved():
-                return False
-            else:
-                aw.soundpop()
-                self.OnMonitor()
+            QApplication.processEvents()
+            # the sample thread might still run, but should terminate soon. We do nothing and ignore this click on ON
+            if not aw.qmc.flagsamplingthreadrunning:
+                if not self.checkSaved():
+                    return False
+                else:
+                    aw.soundpop()
+                    self.OnMonitor()
         #turn OFF
         else:
             aw.soundpop()
