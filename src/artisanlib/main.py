@@ -3461,7 +3461,7 @@ class tgraphcanvas(FigureCanvas):
         if len(mathexpression):
             mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
                               "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
-                              "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
+                              "sqrt":math.sqrt,"degrees":math.degrees}
             #if sampling 
             if RTsname:
                 if len(self.timex):
@@ -3485,17 +3485,20 @@ class tgraphcanvas(FigureCanvas):
             #if background
             if self.background and "B" in mathexpression:
                 bindex = self.backgroundtime2index(t)         #use background time
+                
+                
+            replacements = {'+':'p','-':'m','*':'m','/':'d','(':'o',')':'c'} # characters to be replaced from symb variable for substitution
             
             #symbolic variables holding the index of main events from self.timeindex to be used to retrieve time and temp data from the corresponding t and Y variables
             #using the absolute access symbolic variables t{<i>} and Y{<i>} defined below
-            #those variable are set to None if no index is yet available
+            #those variable are set to the error item -1 if no index is yet available
             
             main_events = ["CHARGE","DRY","FCs","FCe","SCs","SCe","DROP", "COOL"]
             for i,v in enumerate(main_events):
                 if (i == 0 and self.timeindex[i] > -1) or (self.timeindex[i] > 0):
                     mathdictionary[v] = self.timeindex[i]
                 else:
-                    mathdictionary[v] = None
+                    mathdictionary[v] = -1
             
             if self.background:
                 background_main_events = ["bCHARGE","bDRY","bFCs","bFCe","bSCs","bSCe","bDROP", "bCOOL"]
@@ -3503,7 +3506,75 @@ class tgraphcanvas(FigureCanvas):
                     if (i == 0 and self.timeindexB[i] > -1) or (self.timeindexB[i] > 0):
                         mathdictionary[v] = self.timeindexB[i]
                     else:
-                        mathdictionary[v] = None
+                        mathdictionary[v] = -1
+            
+            # time in seconds after those events. If an event was not issued yet this evaluates to 0
+            delta_main_events = ["dCHARGE","dDRY","dFCs","dFCe","dSCs","dSCe","dDROP", "dCOOL"]
+            try:
+                for i,v in enumerate(delta_main_events):
+                    if (i == 0 and self.timeindex[i] > -1) or (self.timeindex[i] > 0):
+                        # we return the time after the event in seconds
+                        mathdictionary[v] = self.timex[-1] - self.timex[self.timeindex[i]]
+                    else:
+                        # before the event we return 0
+                        mathdictionary[v] = 0
+            except:
+                pass
+                
+            # prediction of the time to DRY and FCs before the event
+            # this evaluates to None before TP and 0 after the event
+            try:
+                for v in ["pDRY","pFCs"]:
+                    if len(self.delta2) > 0 and self.delta2[-1] and self.delta2[-1] > 0:
+                        mathdictionary[v] = 0
+                        if v == "pDRY":
+                            if self.background and self.timeindexB[1] and not self.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
+                                drytarget = self.temp2B[self.timeindexB[1]] # Background DRY BT temperature
+                            else:
+                                drytarget = self.phases[1] # Drying max phases definition
+                            if drytarget > self.temp2[-1]:
+                                mathdictionary[v] = (drytarget - self.temp2[-1])/(self.delta2[-1]/60.)
+                        elif v == "pFCs":
+                            # display expected time to reach FCs as defined in the background profile or the phases dialog
+                            if self.background and self.timeindexB[2]:
+                                fcstarget = self.temp2B[self.timeindexB[2]] # Background FCs BT temperature
+                            else:
+                                fcstarget = self.phases[2] # FCs min phases definition
+                            if fcstarget > self.temp2[-1]:
+                                mathdictionary[v] = (fcstarget - self.temp2[-1])/(self.delta2[-1]/60.)
+                    else:
+                        # if a prediction is not possible (before TP), we return the error value -1
+                        mathdictionary[v] = -1
+            except:
+                pass
+            
+            
+            # add AUC variables (AUCbase, AUCtarget, AUCvalue)
+            try:
+                mathdictionary["AUCvalue"] = self.AUCvalue
+                if self.AUCbaseFlag:
+                    if self.AUCbegin == 0 and self.timeindex[0] > -1: # start after CHARGE
+                        idx = self.timeindex[0]
+                    elif self.AUCbegin == 1 and self.TPalarmtimeindex: # start ater TP
+                        idx = self.TPalarmtimeindex
+                    elif self.AUCbegin == 2 and self.timeindex[1] > 0: # DRY END
+                        idx = self.timeindex[1]
+                    elif self.AUCbegin == 3 and self.timeindex[2] > 0: # FC START
+                        idx = self.timeindex[2]
+                    else:
+                        idx = -1
+                    if idx > -1: # we passed the AUCbegin event
+                        mathdictionary["AUCbase"] = self.temp2[idx]
+                    else:
+                        mathdictionary["AUCbase"] = None # Event not set yet, no AUCbase
+                else:
+                    mathdictionary["AUCbase"] = self.AUCbase
+                if self.AUCtargetFlag and self.background and self.AUCbackground > 0:
+                    mathdictionary["AUCtarget"] = self.AUCbackground
+                else:
+                    mathdictionary["AUCtarget"] = self.AUCtarget
+            except:
+                pass
                         
             #timeshift working vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
@@ -3522,9 +3593,9 @@ class tgraphcanvas(FigureCanvas):
                         if i+1 < mlen:                          #check for out of range
                             if mathexpression[i+1].isdigit():                                
                                 seconddigitstr = ""
+                                nint = int(mathexpression[i+1])              #Ynumber int
                                 #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" 
                                 if i+5 < len(mathexpression) and mathexpression[i+2] == "[":
-                                    nint = int(mathexpression[i+1])              #Ynumber int
                                     Yshiftval = int(mathexpression[i+4])
                                     sign = mathexpression[i+3]
     
@@ -3567,7 +3638,36 @@ class tgraphcanvas(FigureCanvas):
                                     #METHOD USED: replace all non digits chars with sign value.
                                     #Example1 "Y2[-7]" = "Y20070"   Example2 "Y2[+9]" = "Y21191"
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
-                                    
+                                #direct index access: e.g. "Y2{CHARGE}" or "Y2{12}"
+                                if i+5 < len(mathexpression) and mathexpression[i+2] == "{" and mathexpression.find("}",i+3) > -1:
+                                    end_idx = mathexpression.index("}",i+3)
+                                    body = mathexpression[i+3:end_idx]
+                                    val = -1
+                                    try:
+                                        absolute_index = eval(body,{"__builtins__":None},mathdictionary)
+                                        if absolute_index > -1:
+                                            if nint == 1: #ET
+                                                val = self.temp1[absolute_index]
+                                            elif nint == 2: #BT
+                                                val = self.temp2[absolute_index]
+                                            elif nint > 2: 
+                                                #map the extra device
+                                                b = [0,0,1,1,2,2,3]
+                                                edindex = b[nint-3]
+                                                if nint%2:
+                                                    val = self.extratemp1[edindex][absolute_index]
+                                                else:
+                                                    val = self.extratemp2[edindex][absolute_index]
+                                    except:
+                                        pass
+                                    #add expression and values found
+                                    literal_body = body
+                                    for k, v in replacements.items():
+                                        literal_body = literal_body.replace(k,v)
+                                    evaltimeexpression = "Y" + mathexpression[i+1] + "u" + literal_body + "u" # curle brackets replaced by "u"
+                                    timeshiftexpressions.append(evaltimeexpression)
+                                    timeshiftexpressionsvalues.append(val)
+                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))        
                                 # Y + TWO digits. Y10-Y99 . 4+ extra devices. No timeshift
                                 elif i+2 < mlen and mathexpression[i+2].isdigit():
                                     Yval.append(mathexpression[i+1]+mathexpression[i+2])
@@ -3617,13 +3717,19 @@ class tgraphcanvas(FigureCanvas):
                                 if "E" + mathexpression[i+1] not in mathdictionary:    
                                     mathdictionary["E"+mathexpression[i+1]] = val
                                     
-                    # time timeshift of absolute time (not relative to CHARGE)                                        
-                    elif mathexpression[i] == "t":
+                    # time timeshift of absolute time (not relative to CHARGE)   
+                    # t : to access the foreground profiles time (self.timex)
+                    # b : to access the background profiles time (self.timeB)
+                    elif mathexpression[i] in ["t","b"]:
+                        if mathexpression[i] == "t":
+                            timex = self.timex
+                        else:
+                            timex = self.timeB
                         seconddigitstr = ""
                         if i+4 < len(mathexpression) and mathexpression[i+1] == "[":
                             Yshiftval = int(mathexpression[i+3])
                             sign = mathexpression[i+2]
-    
+        
                             if mathexpression[i+4].isdigit():
                                 seconddigit = int(mathexpression[i+4])
                                 seconddigitstr = mathexpression[i+4]
@@ -3635,22 +3741,42 @@ class tgraphcanvas(FigureCanvas):
                                 shiftedindex = index - Yshiftval   
                                 if shiftedindex < 0:
                                     shiftedindex = 0
-                                val = self.timex[shiftedindex]
+                                val = timex[shiftedindex]
                             elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
                                 evalsign = "1"      #digit 1 = "+"
                                 shiftedindex = index + Yshiftval
-                                if shiftedindex >= len(self.timex):
-                                    shiftedindex = len(self.timex)- 1
-                                val = self.timex[shiftedindex]
+                                
+                                if shiftedindex >= len(timex):
+                                    shiftedindex = len(timex)- 1
+                                val = timex[shiftedindex]
                             val = val - t_offset
                             evaltimeexpression = mathexpression[i] + evalsign*2 + mathexpression[i+3] + seconddigitstr + evalsign
                             timeshiftexpressions.append(evaltimeexpression)
                             timeshiftexpressionsvalues.append(val)
                             mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+5:]))
+                        #direct index access: e.g. "t{CHARGE}" or "t{12}"
+                        elif i+3 < len(mathexpression) and mathexpression[i+1] == "{" and mathexpression.find("}",i+2) > -1:
+                            end_idx = mathexpression.index("}",i+2)
+                            body = mathexpression[i+2:end_idx]
+                            val = -1
+                            try:
+                                absolute_index = eval(body,{"__builtins__":None},mathdictionary)
+                                if absolute_index > -1:
+                                    val = timex[absolute_index]
+                            except:
+                                pass
+                            literal_body = body
+                            for k, v in replacements.items():
+                                literal_body = literal_body.replace(k,v)
+                            evaltimeexpression = mathexpression[i] + "q" + literal_body + "q" # curle brackets replaced by "q"
+                            timeshiftexpressions.append(evaltimeexpression)
+                            timeshiftexpressionsvalues.append(val)
+                            mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
                         #no timeshift
                         else:
-                            if "t" not in mathdictionary:
+                            if mathexpression[i] == "t" and "t" not in mathdictionary:
                                 mathdictionary['t'] = t - t_offset         #add t to the math dictionary
+                            # b is only valid with index
                                     
                     #Add to dict plotter Previous results (cascading) from plotter field windows (1-9)
                     elif mathexpression[i] == "P":
@@ -3735,6 +3861,38 @@ class tgraphcanvas(FigureCanvas):
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                #direct index access: e.g. "B2{CHARGE}" or "B2{12}"
+                                if i+5 < len(mathexpression) and mathexpression[i+2] == "{" and mathexpression.find("}",i+3) > -1:
+                                    end_idx = mathexpression.index("}",i+3)
+                                    body = mathexpression[i+3:end_idx]
+                                    val = -1
+                                    try:
+                                        absolute_index = eval(body,{"__builtins__":None},mathdictionary)
+                                        if absolute_index > -1:
+                                            if nint == 1: #ET
+                                                val = self.temp1B[absolute_index]
+                                            elif nint == 2: #BT
+                                                val = self.temp2B[absolute_index]
+                                            else: 
+                                                idx3 = aw.qmc.xtcurveidx - 1
+                                                n3 = idx3//2
+                                                #map the extra device
+                                                b = [0,0,1,1,2,2,3]
+                                                edindex = b[nint-3]
+                                                if aw.qmc.xtcurveidx%2:
+                                                    val = self.temp1BX[n3][absolute_index]
+                                                else:
+                                                    val = self.temp2BX[n3][absolute_index]
+                                    except:
+                                        pass
+                                    #add expression and values found
+                                    literal_body = body
+                                    for k, v in replacements.items():
+                                        literal_body = literal_body.replace(k,v)
+                                    evaltimeexpression = "B" + mathexpression[i+1] + "z" + literal_body + "z" # curle brackets replaced by "z"
+                                    timeshiftexpressions.append(evaltimeexpression)
+                                    timeshiftexpressionsvalues.append(val)
+                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
                                 #no shift
                                 else:
                                     if not len(self.timeB):
@@ -3807,7 +3965,7 @@ class tgraphcanvas(FigureCanvas):
                             if "Y"+ Yval[i] not in mathdictionary:
                                 mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
                                 
-                        #add other timeshifted expressions to the math dictionary: shifted P
+                        #add other timeshifted expressions to the math dictionary: shifted t and P
                         for i in range(len(timeshiftexpressions)):
                             if timeshiftexpressions[i] not in mathdictionary:
                                 mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
@@ -3820,13 +3978,13 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(len(timeshiftexpressions)):
                         if timeshiftexpressions[i] not in mathdictionary:   
                             mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]                    
-                                    
                 try:
-                    if any([k in mathexpression for k,v in mathdictionary.items() if v == -1]):
+                    # we exclude the main_events as they occur as substrings in others like CHARGE in dCHARGE
+                    if any([k in mathexpression for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
                         return -1
                     else:
-                        res = eval(mathexpression,{"__builtins__":None},mathdictionary)
+                        res = float(eval(mathexpression,{"__builtins__":None},mathdictionary))
                 except TypeError as e:
                     res = -1
                 except ValueError as e:
@@ -3837,7 +3995,6 @@ class tgraphcanvas(FigureCanvas):
                     res = -1
                 if res is None:
                     return -1
-                
                 else:
                     #stack (use in feedback "F" in same formula)
                     self.plotterstack.insert(10,res)
@@ -5985,14 +6142,22 @@ class tgraphcanvas(FigureCanvas):
                             l1 = extraname1_subst[i]
                             if not l1.startswith("_"):
                                 self.handles.append(self.extratemp1lines[idx1])
-                                self.labels.append(aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                                try:
+                                    self.labels.append(aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                                except:
+                                    # a key error can occure triggered by the format if curley braces are used without reference
+                                    self.labels.append(aw.arabicReshape(l1))
                         if aw.extraCurveVisibility2[i]:
                             idx2 = xtmpl2idx
                             xtmpl2idx = xtmpl2idx + 1
                             l2 = extraname2_subst[i]
                             if not l2.startswith("_"):
                                 self.handles.append(self.extratemp2lines[idx2])
-                                self.labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                                try:
+                                    self.labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                                except:
+                                    # a key error can occure triggered by the format if curley braces are used without reference
+                                    self.labels.append(aw.arabicReshape(l2))
     
                 if self.eventsshowflag and self.eventsGraphflag in [2,3,4] and Nevents:
                     if E1_nonempty and aw.qmc.showEtypes[0]:
@@ -11541,8 +11706,8 @@ class SampleThread(QThread):
                 if aw.qmc.flagstart and (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
                     aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
             except Exception as e:
-                #import traceback
-                #traceback.print_exc(file=sys.stdout)
+                import traceback
+                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() {0}").format(str(e)),exc_tb.tb_lineno)
             finally:
@@ -15946,9 +16111,9 @@ class ApplicationWindow(QMainWindow):
                             self.FCslabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")                    
                                 
                         if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
-                            # after DRY:
-                            ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
-                            self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
+                            ## after DRY:
+                            #ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
+                            #self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
                             if self.qmc.background and self.qmc.timeindexB[2]:
                                 fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
@@ -25295,10 +25460,10 @@ class ApplicationWindow(QMainWindow):
                     idx = aw.qmc.timeindex[0]
                 elif aw.qmc.AUCbegin == 1 and aw.qmc.TPalarmtimeindex: # start ater TP
                     idx = aw.qmc.TPalarmtimeindex
-                elif aw.qmc.AUCbegin == 2 and self.qmc.timeindex[1] > 0: # DRY END
-                    idx = self.qmc.timeindex[1]
-                elif aw.qmc.AUCbegin == 3 and self.qmc.timeindex[2] > 0: # FC START
-                    idx = self.qmc.timeindex[2]
+                elif aw.qmc.AUCbegin == 2 and aw.qmc.timeindex[1] > 0: # DRY END
+                    idx = aw.qmc.timeindex[1]
+                elif aw.qmc.AUCbegin == 3 and aw.qmc.timeindex[2] > 0: # FC START
+                    idx = aw.qmc.timeindex[2]
                 else:
                     idx = -1
                 if idx > -1: # we passed the AUCbegin event
@@ -45330,7 +45495,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
 #        self.devicetypeComboBox.view().setTextElideMode(Qt.ElideNone)
         # HACK: only needed for the macintosh UI on Qt 5.12 onwords; without long items get cutted in the popup
         #  note the -7 as the width of the popup is too large if given the correct maximum characters
-        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
+#        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
+        self.devicetypeComboBox.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Preferred)
 
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(aw.ser.externalprogram)
@@ -46208,14 +46374,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
         adjustmentsLayout.addLayout(adjustmentHelp)
         adjustmentGroupBox.setLayout(adjustmentsLayout)
         #LAYOUT TAB 1
+        deviceSubSelector = QHBoxLayout()
+        deviceSubSelector.addWidget(self.controlButtonFlag)
+        deviceSubSelector.addSpacing(35)
+        deviceSubSelector.addWidget(self.curves)
+        deviceSubSelector.addSpacing(15)
+        deviceSubSelector.addWidget(self.lcds)
+        
         deviceSelector = QHBoxLayout()
         deviceSelector.addWidget(self.devicetypeComboBox)
         deviceSelector.addStretch()
-        deviceSelector.addWidget(self.controlButtonFlag)        
-        deviceSelector.addStretch()
-        deviceSelector.addWidget(self.curves)
-        deviceSelector.addStretch()
-        deviceSelector.addWidget(self.lcds)
+        deviceSelector.addLayout(deviceSubSelector)
 
         grid = QGridLayout()
         grid.addWidget(self.nonpidButton,2,0)
@@ -46644,9 +46813,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.extraname2[i] = u("")
                     
                 l1 = "<b>" + aw.qmc.extraname1[i] + "</b>"
-                aw.extraLCDlabel1[i].setText(l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
+                try:
+                    aw.extraLCDlabel1[i].setText(l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
+                except:
+                    aw.extraLCDlabel1[i].setText(l1)
                 l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
-                aw.extraLCDlabel2[i].setText(l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
+                try:
+                    aw.extraLCDlabel2[i].setText(l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
+                except:
+                    aw.extraLCDlabel2[i].setText(l2)
                 if mexpr2edit:
                     aw.qmc.extramathexpression1[i] = u(mexpr1edit.text())
                 else:
