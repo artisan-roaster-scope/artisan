@@ -1052,6 +1052,10 @@ class tgraphcanvas(FigureCanvas):
                        "Behmor BT/CT",              #101
                        "Behmor 34",                 #102
                        "VICTOR 86B",                #103
+                       "Behmor 56",                 #104
+                       "Behmor 78",                 #105
+                       "Phidget HUB0000 IO 0",      #106
+                       "Phidget HUB0000 IO Digital 0", #107
                        ]
 
         # ADD DEVICE:
@@ -1081,8 +1085,10 @@ class tgraphcanvas(FigureCanvas):
             96, # Phidget DAQ1400 Frequency
             97, # Phidget DAQ1400 Digital
             98, # Phidget DAQ1400 Voltage
-            99,  # Aillio Bullet R1 IBTS/BT
-            100  # Yocto IR
+            99, # Aillio Bullet R1 IBTS/BT
+            100, # Yocto IR
+            106, # Phidget HUB0000 IO 0
+            107  # Phidget HUB0000 IO Digital 0
         ]
         
         # ADD DEVICE:
@@ -1105,6 +1111,8 @@ class tgraphcanvas(FigureCanvas):
             96, # Phidget DAQ1400 Frequency
             97, # Phidget DAQ1400 Digital
             98, # Phidget DAQ1400 Voltage
+            106, # Phidget HUB0000 IO 0
+            107  # Phidget HUB0000 IO Digital 0
         ]
                  
         # ADD DEVICE:
@@ -1140,7 +1148,9 @@ class tgraphcanvas(FigureCanvas):
             95, # Phidget DAQ1400 Current
             96, # Phidget DAQ1400 Frequency
             97, # Phidget DAQ1400 Digital
-            98  # Phidget DAQ1400 Voltage
+            98, # Phidget DAQ1400 Voltage
+            106, # Phidget HUB0000 IO 0
+            107  # Phidget HUB0000 IO Digital 0
         ]
 
         #extra devices
@@ -4017,6 +4027,7 @@ class tgraphcanvas(FigureCanvas):
                     if len(self.timex) > 2:
                         e = str(e)
                         _, _, exc_tb = sys.exc_info()
+                        mathexpression = mathexpression.replace("{","(").replace("}",")") # avoid {x} leading to key arrows
                         self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): %s {0} "%mathexpression).format(e),exc_tb.tb_lineno)
                     return -1    
         return -1
@@ -39075,6 +39086,8 @@ class serialport(object):
                                    self.VICTOR86B,            #103
                                    self.BEHMOR_56,            #104
                                    self.BEHMOR_78,            #105
+                                   self.PHIDGET_HUB0000_0,    #106
+                                   self.PHIDGET_HUB0000_D_0,  #107
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -39513,7 +39526,12 @@ class serialport(object):
     def PHIDGET_HUB0000_D_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"digital")
-        return tx,v1,v2        
+        return tx,v1,v2   
+        
+    def PHIDGET_HUB0000_D_0(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,API="digital",retry=False,single=True)
+        return tx,v1,v2     
 
     def PHIDGET_TMP1101(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -39553,6 +39571,11 @@ class serialport(object):
     def PHIDGET_HUB0000_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,"voltage")
+        return tx,v1,v2
+        
+    def PHIDGET_HUB0000_0(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1  = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,API="voltage",retry=False,single=True)
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_CURRENT(self):
@@ -42423,7 +42446,8 @@ class serialport(object):
     #  - Phidget IO 6/6/6 (HUB0000): DeviceID.PHIDID_HUB0000
     #  - Phidget IO 2/2/2 (1011): DeviceID.PHIDID_1011
     # the API parameter is one of "voltage", "digital", "current", "frequency"
-    def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0, API="voltage", retry=True):
+    # if single is set, only the first channel of the two is allocated
+    def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0, API="voltage", retry=True, single=False):
         try:
             if self.PhidgetIO is None and aw.qmc.phidgetManager is not None:
                 ser = None
@@ -42472,7 +42496,7 @@ class serialport(object):
                     try: 
                         self.PhidgetIO[0].setOnAttachHandler(lambda _:self.phidget1018attached(ser,port,tp,deviceType,0,API))
                         self.PhidgetIO[0].setOnDetachHandler(lambda _:self.phidget1018detached(ser,port,tp,deviceType,0))
-                        if deviceType != DeviceID.PHIDID_DAQ1400:
+                        if deviceType != DeviceID.PHIDID_DAQ1400 and not single:
                             self.PhidgetIO[1].setOnAttachHandler(lambda _:self.phidget1018attached(ser,port,tp,deviceType,1,API))
                             self.PhidgetIO[1].setOnDetachHandler(lambda _:self.phidget1018detached(ser,port,tp,deviceType,1))
                         if deviceType in [DeviceID.PHIDID_HUB0000]:
@@ -42496,7 +42520,7 @@ class serialport(object):
                         except:
                             pass
                         self.PhidgetIO[1].setDeviceSerialNumber(ser)
-                        if deviceType != DeviceID.PHIDID_DAQ1400:
+                        if deviceType != DeviceID.PHIDID_DAQ1400 and not single:
                             try:
                                 self.PhidgetIO[1].open() #.openWaitForAttachment(timeout)
                             except:
@@ -42525,16 +42549,17 @@ class serialport(object):
                 except Exception:
                     pass
                 return probe, -1
-            elif deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
+            elif deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and (single or self.PhidgetIO[1].getAttached()):
                 probe1 = probe2 = -1
                 try:
                     probe1 = self.phidget1018getSensorReading(mode*2,0,deviceType,API)
-                except Exception:
+                except:
                     pass
-                try:
-                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,deviceType,API)
-                except Exception:
-                    pass
+                if not single:
+                    try:
+                        probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,deviceType,API)
+                    except Exception:
+                        pass
                 return probe1, probe2
             elif retry:
                 libtime.sleep(0.1)
@@ -42547,7 +42572,7 @@ class serialport(object):
             try:
                 if self.PhidgetIO and self.PhidgetIO[0].getAttached():
                     self.PhidgetIO[0].close()
-                if self.PhidgetIO and len(self.PhidgetIO)> 1 and self.PhidgetIO[1].getAttached():
+                if not single and self.PhidgetIO and len(self.PhidgetIO)> 1 and self.PhidgetIO[1].getAttached():
                     self.PhidgetIO[1].close()                            
             except Exception:
                 pass
@@ -47531,6 +47556,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 105 Behmor 78 channel 7 and 8
                 ##########################
+                ##########################
+                elif meter == "Phidget HUB0000 IO 0":
+                    aw.qmc.device = 106
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                elif meter == "Phidget IO Digital 0":
+                    aw.qmc.device = 107
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+
 
                 # ADD DEVICE:
 
@@ -47652,6 +47686,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 5, # 103
                 9, # 104
                 9, # 105
+                1, # 106
+                1, # 107
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
