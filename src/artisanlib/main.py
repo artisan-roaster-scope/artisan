@@ -45521,7 +45521,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         # HACK: only needed for the macintosh UI on Qt 5.12 onwords; without long items get cutted in the popup
         #  note the -7 as the width of the popup is too large if given the correct maximum characters
 #        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
-        self.devicetypeComboBox.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Preferred)
+        self.devicetypeComboBox.setSizePolicy(QSizePolicy.Expanding,self.devicetypeComboBox.sizePolicy().verticalPolicy())
 
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(aw.ser.externalprogram)
