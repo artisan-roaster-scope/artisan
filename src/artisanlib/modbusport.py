@@ -289,7 +289,8 @@ class modbusport(object):
                     self.readRetries = 1
                 self.master.connect()
                 time.sleep(.5) # avoid possible hickups on startup
-                self.sendmessage(QApplication.translate("Message", "Connected via MODBUS", None))
+                if self.isConnected() != None:
+                    self.sendmessage(QApplication.translate("Message", "Connected via MODBUS", None))
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 self.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
