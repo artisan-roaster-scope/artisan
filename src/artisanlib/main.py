@@ -5238,7 +5238,7 @@ class tgraphcanvas(FigureCanvas):
                     direction=tick_dir,
                     labelbottom=True)   # labels along the bottom edge are on 
                 prop = aw.mpl_fontproperties.copy()
-                prop.set_size("medium")
+                prop.set_size("small")
                 for label in self.ax.get_xticklabels() :
                     label.set_fontproperties(prop)
                 for label in self.ax.get_yticklabels() :

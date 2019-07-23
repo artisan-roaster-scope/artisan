@@ -14,6 +14,7 @@ elif [ "$ARTISAN_OS" = "osx" ]; then
     os="osx"
 fi
 
-curl -L -O https://kent.dl.sourceforge.net/project/snap7/${version}/snap7-full-${version}.7z
+# we use the -k option in the following as the SSL certificate on sourceforge does not validate
+curl -k -L -O https://kent.dl.sourceforge.net/project/snap7/${version}/snap7-full-${version}.7z
 7z x -bd snap7-full-${version}.7z
 (cd snap7-full-${version}/build/${os} && make -f ${mkfile}.mk -j4 all && sudo make -f ${mkfile}.mk LibInstall=${libinstall} install)
