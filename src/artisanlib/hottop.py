@@ -86,9 +86,9 @@ def gettemperatures(p,retry=True):
         openport(p)
         if p.isOpen():
             #p.flushInput() # deprecated in v3
-            #p.reset_input_buffer()
+            p.reset_input_buffer()
             #p.flushOutput() # deprecated in v3
-            #p.reset_output_buffer()
+            p.reset_output_buffer()
             r = p.read(36)
 #            print(len(r),"".join("\\x%02x" % ord(i) for i in r))
             if len(r) != 36:
