@@ -26103,8 +26103,10 @@ class ApplicationWindow(QMainWindow):
                     aw.stopActivities()
                     res = aw.settingsLoad(filename)
                     if reset:
+                        flag_temp = aw.qmc.roastpropertiesflag
                         aw.qmc.roastpropertiesflag = 1 # ensure that all roast properties are reset!
                         aw.qmc.reset(soundOn=False)
+                        aw.qmc.roastpropertiesflag = flag_temp
                     if res and remember:
                         # update recentSettings menu
                         settings = QSettings()
