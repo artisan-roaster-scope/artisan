@@ -3961,8 +3961,8 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             Y = [self.temp1[index], self.temp2[index]]
                         if len(self.extratimex):
-                            if len(self.extratimex[0]):
-                                for i in range(len(self.extradevices)):
+                            for i in range(len(self.extradevices)):
+                                if len(self.extratimex[i]):
                                     if RTsname:
                                         Y.append(self.extratemp1[i][-1])
                                         Y.append(self.extratemp2[i][-1])
@@ -18539,6 +18539,40 @@ class ApplicationWindow(QMainWindow):
         else:
             self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
         self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered    
+
+    def calcVirtualdevices(self):
+        try:
+            for j in range(len(self.qmc.extradevices)):
+                if aw.qmc.extradevices[j] == 25:  #virtual device
+                    if len(aw.qmc.extratimex[j]) > 0:  # move on if the virtual device already has data 
+                        continue
+                    if self.qmc.timeindex[0] > -1:
+                        toff = aw.qmc.timex[self.qmc.timeindex[0]]
+                    else:
+                        toff = 0
+                        
+                    self.qmc.extratimex[j] = aw.qmc.timex[:]
+                    self.qmc.extratemp1[j] = [-1]*len((self.qmc.timex))
+                    self.qmc.extratemp2[j] = [-1]*len((self.qmc.timex))
+                    y_range1 = []
+                    y_range2 = []
+
+                    # need two seperate loops. without y2(x) cannot calculate a dependency on y1(x).
+                    for i in range(len(self.qmc.timex)):
+                        y_range1.append(self.qmc.eval_math_expression(self.qmc.extramathexpression1[j],self.qmc.timex[i],t_offset=toff))
+                    self.qmc.extratemp1[j] = y_range1[:]
+
+                    for i in range(len(self.qmc.timex)):
+                        y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.timex[i],t_offset=toff))
+                    self.qmc.extratemp2[j] = y_range2[:]
+
+            self.qmc.safesaveflag = True
+       
+        except Exception as ex:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()  
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " calcVirtualdevices() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     # Loads background profile
     def loadbackground(self,filename):
@@ -45681,6 +45715,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.delButton.setMinimumWidth(100)
         #self.delButton.setMaximumWidth(100)
         self.delButton.clicked.connect(lambda _:self.deldevice()) 
+        self.recalcButton = QPushButton(QApplication.translate("Button","Update Profile",None))
+        self.recalcButton.setFocusPolicy(Qt.NoFocus)
+        self.recalcButton.setMinimumWidth(100)
+        self.recalcButton.setToolTip(QApplication.translate("Tooltip","Recaclulates all Virtual Devices and updates their values in the profile",None))
+        self.recalcButton.clicked.connect(lambda _:self.updateVirtualdevicesinprofile())
         self.enableDisableAddDeleteButtons()
         ##########     LAYOUTS
         # create Phidget box
@@ -46467,6 +46506,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         bLayout.addWidget(self.delButton)
         bLayout.addStretch()
         bLayout.addSpacing(10)
+        bLayout.addWidget(self.recalcButton)
+        bLayout.addStretch()
+        bLayout.addSpacing(10)
         bLayout.addWidget(resetButton)
         #LAYOUT TAB 2 (Extra Devices)
         tab2Layout = QVBoxLayout()
@@ -46733,6 +46775,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.delButton.setEnabled(True)
         else:
             self.delButton.setEnabled(False)
+        if len(aw.qmc.timex) > 0:
+            self.recalcButton.setEnabled(True)
+        else:
+            self.recalcButton.setEnabled(False)
 
     #adds extra device
     def adddevice(self):
@@ -46888,12 +46934,27 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.extramathexpression2[i] = u(mexpr2edit.text())
                 else:
                     aw.qmc.extramathexpression2[i] = u("")
+            aw.calcVirtualdevices()
             #update legend with new curves
             if redraw:
                 aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "savedevicetable(): {0}").format(str(ex)),exc_tb.tb_lineno)
+
+    def updateVirtualdevicesinprofile(self):
+        try:
+            self.savedevicetable()
+            for j in range(len(aw.qmc.extradevices)):
+                if aw.qmc.extradevices[j] == 25:  #virtual device
+                    aw.qmc.extratemp1[j] = []
+                    aw.qmc.extratemp2[j] = []
+                    aw.qmc.extratimex[j] = []
+            aw.calcVirtualdevices()
+            aw.qmc.redraw(recomputeAllDeltas=False)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateVirtualdevicesinprofile(): {0}").format(str(ex)),exc_tb.tb_lineno)
 
     def updateLCDvisibility(self,x,lcd,ind):
         if lcd == 1:
