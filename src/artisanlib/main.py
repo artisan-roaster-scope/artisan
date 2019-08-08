@@ -9318,16 +9318,19 @@ class tgraphcanvas(FigureCanvas):
     #ln() regression
     # if xx=True the quadratic approximation instead of the ln() one is applied
     # start from room temperature if TP=False, else from TP
-    def lnRegression(self,xx=False,TP=False):
+    def lnRegression(self,power=0, timeoffset=0):
         res = ""
         try:
             if self.timeindex[0] > -1: # only if CHARGE is set
                 from scipy.optimize import curve_fit
                 charge = self.timex[self.timeindex[0]]
-                if TP:
-                    TP_index = aw.findTP()
-                    a = [self.timex[TP_index]-charge]
-                    n = [self.temp2[TP_index]]
+                if timeoffset != None and timeoffset > 0:
+                    timeidx = aw.time2index(timeoffset + charge)
+                    a = [self.timex[timeidx]-charge]
+                    n = [self.temp2[timeidx]]
+                elif aw.qmc.ambientTemp != None and aw.qmc.ambientTemp > 0:
+                    a = [0]
+                    n = [aw.qmc.ambientTemp]                    
                 else:
                     a = [0]
                     if aw.qmc.mode == "F":
@@ -9353,14 +9356,16 @@ class tgraphcanvas(FigureCanvas):
                     x = self.timex[i] - charge
                     a = a + [x]
                     n = n + [self.temp2[i]]
-                if xx and self.timeindex[6]:
+                if power > 0 and self.timeindex[6]:
                     x = self.timex[self.timeindex[6]] - charge
                     a = a + [x]
                     n = n + [self.temp2[self.timeindex[6]]]
                     
                 xa = numpy.array(a)
                 yn = numpy.array(n)
-                if xx:
+                if power == 2:
+                    func = lambda x,a,b,c: a*x*x + b*x + c
+                elif power == 3:
                     func = lambda x,a,b,c,d: a*x*x*x + b*x*x + c*x + d
                 else:
                     func = lambda x,a,b,c: a * numpy.log(b*x+c)
@@ -9375,7 +9380,9 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.plot(xxa, yn, "ro")
                 self.fig.canvas.draw()
                 if len(popt)>2:
-                    if xx:
+                    if power == 2:
+                        res = "%.8f * t*t %s %.8f * t %s %.8f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                    elif power ==3:
                         res = "%.8f * t*t*t %s %.8f * t*t %s %.8f * t %s %.8f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2],("+" if popt[3] > 0 else ""),popt[3])
                     else:
                         res = "%.8f * log(%.8f * t %s %.8f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
@@ -28658,14 +28665,28 @@ class HUDDlg(ArtisanDialog):
         self.lnresult = QLineEdit()
         self.lnresult.setReadOnly(True)
         self.lnresult.setStyleSheet("background-color:'lightgrey';")
-        self.xxvarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
-        self.xxvarCheck.setFocusPolicy(Qt.NoFocus)
-        self.xxvarCheck.stateChanged.connect(lambda i=0:self.xxvar(i)) #toggle
-        self.xxresult = QLineEdit()
-        self.xxresult.setReadOnly(True)
-        self.xxresult.setStyleSheet("background-color:'lightgrey';")
-        self.TPCheck = QCheckBox(QApplication.translate("CheckBox", "TP",None))
-        self.TPCheck.setFocusPolicy(Qt.NoFocus)
+        self.expvarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
+        self.expvarCheck.setFocusPolicy(Qt.NoFocus)
+        self.expvarCheck.stateChanged.connect(lambda i=0:self.expvar(i)) #toggle
+        self.expresult = QLineEdit()
+        self.expresult.setReadOnly(True)
+        self.expresult.setStyleSheet("background-color:'lightgrey';")
+        self.expradiobutton1 = QRadioButton(QApplication.translate("Label", "x^2", None))
+        self.expradiobutton1.setChecked(True)
+        self.expradiobutton1.power = self.exppower = 2
+        self.expradiobutton1.toggled.connect(self.expradiobuttonClicked)
+        self.expradiobutton2 = QRadioButton(QApplication.translate("Label", "x^3", None))
+        self.expradiobutton2.power = 3        
+        self.expradiobutton2.toggled.connect(self.expradiobuttonClicked)
+        self.exptimeoffsetLabel = QLabel(QApplication.translate("Label", "Offset seconds from CHARGE", None))
+        self.exptimeoffset = QLineEdit("180")   #default to 180 seconds past CHARGE
+        self.exptimeoffset.editingFinished.connect(self.exptimeoffsetChanged) 
+        self.bkgndButton = QPushButton(QApplication.translate("Button","Create Background Curve",None))
+        self.bkgndButton.setFocusPolicy(Qt.NoFocus)
+        self.bkgndButton.setMaximumSize(self.bkgndButton.sizeHint())
+        self.bkgndButton.setMinimumSize(self.bkgndButton.minimumSizeHint())        
+        self.bkgndButton.clicked.connect(self.fittoBackground)
+        self.bkgndButton.setEnabled(False)
         polyfitdeglabel = QLabel("deg")
         self.polyfitdeg = QSpinBox()
         self.polyfitdeg.setFocusPolicy(Qt.NoFocus)
@@ -28731,17 +28752,21 @@ class HUDDlg(ArtisanDialog):
         lnVLayout.addStretch()
         lnvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","ln()",None))
         lnvarGroupLayout.setLayout(lnVLayout)
-        xxHLayout1 = QHBoxLayout()        
-        xxHLayout1.addWidget(self.xxvarCheck)
-        xxHLayout1.addWidget(self.xxresult)        
-        xxHLayout2 = QHBoxLayout()        
-        xxHLayout2.addWidget(self.TPCheck)
-        xxHLayout2.addStretch()
-        xxLayout = QVBoxLayout()
-        xxLayout.addLayout(xxHLayout1)
-        xxLayout.addLayout(xxHLayout2)
-        xxvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","x^3",None))
-        xxvarGroupLayout.setLayout(xxLayout)
+        expHLayout1 = QHBoxLayout()        
+        expHLayout1.addWidget(self.expvarCheck)
+        expHLayout1.addWidget(self.expresult)        
+        expHLayout2 = QHBoxLayout()        
+        expHLayout2.addWidget(self.expradiobutton1)
+        expHLayout2.addWidget(self.expradiobutton2)
+        expHLayout2.addWidget(self.exptimeoffsetLabel)
+        expHLayout2.addWidget(self.exptimeoffset)
+        expHLayout2.addStretch()
+        expLayout = QVBoxLayout()
+        expLayout.addLayout(expHLayout2)
+        expLayout.addLayout(expHLayout1)
+        expLayout.addWidget(self.bkgndButton)
+        expvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","Exponent",None))
+        expvarGroupLayout.setLayout(expLayout)
         polytimes = QHBoxLayout()
         polytimes.addWidget(startlabel)
         polytimes.addWidget(self.startEdit)
@@ -28769,11 +28794,11 @@ class HUDDlg(ArtisanDialog):
         interUniLayout = QHBoxLayout()
         interUniLayout.addWidget(interGroupLayout)
         interUniLayout.addWidget(univarGroupLayout)
-        lnvarxxvarLayout = QHBoxLayout()
-        lnvarxxvarLayout.addWidget(lnvarGroupLayout)
-        lnvarxxvarLayout.addWidget(xxvarGroupLayout)        
+        lnvarexpvarLayout = QHBoxLayout()
+        lnvarexpvarLayout.addWidget(lnvarGroupLayout)
+        lnvarexpvarLayout.addWidget(expvarGroupLayout)        
         tab3Layout.addLayout(interUniLayout)
-        tab3Layout.addLayout(lnvarxxvarLayout)
+        tab3Layout.addLayout(lnvarexpvarLayout)
         tab3Layout.addWidget(polyfitGroupLayout)
         tab3Layout.addStretch()
         ##### TAB 4
@@ -28953,6 +28978,30 @@ class HUDDlg(ArtisanDialog):
         self.c1ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(4))
         self.c2ComboBox.currentIndexChanged.connect(lambda _ :self.polyfitcurveschanged(5))              
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+
+    def fittoBackground(self):
+        if len(self.expresult.text()) > 0:
+            self.setbackgroundequ1(mathequ=True)
+            QApplication.processEvents()  #occasionally the fit curve remains showing.  maybe this will help.
+            aw.qmc.redraw(recomputeAllDeltas=True)
+            #self.updatetargets()
+        else:
+            return
+        
+    def exptimeoffsetChanged(self):
+        self.expvarCheck.setChecked(False)
+        self.expvar(0)
+        self.expvarCheck.setChecked(True)
+        self.expvar(0)
+        
+    def expradiobuttonClicked(self):
+        self.expradioButton = self.sender()
+        if self.expradioButton.isChecked():
+            self.exppower = self.expradioButton.power
+            self.expvarCheck.setChecked(False)
+            self.expvar(0)
+            self.expvarCheck.setChecked(True)
+            self.expvar(0)
 
     def renameBT(self):
         aw.BTname = str(self.renameBTLine.text()).strip()
@@ -29154,10 +29203,12 @@ class HUDDlg(ArtisanDialog):
         equdataDlg.show()
         equdataDlg.activateWindow()
 
-    def setbackgroundequ1(self,foreground=False):
+    def setbackgroundequ1(self,foreground=False, mathequ=False):
 
         # Check for incompatible vars from in the equations
         EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
+        if mathequ:
+            EQU = [str(""),str(self.expresult.text())]
         incompatiblevars = ["P","F","$","#"]
         error = ""
         for i in range(len(incompatiblevars)):
@@ -29428,20 +29479,27 @@ class HUDDlg(ArtisanDialog):
             self.redraw_enabled_math_curves()
 
     
-    def xxvar(self,_):
-        if self.xxvarCheck.isChecked():
+    def expvar(self,_):
+        if self.expvarCheck.isChecked():
             #check for finished roast
             if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
-                res = aw.qmc.lnRegression(xx=True,TP=self.TPCheck.isChecked())
-                self.xxresult.setText(res)
+                try:
+                    _timeoffset = int(self.exptimeoffset.text())
+                except:
+                    _timeoffset = 0
+                res = aw.qmc.lnRegression(power=self.exppower, timeoffset=_timeoffset)
+                self.expresult.setText(res)
+                self.bkgndButton.setEnabled(True)                
             else:
-                aw.sendmessage(QApplication.translate("Error Message", "xxvar(): no profile data available", None))
-                self.xxvarCheck.setChecked(False)
-                self.xxresult.setText("")
+                aw.sendmessage(QApplication.translate("Error Message", "expvar(): no profile data available", None))
+                self.expvarCheck.setChecked(False)
+                self.expresult.setText("")
+                self.bkgndButton.setEnabled(False)
         else:
-            self.xxresult.setText("")
+            self.expresult.setText("")
             aw.qmc.resetlines()
             self.redraw_enabled_math_curves()
+            self.bkgndButton.setEnabled(False)
                                     
     def univar(self,_):
         if self.univarCheck.isChecked():
@@ -29461,12 +29519,12 @@ class HUDDlg(ArtisanDialog):
         if self.univarCheck.isChecked():
             aw.qmc.univariate()
         if self.lnvarCheck.isChecked():
-            aw.qmc.lnRegression(TP=self.TPCheck.isChecked())
-        if self.xxvarCheck.isChecked():
-            aw.qmc.lnRegression(xx=True,TP=self.TPCheck.isChecked())
+            aw.qmc.lnRegression()
+        if self.expvarCheck.isChecked():
+            aw.qmc.lnRegression(power=self.exppower)
         if self.polyfitCheck.isChecked():
             self.doPolyfit()
-        if not self.polyfitCheck.isChecked() and not self.xxvarCheck.isChecked() and not self.lnvarCheck.isChecked() and not self.univarCheck.isChecked() and not self.interpCheck.isChecked():
+        if not self.polyfitCheck.isChecked() and not self.expvarCheck.isChecked() and not self.lnvarCheck.isChecked() and not self.univarCheck.isChecked() and not self.interpCheck.isChecked():
             aw.qmc.resetlines()
             aw.qmc.redraw(recomputeAllDeltas=False)
             
@@ -29608,8 +29666,8 @@ class HUDDlg(ArtisanDialog):
         if i != 4:
             if self.polyfitCheck.isChecked():
                 self.polyfitCheck.setChecked(False)
-            if self.xxvarCheck.isChecked():
-                self.xxvarCheck.setChecked(False)
+            if self.expvarCheck.isChecked():
+                self.expvarCheck.setChecked(False)
             if self.lnvarCheck.isChecked():
                 self.lnvarCheck.setChecked(False)
             if self.interpCheck.isChecked():
