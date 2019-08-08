@@ -28522,14 +28522,11 @@ class HUDDlg(ArtisanDialog):
         equshowtablebutton.setFocusPolicy(Qt.NoFocus)
         equshowtablebutton.setToolTip(QApplication.translate("Tooltip","Shows data table of plots",None))
         equshowtablebutton.clicked.connect(lambda _:self.equshowtable())
-        equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None))
-        equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
-        equbackgroundbutton.clicked.connect(lambda _:self.setbackgroundequ1())
-        equbackgroundbutton.setToolTip(QApplication.translate("Tooltip","Set P1 as ET background B1\nSet P2 as BT background B2",None))                
-        equvdevicebutton = QPushButton(QApplication.translate("Button","ET/BT",None))
-        equvdevicebutton.setFocusPolicy(Qt.NoFocus)
-        equvdevicebutton.clicked.connect(lambda _:self.setvdevice())
-        equvdevicebutton.setToolTip(QApplication.translate("Tooltip","Add P1 and P2 as:\n\n1 to Extra device virtual if a profile is loaded\n2 or set to ET and BT if profile is not loaded\n",None))        
+        self.equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None))
+        self.equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
+        self.equbackgroundbutton.clicked.connect(lambda _:self.setbackgroundequ1())
+        self.equvdevicebutton = QPushButton()       
+        self.update_equbuttons()
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
@@ -28544,12 +28541,12 @@ class HUDDlg(ArtisanDialog):
         curve1Layout.setSpacing(5)
         curve1Layout.addWidget(self.equc1label,0,0)
         curve1Layout.addWidget(self.equedit1,0,1)
-        curve1Layout.addWidget(equbackgroundbutton,0,2)
+        curve1Layout.addWidget(self.equbackgroundbutton,0,2)
         curve1Layout.addWidget(color1Button,0,3)
         curve1Layout.addWidget(self.equc1colorlabel,0,4)
         curve1Layout.addWidget(self.equc2label,1,0)        
         curve1Layout.addWidget(self.equedit2,1,1)
-        curve1Layout.addWidget(equvdevicebutton,1,2)
+        curve1Layout.addWidget(self.equvdevicebutton,1,2)
         curve1Layout.addWidget(color2Button,1,3)
         curve1Layout.addWidget(self.equc2colorlabel,1,4)
         plot1GroupBox = QGroupBox()
@@ -29029,6 +29026,37 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setcurvecolor(): {0}").format(str(e)),exc_tb.tb_lineno)
 
+    def update_equbuttons(self):
+        self.equvdevicebutton.setFocusPolicy(Qt.NoFocus)
+        if len(aw.qmc.timex) < 2: # empty profile
+            self.equvdevicebutton.setEnabled(True)
+            self.equvdevicebutton.setText(QApplication.translate("Button","ET/BT",None))
+            self.equvdevicebutton.setToolTip(QApplication.translate("Tooltip","Add P1 and P2 as ET and BT",None))
+        else:
+            self.equvdevicebutton.setText(QApplication.translate("Button","Create Virtual\nExtra Device",None))
+            if len(aw.qmc.extradevices) < aw.nLCDS:  #not at maximimum of virtual devices
+                self.equvdevicebutton.setEnabled(True)
+                self.equvdevicebutton.setToolTip(QApplication.translate("Tooltip","Add P1 and P2 as:\n\n1 an Extra virtual device if a profile is loaded\n2 or ET and BT if profile is not loaded\n",None))
+            else:
+                self.equvdevicebutton.setEnabled(False)
+                self.equvdevicebutton.setToolTip(QApplication.translate("Tooltip","No more Virtual Extra Devices available",None))
+        if aw.qmc.flagon:
+            self.equvdevicebutton.setEnabled(False)
+            self.equvdevicebutton.setToolTip(QApplication.translate("Tooltip","Not available during recording",None)) 
+            self.equbackgroundbutton.setEnabled(False)
+            self.equbackgroundbutton.setToolTip(QApplication.translate("Tooltip","Not available during recording",None))                
+        else:
+            self.equbackgroundbutton.setEnabled(True)            
+            self.equbackgroundbutton.setToolTip(QApplication.translate("Tooltip","Set P1 as ET background B1\nSet P2 as BT background B2\nNote: Erases all existing background curves.",None))                
+
+        if self.equvdevicebutton.isEnabled():
+            self.equvdevicebutton.clicked.connect(lambda _:self.setvdevice())
+        else:
+            try:
+                self.equvdevicebutton.disconnect()
+            except:
+                pass
+   
     def setvdevice(self):
         # compute values
         if len(aw.qmc.timex) < 2: # empty profile
@@ -29072,8 +29100,8 @@ class HUDDlg(ArtisanDialog):
                 aw.qmc.extradevicecolor1[-1] = aw.qmc.plotcurvecolor[0]
                 aw.qmc.extradevicecolor2[-1] = aw.qmc.plotcurvecolor[1]
                 # set expressions
-                #aw.qmc.extramathexpression1[-1] = str(self.equedit1.text())
-                #aw.qmc.extramathexpression2[-1] = str(self.equedit2.text())
+                aw.qmc.extramathexpression1[-1] = str(self.equedit1.text())
+                aw.qmc.extramathexpression2[-1] = str(self.equedit2.text())
                 # set values
                 aw.qmc.extratemp1[-1] = extratemp1
                 aw.qmc.extratemp2[-1] = extratemp2
@@ -29082,6 +29110,9 @@ class HUDDlg(ArtisanDialog):
                 aw.qmc.redraw(recomputeAllDeltas=False)
 
                 aw.sendmessage(QApplication.translate("Message","New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]"%(EQU[0],EQU[1]), None))
+
+        aw.calcVirtualdevices()
+        self.update_equbuttons()
 
     def equshowtable(self):        
         equdataDlg = equDataDlg(self)
