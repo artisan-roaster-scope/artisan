@@ -26472,6 +26472,34 @@ class ApplicationWindow(QMainWindow):
             if background_profile_path:
             # load background into foreground
                 aw.loadFile(background_profile_path)
+            # if there is a plotter generated background curve bring it to the foreground 
+            elif len(aw.qmc.temp1B) > 2:
+                _timex  = aw.qmc.timeB[:]
+                _temp1 = aw.qmc.temp1B[:]
+                _temp2 = aw.qmc.temp2B[:]
+                # use foreground events if the background has no CHARGE 
+                if aw.qmc.timeindexB[0] == -1:
+                    _timeindex = aw.qmc.timeindex[:]
+                else:
+                    _timeindex = aw.qmc.timeindexB[:]
+                # clear the background
+                aw.qmc.timeB = []
+                aw.qmc.temp1B = []
+                aw.qmc.temp2B = []
+                aw.qmc.timeindexB = []
+                aw.qmc.background = False
+
+                flag_temp = aw.qmc.roastpropertiesflag
+                aw.qmc.roastpropertiesflag = 1 # ensure that all roast properties are reset!
+                aw.qmc.reset(soundOn=False)
+                aw.qmc.roastpropertiesflag = flag_temp
+                aw.qmc.timex = _timex[:]
+                aw.qmc.temp1 = _temp1[:]
+                aw.qmc.temp2 = _temp2[:]
+                aw.qmc.timeindex = _timeindex[:]
+                if not foreground_profile_path:
+                    aw.qmc.redraw(recomputeAllDeltas=True)
+                aw.qmc.safesaveflag = True
             else:
                 # reset
                 aw.qmc.reset(soundOn=False)
