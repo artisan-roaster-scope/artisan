@@ -26483,11 +26483,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     _timeindex = aw.qmc.timeindexB[:]
                 # clear the background
-                aw.qmc.timeB = []
-                aw.qmc.temp1B = []
-                aw.qmc.temp2B = []
-                aw.qmc.timeindexB = []
-                aw.qmc.background = False
+                aw.deleteBackground
 
                 flag_temp = aw.qmc.roastpropertiesflag
                 aw.qmc.roastpropertiesflag = 1 # ensure that all roast properties are reset!
@@ -29009,10 +29005,11 @@ class HUDDlg(ArtisanDialog):
 
     def fittoBackground(self):
         if len(self.expresult.text()) > 0:
+            aw.deleteBackground
             self.setbackgroundequ1(mathequ=True)
-            QApplication.processEvents()  #occasionally the fit curve remains showing.  maybe this will help.
+            QApplication.processEvents()  #occasionally the fit curve remains showing.
             aw.qmc.redraw(recomputeAllDeltas=True)
-            #self.updatetargets()
+            #self.updatetargets()  #accept and close dialog
         else:
             return
         
