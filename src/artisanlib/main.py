@@ -9315,9 +9315,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             return None
     
-    #ln() regression
-    # if xx=True the quadratic approximation instead of the ln() one is applied
-    # start from room temperature if TP=False, else from TP
+    #ln() regression. ln() will be used when power does not equal 2 (quadratic) or 3 (cubic).
     def lnRegression(self,power=0, timeoffset=0):
         res = ""
         try:
@@ -25618,21 +25616,21 @@ class ApplicationWindow(QMainWindow):
     # returns AUC(ET-BT), AUC(ET), AUC(BT), AUCbegin_idx
     def ts(self,start=None,end=None,tp=None,background=False):
         if background:
-            timeindex = self.qmc.timeindexB
-            timex = self.qmc.timeB
-            temp1 = self.qmc.temp1B
-            temp2 = self.qmc.temp2B
+            timeindex = self.qmc.timeindexB[:]
+            timex = self.qmc.timeB[:]
+            temp1 = self.qmc.temp1B[:]
+            temp2 = self.qmc.temp2B[:]
         else:
-            timeindex = self.qmc.timeindex
-            timex = self.qmc.timex
-            temp1 = self.qmc.temp1
-            temp2 = self.qmc.temp2
+            timeindex = self.qmc.timeindex[:]
+            timex = self.qmc.timex[:]
+            temp1 = self.qmc.temp1[:]
+            temp2 = self.qmc.temp2[:]
         return self.profileAUC(timeindex,timex,temp1,temp2,start,end,tp)
     
     def profileAUC(self,timeindex,timex,temp1,temp2,start=None,end=None,tp=None):            
         delta = ET = BT = 0.0
         if (start == 0 and end == 0) or (start and (start < 0 or (start == 0 and timeindex[0] < 0))) or (len(timex) == 0):
-            return 0,0,0
+            return 0,0,0,0
         else:
             try:
                 if tp:
@@ -28039,7 +28037,7 @@ class ArtisanDialog(QDialog):
     def keyPressEvent(self,event):
         key = int(event.key())
         #uncomment next line to find the integer value of a key
-        #print key
+        #print(key)
         modifiers = QApplication.keyboardModifiers()
         if key == 16777216 or (key == 87 and modifiers == Qt.ControlModifier): #ESCAPE or CMD-W
             self.close()
