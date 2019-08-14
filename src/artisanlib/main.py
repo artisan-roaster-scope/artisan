@@ -1050,10 +1050,10 @@ class tgraphcanvas(FigureCanvas):
                        "Aillio Bullet R1 IBTS/BT",  #99
                        "Yocto IR",                  #100
                        "Behmor BT/CT",              #101
-                       "Behmor 34",                 #102
+                       "+Behmor 34",                #102
                        "VICTOR 86B",                #103
-                       "Behmor 56",                 #104
-                       "Behmor 78",                 #105
+                       "+Behmor 56",                #104
+                       "+Behmor 78",                #105
                        "Phidget HUB0000 IO 0",      #106
                        "Phidget HUB0000 IO Digital 0", #107
                        ]
@@ -40525,7 +40525,6 @@ class serialport(object):
                 aw.ser.openport()
             temps = [-1,-1]
             if aw.ser.SP.isOpen():
-                
                 for i,c in [(0,ch1),(1,ch2)]:
                     try:
                         command = "gts," + str(c) + "\r\n"
@@ -40536,6 +40535,8 @@ class serialport(object):
                         #res = aw.ser.SP.readline() # takes at least the timeout period as line is not \n terminated!
                         #res = aw.ser.SP.read_until('\r') # takes at least the timeout period!
                         t = float(res)
+                        if aw.qmc.mode == "F":
+                            t = aw.qmc.fromCtoF(t)
                         temps[i] = t
                         if aw.seriallogflag:
                             settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
