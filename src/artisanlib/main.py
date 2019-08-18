@@ -144,6 +144,7 @@ from Phidget22.Devices.VoltageOutput import VoltageOutput # @UnusedWildImport
 from Phidget22.Devices.RCServo import RCServo # @UnusedWildImport
 from Phidget22.Devices.CurrentInput import CurrentInput # @UnusedWildImport
 from Phidget22.Devices.FrequencyCounter import FrequencyCounter # @UnusedWildImport
+from Phidget22.Phidget import Phidget as PhidgetDriver
 
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
@@ -495,7 +496,7 @@ if sys.platform.startswith("darwin"):
     # control app napping on OS X >= 10.9
     import appnope
     # import module to detect if OS X dark mode is active or not
-    import darkdetect
+    import darkdetect # @UnresolvedImport
     # to establish a thread pool on OS X
     import objc  # @UnusedImport # pyobjc seems not to be needed anylonger
     import Foundation
@@ -1011,9 +1012,9 @@ class tgraphcanvas(FigureCanvas):
                        "+Phidget TMP1101 4xTC AT", #60
                        "Phidget TMP1100 1xTC",  #61
                        "Phidget 1011 IO 01",    #62
-                       "Phidget HUB0000 IO 01", #63
-                       "+Phidget HUB0000 IO 23",#64
-                       "+Phidget HUB0000 IO 45",#65
+                       "Phidget HUB IO 01", #63
+                       "+Phidget HUB IO 23",#64
+                       "+Phidget HUB IO 45",#65
                        "-Omega HH806W",         #66 NOT WORKING 
                        "VOLTCRAFT PL-125-T2",   #67
                        "Phidget TMP1200 1xRTD", #68
@@ -1022,9 +1023,9 @@ class tgraphcanvas(FigureCanvas):
                        "+Phidget IO Digital 45",        #71
                        "+Phidget IO Digital 67",        #72
                        "Phidget 1011 IO Digital 01",    #73
-                       "Phidget HUB0000 IO Digital 01", #74
-                       "+Phidget HUB0000 IO Digital 23",#75
-                       "+Phidget HUB0000 IO Digital 45",#76
+                       "Phidget HUB IO Digital 01", #74
+                       "+Phidget HUB IO Digital 23",#75
+                       "+Phidget HUB IO Digital 45",#76
                        "VOLTCRAFT PL-125-T4",       #77
                        "+VOLTCRAFT PL-125-T4 34",   #78
                        "S7",                        #79
@@ -1054,8 +1055,8 @@ class tgraphcanvas(FigureCanvas):
                        "VICTOR 86B",                #103
                        "+Behmor 56",                #104
                        "+Behmor 78",                #105
-                       "Phidget HUB0000 IO 0",      #106
-                       "Phidget HUB0000 IO Digital 0", #107
+                       "Phidget HUB IO 0",      #106
+                       "Phidget HUB IO Digital 0", #107
                        ]
 
         # ADD DEVICE:
@@ -1073,11 +1074,11 @@ class tgraphcanvas(FigureCanvas):
             58, # Phidget TMP1101 4xTC 01
             61, # Phidget TMP1100 1xTC
             62, # Phidget 1011 IO 01
-            63, # Phidget HUB0000 IO 01
+            63, # Phidget HUB IO 01
             68, # Phidget TMP1200 1xRTD
             69, # Phidget IO Digital 01
             73, # Phidget 1011 IO Digital 01
-            74, # Phidget HUB0000 IO Digital 01
+            74, # Phidget HUB IO Digital 01
             79, # S7
             83, # Aillio Bullet R1 BT/DT
             92, # Probat Middleware
@@ -1087,8 +1088,8 @@ class tgraphcanvas(FigureCanvas):
             98, # Phidget DAQ1400 Voltage
             99, # Aillio Bullet R1 IBTS/BT
             100, # Yocto IR
-            106, # Phidget HUB0000 IO 0
-            107  # Phidget HUB0000 IO Digital 0
+            106, # Phidget HUB IO 0
+            107  # Phidget HUB IO Digital 0
         ]
         
         # ADD DEVICE:
@@ -1102,17 +1103,17 @@ class tgraphcanvas(FigureCanvas):
             58, # Phidget TMP1101
             61, # Phidget TMP1100
             62, # Phidget 1011
-            63, # Phidget HUB0000
+            63, # Phidget HUB IO 01
             68, # Phidget TMP1200
             69, # Phidget IO Digital
             73, # Phidget 1011 IO Digital
-            74, # Phidget HUB0000 IO Digital
+            74, # Phidget HUB IO Digital 01
             95, # Phidget DAQ1400 Current
             96, # Phidget DAQ1400 Frequency
             97, # Phidget DAQ1400 Digital
             98, # Phidget DAQ1400 Voltage
-            106, # Phidget HUB0000 IO 0
-            107  # Phidget HUB0000 IO Digital 0
+            106, # Phidget HUB IO 0
+            107  # Phidget HUB IO Digital 0
         ]
                  
         # ADD DEVICE:
@@ -1128,17 +1129,17 @@ class tgraphcanvas(FigureCanvas):
             54, # +Hottop Heater/Fan
             57, # EXTECH 755
             62, # Phidget 1011 IO 01
-            63, # Phidget HUB0000 IO 01
-            64, # +Phidget HUB0000 IO 23
-            65, # +Phidget HUB0000 IO 45
+            63, # Phidget HUB IO 01
+            64, # +Phidget HUB IO 23
+            65, # +Phidget HUB IO 45
             69, # Phidget IO Digital 01
             70, # +Phidget IO Digital 23
             71, # +Phidget IO Digital 45
             72, # +Phidget IO Digital 67
             73, # Phidget 1011 IO Digital 01
-            74, # Phidget HUB0000 IO Digital 0
-            75, # +Phidget HUB0000 IO Digital 23
-            76, # +Phidget HUB0000 IO Digital 45
+            74, # Phidget HUB IO Digital 0
+            75, # +Phidget HUB IO Digital 23
+            76, # +Phidget HUB IO Digital 45
             84, # +Aillio Bullet R1 Heater/Fan
             87, # +Aillio Bullet R1 State
             90, # +Slider 01
@@ -1149,8 +1150,8 @@ class tgraphcanvas(FigureCanvas):
             96, # Phidget DAQ1400 Frequency
             97, # Phidget DAQ1400 Digital
             98, # Phidget DAQ1400 Voltage
-            106, # Phidget HUB0000 IO 0
-            107  # Phidget HUB0000 IO Digital 0
+            106, # Phidget HUB IO 0
+            107  # Phidget HUB IO Digital 0
         ]
 
         #extra devices
@@ -4334,6 +4335,8 @@ class tgraphcanvas(FigureCanvas):
                 self.AUCvalue = 0
                 self.AUCsinceFCs = 0
                 self.AUCguideTime = 0
+                
+                self.statisticstimes = [0,0,0,0,0]
 
                 self.roastdate = QDateTime.currentDateTime()
                 self.roastepoch = QDateTime.currentDateTime().toTime_t()
@@ -4523,6 +4526,8 @@ class tgraphcanvas(FigureCanvas):
                 if window_len > 2:
                     # smooth curves
                     #s = numpy.r_[2*x[0]-y[window_len:1:-1],y,2*y[-1]-y[-1:-window_len:-1]]
+                    #s=numpy.r_[y[window_len-1:0:-1],y,y[-2:-window_len-1:-1]]
+                    #s = y
                     s=numpy.r_[y[window_len-1:0:-1],y,y[-1:-window_len:-1]]
                     if window == 'flat': #moving average
                         w = numpy.ones(window_len,'d')
@@ -6053,7 +6058,7 @@ class tgraphcanvas(FigureCanvas):
                         cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                         decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
                         t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                        t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)  
+                        t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                         # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                         if aw.qmc.timeindex[0]>-1:
                             RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
@@ -8925,12 +8930,10 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writecharacteristics() {0}").format(str(ex)),exc_tb.tb_lineno)
     
-
-    # Writes information about the finished profile in the graph
-    # TP_index is the TP index calculated by findTP and might be -1 if no TP could be detected
-    def writestatistics(self,TP_index):
+    # calculates self.statisticstimes values and returns dryEndIndex as well as the calcuated statisticstimes array of length 5
+    def calcStatistics(self,TP_index):
+        statisticstimes = [0,0,0,0,0]
         try:
-            LP = None
             if self.timeindex[1] and self.phasesbuttonflag:
                 #manual dryend available
                 dryEndIndex = self.timeindex[1]
@@ -8938,40 +8941,59 @@ class tgraphcanvas(FigureCanvas):
                 #find when dry phase ends 
                 dryEndIndex = aw.findDryEnd(TP_index)
             dryEndTime = self.timex[dryEndIndex]
-
+    
             #if DROP
             if self.timeindex[6] and self.timeindex[2]:
                 totaltime = int(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
                 if totaltime == 0:
-                    aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [DROP]", None))
-                    return
-
-                self.statisticstimes[0] = totaltime
+                    return dryEndIndex, statisticstimes
+                    
+                statisticstimes[0] = totaltime
                 dryphasetime = aw.float2float(dryEndTime - self.timex[self.timeindex[0]])
                 midphasetime = aw.float2float(self.timex[self.timeindex[2]] - dryEndTime)
                 finishphasetime = aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
-
+    
                 if self.timeindex[7]:
                     coolphasetime = int(round(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]]))
                 else:
                     coolphasetime = 0
+    
+                statisticstimes[1] = dryphasetime
+                statisticstimes[2] = midphasetime
+                statisticstimes[3] = finishphasetime
+                statisticstimes[4] = coolphasetime
+            return dryEndIndex, statisticstimes
+        except:
+            return self.timeindex[1], statisticstimes
 
-                self.statisticstimes[1] = dryphasetime
-                self.statisticstimes[2] = midphasetime
-                self.statisticstimes[3] = finishphasetime
-                self.statisticstimes[4] = coolphasetime
+    # Writes information about the finished profile in the graph
+    # TP_index is the TP index calculated by findTP and might be -1 if no TP could be detected
+    def writestatistics(self,TP_index):
+        try:
+            LP = None
+            
+            dryEndIndex, statisticstimes = self.calcStatistics(TP_index)
+            
+            if statisticstimes[0] == 0:
+                aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [DROP]", None))
+                return
+            else:
+                self.statisticstimes = statisticstimes
+
+            #if DROP
+            if self.timeindex[6] and self.timeindex[2]:
 
                 #dry time string
-                st1 = self.stringfromseconds(dryphasetime,False)
+                st1 = self.stringfromseconds(self.statisticstimes[1],False)
 
                 #mid time string
-                st2 = self.stringfromseconds(midphasetime,False)
+                st2 = self.stringfromseconds(self.statisticstimes[2],False)
 
                 #finish time string
-                st3 = self.stringfromseconds(finishphasetime,False)
+                st3 = self.stringfromseconds(self.statisticstimes[3],False)
                 
-                if coolphasetime:
-                    st4 = self.stringfromseconds(coolphasetime,False)
+                if self.statisticstimes[4]:
+                    st4 = self.stringfromseconds(self.statisticstimes[4],False)
                 else:
                     st4 = ""
 
@@ -8997,24 +9019,24 @@ class tgraphcanvas(FigureCanvas):
 
                     #Draw cool phase rectangle
                     if self.timeindex[7]:
-                        rect = patches.Rectangle((self.timex[self.timeindex[6]], statisticsheight), width = coolphasetime, height = statisticsbarheight,
+                        rect = patches.Rectangle((self.timex[self.timeindex[6]], statisticsheight), width = self.statisticstimes[4], height = statisticsbarheight,
                                                 color = self.palette["rect4"],alpha=0.5)
                         self.ax.add_patch(rect)
 
                     if self.timeindex[2]: # only if FCs exists
                         #Draw finish phase rectangle
                         #check to see if end of 1C exists. If so, use half between start of 1C and end of 1C. Otherwise use only the start of 1C
-                        rect = patches.Rectangle((self.timex[self.timeindex[2]], statisticsheight), width = finishphasetime, height = statisticsbarheight,
+                        rect = patches.Rectangle((self.timex[self.timeindex[2]], statisticsheight), width = self.statisticstimes[3], height = statisticsbarheight,
                                                 color = self.palette["rect3"],alpha=0.5)
                         self.ax.add_patch(rect)
 
                         # Draw mid phase rectangle
-                        rect = patches.Rectangle((self.timex[self.timeindex[0]]+dryphasetime, statisticsheight), width = midphasetime, height = statisticsbarheight,
+                        rect = patches.Rectangle((self.timex[self.timeindex[0]]+self.statisticstimes[1], statisticsheight), width = self.statisticstimes[2], height = statisticsbarheight,
                                               color = self.palette["rect2"],alpha=0.5)
                         self.ax.add_patch(rect)
 
                     # Draw dry phase rectangle
-                    rect = patches.Rectangle((self.timex[self.timeindex[0]], statisticsheight), width = dryphasetime, height = statisticsbarheight,
+                    rect = patches.Rectangle((self.timex[self.timeindex[0]], statisticsheight), width = self.statisticstimes[1], height = statisticsbarheight,
                                               color = self.palette["rect1"],alpha=0.5)
                     self.ax.add_patch(rect)
 
@@ -9022,10 +9044,10 @@ class tgraphcanvas(FigureCanvas):
                     fmtstr = "%.1f"
                 else:
                     fmtstr = "%.0f" 
-                if totaltime:
-                    dryphaseP = fmtstr%(dryphasetime*100./totaltime)
-                    midphaseP = fmtstr%(midphasetime*100./totaltime)
-                    finishphaseP = fmtstr%(finishphasetime*100./totaltime)
+                if self.statisticstimes[0]:
+                    dryphaseP = fmtstr%(self.statisticstimes[1]*100./self.statisticstimes[0])
+                    midphaseP = fmtstr%(self.statisticstimes[2]*100./self.statisticstimes[0])
+                    finishphaseP = fmtstr%(self.statisticstimes[3]*100./self.statisticstimes[0])
                 else:
                     dryphaseP = " --- "
                     midphaseP = " --- "
@@ -9039,24 +9061,24 @@ class tgraphcanvas(FigureCanvas):
                 if self.statisticsflags[0]:
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
-                    text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
                     try:
                         text.set_in_layout(False)
                     except:
                         pass
                     if self.timeindex[2]: # only if FCs exists
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
                         try:
                             text.set_in_layout(False)
                         except:
                             pass
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
                         try:
                             text.set_in_layout(False)
                         except:
                             pass
                     if self.timeindex[7]: # only if COOL exists
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+coolphasetime/2.,statisticsupper,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+self.statisticstimes[4]/2.,statisticsupper,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
                         try:
                             text.set_in_layout(False)
                         except:
@@ -9101,24 +9123,24 @@ class tgraphcanvas(FigureCanvas):
                     #Write flavor estimation
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
-                    text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
                     try:
                         text.set_in_layout(False)
                     except:
                         pass
                     if self.timeindex[2]: # only if FCs exists
-                        text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontproperties=statsprop)
                         try:
                             text.set_in_layout(False)
                         except:
                             pass
-                        text = self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontproperties=statsprop)
                         try:
                             text.set_in_layout(False)
                         except:
                             pass
                     if self.timeindex[7]: # only if COOL exists
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+max(self.statisticstimes[4]/2.,self.statisticstimes[4]/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
                         try:
                             text.set_in_layout(False)
                         except:
@@ -16446,9 +16468,9 @@ class ApplicationWindow(QMainWindow):
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Command; 11= p-i-d; 12= Fuji Command;
     #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command;
     #         20= Artisan Command; 21= RC Command
-    def eventaction(self,action,cmd):
+    def eventaction(self,action,cmd,parallel=True):
         if action:
-            if action == 3: # multiple event actions, we cannot run in parallel as it crashs!
+            if not parallel: # subactions of multiple event actions, may crash if run in parallel, especially if they update the UI like button shape!
                 self.eventaction_internal(action,cmd)
             else:
                 eventActionThread = EventActionThread(action,cmd)                
@@ -16504,11 +16526,21 @@ class ApplicationWindow(QMainWindow):
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " eventaction() {0}").format(str(e)),exc_tb.tb_lineno)
                 elif action == 3: # Multiple Event
-                    cmds = cmd_str.split(",")
-                    for i in range(len(cmds)):
-                        buttonnumber = int(cmds[i])-1
-                        if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
-                            self.recordextraevent(buttonnumber)
+                    cmd_list = cmd_str.split(",")
+                    for i in range(len(cmd_list)):
+                        cs = cmd_list[i]
+                        if cs.startswith('sleep'):
+                            try:
+                                cmds = eval(cs[len('sleep'):])
+                                if isinstance(cmds,float) or isinstance(cmds,int):
+                                    # cmd has format "sleep(xx.yy)"
+                                    libtime.sleep(cmds)
+                            except Exception:
+                                pass
+                        else:
+                            buttonnumber = int(cs)-1
+                            if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
+                                self.recordextraevent(buttonnumber,updateButtons=False)
                 elif action == 4: # MODBUS Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -17217,33 +17249,35 @@ class ApplicationWindow(QMainWindow):
         self.buttonlist[tee].setStyleSheet(plain_style + hover_style + pressed_style)
 
     #called from user configured event buttons
-    def recordextraevent(self,ee):
+    #by default actions are processed in a parallel thread, but components of multiple button actions not to avoid crashes
+    def recordextraevent(self,ee,parallel=True,updateButtons=True):
         eventtype = self.extraeventstypes[ee]
-        try:
-            aw.qmc.eventactionsemaphore.acquire(1)
-            # reset color of last pressed button
-            if self.lastbuttonpressed != -1 and len(self.buttonlist)>self.lastbuttonpressed:
-                self.setExtraEventButtonStyle(self.lastbuttonpressed, style="normal")
-
-            #toggle button if it has nonzero state prior to toggling
-            if self.buttonStates[ee] != 0:
-                self.setExtraEventButtonStyle(ee, style="normal")
-            else:
-                self.setExtraEventButtonStyle(ee, style="pressed")
-
-            # reset lastbuttonpressed
-            self.lastbuttonpressed = ee
-
-        except Exception:
-            pass
-        finally:
-            if aw.qmc.eventactionsemaphore.available() < 1:
-                aw.qmc.eventactionsemaphore.release(1)
+        if updateButtons: # not if triggered from mutliplebutton actions:
+            try:
+                aw.qmc.eventactionsemaphore.acquire(1)
+                # reset color of last pressed button
+                if self.lastbuttonpressed != -1 and len(self.buttonlist)>self.lastbuttonpressed:
+                    self.setExtraEventButtonStyle(self.lastbuttonpressed, style="normal")
+    
+                #toggle button if it has nonzero state prior to toggling
+                if self.buttonStates[ee] != 0:
+                    self.setExtraEventButtonStyle(ee, style="normal")
+                else:
+                    self.setExtraEventButtonStyle(ee, style="pressed")
+    
+                # reset lastbuttonpressed
+                self.lastbuttonpressed = ee
+    
+            except Exception:
+                pass
+            finally:
+                if aw.qmc.eventactionsemaphore.available() < 1:
+                    aw.qmc.eventactionsemaphore.release(1)
         cmdvalue = self.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee])
         if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type " " that does not add an event; if eventtype == 9 ("-") we have an untyped event
             if eventtype == 9: # an untyped event
                 # we just fire the action
-                self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
+                self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue),parallel=parallel)
                 # and record the event
                 if self.qmc.flagstart:
                     self.qmc.EventRecord(extraevent = ee)      
@@ -17267,9 +17301,9 @@ class ApplicationWindow(QMainWindow):
                 if self.extraeventsactions[ee] != 14: # only for VOUT Commands we keep the floats
                     actionvalue = int(round(actionvalue))
                 if self.extraeventsactions[ee] in [8,9,16,17,18]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
-                    self.eventaction(self.extraeventsactions[ee],u(int(new_value)))
+                    self.eventaction(self.extraeventsactions[ee],u(int(new_value)),parallel=parallel)
                 else:
-                    self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(actionvalue))
+                    self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(actionvalue),parallel=parallel)
                 # remember the new value as the last value set for this event
                 self.block_quantification_sampling_ticks[etype] = self.sampling_ticks_to_block_quantifiction
                 self.extraeventsactionslastvalue[etype] = new_value
@@ -17279,7 +17313,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.EventRecord(extraevent = ee)                 
         else:
             # just issue the eventaction (no cmd substitution here)
-            self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
+            self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue),parallel=parallel)
 
     def resetApplication(self):
         if app.artisanviewerMode:
@@ -20499,16 +20533,18 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)        
         ######### Phases #########
         try:
-            if self.qmc.statisticstimes[0]:
-                computedProfile["totaltime"] = self.qmc.statisticstimes[0]
-            if self.qmc.statisticstimes[1]:
-                computedProfile["dryphasetime"] = self.qmc.statisticstimes[1]
-            if self.qmc.statisticstimes[2]:
-                computedProfile["midphasetime"] = self.qmc.statisticstimes[2]
-            if self.qmc.statisticstimes[3]:
-                computedProfile["finishphasetime"] = self.qmc.statisticstimes[3]
-            if self.qmc.statisticstimes[4]:
-                computedProfile["coolphasetime"] = self.qmc.statisticstimes[4]
+            # we calcuate the statistics here as the profile might not have yet been rendered and thus the statistics are not yet computed
+            _,statisticstimes = self.qmc.calcStatistics(TP_index)
+            if statisticstimes[0]:
+                computedProfile["totaltime"] = statisticstimes[0]
+            if statisticstimes[1]:
+                computedProfile["dryphasetime"] = statisticstimes[1]
+            if statisticstimes[2]:
+                computedProfile["midphasetime"] = statisticstimes[2]
+            if statisticstimes[3]:
+                computedProfile["finishphasetime"] = statisticstimes[3]
+            if statisticstimes[4]:
+                computedProfile["coolphasetime"] = statisticstimes[4]
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -25775,11 +25811,23 @@ class ApplicationWindow(QMainWindow):
             name = "ArtisanViewer"
         else:
             name = "Artisan"
+        otherlibs = ""
+        try:
+            phidgetlibversion = PhidgetDriver.getLibraryVersion()
+            otherlibs += ", " + phidgetlibversion
+        except:
+            pass
+        try:
+            from yoctopuce.yocto_api import YAPI
+            yocto_version = YAPI.GetAPIVersion()
+            otherlibs += ", Yoctopuce " + yocto_version
+        except:
+            pass
         box.about(self,
                 QApplication.translate("About", "About",None),
                 u("""<h2>{0} {1}{16} ({2})</h2>
                 <p>
-                <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}, pymodbus {13}</small>
+                <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}, pymodbus {13}{17}</small>
                 </p>
                 <p><b>{9}</b><small>{10}</small></p>
                 <p><b>{11}</b><small>{12}</small></p>
@@ -25801,7 +25849,8 @@ class ApplicationWindow(QMainWindow):
                 PYMODBUS_VERSION_STR,
                 QApplication.translate("About", "License",None),
                 '<a href="http://www.gnu.org/copyleft/gpl.html">GNU Public Licence (GPLv3.0)</a>',
-                build))
+                build,
+                otherlibs))
 
     def showAboutQt(self):
         QApplication.instance().aboutQt()
@@ -31892,6 +31941,10 @@ class editGraphDlg(ArtisanDialog):
             self.scaleWeightAccumulated.setText("{0:.1f}g".format(weight + self.scale_set))
 
     def ble_scan_failed(self):
+#        import datetime
+#        ts = libtime.time()
+#        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+#        print(st,"ble_scan_failed")
         self.scale_weight = None
         self.scaleWeight.setText("")
         if self.ble is not None:
@@ -37210,7 +37263,7 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<li><b>setDBfloat</b>(&lt;dbnumber&gt;,&lt;start&gt;,&lt;value&gt;): write float to S7 DB</ul>",None))
         string += u(QApplication.translate("Message", "<LI>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None))
         string += u(QApplication.translate("Message", "<LI>IO Command: set(n,0), set(n,1), toggle(n), pulse(n,t) to set Phidget IO digital output n",None))
-        string += u(QApplication.translate("Message", "<LI>PWM Command: out(n,v), toggle(n), pulse(n,t) set digital output channel n to PWM value v (0-100) on a Phidget OUT1100; outhub(n,v), togglehub(n), pulsehub(n,t) on a Phidget HUB0000",None))
+        string += u(QApplication.translate("Message", "<LI>PWM Command: out(n,v), toggle(n), pulse(n,t) set digital output channel n to PWM value v (0-100) on a Phidget OUT1100; outhub(n,v), togglehub(n), pulsehub(n,t) on a Phidget HUB",None))
         string += u(QApplication.translate("Message", "<LI>VOUT Command: out(n,v) set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V) on a Phidget OUT1000/OUT1001/OUT1002",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Heater: sets heater to value",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Fan: sets fan to value",None))
@@ -42140,12 +42193,12 @@ class serialport(object):
             aw.ser.PhidgetDigitalOut = None
 
 #--- Phidget Digital PWMhub Output (only one supported for now)
-#  only supporting 6 channel Phidget HUB0000 module
+#  only supporting 6 channel Phidget HUB module
 
     def phidgetOUTattachHub(self,channel):
         if not aw.ser.PhidgetDigitalOutHub and aw.qmc.phidgetManager is not None:
             aw.qmc.startPhidgetManager()
-            # try to attach the 6 channels of the Phidget HUB0000 module
+            # try to attach the 6 channels of the Phidget HUB module
             ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_DIGITALOUTPUT_PORT,channel,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             if ser is not None:
@@ -47562,15 +47615,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.device = 62
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                elif meter == "Phidget HUB0000 IO 01":
+                elif meter == "Phidget HUB IO 01":
                     aw.qmc.device = 63
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
                 ##########################
-                ####  DEVICE 64 is +Phidget HUB0000 IO 23 but +DEVICE cannot be set as main device
+                ####  DEVICE 64 is +Phidget HUB IO 23 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 65 is +Phidget HUB0000 IO 45 but +DEVICE cannot be set as main device
+                ####  DEVICE 65 is +Phidget HUB IO 45 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 66 is -HH806W but -DEVICE cannot be set as main device
@@ -47608,15 +47661,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.device = 73
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                elif meter == "Phidget HUB0000 IO Digital 01":
+                elif meter == "Phidget HUB IO Digital 01":
                     aw.qmc.device = 74
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
                 ##########################
-                ####  DEVICE 75 is +Phidget HUB0000 IO Digital 23 but +DEVICE cannot be set as main device
+                ####  DEVICE 75 is +Phidget HUB IO Digital 23 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 76 is +Phidget HUB0000 IO Digital 45 but +DEVICE cannot be set as main device
+                ####  DEVICE 76 is +Phidget HUB IO Digital 45 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 elif meter == "VOLTCRAFT PL-125-T4":
@@ -47733,11 +47786,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ####  DEVICE 105 Behmor 78 channel 7 and 8
                 ##########################
                 ##########################
-                elif meter == "Phidget HUB0000 IO 0":
+                elif meter == "Phidget HUB IO 0":
                     aw.qmc.device = 106
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                elif meter == "Phidget IO Digital 0":
+                elif meter == "Phidget HUB IO Digital 0":
                     aw.qmc.device = 107
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
 

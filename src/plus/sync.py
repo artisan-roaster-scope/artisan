@@ -108,12 +108,15 @@ cached_sync_record_hash = None # hash over the sync record
 
 # called before local edits can start to remember the original state of the sync record
 # if provided, roast_record is assumed to be a full roast record as provided by roast.getRoast()
-def setSyncRecordHash(roast_record = None):
+def setSyncRecordHash(roast_record = None, hash = None):
     global cached_sync_record_hash
     try:
         config.logger.debug("sync:setSyncRecordHash()")
         sync_record_semaphore.acquire(1)
-        _,cached_sync_record_hash = roast.getSyncRecord(roast_record)
+        if hash is None:
+            _,cached_sync_record_hash = roast.getSyncRecord(roast_record)
+        else:
+            cached_sync_record_hash = hash
     except Exception as e:
         config.logger.error("sync: Exception in setSyncRecordHash() %s",e)
     finally:
@@ -387,7 +390,7 @@ def sync():
             aw.qmc.safesaveflag = True # set file dirty flag
             clearSyncRecordHash() # clear sync record hash cash to trigger an upload of the modified plus sync record on next save
         else:
-            setSyncRecordHash(rr) # we remember that consistent state to be able to detect future modifications
+            setSyncRecordHash(hash = computed_sync_record_hash) # we remember that consistent state to be able to detect future modifications
         getUpdate(aw.qmc.roastUUID,aw.curFile) # now we check for updates on the server side
     except Exception as e:
         import sys

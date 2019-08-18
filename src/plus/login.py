@@ -126,4 +126,8 @@ def plus_login(window,email=None,remember_credentials=True):
     l.setWindowFlags(Qt.Sheet)
     l.setAttribute(Qt.WA_DeleteOnClose, True)
     l.exec_()
-    return l.login.strip(),l.passwd,l.remember
+    if l.login is not None:
+        login_processed = l.login.strip()
+    else:
+        login_processed = None
+    return login_processed,l.passwd,l.remember
