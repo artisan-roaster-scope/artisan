@@ -21165,11 +21165,11 @@ class ApplicationWindow(QMainWindow):
                         current_counter = aw.qmc.batchprefix + str(aw.qmc.batchcounter)
                         files_counter = files_batchprefix + str(files_batchcounter)
                         if aw.qmc.batchcounter < 0:
-                            string = QApplication.translate("Message","Your batch counter is currently turned off. Turn it on and set it to %s from the settings file?"%(files_counter), None)
+                            string = QApplication.translate("Message","Your batch counter is currently turned off. Turn it on and set it to %s from the settings file to be imported?"%(files_counter), None)
                         elif files_batchcounter < 0:
-                            string = QApplication.translate("Message","Your batch counter is set to %s. Turn it off as in the settings file?"%(current_counter), None)
+                            string = QApplication.translate("Message","Your batch counter is set to %s. Turn it off as in the settings file to be imported?"%(current_counter), None)
                         else:
-                            string = QApplication.translate("Message","Overwrite your current batch counter %s by %s from the settings file?"%(current_counter,files_counter), None)
+                            string = QApplication.translate("Message","Overwrite your current batch counter %s by %s from the settings file to be imported?"%(current_counter,files_counter), None)
                         reply = QMessageBox.question(aw,QApplication.translate("Message","Batch Counter", None),string,
                                 QMessageBox.Cancel |QMessageBox.No|QMessageBox.Yes)
                         if reply == QMessageBox.Cancel:
