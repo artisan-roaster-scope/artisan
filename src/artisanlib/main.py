@@ -8331,7 +8331,8 @@ class tgraphcanvas(FigureCanvas):
                     settings.beginGroup("Batch")
                     if settings.contains("batchcounter"):
                         bc = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
-                        if bc > -1:
+                        bprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
+                        if bc > -1 and bc == aw.qmc.batchcounter+1 and aw.qmc.batchprefix == bprefix:
                             settings.setValue("batchcounter",bc - 1)
                     settings.endGroup()
                 except Exception:
@@ -8351,7 +8352,8 @@ class tgraphcanvas(FigureCanvas):
                     settings.beginGroup("Batch")
                     if settings.contains("batchcounter"):
                         bc = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
-                        if bc > -1:
+                        bprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
+                        if bc > -1 and bc == aw.qmc.batchcounter-1 and aw.qmc.batchprefix == bprefix:
                             settings.setValue("batchcounter",bc + 1)
                     settings.endGroup()
                 except Exception:
