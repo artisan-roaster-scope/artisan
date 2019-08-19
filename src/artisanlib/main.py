@@ -7541,6 +7541,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[0]
 
             aw.update_minieventline_visibility()
+            
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -21197,7 +21198,7 @@ class ApplicationWindow(QMainWindow):
             # we remember from which location we loaded the last settings file
             # to be able to update the batch counter in this file from incBatchCounter()/decBatchCounter()
             # but not for loading of settings fragments like themes or machines
-            if filename:
+            if filename and updateBatchCounter:
                 settings.beginGroup("Batch")
                 if settings.contains("batchcounter"):
                     self.settingspath = filename
@@ -21979,7 +21980,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
 
             self.userprofilepath = toString(settings.value("profilepath",self.userprofilepath))
-            if settings.contains("settingspath"):            
+            if settings.contains("settingspath") and not filename:
                 self.settingspath = toString(settings.value("settingspath",self.settingspath))
             if settings.contains("wheelpath"):            
                 self.wheelpath = toString(settings.value("wheelpath",self.wheelpath))
@@ -34031,6 +34032,7 @@ class batchDlg(ArtisanDialog):
         counterlabel = QLabel()
         counterlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         counterlabel.setText(u(QApplication.translate("Label", "Counter",None)))
+        descrLabel = QLabel("<i>" + QApplication.translate("Message", "Next batch: counter+1",None) + "</i>")
         
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(lambda :self.batchChanged())
@@ -34047,6 +34049,7 @@ class batchDlg(ArtisanDialog):
         batchlayout.addWidget(self.prefixEdit,1,1)
         batchlayout.addWidget(counterlabel,2,0)
         batchlayout.addWidget(self.counterSpinBox,2,1)
+        batchlayout.addWidget(descrLabel,3,0,1,3)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(batchlayout)
         mainLayout.addStretch()
