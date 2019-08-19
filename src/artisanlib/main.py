@@ -2520,7 +2520,7 @@ class tgraphcanvas(FigureCanvas):
             self.specialeventsStrings.append("")
             self.specialeventsvalue.append(0)
         aw.qmc.safesaveflag = True
-        self.redraw(recomputeAllDeltas=False)
+        self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
         
     def updateWebLCDs(self,bt=None,et=None,time=None,alertTitle=None,alertText=None,alertTimeout=None):
         try:
