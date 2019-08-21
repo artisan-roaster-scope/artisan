@@ -1331,7 +1331,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundmovespeed = 30
         self.titleB = ""
         self.roastbatchnrB = 0
-        self.roastbatchprefixB = u("")
+        self.roastbatchprefixB = ""
         self.roastbatchposB = 1
         self.temp1B,self.temp2B,self.temp1BX,self.temp2BX,self.timeB = [],[],[],[],[]
         self.stemp1B,self.stemp2B,self.stemp1BX,self.stemp2BX = [],[],[],[] # smoothed versions of the background curves
@@ -1400,7 +1400,8 @@ class tgraphcanvas(FigureCanvas):
         self.lastroastepoch = self.roastepoch # the epoch of the last roast in seconds
         self.batchcounter = -1 # global batch counter; if batchcounter is -1, batchcounter system is inactive
         self.batchsequence = 1 # global counter of position in sequence of batches of one session
-        self.batchprefix = u("")
+        self.batchprefix = ""
+        self.neverUpdateBatchCounter = False
         # profile batch nr
         self.roastbatchnr = 0 # batch number of the roast; if roastbatchnr=0, prefix/counter is hidden/inactiv (initialized to 0 on roast START)
         self.roastbatchprefix = self.batchprefix # batch prefix of the roast
@@ -2325,7 +2326,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             # display MET information by clicking on the MET marker
             if isinstance(event.artist, matplotlib.text.Annotation) and self.showmet and event.artist in [self.met_annotate]:
-                message = u("")
+                message = ""
                 message += u("MET ") + str(aw.float2float(self.met_timex_temp1_delta[1],1)) + aw.qmc.mode
                 message += u(" @ ") + self.stringfromseconds(self.met_timex_temp1_delta[0])
                 if self.met_timex_temp1_delta[2] is not None and self.met_timex_temp1_delta[2] >= 0:   #met_delta
@@ -3479,9 +3480,13 @@ class tgraphcanvas(FigureCanvas):
                     index = len(self.timex)-1
                 else:
                     index = 0
-                #load real time buffers acquired at sample() to the dictionary                  
-                mathdictionary["Y1"] = self.RTtemp1
-                mathdictionary["Y2"] = self.RTtemp2
+                #load real time buffers acquired at sample() to the dictionary
+                mathdictionary["Y1"] = self.RTtemp1 # ET
+                mathdictionary["Y2"] = self.RTtemp2 # BT
+                
+                mathdictionary["R1"] = self.rateofchange1 # ET RoR
+                mathdictionary["R2"] = self.rateofchange2 # BT RoR
+                
                 for d in range(len(self.RTextratemp1)):
                     mathdictionary["Y%i"%(d*2+3)] = self.RTextratemp1[d]
                     mathdictionary["Y%i"%(d*2+4)] = self.RTextratemp2[d]
@@ -8336,7 +8341,7 @@ class tgraphcanvas(FigureCanvas):
                             settings.setValue("batchcounter",bc - 1)
                     settings.endGroup()
                 except Exception:
-                    aw.settingspath = u("")                   
+                    aw.settingspath = ""                  
         
     def incBatchCounter(self):
         if aw.qmc.batchcounter > -1:
@@ -8357,7 +8362,7 @@ class tgraphcanvas(FigureCanvas):
                             settings.setValue("batchcounter",bc + 1)
                     settings.endGroup()
                 except Exception:
-                    aw.settingspath = u("")
+                    aw.settingspath = ""
             # update batchsequence by estimating batch sequence (roastbatchpos) from lastroastepoch and roastepoch
             # if this roasts DROP is more than 1.5h after the last registered DROP, we assume a new session starts
             if aw.qmc.lastroastepoch + 5400 < aw.qmc.roastepoch:
@@ -8891,7 +8896,7 @@ class tgraphcanvas(FigureCanvas):
                         if FCperiod is not None:
                             strline = u("min%s=" % FCperiod + QApplication.translate("Label", "FC", None) + "   ") + strline
                     else:
-                        strline = u("")
+                        strline = ""
                         if temp1_values_max and temp1_values_max > 0:
                             strline = u(QApplication.translate("Label", "MET", None) + "={0}   ").format(u(ETmax))
                         strline += u(QApplication.translate("Label", "RoR", None) + "={0}" \
@@ -11942,10 +11947,10 @@ class ApplicationWindow(QMainWindow):
         #flag to reset Qsettings
         self.resetqsettings = 0
         #path of last loadded QSettings
-        self.settingspath = u("") # if empty string, the settingspath will be ignored, otherwise it will be used to update the batchcounter of those settings
+        self.settingspath = "" # if empty string, the settingspath will be ignored, otherwise it will be used to update the batchcounter of those settings
         
         # path of last laoded WheelGraph
-        self.wheelpath = u("")
+        self.wheelpath = ""
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month file-open/save will point to profilepath
         self.profilepath = ""
@@ -18151,7 +18156,7 @@ class ApplicationWindow(QMainWindow):
     def automaticsave(self):
         try:
             if self.qmc.autosavepath and self.qmc.autosaveflag:
-                prefix = u("")
+                prefix = ""
                 if self.qmc.autosaveprefix != "":
                     prefix = self.qmc.autosaveprefix
                 if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
@@ -18711,7 +18716,7 @@ class ApplicationWindow(QMainWindow):
                         pass
                 else:
                     self.qmc.roastbatchnrB = 0
-                    self.qmc.roastbatchprefixB = u("")
+                    self.qmc.roastbatchprefixB = ""
                     self.qmc.roastbatchposB = 1
                 
 # on request we load alarms from backgrounds, but keep in mind as this would overload the one of the foreground profile that automatically loads this background
@@ -18775,7 +18780,7 @@ class ApplicationWindow(QMainWindow):
                 if len(self.qmc.timeB) > backgroundDrop:
                     message =  u(QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(u(filename),str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))))
                 else:
-                    message =  u(QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(u(filename),u("")))                    
+                    message =  u(QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(u(filename),""))                    
                 self.sendmessage(message)
                 self.qmc.backgroundpath = u(filename)
                 if "roastUUID" in profile:
@@ -20875,7 +20880,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
                     prefix = u(aw.qmc.batchprefix) + u(aw.qmc.roastbatchnr)
                 else:
-                    prefix = u("")
+                    prefix = ""
                 fname = path.absoluteFilePath(self.generateFilename(prefix=prefix))
                 filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None), path=fname, copy=copy)
             if filename:
@@ -21157,29 +21162,32 @@ class ApplicationWindow(QMainWindow):
             updateBatchCounter = True
             if filename is not None:
                 settings = QSettings(filename,QSettings.IniFormat)
-                settings.beginGroup("Batch")
-                if settings.contains("batchcounter"):
-                    files_batchcounter = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
-                    files_batchprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
-                    if files_batchcounter != aw.qmc.batchcounter or files_batchprefix != aw.qmc.batchprefix:
-                        current_counter = aw.qmc.batchprefix + str(aw.qmc.batchcounter)
-                        files_counter = files_batchprefix + str(files_batchcounter)
-                        if aw.qmc.batchcounter < 0:
-                            string = QApplication.translate("Message","Your batch counter is currently turned off. Turn it on and set it to %s from the settings file to be imported?"%(files_counter), None)
-                        elif files_batchcounter < 0:
-                            string = QApplication.translate("Message","Your batch counter is set to %s. Turn it off as in the settings file to be imported?"%(current_counter), None)
-                        else:
-                            string = QApplication.translate("Message","Overwrite your current batch counter %s by %s from the settings file to be imported?"%(current_counter,files_counter), None)
-                        reply = QMessageBox.question(aw,QApplication.translate("Message","Batch Counter", None),string,
-                                QMessageBox.Cancel |QMessageBox.No|QMessageBox.Yes)
-                        if reply == QMessageBox.Cancel:
-                            aw.sendmessage(QApplication.translate("Message","Load Settings canceled"))
-                            return
-                        elif reply == QMessageBox.No:
-                            updateBatchCounter = False
-                        else:
-                            updateBatchCounter = True
-                settings.endGroup()
+                if aw.qmc.neverUpdateBatchCounter:
+                    updateBatchCounter = False
+                else:
+                    settings.beginGroup("Batch")
+                    if settings.contains("batchcounter"):
+                        files_batchcounter = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
+                        files_batchprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
+                        if files_batchcounter != aw.qmc.batchcounter or files_batchprefix != aw.qmc.batchprefix:
+                            current_counter = aw.qmc.batchprefix + str(aw.qmc.batchcounter)
+                            files_counter = files_batchprefix + str(files_batchcounter)
+                            if aw.qmc.batchcounter < 0:
+                                string = QApplication.translate("Message","Your batch counter is currently turned off. Turn it on and set it to %s from the settings file to be imported?"%(files_counter), None)
+                            elif files_batchcounter < 0:
+                                string = QApplication.translate("Message","Your batch counter is set to %s. Turn it off as in the settings file to be imported?"%(current_counter), None)
+                            else:
+                                string = QApplication.translate("Message","Overwrite your current batch counter %s by %s from the settings file to be imported?"%(current_counter,files_counter), None)
+                            reply = QMessageBox.question(aw,QApplication.translate("Message","Batch Counter", None),string,
+                                    QMessageBox.Cancel |QMessageBox.No|QMessageBox.Yes)
+                            if reply == QMessageBox.Cancel:
+                                aw.sendmessage(QApplication.translate("Message","Load Settings canceled"))
+                                return
+                            elif reply == QMessageBox.No:
+                                updateBatchCounter = False
+                            else:
+                                updateBatchCounter = True
+                    settings.endGroup()
             else:
                 settings = QSettings()
             if settings.contains("resetqsettings"):
@@ -21200,10 +21208,19 @@ class ApplicationWindow(QMainWindow):
             # we remember from which location we loaded the last settings file
             # to be able to update the batch counter in this file from incBatchCounter()/decBatchCounter()
             # but not for loading of settings fragments like themes or machines
-            if filename and updateBatchCounter:
+            if filename:
+                if updateBatchCounter:
+                    settings.beginGroup("Batch")
+                    if settings.contains("batchcounter"):
+                        self.settingspath = filename
+                    settings.endGroup()
+                else:
+                    self.settingspath = ""
+            else:
+                # the neverUpdateBatchCounter flag is never changed on loading a settings file!
                 settings.beginGroup("Batch")
-                if settings.contains("batchcounter"):
-                    self.settingspath = filename
+                if settings.contains("neverUpdateBatchCounter"):
+                    aw.qmc.neverUpdateBatchCounter = toInt(settings.value("neverUpdateBatchCounter",aw.qmc.neverUpdateBatchCounter))
                 settings.endGroup()
             
             if filename is None and settings.contains("fullscreen"):
@@ -23371,6 +23388,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("batchsequence",self.qmc.batchsequence)
             settings.setValue("batchprefix",self.qmc.batchprefix)
             settings.setValue("lastroastepoch",self.qmc.lastroastepoch)
+            settings.setValue("neverUpdateBatchCounter",self.qmc.neverUpdateBatchCounter)
             settings.endGroup()
             settings.beginGroup("ExtrasMoreInfo")
             settings.setValue("showmet",self.qmc.showmet)
@@ -23582,7 +23600,7 @@ class ApplicationWindow(QMainWindow):
         res = {}
         # id (prefix+nr)
         res["nr"] = u(data["batchnr"])
-        res["id"] = ((u(data["batchprefix"]) + u(data["batchnr"])) if (data["batchnr"] != 0) else u(""))
+        res["id"] = ((u(data["batchprefix"]) + u(data["batchnr"])) if (data["batchnr"] != 0) else "")
         # title
         res["title"] = data["title"]
         # date and time
@@ -24088,7 +24106,7 @@ class ApplicationWindow(QMainWindow):
 </tr>""")
         pd = self.productionData2string(production_data)
         rd = self.rankingData2string(ranking_data)
-        batch_td_color = u("")
+        batch_td_color = ""
         if plot_color is not None:
             batch_color = [x * 100 for x in plot_color[0:3]]
             batch_color.append(0.7)
@@ -24305,7 +24323,7 @@ class ApplicationWindow(QMainWindow):
                             label_chr_nr = label_chr_nr + 1
                         # surpress default description
                         if pd["title"] == QApplication.translate("Scope Title", "Roaster Scope",None):
-                            pd["title"] = u("")
+                            pd["title"] = ""
                         
                         entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
                         
@@ -24551,7 +24569,7 @@ class ApplicationWindow(QMainWindow):
                         i += 1   #avoid a blank line
                         continue
                     pd = self.profileProductionData(p)
-                    label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))[:8]
+                    label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else "")[:8]
                     if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
                         ax.broken_barh( [ (0, m), 
                                           (n, rd["DRY_percent"]), 
@@ -24979,7 +24997,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 degree = u("--")
 
-            moisture = u("")
+            moisture = ""
             if "moisture_greens" in cp:
                 moisture = u("%d%%"%cp["moisture_greens"])
                 moisture += " (" + u(QApplication.translate("Label","greens")) + ")"
@@ -24989,7 +25007,7 @@ class ApplicationWindow(QMainWindow):
                 moisture += u("%d%%"%cp["moisture_roasted"])
                 moisture += " (" + u(QApplication.translate("Label","roasted")) + ")"
                 
-            humidity = u("")
+            humidity = ""
             if "ambient_humidity" in cp:
                 humidity += u("%d%%"%cp["ambient_humidity"])
                 if "ambient_temperature" in cp:
@@ -25034,7 +25052,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 alarms = u("--")            
             if aw.qmc.roastbatchnr == 0:
-                batch = u("")
+                batch = ""
             else:
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + u(" ")
             datetime_html=u(self.qmc.roastdate.date().toString()) + ", " + u(self.qmc.roastdate.time().toString()[:-3])
@@ -25181,7 +25199,7 @@ class ApplicationWindow(QMainWindow):
         if len(res) > 0:
             return u("\n<center><pre>" + ', '.join(res) + "</pre></center>")
         else:
-            return u("")
+            return ""
 
     def cuppingSum(self,flavors):
         score = 0.
@@ -25262,7 +25280,7 @@ class ApplicationWindow(QMainWindow):
         return u(res)
 
     def specialevents2html(self):
-        html = u("")
+        html = ""
         if self.qmc.specialevents and len(self.qmc.specialevents) > 0:
             html += u('<center>\n<table cellpadding="10" cellspacing="8">\n')
             if self.qmc.timeindex[0] != -1:
@@ -25301,7 +25319,7 @@ class ApplicationWindow(QMainWindow):
         return u(html)
 
     def note2html(self,notes):
-        notes_html = u("")
+        notes_html = ""
         for i in range(len(notes)):
             if o(u(notes[i])) == 9:
                 notes_html += u(" &nbsp&nbsp&nbsp&nbsp ")
@@ -26477,7 +26495,7 @@ class ApplicationWindow(QMainWindow):
                     aw.loadWheel(aw.wheelpath)
                     self.wheeldialog.createdatatable()
                 except Exception:
-                    aw.settingspath = u("") 
+                    aw.settingspath = "" 
             aw.qmc.drawWheel()
 
     def background(self):
@@ -26492,7 +26510,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.backgroundUUID = None
         self.qmc.titleB = ""
         self.qmc.roastbatchnrB = 0
-        self.qmc.roastbatchprefixB = u("")
+        self.qmc.roastbatchprefixB = ""
         self.qmc.roastbatchposB = 1
         self.qmc.temp1B, self.qmc.temp2B, self.qmc.temp1BX, self.qmc.temp2BX, self.qmc.timeB = [],[],[],[],[]
         self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = [],[],[],[] # smoothed versions of the background courves
@@ -27385,8 +27403,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 text4 = u(QApplication.translate("Label","{0} to reach BT {1}", None).format("xx:xx",str(self.qmc.BT2target) + self.qmc.mode))
             ####  Phase Texts #####
-            phasetext1 = u("") # lower textline
-            phasetext2 = u("") # higher textline
+            phasetext1 = "" # lower textline
+            phasetext2 = "" # higher textline
             if self.qmc.timeindex[2]: # after FCs
                 FCs_time = self.qmc.timex[self.qmc.timeindex[2]]
                 if self.qmc.timeindex[6]: # after DROP
@@ -31171,13 +31189,13 @@ class editGraphDlg(ArtisanDialog):
             batchLayout.addWidget(self.batchcounterSpinBox)
             batchLayout.addWidget(self.batchposSpinBox)
         else:
-            batch = u("")
+            batch = ""
             if aw.qmc.roastbatchnr != 0:
                 roastpos = u" (" + u(aw.qmc.roastbatchpos) + u")"
             else:
-                roastpos = u("")
+                roastpos = ""
             if aw.qmc.roastbatchnr == 0:
-                batch = u("")
+                batch = ""
             else:
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + roastpos + u(" ")
             batchedit = QLineEdit(batch)
@@ -32901,7 +32919,7 @@ class editGraphDlg(ArtisanDialog):
                     self.datatable.item(i,0).setBackground(QColor('orange'))
                     text = QApplication.translate("Table", "COOL",None)
                 else:
-                    text = u("")
+                    text = ""
                 Rtime.setText(text + u(" " + Rtime.text()))
             else:
                 Rtime.setText(u(" " + Rtime.text()))
@@ -34012,14 +34030,6 @@ class batchDlg(ArtisanDialog):
         self.counterSpinBox = QSpinBox()
         self.counterSpinBox.setRange(0,999999)
         self.counterSpinBox.setSingleStep(1)
-        if aw.qmc.batchcounter > -1:
-            self.counterSpinBox.setValue(aw.qmc.batchcounter)
-            self.counterSpinBox.setEnabled(True)
-            self.prefixEdit.setEnabled(True)
-        else:
-            self.counterSpinBox.setValue(0)
-            self.counterSpinBox.setEnabled(False)
-            self.prefixEdit.setEnabled(False)
         self.counterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)                
         batchchecklabel = QLabel(QApplication.translate("CheckBox","Batch Counter", None))
         self.batchcheckbox = QCheckBox()
@@ -34029,12 +34039,31 @@ class batchDlg(ArtisanDialog):
         else:
             self.batchcheckbox.setChecked(False)
         prefixlabel = QLabel()
-        prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        prefixlabel.setAlignment(Qt.Alignment(Qt.AlignVCenter | Qt.AlignRight))
         prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None)))
         counterlabel = QLabel()
-        counterlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        counterlabel.setAlignment(Qt.Alignment(Qt.AlignVCenter | Qt.AlignRight))
         counterlabel.setText(u(QApplication.translate("Label", "Counter",None)))
         descrLabel = QLabel("<i>" + QApplication.translate("Message", "Next batch: counter+1",None) + "</i>")
+        
+        neverOverwriteCounterlabel = QLabel(QApplication.translate("CheckBox","Never overwrite counter", None))
+        self.neverOverwriteCheckbox = QCheckBox()
+        self.neverOverwriteCheckbox.setToolTip(QApplication.translate("Tooltip", "If ticked, the batch counter is never modified by loading a settings file",None))
+        if aw.qmc.neverUpdateBatchCounter:
+            self.neverOverwriteCheckbox.setChecked(True)
+        else:
+            self.neverOverwriteCheckbox.setChecked(False)
+        
+        if aw.qmc.batchcounter > -1:
+            self.counterSpinBox.setValue(aw.qmc.batchcounter)
+            self.counterSpinBox.setEnabled(True)
+            self.prefixEdit.setEnabled(True)
+            self.neverOverwriteCheckbox.setEnabled(True)
+        else:
+            self.counterSpinBox.setValue(0)
+            self.counterSpinBox.setEnabled(False)
+            self.prefixEdit.setEnabled(False)
+            self.neverOverwriteCheckbox.setEnabled(False)
         
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(lambda :self.batchChanged())
@@ -34052,6 +34081,9 @@ class batchDlg(ArtisanDialog):
         batchlayout.addWidget(counterlabel,2,0)
         batchlayout.addWidget(self.counterSpinBox,2,1)
         batchlayout.addWidget(descrLabel,3,0,1,3)
+        batchlayout.addWidget(self.neverOverwriteCheckbox,4,0,Qt.AlignRight)
+        batchlayout.addWidget(neverOverwriteCounterlabel,4,1)
+        
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(batchlayout)
         mainLayout.addStretch()
@@ -34064,9 +34096,11 @@ class batchDlg(ArtisanDialog):
         if self.batchcheckbox.isChecked():
             self.prefixEdit.setEnabled(True)
             self.counterSpinBox.setEnabled(True)
+            self.neverOverwriteCheckbox.setEnabled(True)
         else:
             self.prefixEdit.setEnabled(False)
             self.counterSpinBox.setEnabled(False)
+            self.neverOverwriteCheckbox.setEnabled(False)
 
     def batchChanged(self):
         aw.qmc.batchprefix = self.prefixEdit.text()
@@ -34075,6 +34109,7 @@ class batchDlg(ArtisanDialog):
         else:
             aw.qmc.batchcounter = -1
             aw.qmc.batchsequence = 1
+        aw.qmc.neverUpdateBatchCounter = self.neverOverwriteCheckbox.isChecked()
         self.close()
         
 ##########################################################################
@@ -38463,7 +38498,7 @@ class backgroundDlg(ArtisanDialog):
                     index = aw.qmc.backgroundEvents.index(i)
                     text = QApplication.translate("Table", "#{0} {1}{2}",None).format(str(index+1),aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0],aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[index]))
                 else:
-                    text = u("")
+                    text = ""
                 Rtime.setText(text + u(" " + Rtime.text()))                
             self.datatable.setItem(i,1,ET)
             self.datatable.setItem(i,2,BT)
@@ -47050,11 +47085,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 if name1edit:
                     aw.qmc.extraname1[i] = u(name1edit.text())
                 else:
-                    aw.qmc.extraname1[i] = u("")
+                    aw.qmc.extraname1[i] = ""
                 if name2edit:
                     aw.qmc.extraname2[i] = u(name2edit.text())
                 else:
-                    aw.qmc.extraname2[i] = u("")
+                    aw.qmc.extraname2[i] = ""
                     
                 l1 = "<b>" + aw.qmc.extraname1[i] + "</b>"
                 try:
@@ -47069,11 +47104,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 if mexpr2edit:
                     aw.qmc.extramathexpression1[i] = u(mexpr1edit.text())
                 else:
-                    aw.qmc.extramathexpression1[i] = u("")
+                    aw.qmc.extramathexpression1[i] = ""
                 if mexpr2edit:
                     aw.qmc.extramathexpression2[i] = u(mexpr2edit.text())
                 else:
-                    aw.qmc.extramathexpression2[i] = u("")
+                    aw.qmc.extramathexpression2[i] = ""
             aw.calcVirtualdevices()
             #update legend with new curves
             if redraw:
