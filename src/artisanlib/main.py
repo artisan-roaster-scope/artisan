@@ -21168,10 +21168,9 @@ class ApplicationWindow(QMainWindow):
                     settings.beginGroup("Batch")
                     if settings.contains("batchcounter"):
                         files_batchcounter = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
-                        files_batchprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
-                        if files_batchcounter != aw.qmc.batchcounter or files_batchprefix != aw.qmc.batchprefix:
-                            current_counter = aw.qmc.batchprefix + str(aw.qmc.batchcounter)
-                            files_counter = files_batchprefix + str(files_batchcounter)
+                        if files_batchcounter != aw.qmc.batchcounter:
+                            current_counter = str(aw.qmc.batchcounter)
+                            files_counter = str(files_batchcounter)
                             if aw.qmc.batchcounter < 0:
                                 string = QApplication.translate("Message","Your batch counter is currently turned off. Turn it on and set it to %s from the settings file to be imported?"%(files_counter), None)
                             elif files_batchcounter < 0:
@@ -46999,6 +46998,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " resetextradevices(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def delextradevice(self,x):
+        print("delextradevicec",x)
         try:
             aw.qmc.extradevices.pop(x)
             aw.qmc.extradevicecolor1.pop(x)
@@ -47023,6 +47023,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.extramarkersizes1.pop(x)
             aw.qmc.extramarkersizes2.pop(x)
             
+            aw.extraLCDvisibility1.pop(x)
+            aw.extraLCDvisibility1.append(True) # keep length constant (aw.nLCDS)
+            aw.extraLCDvisibility2.pop(x)
+            aw.extraLCDvisibility2.append(True) # keep length constant (aw.nLCDS)
+            aw.extraCurveVisibility1.pop(x)
+            aw.extraCurveVisibility1.append(True) # keep length constant (aw.nLCDS)
+            aw.extraCurveVisibility2.pop(x)
+            aw.extraCurveVisibility2.append(True) # keep length constant (aw.nLCDS)
+            
             # visible courves before this one
             before1 = before2 = 0
             for j in range(x):
@@ -47034,6 +47043,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.extratemp1lines.pop(before1)
             if aw.extraCurveVisibility2[x]:
                 aw.qmc.extratemp2lines.pop(before2)
+
             aw.qmc.extraname1.pop(x)
             aw.qmc.extraname2.pop(x)
             aw.qmc.extramathexpression1.pop(x)
