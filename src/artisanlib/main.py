@@ -10843,7 +10843,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.ax.draw_artist(self.base_verticalcrossline)
                     self.fig.canvas.blit(aw.qmc.ax.get_tightbbox(self.fig.canvas.get_renderer()))
                 else:
-                    self.fig.canvas.draw()
+                    self.updateBackground()
         elif event.inaxes == self.delta_ax:
             x = event.xdata 
             y = event.ydata
@@ -10862,7 +10862,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.delta_ax.draw_artist(self.l_verticalcrossline)
                     self.fig.canvas.blit(aw.qmc.delta_ax.bbox)
                 else:
-                    self.fig.canvas.draw()
+                    self.updateBackground()
 
 #######################################################################################
 #######################  END OF MAIN APPLICATION   ####################################
