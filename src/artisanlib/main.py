@@ -4470,8 +4470,6 @@ class tgraphcanvas(FigureCanvas):
 
                 aw.hideDefaultButtons()
                 aw.updateExtraButtonsVisibility()
-                aw.hideLCDs()
-#                aw.updateSlidersVisibility()
                 aw.enableEditMenus()
                 
                 aw.pidcontrol.pidActive = False
@@ -7196,7 +7194,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
             except Exception:
                 pass
-            aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             
             #reset alarms
             self.temporaryalarmflag = -3
@@ -7226,7 +7223,7 @@ class tgraphcanvas(FigureCanvas):
             aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons and aw.button_10.isVisible())
             aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider and aw.button_10.isVisible())
             self.block_update = False # unblock the updating of the bitblit canvas            
-            aw.showLCDs() # this one triggers the resize and the recreation of the bitblit canvas
+            aw.updateReadingsLCDsVisibility() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
 #            QApplication.processEvents()
             self.StartAsyncSamplingAction()
@@ -7276,7 +7273,7 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Scope stopped", None))
             aw.button_1.setText(QApplication.translate("Button", "ON",None)) # text means click to turn OFF (it is ON)
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
-            aw.hideLCDs()
+            aw.updateReadingsLCDsVisibility()
             # reset WebLCDs
             if aw.qmc.LCDdecimalplaces:
                 resLCD = "-.-"
@@ -7538,6 +7535,7 @@ class tgraphcanvas(FigureCanvas):
             aw.updateExtraButtonsVisibility() 
                        
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            aw.updateReadingsLCDsVisibility() # update visiblity of reading LCDs based on the user preference
             if aw.qmc.phasesLCDflag:
                 aw.phasesLCDs.show()
                 aw.TP2DRYlabel.setStyleSheet("background-color:'transparent'; color: " + aw.qmc.palette["messages"] + ";")
@@ -12132,6 +12130,8 @@ class ApplicationWindow(QMainWindow):
         self.eventquantifierthresholdcoarse = .5
         self.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
         self.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
+        
+        self.readingslcdsflags = [0,1,1] # readings LCD visibility per state OFF, ON, START
         
         # set window title
         if app.artisanviewerMode:
@@ -17560,13 +17560,42 @@ class ApplicationWindow(QMainWindow):
             aw.sliderGrpBox4.setVisible(False)
             aw.sliderGrpBox4.setTitle(None)
 
-    def hideLCDs(self):
+    def hideLCDs(self,changeDefault=True):
         self.lcdFrame.setVisible(False)
         aw.readingsAction.setChecked(False)
+        if changeDefault:
+            if aw.qmc.flagstart:
+                aw.readingslcdsflags[2] = 0
+            elif aw.qmc.flagon:
+                aw.readingslcdsflags[1] = 0
+            else:
+                aw.readingslcdsflags[0] = 0
 
-    def showLCDs(self):
+    def showLCDs(self,changeDefault=True):
         self.lcdFrame.setVisible(True)
         aw.readingsAction.setChecked(True)
+        if changeDefault:
+            if aw.qmc.flagstart:
+                aw.readingslcdsflags[2] = 1
+            elif aw.qmc.flagon:
+                aw.readingslcdsflags[1] = 1
+            else:
+                aw.readingslcdsflags[0] = 1
+        
+    def updateReadingsLCDsVisibility(self):
+        # update visibility (based on the app state)
+        if aw.qmc.flagstart:
+            visible = aw.readingslcdsflags[2]
+        elif aw.qmc.flagon:
+            visible = aw.readingslcdsflags[1]
+        else:
+            visible = aw.readingslcdsflags[0]
+        if visible:
+            self.showLCDs(False)
+        else:
+            self.hideLCDs(False)
+        if app.artisanviewerMode:
+            self.hideLCDs(True)
 
     def hideEventsMinieditor(self):
         self.EventsGroupLayout.setVisible(False)
@@ -21528,6 +21557,9 @@ class ApplicationWindow(QMainWindow):
             self.lcd6.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.lcd7.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
 
+            if settings.contains("readingslcdsflags"):
+                self.readingslcdsflags = [toInt(x) for x in toList(settings.value("readingslcdsflags",self.readingslcdsflags))]
+
             #restore flavors
             self.qmc.flavorlabels = toStringList(settings.value("Flavors",self.qmc.flavorlabels))
             self.qmc.flavors = [5.]*len(self.qmc.flavorlabels)
@@ -22460,6 +22492,7 @@ class ApplicationWindow(QMainWindow):
             self.realignbuttons()
             
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            aw.updateReadingsLCDsVisibility() # update visibility of reading LCD based on the users preference
             
             if filename is None and self.full_screen_mode_active:
                 self.showFullScreen()
@@ -22947,6 +22980,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)
             settings.setValue("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)
             settings.setValue("BackgroundAlpha",self.qmc.backgroundalpha)
+            #save readings LCDs status flags
+            settings.setValue("readingslcdsflags",self.readingslcdsflags)
             #save flavors
             settings.setValue("Flavors",self.qmc.flavorlabels)
             settings.setValue("flavorstartangle",self.qmc.flavorstartangle)
@@ -26510,7 +26545,7 @@ class ApplicationWindow(QMainWindow):
             aw.showControls()
         else:
             aw.hideControls()
-            aw.hideLCDs()
+            aw.hideLCDs(False)
             aw.hideSliders(False)
             aw.hideExtraButtons()
             aw.disableEditMenus(wheel=True)
@@ -26609,7 +26644,7 @@ class ApplicationWindow(QMainWindow):
 
     def flavorchart(self):
         self.hideControls()
-        self.hideLCDs()
+        self.hideLCDs(False)
         self.hideSliders(False)
         self.hideExtraButtons()
         dialog = flavorDlg(self)
