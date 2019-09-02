@@ -197,7 +197,7 @@ OPTIONS = {
     'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
-    'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'
+    'matplotlib_backends': '-', # '-' for imported or explicit 'qt5agg'
     'includes': ['serial',
                  'PyQt5',
                  'PyQt5.QtCore',

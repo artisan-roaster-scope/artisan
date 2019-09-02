@@ -85,7 +85,7 @@ from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton, # @Reimport
                          QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
                          QListView, QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox,QButtonGroup) # @Reimport
-from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
+from PyQt5.QtGui import (QImageReader, QWindow, QFontMetrics,  # @Reimport
                             QKeySequence,QStandardItem, #QImage,
                             QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
                             QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
@@ -2546,16 +2546,36 @@ class tgraphcanvas(FigureCanvas):
             request_post(url, data=json_dumps(payload),headers=headers,timeout=0.3)
         except Exception:
             pass
-            
+    
+    # note that partial values might be given here (time might update, but not the values)
     def updateLargeLCDs(self,bt=None,et=None,time=None):
         try:
-            if time:
-                aw.largeLCDs_dialog.lcd1.display(time)
-            if et:
-                aw.largeLCDs_dialog.lcd2.display(et)
-            if bt:
-                aw.largeLCDs_dialog.lcd3.display(bt)
-        except Exception:
+            if aw.largeLCDs_dialog is not None:
+                aw.largeLCDs_dialog.updateValues([et],[bt],time=time)
+        except:
+            pass
+            
+    # note that partial values might be given here
+    def updateLargeDeltaLCDs(self,deltabt=None,deltaet=None):
+        try:
+            if aw.largeDeltaLCDs_dialog is not None:
+                aw.largeDeltaLCDs_dialog.updateValues([deltaet],[deltabt])
+        except:
+            pass
+
+    # note that partial values might be given here
+    def updateLargePIDLCDs(self,sv=None,duty=None):
+        try:
+            if aw.largePIDLCDs_dialog is not None:
+                aw.largePIDLCDs_dialog.updateValues([sv],[duty])
+        except:
+            pass
+
+    def updateLargeExtraLCDs(self,extra1=None,extra2=None):
+        try:
+            if aw.largeExtraLCDs_dialog is not None:
+                aw.largeExtraLCDs_dialog.updateValues(extra1,extra2)
+        except:
             pass
 
     # returns True if the extra device n, channel c, is of type MODBUS or S7, has no factor defined and is of type int
@@ -2619,25 +2639,31 @@ class tgraphcanvas(FigureCanvas):
                         except:
                             pass
                         aw.lcd3.display(btstr)
+                        deltaetstr = "--"
+                        deltabtstr = "--"
                         try:
                             if -100 < self.rateofchange1 < 1000:                    
-                                aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
-                            else:
-                                aw.lcd4.display("--")
+                                deltaetstr = lcdformat%float(self.rateofchange1)        # rate of change MET (degress per minute)
+                            aw.lcd4.display(deltaetstr)
                             if -100 < self.rateofchange2 < 1000:
-                                aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
-                            else:
-                                aw.lcd5.display("--")
+                                deltabtstr = lcdformat%float(self.rateofchange2)        # rate of change BT (degrees per minute)
+                            aw.lcd5.display(deltabtstr)
+                            self.updateLargeDeltaLCDs(deltabt=deltabtstr,deltaet=deltaetstr)
                         except:
                             pass
                         try:                    
                             if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
-                                aw.lcd6.display(lcdformat%self.currentpidsv)
-                                aw.lcd7.display(lcdformat%self.dutycycle)
+                                pidsv = lcdformat%self.currentpidsv
+                                aw.lcd6.display(pidsv)
+                                pidduty = lcdformat%self.dutycycle
+                                aw.lcd7.display(pidduty)
+                                self.updateLargePIDLCDs(sv=pidsv,duty=pidduty)
                         except:
                             pass
     
                         ndev = len(self.extradevices)
+                        extra1_values = []
+                        extra2_values = []
                         for i in range(ndev):
                             if i < aw.nLCDS:
                                 try:
@@ -2647,12 +2673,14 @@ class tgraphcanvas(FigureCanvas):
                                         if (v.is_integer() and self.intChannel(i,0)):
                                             fmt = "%.0f"  
                                         if -100 < v < 1000:
-                                            aw.extraLCD1[i].display(fmt%v) # everything fits
+                                            extra1_value = fmt%v # everything fits
                                         elif self.LCDdecimalplaces and -10000 < v < 100000:
                                             fmt = "%.0f"
-                                            aw.extraLCD1[i].display(fmt%v)
+                                            extra1_value = fmt%v
                                         else:
-                                            aw.extraLCD1[i].display("--")
+                                            extra1_value = "--"
+                                        aw.extraLCD1[i].display(extra1_value)
+                                        extra1_values.append(extra1_value)
                                 except:
                                     pass
                                 try:
@@ -2662,12 +2690,14 @@ class tgraphcanvas(FigureCanvas):
                                         if (v.is_integer() and self.intChannel(i,1)):
                                             fmt = "%.0f"  
                                         if -100 < v < 1000:
-                                            aw.extraLCD2[i].display(fmt%v) # everything fits
+                                            extra2_value = fmt%v # everything fits
                                         elif self.LCDdecimalplaces and -10000 < v < 100000:
                                             fmt = "%.0f"
-                                            aw.extraLCD2[i].display(fmt%v)
+                                            extra2_value = fmt%v
                                         else:
-                                            aw.extraLCD2[i].display("--")
+                                            extra2_value = "--"
+                                        aw.extraLCD2[i].display(extra2_value)
+                                        extra2_values.append(extra2_value)
                                 except:
                                     pass
                                         
@@ -2677,8 +2707,8 @@ class tgraphcanvas(FigureCanvas):
                             timestr = "00:00"
                         if aw.WebLCDs:                       
                             self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
-                        if aw.largeLCDs_dialog:
-                            self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
+                        self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
+                        self.updateLargeExtraLCDs(extra1=extra1_values,extra2=extra2_values)
                 finally:
                     if aw.qmc.samplingsemaphore.available() < 1:
                         aw.qmc.samplingsemaphore.release(1)
@@ -4215,9 +4245,9 @@ class tgraphcanvas(FigureCanvas):
                 self.updateLargeLCDs(time="00:00")
             if andLCDs:
                 if self.LCDdecimalplaces:
-                    zz = "0.0"
+                    zz = "-.-"
                 else:
-                    zz = "0"
+                    zz = "--"
                 aw.lcd2.display(zz)
                 aw.lcd3.display(zz)
                 aw.lcd4.display(zz)
@@ -4227,6 +4257,14 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(aw.nLCDS):
                     aw.extraLCD1[i].display(zz)
                     aw.extraLCD2[i].display(zz)
+                if aw.largeLCDs_dialog is not None:
+                    aw.largeLCDs_dialog.updateDecimals()
+                if aw.largeDeltaLCDs_dialog is not None:
+                    aw.largeDeltaLCDs_dialog.updateDecimals()
+                if aw.largePIDLCDs_dialog is not None:
+                    aw.largePIDLCDs_dialog.updateDecimals()
+                if aw.largeExtraLCDs_dialog is not None:
+                    aw.largeExtraLCDs_dialog.updateDecimals()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -6139,17 +6177,17 @@ class tgraphcanvas(FigureCanvas):
                 
                 if aw.qmc.ETcurve:
                     self.handles.append(self.l_temp1)
-                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", aw.ETname, None)))
+                    self.labels.append(aw.arabicReshape(aw.ETname))
                 if aw.qmc.BTcurve:
                     self.handles.append(self.l_temp2)
-                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", aw.BTname, None)))
+                    self.labels.append(aw.arabicReshape(aw.BTname))
     
                 if self.DeltaETflag: 
                     self.handles.append(self.l_delta1)
-                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", aw.ETname, None)))
+                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + aw.ETname))
                 if self.DeltaBTflag:
                     self.handles.append(self.l_delta2)
-                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", aw.BTname, None)))
+                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + aw.BTname))
     
                 nrdevices = len(self.extradevices)
                 
@@ -7246,9 +7284,7 @@ class tgraphcanvas(FigureCanvas):
             while self.flagsampling:
                 libtime.sleep(0.02)
                 QApplication.processEvents()
-            if len(self.timex) < 3:
-                # clear data from monitoring-only mode
-                aw.qmc.clearMeasurements()
+            aw.qmc.clearMeasurements()
 
             aw.pidcontrol.pidOff()
 #            if aw.qmc.device == 53:
@@ -7274,15 +7310,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setText(QApplication.translate("Button", "ON",None)) # text means click to turn OFF (it is ON)
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
             aw.updateReadingsLCDsVisibility()
-            # reset WebLCDs
-            if aw.qmc.LCDdecimalplaces:
-                resLCD = "-.-"
-            else:
-                resLCD = "--"
-            if aw.WebLCDs: 
-                self.updateWebLCDs(bt=resLCD,et=resLCD)
-            if aw.largeLCDs_dialog:
-                self.updateLargeLCDs(bt=resLCD,et=resLCD)
+
             if not aw.HottopControlActive:
                 aw.hideExtraButtons(changeDefault=False)
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference    
@@ -11752,8 +11780,8 @@ class SampleThread(QThread):
                 if aw.qmc.flagstart and (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
                     aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
             except Exception as e:
-                import traceback
-                traceback.print_exc(file=sys.stdout)
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() {0}").format(str(e)),exc_tb.tb_lineno)
             finally:
@@ -11938,7 +11966,13 @@ class ApplicationWindow(QMainWindow):
         
         # large LCDs
         self.largeLCDs_dialog = None
-        self.LargeLCDs = False
+        self.LargeLCDsFlag = False
+        self.largeDeltaLCDs_dialog = None
+        self.LargeDeltaLCDsFlag = False
+        self.largePIDLCDs_dialog = None
+        self.LargePIDLCDsFlag = False
+        self.largeExtraLCDs_dialog = None
+        self.LargeExtraLCDsFlag = False
         self.WebLCDs = False
         self.WebLCDsPort = 8080
         self.WebLCDsAlerts = False
@@ -12808,10 +12842,24 @@ class ApplicationWindow(QMainWindow):
 
         self.viewMenu.addSeparator()
 
-        self.lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
-        self.lcdsAction.triggered.connect(self.largeLCDs)
-        self.lcdsAction.setShortcut("Ctrl+L")
-        self.viewMenu.addAction(self.lcdsAction)
+        lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
+        lcdsAction.triggered.connect(self.largeLCDs)
+        lcdsAction.setShortcut("Ctrl+L")
+        self.viewMenu.addAction(lcdsAction)
+
+        deltalcdsAction = QAction(UIconst.TOOLKIT_MENU_DELTA_LCDS,self)
+        deltalcdsAction.triggered.connect(self.largeDeltaLCDs)
+        self.viewMenu.addAction(deltalcdsAction)
+
+        pidlcdsAction = QAction(UIconst.TOOLKIT_MENU_PID_LCDS,self)
+        pidlcdsAction.triggered.connect(self.largePIDLCDs)
+        self.viewMenu.addAction(pidlcdsAction)
+
+        self.extralcdsAction = QAction(UIconst.TOOLKIT_MENU_EXTRA_LCDS,self)
+        self.extralcdsAction.triggered.connect(self.largeExtraLCDs)
+        self.viewMenu.addAction(self.extralcdsAction)
+        
+        self.viewMenu.addSeparator()
 
         if platf != 'Darwin': # MacOS X automatically adds the fullscreen action
             self.fullscreenAction = QAction(UIconst.VIEW_MENU_FULLSCREEN,self)
@@ -13741,9 +13789,9 @@ class ApplicationWindow(QMainWindow):
 
         self.lcd1.display("00:00")
         if self.qmc.LCDdecimalplaces:
-            zz = "0.0"
+            zz = "-.-"
         else:
-            zz = "0"
+            zz = "--"
         self.lcd2.display(zz)
         self.lcd3.display(zz)
         self.lcd4.display(zz)
@@ -13813,11 +13861,11 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDlabel2.append(QLabel())
             self.extraLCDframe1[i].setVisible(False)
             if self.qmc.LCDdecimalplaces:
-                self.extraLCD1[i].display("0.0")
-                self.extraLCD2[i].display("0.0")
+                self.extraLCD1[i].display("-.-")
+                self.extraLCD2[i].display("-.-")
             else:
-                self.extraLCD1[i].display("0")
-                self.extraLCD2[i].display("0")
+                self.extraLCD1[i].display("--")
+                self.extraLCD2[i].display("--")
             self.extraLCD1[i].setContextMenuPolicy(Qt.CustomContextMenu)
             self.extraLCD1[i].setContextMenuPolicy(Qt.CustomContextMenu)
             self.extraLCD1[i].customContextMenuRequested.connect(lambda _,r=2+i*2: self.setTare(r))
@@ -15652,23 +15700,16 @@ class ApplicationWindow(QMainWindow):
     def setLCDsDigitCount(self,n):
         self.lcd2.setDigitCount(n)
         self.lcd2.setMinimumWidth(n*16)
-        #self.lcd2.setMaximumWidth(n*16)
-        #self.lcd2.setMaximumWidth(self.lcd2.maxiumumSizeHint())
         self.lcd3.setDigitCount(n)
         self.lcd3.setMinimumWidth(n*16)
-        #self.lcd3.setMaximumWidth(n*16)
         self.lcd4.setDigitCount(n)
         self.lcd4.setMinimumWidth(n*16)
-        #self.lcd4.setMaximumWidth(n*16)
         self.lcd5.setDigitCount(n)
         self.lcd5.setMinimumWidth(n*16)
-        #self.lcd5.setMaximumWidth(n*16)
         self.lcd6.setDigitCount(n)
         self.lcd6.setMinimumWidth(n*16)
-        #self.lcd6.setMaximumWidth(n*16)
         self.lcd7.setDigitCount(n)
         self.lcd7.setMinimumWidth(n*16)
-        #self.lcd7.setMaximumWidth(n*16)
         for i in range(self.nLCDS):
             self.extraLCD1[i].setDigitCount(n)
             self.extraLCD1[i].setMinimumWidth(n*16)
@@ -15676,15 +15717,27 @@ class ApplicationWindow(QMainWindow):
             self.extraLCD2[i].setDigitCount(n)
             self.extraLCD2[i].setMinimumWidth(n*16)
             #self.extraLCD2[i].setMaximumWidth(n*16)
-        if aw.largeLCDs_dialog:
-            aw.largeLCDs_dialog.lcd2.setDigitCount(n+1)
-            aw.largeLCDs_dialog.lcd3.setDigitCount(n+1)
-            if aw.qmc.LCDdecimalplaces:
-                aw.largeLCDs_dialog.lcd2.display("-.-")
-                aw.largeLCDs_dialog.lcd3.display("-.-")
+        #
+        if not aw.qmc.flagon:
+            if self.qmc.LCDdecimalplaces:
+                zz = "-.-"
             else:
-                aw.largeLCDs_dialog.lcd2.display("--")
-                aw.largeLCDs_dialog.lcd3.display("--")
+                zz = "--"
+            self.lcd2.display(zz)
+            self.lcd3.display(zz)
+            self.lcd4.display(zz)
+            self.lcd5.display(zz)
+            self.lcd6.display(zz)
+            self.lcd7.display(zz)
+        #
+        if aw.largeLCDs_dialog:
+            aw.largeLCDs_dialog.updateDecimals()
+        if aw.largeDeltaLCDs_dialog:
+            aw.largeDeltaLCDs_dialog.updateDecimals()
+        if aw.largePIDLCDs_dialog:
+            aw.largePIDLCDs_dialog.updateDecimals()
+        if aw.largeExtraLCDs_dialog:
+            aw.largeExtraLCDs_dialog.updateDecimals()
             
     def ArtisanLCD(self):
         lcd = QLCDNumber()
@@ -17633,12 +17686,16 @@ class ApplicationWindow(QMainWindow):
         aw.LCD3frame.setVisible((aw.qmc.ETlcd if aw.qmc.swaplcds else aw.qmc.BTlcd))
         aw.LCD4frame.setVisible((aw.qmc.DeltaBTlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaETlcdflag))
         aw.LCD5frame.setVisible((aw.qmc.DeltaETlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaBTlcdflag))
-        if aw.largeLCDs_dialog:
-            try:
-                aw.largeLCDs_dialog.lcd2.setVisible(aw.qmc.ETlcd)
-                aw.largeLCDs_dialog.lcd3.setVisible(aw.qmc.BTlcd)
-            except Exception:
-                pass
+        #
+        if aw.largeLCDs_dialog is not None:
+            aw.largeLCDs_dialog.updateVisiblitiesETBT()
+        if aw.largeDeltaLCDs_dialog is not None:
+            aw.largeDeltaLCDs_dialog.updateVisiblitiesDeltaETBT()
+        if aw.largePIDLCDs_dialog is not None:
+            aw.largePIDLCDs_dialog.updateVisiblitiesPID()
+        if aw.largeExtraLCDs_dialog is not None:
+            aw.largeExtraLCDs_dialog.updateVisiblitiesExtra()
+        #
         if aw.ser.showFujiLCDs and aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid
             aw.LCD6frame.setVisible(True)
             aw.LCD7frame.setVisible(True)
@@ -21253,7 +21310,7 @@ class ApplicationWindow(QMainWindow):
                         aw.updateCanvasColors()
                     # remove window geometry settings
                     for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry",
-                        "BackgroundGeometry","LCDGeometry","AlarmsGeometry","PIDGeometry","DeviceAssignmentGeometry"]:
+                        "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","AlarmsGeometry","PIDGeometry","DeviceAssignmentGeometry"]:
                         settings.remove(s)
                     #
                     aw.setFonts()
@@ -21990,16 +22047,16 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.graphfont = toInt(settings.value("graphfont",self.qmc.graphfont))
             if settings.contains("ETname"):
                 self.ETname = settings.value("ETname")
-                self.label2.setText("<big><b>" + u(QApplication.translate("Label", self.ETname,None)) + "</b></big>")
-                self.label4.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", self.ETname,None)) + "</b></big>")
+                self.label2.setText("<big><b>" + self.ETname + "</b></big>")
+                self.label4.setText(deltaLabelBigPrefix + self.ETname + "</b></big>")
             else:
-                self.ETname = "ET"
+                self.ETname = u(QApplication.translate("Label", "ET", None))
             if settings.contains("BTname"):
                 self.BTname = settings.value("BTname")
-                self.label3.setText("<big><b>" + u(QApplication.translate("Label", self.BTname,None)) + "</b></big>")
-                self.label5.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", self.BTname,None)) + "</b></big>")
+                self.label3.setText("<big><b>" + self.BTname + "</b></big>")
+                self.label5.setText(deltaLabelBigPrefix + self.BTname + "</b></big>")
             else:
-                self.BTname = "BT"
+                self.BTname = u(QApplication.translate("Label", "BT", None))
             settings.endGroup()
             settings.beginGroup("Sound")
             self.soundflag = toInt(settings.value("Beep",self.soundflag))
@@ -22210,7 +22267,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extractimex2.append([])
                 self.qmc.extractemp1.append([])
                 self.qmc.extractemp2.append([])
-            #extra LCDs
+            #extra LCDs and other LCDs visibility
             self.updateLCDproperties()
             # set extraLCD colors
             for i in range(len(self.qmc.extradevices)):
@@ -22358,9 +22415,21 @@ class ApplicationWindow(QMainWindow):
                 self.WebLCDsAlerts = bool(toBool(settings.value("alerts",self.WebLCDsAlerts)))
             settings.endGroup()
             if settings.contains("LargeLCDs"):
-                self.LargeLCDs = toBool(settings.value("LargeLCDs",self.LargeLCDs))
-            if self.LargeLCDs:
+                self.LargeLCDsFlag = toBool(settings.value("LargeLCDs",self.LargeLCDsFlag))
+            if self.LargeLCDsFlag:
                 self.largeLCDs()
+            if settings.contains("LargeDeltaLCDs"):
+                self.LargeDeltaLCDsFlag = toBool(settings.value("LargeDeltaLCDs",self.LargeDeltaLCDsFlag))
+            if self.LargeDeltaLCDsFlag:
+                self.largeDeltaLCDs()
+            if settings.contains("LargePIDLCDs"):
+                self.LargePIDLCDsFlag = toBool(settings.value("LargePIDLCDs",self.LargePIDLCDsFlag))
+            if self.LargePIDLCDsFlag:
+                self.largePIDLCDs()
+            if settings.contains("LargeExtraLCDs"):
+                self.LargeExtraLCDsFlag = toBool(settings.value("LargeExtraLCDs",self.LargeExtraLCDsFlag))
+            if self.LargeExtraLCDsFlag:
+                self.largeExtraLCDs()
             # start server if needed
             if self.WebLCDs:
                 self.startWebLCDs(force=True)
@@ -23385,7 +23454,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("port",self.WebLCDsPort)
             settings.setValue("alerts",self.WebLCDsAlerts)
             settings.endGroup()
-            settings.setValue("LargeLCDs",self.LargeLCDs)
+            settings.setValue("LargeLCDs",self.LargeLCDsFlag)
+            settings.setValue("LargeDeltaLCDs",self.LargeDeltaLCDsFlag)
+            settings.setValue("LargePIDLCDs",self.LargePIDLCDsFlag)
+            settings.setValue("LargeExtraLCDs",self.LargeExtraLCDsFlag)
             #custom event buttons
             settings.beginGroup("ExtraEventButtons")
             settings.setValue("buttonlistmaxlen",self.buttonlistmaxlen)
@@ -23560,10 +23632,22 @@ class ApplicationWindow(QMainWindow):
         if aw.WebLCDs:
             aw.stopWebLCDs()
             aw.WebLCDs = True # to ensure they are started again on restart
-        if aw.LargeLCDs and aw.largeLCDs_dialog:
-            tmp_LargeLCDs = aw.LargeLCDs # we keep the state to properly store it in the settings
-            aw.largeLCDs_dialog.close()
-            aw.LargeLCDs = tmp_LargeLCDs
+        if self.LargeLCDsFlag and self.largeLCDs_dialog:
+            tmp_LargeLCDs = self.LargeLCDsFlag # we keep the state to properly store it in the settings
+            self.largeLCDs_dialog.close()
+            self.LargeLCDsFlag = tmp_LargeLCDs
+        if self.LargeDeltaLCDsFlag and self.largeDeltaLCDs_dialog:
+            tmp_LargeLCDs = self.LargeDeltaLCDsFlag # we keep the state to properly store it in the settings
+            self.largeDeltaLCDs_dialog.close()
+            self.LargeDeltaLCDsFlag = tmp_LargeLCDs
+        if self.LargePIDLCDsFlag and self.largePIDLCDs_dialog:
+            tmp_LargeLCDs = self.LargePIDLCDsFlag # we keep the state to properly store it in the settings
+            self.largePIDLCDs_dialog.close()
+            self.LargePIDLCDsFlag = tmp_LargeLCDs
+        if self.LargeExtraLCDsFlag and self.largeExtraLCDs_dialog:
+            tmp_LargeLCDs = self.LargeExtraLCDsFlag # we keep the state to properly store it in the settings
+            self.largeExtraLCDs_dialog.close()
+            self.LargeExtraLCDsFlag = tmp_LargeLCDs
         # now wait until the current sampling thread is terminated
         while aw.qmc.flagsamplingthreadrunning:
             QApplication.processEvents()
@@ -26526,13 +26610,47 @@ class ApplicationWindow(QMainWindow):
         
     def largeLCDs(self):
         if self.largeLCDs_dialog is None:
-            self.largeLCDs_dialog = LargeLCDs(self)
-            self.LargeLCDs = True
-        self.largeLCDs_dialog.setModal(False)
-        self.largeLCDs_dialog.show()
-        self.largeLCDs_dialog.raise_()
-        self.largeLCDs_dialog.activateWindow()
-        QApplication.processEvents()
+            self.largeLCDs_dialog = LargeMainLCDs(self)
+            self.LargeLCDsFlag = True
+        if self.largeLCDs_dialog is not None:
+            self.largeLCDs_dialog.setModal(False)
+            self.largeLCDs_dialog.show()
+            self.largeLCDs_dialog.raise_()
+            self.largeLCDs_dialog.activateWindow()
+            QApplication.processEvents()
+        
+    def largeDeltaLCDs(self):
+        if self.largeDeltaLCDs_dialog is None:
+            self.largeDeltaLCDs_dialog = LargeDeltaLCDs(self)
+            self.LargeDeltaLCDsFlag = True
+        if self.largeDeltaLCDs_dialog is not None:
+            self.largeDeltaLCDs_dialog.setModal(False)
+            self.largeDeltaLCDs_dialog.show()
+            self.largeDeltaLCDs_dialog.raise_()
+            self.largeDeltaLCDs_dialog.activateWindow()
+            QApplication.processEvents()
+        
+    def largePIDLCDs(self):
+        if self.largePIDLCDs_dialog is None:
+            self.largePIDLCDs_dialog = LargePIDLCDs(self)
+            self.LargePIDLCDsFlag = True
+        if self.largePIDLCDs_dialog is not None:
+            self.largePIDLCDs_dialog.setModal(False)
+            self.largePIDLCDs_dialog.show()
+            self.largePIDLCDs_dialog.raise_()
+            self.largePIDLCDs_dialog.activateWindow()
+            QApplication.processEvents()
+        
+    def largeExtraLCDs(self):
+        if self.largeExtraLCDs_dialog is None:
+            self.largeExtraLCDs_dialog = LargeExtraLCDs(self)
+            self.LargeExtraLCDsFlag = True
+        if self.largeExtraLCDs_dialog is not None:
+            self.largeExtraLCDs_dialog.setModal(False)
+            self.largeExtraLCDs_dialog.show()
+            self.largeExtraLCDs_dialog.raise_()
+            self.largeExtraLCDs_dialog.activateWindow()
+            QApplication.processEvents()
 
     def graphwheel(self):
         if self.qmc.designerflag:
@@ -28472,7 +28590,6 @@ class HUDDlg(ArtisanDialog):
         self.DecimalPlaceslcd.setChecked(aw.qmc.LCDdecimalplaces)
         self.DeltaETlcd.stateChanged.connect(lambda _:self.changeDeltaETlcd())         #toggle
         self.DeltaBTlcd.stateChanged.connect(lambda _:self.changeDeltaBTlcd())         #toggle
-        self.DecimalPlaceslcd.stateChanged.connect(lambda _:self.changeDecimalPlaceslcd())         #toggle
         lcdsLayout = QHBoxLayout()
         lcdsLayout.addWidget(self.DeltaETlcd)
         lcdsLayout.addWidget(DeltaETlcdLabel)
@@ -29159,16 +29276,16 @@ class HUDDlg(ArtisanDialog):
     def renameBT(self):
         aw.BTname = str(self.renameBTLine.text()).strip()
         if aw.BTname == "":
-            aw.BTname = "BT"
-        aw.label3.setText("<big><b>" + u(QApplication.translate("Label", aw.BTname,None)) + "</b></big>")
-        aw.label5.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", aw.BTname,None)) + "</b></big>")
+            aw.BTname = QApplication.translate("Label", "BT")
+        aw.label3.setText("<big><b>" + aw.BTname + "</b></big>")
+        aw.label5.setText(deltaLabelBigPrefix + aw.BTname + "</b></big>")
 
     def renameET(self):
         aw.ETname = str(self.renameETLine.text()).strip()
         if aw.ETname == "":
-            aw.ETname = "ET"
-        aw.label2.setText("<big><b>" + u(QApplication.translate("Label", aw.ETname,None)) + "</b></big>")
-        aw.label4.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", aw.ETname,None)) + "</b></big>")
+            aw.ETname = QApplication.translate("Label", "ET")
+        aw.label2.setText("<big><b>" + aw.ETname + "</b></big>")
+        aw.label4.setText(deltaLabelBigPrefix + aw.ETname + "</b></big>")
 
     def toggleWebLCDsAlerts(self):
         aw.WebLCDsAlerts = not aw.WebLCDsAlerts
@@ -30068,11 +30185,6 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.DeltaBTflag = self.org_DeltaBT
         aw.qmc.DeltaETlcdflag = self.org_DeltaETlcd
         aw.qmc.DeltaBTlcdflag = self.org_DeltaBTlcd
-        if aw.qmc.flagon:
-            aw.lcd4.setVisible(aw.qmc.DeltaETlcdflag)
-            aw.label4.setVisible(aw.qmc.DeltaETlcdflag)
-            aw.lcd5.setVisible(aw.qmc.DeltaBTlcdflag)
-            aw.label5.setVisible(aw.qmc.DeltaBTlcdflag)
         aw.qmc.projectFlag = self.org_Projection
         aw.qmc.patheffects = self.org_patheffects
         aw.qmc.graphstyle = self.org_graphstyle
@@ -30087,6 +30199,11 @@ class HUDDlg(ArtisanDialog):
 
     #button OK
     def updatetargets(self):
+        aw.LCD4frame.setVisible((aw.qmc.DeltaBTlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaETlcdflag))
+        aw.LCD5frame.setVisible((aw.qmc.DeltaETlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaBTlcdflag))
+        if aw.largeDeltaLCDs_dialog is not None:
+            aw.largeDeltaLCDs_dialog.updateVisiblitiesDeltaETBT()
+        self.changeDecimalPlaceslcd()
         swap = self.swapdeltalcds.isChecked()
         # swap DeltaBT/ET lcds on leaving this dialog
         if aw.qmc.swapdeltalcds != swap:
@@ -30094,9 +30211,12 @@ class HUDDlg(ArtisanDialog):
             tmp.setLayout(aw.LCD4frame.layout())
             aw.LCD4frame.setLayout(aw.LCD5frame.layout())
             aw.LCD5frame.setLayout(tmp.layout())
-        aw.qmc.swapdeltalcds = swap
-        aw.LCD4frame.setVisible((aw.qmc.DeltaBTlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaETlcdflag))
-        aw.LCD5frame.setVisible((aw.qmc.DeltaETlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaBTlcdflag))
+            aw.qmc.swapdeltalcds = swap
+        # reflect swap or rename of ET/BT in large LCDs:
+        if aw.largeLCDs_dialog is not None:
+            aw.largeLCDs_dialog.reLayout()
+        if aw.largeDeltaLCDs_dialog is not None:
+            aw.largeDeltaLCDs_dialog.reLayout()
             
         aw.qmc.RoRlimitFlag = self.rorFilter.isChecked()
         aw.qmc.RoRlimitm = int(self.rorminLimit.value())
@@ -48074,7 +48194,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 tmp = QWidget()
                 tmp.setLayout(aw.LCD2frame.layout())
                 aw.LCD2frame.setLayout(aw.LCD3frame.layout())
-                aw.LCD3frame.setLayout(tmp.layout())        
+                aw.LCD3frame.setLayout(tmp.layout())
+                if aw.largeLCDs_dialog is not None:
+                    aw.qmc.swaplcds = swap
+                    aw.largeLCDs_dialog.reLayout()
             aw.qmc.swaplcds = swap
             
             # close all ports to force a reopen
@@ -48139,11 +48262,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.LCD2frame.setVisible((aw.qmc.BTlcd if aw.qmc.swaplcds else aw.qmc.ETlcd))
             aw.LCD3frame.setVisible((aw.qmc.ETlcd if aw.qmc.swaplcds else aw.qmc.BTlcd))
             if aw.largeLCDs_dialog:
-                try:
-                    aw.largeLCDs_dialog.lcd2.setVisible(aw.qmc.ETlcd)
-                    aw.largeLCDs_dialog.lcd3.setVisible(aw.qmc.BTlcd)
-                except Exception:
-                    pass
+                aw.largeLCDs_dialog.updateVisiblitiesETBT()
+            if aw.largePIDLCDs_dialog:
+                aw.largePIDLCDs_dialog.updateVisiblitiesPID()
+            if aw.largeExtraLCDs_dialog:
+                aw.largeExtraLCDs_dialog.reLayout() # names, styles and visibilties might have changed
             aw.qmc.redraw(recomputeAllDeltas=False)
             aw.sendmessage(message)
             #open serial conf Dialog
@@ -48687,37 +48810,48 @@ class graphColorDlg(ArtisanDialog):
             aw.lcdpaletteF["timer"] = str(color.name())
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             if aw.largeLCDs_dialog:
-                aw.largeLCDs_dialog.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+                aw.largeLCDs_dialog.updateStyles()
         elif lcd == 2:
             color = QColor(aw.lcdpaletteF["et"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["et"] = str(color.name())
             aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
             if aw.largeLCDs_dialog:
-                aw.largeLCDs_dialog.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+                aw.largeLCDs_dialog.updateStyles()
         elif lcd == 3:
             color = QColor(aw.lcdpaletteF["bt"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["bt"] = str(color.name())
             aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
             if aw.largeLCDs_dialog:
-                aw.largeLCDs_dialog.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+                aw.largeLCDs_dialog.updateStyles()
         elif lcd == 4:
             color = QColor(aw.lcdpaletteF["deltaet"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["deltaet"] = str(color.name())
             aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
+            if aw.largeDeltaLCDs_dialog:
+                aw.largeDeltaLCDs_dialog.updateStyles()
         elif lcd == 5:
             color = QColor(aw.lcdpaletteF["deltabt"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["deltabt"] = str(color.name())
             aw.lcd5.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
+            if aw.largeDeltaLCDs_dialog:
+                aw.largeDeltaLCDs_dialog.updateStyles()
         elif lcd == 6:
             color = QColor(aw.lcdpaletteF["sv"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["sv"] = str(color.name())
             aw.lcd6.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            for i in range(len(aw.qmc.extradevices)):
+                aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+                aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            if aw.largePIDLCDs_dialog:
+                aw.largePIDLCDs_dialog.updateStyles()
+            if aw.largeExtraLCDs_dialog:
+                aw.largeExtraLCDs_dialog.updateStyles()
 
     def paintlcds(self,flag,lcdnumber):
         if lcdnumber ==1:
@@ -48727,7 +48861,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"timer")
             aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             if aw.largeLCDs_dialog:
-                aw.largeLCDs_dialog.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+                aw.largeLCDs_dialog.updateStyles()
         if lcdnumber == 2:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"et")
@@ -48735,7 +48869,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"et")
             aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
             if aw.largeLCDs_dialog:
-                aw.largeLCDs_dialog.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+                aw.largeLCDs_dialog.updateStyles()
         if lcdnumber ==3:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"bt")
@@ -48743,19 +48877,23 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"bt")
             aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
             if aw.largeLCDs_dialog:
-                aw.largeLCDs_dialog.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+                aw.largeLCDs_dialog.updateStyles()
         if lcdnumber ==4:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltaet")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltaet")
             aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
+            if aw.largeDeltaLCDs_dialog:
+                aw.largeDeltaLCDs_dialog.updateStyles()
         if lcdnumber ==5:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltabt")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltabt")
             aw.lcd5.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
+            if aw.largeDeltaLCDs_dialog:
+                aw.largeDeltaLCDs_dialog.updateStyles()
         if lcdnumber ==6:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"sv")
@@ -48763,7 +48901,13 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"sv")
             aw.lcd6.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-            aw.updateExtraLCDvisibility()
+            for i in range(len(aw.qmc.extradevices)):
+                aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+                aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            if aw.largePIDLCDs_dialog:
+                aw.largePIDLCDs_dialog.updateStyles()
+            if aw.largeExtraLCDs_dialog:
+                aw.largeExtraLCDs_dialog.updateStyles()
         self.setColorLabels()
 
     def setColorLabels(self):
@@ -48911,104 +49055,325 @@ class graphColorDlg(ArtisanDialog):
 class LargeLCDs(ArtisanDialog):
     def __init__(self, parent = None):
         super(LargeLCDs,self).__init__(parent)
-        self.lcd1 = None # Timer
-        self.lcd2 = None # ET
-        self.lcd3 = None # BT
-        settings = QSettings()
-        if settings.contains("LCDGeometry"):
-            self.restoreGeometry(settings.value("LCDGeometry"))
-        self.resized = False # prevent first resizing event handling
-        self.layoutNr = -1 # 0: landscape, 1: landscape tight, 2: portrait         
-        self.chooseLayout(self.width(),self.height())
-        
-        self.resizeEvent = self.resizeDialog
-        
-    def makeLCD(self,s,tight=False):    
-        lcd = QLCDNumber() # Temperature BT
-        lcd.setSegmentStyle(2)
-        lcd.setFrameStyle(QFrame.Plain)        
-        if s == "timer":
-            lcd.setDigitCount(5)
-            lcd.display("00:00")
-        else:
-            lcd.setSmallDecimalPoint(True)
-            if aw.qmc.LCDdecimalplaces:
-                if tight:
-                    lcd.setDigitCount(4)
-                    lcd.display("  -.-")
-                else:
-                    lcd.setDigitCount(5)
-                    lcd.display("   -.-")
+        # it is assumed that both lists of lcds (lcd1 & lcd2) have the same length
+        # the same is assumed for the other lists below:
+        self.lcds1 = []
+        self.lcds2 = []
+        self.lcds1styles = []
+        self.lcds2styles = []
+        self.lcds1labelsUpper = []
+        self.lcds1labelsLower = []
+        self.lcds2labelsUpper = []
+        self.lcds2labelsLower = []
+        self.lcds1frames = []
+        self.lcds2frames = []
+        self.tight = False
+        self.layoutNr = -1 # 0: landscape, 1: portrait
+        self.swaplcds = False
+        windowFlags = self.windowFlags()
+        windowFlags |= Qt.Tool
+        self.setWindowFlags(windowFlags)
+    
+    def resizeEvent(self, event):
+        super(LargeLCDs, self).resizeEvent(event)
+        w = event.size().width()
+        h = event.size().height()
+        self.chooseLayout(w,h)
+
+    def landscapeLayout(self):
+        self.tight = False
+        self.makeLCDs()
+        landscapelayout = QHBoxLayout()
+        for i in range(min(len(self.lcds1frames),len(self.lcds2frames))):
+            if self.swaplcds:
+                landscapelayout.addWidget(self.lcds2frames[i])
+                landscapelayout.addWidget(self.lcds1frames[i])
             else:
-                if tight:
-                    lcd.setDigitCount(3)
-                    lcd.display(" --")
-                else:
-                    lcd.setDigitCount(4)
-                    lcd.display("  --")
-            if s == "et":
-                lcd.setVisible(aw.qmc.ETlcd)
-            elif s == "bt":
-                lcd.setVisible(aw.qmc.BTlcd)
+                landscapelayout.addWidget(self.lcds1frames[i])
+                landscapelayout.addWidget(self.lcds2frames[i])
+        landscapelayout.setSpacing(0)
+        landscapelayout.setContentsMargins(0, 0, 0, 0)
+        return landscapelayout
+
+    def portraitLayout(self):
+        self.tight = True
+        self.makeLCDs()
+        portraitlayout = QVBoxLayout()
+        for i in range(min(len(self.lcds1frames),len(self.lcds2frames))):
+            if self.swaplcds:
+                portraitlayout.addWidget(self.lcds2frames[i],1)
+                portraitlayout.addWidget(self.lcds1frames[i],1)
+            else:
+                portraitlayout.addWidget(self.lcds1frames[i],1)
+                portraitlayout.addWidget(self.lcds2frames[i],1)
+        portraitlayout.setSpacing(0)
+        portraitlayout.setContentsMargins(0, 0, 0, 0)
+        return portraitlayout
+
+    # n the number of layout to be set (0: landscape, 1: portrait)
+    # calling reLayout() without arg will force a relayout using the current layout
+    def reLayout(self,n=None):
+        if self.layoutNr != n:
+            if n is None:
+                newLayoutNr = self.layoutNr
+            else:
+                newLayoutNr = n
+            if newLayoutNr < 0:
+                newLayoutNr = 0
+            # release old layout
+            if self.layout():
+                QWidget().setLayout(self.layout())
+            # install the new layout
+            if newLayoutNr == 0:
+                self.setLayout(self.landscapeLayout())
+            elif newLayoutNr == 1:
+                self.setLayout(self.portraitLayout())
+            self.raise_()
+            self.activateWindow()
+            self.layoutNr = newLayoutNr
+    
+    def chooseLayout(self,w,h):
+        if w > h:
+            self.reLayout(0)
+        else:
+            self.reLayout(1)
+    
+    def makeLCD(self,s):
+        lcd = QLCDNumber()
+        lcd.setSegmentStyle(2)
+        lcd.setFrameStyle(QFrame.Plain)
+        lcd.setSmallDecimalPoint(True)
         lcd.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
         return lcd
     
-    def makeLCDs(self,tight=False):
+    def makeLabel(self,name):
+        label = myQLabel(name)
+        label.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
+        return label
+    
+    def makeLCDframe(self,lcdUpper,lcd,lcdLower):
+        lcdlayout = QVBoxLayout()
+        lcdlayout.addWidget(lcdUpper,1)
+        lcdlayout.addWidget(lcd,5)
+        lcdlayout.addWidget(lcdLower,1)
+        lcdlayout.setSpacing(0)
+        lcdlayout.setContentsMargins(0, 0, 0, 0)
+        frame = QFrame()
+        frame.setContentsMargins(0, 0, 0, 0)
+        frame.setLayout(lcdlayout)
+        return frame
+        
+    # to be implemented in subclasses
+    def makeLCDs(self):
+        pass
+
+    def updateVisibilities(self,l1,l2):
+        for i in range(len(l1)):
+            try:
+                self.lcds1frames[i].setVisible(l1[i])
+            except:
+                pass
+        for i in range(len(l2)):
+            try:
+                self.lcds2frames[i].setVisible(l2[i])
+            except:
+                pass
+    
+    def updateStyles(self):
+        for i,s in enumerate(self.lcds1styles):
+            try:
+                self.lcds1labelsUpper[i].setStyleSheet("QLabel { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
+            except:
+                pass
+            try:
+                self.lcds1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
+            except:
+                pass
+            try:
+                self.lcds1labelsLower[i].setStyleSheet("QLabel { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
+            except:
+                pass
+        for i,s in enumerate(self.lcds2styles):
+            try:
+                self.lcds2labelsUpper[i].setStyleSheet("QLabel { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
+            except:
+                pass
+            try:
+                self.lcds2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
+            except:
+                pass
+            try:
+                self.lcds2labelsLower[i].setStyleSheet("QLabel { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
+            except:
+                pass
+    
+    def updateDecimals(self):
+        for lcd in self.lcds1 + self.lcds2:
+            if aw.qmc.LCDdecimalplaces:
+                if self.tight:
+                    lcd.setDigitCount(4)
+                    if not aw.qmc.flagon:
+                        lcd.display(None) # this seems to be necessary to update on a change of decimal places via the next line!?
+                        lcd.display("  -.-")
+                else:
+                    lcd.setDigitCount(5)
+                    if not aw.qmc.flagon:
+                        lcd.display(None) # this seems to be necessary to update on a change of decimal places via the next line!?
+                        lcd.display("  -.-")
+            else:
+                if self.tight:
+                    lcd.setDigitCount(3)
+                    if not aw.qmc.flagon:
+                        lcd.display(None) # this seems to be necessary to update on a change of decimal places via the next line!?
+                        lcd.display(" --")
+                else:
+                    lcd.setDigitCount(4)
+                    if not aw.qmc.flagon:
+                        lcd.display(None) # this seems to be necessary to update on a change of decimal places via the next line!?
+                        lcd.display("  --")
+
+    # note that values1 and values2 can contain None values indicating that those lcds are not updated in this round
+    def updateValues(self,values1,values2, *args, **kwargs): 
+        del args, kwargs
+        for i,v1 in enumerate(values1):
+            try:
+                if v1 is not None:
+                    self.lcds1[i].display(v1)
+            except:
+                pass
+        for i,v2 in enumerate(values2):
+            try:
+                if v2 is not None:
+                    self.lcds2[i].display(v2)
+            except:
+                pass
+
+class LargeMainLCDs(LargeLCDs):
+    def __init__(self, parent = None):
+        self.lcd0 = None # Timer
+        # we add the ET lcd to the lcd1 list and the BT lcds to the lcd2 list (same for styles, labels and frames
+        super(LargeMainLCDs,self).__init__(parent)
+        settings = QSettings()
+        if settings.contains("LCDGeometry"):
+            self.restoreGeometry(settings.value("LCDGeometry"))
+        else:
+            self.resize(200,100)
+        self.chooseLayout(self.width(),self.height())
+        self.setWindowTitle(UIconst.TOOLKIT_MENU_LCDS)
+    
+    def updateVisiblitiesETBT(self):
+        self.updateVisibilities([aw.qmc.ETlcd],[aw.qmc.BTlcd])
+    
+    def updateStyles(self):
+        self.lcd0.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+        super().updateStyles()
+
+    def updateValues(self, values1, values2, time=None, *args, **kwargs):
+        super().updateValues(values1,values2,*args, **kwargs)
+        if time is not None:
+            self.lcd0.display(time)
+    
+    # create LCDs, LCD labels and LCD frames
+    def makeLCDs(self):
         # time LCD
-        self.lcd1 = self.makeLCD("timer",False) # time
+        self.lcd0 = self.makeLCD("timer") # time
+        self.lcd0.setDigitCount(5)
+        self.lcd0.display("00:00")
         # ET
-        self.lcd2 = self.makeLCD("et",tight) # Temperature ET
+        ETlcd = self.makeLCD("et") # Environmental Temperature ET
+        ETlabelUpper = self.makeLabel("<b>" + aw.ETname + "</b> ")
+        ETlabelLower = self.makeLabel(" ")
+        #
+        self.lcds1 = [ETlcd]
+        self.lcds1styles = ["et"]
+        self.lcds1labelsUpper = [ETlabelUpper]
+        self.lcds1labelsLower = [ETlabelLower]
+        self.lcds1frames = [self.makeLCDframe(ETlabelUpper,ETlcd,ETlabelLower)]
         # BT
-        self.lcd3 = self.makeLCD("bt",tight) # Temperature BT
+        BTlcd = self.makeLCD("bt") # Bean Temperature BT
+        BTlabelUpper = self.makeLabel("<b>" + aw.BTname + "</b> ")
+        BTlabelLower = self.makeLabel(" ")
+        #
+        self.lcds2 = [BTlcd]
+        self.lcds2styles = ["bt"]
+        self.lcds2labelsUpper = [BTlabelUpper]
+        self.lcds2labelsLower = [BTlabelLower]
+        self.lcds2frames = [self.makeLCDframe(BTlabelUpper,BTlcd,BTlabelLower)]
+        ##
+        self.updateVisiblitiesETBT()
+        self.updateStyles()
+        self.updateDecimals()
         
     def landscapeLayout(self):
+        self.tight = False
         self.makeLCDs()
         templayout = QHBoxLayout()
-        templayout.addWidget(self.lcd2)
-        templayout.addWidget(self.lcd3)
+        if aw.qmc.swaplcds:
+            templayout.addWidget(self.lcds2frames[0])
+            templayout.addWidget(self.lcds1frames[0])
+        else:
+            templayout.addWidget(self.lcds1frames[0])
+            templayout.addWidget(self.lcds2frames[0])
         landscapelayout = QVBoxLayout()
-        landscapelayout.addWidget(self.lcd1)
-        landscapelayout.addLayout(templayout)
+        landscapelayout.addWidget(self.lcd0,1)
+        landscapelayout.addLayout(templayout,1)
         landscapelayout.setSpacing(0)
         landscapelayout.setContentsMargins(0, 0, 0, 0)
         return landscapelayout
         
     def landscapeTightLayout(self):
+        self.tight = False
         self.makeLCDs()
         landscapetightlayout = QHBoxLayout()
-        landscapetightlayout.addWidget(self.lcd1)
-        landscapetightlayout.addWidget(self.lcd2)
-        landscapetightlayout.addWidget(self.lcd3)
+        landscapetightlayout.addWidget(self.lcd0,1)
+        if aw.qmc.swaplcds:
+            landscapetightlayout.addWidget(self.lcds2frames[0],1)
+            landscapetightlayout.addWidget(self.lcds1frames[0],1)
+        else:
+            landscapetightlayout.addWidget(self.lcds1frames[0],1)
+            landscapetightlayout.addWidget(self.lcds2frames[0],1)
         landscapetightlayout.setSpacing(0)
         landscapetightlayout.setContentsMargins(0, 0, 0, 0)
         return landscapetightlayout
         
     def portraitLayout(self):
-        self.makeLCDs(tight=True)
+        self.tight = True
+        self.makeLCDs()
         portraitlayout = QVBoxLayout()
-        portraitlayout.addWidget(self.lcd1)
-        portraitlayout.addWidget(self.lcd2)
-        portraitlayout.addWidget(self.lcd3)
+        portraitlayout.addWidget(self.lcd0,1)
+        if aw.qmc.swaplcds:
+            portraitlayout.addWidget(self.lcds2frames[0],1)
+            portraitlayout.addWidget(self.lcds1frames[0],1)
+        else:
+            portraitlayout.addWidget(self.lcds1frames[0],1)
+            portraitlayout.addWidget(self.lcds2frames[0],1)
         portraitlayout.setSpacing(0)
         portraitlayout.setContentsMargins(0, 0, 0, 0)
         return portraitlayout
                 
     # n the number of layout to be set (0: landscape, 1: landscape tight, 2: portrait)
-    def reLayout(self,n):
+    # calling reLayout() without arg will force a relayout using the current layout
+    def reLayout(self,n=None):
         if self.layoutNr != n:
+            if n is None:
+                newLayoutNr = self.layoutNr
+            else:
+                newLayoutNr = n
+            if newLayoutNr < 0:
+                newLayoutNr = 0
             # release old layout
             if self.layout():
                 QWidget().setLayout(self.layout())
             # install the new layout
-            if n == 0:
+            if newLayoutNr == 0:
                 self.setLayout(self.landscapeLayout())
-            elif n == 1:
+            elif newLayoutNr == 1:
                 self.setLayout(self.landscapeTightLayout())
-            elif n == 2:
+            elif newLayoutNr == 2:
                 self.setLayout(self.portraitLayout())
             self.raise_()
             self.activateWindow()
-        self.layoutNr = n
+            self.layoutNr = newLayoutNr
     
     def chooseLayout(self,w,h):
         if w > h:
@@ -49019,21 +49384,174 @@ class LargeLCDs(ArtisanDialog):
         else:
             self.reLayout(2)
         
-    def resizeDialog(self,event):
-        if self.resized:
-            w = event.size().width()
-            h = event.size().height()
-            self.chooseLayout(w,h)
-        else:
-            self.resized = True
-        
     def closeEvent(self, _):
         settings = QSettings()
         #save window geometry
         settings.setValue("LCDGeometry",self.saveGeometry())
-                
+        #free resources
         aw.largeLCDs_dialog = None
-        aw.LargeLCDs = False
+        aw.LargeLCDsFlag = False
+
+class LargeDeltaLCDs(LargeLCDs):
+    def __init__(self, parent = None):
+        super(LargeDeltaLCDs,self).__init__(parent)
+        settings = QSettings()
+        if settings.contains("DeltaLCDGeometry"):
+            self.restoreGeometry(settings.value("DeltaLCDGeometry"))
+        else:
+            self.resize(100,200)
+        self.setWindowTitle(UIconst.TOOLKIT_MENU_DELTA_LCDS)
+        self.chooseLayout(self.width(),self.height())
+    
+    def makeLCDs(self):
+        self.lcds1styles = ["deltaet"]
+        self.lcds1 = [self.makeLCD(self.lcds1styles[0])] # DeltaET
+        label1Upper = self.makeLabel("<b>&Delta;" + aw.ETname + "</b> ")
+        label1Lower = self.makeLabel(" ")
+        self.lcds1labelsUpper = [label1Upper]
+        self.lcds1labelsLower = [label1Lower]
+        self.lcds1frames = [self.makeLCDframe(label1Upper,self.lcds1[0],label1Lower)]
+        #
+        self.lcds2styles = ["deltabt"]
+        self.lcds2 = [self.makeLCD(self.lcds2styles[0])] # DeltaBT
+        label2Upper = self.makeLabel("<b>&Delta;" + aw.BTname + "</b> ")
+        label2Lower = self.makeLabel(" ")
+        self.lcds2labelsUpper = [label2Upper]
+        self.lcds2labelsLower = [label2Lower]
+        self.lcds2frames = [self.makeLCDframe(label2Upper,self.lcds2[0],label2Lower)]
+        ##
+        self.updateVisiblitiesDeltaETBT()
+        self.updateStyles()
+        self.updateDecimals()
+    
+    def updateVisiblitiesDeltaETBT(self):
+        self.updateVisibilities([aw.qmc.DeltaETlcdflag],[aw.qmc.DeltaBTlcdflag])
+    
+    def reLayout(self,n=None):
+        self.swaplcds = aw.qmc.swapdeltalcds
+        super().reLayout(n)
+        
+    def closeEvent(self, _):
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("DeltaLCDGeometry",self.saveGeometry())
+        aw.largeDeltaLCDs_dialog = None
+        aw.LargeDeltaLCDsFlag = False
+
+class LargePIDLCDs(LargeLCDs):
+    def __init__(self, parent = None):
+        super(LargePIDLCDs,self).__init__(parent)
+        settings = QSettings()
+        if settings.contains("PIDLCDGeometry"):
+            self.restoreGeometry(settings.value("PIDLCDGeometry"))
+        else:
+            self.resize(100,200)
+        self.setWindowTitle(UIconst.TOOLKIT_MENU_PID_LCDS)
+        self.chooseLayout(self.width(),self.height())
+    
+    def makeLCDs(self):
+        self.lcds1styles = ["sv"]
+        self.lcds1 = [self.makeLCD(self.lcds1styles[0])] # PID SV
+        label1Upper = self.makeLabel("<b>" + u(QApplication.translate("Label", "PID SV",None)) + "</b> ")
+        label1Lower = self.makeLabel(" ")
+        self.lcds1labelsUpper = [label1Upper]
+        self.lcds1labelsLower = [label1Lower]
+        self.lcds1frames = [self.makeLCDframe(label1Upper,self.lcds1[0],label1Lower)]
+        #
+        self.lcds2styles = ["sv"]
+        self.lcds2 = [self.makeLCD(self.lcds2styles[0])] # PID %
+        label2Upper = self.makeLabel("<b>" + u(QApplication.translate("Label", "PID %",None)) + "</b> ")
+        label2Lower = self.makeLabel(" ")
+        self.lcds2labelsUpper = [label2Upper]
+        self.lcds2labelsLower = [label2Lower]
+        self.lcds2frames = [self.makeLCDframe(label2Upper,self.lcds2[0],label2Lower)]
+        ##
+        self.updateVisiblitiesPID()
+        self.updateStyles()
+        self.updateDecimals()
+    
+    def updateVisiblitiesPID(self):
+        if aw.ser.showFujiLCDs and aw.qmc.device == 0 or aw.qmc.device == 26:
+            self.updateVisibilities([True],[True])
+        else:
+            self.updateVisibilities([False],[False])
+        
+    def closeEvent(self, _):
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("PIDLCDGeometry",self.saveGeometry())
+        aw.largePIDLCDs_dialog = None
+        aw.LargePIDLCDsFlag = False
+
+class LargeExtraLCDs(LargeLCDs):
+    def __init__(self, parent = None):
+        super(LargeExtraLCDs,self).__init__(parent)
+        settings = QSettings()
+        if settings.contains("ExtraLCDGeometry"):
+            self.restoreGeometry(settings.value("ExtraLCDGeometry"))
+        else:
+            self.resize(100,200)
+        self.chooseLayout(self.width(),self.height())
+        self.setWindowTitle(UIconst.TOOLKIT_MENU_EXTRA_LCDS)
+    
+    def makeLCDs(self):
+        self.lcds1 = []
+        self.lcds2 = []
+        self.lcds1styles = []
+        self.lcds2styles = []
+        self.lcds1labelsUpper = []
+        self.lcds2labelsUpper = []
+        self.lcds1labelsLower = []
+        self.lcds2labelsLower = []
+        self.lcds1frames = []
+        self.lcds2frames = []
+        for i in range(len(aw.qmc.extradevices)): #(aw.nLCDS):
+            lcdstyle = "sv"
+            #
+            lcd1 = self.makeLCD(lcdstyle)
+            self.lcds1.append(lcd1)
+            self.lcds1styles.append(lcdstyle)
+            label1Upper = self.makeLabel("<b>" + aw.qmc.extraname1[i] + "</b> ")
+            self.lcds1labelsUpper.append(label1Upper)
+            label1Lower = self.makeLabel(" ")
+            self.lcds1labelsLower.append(label1Lower)
+            self.lcds1frames.append(self.makeLCDframe(label1Upper,lcd1,label1Lower))
+            #
+            lcd2 = self.makeLCD(lcdstyle)
+            self.lcds2.append(lcd2)
+            self.lcds2styles.append(lcdstyle)
+            label2Upper = self.makeLabel("<b>" + aw.qmc.extraname2[i] + "</b> ")
+            self.lcds2labelsUpper.append(label2Upper)
+            label2Lower = self.makeLabel(" ")
+            self.lcds2labelsLower.append(label2Lower)
+            self.lcds2frames.append(self.makeLCDframe(label2Upper,lcd2,label2Lower))
+        ##
+        self.updateVisiblitiesExtra()
+        self.updateStyles()
+        self.updateDecimals()
+    
+    def updateVisiblitiesExtra(self):
+        self.updateVisibilities(aw.extraCurveVisibility1,aw.extraCurveVisibility2)
+
+    def updateStyles(self):
+        super(LargeExtraLCDs,self).updateStyles()
+        for i,s in enumerate(self.lcds1styles):
+            try:
+                self.lcds1labelsUpper[i].setStyleSheet("QLabel { color: %s; background-color: %s;}"%(aw.qmc.extradevicecolor1[i],aw.lcdpaletteB[s]))
+            except:
+                pass
+        for i,s in enumerate(self.lcds2styles):
+            try:
+                self.lcds2labelsUpper[i].setStyleSheet("QLabel { color: %s; background-color: %s;}"%(aw.qmc.extradevicecolor2[i],aw.lcdpaletteB[s]))
+            except:
+                pass
+    
+    def closeEvent(self, _):
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("ExtraLCDGeometry",self.saveGeometry())
+        aw.largeExtraLCDs_dialog = None
+        aw.LargeExtraLCDsFlag = False
 
 ############################################################
 #######################  WHEEL GRAPH CONFIG DIALOG  ########
@@ -49678,6 +50196,48 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem):
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     def __lt__(self, other):
         return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
+
+# QLabel that automatically resizes its text font
+class myQLabel(QLabel):
+    def __init__(self, *args, **kargs):
+        super(myQLabel, self).__init__(*args, **kargs)
+        self.setSizePolicy(QSizePolicy(QSizePolicy.Ignored,QSizePolicy.Ignored))
+        self.setMinSize(14)
+
+    def setMinSize(self, minfs):
+        f = self.font()
+        f.setPixelSize(minfs)
+        br = QFontMetrics(f).boundingRect(self.text())
+        self.setMinimumSize(br.width(), br.height())
+
+    def resizeEvent(self, event):
+        super(myQLabel, self).resizeEvent(event)
+        if not self.text():
+            return
+        #--- fetch current parameters ----
+        f = self.font()
+        cr = self.contentsRect()
+        #--- iterate to find the font size that fits the contentsRect ---
+        dw = event.size().width() - event.oldSize().width()   # width change
+        dh = event.size().height() - event.oldSize().height() # height change
+        fs = max(f.pixelSize(), 1)
+        while True:
+            f.setPixelSize(fs)
+            br =  QFontMetrics(f).boundingRect(self.text())
+            if dw >= 0 and dh >= 0: # label is expanding
+                if br.height() <= cr.height() and br.width() <= cr.width():
+                    fs += 1
+                else:
+                    f.setPixelSize(max(fs - 1, 1)) # backtrack
+                    break
+            else: # label is shrinking
+                if br.height() > cr.height() or br.width() > cr.width():
+                    fs -= 1
+                else:
+                    break
+            if fs < 1: break
+        #--- update font size --- 
+        self.setFont(f)
 
 class AlarmDlg(ArtisanDialog):
     def __init__(self, parent = None):

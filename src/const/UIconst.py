@@ -156,7 +156,10 @@ if platf != 'Darwin':
 TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None)    
 TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None)
 TOOLKIT_MENU_WHEELGRAPH = QApplication.translate("Menu", "Wheel Graph", None)
-TOOLKIT_MENU_LCDS = QApplication.translate("Menu", "LCDs", None)
+TOOLKIT_MENU_LCDS = QApplication.translate("Menu", "Main LCDs", None)
+TOOLKIT_MENU_DELTA_LCDS = QApplication.translate("Menu", "Delta LCDs", None)
+TOOLKIT_MENU_PID_LCDS = QApplication.translate("Menu", "PID LCDs", None)
+TOOLKIT_MENU_EXTRA_LCDS = QApplication.translate("Menu", "Extra LCDs", None)
 
 
 #Settings menu

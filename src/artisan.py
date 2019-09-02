@@ -2,6 +2,10 @@
 """
 Start the application.
 """
+
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
+
 import sys
 #import imp # deprecated favour of importlib
 import os
