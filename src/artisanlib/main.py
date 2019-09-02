@@ -21218,7 +21218,7 @@ class ApplicationWindow(QMainWindow):
             updateBatchCounter = True
             if filename is not None:
                 settings = QSettings(filename,QSettings.IniFormat)
-                if aw.qmc.neverUpdateBatchCounter:
+                if aw.qmc.neverUpdateBatchCounter or app.artisanviewerMode:
                     updateBatchCounter = False
                 else:
                     settings.beginGroup("Batch")
