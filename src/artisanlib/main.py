@@ -6389,7 +6389,7 @@ class tgraphcanvas(FigureCanvas):
             return
         try:
             if len(aw.logofilename) == 0: 
-                print("---No image file!")
+#                print("---No image file!")
                 return
             self.logoimg = aw.qmc.logoimg
             img_height_pixels, img_width_pixels, depth = self.logoimg.shape
