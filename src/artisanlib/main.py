@@ -15743,6 +15743,7 @@ class ApplicationWindow(QMainWindow):
         lcd = QLCDNumber()
         lcd.setSegmentStyle(2)
         lcd.setFrameStyle(QFrame.Plain)
+        lcd.setSmallDecimalPoint(False)
         lcd.setMinimumHeight(35)
         x = 16
         if self.qmc.LCDdecimalplaces:
@@ -49142,7 +49143,7 @@ class LargeLCDs(ArtisanDialog):
         lcd = QLCDNumber()
         lcd.setSegmentStyle(2)
         lcd.setFrameStyle(QFrame.Plain)
-        lcd.setSmallDecimalPoint(True)
+        lcd.setSmallDecimalPoint(False)
         lcd.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
         return lcd
     
