@@ -6319,6 +6319,9 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
 
+            #watermark image
+            self.placelogoimage()
+
             # we can run the actual redraw outside of the sampling semaphore
             try:  
                 ############  ready to plot ############
@@ -6376,6 +6379,61 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
 
 
+    #watermark image
+    def placelogoimage(self):
+        if self.flagon and aw.logoimgflag:  #if hide during roast
+            return
+        try:
+            if len(aw.logofilename) == 0: 
+                print("---No image file!")
+                return
+            self.logoimg = aw.qmc.logoimg
+            img_height_pixels, img_width_pixels, depth = self.logoimg.shape
+            img_aspect = img_height_pixels / img_width_pixels
+            coord_axes_middle_Display = self.ax.transAxes.transform((.5,.5))
+            coord_axes_upperright_Display = self.ax.transAxes.transform((1.,1.))
+            coord_axes_lowerleft_Display = self.ax.transAxes.transform((0.,0.))
+            coord_axes_height_pixels = coord_axes_upperright_Display[1] - coord_axes_lowerleft_Display[1]
+            coord_axes_width_pixels = coord_axes_upperright_Display[0] - coord_axes_lowerleft_Display[0]
+            coord_axes_aspect = coord_axes_height_pixels / coord_axes_width_pixels
+            if img_aspect >= coord_axes_aspect:
+                scale = min(1., coord_axes_height_pixels / img_height_pixels)
+            else:
+                scale = min(1., coord_axes_width_pixels / img_width_pixels)
+
+            corner_pixels = [0.,0.,0.,0.]
+            corner_pixels[0] = coord_axes_middle_Display[0] - (scale * img_width_pixels / 2) 
+            corner_pixels[1] = coord_axes_middle_Display[1] - (scale * img_height_pixels / 2)
+            corner_pixels[2] = corner_pixels[0] + scale * img_width_pixels
+            corner_pixels[3] = corner_pixels[1] + scale * img_height_pixels
+            ll_corner_axes = self.ax.transData.inverted().transform_point((corner_pixels[0],corner_pixels[1]))
+            ur_corner_axes = self.ax.transData.inverted().transform_point((corner_pixels[2],corner_pixels[3]))            
+            extent = [ll_corner_axes[0], ur_corner_axes[0], ll_corner_axes[1], ur_corner_axes[1]]
+
+            self.ai = self.ax.imshow(self.logoimg, zorder=0, extent=extent, alpha=aw.logoimgalpha/100, aspect='auto', resample=False)
+            self.updateBackground()
+            
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " placelogoimage() {0}").format(str(ex)),exc_tb.tb_lineno)
+
+    #watermark image
+    def logoloadfile(self,filename=None):
+        try:
+            if not filename:
+                filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Image File",None),ext="*.png *.jpg")
+            if len(u(filename)) == 0:
+                return
+            from matplotlib.pyplot import imread
+            aw.qmc.logoimg = imread(filename)
+            aw.logofilename = filename
+            aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}", None).format(filename))
+#            aw.qmc.redraw()
+            QTimer.singleShot(3000, lambda :aw.qmc.redraw())            
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info() 
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " logoloadfile() {0}").format(str(ex)),exc_tb.tb_lineno)                        
+            aw.logofilename = ""
 
     #add stats summmary to graph 
     def statsSummary(self):
@@ -12167,6 +12225,11 @@ class ApplicationWindow(QMainWindow):
         
         self.readingslcdsflags = [0,1,1] # readings LCD visibility per state OFF, ON, START
         
+        #watermark image
+        self.logoimgalpha = 20
+        self.logoimgflag = False
+        self.logofilename = ""
+
         # set window title
         if app.artisanviewerMode:
             self.windowTitle = "ArtisanViewer %s"%str(__version__)
@@ -22510,6 +22573,16 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("lastLoadedBackground"):
                 aw.lastLoadedBackground = toString(settings.value("lastLoadedBackground",aw.qmc.backgroundpath))
             
+            #watermark image
+            if settings.contains("logoimgalpha"):
+                self.logoimgalpha = toInt(settings.value("logoimgalpha"))
+            if settings.contains("logoimgflag"):
+                self.logoimgflag = bool(toBool(settings.value("logoimgflag", self.logoimgflag)))
+            if settings.contains("logofilename"):
+                self.logofilename = toString(settings.value("logofilename"))
+                if len(self.logofilename) > 0:
+                    self.qmc.logoloadfile(self.logofilename)
+
             res = True
             
         except Exception:
@@ -23059,6 +23132,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("colorsystem",self.qmc.color_system_idx)
             #soundflag
             settings.setValue("sound",self.soundflag)
+            #watermark image
+            settings.setValue("logofilename", self.logofilename)
+            settings.setValue("logoimgalpha", self.logoimgalpha)
+            settings.setValue("logoimgflag", self.logoimgflag)
             settings.beginGroup("Tare")
             settings.setValue("names",self.qmc.container_names)
             settings.setValue("weights",self.qmc.container_weights)
@@ -29185,11 +29262,51 @@ class HUDDlg(ArtisanDialog):
         renameLayout.addWidget(self.renameBTLine)
         renameGroupWidget = QGroupBox(QApplication.translate("GroupBox", "Rename ET and BT",None))
         renameGroupWidget.setLayout(renameLayout)
+        #watermark image
+        self.logopathedit = QLineEdit(aw.qmc.backgroundpath)
+        self.logopathedit.setStyleSheet("background-color:'lightgrey';")
+        self.logopathedit.setReadOnly(True)
+        self.logopathedit.setFocusPolicy(Qt.NoFocus)
+        self.logopathedit.setText(aw.logofilename)
+        logoalphalabel = QLabel(QApplication.translate("Label","Opacity", None))
+        self.logoalpha = QSpinBox()
+        self.logoalpha.setSingleStep(10)
+        self.logoalpha.setRange(0,100)
+        self.logoalpha.setValue(aw.logoimgalpha)
+        self.logoalpha.setMinimumWidth(40)
+        self.logoalpha.setAlignment(Qt.AlignRight)
+        self.logoalpha.editingFinished.connect(lambda i=self.logoalpha.value:self.changelogoalpha(i))
+        logoshowCheck = QCheckBox(QApplication.translate("CheckBox", "Hide Image During Roast",None))
+        logoshowCheck.setChecked(aw.logoimgflag)
+        logoshowCheck.setFocusPolicy(Qt.NoFocus)
+        logoshowCheck.stateChanged.connect(lambda _:self.changelogoshowCheck())
+        loadButton = QPushButton(QApplication.translate("Button","Load", None))
+        loadButton.setFocusPolicy(Qt.NoFocus)
+        delButton = QPushButton(QApplication.translate("Button","Delete", None))
+        delButton.setFocusPolicy(Qt.NoFocus)
+        loadButton.clicked.connect(lambda _:self.logofileload())
+        delButton.clicked.connect(lambda _:self.logofiledelete())
+        logofileLayout = QHBoxLayout()
+        logofileLayout.addWidget(self.logopathedit)
+        logofileLayout.addWidget(logoalphalabel)
+        logofileLayout.addWidget(self.logoalpha)
+        logobuttonsLayout = QHBoxLayout()
+        logobuttonsLayout.addWidget(loadButton)
+        logobuttonsLayout.addWidget(delButton)
+        logobuttonsLayout.addStretch()
+        logobuttonsLayout.addWidget(logoshowCheck)
+        logoLayout = QVBoxLayout()
+        logoLayout.addLayout(logofileLayout)
+        logoLayout.addLayout(logobuttonsLayout)
+        logofileGroupWidget = QGroupBox(QApplication.translate("GroupBox", "Logo Image File",None))
+        logofileGroupWidget.setLayout(logoLayout)
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(appearanceGroupWidget)
         tab5Layout.addWidget(resolutionGroupWidget)
         tab5Layout.addWidget(WebLCDsGroupWidget)
         tab5Layout.addWidget(renameGroupWidget)
+        tab5Layout.addStretch()
+        tab5Layout.addWidget(logofileGroupWidget)
         tab5Layout.addStretch()
 
         ############################  TABS LAYOUT
@@ -29273,6 +29390,24 @@ class HUDDlg(ArtisanDialog):
             self.expvar(0)
             self.expvarCheck.setChecked(True)
             self.expvar(0)
+
+    #watermark image
+    def logofileload(self):
+        aw.qmc.logoloadfile()
+        self.logopathedit.setText(u(aw.logofilename))
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        
+    def logofiledelete(self):
+        self.logopathedit.setText("")
+        aw.logofilename = ""
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        
+    def changelogoalpha(self,logoalpha):
+        aw.logoimgalpha = self.logoalpha.value()
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        
+    def changelogoshowCheck(self):
+        aw.logoimgflag = not aw.logoimgflag
 
     def renameBT(self):
         aw.BTname = str(self.renameBTLine.text()).strip()
