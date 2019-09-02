@@ -4219,6 +4219,29 @@ class tgraphcanvas(FigureCanvas):
             # nothing to be saved
             return True
 
+    def clearLCDs(self):
+        if self.LCDdecimalplaces:
+            zz = "-.-"
+        else:
+            zz = "--"
+        aw.lcd2.display(zz)
+        aw.lcd3.display(zz)
+        aw.lcd4.display(zz)
+        aw.lcd5.display(zz)
+        aw.lcd6.display(zz)
+        aw.lcd7.display(zz)
+        for i in range(aw.nLCDS):
+            aw.extraLCD1[i].display(zz)
+            aw.extraLCD2[i].display(zz)
+        if aw.largeLCDs_dialog is not None:
+            aw.largeLCDs_dialog.updateDecimals()
+        if aw.largeDeltaLCDs_dialog is not None:
+            aw.largeDeltaLCDs_dialog.updateDecimals()
+        if aw.largePIDLCDs_dialog is not None:
+            aw.largePIDLCDs_dialog.updateDecimals()
+        if aw.largeExtraLCDs_dialog is not None:
+            aw.largeExtraLCDs_dialog.updateDecimals()
+    
     def clearMeasurements(self,andLCDs=True):
         try:
             #### lock shared resources #####
@@ -4244,27 +4267,8 @@ class tgraphcanvas(FigureCanvas):
             if aw.largeLCDs_dialog:
                 self.updateLargeLCDs(time="00:00")
             if andLCDs:
-                if self.LCDdecimalplaces:
-                    zz = "-.-"
-                else:
-                    zz = "--"
-                aw.lcd2.display(zz)
-                aw.lcd3.display(zz)
-                aw.lcd4.display(zz)
-                aw.lcd5.display(zz)
-                aw.lcd6.display(zz)
-                aw.lcd7.display(zz)
-                for i in range(aw.nLCDS):
-                    aw.extraLCD1[i].display(zz)
-                    aw.extraLCD2[i].display(zz)
-                if aw.largeLCDs_dialog is not None:
-                    aw.largeLCDs_dialog.updateDecimals()
-                if aw.largeDeltaLCDs_dialog is not None:
-                    aw.largeDeltaLCDs_dialog.updateDecimals()
-                if aw.largePIDLCDs_dialog is not None:
-                    aw.largePIDLCDs_dialog.updateDecimals()
-                if aw.largeExtraLCDs_dialog is not None:
-                    aw.largeExtraLCDs_dialog.updateDecimals()
+                self.clearLCDs()
+
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -7342,7 +7346,12 @@ class tgraphcanvas(FigureCanvas):
             while self.flagsampling:
                 libtime.sleep(0.02)
                 QApplication.processEvents()
-            aw.qmc.clearMeasurements()
+            if len(self.timex) < 3:
+                # clear data from monitoring-only mode
+                aw.qmc.clearMeasurements()
+            else:
+                # we only reset the LCDs, but keep the readings
+                aw.qmc.clearLCDs()
 
             aw.pidcontrol.pidOff()
 #            if aw.qmc.device == 53:
@@ -7368,7 +7377,13 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setText(QApplication.translate("Button", "ON",None)) # text means click to turn OFF (it is ON)
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
             aw.updateReadingsLCDsVisibility()
-
+            # reset WebLCDs	
+            if aw.qmc.LCDdecimalplaces:
+                resLCD = "-.-"
+            else:	
+                resLCD = "--"
+            if aw.WebLCDs: 	
+                self.updateWebLCDs(bt=resLCD,et=resLCD)
             if not aw.HottopControlActive:
                 aw.hideExtraButtons(changeDefault=False)
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference    
