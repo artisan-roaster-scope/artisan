@@ -2090,13 +2090,12 @@ class tgraphcanvas(FigureCanvas):
         self.eventmessagetimer = None
         
         self.resizeredrawing = 0 # holds timestamp of last resize triggered redraw
+        
+        self.logoimg = None # holds the background logo image
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
-    
-    def resizeRedraw(self):
-        aw.qmc.redraw(recomputeAllDeltas=False)
 
     def resizeEvent(self, event):
         super(tgraphcanvas,self).resizeEvent(event)
@@ -2106,7 +2105,7 @@ class tgraphcanvas(FigureCanvas):
         # ensure that we redraw during resize only once per second
         if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
             self.resizeredrawing = t
-            QTimer.singleShot(500, lambda : self.resizeRedraw())
+            QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False))
     
     # update the aw.qmc.deltaBTspan and deltaETspan from the given sampling interval, aw.qmc.deltaETsamples and aw.qmc.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
@@ -5536,7 +5535,7 @@ class tgraphcanvas(FigureCanvas):
                     
                     #populate background delta ET (self.delta1B) and delta BT (self.delta2B)                    
                     if self.DeltaETBflag or self.DeltaBTBflag:
-                        if recomputeAllDeltas:
+                        if recomputeAllDeltas or (self.DeltaETBflag and self.delta1B == []) or (self.DeltaBTBflag and self.delta2B == []):
                             # we populate temporary smoothed ET/BT data arrays
                             cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing                            
                             st1 = self.smooth_list(self.timeB,self.fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
@@ -6116,7 +6115,7 @@ class tgraphcanvas(FigureCanvas):
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:            
-                    if recomputeAllDeltas and not self.flagstart: # during recording we don't recompute the deltas
+                    if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
                         cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                         decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
                         t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
@@ -6403,9 +6402,8 @@ class tgraphcanvas(FigureCanvas):
         if self.flagon and aw.logoimgflag:  #if hide during roast
             return
         try:
-            if len(aw.logofilename) == 0: 
+            if len(aw.logofilename) == 0 or self.logoimg is None: 
                 return
-            self.logoimg = aw.qmc.logoimg
             img_height_pixels, img_width_pixels, depth = self.logoimg.shape
             img_aspect = img_height_pixels / img_width_pixels
             coord_axes_middle_Display = self.ax.transAxes.transform((.5,.5))
@@ -6443,9 +6441,7 @@ class tgraphcanvas(FigureCanvas):
             from matplotlib.pyplot import imread
             aw.qmc.logoimg = imread(filename)
             aw.logofilename = filename
-            aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}", None).format(filename))
-#            aw.qmc.redraw()
-#            QTimer.singleShot(3000, lambda :aw.qmc.redraw())            
+            aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}", None).format(filename))           
         except Exception as ex:
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " logoloadfile() {0}").format(str(ex)),exc_tb.tb_lineno)                        
@@ -22665,7 +22661,6 @@ class ApplicationWindow(QMainWindow):
             
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             aw.updateReadingsLCDsVisibility() # update visibility of reading LCD based on the users preference
-            
             
             if filename is None and self.full_screen_mode_active:
                 self.showFullScreen()
@@ -56213,7 +56208,9 @@ def main():
                     aw.loadbackground(u(aw.lastLoadedBackground))
                     aw.qmc.background = True
                     if not aw.lastLoadedProfile:
-                        aw.qmc.redraw()
+                        #aw.qmc.redraw()
+                        # this extra redraw is not needed as it is triggered by the resize-redraw mechanism
+                        pass
                     else:
                         aw.qmc.timealign(redraw=True,recompute=True)
                 except Exception:
