@@ -2088,10 +2088,25 @@ class tgraphcanvas(FigureCanvas):
         self.eventmessage = ""
         self.backgroundeventmessage = ""
         self.eventmessagetimer = None
+        
+        self.resizeredrawing = 0 # holds timestamp of last resize triggered redraw
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
+    
+    def resizeRedraw(self):
+        aw.qmc.redraw(recomputeAllDeltas=False)
+
+    def resizeEvent(self, event):
+        super(tgraphcanvas,self).resizeEvent(event)
+        dw = event.size().width() - event.oldSize().width()   # width change
+        dh = event.size().height() - event.oldSize().height() # height change
+        t = libtime.time()
+        # ensure that we redraw during resize only once per second
+        if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
+            self.resizeredrawing = t
+            QTimer.singleShot(500, lambda : self.resizeRedraw())
     
     # update the aw.qmc.deltaBTspan and deltaETspan from the given sampling interval, aw.qmc.deltaETsamples and aw.qmc.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
@@ -6389,7 +6404,6 @@ class tgraphcanvas(FigureCanvas):
             return
         try:
             if len(aw.logofilename) == 0: 
-#                print("---No image file!")
                 return
             self.logoimg = aw.qmc.logoimg
             img_height_pixels, img_width_pixels, depth = self.logoimg.shape
@@ -6413,9 +6427,7 @@ class tgraphcanvas(FigureCanvas):
             ll_corner_axes = self.ax.transData.inverted().transform_point((corner_pixels[0],corner_pixels[1]))
             ur_corner_axes = self.ax.transData.inverted().transform_point((corner_pixels[2],corner_pixels[3]))            
             extent = [ll_corner_axes[0], ur_corner_axes[0], ll_corner_axes[1], ur_corner_axes[1]]
-
             self.ai = self.ax.imshow(self.logoimg, zorder=0, extent=extent, alpha=aw.logoimgalpha/100, aspect='auto', resample=False)
-            self.updateBackground()
             
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -6433,7 +6445,7 @@ class tgraphcanvas(FigureCanvas):
             aw.logofilename = filename
             aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}", None).format(filename))
 #            aw.qmc.redraw()
-            QTimer.singleShot(3000, lambda :aw.qmc.redraw())            
+#            QTimer.singleShot(3000, lambda :aw.qmc.redraw())            
         except Exception as ex:
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " logoloadfile() {0}").format(str(ex)),exc_tb.tb_lineno)                        
@@ -22595,8 +22607,6 @@ class ApplicationWindow(QMainWindow):
                 self.logoimgflag = bool(toBool(settings.value("logoimgflag", self.logoimgflag)))
             if settings.contains("logofilename"):
                 self.logofilename = toString(settings.value("logofilename"))
-                if len(self.logofilename) > 0:
-                    self.qmc.logoloadfile(self.logofilename)
 
             res = True
             
@@ -22613,8 +22623,12 @@ class ApplicationWindow(QMainWindow):
             if "canvas" in aw.qmc.palette:
                 aw.updateCanvasColors()
             
-            aw.setFonts()
+            aw.setFonts() # this one triggers a redraw by default to establish the correct fonts
+            # only after this the correct aspect ratio of the qmc canvas is set
             
+            if len(self.logofilename) > 0:
+                self.qmc.logoloadfile(self.logofilename)
+
             # set window appearances (style)
             if settings.contains("appearance"):
                 try:
@@ -22624,7 +22638,7 @@ class ApplicationWindow(QMainWindow):
                     aw.appearance = available[i].lower()
                 except Exception:
                     pass
-                    
+            
             # set dpi
             if filename is not None and settings.contains("dpi"):
                 # if filename is None (ie. setting is not explicitly loaded from file, but from default location on app start),
@@ -22651,6 +22665,7 @@ class ApplicationWindow(QMainWindow):
             
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             aw.updateReadingsLCDsVisibility() # update visibility of reading LCD based on the users preference
+            
             
             if filename is None and self.full_screen_mode_active:
                 self.showFullScreen()
@@ -29410,7 +29425,7 @@ class HUDDlg(ArtisanDialog):
     def logofileload(self):
         aw.qmc.logoloadfile()
         self.logopathedit.setText(u(aw.logofilename))
-        aw.qmc.redraw(recomputeAllDeltas=False)
+        # note the logo is only visible after a full redraw
         
     def logofiledelete(self):
         self.logopathedit.setText("")
