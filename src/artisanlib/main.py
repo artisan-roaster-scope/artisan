@@ -6404,7 +6404,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if len(aw.logofilename) == 0 or self.logoimg is None: 
                 return
-            img_height_pixels, img_width_pixels, depth = self.logoimg.shape
+            img_height_pixels, img_width_pixels, _ = self.logoimg.shape
             img_aspect = img_height_pixels / img_width_pixels
             coord_axes_middle_Display = self.ax.transAxes.transform((.5,.5))
             coord_axes_upperright_Display = self.ax.transAxes.transform((1.,1.))
@@ -29300,7 +29300,7 @@ class HUDDlg(ArtisanDialog):
         self.logoalpha.setValue(aw.logoimgalpha)
         self.logoalpha.setMinimumWidth(40)
         self.logoalpha.setAlignment(Qt.AlignRight)
-        self.logoalpha.editingFinished.connect(lambda i=self.logoalpha.value:self.changelogoalpha(i))
+        self.logoalpha.editingFinished.connect(lambda :self.changelogoalpha())
         logoshowCheck = QCheckBox(QApplication.translate("CheckBox", "Hide Image During Roast",None))
         logoshowCheck.setChecked(aw.logoimgflag)
         logoshowCheck.setFocusPolicy(Qt.NoFocus)
@@ -29427,7 +29427,7 @@ class HUDDlg(ArtisanDialog):
         aw.logofilename = ""
         aw.qmc.redraw(recomputeAllDeltas=False)
         
-    def changelogoalpha(self,logoalpha):
+    def changelogoalpha(self):
         aw.logoimgalpha = self.logoalpha.value()
         aw.qmc.redraw(recomputeAllDeltas=False)
         
