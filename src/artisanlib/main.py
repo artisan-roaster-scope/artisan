@@ -2099,13 +2099,15 @@ class tgraphcanvas(FigureCanvas):
 
     def resizeEvent(self, event):
         super(tgraphcanvas,self).resizeEvent(event)
-        dw = event.size().width() - event.oldSize().width()   # width change
-        dh = event.size().height() - event.oldSize().height() # height change
-        t = libtime.time()
-        # ensure that we redraw during resize only once per second
-        if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
-            self.resizeredrawing = t
-            QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False))
+        # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
+        if aw.logofilename != "" and aw.logoimgflag:
+            dw = event.size().width() - event.oldSize().width()   # width change
+            dh = event.size().height() - event.oldSize().height() # height change
+            t = libtime.time()
+            # ensure that we redraw during resize only once per second
+            if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
+                self.resizeredrawing = t
+                QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False))
     
     # update the aw.qmc.deltaBTspan and deltaETspan from the given sampling interval, aw.qmc.deltaETsamples and aw.qmc.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
@@ -12250,7 +12252,7 @@ class ApplicationWindow(QMainWindow):
         
         #watermark image
         self.logoimgalpha = 20
-        self.logoimgflag = False
+        self.logoimgflag = False # display during OnMonitor?
         self.logofilename = ""
 
         # set window title
@@ -49368,29 +49370,27 @@ class LargeLCDs(ArtisanDialog):
             except:
                 pass
     
+    # in horizontal layouts we add one more digit per LCD than needed as spacer for separation
+    # in vertical layouts we add only the exact number of digits that are needed to fully display the number to save space (tight mode)
     def updateDecimals(self):
         for lcd in self.lcds1 + self.lcds2:
             if aw.qmc.LCDdecimalplaces:
                 if self.tight:
-                    lcd.setDigitCount(4)
-                    if not aw.qmc.flagon:
-                        lcd.display(None) # this seems to be necessary to update on a change of decimal places via the next line!?
-                        lcd.display("  -.-")
-                else:
                     lcd.setDigitCount(5)
                     if not aw.qmc.flagon:
-                        lcd.display(None) # this seems to be necessary to update on a change of decimal places via the next line!?
                         lcd.display("  -.-")
+                else:
+                    lcd.setDigitCount(6)
+                    if not aw.qmc.flagon:
+                        lcd.display("   -.-")
             else:
                 if self.tight:
                     lcd.setDigitCount(3)
                     if not aw.qmc.flagon:
-                        lcd.display(None) # this seems to be necessary to update on a change of decimal places via the next line!?
                         lcd.display(" --")
                 else:
                     lcd.setDigitCount(4)
                     if not aw.qmc.flagon:
-                        lcd.display(None) # this seems to be necessary to update on a change of decimal places via the next line!?
                         lcd.display("  --")
 
     # note that values1 and values2 can contain None values indicating that those lcds are not updated in this round
@@ -56207,10 +56207,9 @@ def main():
                 try:
                     aw.loadbackground(u(aw.lastLoadedBackground))
                     aw.qmc.background = True
-                    if not aw.lastLoadedProfile:
-                        #aw.qmc.redraw()
-                        # this extra redraw is not needed as it is triggered by the resize-redraw mechanism
-                        pass
+                    if not aw.lastLoadedProfile and not(aw.logofilename != "" and aw.logoimgflag):
+                        # this extra redraw is not needed if a watermark is loaded as it is triggered by the resize-redraw mechanism
+                        aw.qmc.redraw()
                     else:
                         aw.qmc.timealign(redraw=True,recompute=True)
                 except Exception:
