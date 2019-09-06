@@ -49672,7 +49672,12 @@ class LargeExtraLCDs(LargeLCDs):
             lcd1 = self.makeLCD(lcdstyle)
             self.lcds1.append(lcd1)
             self.lcds1styles.append(lcdstyle)
-            label1Upper = self.makeLabel("<b>" + aw.qmc.extraname1[i] + "</b> ")
+            l1 = "<b>" + aw.qmc.extraname1[i] + "</b> "
+            try:
+                l1 = l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+            except:
+                pass
+            label1Upper = self.makeLabel(l1)
             self.lcds1labelsUpper.append(label1Upper)
             label1Lower = self.makeLabel(" ")
             self.lcds1labelsLower.append(label1Lower)
@@ -49681,7 +49686,12 @@ class LargeExtraLCDs(LargeLCDs):
             lcd2 = self.makeLCD(lcdstyle)
             self.lcds2.append(lcd2)
             self.lcds2styles.append(lcdstyle)
-            label2Upper = self.makeLabel("<b>" + aw.qmc.extraname2[i] + "</b> ")
+            l2 = "<b>" + aw.qmc.extraname2[i] + "</b> "
+            try:
+                l2 = l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+            except:
+                pass
+            label2Upper = self.makeLabel(l2)
             self.lcds2labelsUpper.append(label2Upper)
             label2Lower = self.makeLabel(" ")
             self.lcds2labelsLower.append(label2Lower)
@@ -49692,7 +49702,7 @@ class LargeExtraLCDs(LargeLCDs):
         self.updateDecimals()
     
     def updateVisiblitiesExtra(self):
-        self.updateVisibilities(aw.extraCurveVisibility1,aw.extraCurveVisibility2)
+        self.updateVisibilities(aw.extraLCDvisibility1,aw.extraLCDvisibility2)
 
     def updateStyles(self):
         super(LargeExtraLCDs,self).updateStyles()
