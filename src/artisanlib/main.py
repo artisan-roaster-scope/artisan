@@ -18674,12 +18674,12 @@ class ApplicationWindow(QMainWindow):
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
                 profile_changed = self.qmc.extradevices != org_obj_extra_devs
+                self.setCurrentFile(filename) #update recent file list
                 if profile_changed:
                     # profiles was adjusted, ensure that it does not overwrite the original file on saving
                     self.qmc.safesaveflag = True
                     self.curFile = None
                 else:
-                    self.setCurrentFile(filename)
                     self.qmc.safesaveflag = False
                 #Plot everything
                 self.qmc.redraw()
