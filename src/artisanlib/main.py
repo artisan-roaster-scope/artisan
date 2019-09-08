@@ -35576,9 +35576,9 @@ class EventsDlg(ArtisanDialog):
         self.colorSpinBox.setRange(0,359)
         self.colorSpinBox.valueChanged.connect(self.colorizebuttons)
         ## tab4
-        transferpalettebutton = QPushButton(QApplication.translate("Button","<<", None))
+        transferpalettebutton = QPushButton(QApplication.translate("Button","<< Store Palette", None))
         transferpalettebutton.setFocusPolicy(Qt.NoFocus)
-        setpalettebutton = QPushButton(QApplication.translate("Button",">>", None))
+        setpalettebutton = QPushButton(QApplication.translate("Button","Apply Palette >>", None))
         setpalettebutton.setFocusPolicy(Qt.NoFocus)
         palette = QApplication.translate("Label","palette #", None)
         palettelist = []
