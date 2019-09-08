@@ -1227,7 +1227,7 @@ class tgraphcanvas(FigureCanvas):
         self.flagsampling = False # if True, Artisan is still in the sampling phase and one has to wait for its end to turn OFF
         self.flagsamplingthreadrunning = False
         #log flag that tells to log ET when using device 18 (manual mode)
-        self.manuallogETflag = 0        
+        self.manuallogETflag = 0
         
         self.zoom_follow = False # if True, Artisan "follows" BT in the center by panning during recording. Activated via a click on the ZOOM icon while ZOOM is active
         
@@ -2728,7 +2728,7 @@ class tgraphcanvas(FigureCanvas):
                 finally:
                     if aw.qmc.samplingsemaphore.available() < 1:
                         aw.qmc.samplingsemaphore.release(1)
-                    
+
                 #check setSV
                 if self.temporarysetsv is not None:
                     if aw.qmc.device == 0 and aw.fujipid.followBackground:
@@ -2954,7 +2954,7 @@ class tgraphcanvas(FigureCanvas):
 
 
     def updateLCDtime(self):
-        if self.flagon and self.flagstart:
+        if self.flagstart and self.flagon:
             tx = self.timeclock.elapsed()/1000.
             
             if type(self.timeindex) is list and len(self.timeindex) == 8: # ensure we have a valid self.timeindex array
@@ -7643,7 +7643,7 @@ class tgraphcanvas(FigureCanvas):
             aw.applyStandardButtonVisibility()
 
             aw.update_extraeventbuttons_visibility()
-            aw.updateExtraButtonsVisibility() 
+            aw.updateExtraButtonsVisibility()
                        
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             aw.updateReadingsLCDsVisibility() # update visiblity of reading LCDs based on the user preference
@@ -13046,11 +13046,13 @@ class ApplicationWindow(QMainWindow):
             self.button_font_size_small = str(self.button_font_size_pt - 6) + 'pt'
             self.button_font_size_small_selected = str(self.button_font_size_pt - 5) + 'pt'
             self.button_font_size_tiny = str(self.button_font_size_pt - 6) + 'pt'
+            self.button_font_size_micro = str(self.button_font_size_pt - 7) + 'pt'
         else:
             self.button_font_size = str(self.button_font_size_pt) + 'pt'
-            self.button_font_size_small = str(self.button_font_size_pt - 4) + 'pt'
-            self.button_font_size_small_selected = str(self.button_font_size_pt - 3) + 'pt'
-            self.button_font_size_tiny = str(self.button_font_size_pt - 5) + 'pt'
+            self.button_font_size_small = str(self.button_font_size_pt - 3) + 'pt'
+            self.button_font_size_small_selected = str(self.button_font_size_pt - 2) + 'pt'
+            self.button_font_size_tiny = str(self.button_font_size_pt - 4) + 'pt'
+            self.button_font_size_micro = str(self.button_font_size_pt - 5) + 'pt'
 
         border_modern = "border-style:solid; border-radius:4;border-color:grey; border-width:0;" # modernize
         # parking this green shade in case we want to use it later #00d55a
@@ -13611,9 +13613,13 @@ class ApplicationWindow(QMainWindow):
 #            self.pushbuttonstyles["ON"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }"
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
         if platf == 'Windows':
-            self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.8
+            self.standard_button_small_height = QPushButton("Test").sizeHint().height()
+            self.standard_button_tiny_height = self.standard_button_small_height * 0.9
+            self.standard_button_height = self.standard_button_small_height * 1.8
         else:
-            self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.3
+            self.standard_button_small_height = QPushButton("Test").sizeHint().height()
+            self.standard_button_tiny_height = self.standard_button_small_height * 0.8
+            self.standard_button_height = self.standard_button_small_height * 1.3
 
         #create ON/OFF buttons
         
@@ -14031,6 +14037,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]] # ,[],[],[],[],[]]
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
+        self.buttonsize = 1 # 0: tiny, 1: small (default), 2: large
 
         self.eventbuttontablecolumnwidths = [] # custom event button table column widths
 
@@ -17359,18 +17366,32 @@ class ApplicationWindow(QMainWindow):
                 self.slider3.setValue(v)
             elif n == 3 and self.slider4.value() != v:
                 self.slider4.setValue(v)
-
-    def setExtraEventButtonStyle(self, tee, style="normal"):
-        buttonstyle = """min-width:60px; margin: 0; padding: 0px; border-style: solid; border-color: darkgrey; border-width: 0; font-size: """ + self.button_font_size_tiny + """; font-weight: bold;"""
+                
+    def extraEventButtonStyle(self,tee,style="normal"):
+        left_rounded_style = "border-top-left-radius:4px;border-bottom-left-radius:4px;"
+        right_rounded_style = "border-top-right-radius:4px; border-bottom-right-radius:4px;"
+        fully_rounded_style = "border-radius:4px;"
+        square_style = "border-radius:0px;"
+        if aw.buttonsize == 0:
+            # tiny
+            buttonstyle = """min-width:50px;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_micro + """; font-weight: bold;"""
+        elif aw.buttonsize == 2:
+            # large
+            buttonstyle = """min-width:75px;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_small + """; font-weight: bold;"""
+        else:
+            # small (default)
+            buttonstyle = """min-width:60px;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_tiny + """; font-weight: bold;"""
+        ##
         if len(self.extraeventbuttonround) > tee:
             if self.extraeventbuttonround[tee] == 1: # left-side rounded
-                buttonstyle += "border-top-left-radius: 4px; border-bottom-left-radius: 4px;"
+                buttonstyle += left_rounded_style
             elif self.extraeventbuttonround[tee] == 2: # right-side rounded
-                buttonstyle += "border-top-right-radius: 4px; border-bottom-right-radius: 4px;"
+                buttonstyle += right_rounded_style
             elif self.extraeventbuttonround[tee] == 3: # both-sides rounded
-                buttonstyle += "border-radius: 4px;"
+                buttonstyle += fully_rounded_style
             else:
-                buttonstyle += "border-radius: 0px;"
+                buttonstyle += square_style
+        #
         if style=="normal":
             color = self.extraeventbuttontextcolor[tee]
             backgroundcolor = self.extraeventbuttoncolor[tee]
@@ -17378,27 +17399,16 @@ class ApplicationWindow(QMainWindow):
             # set color of this button to "pressed"
             color = self.extraeventbuttoncolor[tee]
             backgroundcolor = self.extraeventbuttontextcolor[tee]
-        core_style = """
-            min-width:60px; 
-            margin: 0; 
-            padding: 0px; 
-            border-style: solid; 
-            border-color: darkgrey; 
-            border-width: 0; 
-            font-size: """ + self.button_font_size_tiny + """; 
-            font-weight: bold; 
-            color: %s; 
-            background: %s}"""
-        plain_style = "QPushButton {" + \
-            buttonstyle + \
-            core_style%(color,backgroundcolor)
-        pressed_style = "QPushButton:hover:pressed {"+ \
-            buttonstyle + \
-            core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(80).name()))
-        hover_style = "QPushButton:hover:!pressed {"+ \
-            buttonstyle + \
-            core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(110).name()))
-        self.buttonlist[tee].setStyleSheet(plain_style + hover_style + pressed_style)
+        core_style = """color:%s;background:%s}"""
+        #
+        plain_style = "QPushButton {" + buttonstyle + core_style%(color,self.createGradient(backgroundcolor))
+        pressed_style = "QPushButton:hover:pressed {" + buttonstyle + core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(80).name()))
+        hover_style = "QPushButton:hover:!pressed {"+ buttonstyle + core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(110).name()))
+        return plain_style + hover_style + pressed_style
+        
+    def setExtraEventButtonStyle(self, tee, style="normal"):
+        button_style = self.extraEventButtonStyle(tee, style)
+        self.buttonlist[tee].setStyleSheet(button_style)
 
     #called from user configured event buttons
     #by default actions are processed in a parallel thread, but components of multiple button actions not to avoid crashes
@@ -22562,6 +22572,8 @@ class ApplicationWindow(QMainWindow):
                     self.buttonpalette_shortcuts = bool(toBool(settings.value("buttonpalette_shortcuts",self.buttonpalette_shortcuts)))
                 if settings.contains("eventbuttontablecolumnwidths"):
                     self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value("eventbuttontablecolumnwidths",self.eventbuttontablecolumnwidths))] 
+                if settings.contains("buttonsize"):
+                    self.buttonsize = toInt(settings.value("buttonsize",self.buttonsize))
             settings.endGroup()
             # Extras more info            
             settings.beginGroup("ExtrasMoreInfo")
@@ -23580,6 +23592,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("buttonpalettemaxlen",self.buttonpalettemaxlen)
             settings.setValue("buttonpalette_shortcuts",self.buttonpalette_shortcuts)
             settings.setValue("eventbuttontablecolumnwidths",self.eventbuttontablecolumnwidths)
+            settings.setValue("buttonsize",self.buttonsize)
             settings.endGroup()
             settings.beginGroup("RoRlimits")
             settings.setValue("RoRlimitFlag",self.qmc.RoRlimitFlag)
@@ -27921,14 +27934,8 @@ class ApplicationWindow(QMainWindow):
         row2count = 0
         row3count = 0
         row4count = 0
+        
         for i in range(len(self.extraeventstypes)):
-            p = QPushButton()
-            p.setAutoDefault(False)
-
-            left_rounded_style = "border-top-left-radius: 4px; border-bottom-left-radius: 4px;"
-            right_rounded_style = "border-top-right-radius: 4px; border-bottom-right-radius: 4px;"
-            fully_rounded_style = "border-radius: 4px;"
-            square_style = "border-radius: 0px;"
             
             # next button in this group is hidden
             next_hidden = (i%self.buttonlistmaxlen < self.buttonlistmaxlen -1 and  # at least one more places in the group 
@@ -27942,60 +27949,35 @@ class ApplicationWindow(QMainWindow):
             if (i%self.buttonlistmaxlen) == 0: # left-most button in the row
                 if i == len(self.extraeventstypes)-1 or next_hidden:
                     # a singleton button in a one element bar
-                    buttonstyle = fully_rounded_style
                     self.extraeventbuttonround.append(3)
                 else:
                     # the left-most button in this bar
-                    buttonstyle = left_rounded_style
                     self.extraeventbuttonround.append(1)
             elif ((i%self.buttonlistmaxlen) < self.buttonlistmaxlen-1) and i != len(self.extraeventstypes)-1:
                 # a button in the middle of this bar
                 if prev_hidden and next_hidden:
                     # we round both sides
-                    buttonstyle = fully_rounded_style
                     self.extraeventbuttonround.append(3)
                 elif prev_hidden:
                     # we start a new rounded-group
-                    buttonstyle = left_rounded_style
                     self.extraeventbuttonround.append(1)
                 elif next_hidden:
-                    buttonstyle = right_rounded_style
                     self.extraeventbuttonround.append(2)
                 else:
                     # squared button
-                    buttonstyle = square_style
                     self.extraeventbuttonround.append(0)
             else:
                 # the right-most button in this bar
                 if prev_hidden:
-                    buttonstyle = fully_rounded_style
                     self.extraeventbuttonround.append(3)
                 else:
-                    buttonstyle = right_rounded_style
                     self.extraeventbuttonround.append(2)
-            core_style = """
-                min-width:60px; 
-                margin: 0; 
-                padding: 0px; 
-                border-style: solid; 
-                border-color: darkgrey; 
-                border-width: 0; 
-                font-size: """ + self.button_font_size_tiny + """;
-                font-weight: bold; 
-                color: %s; 
-                background: %s}"""
-            # hover
-            plain_style = "QPushButton {" + \
-                buttonstyle + \
-                core_style%(self.extraeventbuttontextcolor[i],self.createGradient(self.extraeventbuttoncolor[i]))
-            pressed_style = "QPushButton:hover:pressed {"+ \
-                buttonstyle + \
-                core_style%(self.extraeventbuttontextcolor[i],self.createGradient(QColor(self.extraeventbuttoncolor[i]).lighter(80).name()))
-            hover_style = "QPushButton:hover:!pressed {"+ \
-                buttonstyle + \
-                core_style%(self.extraeventbuttontextcolor[i],self.createGradient(QColor(self.extraeventbuttoncolor[i]).lighter(110).name()))
-            p.setStyleSheet(plain_style + hover_style + pressed_style)
-            p.setMinimumHeight(30)
+
+            p = QPushButton()
+            p.setAutoDefault(False)
+            p.setStyleSheet(self.extraEventButtonStyle(i))
+            p.setMinimumHeight([self.standard_button_tiny_height,self.standard_button_small_height,self.standard_button_height][aw.buttonsize])
+            
             p.setCursor(QCursor(Qt.PointingHandCursor))
             
             l = self.extraeventslabels[i]
@@ -35543,6 +35525,20 @@ class EventsDlg(ArtisanDialog):
         self.nbuttonsSpinBox.setRange(6,30)
         self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
         self.nbuttonsSpinBox.valueChanged.connect(self.setbuttonlistmaxlen)
+        nbuttonsSizeLabel = QLabel(QApplication.translate("Label","Button size", None))
+        self.nbuttonsSizeBox = MyQComboBox()
+        size_items = [
+                    QApplication.translate("ComboBox", "tiny",None),
+                    QApplication.translate("ComboBox", "small",None),
+                    QApplication.translate("ComboBox", "large",None)
+                ]
+        # hack to ensure the popup items are not cutted
+        if sys.platform.startswith("darwin"):
+            size_items = [s + " " for s in size_items]
+        self.nbuttonsSizeBox.addItems(size_items)
+        self.nbuttonsSizeBox.setCurrentIndex(aw.buttonsize)
+#        self.nbuttonsSizeBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+#        self.nbuttonsSizeBox.setSizePolicy(QSizePolicy.Expanding,self.nbuttonsSizeBox.sizePolicy().verticalPolicy())
         #table for showing events
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
@@ -36184,6 +36180,10 @@ class EventsDlg(ArtisanDialog):
         nbuttonslayout = QHBoxLayout()
         nbuttonslayout.addWidget(self.nbuttonslabel)
         nbuttonslayout.addWidget(self.nbuttonsSpinBox)
+        nbuttonslayout.addSpacing(10)
+        nbuttonslayout.addWidget(nbuttonsSizeLabel)
+        nbuttonslayout.addWidget(self.nbuttonsSizeBox)
+        nbuttonslayout.addSpacing(10)
         nbuttonslayout.addWidget(colorpatternlabel)
         nbuttonslayout.addWidget(self.colorSpinBox)
         nbuttonslayout.addStretch()
@@ -37515,6 +37515,7 @@ class EventsDlg(ArtisanDialog):
     #called from OK button
     def updatetypes(self):
         try:
+            aw.buttonsize = self.nbuttonsSizeBox.currentIndex()
             self.savetableextraeventbutton()
             # save column widths
             aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]        
@@ -50292,7 +50293,8 @@ class MyQComboBox(QComboBox):
     def __init__(self, *args, **kwargs):
         super(MyQComboBox, self).__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.StrongFocus)
-        self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+#        self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
