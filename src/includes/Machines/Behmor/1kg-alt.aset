@@ -1,0 +1,58 @@
+[DefaultButtons]
+buttonactions=0, 0, 0, 0, 0, 0, 0, 0
+buttonactionstrings=, , , , , , , 
+buttonvisibility=true, true, true, true, true, false, true, true
+extrabuttonactions=0, 0, 0
+extrabuttonactionstrings=, , 
+xextrabuttonactions=0, 0
+xextrabuttonactionstrings=, 
+
+[Device]
+id=18
+
+[ExtraEventButtons]
+buttonlistmaxlen=11
+buttonpalette=@Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0)
+buttonpalette_shortcuts=true
+buttonpalettemaxlen=14, 14, 14, 14, 14, 14, 14, 14, 14, 14
+eventbuttontablecolumnwidths=@Invalid()
+extraeventbuttoncolor=@Invalid()
+extraeventbuttontextcolor=@Invalid()
+extraeventsactions=@Invalid()
+extraeventsactionstrings=@Invalid()
+extraeventsbuttonsflag=1
+extraeventsbuttonsflags=0, 1, 1
+extraeventsdescriptions=@Invalid()
+extraeventslabels=@Invalid()
+extraeventstypes=@Invalid()
+extraeventsvalues=@Invalid()
+extraeventsvisibility=@Invalid()
+
+[RoastProperties]
+roastertype=
+
+[SerialPort]
+baudrate=9600
+bytesize=8
+comport=COM4
+parity=O
+stopbits=1
+timeout=1
+
+[Sliders]
+ModeTempSliders=C
+eventslidercoarse=0, 0, 0, 0
+eventslidersflag=1
+eventslidersflags=0, 1, 1
+eventslidertemp=0, 0, 0, 0
+eventsliderunits=, , , 
+slideractions=0, 0, 0, 0
+slidercommands=, , , 
+sliderfactors=1, 1, 1, 1
+slidermax=100, 100, 100, 100
+slidermin=0, 0, 0, 0
+slideroffsets=0, 0, 0, 0
+slidervisibilities=0, 0, 0, 0
+
+[Style]
+ETname=ET
