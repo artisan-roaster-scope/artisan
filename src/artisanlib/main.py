@@ -4491,14 +4491,14 @@ class tgraphcanvas(FigureCanvas):
                 except Exception:
                     pass
 
-                if not keepProperties:
-                    # reset sliders
-                    aw.moveslider(0,aw.eventslidermin[0])
-                    aw.moveslider(1,aw.eventslidermin[1])
-                    aw.moveslider(2,aw.eventslidermin[2])
-                    aw.moveslider(3,aw.eventslidermin[3])
-                    # reset Arduino/TC4 PID SV
-                    aw.moveSVslider(aw.pidcontrol.svSliderMin)
+#                if not keepProperties:
+#                    # reset sliders
+#                    aw.moveslider(0,aw.eventslidermin[0])
+#                    aw.moveslider(1,aw.eventslidermin[1])
+#                    aw.moveslider(2,aw.eventslidermin[2])
+#                    aw.moveslider(3,aw.eventslidermin[3])
+#                    # reset Arduino/TC4 PID SV
+#                    aw.moveSVslider(aw.pidcontrol.svSliderMin)
                 aw.pidcontrol.sv = None
                 aw.fujipid.sv = None
                 aw.qmc.dutycycle = -1
@@ -16615,10 +16615,11 @@ class ApplicationWindow(QMainWindow):
             #self.ConfMenu.setEnabled(False)
             self.calibrateDelayAction.setEnabled(False)
 
-    # relocate event actions, by skippig 3=MultipleEvent and 7=SliderAction
+    # relocate event actions, by skippig 3=MultipleEvent and 7=Call Program SliderAction
     def eventactionx(self,a,cmd):
         try:
-            self.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))), cmd)
+            #self.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))), cmd)
+            self.eventaction((a if (a < 7) else (a + 1)), cmd)
         except Exception:
             pass
                     
@@ -16653,6 +16654,7 @@ class ApplicationWindow(QMainWindow):
     
     def eventaction_internal(self,action,cmd):
         if action:
+            print("eventaction_internal",action,cmd)
             try:
                 if action in [8,9,10]:
                     from artisanlib.hottop import setHottop
@@ -35522,7 +35524,7 @@ class EventsDlg(ArtisanDialog):
         self.nbuttonsSpinBox = QSpinBox()
         self.nbuttonsSpinBox.setMaximumWidth(100)
         self.nbuttonsSpinBox.setAlignment(Qt.AlignCenter)
-        self.nbuttonsSpinBox.setRange(6,30)
+        self.nbuttonsSpinBox.setRange(2,30)
         self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
         self.nbuttonsSpinBox.valueChanged.connect(self.setbuttonlistmaxlen)
         nbuttonsSizeLabel = QLabel(QApplication.translate("Label","Button size", None))
@@ -35967,6 +35969,7 @@ class EventsDlg(ArtisanDialog):
         self.buttonActionTypes = ["",#QApplication.translate("ComboBox", "None",None),
                        QApplication.translate("ComboBox", "Serial Command",None),
                        QApplication.translate("ComboBox", "Call Program",None),
+                       QApplication.translate("ComboBox", "Multiple Event",None),
                        QApplication.translate("ComboBox", "Modbus Command",None),
                        QApplication.translate("ComboBox", "DTA Command",None),
                        QApplication.translate("ComboBox", "IO Command",None),
