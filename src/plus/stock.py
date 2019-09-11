@@ -180,10 +180,9 @@ unit_translations_plural  = {
     "barrel": QApplication.translate("Plus", "barrels",None)
 }
 
-
 def renderAmount(amount,default_unit = None,target_unit_idx = 0):
     res = ""
-    # first try to convert to default_unit
+    # first try to convert to default_unit (like "bags")
     try:
         unit_size = int(default_unit["size"])
         if amount > unit_size:
@@ -203,12 +202,39 @@ def renderAmount(amount,default_unit = None,target_unit_idx = 0):
             # we convert Kg to the smaller unit g for readability
             w = config.app_window.convertWeight(amount,1,target_unit_idx-1) # @UndefinedVariable
             target_unit = config.app_window.qmc.weight_units[target_unit_idx-1] # @UndefinedVariable
+        elif w >= 1000000 and target_unit_idx == 0:
+            # we convert kg to tonnes
+            w = w / 1000000.
+            target_unit = "t"
         elif w > 999 and target_unit_idx == 0:
             # we convert g to the larger unit Kg for readability
             w = config.app_window.convertWeight(amount,1,target_unit_idx+1) # @UndefinedVariable
             target_unit = config.app_window.qmc.weight_units[target_unit_idx+1] # @UndefinedVariable
+        elif w >= 1000 and target_unit_idx == 1:
+            # we convert kg to tonnes
+            w = w / 1000.
+            target_unit = "t"
+        elif w >= 2000 and target_unit_idx == 2:
+            # we convert lbs to tonnes
+            w = w / 2000.
+            target_unit = "t" # US tons
+        elif w >= 16 and target_unit_idx == 3:
+            if w >= 3200:
+                # we convert oz to US tonnes
+                w = w / 32000.
+                target_unit = "t" # US tons
+            else: # w >= 16:
+                # we convert oz to lb
+                w = w / 16.
+                if abs(abs(w) - 1.00) < 0.01:
+                    target_unit = "lb"
+                else:
+                    target_unit = "lbs"
         else:
             target_unit = config.app_window.qmc.weight_units[target_unit_idx] # @UndefinedVariable
+            if target_unit_idx == 2 and not (abs(abs(w) - 1.00) < 0.01):
+                # lb => lbs if |w|>1
+                target_unit += "s"
         if w > 9:
             w = int(round(w)) # we truncate all decimals
         else:
@@ -320,7 +346,10 @@ def coffee2beans(coffee):
         elif landed and not picked:
             year = ', {:d}'.format(landed)
         elif picked and landed:
-            year = ', {:d}/{:d}'.format(picked,landed)
+            if picked == landed:
+                year = ', {:d}'.format(picked)
+            else:
+                year = ', {:d}/{:d}'.format(picked,landed)
     return '{}{}{}{}'.format(origin,label,bean,year)
 
 def getCoffees(weight_unit_idx,store=None):

@@ -16653,7 +16653,6 @@ class ApplicationWindow(QMainWindow):
     
     def eventaction_internal(self,action,cmd):
         if action:
-            print("eventaction_internal",action,cmd)
             try:
                 if action in [8,9,10]:
                     from artisanlib.hottop import setHottop
