@@ -42,6 +42,8 @@ stock = None # holds the dict with the current stock data (coffees, blends,..)
 
 import threading
 
+stock_epsilon = 0.01 # in kg; only stock larger than stock_epsilon (10g) will be considered, the rest ignored
+
 ################### 
 # stock cache update
 # 
@@ -239,7 +241,8 @@ def getStores(acquire_lock=True):
             for c in stock["coffees"]:
                 if "stock" in c:
                     for s in c["stock"]:
-                        res[s["location_label"]] = s["location_hr_id"]
+                        if "amount" in s and s["amount"] is not None and s["amount"] > stock_epsilon:
+                            res[s["location_label"]] = s["location_hr_id"]
             return sorted(res.items(), key=lambda x: getStoreLabel(x))
         else:
             return []
@@ -330,7 +333,7 @@ def getCoffees(weight_unit_idx,store=None):
             for c in stock["coffees"]:
                 try:
                     origin = ""
-                    if "origin" in c:
+                    if "origin" in c and c["origin"] is not None and c["origin"] != "":
                         origin = QApplication.translate("Countries", c["origin"],None)
                         if "crop_date" in c:
                             cy = c["crop_date"]
@@ -348,7 +351,7 @@ def getCoffees(weight_unit_idx,store=None):
                                 location = s["location_label"]
                                 if "amount" in s:
                                     amount = s["amount"]
-                                    if amount > 0: # TODO: check here the machines capacity limits
+                                    if amount > stock_epsilon: # TODO: check here the machines capacity limits
                                         # add location only if this coffee is available in several locations
                                         if store:
                                             loc = ""
