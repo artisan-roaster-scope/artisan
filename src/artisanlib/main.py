@@ -13866,8 +13866,7 @@ class ApplicationWindow(QMainWindow):
         # switch superusermode action:
         self.lcd1.setContextMenuPolicy(Qt.CustomContextMenu)
         self.lcd1.customContextMenuRequested.connect(self.superusermodeClicked)
-        if app.artisanviewerMode:
-            self.lcd1.setVisible(False)
+        self.lcd1.setVisible(False)
 
 
         self.lcd2 = self.ArtisanLCD() # Temperature ET
@@ -17715,6 +17714,7 @@ class ApplicationWindow(QMainWindow):
             aw.sliderGrpBox4.setTitle(None)
 
     def hideLCDs(self,changeDefault=True):
+        self.lcd1.setVisible(False)
         self.lcdFrame.setVisible(False)
         aw.readingsAction.setChecked(False)
         if changeDefault:
@@ -17726,6 +17726,7 @@ class ApplicationWindow(QMainWindow):
                 aw.readingslcdsflags[0] = 0
 
     def showLCDs(self,changeDefault=True):
+        self.lcd1.setVisible(True)
         self.lcdFrame.setVisible(True)
         aw.readingsAction.setChecked(True)
         if changeDefault:
