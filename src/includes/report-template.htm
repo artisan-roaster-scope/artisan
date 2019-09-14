@@ -5,24 +5,69 @@
 <title>$title</title>
 <meta name="description" content="Artisan roast report">
 <meta name="author" content="Artisan Roaster Scope">
-<script src="${resources}sorttable.js" type="text/javascript"></script>
-<style type="text/css">
+<script src="${resources}sorttable.js"></script>
+<style>
+html {
+  --hue: 200;
+  --accent-hue: 340;
+  --background: hsl(var(--hue), 0%, 100%);
+  --background-light: hsl(var(--hue), 5%, 95%);
+  --background-lighter: hsl(var(--hue), 5%, 60%);
+  --background-very-light: hsl(var(--hue), 5%, 80%);
+
+  --border-color: hsl(var(--hue), 5%, 85%);
+
+  --text-color-normal: hsl(var(--hue), 77%, 25%);
+  --text-color-inv: hsl(var(--hue), 0%, 100%);
+  --text-color-light: hsl(var(--hue), 50%, 72%);
+  --text-color-dark: hsl(var(--hue), 40%, 25%);
+  --text-color-richer: hsl(var(--hue), 55%, 50%);
+
+  --link-color: hsl(var(--hue), 60%, 40%);
+  --accent-color: hsl(var(--accent-hue), 70%, 40%);
+}
+@media screen and (prefers-color-scheme: dark) {
+  html {
+    --background: hsl(var(--hue), 5%, 15%);
+    --background-light: hsl(var(--hue), 5%, 20%);
+    --background-lighter: hsl(var(--hue), 5%, 30%);
+    --background-very-light: hsl(var(--hue), 5%, 60%);
+
+    --border-color: hsl(var(--hue), 10%, 55%);
+
+    --text-color-normal: hsl(var(--hue), 10%, 65%);
+    --text-color-inv: hsl(var(--hue), 0%, 85%);
+    --text-color-light: hsl(var(--hue), 15%, 35%);
+    --text-color-dark: hsl(var(--hue), 20%, 20%);
+    --text-color-richer: hsl(var(--hue), 60%, 40%);
+
+    --link-color: hsl(var(--hue), 70%, 50%);
+    --accent-color: hsl(var(--accent-hue), 90%, 65%);
+  }
+}
+body {
+    background: var(--background);
+    color: var(--text-color-normal);
+}
+a {
+  color: var(--link-color);
+}
+h1 {
+  color: var(--accent-color);
+}
 .inv {
-    color: black; 
-    background-color: #D0D0D0 !important;
+    color: var(--text-color-dark);
+    background-color: var(--background-very-light) !important;
 }
 table {
     border-collapse: collapse;
     width: 100%;
 }
-h1 {
-    color: #808080;
-}
 th, td {
     text-align: left;
     padding: 8px;
     white-space:nowrap;
-    border: 1px solid #808080;
+    border: 1px solid var(--border-color);
 }
 td:nth-child(3) {
      width: 40%;
@@ -40,14 +85,15 @@ td:nth-child(5),td:nth-child(6),td:nth-child(7) {
     text-align: right;
 }
 tr {
+    background-color: var(--background-normal) !important;
     page-break-inside: avoid;
 }
 tr:nth-child(even) {
-    background-color: #f2f2f2 !important;
+    background-color: var(--background-light) !important;
     -webkit-print-color-adjust: exact;
 }
 tfoot {
-    background-color: #808080 !important;
+    background-color: var(--background-lighter) !important;
     color: white !important;
     -webkit-print-color-adjust: exact;
     font-weight: bold;
@@ -55,8 +101,8 @@ tfoot {
 th {
     font-size: large;
     text-align: center;
-    background-color: #4CAF50 !important;
-    color: white !important;
+    background-color: var(--text-color-richer);
+    color: var(--text-color-inv) !important;
     -webkit-print-color-adjust: exact; 
 }
 </style>

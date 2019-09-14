@@ -176,8 +176,11 @@ class s7port(object):
             self.plc = S7Client()
             with suppress_stdout_stderr():
                 time.sleep(0.4)
-                self.plc.connect(self.host,self.rack,self.slot,self.port)
-                time.sleep(0.4)
+                try:
+                    self.plc.connect(self.host,self.rack,self.slot,self.port)
+                    time.sleep(0.4)
+                except Snap7Exception:
+                    pass
             if self.plc.get_connected():
                 self.sendmessage(QApplication.translate("Message","S7 Connected", None))
                 time.sleep(0.7)

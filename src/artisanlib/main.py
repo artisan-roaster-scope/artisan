@@ -91,7 +91,7 @@ from PyQt5.QtGui import (QImageReader, QWindow, QFontMetrics,  # @Reimport
                             QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,  # @Reimport
-                          QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
+                          qVersion,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
                           QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
@@ -24744,7 +24744,7 @@ class ApplicationWindow(QMainWindow):
                         except OSError:
                             pass
                         self.qmc.fig.set_tight_layout(self.qmc.tight_layout_params)
-                        self.qmc.fig.savefig(graph_image)
+                        self.qmc.fig.savefig(graph_image,transparent=True)
                             
                         #add some random number to force HTML reloading
                         graph_image = path2url(graph_image)
@@ -24882,7 +24882,7 @@ class ApplicationWindow(QMainWindow):
                         os.remove(graph_image_pct)
                     except OSError:
                         pass
-                    fig.savefig(graph_image_pct)                   
+                    fig.savefig(graph_image_pct,transparent=True)                   
                     #add some random number to force HTML reloading
                     graph_image_pct = path2url(graph_image_pct)
                     graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
@@ -25216,7 +25216,7 @@ class ApplicationWindow(QMainWindow):
                 os.remove(graph_image)
             except OSError:
                 pass
-            self.qmc.fig.savefig(graph_image)
+            self.qmc.fig.savefig(graph_image,transparent=True)
             #add some random number to force HTML reloading
             graph_image = path2url(graph_image)
             graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
@@ -25228,7 +25228,7 @@ class ApplicationWindow(QMainWindow):
                 os.remove(flavor_image)
             except OSError:
                 pass
-            self.qmc.fig.savefig(flavor_image)
+            self.qmc.fig.savefig(flavor_image,transparent=True)
             flavor_image = path2url(flavor_image)
             flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
             #return screen to GRAPH profile mode
@@ -25255,9 +25255,9 @@ class ApplicationWindow(QMainWindow):
                 degree = u(self.roast_degree(cp["weight_loss"]))
                 if "set_density" in cp:
                     if "green_density" in cp and "roasted_density" in cp:
-                        density = u("%.1fg/l (green)<br>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"]))
+                        density = u("%.1fg/l (%s)<br>%.1fg/l (%s)"%(cp["green_density"],u(QApplication.translate("Label","greens")),cp["roasted_density"],u(QApplication.translate("Label","roasted"))))
                 elif "green_density" in cp and "roasted_density" in cp:
-                    density = u("%.1fg/l (green)<br>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"]))
+                    density = u("%.1fg/l (%s)<br>%.1fg/l (%s)"%(cp["green_density"],u(QApplication.translate("Label","greens")),cp["roasted_density"],u(QApplication.translate("Label","roasted"))))
             else:
                 degree = u("--")
 
@@ -25400,14 +25400,14 @@ class ApplicationWindow(QMainWindow):
                 ror= ror,
                 etbta_label=u(QApplication.translate("HTML Report Template", "AUC:", None)),
                 etbta=etbta,
-                roasting_notes_label=u(QApplication.translate("HTML Report Template", "Roasting Notes", None)),
+                roasting_notes_label=(u(QApplication.translate("HTML Report Template", "Roasting Notes", None)) if self.qmc.roastingnotes != "" else ""),
                 roasting_notes=self.note2html(self.qmc.roastingnotes),
                 roast_attributes=self.roastattributes(),
                 graph_image=graph_image,
                 flavor_image=flavor_image,
                 specialevents_label=u(QApplication.translate("HTML Report Template", "Events", None)),
                 specialevents=self.specialevents2html(),
-                cupping_notes_label=u(QApplication.translate("HTML Report Template", "Cupping Notes", None)),
+                cupping_notes_label=(u(QApplication.translate("HTML Report Template", "Cupping Notes", None)) if self.qmc.cuppingnotes != "" else ""),
                 cupping_notes=self.note2html(self.qmc.cuppingnotes))
             f = None
             try:
@@ -25591,6 +25591,8 @@ class ApplicationWindow(QMainWindow):
                 notes_html += u("<br>\n")
             else:           
                 notes_html += u(notes[i])
+        if notes_html != "":
+            notes_html = "<br>" + notes_html
         return notes_html
 
     #finds closest Bean Temperature in aw.qmc.temp2 given an input time. timex and temp2 always have same dimension
@@ -26122,7 +26124,7 @@ class ApplicationWindow(QMainWindow):
                 str(__version__),
                 str(__revision__),
                 platform.python_version(),
-                QT_VERSION_STR,
+                qVersion(),
                 PYQT_VERSION_STR,
                 mpl.__version__,
                 numpy.__version__,
@@ -31123,7 +31125,8 @@ class RoastsComboBox(QComboBox):
         self.setEditable(True)
 
     def textEdited(self,txt):
-        self.edited = txt
+        cleaned = ' '.join(txt.split())
+        self.edited = cleaned
 
     def getSelection(self):
         return self.edited or self.selection
@@ -32816,7 +32819,7 @@ class editGraphDlg(ArtisanDialog):
         
     def delRecentRoast(self):
         try:
-            title = u(self.titleedit.currentText())
+            title = ' '.join(u(self.titleedit.currentText()).split())
             weightIn = float(str(self.weightinedit.text()))
             weightUnit = u(self.unitsComboBox.currentText())
             aw.recentRoasts = aw.delRecentRoast(title,weightIn,weightUnit)
@@ -32825,7 +32828,7 @@ class editGraphDlg(ArtisanDialog):
         
     def addRecentRoast(self):
         try:
-            title = u(self.titleedit.currentText())
+            title = ' '.join(u(self.titleedit.currentText()).split())
             weightIn = float(str(self.weightinedit.text()))
             # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
             if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
@@ -33806,7 +33809,7 @@ class editGraphDlg(ArtisanDialog):
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
         # Update Title
-        aw.qmc.title = u(self.titleedit.currentText())
+        aw.qmc.title = ' '.join(u(self.titleedit.currentText()).split())
         aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
         aw.qmc.container_idx = self.tareComboBox.currentIndex() - 3
 
@@ -35534,9 +35537,9 @@ class EventsDlg(ArtisanDialog):
                     QApplication.translate("ComboBox", "small",None),
                     QApplication.translate("ComboBox", "large",None)
                 ]
-        # hack to ensure the popup items are not cutted
-        if sys.platform.startswith("darwin"):
-            size_items = [s + " " for s in size_items]
+#        # hack to ensure the popup items are not cutted (PyQt 5.13.0, fixed in PyQt 5.13.1)
+#        if sys.platform.startswith("darwin"):
+#            size_items = [s + " " for s in size_items]
         self.nbuttonsSizeBox.addItems(size_items)
         self.nbuttonsSizeBox.setCurrentIndex(aw.buttonsize)
 #        self.nbuttonsSizeBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
