@@ -13675,9 +13675,10 @@ class ApplicationWindow(QMainWindow):
 #            self.pushbuttonstyles["ON"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }"
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
         if platf == 'Windows':
-            self.standard_button_small_height = QPushButton("Test").sizeHint().height() * 1.1
-            self.standard_button_tiny_height = self.standard_button_small_height * 1.4
-            self.standard_button_height = self.standard_button_small_height * 1.9
+            default_button_height = QPushButton("Test").sizeHint().height()
+            self.standard_button_tiny_height = default_button_height * 1.1
+            self.standard_button_small_height = default_button_height * 1.5
+            self.standard_button_height = default_button_height * 2
         else:
             self.standard_button_small_height = QPushButton("Test").sizeHint().height()
             self.standard_button_tiny_height = self.standard_button_small_height * 0.8
