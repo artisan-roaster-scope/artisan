@@ -24924,7 +24924,8 @@ class ApplicationWindow(QMainWindow):
                         
                     # generate the bar graph 
                     prop.set_size("small")  
-                    color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable   
+                    color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable  
+                    label_chr_nr = 0
                     for p in profiles:
                         i -= 1
                         try:
@@ -24942,7 +24943,13 @@ class ApplicationWindow(QMainWindow):
                             i += 1   #avoid a blank line
                             continue
                         pd = self.profileProductionData(p)
-                        label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else "")[:8]
+                        if pd["batchnr"] > 0:
+                            label = u(pd["batchprefix"]) + u(pd["batchnr"])[:8]
+                        elif label_chr_nr < 26:
+                            label = u(libstring.ascii_uppercase[label_chr_nr])
+                            label_chr_nr = label_chr_nr + 1
+                        else:
+                            label = ""
                         if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
                             ax.broken_barh( [ (0, m), 
                                               (n, rd["DRY_percent"]), 
