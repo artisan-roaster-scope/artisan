@@ -2092,6 +2092,10 @@ class tgraphcanvas(FigureCanvas):
         self.resizeredrawing = 0 # holds timestamp of last resize triggered redraw
         
         self.logoimg = None # holds the background logo image
+        self.analysisresultsloc = [.5,.5]
+        self.analysispickflag = False
+        self.analysisresultsstr = ""
+
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -2351,6 +2355,10 @@ class tgraphcanvas(FigureCanvas):
                     message += u(", ") + str(-self.met_timex_temp1_delta[2]) + u(" ") + QApplication.translate("Message","seconds after FCs", None)
                 aw.sendmessage(message)
 
+            # the analysis results were clicked
+            elif isinstance(event.artist, matplotlib.text.Annotation) and event.artist in [aw.analysisresultsanno]:
+                self.analysispickflag = True
+
             # toggle visibility of graph lines by clicking on the legend 
             elif self.legend is not None and event.artist != self.legend and (isinstance(event.artist, matplotlib.lines.Line2D) or isinstance(event.artist, matplotlib.text.Text)) \
                 and event.artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
@@ -2444,6 +2452,11 @@ class tgraphcanvas(FigureCanvas):
             if event.button==1: 
                 self.baseX,self.baseY = None, None
                 self.base_horizontalcrossline, self.base_verticalcrossline = None, None
+            # save the location of analysis results after dragging
+            if self.analysispickflag:
+                self.analysispickflag = False
+                corners = aw.qmc.ax.transAxes.inverted().transform(aw.analysisresultsanno.get_bbox_patch().get_extents())
+                aw.qmc.analysisresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -4515,6 +4528,8 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.crossmarker:
                     aw.qmc.togglecrosslines()
                 
+                #remove the analysis results annotation if it exists
+                aw.qmc.analysisresultsstr = ""
 
                 #autodetected CHARGE and DROP index
                 self.autoChargeIdx = 0
@@ -5784,6 +5799,10 @@ class tgraphcanvas(FigureCanvas):
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                         
+                    #show the analysis results if they exist
+                    if len(self.analysisresultsstr) > 0:
+                        aw.analysisShowResults()
+
                     #END of Background
                     
                 if aw.qmc.patheffects:
@@ -8991,7 +9010,7 @@ class tgraphcanvas(FigureCanvas):
                     _,_,tsb,_ = aw.ts(tp=TP_index)
                     
                     #curveSimilarity
-                    det,dbt = aw.curveSimilarity(aw.qmc.phases[1]) # we analyze from DRY-END as specified in the phases dialog to DROP
+                    det,dbt,_,_ = aw.curveSimilarity(aw.qmc.phases[1]) # we analyze from DRY-END as specified in the phases dialog to DROP
                 
                     #end temperature
                     if locale == "ar":
@@ -9510,8 +9529,8 @@ class tgraphcanvas(FigureCanvas):
                     func = lambda x,a,b,c: a * numpy.log(b*x+c)
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    popt,_ = curve_fit(func, xa, yn)
-                #perr = numpy.sqrt(numpy.diag(pcov))
+                    popt,pcov = curve_fit(func, xa, yn)
+                perr = numpy.sqrt(numpy.diag(pcov))
                 xb = numpy.array(self.timex)
                 xxb = xb + charge
                 xxa = xa + charge                                    
@@ -9530,7 +9549,7 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " lnRegression() " + str(e),exc_tb.tb_lineno)
-        return res
+        return res,perr
 
     #interpolation type
     def univariate(self):
@@ -9655,7 +9674,20 @@ class tgraphcanvas(FigureCanvas):
         else:
             offset = 0
         return self.timetemparray2temp(self.timeB,self.stemp1B,seconds + offset)
-    
+
+    def backgroundDBTat(self,seconds, relative=False):
+        if self.timeindexB[0] > -1 and relative:
+            offset = self.timeB[self.timeindexB[0]]
+        else:
+            offset = 0
+        return self.timetemparray2temp(self.timeB,self.delta2B,seconds + offset)
+        
+    def backgroundDETat(self,seconds,relative=False):
+        if self.timeindexB[0] > -1 and relative:
+            offset = self.timeB[self.timeindexB[0]]
+        else:
+            offset = 0
+        return self.timetemparray2temp(self.timeB,self.delta1B,seconds + offset)
 
     def timearray2index(self,timearray,seconds):
         #find where given seconds crosses timearray
@@ -9743,6 +9775,9 @@ class tgraphcanvas(FigureCanvas):
         #disconnect mouse cross if ON
         if self.crossmarker:
             self.togglecrosslines()
+        #clear background if it came from analysis
+        if len(aw.qmc.analysisresultsstr) > 0:
+            aw.deleteBackground()
 
         if len(self.timex):
             reply = QMessageBox.question(aw,QApplication.translate("Message","Designer Start",None),
@@ -12900,6 +12935,22 @@ class ApplicationWindow(QMainWindow):
         else:
             self.CelsiusAction.setDisabled(True)
             self.ConvertToCelsiusAction.setDisabled(True)
+
+        self.ToolkitMenu.addSeparator()
+        self.analyzeMenu = self.ToolkitMenu.addMenu("Analyze")
+        self.fitIdealautoAction = QAction("Auto All",self)
+        self.fitIdealautoAction.triggered.connect(lambda _:self.analysisfitCurves(-1))
+        self.analyzeMenu.addAction(self.fitIdealautoAction)
+        self.analyzeMenu.addSeparator()
+        self.fitIdealx2Action = QAction("Fit DE->DROP to x^2",self)
+        self.fitIdealx2Action.triggered.connect(lambda _:self.analysisfitCurves(2))
+        self.analyzeMenu.addAction(self.fitIdealx2Action)
+        self.fitIdealx3Action = QAction("Fit DE->DROP to x^3",self)
+        self.fitIdealx3Action.triggered.connect(lambda _:self.analysisfitCurves(3))
+        self.analyzeMenu.addAction(self.fitIdealx3Action)
+        self.fitIdealx0Action = QAction("Fit DE->DROP to ln()",self)
+        self.fitIdealx0Action.triggered.connect(lambda _:self.analysisfitCurves(0))
+        self.analyzeMenu.addAction(self.fitIdealx0Action)
             
                     
         # VIEW menu
@@ -15754,6 +15805,10 @@ class ApplicationWindow(QMainWindow):
                 totalQuadraticDeltaET = 0
                 totalQuadraticDeltaBT = 0
                 count = 0
+                totalQuadraticDeltaETB = 0
+                totalQuadraticDeltaBTB = 0
+                btbcount = 0
+                etbcount = 0
                 for i in range(aw.qmc.timeindex[6],0,-1):
                     # iterate backward from DROP to BTlimit
                     if aw.qmc.stemp1 and len(aw.qmc.stemp1) > i:
@@ -15766,6 +15821,15 @@ class ApplicationWindow(QMainWindow):
                         bt = aw.qmc.stemp2[i]
                     else:
                         bt = aw.qmc.temp2[i]
+                        
+                    if len(aw.qmc.delta1) > 0:
+                        deltaet = aw.qmc.delta1[i]
+                    else:
+                        deltaet = None
+                    if len(aw.qmc.delta2) > 0:
+                        deltabt = aw.qmc.delta2[i]
+                    else:
+                        deltabt = None
                     if BTlimit and bt > BTlimit:
                         # still above the limit
                         # retrieve corresponding values from the background (is always smoothed)
@@ -15780,16 +15844,40 @@ class ApplicationWindow(QMainWindow):
                         dbt = (bt - btb)
                         totalQuadraticDeltaBT += dbt * dbt
                         count += 1                        
+
+                        if deltabt != None and len(aw.qmc.delta2B) > 0 and len(aw.qmc.delta2B) > i and aw.qmc.delta2B[i] != None:
+                            deltabtb = aw.qmc.backgroundDBTat(aw.qmc.timex[i] - dropTimeDelta)
+                            bdbt = (deltabt - deltabtb)
+                            totalQuadraticDeltaBTB += bdbt * bdbt
+                            btbcount += 1
+
+                        if deltaet != None and len(aw.qmc.delta1B) > 0 and len(aw.qmc.delta1B) > i and aw.qmc.delta1B[i] != None:
+                            deltaetb = aw.qmc.backgroundDETat(aw.qmc.timex[i] - dropTimeDelta)
+                            bdet = (deltaet - deltaetb)
+                            totalQuadraticDeltaETB += bdet * bdet
+                            etbcount += 1
+
                     else:
                         break
-                return math.sqrt(totalQuadraticDeltaET/float(count)), math.sqrt(totalQuadraticDeltaBT/float(count))
+
+                # prevent divide by zero
+                if btbcount == 0:
+                    btbcount = 1
+                if etbcount == 0:
+                    etbcount = 1
+                    
+                return math.sqrt(totalQuadraticDeltaET/float(count)), \
+                       math.sqrt(totalQuadraticDeltaBT/float(count)), \
+                       math.sqrt(totalQuadraticDeltaETB/float(etbcount)), \
+                       math.sqrt(totalQuadraticDeltaBTB/float(btbcount))
+
             else:
                 # no DROP event registered
-                return None, None
+                return None, None, None, None
         except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)        
-            return None, None
+            return None, None, None
             
     def setLCDsDigitCount(self,n):
         self.lcd2.setDigitCount(n)
@@ -17831,6 +17919,7 @@ class ApplicationWindow(QMainWindow):
         self.designerAction.setEnabled(True)
         self.wheeleditorAction.setEnabled(True)
         self.hudAction.setEnabled(True)            
+        self.analyzeMenu.setEnabled(True)
         self.loadSettingsAction.setEnabled(True)
         self.openRecentSettingMenu.setEnabled(True)
         self.saveAsSettingsAction.setEnabled(True)
@@ -17893,6 +17982,7 @@ class ApplicationWindow(QMainWindow):
             self.StatisticsAction.setEnabled(False)
             self.WindowconfigAction.setEnabled(False)
             self.colorsAction.setEnabled(False)
+        self.analyzeMenu.setEnabled(False)
         self.loadSettingsAction.setEnabled(False)
         self.openRecentSettingMenu.setEnabled(False)
         self.saveAsSettingsAction.setEnabled(False)
@@ -18837,6 +18927,9 @@ class ApplicationWindow(QMainWindow):
                 t1x = profile["extratemp1"]
                 t2x = profile["extratemp2"]
                 
+                #remove the analysis results annotation if it exists
+                aw.qmc.analysisresultsstr = ""
+
                 if "mode" in profile:
                     m = str(profile["mode"])
                     #convert modes only if needed comparing the new uploaded mode to the old one.
@@ -20887,7 +20980,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
         ######### Similarity #########
         try:
-            det,dbt = aw.curveSimilarity(aw.qmc.phases[1])
+            det,dbt,_,_ = aw.curveSimilarity(aw.qmc.phases[1])
             if det is not None and not math.isnan(det):
                 computedProfile["det"] = det
             if dbt is not None and not math.isnan(dbt):
@@ -21645,6 +21738,8 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(tmpconds),len(self.qmc.statisticsconditions)):
                     tmpconds.append(self.qmc.statisticsconditions[i])
                 self.qmc.statisticsconditions = tmpconds
+            if settings.contains("AnalysisResultsLoc"):
+                self.qmc.analysisresultsloc = [toFloat(x) for x in toList(settings.value("AnalysisResultsLoc",self.qmc.analysisresultsloc))]
             if settings.contains("AUCbegin"):
                 self.qmc.AUCbegin = toInt(settings.value("AUCbegin",int()))
                 self.qmc.AUCbase = toInt(settings.value("AUCbase",int()))
@@ -23105,6 +23200,7 @@ class ApplicationWindow(QMainWindow):
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
             settings.setValue("StatisticsConds",self.qmc.statisticsconditions)
+            settings.setValue("AnalysisResultsLoc",aw.qmc.analysisresultsloc)
             #save AUC
             settings.setValue("AUCbegin",self.qmc.AUCbegin)
             settings.setValue("AUCbase",self.qmc.AUCbase)
@@ -26823,6 +26919,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.TP_time_B_loaded = -1
         self.qmc.AUCbackground = -1
         self.qmc.l_background_annotations = []
+        self.qmc.analysisresultsstr = ""
 
     def switchETBT(self):
         t2 = aw.qmc.temp2
@@ -28325,6 +28422,199 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadAlarms() {0}").format(str(ex)),exc_tb.tb_lineno)
             return
 
+    def analysisfitCurves(self, exp=-1):
+        # exp == 0 -> ln(), 1 -> unused, 2 -> quadratic, 3 -> cubic, -1 -> all of them 
+        
+        #check for finished roast
+        if not (self.qmc.timeindex[0] > -1 and self.qmc.timeindex[6]):
+            self.sendmessage(QApplication.translate("Error Message", "Analyze: no profile data available", None))
+            return
+            
+        #Turn off background annotations
+        self.qmc.backgroundDetails = False
+        
+        #prevent accidental overwrite of the original file 
+        self.qmc.safesaveflag = True
+        self.curFile = None
+
+        #adjust time from start to charge
+        timeadj = self.qmc.timex[self.qmc.timeindex[0]]
+        
+        #drytime is either the DRY event or as set in the Phases dialog
+        if self.qmc.timeindex[1]:  
+            #use the DRY event
+            drytime = self.qmc.timex[self.qmc.timeindex[1]] - timeadj - self.qmc.profile_sampling_interval  #subtracting 
+        else:
+            #use the phases dialog value
+            i = self.findDryEnd(phasesindex=1)
+            drytime = self.qmc.timex[i] - timeadj
+
+        #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after DROP.
+        tpidx = self.findTP()
+        if tpidx > 1:
+            tptime = self.qmc.timex[tpidx] - timeadj
+            lnoffset = tptime + .25 * (drytime - tptime)
+        else:
+            lnoffset = .33 * drytime
+
+        # curve fit results
+        self.cfr = {} 
+
+        # build the results string
+        RMSEstr =  "          RMSE"
+        RMSEstr += "\n        BT    " + u("\u0394") + "BT"
+        #RMSEstr += "   PERR"
+        RMSEstr += "\n    | -----  -----"
+        #RMSEstr += "  -----"
+
+        # ln() or all
+        if exp == 0 or exp == -1:
+            self.cfr["equ_naturallog"],self.cfr["dbt_naturallog"],self.cfr["dbdbt_naturallog"],self.cfr["perr_naturallog"] = self.analysisGetResults(exp=0,timeoffset=lnoffset)
+        # cubic or all
+        if exp == 3 or exp == -1:
+            self.cfr["equ_cubic"],self.cfr["dbt_cubic"],self.cfr["dbdbt_cubic"],self.cfr["perr_cubic"] = self.analysisGetResults(exp=3,timeoffset=drytime)
+        # run last to leave as curve in backgorund
+        # quadratic or all
+        if exp == 2 or exp == -1:
+            self.cfr["equ_quadratic"],self.cfr["dbt_quadratic"],self.cfr["dbdbt_quadratic"],self.cfr["perr_quadratic"] = self.analysisGetResults(exp=2,timeoffset=drytime)
+        
+        # build the results string
+        if "equ_quadratic" in self.cfr:
+            RMSEstr += "\nx^2 |{0:5.1f}  {1:5.1f}".format(self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"])
+            #RMSEstr += "  {0:5.1f}".format(self.cfr["perr_quadratic"])
+        if "equ_cubic" in self.cfr:
+            RMSEstr += "\nx^3 |{0:5.1f}  {1:5.1f}".format(self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"])
+            #RMSEstr += "  {0:5.1f}".format(self.cfr["perr_cubic"])
+        if "equ_naturallog" in self.cfr:
+            RMSEstr += "\nln()|{0:5.1f}  {1:5.1f}".format(self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"])
+            #RMSEstr += "  {0:5.1f}".format(self.cfr["perr_naturallog"])
+
+        # create the output annotation
+        self.analysisShowResults(RMSEstr)
+#        try:
+#            self.analysisresultsanno = self.qmc.ax.annotate(RMSEstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
+#                       ha="left", va="center",
+#                       fontfamily='monospace',
+#                       fontsize = 'small',
+#                       picker=True,
+#                       bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
+#            self.analysisresultsanno.draggable()
+#            self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
+#            self.qmc.fig.canvas.draw()
+#
+#        except Exception as e:
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " autoAnalysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
+            
+    def analysisShowResults(self,resultstr=""):
+        if len(resultstr) == 0:
+            resultstr = self.qmc.analysisresultsstr
+        else:
+            self.qmc.analysisresultsstr = resultstr
+        try:
+            self.analysisresultsanno = self.qmc.ax.annotate(resultstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
+                       ha="left", va="center",
+                       fontfamily='monospace',
+                       fontsize = 'small',
+                       picker=True,
+                       zorder=11,
+                       bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
+            self.analysisresultsanno.draggable()
+            self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
+            self.qmc.fig.canvas.draw()
+
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " autoAnalysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
+
+    def analysisGetResults(self,exp=2,timeoffset=0):
+        res,perr = self.qmc.lnRegression(power=exp, timeoffset=timeoffset)
+        self.deleteBackground()
+        self.setbackgroundequ(EQU=["",res])
+        QApplication.processEvents()  #occasionally the fit curve remains showing.
+        self.qmc.redraw(recomputeAllDeltas=True)
+        _,dbt,_,dbdbt = self.curveSimilarity(self.qmc.phases[1]) # analyze from DRY-END as specified in the phases dialog to DROP
+        return res,dbt,dbdbt,perr
+                
+    def setbackgroundequ(self,foreground=False, EQU=['','']):
+        # Check for incompatible vars from in the equations
+        incompatiblevars = ["P","F","$","#"]
+        error = ""
+        for i in range(len(incompatiblevars)):
+            if incompatiblevars[i] in EQU[0]:
+                error = "P1: \n-%s\n\n[%s]"%(incompatiblevars[i],EQU[0])
+            elif incompatiblevars[i] in EQU[1]:
+                error = "P2: \n-%s\n\n[%s]"%(incompatiblevars[i],EQU[1])
+                
+        if error:
+            string = QApplication.translate("Message","Incompatible variables found in %s"%error, None)
+            QMessageBox.warning(self,QApplication.translate("Message","Assignment problem", None),string,
+                                QMessageBox.Discard)
+            
+        else:
+            try:
+                equ = EQU[0]
+                equ2 = EQU[1]
+                if len(equ) or len(equ2):
+                    aw.qmc.resetlines()
+                    #create x range
+                    if len(aw.qmc.timex) > 1:
+                        x_range = aw.qmc.timex[:]
+                        if not foreground and aw.qmc.timeindex[0] > -1:
+                            toff = aw.qmc.timex[aw.qmc.timeindex[0]]
+                        else:
+                            toff = 0
+                    else:
+                        x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
+                        toff = 0
+                    #create y range
+                    y_range = []
+                    y_range2 = []
+                    for i in range(len(x_range)):
+                        y_range.append(aw.qmc.eval_math_expression(equ,x_range[i],t_offset=toff))
+                        y_range2.append(aw.qmc.eval_math_expression(equ2,x_range[i],t_offset=toff))
+                        
+                    #if foreground flag passed, set EQUs as ET BT instead of background
+                    if foreground:
+                        aw.qmc.timex = x_range[:]
+                        aw.qmc.temp1 = y_range[:]
+                        aw.qmc.temp2 = y_range2[:]
+                        aw.qmc.redraw(recomputeAllDeltas=True)
+                        #make extra devices not visible 
+                        for x in range(len(aw.qmc.extradevices)):
+                            aw.qmc.extratemp1[x] = [-1]*len(x_range)
+                            aw.qmc.extratemp2[x] = [-1]*len(x_range)
+                            aw.qmc.extratimex[x] = x_range[:]
+                        aw.sendmessage(QApplication.translate("Message","Y1 = [%s] ; Y2 = [%s]"%(EQU[0],EQU[1]), None))
+
+                    else:
+                        aw.qmc.timeB = x_range[:]
+                        aw.qmc.temp1B = y_range[:]
+                        aw.qmc.stemp1B = y_range[:] 
+                        aw.qmc.temp2B = y_range2[:]               
+                        aw.qmc.stemp2B = aw.qmc.temp2B[:]
+                        for i in range(8):
+                            aw.qmc.timeindexB[i] = 0
+                        aw.qmc.timeindexB[0] = -1
+                        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
+                            # we copy the CHARGE and DROP from the foreground to allow alignment
+                            t1 = aw.qmc.timex[aw.qmc.timeindex[0]]
+                            aw.qmc.timeindexB[0] = aw.qmc.backgroundtime2index(t1)
+                            if aw.qmc.timeindex[1]:
+                                t_DE = aw.qmc.timex[aw.qmc.timeindex[1]]
+                                aw.qmc.timeindexB[1] = aw.qmc.backgroundtime2index(t_DE)
+                            if aw.qmc.timeindex[2]:
+                                t_FCs = aw.qmc.timex[aw.qmc.timeindex[2]]
+                                aw.qmc.timeindexB[2] = aw.qmc.backgroundtime2index(t_FCs)
+                            t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
+                            aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
+                        aw.qmc.background = True
+                        aw.qmc.redraw(recomputeAllDeltas=False)
+                        aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1]), None))
+
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ(): {0}").format(str(e)),exc_tb.tb_lineno)
 
 ########################################################################################
 #####################  Artisan QDialog Subclass  #######################################
@@ -29623,89 +29913,10 @@ class HUDDlg(ArtisanDialog):
         equdataDlg.activateWindow()
 
     def setbackgroundequ1(self,foreground=False, mathequ=False):
-
-        # Check for incompatible vars from in the equations
         EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
         if mathequ:
             EQU = [str(""),str(self.expresult.text())]
-        incompatiblevars = ["P","F","$","#"]
-        error = ""
-        for i in range(len(incompatiblevars)):
-            if incompatiblevars[i] in EQU[0]:
-                error = "P1: \n-%s\n\n[%s]"%(incompatiblevars[i],EQU[0])
-            elif incompatiblevars[i] in EQU[1]:
-                error = "P2: \n-%s\n\n[%s]"%(incompatiblevars[i],EQU[1])
-                
-        if error:
-            string = QApplication.translate("Message","Incompatible variables found in %s"%error, None)
-            QMessageBox.warning(self,QApplication.translate("Message","Assignment problem", None),string,
-                                QMessageBox.Discard)
-            
-        else:
-            try:
-                equ = EQU[0]
-                equ2 = EQU[1]
-                if len(equ) or len(equ2):
-                    aw.qmc.resetlines()
-                    #create x range
-                    if len(aw.qmc.timex) > 1:
-                        x_range = aw.qmc.timex[:]
-                        if not foreground and aw.qmc.timeindex[0] > -1:
-                            toff = aw.qmc.timex[aw.qmc.timeindex[0]]
-                        else:
-                            toff = 0
-                    else:
-                        x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
-                        toff = 0
-                    #create y range
-                    y_range = []
-                    y_range2 = []
-                    for i in range(len(x_range)):
-                        y_range.append(aw.qmc.eval_math_expression(equ,x_range[i],t_offset=toff))
-                        y_range2.append(aw.qmc.eval_math_expression(equ2,x_range[i],t_offset=toff))
-                        
-                    #if foreground flag passed, set EQUs as ET BT instead of background
-                    if foreground:
-                        aw.qmc.timex = x_range[:]
-                        aw.qmc.temp1 = y_range[:]
-                        aw.qmc.temp2 = y_range2[:]
-                        aw.qmc.redraw(recomputeAllDeltas=True)
-                        #make extra devices not visible 
-                        for x in range(len(aw.qmc.extradevices)):
-                            aw.qmc.extratemp1[x] = [-1]*len(x_range)
-                            aw.qmc.extratemp2[x] = [-1]*len(x_range)
-                            aw.qmc.extratimex[x] = x_range[:]
-                        aw.sendmessage(QApplication.translate("Message","Y1 = [%s] ; Y2 = [%s]"%(EQU[0],EQU[1]), None))
-
-                    else:
-                        aw.qmc.timeB = x_range[:]
-                        aw.qmc.temp1B = y_range[:]
-                        aw.qmc.stemp1B = y_range[:] 
-                        aw.qmc.temp2B = y_range2[:]               
-                        aw.qmc.stemp2B = aw.qmc.temp2B[:]
-                        for i in range(8):
-                            aw.qmc.timeindexB[i] = 0
-                        aw.qmc.timeindexB[0] = -1
-                        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
-                            # we copy the CHARGE and DROP from the foreground to allow alignment
-                            t1 = aw.qmc.timex[aw.qmc.timeindex[0]]
-                            aw.qmc.timeindexB[0] = aw.qmc.backgroundtime2index(t1)
-                            if aw.qmc.timeindex[1]:
-                                t_DE = aw.qmc.timex[aw.qmc.timeindex[1]]
-                                aw.qmc.timeindexB[1] = aw.qmc.backgroundtime2index(t_DE)
-                            if aw.qmc.timeindex[2]:
-                                t_FCs = aw.qmc.timex[aw.qmc.timeindex[2]]
-                                aw.qmc.timeindexB[2] = aw.qmc.backgroundtime2index(t_FCs)
-                            t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
-                            aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
-                        aw.qmc.background = True
-                        aw.qmc.redraw(recomputeAllDeltas=False)
-                        aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1]), None))
-
-                        
-            except Exception as e:
-                _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ1(): {0}").format(str(e)),exc_tb.tb_lineno)
+        aw.setbackgroundequ(EQU=EQU)
 
     def updatePlotterleftlabels(self):
         if len(aw.qmc.plotterequationresults[0]):
@@ -29886,7 +30097,11 @@ class HUDDlg(ArtisanDialog):
         if self.lnvarCheck.isChecked():
             #check for finished roast
             if aw.qmc.timeindex[0] > -1:
-                res = aw.qmc.lnRegression()
+                try:
+                    _timeoffset = int(self.exptimeoffset.text())
+                except:
+                    _timeoffset = 0
+                res,_ = aw.qmc.lnRegression(timeoffset=_timeoffset)
                 self.lnresult.setText(res)
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "ln(): no profile data available", None))
@@ -29906,7 +30121,7 @@ class HUDDlg(ArtisanDialog):
                     _timeoffset = int(self.exptimeoffset.text())
                 except:
                     _timeoffset = 0
-                res = aw.qmc.lnRegression(power=self.exppower, timeoffset=_timeoffset)
+                res,_ = aw.qmc.lnRegression(power=self.exppower, timeoffset=_timeoffset)
                 self.expresult.setText(res)
                 self.bkgndButton.setEnabled(True)                
             else:
