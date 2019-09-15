@@ -1,5 +1,5 @@
 [DefaultButtons]
-buttonactions=0, 0, 0, 0, 0, 0, 3, 0
+buttonactions=0, 0, 0, 0, 0, 0, 20, 0
 buttonactionstrings=, , , , , , "3,sleep(30),8", 
 buttonvisibility=true, true, true, true, true, false, true, true
 extrabuttonactions=1, 1, 0

@@ -16717,11 +16717,10 @@ class ApplicationWindow(QMainWindow):
     # relocate event actions, by skippig 3=MultipleEvent and 7=Call Program SliderAction
     def eventactionx(self,a,cmd):
         try:
-            #self.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))), cmd)
-            self.eventaction((a if (a < 7) else (a + 1)), cmd)
+            # we added "Multiple Events" at position 20 which has to be mapped to action 3
+            self.eventaction((a if (a < 3) else (3 if (a == 20) else ((a + 2) if (a > 5) else (a + 1)))), cmd)
         except Exception:
-            pass
-                    
+            pass                    
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Command; 11= p-i-d; 12= Fuji Command;
@@ -36207,7 +36206,6 @@ class EventsDlg(ArtisanDialog):
         self.buttonActionTypes = ["",#QApplication.translate("ComboBox", "None",None),
                        QApplication.translate("ComboBox", "Serial Command",None),
                        QApplication.translate("ComboBox", "Call Program",None),
-                       QApplication.translate("ComboBox", "Multiple Event",None),
                        QApplication.translate("ComboBox", "Modbus Command",None),
                        QApplication.translate("ComboBox", "DTA Command",None),
                        QApplication.translate("ComboBox", "IO Command",None),
@@ -36224,7 +36222,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Aillio R1 Drum",None),
                        QApplication.translate("ComboBox", "Aillio R1 Command",None),
                        QApplication.translate("ComboBox", "Artisan Command",None),
-                       QApplication.translate("ComboBox", "RC Command",None)]
+                       QApplication.translate("ComboBox", "RC Command",None),
+                       QApplication.translate("ComboBox", "Multiple Event",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
