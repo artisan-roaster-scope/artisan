@@ -29924,11 +29924,12 @@ class HUDDlg(ArtisanDialog):
         equdataDlg.show()
         equdataDlg.activateWindow()
 
-    def setbackgroundequ1(self,_foreground=False, mathequ=False):
+    def setbackgroundequ1(self,foreground=False, mathequ=False):
         EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
         if mathequ:
             EQU = [str(""),str(self.expresult.text())]
-        aw.setbackgroundequ(EQU=EQU)
+        aw.qmc.analysisresultsstr = ""
+        aw.setbackgroundequ(foreground=foreground, EQU=EQU)
 
     def updatePlotterleftlabels(self):
         if len(aw.qmc.plotterequationresults[0]):
