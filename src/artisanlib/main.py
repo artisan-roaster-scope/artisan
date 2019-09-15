@@ -28509,20 +28509,6 @@ class ApplicationWindow(QMainWindow):
 
         # create the output annotation
         self.analysisShowResults(RMSEstr)
-#        try:
-#            self.analysisresultsanno = self.qmc.ax.annotate(RMSEstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
-#                       ha="left", va="center",
-#                       fontfamily='monospace',
-#                       fontsize = 'small',
-#                       picker=True,
-#                       bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
-#            self.analysisresultsanno.draggable()
-#            self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
-#            self.qmc.fig.canvas.draw()
-#
-#        except Exception as e:
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " autoAnalysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
             
     def analysisShowResults(self,resultstr=""):
         if len(resultstr) == 0:
@@ -28537,7 +28523,7 @@ class ApplicationWindow(QMainWindow):
                        picker=True,
                        zorder=11,
                        bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
-            self.analysisresultsanno.draggable(use_blit=sys.platform.startswith("darwin"))
+            self.analysisresultsanno.draggable(use_blit=True)
             self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
             self.qmc.fig.canvas.draw()
 
