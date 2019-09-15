@@ -13089,15 +13089,15 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel.setIndent(6)
         # set a few broad style parameters
         if locale == "es":
-            self.button_font_size_pt = 11
+            self.button_font_size_pt = 12
         else:
             self.button_font_size_pt = 13
         if platf == 'Windows':
             self.button_font_size = str(self.button_font_size_pt - 2) + 'pt'
-            self.button_font_size_small = str(self.button_font_size_pt - 6) + 'pt'
-            self.button_font_size_small_selected = str(self.button_font_size_pt - 5) + 'pt'
-            self.button_font_size_tiny = str(self.button_font_size_pt - 6) + 'pt'
-            self.button_font_size_micro = str(self.button_font_size_pt - 7) + 'pt'
+            self.button_font_size_small = str(self.button_font_size_pt - 3) + 'pt'
+            self.button_font_size_small_selected = str(self.button_font_size_pt - 2) + 'pt'
+            self.button_font_size_tiny = str(self.button_font_size_pt - 4) + 'pt'
+            self.button_font_size_micro = str(self.button_font_size_pt - 5) + 'pt'
         else:
             self.button_font_size = str(self.button_font_size_pt) + 'pt'
             self.button_font_size_small = str(self.button_font_size_pt - 3) + 'pt'
@@ -13105,12 +13105,23 @@ class ApplicationWindow(QMainWindow):
             self.button_font_size_tiny = str(self.button_font_size_pt - 4) + 'pt'
             self.button_font_size_micro = str(self.button_font_size_pt - 5) + 'pt'
 
+        if platf == 'Windows':
+            self.main_button_min_width = "110px"
+            self.standard_button_min_width = "90px"
+            self.small_button_min_width = "75px"
+            self.tiny_button_min_width = "60px"
+        else:
+            self.main_button_min_width = "90px"
+            self.standard_button_min_width = "75px"
+            self.small_button_min_width = "60px"
+            self.tiny_button_min_width = "50px"
+
         border_modern = "border-style:solid; border-radius:4;border-color:grey; border-width:0;" # modernize
         # parking this green shade in case we want to use it later #00d55a
         self.pushbuttonstyles = {
             "RESET":     """
                 QPushButton {
-                    min-width:90px;
+                    min-width: """ + self.main_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
@@ -13132,7 +13143,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "OFF":    """
                 QPushButton {
-                    min-width:90px;
+                    min-width: """ + self.main_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
@@ -13150,7 +13161,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "ON":    """
                 QPushButton {
-                    min-width:90px;
+                    min-width: """ + self.main_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
@@ -13168,7 +13179,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "STOP":     """
                 QPushButton {
-                    min-width:90px;
+                    min-width: """ + self.main_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
@@ -13190,7 +13201,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "START":    """
                 QPushButton {
-                    min-width:90px;
+                    min-width: """ + self.main_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
@@ -13213,7 +13224,7 @@ class ApplicationWindow(QMainWindow):
 
             "CHARGE":    """
                 QPushButton {
-                    min-width:75px;
+                    min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13243,7 +13254,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "DRY END":    """
                 QPushButton {
-                    min-width:75px;
+                    min-width:  """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13273,7 +13284,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "FC START":    """
                 QPushButton {
-                    min-width:75px;
+                    min-width:  """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13303,7 +13314,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "FC END":    """
                 QPushButton {
-                    min-width:75px;
+                    min-width:  """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13333,7 +13344,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "SC START":    """
                 QPushButton {
-                    min-width:75px;
+                    min-width:  """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13363,7 +13374,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "SC END":    """
                 QPushButton {
-                    min-width:75px;
+                    min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13393,7 +13404,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "DROP":    """
                 QPushButton {
-                    min-width:75px;
+                    min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13423,7 +13434,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "COOL END":    """
                 QPushButton {
-                    min-width:75px;
+                    min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13453,7 +13464,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "EVENT":    """
                 QPushButton {
-                    min-width:75px;
+                    min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13471,7 +13482,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "PID":     """
                 QPushButton {
-                    min-width:90px;
+                    min-width: """ + self.main_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
@@ -13493,7 +13504,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "PIDactive":     """
                 QPushButton {
-                    min-width:90px;
+                    min-width: """ + self.main_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
@@ -13515,7 +13526,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "SV +":     """
                 QPushButton {
-                    min-width:75px;
+                    min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13533,7 +13544,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "SV -":     """
                 QPushButton {
-                    min-width:75px;
+                    min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small + """;
                     font-weight: bold;
@@ -13552,7 +13563,7 @@ class ApplicationWindow(QMainWindow):
 
             "HUD_OFF":     """
                 QPushButton {
-                    min-width:90px;
+                    min-width: """ + self.main_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
@@ -13574,7 +13585,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "HUD_ON":     """
                 QPushButton {
-                    min-width:90px;
+                    min-width: """ + self.main_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
@@ -13596,7 +13607,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "SELECTED":     """
                 QPushButton {
-                    min-width:75px;
+                    min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small_selected + """;
                     font-weight: bold;
@@ -13626,7 +13637,7 @@ class ApplicationWindow(QMainWindow):
             """,
             "SELECTED_MAIN":     """
                 QPushButton {
-                    min-width:75px;
+                    min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small_selected + """;
                     font-weight: bold;
@@ -13666,7 +13677,7 @@ class ApplicationWindow(QMainWindow):
         if platf == 'Windows':
             self.standard_button_small_height = QPushButton("Test").sizeHint().height()
             self.standard_button_tiny_height = self.standard_button_small_height * 0.9
-            self.standard_button_height = self.standard_button_small_height * 1.8
+            self.standard_button_height = self.standard_button_small_height * 1.9
         else:
             self.standard_button_small_height = QPushButton("Test").sizeHint().height()
             self.standard_button_tiny_height = self.standard_button_small_height * 0.8
@@ -17462,13 +17473,13 @@ class ApplicationWindow(QMainWindow):
         square_style = "border-radius:0px;"
         if aw.buttonsize == 0:
             # tiny
-            buttonstyle = """min-width:50px;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_micro + """; font-weight: bold;"""
+            buttonstyle = """min-width:""" + self.tiny_button_min_width + """;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_micro + """; font-weight: bold;"""
         elif aw.buttonsize == 2:
             # large
-            buttonstyle = """min-width:75px;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_small + """; font-weight: bold;"""
+            buttonstyle = """min-width:""" + self.standard_button_min_width + """;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_small + """; font-weight: bold;"""
         else:
             # small (default)
-            buttonstyle = """min-width:60px;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_tiny + """; font-weight: bold;"""
+            buttonstyle = """min-width:""" + self.small_button_min_width + """;margin:0;padding:0px;border-style:solid;border-color:darkgrey;border-width:0;font-size:""" + self.button_font_size_tiny + """; font-weight: bold;"""
         ##
         if len(self.extraeventbuttonround) > tee:
             if self.extraeventbuttonround[tee] == 1: # left-side rounded
@@ -28519,7 +28530,7 @@ class ApplicationWindow(QMainWindow):
                        picker=True,
                        zorder=11,
                        bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
-            self.analysisresultsanno.draggable()
+            self.analysisresultsanno.draggable(use_blit=sys.platform.startswith("darwin"))
             self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
             self.qmc.fig.canvas.draw()
 

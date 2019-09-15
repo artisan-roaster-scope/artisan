@@ -17,7 +17,7 @@ try:
     from PyQt5.QtCore import Qt
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-    os.environ["QT_SCALE_FACTOR"] = "1"
+#    os.environ["QT_SCALE_FACTOR"] = "1"
 except Exception as e:
     pass
         
