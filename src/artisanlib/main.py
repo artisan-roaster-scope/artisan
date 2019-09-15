@@ -6331,7 +6331,7 @@ class tgraphcanvas(FigureCanvas):
                     for l in leg.texts:
                         l.set_picker(5)                        
                     try:
-                        leg.set_draggable(state=True,use_blit=sys.platform.startswith("darwin"))  #,update='bbox')
+                        leg.set_draggable(state=True,use_blit=not sys.platform.startswith("linux"))  #,update='bbox')
                     except: # not available in mpl<3.x
                         leg.draggable(state=True) # for mpl 2.x
                     frame = leg.get_frame()
@@ -28523,7 +28523,7 @@ class ApplicationWindow(QMainWindow):
                        picker=True,
                        zorder=11,
                        bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
-            self.analysisresultsanno.draggable(use_blit=True)
+            self.analysisresultsanno.draggable(use_blit=not sys.platform.startswith("linux"))
             self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
             self.qmc.fig.canvas.draw()
 
