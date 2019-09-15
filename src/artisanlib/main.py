@@ -12981,10 +12981,10 @@ class ApplicationWindow(QMainWindow):
 
         self.viewMenu.addSeparator()
 
-        lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
-        lcdsAction.triggered.connect(self.largeLCDs)
-        lcdsAction.setShortcut("Ctrl+L")
-        self.viewMenu.addAction(lcdsAction)
+        self.lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
+        self.lcdsAction.triggered.connect(self.largeLCDs)
+        self.lcdsAction.setShortcut("Ctrl+L")
+        self.viewMenu.addAction(self.lcdsAction)
 
         deltalcdsAction = QAction(UIconst.TOOLKIT_MENU_DELTA_LCDS,self)
         deltalcdsAction.triggered.connect(self.largeDeltaLCDs)
