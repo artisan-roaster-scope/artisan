@@ -6,31 +6,27 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>$doc</title>
 <style type="text/css">
-html {
-  --hue: 210;
-  --accent-hue: 340;
-  --background: hsl(var(--hue), 0%, 100%);
-  --text-color-normal: hsl(var(--hue), 77%, 17%);
-  --link-color: hsl(var(--hue), 60%, 40%);
-  --accent-color: hsl(var(--accent-hue), 70%, 40%);
-}
-@media screen and (prefers-color-scheme: dark) {
-  html {
-    --background: hsl(var(--hue), 10%, 15%);
-    --text-color-normal: hsl(var(--hue), 10%, 62%);
-    --link-color: hsl(var(--hue), 90%, 70%);
-    --accent-color: hsl(var(--accent-hue), 100%, 70%);
-  }
-}
 body {
-    background: var(--background);
-    color: var(--text-color-normal);
+    background: hsl(210, 0%, 100%);
+    color: hsl(210, 77%, 17%);
 }
 a {
-  color: var(--link-color);
+  color: hsl(210, 60%, 40%);
 }
 h1 {
-  color: var(--accent-color);
+  color: hsl(340, 70%, 40%);
+}
+@media screen and (prefers-color-scheme: dark) {
+  body {
+      background: hsl(210, 10%, 15%);
+      color: hsl(210, 10%, 62%);
+  }
+  a {
+    color: hsl(210, 90%, 70%);
+  }
+  h1 {
+    color: hsl(340, 100%, 70%);
+  }
 }
 td { 
   vertical-align: top;

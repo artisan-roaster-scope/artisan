@@ -13088,7 +13088,7 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(6)
         # set a few broad style parameters
-        if locale == "es":
+        if False: #locale == "es":
             self.button_font_size_pt = 12
         else:
             self.button_font_size_pt = 13
@@ -13675,8 +13675,8 @@ class ApplicationWindow(QMainWindow):
 #            self.pushbuttonstyles["ON"] = "QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }"
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
         if platf == 'Windows':
-            self.standard_button_small_height = QPushButton("Test").sizeHint().height()
-            self.standard_button_tiny_height = self.standard_button_small_height * 0.9
+            self.standard_button_small_height = QPushButton("Test").sizeHint().height() * 1.1
+            self.standard_button_tiny_height = self.standard_button_small_height * 1.4
             self.standard_button_height = self.standard_button_small_height * 1.9
         else:
             self.standard_button_small_height = QPushButton("Test").sizeHint().height()
@@ -13685,8 +13685,8 @@ class ApplicationWindow(QMainWindow):
 
         #create ON/OFF buttons
         
-        if locale in ["el"]:
-            self.pushbuttonstyles["OFF"] = self.pushbuttonstyles["OFF"].replace("90px","120px")
+#        if locale in ["el"]:
+#            self.pushbuttonstyles["OFF"] = self.pushbuttonstyles["OFF"].replace("90px","120px")
             
         self.button_1 = QPushButton(QApplication.translate("Button", "ON", None))
         self.button_1.setFocusPolicy(Qt.NoFocus)
@@ -29923,7 +29923,7 @@ class HUDDlg(ArtisanDialog):
         equdataDlg.show()
         equdataDlg.activateWindow()
 
-    def setbackgroundequ1(self,foreground=False, mathequ=False):
+    def setbackgroundequ1(self,_foreground=False, mathequ=False):
         EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
         if mathequ:
             EQU = [str(""),str(self.expresult.text())]
