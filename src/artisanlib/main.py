@@ -12919,7 +12919,7 @@ class ApplicationWindow(QMainWindow):
 
         self.ToolkitMenu.addSeparator()
 
-        self.temperatureMenu = self.ToolkitMenu.addMenu(UIconst.CONF_MENU_TEMPERATURE)
+        self.temperatureMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_TEMPERATURE)
         
         self.ConvertToFahrenheitAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_FAHRENHEIT,self)
         self.ConvertToFahrenheitAction.triggered.connect(lambda _:self.qmc.convertTemperature("F"))
