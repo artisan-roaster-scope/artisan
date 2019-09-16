@@ -1,6 +1,6 @@
 [General]
 Delay=1000
-Oversampling=true
+Oversampling=false
 
 [ArduinoPID]
 dutyMax=100
@@ -67,14 +67,14 @@ input1bcd=false
 input1code=3
 input1div=1
 input1float=false
-input1mode=F
+input1mode=C
 input1register=6
 input1slave=1
 input2bcd=false
 input2code=3
 input2div=1
 input2float=false
-input2mode=F
+input2mode=C
 input2register=7
 input2slave=1
 input3bcd=false

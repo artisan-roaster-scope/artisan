@@ -1,6 +1,6 @@
 [General]
 Delay=3000
-Oversampling=true
+Oversampling=false
 
 [Device]
 id=29
@@ -20,19 +20,19 @@ bytesize=8
 comport=COM4
 host=10.0.0.9
 input1bcd=false
-input1code=4
+input1code=3
 input1div=0
 input1float=false
 input1mode=C
-input1register=0
+input1register=45
 input1slave=1
 input2bcd=false
-input2code=4
+input2code=3
 input2div=0
 input2float=false
 input2mode=C
-input2register=0
-input2slave=2
+input2register=46
+input2slave=1
 input3bcd=false
 input3code=4
 input3div=0
@@ -70,4 +70,4 @@ type=0
 wordorderLittle=true
 
 [RoastProperties]
-roastertype=Besca BSC manual
+roastertype=Besca BSC manual v2
