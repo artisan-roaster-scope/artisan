@@ -355,22 +355,23 @@ class Artisan(QtSingleApplication):
             self.artisanviewerMode = False
         
     def appRaised(self,oldFocusWidget,newFocusWidget):
-        if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
-            #focus gained
-#PLUS
-            try:
-                if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
-                        libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
-                        plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
-            except:
-                pass
-            self.sentToBackground = None
-                
-        elif oldFocusWidget is not None and newFocusWidget is None and aw is not None and aw.centralWidget() == oldFocusWidget:
-            # focus released
-            self.sentToBackground = libtime.time() # keep the timestamp on sending the app with the main window to background
-        else: # on raising another dialog/widget was open, reset timer
-            self.sentToBackground = None
+        if not sip.isdeleted(aw):
+            if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
+                #focus gained
+    #PLUS
+                try:
+                    if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
+                            libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
+                            plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
+                except:
+                    pass
+                self.sentToBackground = None
+                    
+            elif oldFocusWidget is not None and newFocusWidget is None and aw is not None and aw.centralWidget() == oldFocusWidget:
+                # focus released
+                self.sentToBackground = libtime.time() # keep the timestamp on sending the app with the main window to background
+            else: # on raising another dialog/widget was open, reset timer
+                self.sentToBackground = None
         
     # takes a QUrl and interprets it as follows
     # artisan://roast/<UUID> : loads profile from path associated with the given roast <UUID>
@@ -3440,7 +3441,7 @@ class tgraphcanvas(FigureCanvas):
                     text = u(aw.messagelabel.text())
                     if len(text):
                         if text[0] == ">":
-                            aw.sendmessage("",style="background-color:'transparent';")
+                            aw.clearMessageLine(style="background-color:'transparent';")
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackevent() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -10967,7 +10968,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
                 self.base_messagevisible = True
             elif self.base_messagevisible:
-                aw.sendmessage("")
+                aw.clearMessageLine()
                 self.base_messagevisible = False
             if x and y:
                 if self.l_horizontalcrossline is None:
@@ -14607,6 +14608,7 @@ class ApplicationWindow(QMainWindow):
         
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatus)
+        
     
     # c a QColor instance, returns the standard W3C value for the perceived brightness of an RGB color in the range of 0-255, ignoring the alpha channel
     # see https://www.w3.org/TR/AERT/#color-contrast
@@ -17608,6 +17610,10 @@ class ApplicationWindow(QMainWindow):
         except Exception:
             pass
 
+    # clears the message line without appending to the message log
+    def clearMessageLine(self,style=None):
+        self.sendmessage("",append=False,style=style)
+        
     # this should only be called from within the main GUI thread (and never from the sampling thread!)
     def sendmessage(self,message,append=True,style=None):
         if isinstance(threading.current_thread(), threading._MainThread):
@@ -18118,7 +18124,7 @@ class ApplicationWindow(QMainWindow):
                     self.moveKbutton("enter")
                 elif key == 16777216:                 #ESCAPE
                     self.quickEventShortCut = None
-                    aw.sendmessage("")
+                    aw.clearMessageLine()
                     macfullscreen = False
                     try:
                         if platf == 'Darwin' and app.allWindows()[0].visibility() == QWindow.FullScreen:
@@ -18226,7 +18232,7 @@ class ApplicationWindow(QMainWindow):
                                     # three digits entered, set the SV
                                     self.quickEventShortCut = None
                                     value = int(eventValueStr)
-                                    aw.sendmessage("")
+                                    aw.clearMessageLine()
                                     aw.pidcontrol.setSV(value)
                                 else:
                                     # keep on looking for digits
@@ -30022,7 +30028,7 @@ class HUDDlg(ArtisanDialog):
         try:
             aw.qmc.plotterstack = [0]*10
             aw.qmc.plottermessage = ""
-            aw.sendmessage("",append=False)
+            aw.clearMessageLine()
 
             aw.qmc.plotterequationresults = [[],[],[],[],[],[],[],[],[]]
             EQU = [str(self.equedit1.text()),str(self.equedit2.text()),
@@ -30563,7 +30569,7 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.resetdeltalines()
         aw.qmc.resetlines()        
         aw.qmc.redraw(recomputeAllDeltas=False)
-        aw.sendmessage("") #clears plotter possible exceptions if Cancel
+        aw.clearMessageLine() #clears plotter possible exceptions if Cancel
         self.accept()
 
     #button OK

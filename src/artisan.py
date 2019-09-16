@@ -18,7 +18,14 @@ try:
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 #    os.environ["QT_SCALE_FACTOR"] = "1"
-except Exception as e:
+except:
+    pass
+
+try:
+    # PyQt new exit scheme (default from 5.14 on)
+    from PyQt5.QtCore import pyqt5_enable_new_onexit_scheme
+    pyqt5_enable_new_onexit_scheme(True)
+except:
     pass
         
 # on Qt5, the platform plugin cocoa/windows is not found in the plugin directory (dispite the qt.conf file) if we do not
