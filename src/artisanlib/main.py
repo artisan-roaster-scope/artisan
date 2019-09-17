@@ -4936,7 +4936,8 @@ class tgraphcanvas(FigureCanvas):
     # timex_lin: a linear spaced version of timex
     def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True,timex_lin=None,deltaETsamples=None,deltaBTsamples=None):
         try:
-            tx = numpy.array(timex)
+            tx_roast = numpy.array(timex)
+            lt = len(tx_roast)
             if CHARGEidx > -1:
                 roast_start_idx = CHARGEidx
             else:
@@ -4944,9 +4945,7 @@ class tgraphcanvas(FigureCanvas):
             if DROPidx > 0:
                 roast_end_idx = DROPidx
             else:
-                roast_end_idx = len(tx)
-            tx_roast = numpy.array(timex) # just the part from CHARGE TO DROP
-            lt = len(tx_roast)
+                roast_end_idx = lt
             if deltaBTsamples is None:
                 dsBT = aw.qmc.deltaBTsamples
             else:
@@ -4957,7 +4956,7 @@ class tgraphcanvas(FigureCanvas):
                 dsET = deltaETsamples
             if timex_lin is not None:
                 if len(timex_lin) == len(timex):
-                    timex_lin = numpy.array(timex_lin) # just the part from CHARGE TO DROP
+                    timex_lin = numpy.array(timex_lin)
                 else:
                     timex_lin = None
             if t1 is not None:
@@ -4965,7 +4964,6 @@ class tgraphcanvas(FigureCanvas):
                     nt1 = numpy.array([0 if x is None else x for x in t1]) # ERROR None Type object not scriptable! t==None on ON
                     z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
                     ld1 = len(z1)
-                    
                 # make lists equal in length
                 if lt > ld1:
                     z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
@@ -4977,7 +4975,7 @@ class tgraphcanvas(FigureCanvas):
                 delta1 = self.smooth_list(tx_roast,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
                 delta1 = delta1[roast_start_idx:roast_end_idx]
                 # add None for parts before and after CHARGE/DROP
-                delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx))) # ERROR: all input arrays must have the same number of dimensions
+                delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(lt-roast_end_idx))) # ERROR: all input arrays must have the same number of dimensions
                 # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
                 if aw.qmc.RoRlimitFlag:
                     # remove values beyond the RoRlimit
@@ -4986,7 +4984,6 @@ class tgraphcanvas(FigureCanvas):
                     delta1 = delta1.tolist()
             else:
                 delta1 = None
-
             if t2 is not None:
                 with numpy.errstate(divide='ignore'):
                     nt2 = numpy.array([0 if x is None else x for x in t2])
@@ -5003,7 +5000,7 @@ class tgraphcanvas(FigureCanvas):
                 delta2 = self.smooth_list(tx_roast,z2,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
                 delta2 = delta2[roast_start_idx:roast_end_idx]
                 # add None for parts before and after CHARGE/DROP
-                delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))                
+                delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(lt-roast_end_idx)))                
                 # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
                 if aw.qmc.RoRlimitFlag:
                     # remove values beyond the RoRlimit
@@ -5494,12 +5491,12 @@ class tgraphcanvas(FigureCanvas):
                             tb_lin = None 
                         self.stemp1B = self.smooth_list(tb,self.fill_gaps(t1),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
                         self.stemp2B = self.smooth_list(tb,self.fill_gaps(t2),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
-                                        
+                    
                     self.l_background_annotations = []
                     #check to see if there is both a profile loaded and a background loaded
                     if self.backmoveflag:
                         self.timealign(redraw=False,recompute=False)
-                        
+                    
                     #draw one extra device on background stemp1BX
                     if aw.qmc.xtcurveidx > 0:
                         idx3 = aw.qmc.xtcurveidx - 1
@@ -5525,8 +5522,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                         sketch_params=None,path_effects=[],
                                                         linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
-                                                        alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None)))                                    
-    
+                                                        alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None)))
                     #draw background
                     if aw.qmc.backgroundETcurve:
                         temp_etb = self.stemp1B
@@ -5544,7 +5540,6 @@ class tgraphcanvas(FigureCanvas):
                                                 linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
                                                 sketch_params=None,path_effects=[],
                                                 alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None)))
-    
     
                     # we resample the temperatures to regular interval timestamps
                     if self.timeB is not None and self.timeB:
@@ -5585,7 +5580,6 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_delta2B, = self.ax.plot(self.timeB, self.delta2B,transform=trans,markersize=self.BTBdeltamarkersize,
                                 sketch_params=None,path_effects=[],
                                 marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
-    
                     #check backgroundevents flag
                     if self.backgroundeventsflag:
                         if self.eventsGraphflag not in [2,4]:
@@ -5780,8 +5774,6 @@ class tgraphcanvas(FigureCanvas):
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass                          
-
-                                                                              
                     #check backgroundDetails flag
                     if self.backgroundDetails:
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min 
@@ -5803,7 +5795,7 @@ class tgraphcanvas(FigureCanvas):
                         
                     #show the analysis results if they exist
                     if len(self.analysisresultsstr) > 0:
-                        aw.analysisShowResults()
+                        aw.analysisShowResults(redraw=False)
 
                     #END of Background
                     
@@ -5814,7 +5806,6 @@ class tgraphcanvas(FigureCanvas):
                 self.labels = []
                 self.legend_lines = []
                     
-
                 # we resample the temperatures to regular interval timestamps
                 if self.timex is not None and self.timex and len(self.timex)>1:
                     timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
@@ -6039,7 +6030,6 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                               picker=2,#markevery=every,
                                                               linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
-                            
                     if Nevents:
                         if self.eventsGraphflag == 4:
                             # we prepare copies of the Evalues
@@ -6137,7 +6127,7 @@ class tgraphcanvas(FigureCanvas):
                                             pass                          
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
-                if self.DeltaETflag or self.DeltaBTflag:            
+                if self.DeltaETflag or self.DeltaBTflag:
                     if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
                         cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                         decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
@@ -6165,7 +6155,6 @@ class tgraphcanvas(FigureCanvas):
 #                        except Exception as e:
 #                            print(e)
 #                            pass
-                                                    
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
                         if len(self.timex) == len(self.delta1) and len(self.timex)  == len(self.delta2):
@@ -6176,7 +6165,6 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 self.drawDeltaBT(trans)
                                 self.drawDeltaET(trans)
-    
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
                 for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
@@ -6288,7 +6276,6 @@ class tgraphcanvas(FigureCanvas):
 
                 if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.AUCshowFlag:
                     self.drawAUC()
-    
 # this seems to mess up the focus if sliders are shown, but mini editor not
 #                    #if recorder on
 #                    if self.flagon and self.eventsshowflag:
@@ -6311,7 +6298,7 @@ class tgraphcanvas(FigureCanvas):
                 if two_ax_mode and self.delta_ax:
                     for label in self.delta_ax.yaxis.get_ticklabels():
                         label.set_color(self.palette["ylabel"])
-    
+                
                 #write legend
                 if self.legendloc and not sampling and not aw.qmc.flagon and len(self.timex) > 2:
                     rcParams['path.effects'] = []
@@ -6369,7 +6356,6 @@ class tgraphcanvas(FigureCanvas):
                 #self.fig.canvas.draw() # done by updateBackground()
                 self.updateBackground() # update bitlblit backgrounds
                 #######################################
-                    
                     
                 # add projection and AUC guide lines last as those are removed by updategraphics for optimized redrawing and not cached
                 if aw.qmc.projectFlag and aw.qmc.BTcurve:
@@ -12944,7 +12930,7 @@ class ApplicationWindow(QMainWindow):
         self.fitIdealautoAction.triggered.connect(lambda _:self.analysisfitCurves(-1))
         self.analyzeMenu.addAction(self.fitIdealautoAction)
         self.analyzeMenu.addSeparator()
-        self.fitIdealx2Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to X\xb2",None),self)
+        self.fitIdealx2Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to x\xb2",None),self)
         self.fitIdealx2Action.triggered.connect(lambda _:self.analysisfitCurves(2))
         self.analyzeMenu.addAction(self.fitIdealx2Action)
         self.fitIdealx3Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to x\xb3",None),self)
@@ -28549,8 +28535,9 @@ class ApplicationWindow(QMainWindow):
         # create the results annotation and update the graph 
         self.analysisShowResults(RMSEstr)
             
-    def analysisShowResults(self,resultstr=""):
-        self.qmc.redraw(recomputeAllDeltas=True)
+    def analysisShowResults(self,resultstr="",redraw=True):
+        if redraw:
+            self.qmc.redraw(recomputeAllDeltas=True)
         if len(resultstr) == 0:
             resultstr = self.qmc.analysisresultsstr
         else:
