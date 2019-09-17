@@ -24246,7 +24246,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # open file
                     from openpyxl import Workbook
-                    from openpyxl.compat import range  # @UnusedImport
+                    #from openpyxl.compat import range  # @UnusedImport
                     #from openpyxl.cell import get_column_letter
                     from openpyxl.utils.cell import get_column_letter  # @UnusedImport 
                     from openpyxl.styles import Font, Fill  # @UnusedImport
