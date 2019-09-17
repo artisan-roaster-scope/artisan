@@ -5181,7 +5181,7 @@ class tgraphcanvas(FigureCanvas):
     
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
-    def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
+    def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False, silent=False):
         if aw.qmc.designerflag:
             aw.qmc.redrawdesigner()
         else:
@@ -5216,7 +5216,8 @@ class tgraphcanvas(FigureCanvas):
     
                 self.fig.clf()   #wipe out figure. keep_observers=False
     
-                self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
+                if not silent:
+                    self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
 
                 self.ax.set_ylim(self.ylimit_min, self.ylimit)
                 self.ax.set_autoscale_on(False)
@@ -12943,13 +12944,13 @@ class ApplicationWindow(QMainWindow):
         self.fitIdealautoAction.triggered.connect(lambda _:self.analysisfitCurves(-1))
         self.analyzeMenu.addAction(self.fitIdealautoAction)
         self.analyzeMenu.addSeparator()
-        self.fitIdealx2Action = QAction("Fit DE->DROP to x^2",self)
+        self.fitIdealx2Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to X\xb2",None),self)
         self.fitIdealx2Action.triggered.connect(lambda _:self.analysisfitCurves(2))
         self.analyzeMenu.addAction(self.fitIdealx2Action)
-        self.fitIdealx3Action = QAction("Fit DE->DROP to x^3",self)
+        self.fitIdealx3Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to x\xb3",None),self)
         self.fitIdealx3Action.triggered.connect(lambda _:self.analysisfitCurves(3))
         self.analyzeMenu.addAction(self.fitIdealx3Action)
-        self.fitIdealx0Action = QAction("Fit DE->DROP to ln()",self)
+        self.fitIdealx0Action = QAction(QApplication.translate("Menu","Fit DE->DROP to ln()",None),self)
         self.fitIdealx0Action.triggered.connect(lambda _:self.analysisfitCurves(0))
         self.analyzeMenu.addAction(self.fitIdealx0Action)
             
@@ -28460,6 +28461,13 @@ class ApplicationWindow(QMainWindow):
         #prevent accidental overwrite of the original file 
         self.qmc.safesaveflag = True
         self.curFile = None
+                    
+#        progress = QProgressDialog(QApplication.translate("Message", "Fitting curves...",None), None, 0, 3, self)
+#        progress.setCancelButton(None)
+#        progress.setWindowModality(Qt.WindowModal)
+#        progress.setAutoClose(True)
+#        progress.show()
+#        QApplication.processEvents()
 
         #adjust time from start to charge
         timeadj = self.qmc.timex[self.qmc.timeindex[0]]
@@ -28467,7 +28475,7 @@ class ApplicationWindow(QMainWindow):
         #drytime is either the DRY event or as set in the Phases dialog
         if self.qmc.timeindex[1]:  
             #use the DRY event
-            drytime = self.qmc.timex[self.qmc.timeindex[1]] - timeadj - self.qmc.profile_sampling_interval  #subtracting 
+            drytime = self.qmc.timex[self.qmc.timeindex[1]] - timeadj - self.qmc.profile_sampling_interval
         else:
             #use the phases dialog value
             i = self.findDryEnd(phasesindex=1)
@@ -28483,40 +28491,66 @@ class ApplicationWindow(QMainWindow):
 
         # curve fit results
         self.cfr = {} 
-
-        # build the results string
-        RMSEstr =  "          RMSE"
-        RMSEstr += "\n        BT    " + u("\u0394") + "BT"
-        #RMSEstr += "   PERR"
-        RMSEstr += "\n    | -----  -----"
-        #RMSEstr += "  -----"
-
         # ln() or all
         if exp == 0 or exp == -1:
             self.cfr["equ_naturallog"],self.cfr["dbt_naturallog"],self.cfr["dbdbt_naturallog"],self.cfr["perr_naturallog"] = self.analysisGetResults(exp=0,timeoffset=lnoffset)
+#            progress.setValue(1)
+#            QApplication.processEvents()
         # cubic or all
         if exp == 3 or exp == -1:
             self.cfr["equ_cubic"],self.cfr["dbt_cubic"],self.cfr["dbdbt_cubic"],self.cfr["perr_cubic"] = self.analysisGetResults(exp=3,timeoffset=drytime)
-        # run last to leave as curve in backgorund
+#            progress.setValue(2)
+#            QApplication.processEvents()
         # quadratic or all
         if exp == 2 or exp == -1:
             self.cfr["equ_quadratic"],self.cfr["dbt_quadratic"],self.cfr["dbdbt_quadratic"],self.cfr["perr_quadratic"] = self.analysisGetResults(exp=2,timeoffset=drytime)
+#            progress.setValue(3)
+#            QApplication.processEvents()
+
+        # find the curve with the best fit
+        try:
+            bestfit = min(self.cfr["dbdbt_quadratic"], self.cfr["dbdbt_cubic"], self.cfr["dbdbt_quadratic"])
+        except:
+            bestfit = -1
         
         # build the results string
-        if "equ_quadratic" in self.cfr:
-            RMSEstr += "\nx^2 |{0:5.1f}  {1:5.1f}".format(self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"])
-            #RMSEstr += "  {0:5.1f}".format(self.cfr["perr_quadratic"])
-        if "equ_cubic" in self.cfr:
-            RMSEstr += "\nx^3 |{0:5.1f}  {1:5.1f}".format(self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"])
-            #RMSEstr += "  {0:5.1f}".format(self.cfr["perr_cubic"])
-        if "equ_naturallog" in self.cfr:
-            RMSEstr += "\nln()|{0:5.1f}  {1:5.1f}".format(self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"])
-            #RMSEstr += "  {0:5.1f}".format(self.cfr["perr_naturallog"])
+        RMSEstr =  r"$ \hspace{5} \; %s $" % ("RMSE")
+        RMSEstr += "\n" + r"$ \hspace{4} \; %s \hspace{2} \; %s $" % ("BT", u("\u0394") + "BT")
+        RMSEstr += "\n" + r"$ \hspace{2} \, \mid %s \: %s $" % ("---", "---")
 
-        # create the output annotation
+        if "equ_quadratic" in self.cfr:
+            s1 = "x^2"
+            n1 = self.cfr["dbt_quadratic"]
+            n2 = self.cfr["dbdbt_quadratic"]
+            if self.cfr["dbdbt_quadratic"] == bestfit: 
+                RMSEstr += "\n" + r"$%s \hspace{1} \mid \, \mathbf{\hspace{1} %5.1f \hspace{2} %5.1f}$"% (s1,n1,n2)
+            else:
+                RMSEstr += "\n" + r"$%s \hspace{1} \mid \mathtt{\hspace{2} %5.1f \hspace{3} \, %5.1f}$"% (s1,n1,n2)
+        if "equ_cubic" in self.cfr:
+            s1 = "x^3"
+            n1 = self.cfr["dbt_cubic"]
+            n2 = self.cfr["dbdbt_cubic"]
+            if self.cfr["dbdbt_cubic"] == bestfit: 
+                RMSEstr += "\n" + r"$%s \hspace{1} \mid \, \mathbf{\hspace{1} %5.1f \hspace{2} %5.1f}$"% (s1,n1,n2)
+            else:
+                RMSEstr += "\n" + r"$%s \hspace{1} \mid \mathtt{\hspace{2} %5.1f \hspace{3} \, %5.1f}$"% (s1,n1,n2)
+        if "equ_naturallog" in self.cfr:
+            s1 = "ln()"
+            n1 = self.cfr["dbt_naturallog"]
+            n2 = self.cfr["dbdbt_naturallog"]
+            if self.cfr["dbdbt_naturallog"] == bestfit: 
+                RMSEstr += "\n" + r"$%s \enspace \mid \mathbf{\hspace{1} %5.1f \hspace{2} %5.1f}$"% (s1,n1,n2)
+            else:
+                RMSEstr += "\n" + r"$%s \enspace \mid \mathtt{\hspace{2} %5.1f \hspace{3} \, %5.1f}$"% (s1,n1,n2)
+
+#        progress.cancel()
+#        progress = None
+
+        # create the results annotation and update the graph 
         self.analysisShowResults(RMSEstr)
             
     def analysisShowResults(self,resultstr=""):
+        self.qmc.redraw(recomputeAllDeltas=True)
         if len(resultstr) == 0:
             resultstr = self.qmc.analysisresultsstr
         else:
@@ -28529,7 +28563,7 @@ class ApplicationWindow(QMainWindow):
                        picker=True,
                        zorder=11,
                        bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
-            self.analysisresultsanno.draggable(use_blit=not sys.platform.startswith("linux"))
+            self.analysisresultsanno.draggable(use_blit=True)
             self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
             self.qmc.fig.canvas.draw()
 
@@ -28538,15 +28572,24 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " autoAnalysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def analysisGetResults(self,exp=2,timeoffset=0):
+        #run all analysis in celsius
+        if aw.qmc.mode == "F":
+            restoreF = True
+            self.qmc.convertTemperature("C", silent=True)
+        else:
+            restoreF = False
+
         res,perr = self.qmc.lnRegression(power=exp, timeoffset=timeoffset)
         self.deleteBackground()
-        self.setbackgroundequ(EQU=["",res])
-        QApplication.processEvents()  #occasionally the fit curve remains showing.
-        self.qmc.redraw(recomputeAllDeltas=True)
+        self.setbackgroundequ(EQU=["",res], silent=True)
+        #QApplication.processEvents()  #occasionally the fit curve remains showing.
+        self.qmc.redraw(recomputeAllDeltas=True, silent=True)
         _,dbt,_,dbdbt = self.curveSimilarity(self.qmc.phases[1]) # analyze from DRY-END as specified in the phases dialog to DROP
+        if restoreF:
+            self.qmc.convertTemperature("F", silent=True)
         return res,dbt,dbdbt,perr
                 
-    def setbackgroundequ(self,foreground=False, EQU=['','']):
+    def setbackgroundequ(self,foreground=False, EQU=['',''], silent=False):
         # Check for incompatible vars from in the equations
         incompatiblevars = ["P","F","$","#"]
         error = ""
@@ -28619,7 +28662,7 @@ class ApplicationWindow(QMainWindow):
                             t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
                             aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
                         aw.qmc.background = True
-                        aw.qmc.redraw(recomputeAllDeltas=False)
+                        aw.qmc.redraw(recomputeAllDeltas=False, silent=silent)
                         aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1]), None))
 
             except Exception as e:
@@ -29331,11 +29374,11 @@ class HUDDlg(ArtisanDialog):
         self.expresult = QLineEdit()
         self.expresult.setReadOnly(True)
         self.expresult.setStyleSheet("background-color:'lightgrey';")
-        self.expradiobutton1 = QRadioButton(QApplication.translate("Label", "x^2", None))
+        self.expradiobutton1 = QRadioButton(QApplication.translate("Label", u"x\xb2", None))
         self.expradiobutton1.setChecked(True)
         self.expradiobutton1.power = self.exppower = 2
         self.expradiobutton1.toggled.connect(self.expradiobuttonClicked)
-        self.expradiobutton2 = QRadioButton(QApplication.translate("Label", "x^3", None))
+        self.expradiobutton2 = QRadioButton(QApplication.translate("Label", u"x\xb3", None))
         self.expradiobutton2.power = 3        
         self.expradiobutton2.toggled.connect(self.expradiobuttonClicked)
         self.exptimeoffsetLabel = QLabel(QApplication.translate("Label", "Offset seconds from CHARGE", None))
