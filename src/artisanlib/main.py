@@ -15864,7 +15864,7 @@ class ApplicationWindow(QMainWindow):
         except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)        
-            return None, None, None
+            return None, None, None, None
             
     def setLCDsDigitCount(self,n):
         self.lcd2.setDigitCount(n)
