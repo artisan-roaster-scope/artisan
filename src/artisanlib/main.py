@@ -826,7 +826,8 @@ class tgraphcanvas(FigureCanvas):
         self.phasesLCDmode_all = [False,False,False]
 
 
-        #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
+        #statistics flags selects to display: stat. time, stat. bar, (stat. flavors), stat. area, stat. deg/min, stat. ETBTarea
+        # NOTE: stat. flavors not used anymore. The code has been removed.
         self.statisticsflags = [1,1,0,1,0,0]
         self.statisticsmode = 1 # one of 0: standard computed values, 1: roast properties
         #conditions to estimate bad flavor:dry[min,max],mid[min,max],finish[min,max] in seconds
@@ -8476,8 +8477,8 @@ class tgraphcanvas(FigureCanvas):
                     if settings.contains("batchcounter"):
                         bc = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
                         bprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
-                        if bc > -1 and bc == aw.qmc.batchcounter-1 and aw.qmc.batchprefix == bprefix:
-                            settings.setValue("batchcounter",bc + 1)
+                        if bc > -1 and aw.qmc.batchprefix == bprefix:
+                            settings.setValue("batchcounter",aw.qmc.batchcounter)
                     settings.endGroup()
                 except Exception:
                     aw.settingspath = ""
@@ -9210,21 +9211,10 @@ class tgraphcanvas(FigureCanvas):
                         except:
                             pass
 
-                if self.statisticsflags[2]:
-                    (st1,st2,st3,st4) = aw.defect_estimation()
-                    st1 = aw.arabicReshape(st1)
-                    st2 = aw.arabicReshape(st2)
-                    st3 = aw.arabicReshape(st3)
-                    st4 = aw.arabicReshape(st4)
-                else:
-                    st1 = st2 = st3 = st4 = ""
+                st1 = st2 = st3 = st4 = ""
 
                 if self.statisticsflags[4] or self.statisticsflags[5]:
                     rates_of_changes = aw.RoR(TP_index,dryEndIndex)
-                    if self.statisticsflags[2]:
-                        st1 = st1 + u(" (")
-                        st2 = st2 + u(" (")
-                        st3 = st3 + u(" (")
                     if self.statisticsflags[4]:
                         st1 = st1 + "%.1f"%rates_of_changes[0] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None))
                         st2 = st2 + "%.1f"%rates_of_changes[1] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None))
@@ -9240,12 +9230,8 @@ class tgraphcanvas(FigureCanvas):
                         st1 += u(ts1b) + u("C*min")
                         st2 += u(ts2b) + u("C*min")
                         st3 += u(ts3b) + u("C*min")
-                    if self.statisticsflags[2]:
-                        st1 = st1 + u(")")
-                        st2 = st2 + u(")")
-                        st3 = st3 + u(")")
 
-                if self.statisticsflags[2] or self.statisticsflags[4] or self.statisticsflags[5]:
+                if self.statisticsflags[4] or self.statisticsflags[5]:
                     #Write flavor estimation
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(11)
@@ -25767,59 +25753,6 @@ class ApplicationWindow(QMainWindow):
                 idx = i
         return idx
 
-    def defect_estimation_phase(self,phase_length,lower_limit,upper_limit,short_taste,optimal_taste,long_taste):
-        result = optimal_taste
-        third_of_optimal_phase = (upper_limit - lower_limit) / 3.0
-        if phase_length < lower_limit:
-            result = short_taste
-        elif phase_length > upper_limit:
-            result = long_taste
-        elif phase_length < lower_limit + third_of_optimal_phase:
-            result = short_taste + '/' + result
-        elif phase_length > upper_limit - third_of_optimal_phase:
-            result = result + '/' + long_taste
-        return result
-
-    #Flavor defect estimation chart for each leg. Thanks to Jim Schulman 
-    #http://www.home-barista.com/home-roasting/roasting-techniques-to-emphasize-coffees-origin-t3914.html#p42178
-    def defect_estimation(self):
-        dryphasetime = self.qmc.statisticstimes[1]
-        midphasetime = self.qmc.statisticstimes[2]
-        finishphasetime = self.qmc.statisticstimes[3]
-        coolphasetime = self.qmc.statisticstimes[4]
-        PerfectPhase = u(QApplication.translate("Flavor Scope Label", "OK",None))
-        ShortDryingPhase = u(QApplication.translate("Flavor Scope Label", "Grassy",None))
-        LongDryingPhase = u(QApplication.translate("Flavor Scope Label", "Leathery",None))
-        ShortTo1CPhase = u(QApplication.translate("Flavor Scope Label", "Toasty",None))
-        LongTo1CPhase = u(QApplication.translate("Flavor Scope Label", "Bready",None))
-        ShortFinishPhase = u(QApplication.translate("Flavor Scope Label", "Acidic",None))
-        LongFinishPhase = u(QApplication.translate("Flavor Scope Label", "Flat",None))
-        ShortCoolPhase = u(QApplication.translate("Flavor Scope Label", "Fracturing",None))
-        PerfectCoolPhase = u(QApplication.translate("Flavor Scope Label", "Sweet",None))
-        LongCoolPhase = u(QApplication.translate("Flavor Scope Label", "Less Sweet",None))
-        #CHECK CONDITIONS
-        #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
-        #  => ShortDryingPhase
-        #if dry phase time > 6 mins or more than 40% of the total time
-        #  => LongDryingPhase
-        st1 = self.defect_estimation_phase(dryphasetime,self.qmc.statisticsconditions[0],self.qmc.statisticsconditions[1],ShortDryingPhase,PerfectPhase,LongDryingPhase)
-        #if mid phase time < 5 minutes
-        #  => ShortTo1CPhase
-        #if mid phase time > 10 minutes
-        #  => LongTo1CPhase
-        st2 = self.defect_estimation_phase(midphasetime,self.qmc.statisticsconditions[2],self.qmc.statisticsconditions[3],ShortTo1CPhase,PerfectPhase,LongTo1CPhase)
-        #if finish phase is less than 3 mins
-        #  => ShortFinishPhase
-        #if finish phase is over 6 minutes
-        #  => LongFinishPhase
-        st3 = self.defect_estimation_phase(finishphasetime,self.qmc.statisticsconditions[4],self.qmc.statisticsconditions[5],ShortFinishPhase,PerfectPhase,LongFinishPhase)
-        #if cool phase is less than 2 mins
-        #  => ShortCoolPhase
-        #if cool phase is over 4 minutes
-        #  => LongCoolPhase
-        st4 = self.defect_estimation_phase(coolphasetime,self.qmc.statisticsconditions[6],self.qmc.statisticsconditions[7],ShortCoolPhase,PerfectCoolPhase,LongCoolPhase)
-        return (st1,st2,st3,st4)
-
     #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
     #if given, starts at TP_index and looks forward, otherwise it looks backwards from end of roast (EoR)
     #find index with smallest abs() difference between aw.qmc.phases[1] and BT (temp2)
@@ -28448,12 +28381,12 @@ class ApplicationWindow(QMainWindow):
         self.qmc.safesaveflag = True
         self.curFile = None
                     
-#        progress = QProgressDialog(QApplication.translate("Message", "Fitting curves...",None), None, 0, 3, self)
-#        progress.setCancelButton(None)
-#        progress.setWindowModality(Qt.WindowModal)
-#        progress.setAutoClose(True)
-#        progress.show()
-#        QApplication.processEvents()
+        progress = QProgressDialog(QApplication.translate("Message", "Fitting curves...",None), None, 0, 3, self)
+        progress.setCancelButton(None)
+        progress.setWindowModality(Qt.WindowModal)
+        progress.setAutoClose(True)
+        progress.show()
+        QApplication.processEvents()
 
         #adjust time from start to charge
         timeadj = self.qmc.timex[self.qmc.timeindex[0]]
@@ -28480,18 +28413,18 @@ class ApplicationWindow(QMainWindow):
         # ln() or all
         if exp == 0 or exp == -1:
             self.cfr["equ_naturallog"],self.cfr["dbt_naturallog"],self.cfr["dbdbt_naturallog"],self.cfr["perr_naturallog"] = self.analysisGetResults(exp=0,timeoffset=lnoffset)
-#            progress.setValue(1)
-#            QApplication.processEvents()
+            progress.setValue(1)
+            QApplication.processEvents()
         # cubic or all
         if exp == 3 or exp == -1:
             self.cfr["equ_cubic"],self.cfr["dbt_cubic"],self.cfr["dbdbt_cubic"],self.cfr["perr_cubic"] = self.analysisGetResults(exp=3,timeoffset=drytime)
-#            progress.setValue(2)
-#            QApplication.processEvents()
+            progress.setValue(2)
+            QApplication.processEvents()
         # quadratic or all
         if exp == 2 or exp == -1:
             self.cfr["equ_quadratic"],self.cfr["dbt_quadratic"],self.cfr["dbdbt_quadratic"],self.cfr["perr_quadratic"] = self.analysisGetResults(exp=2,timeoffset=drytime)
-#            progress.setValue(3)
-#            QApplication.processEvents()
+            progress.setValue(3)
+            QApplication.processEvents()
 
         # find the curve with the best fit
         try:
@@ -39146,7 +39079,6 @@ class StatisticsDlg(ArtisanDialog):
         self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None))
         self.ror = QCheckBox(aw.qmc.mode + QApplication.translate("CheckBox","/min",None))
         self.ts = QCheckBox(QApplication.translate("CheckBox","AUC",None))
-        self.flavor = QCheckBox(QApplication.translate("CheckBox","Evaluation",None))
         self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None))
         self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Summary",None))
         self.ShowStatsSummary.setChecked(aw.qmc.statssummary)
@@ -39203,8 +39135,6 @@ class StatisticsDlg(ArtisanDialog):
                 self.timez.setChecked(True)
             if aw.qmc.statisticsflags[1]:
                 self.bar.setChecked(True)
-            if aw.qmc.statisticsflags[2]:
-                self.flavor.setChecked(True)
             if aw.qmc.statisticsflags[3]:
                 self.area.setChecked(True)
             if aw.qmc.statisticsflags[4]:
@@ -39215,13 +39145,11 @@ class StatisticsDlg(ArtisanDialog):
             aw.qmc.statisticsflags = [1,1,0,1,1,0]
             self.timez.setChecked(True)
             self.bar.setChecked(True)
-            self.flavor.setChecked(False)
             self.area.setChecked(True)
             self.ror.setChecked(True)
             self.ts.setChecked(False)
         self.timez.stateChanged.connect(lambda x=0: self.changeStatisticsflag(x,0))
         self.bar.stateChanged.connect(lambda x=0: self.changeStatisticsflag(x,1))
-        self.flavor.stateChanged.connect(lambda x=0: self.changeStatisticsflag(x,2))
         self.area.stateChanged.connect(lambda x=0: self.changeStatisticsflag(x,3))
         self.ror.stateChanged.connect(lambda x=0: self.changeStatisticsflag(x,4))
         self.ts.stateChanged.connect(lambda x=0: self.changeStatisticsflag(x,5))
@@ -39239,9 +39167,8 @@ class StatisticsDlg(ArtisanDialog):
         flagsLayout.addWidget(self.bar,0,1)
         flagsLayout.addWidget(self.ror,0,2)
         flagsLayout.addWidget(self.ts,0,3)
-        flagsLayout.addWidget(self.flavor,0,4)
-        flagsLayout.addWidget(self.area,0,5)
-        flagsLayout.addWidget(self.ShowStatsSummary,0,6)
+        flagsLayout.addWidget(self.area,0,4)
+        flagsLayout.addWidget(self.ShowStatsSummary,0,5)
         layout = QGridLayout()
         layout.addWidget(minf,0,1,Qt.AlignCenter)
         layout.addWidget(maxf,0,2,Qt.AlignCenter)
@@ -39427,11 +39354,6 @@ class StatisticsDlg(ArtisanDialog):
                 aw.qmc.statisticsflags[1] = 1
             else:
                 aw.qmc.statisticsflags[1] = 0
-                
-            if self.flavor.isChecked(): 
-                aw.qmc.statisticsflags[2] = 1
-            else:
-                aw.qmc.statisticsflags[2] = 0
                 
             if self.area.isChecked(): 
                 aw.qmc.statisticsflags[3] = 1
