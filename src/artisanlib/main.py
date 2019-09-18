@@ -2358,7 +2358,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
 
             # the analysis results were clicked
-            elif isinstance(event.artist, matplotlib.text.Annotation) and event.artist in [aw.analysisresultsanno]:
+            elif aw.analysisresultsanno is not None and isinstance(event.artist, matplotlib.text.Annotation) and event.artist in [aw.analysisresultsanno]:
                 self.analysispickflag = True
 
             # toggle visibility of graph lines by clicking on the legend 
@@ -4725,6 +4725,7 @@ class tgraphcanvas(FigureCanvas):
                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
         try:
             temp_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+            temp_anno.draggable(use_blit=not sys.platform.startswith("linux"))
         except: # mpl before v3.0 do not have this set_in_layout() function
             pass
         #anotate time
@@ -4732,6 +4733,7 @@ class tgraphcanvas(FigureCanvas):
                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
         try:
             time_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+            time_anno.draggable(use_blit=not sys.platform.startswith("linux"))
         except: # mpl before v3.0 do not have this set_in_layout() function
             pass
         if aw.qmc.patheffects:
@@ -5916,6 +5918,7 @@ class tgraphcanvas(FigureCanvas):
                                                      fontproperties=fontprop_small)
                                     try:
                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        anno.draggable(use_blit=not sys.platform.startswith("linux"))
                                     except: # mpl before v3.0 do not have this set_in_layout() function
                                         pass
     
@@ -6110,6 +6113,7 @@ class tgraphcanvas(FigureCanvas):
                                                      )
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            anno.draggable(use_blit=not sys.platform.startswith("linux"))
                                         except: # mpl before v3.0 do not have this set_in_layout() function
                                             pass
                                     elif self.eventsGraphflag == 4:
@@ -6124,6 +6128,7 @@ class tgraphcanvas(FigureCanvas):
                                                      )
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            anno.draggable(use_blit=not sys.platform.startswith("linux"))
                                         except: # mpl before v3.0 do not have this set_in_layout() function
                                             pass                          
                             
@@ -12055,6 +12060,9 @@ class ApplicationWindow(QMainWindow):
         self.lastLoadedProfile = ""
         self.lastLoadedBackground = ""
         
+        # analyzer
+        self.analysisresultsanno = None
+        
         # large LCDs
         self.largeLCDs_dialog = None
         self.LargeLCDsFlag = False
@@ -14887,6 +14895,8 @@ class ApplicationWindow(QMainWindow):
     def newRecentRoast(self):
         action = self.sender()
         if action:
+            modifiers = QApplication.keyboardModifiers()
+            alt_modifier = modifiers == Qt.AltModifier
             rr = action.data()
             if "background" in rr and rr["background"] is not None and rr["background"] != "":
                 try:
@@ -14896,8 +14906,9 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.timealign(redraw=False)
                     aw.qmc.redraw()
                 except:
-                    pass                        
-            self.newRoast()
+                    pass
+            if not alt_modifier:        
+                self.newRoast()
             self.setRecentRoast(rr)
                 
         
@@ -20838,16 +20849,6 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["finishphasetime"] = statisticstimes[3]
             if statisticstimes[4]:
                 computedProfile["coolphasetime"] = statisticstimes[4]
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
-        ######### Evaluations #########
-        try:
-            evaluations = self.defect_estimation()
-            computedProfile["dryphaseeval"] = encodeLocal(u(evaluations[0]))
-            computedProfile["midphaseeval"] = encodeLocal(u(evaluations[1]))
-            computedProfile["finishphaseeval"] = encodeLocal(u(evaluations[2]))
-            computedProfile["coolphaseeval"] = encodeLocal(u(evaluations[3]))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -28488,7 +28489,7 @@ class ApplicationWindow(QMainWindow):
                        picker=True,
                        zorder=11,
                        bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
-            self.analysisresultsanno.draggable(use_blit=True)
+            self.analysisresultsanno.draggable(use_blit=not sys.platform.startswith("linux"))
             self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
             self.qmc.fig.canvas.draw()
 
@@ -28645,7 +28646,8 @@ class ArtisanDialog(QDialog):
         key = int(event.key())
         #uncomment next line to find the integer value of a key
         #print(key)
-        modifiers = QApplication.keyboardModifiers()
+        #modifiers = QApplication.keyboardModifiers()
+        modifiers = event.modifiers()
         if key == 16777216 or (key == 87 and modifiers == Qt.ControlModifier): #ESCAPE or CMD-W
             self.close()
 
