@@ -6155,7 +6155,6 @@ class tgraphcanvas(FigureCanvas):
 #                            print("BT RoR std (new):",numpy.std(self.delta2))
 #                        except Exception as e:
 #                            print(e)
-#                            pass
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
                         if len(self.timex) == len(self.delta1) and len(self.timex)  == len(self.delta2):
@@ -18017,7 +18016,10 @@ class ApplicationWindow(QMainWindow):
             try:
                 self.processingKeyEvent = True
                 key = int(event.key())
-                control_modifier = event.modifiers() == Qt.ControlModifier
+                modifiers = event.modifiers()
+                control_modifier = modifiers == Qt.ControlModifier
+                alt_modifier = modifiers == Qt.AltModifier
+                #meta_modifier = modifiers == Qt.MetaModifier
                 #uncomment next line to find the integer value of a key
                 #print(key)
                 
@@ -18029,18 +18031,20 @@ class ApplicationWindow(QMainWindow):
                     self.setbuttonsfrom(numberkeys.index(key))
                 elif key == 72:                       #H
                     if not aw.qmc.designerflag:
-                        self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
-                        if len(u(self.filename)) == 0:
+                        if alt_modifier:
                             aw.deleteBackground()
+                            aw.qmc.redraw()
                         else:
-                            try:
-                                aw.qmc.resetlinecountcaches()
-                                aw.loadbackground(u(self.filename))           
-                            except:
-                                pass
-                            aw.qmc.background = True
-                        aw.qmc.timealign(redraw=False)
-                        aw.qmc.redraw()  
+                            self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
+                            if len(u(self.filename)) != 0:
+                                try:
+                                    aw.qmc.resetlinecountcaches()
+                                    aw.loadbackground(u(self.filename))           
+                                except:
+                                    pass
+                                aw.qmc.background = True
+                                aw.qmc.timealign(redraw=False)
+                                aw.qmc.redraw()  
                 elif key == 76:                       #L
                     self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Alarms",None),ext="*.alrm")
                     if len(u(self.filename)) == 0:
@@ -18478,6 +18482,7 @@ class ApplicationWindow(QMainWindow):
 #        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[o]</b></td><td>Retrieve Weight Out from Scale</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[p]</b></td><td>Toggle PID mode</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[h]</b></td><td>Load background profile</td></tr>",None))
+        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[ALT h]</b></td><td>Remove background profile</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[l]</b></td><td>Load alarms</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[+,-]</b></td><td>Inc/dec PID lookahead</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[CRTL 0-9]</b></td><td>Changes Event Button Palettes</td></tr>",None))
@@ -56308,15 +56313,6 @@ if sys.platform.startswith("darwin"):
         def makeWindowControllers(self):
             pass
 
-#def open_desktopservices_url(url):
-#    print("url",url.toString())
-#
-#class URLHandler(QObject):
-#    def handleURL(self, link):
-#        open_desktopservices_url (url)
-#        print("link",link.toString())
-
-    
 def main():
     global aw
     global app
