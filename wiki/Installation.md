@@ -10,7 +10,8 @@ Verify that your roasting machine and the devices you plan to operate with Artis
 
 Find and download the package of the latest release for your platform. The filenames are as follows, with `x.x.x` the version number.
 
-* OS X: `artisan-mac-x.x.x.dmg`
+* macOS: `artisan-mac-x.x.x.dmg`
+  * Artisan is also available via the [Homebrew Cask](https://github.com/Homebrew/homebrew-cask) package manager. See below for instructions.
 * Windows: `artisan-win-x.x.x.zip`
 * Linux Redhat/CentOS: `artisan-linux-x.x.x.rpm`
 * Linux Debian/Ubuntu: `artisan-linux-x.x.x.deb`
@@ -22,11 +23,21 @@ Find and download the package of the latest release for your platform. The filen
 
 Extract the downloaded zip archive and start the included installer.
 
-### Mac OS X
+### macOS
 
 Mount the installation `.dmg` archive with a double-click and drag the contained `Artisan.app` to your `Applications` folder
 
 You need to (temporarily during installation) tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app. On first app start Mac OS X can warn about unidentified developer. See https://support.apple.com/kb/PH21769 on how to open an app from an unidentified developer. After first application start, tick again "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel.
+
+#### Alternative: Homebrew
+Artisan is available on [Homebrew](https://brew.sh/). To install Homebrew:
+```
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+To install Artisan via Homebrew:
+```
+brew cask install artisan
+```
 
 ### Linux
 

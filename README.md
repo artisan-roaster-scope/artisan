@@ -37,7 +37,7 @@ If you think Artisan is useful to you, contribute financially to its further dev
 <img src="https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/artisan-cover.png?raw" width="700">
 -->
 
-[Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)
+[Download](https://github.com/MAKOMO/artisan/releases/latest) (macOS/Windows/Linux)
 
 [Installation Instructions](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md)
 
