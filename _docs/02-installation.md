@@ -19,7 +19,7 @@ Note that Supported Machines are those manufactures that have chosen to support 
 
 Find and [download](https://github.com/artisan-roaster-scope/artisan/releases/latest) the package of the latest release for your platform. The filenames are as follows, with `x.x.x` the version number.
 
-* OS X: `artisan-mac-x.x.x.dmg`
+* macOS: `artisan-mac-x.x.x.dmg`
 * Windows: `artisan-win-x.x.x.zip`
 * Linux Redhat/CentOS: `artisan-linux-x.x.x.rpm`
 * Linux Debian/Ubuntu: `artisan-linux-x.x.x.deb`
@@ -31,7 +31,7 @@ Find and [download](https://github.com/artisan-roaster-scope/artisan/releases/la
 
 Extract the downloaded zip archive and start the included installer.
 
-### Mac OS X
+### macOS
 
 Mount the installation `.dmg` archive with a double-click and drag the contained `Artisan.app` to your `Applications` folder
 

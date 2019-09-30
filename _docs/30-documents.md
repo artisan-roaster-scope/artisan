@@ -36,4 +36,4 @@ toc: false
 
 *  Amprobe Drivers
    - For devices that use the FT232R UART driver protocol in Windows. [Driver Installation Instructions](https://www.usb-drivers.org/ft232r-usb-uart-driver.html)
-   - For Mac all currently supported OS X versions come with an Apple driver for FTDI devices and installing an additional driver could cause conflicts.  
+   - For Mac all currently supported macOS versions come with an Apple driver for FTDI devices and installing an additional driver could cause conflicts.  

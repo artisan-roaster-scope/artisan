@@ -26,7 +26,7 @@ If you want to load Alarms from a profile (.alog file) check Load from Profile, 
 
 If you have a previous roast loaded that contains some (custom) events, you open its event table (menu Roast >> Properties; 3rd tab Events) you can turn the list of events listed there into alarms by clicking "Create Alarms".
 
-The "Create Alarms" action takes all SELECTED events listed in the table.  If NO events are  selected it takes all of them and turns each of them into an alarm rule. Make sure you check what is selected on on your screen.  Note that you can use the standard modifier keys on your operating system to achieve multi-selections (e.g. the command/apple key on Mac OS X) and further note that other tables within Artisan behave in a similar way.
+The "Create Alarms" action takes all SELECTED events listed in the table.  If NO events are  selected it takes all of them and turns each of them into an alarm rule. Make sure you check what is selected on on your screen.  Note that you can use the standard modifier keys on your operating system to achieve multi-selections (e.g. the command/apple key on macOS) and further note that other tables within Artisan behave in a similar way.
 
 
 ### Alarms To Trigger PopUPs

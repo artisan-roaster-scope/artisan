@@ -78,7 +78,7 @@ Artisan is an open-source software that helps coffee roasters record, analyze, a
 
 Artisan supports the following 64bit operating systems:
 
-* Mac OS X 10.13 and newer
+* macOS 10.13 and newer
 * Windows 8 and newer
 * Linux glibc 2.18
 
