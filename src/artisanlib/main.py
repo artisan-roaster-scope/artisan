@@ -9461,13 +9461,15 @@ class tgraphcanvas(FigureCanvas):
                 from scipy.optimize import curve_fit
                 charge = self.timex[self.timeindex[0]]
                 if timeoffset != None and timeoffset > 0:
-                    timeidx = aw.time2index(timeoffset + charge)
+                    timeidx = aw.time2index(timeoffset)
                     a = [self.timex[timeidx]-charge]
                     n = [self.temp2[timeidx]]
                 elif aw.qmc.ambientTemp != None and aw.qmc.ambientTemp > 0:
+                    timeidx = 0
                     a = [0]
                     n = [aw.qmc.ambientTemp]                    
                 else:
+                    timeidx = 0
                     a = [0]
                     if aw.qmc.mode == "F":
                         roomTemp = 70.0
@@ -9492,7 +9494,7 @@ class tgraphcanvas(FigureCanvas):
                     x = self.timex[i] - charge
                     a = a + [x]
                     n = n + [self.temp2[i]]
-                if power > 0 and self.timeindex[6]:
+                if self.timeindex[6]:
                     x = self.timex[self.timeindex[6]] - charge
                     a = a + [x]
                     n = n + [self.temp2[self.timeindex[6]]]
@@ -9508,7 +9510,7 @@ class tgraphcanvas(FigureCanvas):
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
                     popt,pcov = curve_fit(func, xa, yn)
-                perr = numpy.sqrt(numpy.diag(pcov))
+                #perr = numpy.sqrt(numpy.diag(pcov))
                 xb = numpy.array(self.timex)
                 xxb = xb + charge
                 xxa = xa + charge                                    
@@ -9527,7 +9529,7 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " lnRegression() " + str(e),exc_tb.tb_lineno)
-        return res,perr
+        return res
 
     #interpolation type
     def univariate(self):
@@ -28589,7 +28591,7 @@ class ApplicationWindow(QMainWindow):
             restoreF = False
 
         res = {}  #use dict to allow more flexible expansion in the future
-        res['equ'],_ = self.qmc.lnRegression(power=exp, timeoffset=timeoffset)
+        res['equ'] = self.qmc.lnRegression(power=exp, timeoffset=timeoffset)
         self.deleteBackground()
         self.setbackgroundequ(EQU=["",res['equ']], silent=True)
         #QApplication.processEvents()  #occasionally the fit curve remains showing.
@@ -30166,10 +30168,10 @@ class HUDDlg(ArtisanDialog):
             #check for finished roast
             if aw.qmc.timeindex[0] > -1:
                 try:
-                    _timeoffset = int(self.exptimeoffset.text())
+                    _timeoffset = int(self.exptimeoffset.text()) + aw.qmc.timex[aw.qmc.timeindex[0]]
                 except:
                     _timeoffset = 0
-                res,_ = aw.qmc.lnRegression(timeoffset=_timeoffset)
+                res = aw.qmc.lnRegression(timeoffset=_timeoffset)
                 self.lnresult.setText(res)
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "ln(): no profile data available", None))
@@ -30186,10 +30188,10 @@ class HUDDlg(ArtisanDialog):
             #check for finished roast
             if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
                 try:
-                    _timeoffset = int(self.exptimeoffset.text())
+                    _timeoffset = int(self.exptimeoffset.text()) + aw.qmc.timex[aw.qmc.timeindex[0]]
                 except:
                     _timeoffset = 0
-                res,_ = aw.qmc.lnRegression(power=self.exppower, timeoffset=_timeoffset)
+                res = aw.qmc.lnRegression(power=self.exppower, timeoffset=_timeoffset)
                 self.expresult.setText(res)
                 self.bkgndButton.setEnabled(True)                
             else:
