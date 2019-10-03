@@ -49953,16 +49953,11 @@ class graphColorDlg(ArtisanDialog):
         self.metboxLabel = self.colorLabel(aw.qmc.palette["metbox"])
         self.metboxButton = QPushButton(QApplication.translate("Button","MET Box", None))
         self.metboxButton.setFocusPolicy(Qt.NoFocus)
-        self.metboxLabel.setFrameStyle(frameStyle)
-        self.metboxButton.clicked.connect(lambda _: self.setColor("metbox",self.metboxLabel,"metbox"))
-        self.analysismaskLabel =QLabel(aw.qmc.palette["analysismask"])
-        self.analysismaskLabel.setPalette(QPalette(QColor(aw.qmc.palette["analysismask"])))
-        self.analysismaskLabel.setAutoFillBackground(True)
+        self.metboxButton.clicked.connect(self.setColorSlot)
+        self.analysismaskLabel = self.colorLabel(aw.qmc.palette["analysismask"])
         self.analysismaskButton = QPushButton(QApplication.translate("Button","Analysis Mask", None))
         self.analysismaskButton.setFocusPolicy(Qt.NoFocus)
-        self.analysismaskLabel.setFrameStyle(frameStyle)
-        self.analysismaskButton.clicked.connect(lambda _: self.setColor("Analysis Mask",self.analysismaskLabel,"analysismask"))
-        self.metboxButton.clicked.connect(self.setColorSlot)
+        self.analysismaskButton.clicked.connect(self.setColorSlot)
 
         self.lcd1LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd1LEDButton.clicked.connect(self.paintlcdsSlot)
@@ -50515,6 +50510,8 @@ class graphColorDlg(ArtisanDialog):
             self.setColor("mettext",self.mettextLabel,"mettext")
         elif widget == self.metboxButton:
             self.setColor("metbox",self.metboxLabel,"metbox")
+        elif widget == self.analysismaskButton:
+            self.setColor("Analysis Mask",self.analysismaskLabel,"analysismask")
             
     def colorLabel(self,s):
         label = QLabel(s)
