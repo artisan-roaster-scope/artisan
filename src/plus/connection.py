@@ -44,7 +44,7 @@ if platform.system().startswith("Windows") or platform.system() == 'Darwin':
 import keyring # @Reimport # imported last to make py2app work
 
 
-from plus import config, account
+from plus import config, account, util
 from artisanlib import __version__
 
 from PyQt5.QtCore import QSemaphore
@@ -144,7 +144,14 @@ def setKeyring():
         import sys # @Reimport
         _, _, exc_tb = sys.exc_info()
         config.logger.error("controller: keyring Exception %s (line %s)",e,exc_tb.tb_lineno)
-    
+
+# res is assumed to be a dict with non-empty res["result"]["user"]
+def extractUserInfo(res,attr,default):
+    if attr in res and isinstance(res[attr], str) and res[attr] != "":
+        return res[attr]
+    else:
+        return default
+
 # returns True on successful authentification
 def authentify():
     config.logger.info("authentify()")        
@@ -169,14 +176,25 @@ def authentify():
                 res = r.json()
                 if "success" in res and res["success"] and "result" in res and "user" in res["result"] and "token" in res["result"]["user"]:
                     config.logger.debug("connection: -> authentified, token received")
-                    if "nickname" in res["result"]["user"]:
-                        nickname = res["result"]["user"]["nickname"]
+                    # extract in user/account data
+                    nickname = extractUserInfo(res["result"]["user"],"nickname",None)
+                    config.app_window.plus_language = extractUserInfo(res["result"]["user"],"language","en")
+                    config.app_window.plus_paidUntil = None
+                    config.app_window.plus_subscription = None
+                    config.app_window.plus_paidUntil = None
+                    if "account" in res["result"]["user"]:
+                        config.app_window.plus_subscription = extractUserInfo(res["result"]["user"]["account"],"subscription",None)
+                        paidUntil = extractUserInfo(res["result"]["user"]["account"],"paidUntil",None)
+                        try:
+                            if paidUntil is not None:
+                                config.app_window.plus_paidUntil = util.ISO86012datetime(paidUntil)
+                        except Exception:
+                            pass
+                    if "readonly" in res["result"]["user"] and isinstance(res["result"]["user"]["readonly"], bool):
+                        config.app_window.plus_readonly = res["result"]["user"]["readonly"]
                     else:
-                        nickname = None
-                    if "language" in res["result"]["user"] and isinstance(res["result"]["user"]["language"], str) and res["result"]["user"]["language"] != "":
-                        config.app_window.plus_language = res["result"]["user"]["language"]
-                    else:
-                        config.app_window.plus_language = "en"
+                        config.app_window.plus_readonly = False
+                    #
                     setToken(res["result"]["user"]["token"],nickname)
                     if "account_id" in res["result"]["user"] and "_id" in res["result"]["user"]["account_id"]:
                         account_nr = account.setAccount(res["result"]["user"]["account_id"]["_id"])

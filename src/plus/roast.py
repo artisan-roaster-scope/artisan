@@ -42,6 +42,12 @@ def getTemplate(bp):
             
         if "roastepoch" in bp:
             d["date"] = util.epoch2ISO8601(bp["roastepoch"])
+            try:
+                gmt_offset = util.limitnum(-60000,60000,util.getGMToffset())
+                if gmt_offset is not None:
+                    d["GMT_offset"] = gmt_offset
+            except:
+                pass
 
         if "weight" in bp:
             if bp["weight"][0]:
@@ -74,7 +80,7 @@ def getTemplate(bp):
         util.addString2dict(bp,"roastertype",d,"machine",50)
         util.addString2dict(bp,"machinesetup",d,"setup",50)
         util.addNum2dict(bp,"whole_color",d,"whole_color",0,255,0)
-        util.addNum2dict(bp,"ground_color",d,"ground_color",0,255,0)       
+        util.addNum2dict(bp,"ground_color",d,"ground_color",0,255,0)
                         
         if ("whole_color" in d or "ground_color" in d):  
             util.addString2dict(bp,"color_system",d,"color_system",25)
@@ -104,6 +110,9 @@ def getTemplate(bp):
                     v = util.limitnum(0,100,util.float2floatMin(cp["finishphasetime"]/cp["totaltime"]*100,1))
                     if v is not None:
                         d["DEV_ratio"] = v
+         
+            util.addNum2dict(cp,"AUC",d,"AUC",0,10000,0)
+            util.addTemp2dict(cp,"AUCbase",d,"AUC_base")
 
     except Exception as e:
         import sys

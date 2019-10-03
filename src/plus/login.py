@@ -25,7 +25,7 @@
 
 from PyQt5.QtWidgets import QApplication,QDialog,QCheckBox,QGroupBox,QHBoxLayout,QVBoxLayout,QLabel,QLineEdit,QDialogButtonBox,QAction
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import (Qt,pyqtSlot)
 
 from plus import config
 
@@ -61,8 +61,8 @@ class Login(QDialog):
         if aw.locale not in aw.qtbase_locales:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setText(QApplication.translate("Button","OK", None))
             self.dialogbuttons.button(QDialogButtonBox.Cancel).setText(QApplication.translate("Button","Cancel",None))
-        self.dialogbuttons.accepted.connect(lambda :self.setCredentials())
-        self.dialogbuttons.rejected.connect(lambda :self.reject())
+        self.dialogbuttons.accepted.connect(self.setCredentials)
+        self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(False)
         self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(True)
         # add additional CMD-. shortcut to close the dialog
@@ -102,9 +102,15 @@ class Login(QDialog):
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(5)
         
-    def rememberCheckChanged(self,s):
-        self.remember = bool(s)
-        
+    @pyqtSlot()
+    def reject(self):
+        super(Login,self).reject()
+
+    @pyqtSlot(int)
+    def rememberCheckChanged(self,i):
+        self.remember = bool(i)
+    
+    @pyqtSlot(str)
     def textChanged(self,_):
         login = self.textName.text()
         passwd = self.textPass.text()
@@ -115,6 +121,7 @@ class Login(QDialog):
             self.dialogbuttons.button(QDialogButtonBox.Cancel).setDefault(True)
             self.dialogbuttons.button(QDialogButtonBox.Ok).setEnabled(False)
 
+    @pyqtSlot()
     def setCredentials(self):
         self.login = self.textName.text()
         self.passwd = self.textPass.text()

@@ -44,6 +44,8 @@ uuid_tag         = "roastUUID"
 api_base_url         = "https://artisan.plus/api/v1"
 web_base_url         = "https://artisan.plus"
 
+shop_base_url         = "https://shop.artisan.plus"
+
 register_url     = web_base_url + "/register"
 reset_passwd_url = web_base_url + "/resetPassword"
 auth_url         = api_base_url + "/accounts/users/authenticate"

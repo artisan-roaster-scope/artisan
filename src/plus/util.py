@@ -89,7 +89,7 @@ def datetime2ISO8601(dt):
     return "%s.%03dZ" % (dtstr, int(micro) / 1000)
 
 def ISO86012datetime(ts):
-    dt = dateutil.parser.parse(ts)    
+    dt = dateutil.parser.parse(ts)
     return dt # dt.replace(tzinfo=None)
 
 def datetime2epoch(dt):
@@ -104,7 +104,10 @@ def epoch2ISO8601(epoch):
     
 def ISO86012epoch(ts):
     return datetime2epoch(ISO86012datetime(ts))
-    
+
+def getGMToffset():
+    return datetime.datetime.now(datetime.timezone.utc).astimezone().utcoffset() // datetime.timedelta(seconds=1)
+
 ## Prepare Temperatures for sending
 
 def temp2C(temp):

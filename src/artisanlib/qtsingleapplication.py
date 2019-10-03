@@ -6,7 +6,7 @@ Original Author: user763305
 Notes: Modified for PyQt5; further modified to remove blocking sockets remaining from died server
 '''
 
-from PyQt5.QtCore import pyqtSignal, QTextStream, Qt
+from PyQt5.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer
 
@@ -96,6 +96,7 @@ class QtSingleApplication(QApplication):
         self._outStream.flush()
         return self._outSocket.waitForBytesWritten()
 
+    @pyqtSlot()
     def _onNewConnection(self):
         if self._inSocket:
             self._inSocket.readyRead.disconnect(self._onReadyRead)
@@ -108,6 +109,7 @@ class QtSingleApplication(QApplication):
         if self._activateOnMessage and self._isRunning:
             self.activateWindow()
 
+    @pyqtSlot()
     def _onReadyRead(self):
         while True:
             msg = self._inStream.readLine()

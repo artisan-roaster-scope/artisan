@@ -123,7 +123,8 @@ class Concur(threading.Thread):
                                     controller.disconnect(remove_credentials = False, stop_queue=False)
                             except:
                                 pass
-                            # we don't change the iter, but retry to connect after a delay in the next iteration
+                            iters = iters - 1
+                            # we retry to connect after a delay in the next iteration
                             time.sleep(config.queue_retry_delay)
                         elif r is not None and r.status_code == 409: # conflict
                             iters = 0 # we don't retry, but remove the task as it is faulty
@@ -207,31 +208,34 @@ def addRoast(roast_record = None):
     global queue
     try:
         config.logger.info("queue:addRoast()")
-        if roast_record == None:
-            r = roast.getRoast()
+        if config.app_window.plus_readonly:
+            config.logger.info("queue: -> roast not queued as users account access is readonly")
         else:
-            r = roast_record
-        # if modification date is not set yet, we add the current time as modified_at timestamp as float EPOCH with millisecond
-        if not "modified_at" in r: 
-            r["modified_at"] = util.epoch2ISO8601(time.time())
-        config.logger.debug("queue: -> roast: %s",r)
-        # check if all required data is available before queueing this up
-        if "roast_id" in r and r["roast_id"] and \
-           (roast_record is not None or ("date" in r and r["date"] and "amount" in r)): # amount can be 0 but has to be present
-            # put in upload queue
-            config.logger.debug("queue: -> put in queue")
-            config.app_window.sendmessage(QApplication.translate("Plus","Queuing roast for upload to artisan.plus",None))    # @UndefinedVariable                             
-            queue.put({
-                "url": config.roast_url,
-                "data": r,
-                "verb": "POST"},
-#                timeout=config.queue_put_timeout # sql queue does not feature a timeout
-                )
-            config.logger.debug("queue: -> roast queued up")
-            config.logger.debug("queue: -> qsize: %s",queue.qsize())
-            sync.setSyncRecordHash(r)
-        else:
-            config.logger.debug("queue: -> roast not queued as mandatory info missing")
+            if roast_record == None:
+                r = roast.getRoast()
+            else:
+                r = roast_record
+            # if modification date is not set yet, we add the current time as modified_at timestamp as float EPOCH with millisecond
+            if not "modified_at" in r: 
+                r["modified_at"] = util.epoch2ISO8601(time.time())
+            config.logger.debug("queue: -> roast: %s",r)
+            # check if all required data is available before queueing this up
+            if "roast_id" in r and r["roast_id"] and \
+               (roast_record is not None or ("date" in r and r["date"] and "amount" in r)): # amount can be 0 but has to be present
+                # put in upload queue
+                config.logger.debug("queue: -> put in queue")
+                config.app_window.sendmessage(QApplication.translate("Plus","Queuing roast for upload to artisan.plus",None))    # @UndefinedVariable                             
+                queue.put({
+                    "url": config.roast_url,
+                    "data": r,
+                    "verb": "POST"},
+#                    timeout=config.queue_put_timeout # sql queue does not feature a timeout
+                    )
+                config.logger.debug("queue: -> roast queued up")
+                config.logger.debug("queue: -> qsize: %s",queue.qsize())
+                sync.setSyncRecordHash(r)
+            else:
+                config.logger.debug("queue: -> roast not queued as mandatory info missing")
     except Exception as e:
         import sys
         _, _, exc_tb = sys.exc_info()
