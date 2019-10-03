@@ -9530,7 +9530,7 @@ class tgraphcanvas(FigureCanvas):
                     func = lambda x,a,b,c: a * numpy.log(b*x+c)
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    popt,pcov = curve_fit(func, xa, yn)
+                    popt,_ = curve_fit(func, xa, yn)
                 #perr = numpy.sqrt(numpy.diag(pcov))
                 xb = numpy.array(self.timex)
                 xxb = xb + charge
@@ -15983,6 +15983,7 @@ class ApplicationWindow(QMainWindow):
         return max(aw.eventslidermin[i]/10., min(aw.eventslidermax[i] / 10.,r))
         
     
+    # BTlimit currently unused
     def curveSimilarity2(self,BTlimit=None,analysis_starttime=0,analysis_endtime=0):
         result = {}
         try:
