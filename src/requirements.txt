@@ -14,3 +14,4 @@ pyusb==1.0.2
 setuptools==40.9.0
 persist-queue==0.4.2
 portalocker==1.4.0
+prettytable==0.7.2

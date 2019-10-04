@@ -9127,7 +9127,7 @@ class tgraphcanvas(FigureCanvas):
             dryEndIndex, statisticstimes = self.calcStatistics(TP_index)
             
             if statisticstimes[0] == 0:
-                aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [DROP]", None))
+                aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [FCs] + [DROP]", None))
                 return
             else:
                 self.statisticstimes = statisticstimes
@@ -15983,66 +15983,76 @@ class ApplicationWindow(QMainWindow):
         return max(aw.eventslidermin[i]/10., min(aw.eventslidermax[i] / 10.,r))
         
     
-    # BTlimit currently unused
-    def curveSimilarity2(self,BTlimit=None,analysis_starttime=0,analysis_endtime=0):
+    def curveSimilarity2(self,analysis_starttime=0,analysis_endtime=0):
         result = {}
-        try:
-            # if background profile is loaded and both profiles have a DROP event set
-            if aw.qmc.background and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
+        # if background profile is loaded and both profiles have a DROP even set
+        if aw.qmc.background and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
+            
+            try:
+                analysis_start = aw.qmc.time2index(analysis_starttime)
+                analysis_end = aw.qmc.time2index(analysis_endtime)
+                analysis_BT = aw.qmc.stemp2[analysis_start:analysis_end]
+                analysis_DeltaBT = aw.qmc.delta2[analysis_start:analysis_end]
+                analysis_BTB = aw.qmc.stemp2B[analysis_start:analysis_end]
+                analysis_DeltaBTB = aw.qmc.delta2B[analysis_start:analysis_end]
                 
-                try:
-                    analysis_start = aw.qmc.time2index(analysis_starttime)
-                    analysis_end = aw.qmc.time2index(analysis_endtime)
-                    analysis_BT = aw.qmc.stemp2[analysis_start:analysis_end]
-                    analysis_DeltaBT = aw.qmc.delta2[analysis_start:analysis_end]
-                    analysis_BTB = aw.qmc.stemp2B[analysis_start:analysis_end]
-                    analysis_DeltaBTB = aw.qmc.delta2B[analysis_start:analysis_end]
-                   
-                    np_bt = numpy.array(analysis_BT)
-                    np_btb = numpy.array(analysis_BTB)
-                    np_dbt = numpy.array(analysis_DeltaBT)
-                    np_dbtb = numpy.array(analysis_DeltaBTB)
+                np_bt = numpy.array(analysis_BT)
+                np_btb = numpy.array(analysis_BTB)
+                np_dbt = numpy.array(analysis_DeltaBT)
+                np_dbtb = numpy.array(analysis_DeltaBTB)
 
-                    # RMSE
-                    rmse_BT = numpy.sqrt(numpy.mean(numpy.square(np_bt - np_btb)))
-                    rmse_deltaBT = numpy.sqrt(numpy.mean(numpy.square(np_dbt - np_dbtb)))
+                # RMSE
+                rmse_BT = numpy.sqrt(numpy.mean(numpy.square(np_bt - np_btb)))
+                rmse_deltaBT = numpy.sqrt(numpy.mean(numpy.square(np_dbt - np_dbtb)))
 
-                    # R squared - Coefficient of determination (1 is a good result, 0 is not good)
-                    # residual sum of squares
-                    ss_res_bt = numpy.sum((np_bt - np_btb) ** 2)
-                    ss_res_dbt = numpy.sum((np_dbt - np_dbtb) ** 2)
-                    # total sum of squares
-                    ss_tot_bt = numpy.sum((np_bt - numpy.mean(np_bt)) ** 2)
-                    ss_tot_dbt = numpy.sum((np_dbt - numpy.mean(np_dbt)) ** 2)
-                    # r-squared
-                    r2_BT = 1 - (ss_res_bt / ss_tot_bt)
-                    r2_deltaBT = 1 - (ss_res_dbt / ss_tot_dbt)
-                    
+                # R squared - Coefficient of determination (1 is a good result, 0 is not good)
+                # residual sum of squares
+                ss_res_bt = numpy.sum((np_bt - np_btb) ** 2)
+                ss_res_dbt = numpy.sum((np_dbt - np_dbtb) ** 2)
+                # total sum of squares
+                ss_tot_bt = numpy.sum((np_bt - numpy.mean(np_bt)) ** 2)
+                ss_tot_dbt = numpy.sum((np_dbt - numpy.mean(np_dbt)) ** 2)
+                # r-squared
+                r2_BT = 1 - (ss_res_bt / ss_tot_bt)
+                r2_deltaBT = 1 - (ss_res_dbt / ss_tot_dbt)
+                
+                # Tests that require FCs is marked
+                if aw.qmc.timeindex[2]:
                     # RoR at time of FCs, and Actual RoR versus Template RoR at FCs
-                    if aw.qmc.timeindex[2]:
-                        RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
-                        RoR_FCs_templ = aw.qmc.delta2B[aw.qmc.timeindex[2]]
-                        RoR_FCs_delta = RoR_FCs_act - RoR_FCs_templ
-                    else:
-                        RoR_FCs_act = 0
-                        RoR_FCs_templ = 0
-                        RoR_FCs_delta = 0
-                    
-                    # build the dict to return
-                    result['rmse_BT'] = rmse_BT
-                    result['rmse_deltaBT'] = rmse_deltaBT
-                    result['r2_BT'] = r2_BT
-                    result['r2_deltaBT'] = r2_deltaBT
-                    result['ror_fcs_act'] = RoR_FCs_act
-                    result['ror_fcs_delta'] = RoR_FCs_delta
-                   
-                except Exception as e:
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curvesimilatrity2() inner: {0}").format(str(e)),exc_tb.tb_lineno)
+                    RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
+                    RoR_FCs_templ = aw.qmc.delta2B[aw.qmc.timeindex[2]]
+                    RoR_FCs_delta = RoR_FCs_act - RoR_FCs_templ
 
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curvesimilatrity2(): {0}").format(str(e)),exc_tb.tb_lineno)
+                    #max and min difference between actual RoR and template RoR 
+                    maxdelta = numpy.max(np_dbt - np_dbtb)
+                    mindelta = numpy.min(np_dbt - np_dbtb)
+                    
+                    #count of times the actual RoR crosses the template RoR
+                    diff_array = np_dbt - np_dbtb
+                    zerocrosses = ((diff_array[:-1] * diff_array[1:]) < 0).sum()
+
+                else:
+                    RoR_FCs_act = 0
+                    RoR_FCs_templ = 0
+                    RoR_FCs_delta = 0
+                    maxdelta = 0
+                    mindelta = 0
+                    zerocrosses = 0
+                
+                # build the dict to return
+                result['rmse_BT'] = rmse_BT
+                result['rmse_deltaBT'] = rmse_deltaBT
+                result['r2_BT'] = r2_BT
+                result['r2_deltaBT'] = r2_deltaBT
+                result['ror_fcs_act'] = RoR_FCs_act
+                result['ror_fcs_delta'] = RoR_FCs_delta
+                result['ror_max_delta'] = maxdelta
+                result['ror_min_delta'] = mindelta
+                result['zerocrosses'] = zerocrosses
+
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curvesimilatrity(): {0}").format(str(e)),exc_tb.tb_lineno)
         return result
 
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
@@ -29040,6 +29050,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.safesaveflag = True
         self.curFile = None
                     
+        # initialize progress dialog
         progress = QProgressDialog(QApplication.translate("Message", "Fitting curves...",None), None, 0, 3, self)
         progress.setCancelButton(None)
         progress.setWindowModality(Qt.WindowModal)
@@ -29067,7 +29078,8 @@ class ApplicationWindow(QMainWindow):
                 i = self.findDryEnd(phasesindex=2)
                 fcstime = self.qmc.timex[i]
 
-            analysis_starttime = fcstime -120
+            analysis_starttime = fcstime - 120
+            #analysis_endtime = fcstime + 30
             analysis_endtime = aw.qmc.timex[aw.qmc.timeindex[6]]
 
             #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after DROP.
@@ -29088,8 +29100,10 @@ class ApplicationWindow(QMainWindow):
                 self.cfr["dbdbt_naturallog"] = res["rmse_deltaBT"]
                 self.cfr["r2_deltabt_naturallog"] = res["r2_deltaBT"]
                 self.cfr['ror_fcs_delta_naturallog'] = res['ror_fcs_delta']
+                self.cfr['ror_max_delta_naturallog'] = res['ror_max_delta']
+                self.cfr['ror_min_delta_naturallog'] = res['ror_min_delta']
+                self.cfr['ror_maxmin_delta_naturallog'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(1)
-
             # cubic or all
             if exp == 3 or exp == -1:
                 res = self.analysisGetResults(exp=3,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
@@ -29098,6 +29112,9 @@ class ApplicationWindow(QMainWindow):
                 self.cfr["dbdbt_cubic"] = res["rmse_deltaBT"]
                 self.cfr["r2_deltabt_cubic"] = res["r2_deltaBT"]
                 self.cfr['ror_fcs_delta_cubic'] = res['ror_fcs_delta']
+                self.cfr['ror_max_delta_cubic'] = res['ror_max_delta']
+                self.cfr['ror_min_delta_cubic'] = res['ror_min_delta']
+                self.cfr['ror_maxmin_delta_cubic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(2)
             # quadratic or all
             if exp == 2 or exp == -1:
@@ -29107,6 +29124,9 @@ class ApplicationWindow(QMainWindow):
                 self.cfr["dbdbt_quadratic"] = res["rmse_deltaBT"]
                 self.cfr["r2_deltabt_quadratic"] = res["r2_deltaBT"]
                 self.cfr['ror_fcs_delta_quadratic'] = res['ror_fcs_delta']
+                self.cfr['ror_max_delta_quadratic'] = res['ror_max_delta']
+                self.cfr['ror_min_delta_quadratic'] = res['ror_min_delta']
+                self.cfr['ror_maxmin_delta_quadratic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(3)
             
             # find the curve with the best fit
@@ -29115,63 +29135,34 @@ class ApplicationWindow(QMainWindow):
             except:
                 bestfit = -1
         
-            # build the results string
-            RMSEstr = ""
-            RMSEstr += r"$ \hspace{5} \; %s $" % ("RMSE")
-            RMSEstr += r"$ \hspace{4} %s $" % (u("R^2"))
-            RMSEstr += r"$ \hspace{3} %s $" % (u("\u0394") + "RoR")
-            RMSEstr += "\n" + r"$ \hspace{4} \; %s \hspace{2} \; %s $" % ("BT", u("\u0394") + "BT")
-            RMSEstr += r"$ \hspace{2} \, %s $" % (u("\u0394") + "BT")
-            RMSEstr += r"$ \hspace{2} \, %s $" % (u("@FCs"))
-            RMSEstr += "\n" + r"$ \hspace{2} \, \mid %s \: %s $" % ("---", "---")
-            RMSEstr += r"$ \mid %s $" % ("---")
-            RMSEstr += r"$ \mid %s $" % ("---")
-
+            # build the results table
+            import prettytable
+            x = prettytable.PrettyTable()
+            x.field_names = ["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"] 
+            x.float_format = "5.2"
             if "equ_quadratic" in self.cfr:
-                s1 = "x^2"
-                n1 = self.cfr["dbt_quadratic"]
-                n2 = self.cfr["dbdbt_quadratic"]
-                if self.cfr["dbdbt_quadratic"] == bestfit: 
-                    RMSEstr += "\n" + r"$%s \hspace{1} \mid \, \mathbf{\hspace{1} %5.1f \hspace{2} %5.1f}$"% (s1,n1,n2)
-                else:
-                    RMSEstr += "\n" + r"$%s \hspace{1} \mid \mathtt{\hspace{2} %5.1f \hspace{3} \, %5.1f}$"% (s1,n1,n2)
-                
-                RMSEstr += r"$\hspace{1} \mid \mathtt{\hspace{1} \; %5.1f}$" % (self.cfr['r2_deltabt_quadratic'])
-                RMSEstr += r"$\hspace{1} \mid \mathtt{\hspace{1} \; %5.1f}$" % (self.cfr['ror_fcs_delta_quadratic'])
-
+                x.add_row(["*" if self.cfr["dbdbt_quadratic"] == bestfit else "", "x\u00b2", self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"], self.cfr["r2_deltabt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
             if "equ_cubic" in self.cfr:
-                s1 = "x^3"
-                n1 = self.cfr["dbt_cubic"]
-                n2 = self.cfr["dbdbt_cubic"]
-                if self.cfr["dbdbt_cubic"] == bestfit: 
-                    RMSEstr += "\n" + r"$%s \hspace{1} \mid \, \mathbf{\hspace{1} %5.1f \hspace{2} %5.1f}$"% (s1,n1,n2)
-                else:
-                    RMSEstr += "\n" + r"$%s \hspace{1} \mid \mathtt{\hspace{2} %5.1f \hspace{3} \, %5.1f}$"% (s1,n1,n2)
-
-                RMSEstr += r"$\hspace{1} \mid \mathtt{\hspace{1} \; %5.1f}$" % (self.cfr['r2_deltabt_cubic'])
-                RMSEstr += r"$\hspace{1} \mid \mathtt{\hspace{1} \; %5.1f}$" % (self.cfr['ror_fcs_delta_cubic'])
-
+                x.add_row(["*" if self.cfr["dbdbt_cubic"] == bestfit else "", "x\u00b3", self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"], self.cfr["r2_deltabt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
             if "equ_naturallog" in self.cfr:
-                s1 = "ln()"
-                n1 = self.cfr["dbt_naturallog"]
-                n2 = self.cfr["dbdbt_naturallog"]
-                if self.cfr["dbdbt_naturallog"] == bestfit: 
-                    RMSEstr += "\n" + r"$%s \enspace \mid \mathbf{\hspace{1} %5.1f \hspace{2} %5.1f}$"% (s1,n1,n2)
-                else:
-                    RMSEstr += "\n" + r"$%s \enspace \mid \mathtt{\hspace{2} %5.1f \hspace{3} \, %5.1f}$"% (s1,n1,n2)
-
-                RMSEstr += r"$\hspace{1} \mid \mathtt{\hspace{1} \; %5.1f}$" % (self.cfr['r2_deltabt_naturallog'])
-                RMSEstr += r"$\hspace{1} \mid \mathtt{\hspace{1} \; %5.1f}$" % (self.cfr['ror_fcs_delta_naturallog'])
-
-            RMSEstr += "\n" + r"%s%4.1f" %(QApplication.translate("Label", "Actual RoR at FCs=",None), res['ror_fcs_act']) 
+                x.add_row(["*" if self.cfr["dbdbt_naturallog"] == bestfit else "", "ln()", self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"], self.cfr["r2_deltabt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
+            
+            # highlight the best curve fit
+            if exp == -1:
+                RMSEstr = x.get_string(fields=["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
+            else:
+                RMSEstr = x.get_string(fields=[" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
+            
+            RMSEstr += "\n{0}   {1}{2:4.1f}".format(QApplication.translate("Label", "Note: All values calculated in Celsius",None), QApplication.translate("Label", "Actual RoR at FCs=",None), res['ror_fcs_act']) 
 
             # create the results annotation and update the graph 
             self.analysisShowResults(RMSEstr,analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ(): {0}").format(str(e)),exc_tb.tb_lineno)
-            RMSEstr = "There was an error"
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
+            RMSEstr = QApplication.translate("Error Message", "There was an error",None)
+        
         progress.cancel()
         progress = None
             
@@ -29207,7 +29198,7 @@ class ApplicationWindow(QMainWindow):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " autoAnalysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisShowResults(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def analysisGetResults(self,exp=2,timeoffset=0, analysis_starttime=0, analysis_endtime=0):
         #run all analysis in celsius
