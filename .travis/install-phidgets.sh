@@ -17,6 +17,8 @@ elif [ "$ARTISAN_OS" = "osx" ]; then
     hdiutil attach Phidget${version}.dmg
     sudo installer -pkg /Volumes/Phidget${version}/Phidgets.pkg -target /
 fi
-curl -L -O https://www.phidgets.com/downloads/phidget${version}/libraries/any/Phidget${version}Python.zip
-unzip -q Phidget${version}Python.zip
-(cd Phidget${version}Python && $SUDO python3 setup.py install)
+
+# Phidget Python module now installed via pip
+# curl -L -O https://www.phidgets.com/downloads/phidget${version}/libraries/any/Phidget${version}Python.zip
+# unzip -q Phidget${version}Python.zip
+# (cd Phidget${version}Python && $SUDO python3 setup.py install)
