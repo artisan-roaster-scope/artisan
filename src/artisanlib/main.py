@@ -14874,6 +14874,11 @@ class ApplicationWindow(QMainWindow):
                 plus_icon += ".svg"
             else:
                 plus_icon += ".png"
+            if subscription_icon is not None:
+                if svgsupport:
+                    subscription_icon += ".svg"
+                else:
+                    subscription_icon += ".png"
             if len(ntb.actions()) > 0:
                 a = ntb.actions()[0] # the plus action is the first one
                 a.setIcon(ntb._icon(plus_icon))
