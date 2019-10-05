@@ -6306,6 +6306,10 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.graphfont == 1:
                         self.labels = [toASCII(l) for l in self.labels]
                     leg = self.ax.legend(self.handles,self.labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                    try:
+                        leg.set_in_layout(False) # remove legend from tight_layout calculation
+                    except: # set_in_layout not available in mpl<3.x
+                        pass
                     self.legend = leg
                     self.legend_lines = leg.get_lines()
                     for h in leg.legendHandles:
@@ -7080,7 +7084,11 @@ class tgraphcanvas(FigureCanvas):
                 self.backgrounddeltaetcolor = str(dialog.bgdeltametLabel.text())
                 self.backgrounddeltabtcolor = str(dialog.bgdeltabtLabel.text())
                 self.backgroundxtcolor = str(dialog.bgextraLabel.text())
-                dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+                #deleteLater() will not work here as the dialog is still bound via the parent
+                #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+                # the following will immedately release the memory dispite this parent link
+                sip.delete(dialog)
+                #print(sip.isdeleted(dialog))
 
         #update screen with new colors
         aw.updateCanvasColors()
@@ -18772,15 +18780,16 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
                     prefix += u(aw.qmc.batchprefix) + u(aw.qmc.roastbatchnr)
                 filename = self.generateFilename(prefix=prefix)
+                filename_path = os.path.join(self.qmc.autosavepath,filename)
                 oldDir = u(QDir.current())
                 res = QDir.setCurrent(self.qmc.autosavepath)
                 if res:
                     #write
-                    self.serialize(u(filename),self.getProfile())
+                    self.serialize(filename_path,self.getProfile())
                     #restore dirs
                     QDir.setCurrent(oldDir)
                     self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
-                    self.setCurrentFile(filename)
+                    #self.setCurrentFile(filename) # we do not add autosaved files any longer to the recent file menu
                     self.qmc.safesaveflag = False
                     
                     if self.qmc.autosaveimage and not aw.qmc.flagon:
@@ -26800,7 +26809,11 @@ class ApplicationWindow(QMainWindow):
             self.color.stopbits = int(str(dialog.color_stopbitsComboBox.currentText()))
             self.color.parity = str(dialog.color_parityComboBox.currentText())
             self.color.timeout = aw.float2float(toFloat(aw.comma2dot(str(dialog.color_timeoutEdit.text()))))
+            # deleteLater() will not work here as the dialog is still bound via the parent
             dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+            # the following will immedately release the memory dispite this parent link
+            sip.delete(dialog)
+            #print(sip.isdeleted(dialog))
 
     def toggleHottopControl(self):
         if self.HottopControlActive:
@@ -29197,6 +29210,10 @@ class ApplicationWindow(QMainWindow):
                        zorder=11,
                        picker=True,
                        bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
+            try:
+                self.analysisresultsanno.set_in_layout(False) # remove from tight_layout calculation
+            except: # set_in_layout not available in mpl<3.x
+                pass
             self.analysisresultsanno.draggable(use_blit=True)
             self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
             self.qmc.fig.canvas.draw()
@@ -29314,9 +29331,10 @@ class ApplicationWindow(QMainWindow):
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None):
         super(ArtisanDialog,self).__init__(parent)
-        # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this attribute 
+        # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this Qt.WA_DeleteOnClose attribute 
         # has to be set to False explicitly in its initializer (like in comportDlg) to avoid the early GC and one might
-        # want to use a dialog.deleteLater() call to explicitly have the dialog and its widgets GCed
+        # want to use a dialog.deleteLater() call to explicitly have the dialog and its widgets GCe
+        # or rather use sip.delete(dialog) if the GC via .deleteLater() is prevented by a link to a parent object (parent not None)
         self.setAttribute(Qt.WA_DeleteOnClose, True)
 
 #        if platf == 'Windows':
