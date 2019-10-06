@@ -121,9 +121,9 @@ th {
 <th class="sorttable_numeric">$time</th>
 <th>$profile</th>
 <th>$beans</th>
-<th>$weightin</th>
-<th>$weightout</th>
-<th>$loss</th>
+<th>$weightin<br><small>($unit)</small></th>
+<th>$weightout<br><small>($unit)</small></th>
+<th>$loss<br><small>(%)</small></th>
 </tr>
 </thead>
 <tbody>
@@ -135,9 +135,9 @@ $entries
 <td></td>
 <td></td>
 <td></td>
-<td class="inv">${total_in}$unit</td>
-<td class="inv">${total_out}$unit</td>
-<td class="inv">${total_loss}%</td>
+<td class="inv">${total_in}</td>
+<td class="inv">${total_out}</td>
+<td> class="inv"${total_loss}</td>
 </tr>
 </tfoot>
 </table>

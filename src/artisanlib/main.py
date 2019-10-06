@@ -24420,7 +24420,7 @@ class ApplicationWindow(QMainWindow):
 <td sorttable_customkey=\"$out_num\">$weightout</td>
 <td sorttable_customkey=\"$loss_num\">$weightloss</td>
 </tr>""")
-        ds = self.productionData2string(data)
+        ds = self.productionData2string(data,units=False)
         batch_html = ds["id"]
         time_html = ds["time"]
         title_html = ds["title"]
@@ -24616,8 +24616,8 @@ class ApplicationWindow(QMainWindow):
                                 s2a(d["time"]),
                                 s2a(d["title"]),
                                 s2a(d["beans"]),
-                                str(d["weight_in_num"]),
-                                str(d["weight_out_num"]),
+                                '{0:.3f}'.format(d["weight_in_num"]), # str(d["weight_in_num"]),  
+                                '{0:.3f}'.format(d["weight_out_num"]), # str(d["weight_out_num"]),
                                 ])
                             c += 1
                         except:
@@ -24821,15 +24821,15 @@ class ApplicationWindow(QMainWindow):
     def rankingData2string(self,data,units=True):
         res = {}
         res["charge_temp_num"] = (aw.qmc.convertTemp(data["charge_temp"],(data["temp_unit"] if units else ""),aw.qmc.mode) if "charge_temp" in data else 0)
-        res["charge_temp"] = self.formatTemp(data,"charge_temp",(data["temp_unit"] if units else ""))
+        res["charge_temp"] = self.formatTemp(data,"charge_temp",data["temp_unit"],units)
         res["FCs_time_num"] = (data["FCs_time"] if "FCs_time" in data else 0)
         res["FCs_time"] = (self.eventtime2string(data["FCs_time"]) if "FCs_time" in data else "")
         res["FCs_temp_num"] = (aw.qmc.convertTemp(data["FCs_temp"],(data["temp_unit"] if units else ""),aw.qmc.mode) if "FCs_temp" in data else 0)
-        res["FCs_temp"] = self.formatTemp(data,"FCs_temp",(data["temp_unit"] if units else ""))
+        res["FCs_temp"] = self.formatTemp(data,"FCs_temp",data["temp_unit"],units)
         res["DROP_time_num"] = (data["DROP_time"] if "DROP_time" in data else 0)
         res["DROP_time"] = (self.eventtime2string(data["DROP_time"]) if "DROP_time" in data else "")
         res["DROP_temp_num"] = (aw.qmc.convertTemp(data["DROP_temp"],(data["temp_unit"] if units else ""),aw.qmc.mode) if "DROP_temp" in data else 0)
-        res["DROP_temp"] = self.formatTemp(data,"DROP_temp",(data["temp_unit"] if units else ""))
+        res["DROP_temp"] = self.formatTemp(data,"DROP_temp",data["temp_unit"],units)
         res["color_num"] = (data["color"] if "color" in data else 0)
         res["color"] = (("#" if units else "" ) + str(data["color"]) if "color" in data and data["color"] != 0 else "")
         res["cupping"] = '{0:.2f}'.format(data["cupping"])
@@ -24843,10 +24843,9 @@ class ApplicationWindow(QMainWindow):
         res["AUC"] = (data["AUC"] if "AUC" in data else "")
         return res
         
-    def formatTemp(self,data,key,unit):
-        return ('{0:.0f}'.format(aw.qmc.convertTemp(data[key],unit,aw.qmc.mode)) + aw.qmc.mode if key in data else "")
-    
-            
+    def formatTemp(self,data,key,unit,units=True):
+        return ('{0:.0f}'.format(aw.qmc.convertTemp(data[key],unit,aw.qmc.mode)) + (aw.qmc.mode if units else "") if key in data else "")
+
     def rankingData2htmlentry(self,production_data,ranking_data,plot_color=None):
         HTML_REPORT_TEMPLATE = u("""<tr>
 <td$color_code>$batch</td>
@@ -24866,8 +24865,8 @@ class ApplicationWindow(QMainWindow):
 <td sorttable_customkey=\"$color_num\">$color</td>
 <td>$cupping</td>
 </tr>""")
-        pd = self.productionData2string(production_data)
-        rd = self.rankingData2string(ranking_data)
+        pd = self.productionData2string(production_data,units=False)
+        rd = self.rankingData2string(ranking_data,units=False)
         batch_td_color = ""
         if plot_color is not None:
             batch_color = [x * 100 for x in plot_color[0:3]]
@@ -25414,19 +25413,21 @@ class ApplicationWindow(QMainWindow):
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                     resources = u(self.getResourcePath()),
                     title = u(QApplication.translate("HTML Report Template", "Roast Ranking", None)),
+                    weight_unit = aw.qmc.weight[2].lower(),
+                    temp_unit = aw.qmc.mode,
                     entries = entries,
-                    charges_avg = (weight_fmt.format(charges / charges_count) + aw.qmc.weight[2].lower() if charges_count > 0 and charges > 0 else ""),
-                    charges_temp_avg = ('{0:.0f}'.format(charges_temp / charges_temp_count) + aw.qmc.mode if charges_temp > 0 and charges_temp_count > 0 else ""),
+                    charges_avg = (weight_fmt.format(charges / charges_count) if charges_count > 0 and charges > 0 else ""),
+                    charges_temp_avg = ('{0:.0f}'.format(charges_temp / charges_temp_count) if charges_temp > 0 and charges_temp_count > 0 else ""),
                     FCs_time_avg = (self.eventtime2string(FCs_time / FCs_time_count) if FCs_time > 0 and FCs_time_count > 0 else ""),
-                    FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) + aw.qmc.mode if FCs_temp > 0 and FCs_temp_count > 0 else ""),
+                    FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) if FCs_temp > 0 and FCs_temp_count > 0 else ""),
                     DROP_time_avg = (self.eventtime2string(DROP_time / DROP_time_count) if DROP_time > 0 and DROP_time_count > 0 else ""),
-                    DROP_temp_avg = ('{0:.0f}'.format(DROP_temp / DROP_temp_count) + aw.qmc.mode if DROP_temp > 0 and DROP_temp_count > 0 else ""),
-                    DRY_percent_avg = ('{0:.1f}%'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 and DRY_percent_count > 0 else ""),
-                    MAI_percent_avg = ('{0:.1f}%'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 and MAI_percent_count > 0 else ""),
-                    DEV_percent_avg = ('{0:.1f}%'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 and DEV_percent_count > 0 else ""),
+                    DROP_temp_avg = ('{0:.0f}'.format(DROP_temp / DROP_temp_count) if DROP_temp > 0 and DROP_temp_count > 0 else ""),
+                    DRY_percent_avg = ('{0:.1f}'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 and DRY_percent_count > 0 else ""),
+                    MAI_percent_avg = ('{0:.1f}'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 and MAI_percent_count > 0 else ""),
+                    DEV_percent_avg = ('{0:.1f}'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 and DEV_percent_count > 0 else ""),
                     AUC_avg = ('{0:.0f}'.format(AUC / AUC_count) if AUC > 0 and AUC_count > 0 else ""),
-                    loss_avg = ('{0:.1f}'.format(loss / loss_count) + "%" if loss_count > 0 and loss > 0 else ""),
-                    colors_avg = ("#" + '{0:.0f}'.format(colors / colors_count) if colors > 0 and colors_count > 0 else ""),
+                    loss_avg = ('{0:.1f}'.format(loss / loss_count) if loss_count > 0 and loss > 0 else ""),
+                    colors_avg = ('{0:.0f}'.format(colors / colors_count) if colors > 0 and colors_count > 0 else ""),
                     cup_avg = ('{0:.2f}'.format(cuppings / cuppings_count) if cuppings > 0 and cuppings_count > 0 else ""),
                     graph_image=graph_image,
                     graph_image_pct=graph_image_pct
@@ -25481,7 +25482,7 @@ class ApplicationWindow(QMainWindow):
                                 s2a(pd["id"]),
                                 s2a(pd["time"]),
                                 s2a(pd["title"]),
-                                str(pd["weight_in_num"]),
+                                '{0:.3f}'.format(pd["weight_in_num"]), # str(pd["weight_in_num"]),                                  
                                 ('{0:.1f}'.format(aw.qmc.convertTemp(dct["charge_temp"],dct["temp_unit"],aw.qmc.mode)) if "charge_temp" in dct else ""),
                                 rd["FCs_time"],
                                 ('{0:.1f}'.format(aw.qmc.convertTemp(dct["FCs_temp"],dct["temp_unit"],aw.qmc.mode)) if "FCs_temp" in dct else ""),
@@ -25516,7 +25517,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # open file
                     from openpyxl import Workbook
-                    from openpyxl.compat import range  # @UnusedImport
+                    #from openpyxl.compat import range  # @UnusedImport
                     #from openpyxl.cell import get_column_letter
                     from openpyxl.utils.cell import get_column_letter  # @UnusedImport
                     from openpyxl.styles import Font, Fill # @UnusedImport
