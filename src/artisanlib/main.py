@@ -24379,7 +24379,7 @@ class ApplicationWindow(QMainWindow):
             unit = aw.qmc.weight[2]
             wi = aw.convertWeight(w[0],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index(unit))
             wo = aw.convertWeight(w[1],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index(unit))
-            if unit == "Kg" or unit == "lb":
+            if unit in ["Kg","lb","oz"]:
                 res["weight_in"] = '{0:.2f}'.format(wi)
                 res["weight_out"] = '{0:.2f}'.format(wo)
             else:
@@ -24844,7 +24844,11 @@ class ApplicationWindow(QMainWindow):
         return res
         
     def formatTemp(self,data,key,unit,units=True):
-        return ('{0:.0f}'.format(aw.qmc.convertTemp(data[key],unit,aw.qmc.mode)) + (aw.qmc.mode if units else "") if key in data else "")
+        if aw.qmc.LCDdecimalplaces:
+            fmt = '{0:.1f}'
+        else:
+            fmt = '{0:.0f}'
+        return (fmt.format(aw.qmc.convertTemp(data[key],unit,aw.qmc.mode)) + (aw.qmc.mode if units else "") if key in data else "")
 
     def rankingData2htmlentry(self,production_data,ranking_data,plot_color=None):
         HTML_REPORT_TEMPLATE = u("""<tr>
@@ -24885,22 +24889,23 @@ class ApplicationWindow(QMainWindow):
                     time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
         except:
             pass
+        weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb", "oz"] else '{0:.0f}')
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             color_code = batch_td_color,
             batch = batch_html,
             time = time_html,
             title = title_html,
-            in_num = '{0:.0f}'.format(pd["weight_in_num"]),
+            in_num = weight_fmt.format(pd["weight_in_num"]),
             weightin = pd["weight_in"],
-            charge_temp_num = '{0:.1f}'.format(rd["charge_temp_num"]),
+            charge_temp_num = '{0:.2f}'.format(rd["charge_temp_num"]),
             charge_temp = rd["charge_temp"],
             FCs_time_num = rd["FCs_time_num"],
             FCs_time = rd["FCs_time"],
-            FCs_temp_num = '{0:.1f}'.format(rd["FCs_temp_num"]),
+            FCs_temp_num = '{0:.2f}'.format(rd["FCs_temp_num"]),
             FCs_temp = rd["FCs_temp"],
             DROP_time_num = rd["DROP_time_num"],
             DROP_time = rd["DROP_time"],
-            DROP_temp_num = '{0:.1f}'.format(rd["DROP_temp_num"]),
+            DROP_temp_num = '{0:.2f}'.format(rd["DROP_temp_num"]),
             DROP_temp = rd["DROP_temp"],
             DRY_percent_num = rd["DRY_percent_num"],
             DRY_percent = rd["DRY_percent"],
@@ -25409,7 +25414,7 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass
                                     
-                weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb"] else '{0:.0f}')
+                weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb", "oz"] else '{0:.0f}')
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                     resources = u(self.getResourcePath()),
                     title = u(QApplication.translate("HTML Report Template", "Roast Ranking", None)),
@@ -25417,17 +25422,17 @@ class ApplicationWindow(QMainWindow):
                     temp_unit = aw.qmc.mode,
                     entries = entries,
                     charges_avg = (weight_fmt.format(charges / charges_count) if charges_count > 0 and charges > 0 else ""),
-                    charges_temp_avg = ('{0:.0f}'.format(charges_temp / charges_temp_count) if charges_temp > 0 and charges_temp_count > 0 else ""),
+                    charges_temp_avg = ('{0:.1f}'.format(charges_temp / charges_temp_count) if charges_temp > 0 and charges_temp_count > 0 else ""),
                     FCs_time_avg = (self.eventtime2string(FCs_time / FCs_time_count) if FCs_time > 0 and FCs_time_count > 0 else ""),
-                    FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) if FCs_temp > 0 and FCs_temp_count > 0 else ""),
+                    FCs_temp_avg = ('{0:.1f}'.format(FCs_temp / FCs_temp_count) if FCs_temp > 0 and FCs_temp_count > 0 else ""),
                     DROP_time_avg = (self.eventtime2string(DROP_time / DROP_time_count) if DROP_time > 0 and DROP_time_count > 0 else ""),
-                    DROP_temp_avg = ('{0:.0f}'.format(DROP_temp / DROP_temp_count) if DROP_temp > 0 and DROP_temp_count > 0 else ""),
+                    DROP_temp_avg = ('{0:.1f}'.format(DROP_temp / DROP_temp_count) if DROP_temp > 0 and DROP_temp_count > 0 else ""),
                     DRY_percent_avg = ('{0:.1f}'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 and DRY_percent_count > 0 else ""),
                     MAI_percent_avg = ('{0:.1f}'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 and MAI_percent_count > 0 else ""),
                     DEV_percent_avg = ('{0:.1f}'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 and DEV_percent_count > 0 else ""),
-                    AUC_avg = ('{0:.0f}'.format(AUC / AUC_count) if AUC > 0 and AUC_count > 0 else ""),
+                    AUC_avg = ('{0:.1f}'.format(AUC / AUC_count) if AUC > 0 and AUC_count > 0 else ""),
                     loss_avg = ('{0:.1f}'.format(loss / loss_count) if loss_count > 0 and loss > 0 else ""),
-                    colors_avg = ('{0:.0f}'.format(colors / colors_count) if colors > 0 and colors_count > 0 else ""),
+                    colors_avg = ('{0:.1f}'.format(colors / colors_count) if colors > 0 and colors_count > 0 else ""),
                     cup_avg = ('{0:.2f}'.format(cuppings / cuppings_count) if cuppings > 0 and cuppings_count > 0 else ""),
                     graph_image=graph_image,
                     graph_image_pct=graph_image_pct
