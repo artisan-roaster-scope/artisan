@@ -1,6 +1,6 @@
 pyserial==3.4
 pymodbus==2.2.0 #1.5.2
-unidecode==1.25.6
+unidecode==1.1.1
 bottle==0.12.17
 qrcode==6.1
 requests==2.22.0
