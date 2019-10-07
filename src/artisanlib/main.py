@@ -13098,6 +13098,7 @@ class ApplicationWindow(QMainWindow):
 
         serialAction = QAction(UIconst.HELP_MENU_SERIAL,self)
         serialAction.triggered.connect(self.viewSerialLog)
+        serialAction.setMenuRole(QAction.NoRole)
         self.helpMenu.addAction(serialAction)
 
         platformAction = QAction(UIconst.HELP_MENU_PLATFORM,self)
@@ -35271,7 +35272,7 @@ class serialLogDlg(ArtisanDialog):
         if aw.seriallogflag:
             self.serialEdit.setText(self.getstring())
 
-    @pyqtSlot(bool)
+    @pyqtSlot(int)
     def serialcheckboxChanged(self,_):
         if self.serialcheckbox.isChecked():
             aw.seriallogflag = True
