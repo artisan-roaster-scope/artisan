@@ -25228,6 +25228,13 @@ class ApplicationWindow(QMainWindow):
                             ncol = int(math.ceil(len(handles)))
                         self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False)
                                 
+                        # Remove and update the logo image
+                        try:
+                            aw.qmc.ai.remove()
+                            self.qmc.placelogoimage()
+                        except:
+                            pass
+
                         # generate graph
                         self.qmc.fig.set_tight_layout(False)
                         self.qmc.fig.canvas.draw()
@@ -29203,6 +29210,11 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ax.axvspan(analysis_starttime, analysis_endtime, ymin=0, ymax=0.025, facecolor=fc, alpha=a, zorder=z)
             self.qmc.ax.axvspan(analysis_starttime, analysis_endtime, ymin=0.975, ymax=1.00,  facecolor=fc, alpha=a, zorder=z)
             
+            #reset the annotationi location if the origin is out of the screen
+            for dim in self.qmc.analysisresultsloc:
+                if dim >= 1 or dim <=0:
+                    self.qmc.analysisresultsloc = [0.5,0.5]
+
             # create the analysis results annotation box
             self.analysisresultsanno = self.qmc.ax.annotate(resultstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
                        ha="left", va="center",
