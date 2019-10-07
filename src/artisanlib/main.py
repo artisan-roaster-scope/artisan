@@ -6550,7 +6550,9 @@ class tgraphcanvas(FigureCanvas):
                 trimmedstatstr = ""
                 lines = statstr.split('\n')
                 for l in lines:
-                    trimmedstatstr += '\n' + l[:statstrmaxlinelen]
+                    if trimmedstatstr != "":
+                        trimmedstatstr += '\n' 
+                    trimmedstatstr += l[:statstrmaxlinelen]
                     if len(l) > statstrmaxlinelen:
                         trimmedstatstr += ".."
                 statstr = trimmedstatstr
@@ -29148,7 +29150,7 @@ class ApplicationWindow(QMainWindow):
                 bestfit = -1
         
             # build the results table
-            import prettytable
+            import prettytable  # @UnresolvedImport
             x = prettytable.PrettyTable()
             x.field_names = ["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"] 
             x.float_format = "5.2"
