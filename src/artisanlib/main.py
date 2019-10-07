@@ -12996,13 +12996,13 @@ class ApplicationWindow(QMainWindow):
         self.fitIdealautoAction.triggered.connect(self.analysisfitCurvesALL)
         self.analyzeMenu.addAction(self.fitIdealautoAction)
         self.analyzeMenu.addSeparator()
-        self.fitIdealx2Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to x\xb2",None),self)
+        self.fitIdealx2Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to",None) + " x\xb2",self)
         self.fitIdealx2Action.triggered.connect(self.analysisfitCurvesX2)
         self.analyzeMenu.addAction(self.fitIdealx2Action)
-        self.fitIdealx3Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to x\xb3",None),self)
+        self.fitIdealx3Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to",None) + " x\xb3",self)
         self.fitIdealx3Action.triggered.connect(self.analysisfitCurvesX3)
         self.analyzeMenu.addAction(self.fitIdealx3Action)
-        self.fitIdealx0Action = QAction(QApplication.translate("Menu","Fit DE->DROP to ln()",None),self)
+        self.fitIdealx0Action = QAction(QApplication.translate("Menu","Fit DE->DROP to",None) + " ln()",self)
         self.fitIdealx0Action.triggered.connect(self.analysisfitCurvesLN)
         self.analyzeMenu.addAction(self.fitIdealx0Action)
             
@@ -25408,6 +25408,11 @@ class ApplicationWindow(QMainWindow):
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                     resources = u(self.getResourcePath()),
                     title = u(QApplication.translate("HTML Report Template", "Roast Ranking", None)),
+                    time = u(QApplication.translate("HTML Report Template", "Date", None)),
+                    profile = u(QApplication.translate("Label", "Title", None)),
+                    weightin = u(QApplication.translate("HTML Report Template", "In", None)),
+                    weightloss = u(QApplication.translate("HTML Report Template", "Loss", None)),
+                    colorHeader = u(QApplication.translate("HTML Report Template", "Color", None)),
                     weight_unit = aw.qmc.weight[2].lower(),
                     temp_unit = aw.qmc.mode,
                     entries = entries,
@@ -30029,11 +30034,11 @@ class HUDDlg(ArtisanDialog):
         self.expresult = QLineEdit()
         self.expresult.setReadOnly(True)
         self.expresult.setStyleSheet("background-color:'lightgrey';")
-        self.expradiobutton1 = QRadioButton(QApplication.translate("Label", u"x\xb2", None))
+        self.expradiobutton1 = QRadioButton(u"x\xb2")
         self.expradiobutton1.setChecked(True)
         self.expradiobutton1.power = self.exppower = 2
         self.expradiobutton1.toggled.connect(self.expradiobuttonClicked)
-        self.expradiobutton2 = QRadioButton(QApplication.translate("Label", u"x\xb3", None))
+        self.expradiobutton2 = QRadioButton(u"x\xb3")
         self.expradiobutton2.power = 3        
         self.expradiobutton2.toggled.connect(self.expradiobuttonClicked)
         self.exptimeoffsetLabel = QLabel(QApplication.translate("Label", "Offset seconds from CHARGE", None))
