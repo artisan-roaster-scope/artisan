@@ -6455,6 +6455,7 @@ class tgraphcanvas(FigureCanvas):
 
     #add stats summmary to graph 
     def statsSummary(self):
+        statstrmaxlinelen = 30  # maximum number of characters in each line before the line is truncated 
         try:
             # build roast of the day string
             if aw.qmc.roastbatchnr != None and aw.qmc.roastbatchnr != 0 and aw.qmc.roastbatchpos != None and aw.qmc.roastbatchpos != 0:
@@ -6479,59 +6480,34 @@ class tgraphcanvas(FigureCanvas):
             skipline = '\n'
             statstr = ''
             if self.statssummary:   
+                
+                #Admin Info Section
+                statstr += aw.qmc.roastbatchprefix + str(aw.qmc.roastbatchnr) + " " + aw.qmc.title
+                statstr += skipline
+                statstr += skipline
                 statstr += aw.qmc.roastdate.date().toString() + ' '
                 statstr += aw.qmc.roastdate.time().toString()
                 statstr += roastoftheday
-                if aw.qmc.roastertype:
-                    statstr += '\n' + str(aw.qmc.roastertype)
-                if aw.qmc.drumspeed:
-                    statstr += '\n' + (QApplication.translate("Label", "Drum Speed",None)) + ': ' + str(aw.qmc.drumspeed) + "RPM"
-                if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [None,0] or aw.qmc.ambient_pressure not in [None,0]:
-                    statstr += '\n' + (QApplication.translate("HTML Report Template", "Ambient:",None)) + ' '
+                statstr += skipline
                 if aw.qmc.ambientTemp not in [None,0]:
                     statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '  '
                 if aw.qmc.ambient_humidity not in [None,0]:
-                    statstr +=  str(int(aw.qmc.ambient_humidity)) + '% '
+                    statstr +=  str(int(aw.qmc.ambient_humidity)) + '%  '
                 if aw.qmc.ambient_pressure not in [None,0]:
                     statstr +=  str(aw.float2float(aw.qmc.ambient_pressure,2)) + 'hPa'
-                if aw.qmc.greens_temp:
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Bean Temp", None) + ': ' + str(int(aw.qmc.greens_temp)) + u'\u00b0' + aw.qmc.mode
+                if aw.qmc.roastertype or aw.qmc.drumspeed:
+                    statstr += skipline
+                if aw.qmc.roastertype:
+                    statstr += str(aw.qmc.roastertype) + " "
+                if aw.qmc.drumspeed:
+                    statstr += "(" + str(aw.qmc.drumspeed) + QApplication.translate("Label", "RPM",None) + ')'
                     
+                #Green Beans Info Section
+                statstr += skipline
                 if aw.qmc.beans is not None and len(aw.qmc.beans)>0:
                     statstr += skipline
-                    lines = aw.qmc.beans.split("\n")
-                    for l in lines[:3]:
-                        statstr += '\n' + l[:28]
-                        if len(l)>28:
-                            statstr += ".."                     
-                    
-                if aw.qmc.weight[0]:
-                    statstr += skipline
-                    if aw.qmc.weight[2] == "g":
-                        w =str(aw.float2float(aw.qmc.weight[0],0))
-                    else:
-                        w = str(aw.float2float(aw.qmc.weight[0],2))
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ w + aw.qmc.weight[2]
-                    if aw.qmc.weight[1]:
-                        statstr += '\n' + QApplication.translate("AddlInfo", "Weight Loss", None) + ': '+ str(aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
-
-                if aw.qmc.density[0] and aw.qmc.density[2] != 0:
-                    statstr += skipline
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3])
-                    if "roasted_density" in cp:
-                        statstr += '\n' + QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(aw.float2float(aw.weight_loss(aw.qmc.density[0],cp["roasted_density"]),1)) + "%"
-
-                if aw.qmc.volume[0]:
-                    statstr += skipline
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2])
-                    if "volume_gain" in cp: 
-                        statstr += '\n' + QApplication.translate("AddlInfo", "Volume Gain", None) + ': ' + str(aw.float2float(cp["volume_gain"],2)) + "%"                        
-#               if aw.qmc.beansize:
-#                    #statstr += skipline
-#                    statstr += '\n' + QApplication.translate("AddlInfo", "Bean Size", None) + ': '+ str(aw.qmc.beansize) + 'mm'
-
+                    statstr += aw.qmc.beans.split("\n")[0]
                 if aw.qmc.beansize_min or aw.qmc.beansize_max:
-                    #statstr += skipline
                     screen = ""
                     if aw.qmc.beansize_min:
                         screen = str(int(round(aw.qmc.beansize_min)))
@@ -6539,46 +6515,59 @@ class tgraphcanvas(FigureCanvas):
                         if screen:
                             screen = screen + "/"
                         screen = screen + str(int(round(aw.qmc.beansize_max)))
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Screen", None) + ': '+ screen # + '18/64\u2033' # the unit makes it hard to read
-
-                if aw.qmc.moisture_greens or aw.qmc.moisture_roasted:
-                    statstr += skipline
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Screen Size", None) + ': '+ screen # + '18/64\u2033' # the unit makes it hard to read
+                if aw.qmc.density[0] and aw.qmc.density[2] != 0:
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Density Green", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3]) 
                 if aw.qmc.moisture_greens:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Moisture Green", None) + ': '+ str(aw.float2float(aw.qmc.moisture_greens,1)) + "%"
+                if aw.qmc.weight[0]:
+                    if aw.qmc.weight[2] == "g":
+                        w =str(aw.float2float(aw.qmc.weight[0],0))
+                    else:
+                        w = str(aw.float2float(aw.qmc.weight[0],2))
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Batch Size", None) + ': '+ w + aw.qmc.weight[2] + " "
+                    if aw.qmc.weight[1]:
+                        statstr += '(-' + str(aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%)"
+
+                # Roast Info Section
+                statstr += skipline
+                if "roasted_density" in cp:
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Density Roasted", None) + ': '+ str(cp["roasted_density"]) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3]) 
                 if aw.qmc.moisture_roasted:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Moisture Roasted", None) + ': '+ str(aw.float2float(aw.qmc.moisture_roasted,1)) + "%"
-                    
-                if aw.qmc.whole_color > 0 or aw.qmc.ground_color > 0:
-                    statstr += skipline
                 if aw.qmc.whole_color > 0:
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Whole Color", None) + ': '+ str(aw.qmc.whole_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Whole Color", None) + ': #' + str(aw.qmc.whole_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
                 if aw.qmc.ground_color > 0:
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Ground Color", None) + ': '+ str(aw.qmc.ground_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
-                    
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Ground Color", None) + ': #' + str(aw.qmc.ground_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
+                if cp["AUC"]:
+                    statstr += '\n' + QApplication.translate("AddlInfo", "AUC", None) + ': ' + str(cp["AUC"]) + 'C*min [' + str(cp["AUCbase"]) + aw.qmc.mode + "]"
+
+                # Notes Section
                 if aw.qmc.roastingnotes is not None and len(aw.qmc.roastingnotes)>0:
                     statstr += skipline
-                    lines = aw.qmc.roastingnotes.split("\n")
-                    for l in lines[:3]:                    
-                        statstr += '\n' + l[:28]
-                        if len(l)>28:
-                            statstr += ".."
+                    statstr += '\n' + aw.qmc.roastingnotes.split("\n")[0]
+                # Trim the long lines
+                trimmedstatstr = ""
+                lines = statstr.split('\n')
+                for l in lines:
+                    trimmedstatstr += '\n' + l[:statstrmaxlinelen]
+                    if len(l) > statstrmaxlinelen:
+                        trimmedstatstr += ".."
+                statstr = trimmedstatstr
 
                 #defaults appropriate for default font
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("small")
                 fc = aw.qmc.palette["text"]  #text color
                 ls = 1.7                     #linespacing
-#                droptext_width = 80          #approximate width of the DROP time annotation (in seconds)
                 border = 10                  #space around outside of text box (in seconds)
                 margin = 4                   #text to edge of text box
                 
                 #adjust for other fonts
                 if aw.qmc.graphfont == 1:   #Humor
                     prop.set_size("x-small")
-#                    droptext_width = 120
                 if aw.qmc.graphfont == 2:   #Comic
                     ls = 1.2
-#                    droptext_width = 70
 
                 if aw.qmc.legendloc != 1:
                     # legend not in upper right
@@ -6611,7 +6600,6 @@ class tgraphcanvas(FigureCanvas):
                         stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                         stats_textbox_width = stats_textbox_bounds[2]
                         stats_textbox_height = stats_textbox_bounds[3]
-#                        print(x,"stats_textbox_width",stats_textbox_width, )
 
                         # position the stats summary relative to the right edge of the drop text
                         aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border #provide room for the stats
