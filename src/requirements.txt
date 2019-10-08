@@ -5,13 +5,13 @@ bottle==0.12.17
 qrcode==6.1
 requests==2.22.0
 yoctopuce==1.10.37304
-pefile==2018.8.8
+pefile==2019.4.18
 openpyxl==3.0.0
 altgraph==0.16.1
 macholib==1.11
 python-snap7==0.10
 pyusb==1.0.2
-setuptools==40.9.0
+setuptools==41.4.0
 persist-queue==0.4.2
 portalocker==1.5.1
 prettytable==0.7.2
