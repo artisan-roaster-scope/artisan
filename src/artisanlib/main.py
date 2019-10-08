@@ -14850,7 +14850,7 @@ class ApplicationWindow(QMainWindow):
                     plus_icon = "plus-on"
                     tooltip = QApplication.translate("Tooltip", 'Disconnect artisan.plus', None)
                 if not aw.plus_readonly:
-                    if aw.plus_subscription == "Home":
+                    if aw.plus_subscription == "HOME":
                         subscription_icon = "plus-home"
                         if aw.plus_paidUntil is not None:
                             remaining_days = (aw.plus_paidUntil.date() - datetime.datetime.now().date()).days
@@ -34174,7 +34174,7 @@ class editGraphDlg(ArtisanDialog):
         QTimer.singleShot(1,lambda : self.setWeight(self.weightinedit,self.bean_density_in_edit,self.moisture_greens_edit,overwrite))
     
     @pyqtSlot(bool)
-    def outWeight(self,_,overwrite=False):
+    def outWeight(self,_=False,overwrite=False):
         QTimer.singleShot(1,lambda : self.setWeight(self.weightoutedit,self.bean_density_out_edit,self.moisture_roasted_edit,overwrite))
 
     def setWeight(self,weight_edit,density_edit,moisture_edit,overwrite=False):
