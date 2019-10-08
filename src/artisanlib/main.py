@@ -48823,28 +48823,28 @@ class DeviceAssignmentDlg(ArtisanDialog):
 
     @pyqtSlot(int)
     def updateLCDvisibility1(self,x):
-        r = self.findDeviceTableWidgetRow(self.sender(),7)
+        r = aw.findWidgetsRow(self.devicetable,self.sender(),7)
         if r is not None:
             aw.extraLCDvisibility1[r] = bool(x)
             aw.extraLCDframe1[r].setVisible(bool(x))
 
     @pyqtSlot(int)
     def updateLCDvisibility2(self,x):
-        r = self.findDeviceTableWidgetRow(self.sender(),8)
+        r = aw.findWidgetsRow(self.devicetable,self.sender(),8)
         if r is not None:
             aw.extraLCDvisibility2[r] = bool(x)
             aw.extraLCDframe2[r].setVisible(bool(x))
 
     @pyqtSlot(int)
     def updateCurveVisibility1(self,x):
-        r = self.findDeviceTableWidgetRow(self.sender(),9)
+        r = aw.findWidgetsRow(self.devicetable,self.sender(),9)
         if r is not None:
             aw.extraCurveVisibility1[r] = bool(x)
             aw.qmc.resetlinecountcaches()
 
     @pyqtSlot(int)
     def updateCurveVisibility2(self,x):
-        r = self.findDeviceTableWidgetRow(self.sender(),10)
+        r = aw.findWidgetsRow(self.devicetable,self.sender(),10)
         if r is not None:
             aw.extraCurveVisibility2[r] = bool(x)
             aw.qmc.resetlinecountcaches()
