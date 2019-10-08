@@ -6484,23 +6484,23 @@ class tgraphcanvas(FigureCanvas):
                 #Admin Info Section
                 statstr += aw.qmc.roastbatchprefix + str(aw.qmc.roastbatchnr) + " " + aw.qmc.title
                 statstr += skipline
-                statstr += skipline
                 statstr += aw.qmc.roastdate.date().toString() + ' '
                 statstr += aw.qmc.roastdate.time().toString()
                 statstr += roastoftheday
-                statstr += skipline
-                if aw.qmc.ambientTemp not in [None,0]:
-                    statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '  '
-                if aw.qmc.ambient_humidity not in [None,0]:
-                    statstr +=  str(int(aw.qmc.ambient_humidity)) + '%  '
-                if aw.qmc.ambient_pressure not in [None,0]:
-                    statstr +=  str(aw.float2float(aw.qmc.ambient_pressure,2)) + 'hPa'
+                if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [None,0] or aw.qmc.ambient_pressure not in [None,0]:
+                    statstr += skipline
+                    if aw.qmc.ambientTemp not in [None,0]:
+                        statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '  '
+                    if aw.qmc.ambient_humidity not in [None,0]:
+                        statstr +=  str(int(aw.qmc.ambient_humidity)) + '%  '
+                    if aw.qmc.ambient_pressure not in [None,0]:
+                        statstr +=  str(aw.float2float(aw.qmc.ambient_pressure,2)) + 'hPa'
                 if aw.qmc.roastertype or aw.qmc.drumspeed:
                     statstr += skipline
-                if aw.qmc.roastertype:
-                    statstr += str(aw.qmc.roastertype) + " "
-                if aw.qmc.drumspeed:
-                    statstr += "(" + str(aw.qmc.drumspeed) + QApplication.translate("Label", "RPM",None) + ')'
+                    if aw.qmc.roastertype:
+                        statstr += str(aw.qmc.roastertype) + " "
+                    if aw.qmc.drumspeed:
+                        statstr += "(" + str(aw.qmc.drumspeed) + QApplication.translate("Label", "RPM",None) + ')'
                     
                 #Green Beans Info Section
                 statstr += skipline
