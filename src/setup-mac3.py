@@ -102,10 +102,12 @@ DATA_FILES = [
     ("../translations", [r'translations/artisan_ar.qm']), 
     ("../translations", [r"translations/artisan_de.qm"]),
     ("../translations", [r"translations/artisan_es.qm"]),
+    ("../translations", [r"translations/artisan_fa.qm"]),
     ("../translations", [r"translations/artisan_fi.qm"]),
     ("../translations", [r"translations/artisan_fr.qm"]),
     ("../translations", [r"translations/artisan_he.qm"]),
-    ("../translations", [r"translations/artisan_hu.qm"]),   
+    ("../translations", [r"translations/artisan_hu.qm"]), 
+    ("../translations", [r"translations/artisan_id.qm"]),  
     ("../translations", [r"translations/artisan_it.qm"]),
     ("../translations", [r"translations/artisan_ja.qm"]),
     ("../translations", [r'translations/artisan_ko.qm']),
@@ -121,7 +123,6 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_nl.qm"]),
     ("../translations", [r"translations/artisan_tr.qm"]),
     ("../translations", [r"translations/artisan_th.qm"]),
-    ("../translations", [r"translations/artisan_id.qm"]),
     ("../translations", [r"translations/qtbase_fa.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_pt.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_sv.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/

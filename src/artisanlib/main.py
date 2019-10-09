@@ -12850,7 +12850,7 @@ class ApplicationWindow(QMainWindow):
         self.IndonesianLanguage.setCheckable(True)
         self.IndonesianLanguage.triggered.connect(self.changelocale_id)
         self.languageMenu.addAction(self.IndonesianLanguage)
-        if locale == "_id":
+        if locale == "id":
             self.IndonesianLanguage.setChecked(True)
 
         self.ItalianLanguage = QAction(UIconst.CONF_MENU_ITALIAN,self)
@@ -24424,7 +24424,8 @@ class ApplicationWindow(QMainWindow):
                     title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
                 if bool(plus.sync.getSync(uuid)):
                     time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
-                beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(data["plus_coffee"]),beans_html)
+                if "plus_coffee" in data and data["plus_coffee"] is not None and data["plus_coffee"] != "":
+                    beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(data["plus_coffee"]),beans_html)
         except:
             pass
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -27561,7 +27562,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)    
     def changelocale_id(self,_=False):
-        self.changelocale("_id")
+        self.changelocale("id")
 
     @pyqtSlot()
     @pyqtSlot(bool)    
@@ -48702,16 +48703,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.extramarkersizes1.pop(x)
             aw.qmc.extramarkersizes2.pop(x)
             
-            aw.extraLCDvisibility1.pop(x)
-            aw.extraLCDvisibility1.append(True) # keep length constant (aw.nLCDS)
-            aw.extraLCDvisibility2.pop(x)
-            aw.extraLCDvisibility2.append(True) # keep length constant (aw.nLCDS)
-            aw.extraCurveVisibility1.pop(x)
-            aw.extraCurveVisibility1.append(True) # keep length constant (aw.nLCDS)
-            aw.extraCurveVisibility2.pop(x)
-            aw.extraCurveVisibility2.append(True) # keep length constant (aw.nLCDS)
-            
-            # visible courves before this one
+            # visible curves before this one
             before1 = before2 = 0
             for j in range(x):
                 if aw.extraCurveVisibility1[j]:
@@ -48722,6 +48714,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.extratemp1lines.pop(before1)
             if aw.extraCurveVisibility2[x]:
                 aw.qmc.extratemp2lines.pop(before2)
+            
+            aw.extraLCDvisibility1.pop(x)
+            aw.extraLCDvisibility1.append(True) # keep length constant (aw.nLCDS)
+            aw.extraLCDvisibility2.pop(x)
+            aw.extraLCDvisibility2.append(True) # keep length constant (aw.nLCDS)
+            aw.extraCurveVisibility1.pop(x)
+            aw.extraCurveVisibility1.append(True) # keep length constant (aw.nLCDS)
+            aw.extraCurveVisibility2.pop(x)
+            aw.extraCurveVisibility2.append(True) # keep length constant (aw.nLCDS)
 
             aw.qmc.extraname1.pop(x)
             aw.qmc.extraname2.pop(x)
@@ -51951,8 +51952,8 @@ class AlarmDlg(ArtisanDialog):
         self.setLayout(mainlayout)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
     
-    @pyqtSlot(int)
-    def selectionChanged(self,_):
+    @pyqtSlot()
+    def selectionChanged(self):
         selected = self.alarmtable.selectedRanges()
         if selected and len(selected) > 0:
             self.insertButton.setEnabled(True)	

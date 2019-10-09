@@ -1,16 +1,17 @@
 [General]
 Delay=1000
-Oversampling=true
+Oversampling=false
 
 [CurveStyles]
+BTlinestyle=-
 extradrawstyles1=default, default
 extradrawstyles2=default, default
 extralinestyles1=-, -
 extralinestyles2=-, -
 extralinewidths1=1, 1
 extralinewidths2=1, 1
-extramarkers1=None, None
-extramarkers2=None, None
+extramarkers1=@Invalid(), @Invalid()
+extramarkers2=@Invalid(), @Invalid()
 extramarkersizes1=6, 6
 extramarkersizes2=6, 6
 
@@ -29,14 +30,14 @@ extratimeout=1, 1
 extraCurveVisibility1=true, true, true, true, true, true, true, true, true, true
 extraCurveVisibility2=true, false, true, true, true, true, true, true, true, true
 extraLCDvisibility1=true, true, false, false, false, false, false, false, false, false
-extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, true, false, false, false, false, false, false, false, false
 extradevicecolor1=black, black
 extradevicecolor2=black, black
 extradevices=33, 55
 extramathexpression1=, 
 extramathexpression2=, 
 extraname1=Burner, Drum
-extraname2=Gas, 
+extraname2=Gas, Air
 
 [Modbus]
 PID_OFF_action=
@@ -90,10 +91,10 @@ input5slave=1
 input6bcd=false
 input6code=3
 input6div=0
-input6float=false
+input6float=true
 input6mode=
-input6register=0
-input6slave=0
+input6register=8
+input6slave=1
 littleEndianFloats=false
 parity=N
 port=502
