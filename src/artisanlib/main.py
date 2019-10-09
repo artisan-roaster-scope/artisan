@@ -54,8 +54,10 @@ import uuid
 import threading
 import multiprocessing
 import re
+import textwrap
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
+
 
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
@@ -6506,7 +6508,12 @@ class tgraphcanvas(FigureCanvas):
                 statstr += skipline
                 if aw.qmc.beans is not None and len(aw.qmc.beans)>0:
                     statstr += skipline
-                    statstr += aw.qmc.beans.split("\n")[0]
+                    beans_lines = textwrap.wrap(aw.qmc.beans, width=statstrmaxlinelen)
+                    statstr += beans_lines[0]
+                    statstr += skipline
+                    statstr += " " + beans_lines[1]
+                    if len(beans_lines)>2:
+                        statstr += ".."
                 if aw.qmc.beansize_min or aw.qmc.beansize_max:
                     screen = ""
                     if aw.qmc.beansize_min:
