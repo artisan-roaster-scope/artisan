@@ -25630,7 +25630,7 @@ class ApplicationWindow(QMainWindow):
                                 w_out = 0                                
                             if "charge_temp" in rd and "temp_unit" in rd:
                                 ws['E{0}'.format(c)] = aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],aw.qmc.mode)
-                                ws['E{0}'.format(c)].number_format = "0"
+                                ws['E{0}'.format(c)].number_format = ("0.0" if aw.qmc.LCDdecimalplaces else "0")
                             if "FCs_time" in rd:
                                 h,m = divmod(rd["FCs_time"],60)
                                 dt = datetime.time(int(round(h)),int(round(m)),0)
@@ -25638,7 +25638,7 @@ class ApplicationWindow(QMainWindow):
                                 ws['F{0}'.format(c)].number_format = 'H:MM'
                             if "FCs_temp" in rd and "temp_unit" in rd:
                                 ws['G{0}'.format(c)] = aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],aw.qmc.mode)
-                                ws['G{0}'.format(c)].number_format = "0"
+                                ws['G{0}'.format(c)].number_format = ("0.0" if aw.qmc.LCDdecimalplaces else "0")
                             if "DROP_time" in rd:
                                 h,m = divmod(rd["DROP_time"],60)
                                 dt = datetime.time(int(round(h)),int(round(m)),0)
@@ -25646,7 +25646,7 @@ class ApplicationWindow(QMainWindow):
                                 ws['H{0}'.format(c)].number_format = 'H:MM'
                             if "DROP_temp" in rd and "temp_unit" in rd:
                                 ws['I{0}'.format(c)] = aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],aw.qmc.mode)
-                                ws['I{0}'.format(c)].number_format = "0"
+                                ws['I{0}'.format(c)].number_format = ("0.0" if aw.qmc.LCDdecimalplaces else "0")
                             if "DRY_percent" in rd:
                                 ws['J{0}'.format(c)] = rd["DRY_percent"]/100.
                                 ws['J{0}'.format(c)].number_format = "0.0%"
