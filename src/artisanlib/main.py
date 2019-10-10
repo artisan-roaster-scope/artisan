@@ -7084,6 +7084,7 @@ class tgraphcanvas(FigureCanvas):
                 #deleteLater() will not work here as the dialog is still bound via the parent
                 #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
                 # the following will immedately release the memory dispite this parent link
+                QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
                 sip.delete(dialog)
                 #print(sip.isdeleted(dialog))
 
@@ -24427,7 +24428,7 @@ class ApplicationWindow(QMainWindow):
             if "roastUUID" in data and data["roastUUID"] is not None and data["roastUUID"] != "":
                 uuid = data["roastUUID"]
                 if plus.register.getPath(uuid):
-                    batch_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,batch_html)
+                    #batch_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,batch_html)
                     title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
                 if bool(plus.sync.getSync(uuid)):
                     time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
@@ -24548,8 +24549,8 @@ class ApplicationWindow(QMainWindow):
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                     title = u(QApplication.translate("HTML Report Template", "Roast Batches", None)),
                     entries = entries,
-                    total_in = ('{0:.2f}'.format(total_in) if unit in ["Kg","lb"] else '{0:.0f}'.format(total_in)),
-                    total_out = ('{0:.2f}'.format(total_out) if unit in ["Kg","lb"] else '{0:.0f}'.format(total_out)),
+                    total_in = ('{0:.2f}'.format(total_in) if unit in ["Kg","lb", "oz"] else '{0:.0f}'.format(total_in)),
+                    total_out = ('{0:.2f}'.format(total_out) if unit in ["Kg","lb", "oz"] else '{0:.0f}'.format(total_out)),
                     total_loss = '{0:.1f}'.format(aw.weight_loss(total_in,total_out)),
                     resources = u(self.getResourcePath()),
                     batch = u(QApplication.translate("HTML Report Template", "Batch", None)),
@@ -24669,9 +24670,14 @@ class ApplicationWindow(QMainWindow):
                     ws['E1'].font = bf 
                     ws['F1'] = u(QApplication.translate("HTML Report Template", "Out",None)) + u" (" + u(unit.lower()) + u")"
                     ws['F1'].font = bf
-                    ws['G1'] = u(QApplication.translate("HTML Report Template", "Loss",None)) 
+                    ws['G1'] = u(QApplication.translate("HTML Report Template", "Loss",None)) + u" (%)"
                     ws['G1'].font = bf 
 
+                    def avgFormat(c,r1,r2):
+                        e1 = "{1}{0}".format(c,r1)
+                        e2 ="{1}{0}".format(c,r2)
+                        return '=IF(' + e1 + '=0,0,(' + e1 + ' - ' + e2 + ') / ' + e1 + ')'
+                    
                     # write data
                     c = 1
                     for p in profiles:
@@ -24687,14 +24693,14 @@ class ApplicationWindow(QMainWindow):
                             w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
                             w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))                            
                             ws['E{0}'.format(c)] = w_in
-                            if unit == "Kg" or unit == "lb":
+                            if unit in["Kg","lb","oz"]:
                                 num_format = '0.00'
                             else:
                                 num_format = '0'
                             ws['E{0}'.format(c)].number_format = num_format
                             ws['F{0}'.format(c)] = w_out
                             ws['F{0}'.format(c)].number_format = num_format
-                            ws['G{0}'.format(c)] = "=(E{0} - F{0}) / E{0}".format(c)
+                            ws['G{0}'.format(c)] = avgFormat(c,"E","F")
                             ws['G{0}'.format(c)].number_format = '0.0%'
                         except Exception as e:
 #                            import traceback
@@ -24710,7 +24716,7 @@ class ApplicationWindow(QMainWindow):
                         ws['F{0}'.format(c+1)] = "=SUM(F2:F{0})".format(c)
                         ws['F{0}'.format(c+1)].font = bf 
                         ws['F{0}'.format(c+1)].number_format = num_format
-                        ws['G{0}'.format(c+1)] = "=(E{0} - F{0}) / E{0}".format(c+1)
+                        ws['G{0}'.format(c+1)] = avgFormat(c+1,"E","F")
                         ws['G{0}'.format(c+1)].font = bf 
                         ws['G{0}'.format(c+1)].number_format = '0.0%'
                     wb.save(filename)
@@ -24770,7 +24776,10 @@ class ApplicationWindow(QMainWindow):
             res["DROP_time"] = timex[timeindex[6]] - start
             # DROP_temp
             res["DROP_temp"] = bt[timeindex[6]]
-        total_time = (timex[timeindex[6]] - start)
+        if len(timex) > timeindex[6]:
+            total_time = (timex[timeindex[6]] - start)
+        else:
+            total_time = 0
         # DRY_time
         if timeindex[1] > 0:
             # DRY_time
@@ -24882,7 +24891,7 @@ class ApplicationWindow(QMainWindow):
             if "roastUUID" in production_data and production_data["roastUUID"] is not None:
                 uuid = production_data["roastUUID"]
                 if plus.register.getPath(uuid):
-                    batch_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,batch_html)
+                    #batch_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,batch_html)
                     title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
                 if bool(plus.sync.getSync(uuid)):
                     time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
@@ -25066,9 +25075,11 @@ class ApplicationWindow(QMainWindow):
                         AUC += rd["AUC"]
                         AUC_count += 1
                         
-                    if i > 0 and o > 0:
-                        loss += aw.weight_loss(i,o)
-                        loss_count += 1
+                    if pd["weight"][0] > 0 and pd["weight"][1] > 0: 
+                        l = aw.weight_loss(pd["weight"][0],pd["weight"][1])
+                        if l < 100 and l > 0:
+                            loss += l
+                            loss_count += 1
                     if "color" in rd and rd["color"] > 0:
                         colors += rd["color"]
                         colors_count += 1
@@ -25101,25 +25112,30 @@ class ApplicationWindow(QMainWindow):
                             drop = rd["drop_idx"] # end of visible data
                             stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
                             timeindex = p["timeindex"]
-                            if first_profile:
-                            # align with CHARGE
-                                delta = timex[rd["charge_idx"]]
-                                # store relative time of align event of first profile
-                                # CHARGE, DRY, FCs, FCe, SCs, SCe, DROP
-                                first_profile_event_time = delta # CHARGE
-                                for j in range(6,0,-1):
-                                    if aw.qmc.alignEvent in [j] and timeindex[j]:
-                                        first_profile_event_time = timex[timeindex[j]] - timex[rd["charge_idx"]]
-                                        break
+                            if len(timex) > rd["charge_idx"]:
+                                if first_profile:
+                                # align with CHARGE
+                                    delta = timex[rd["charge_idx"]]
+                                    # store relative time of align event of first profile
+                                    # CHARGE, DRY, FCs, FCe, SCs, SCe, DROP
+                                    first_profile_event_time = delta # CHARGE
+                                    for j in range(6,0,-1):
+                                        if aw.qmc.alignEvent in [j] and timeindex[j]:
+                                            first_profile_event_time = timex[timeindex[j]] - timex[rd["charge_idx"]]
+                                            break
+                                else:
+                                    delta = timex[rd["charge_idx"]]
+                                    for j in range(6,0,-1):
+                                        if aw.qmc.alignEvent in [j] and timeindex[j]:
+                                            delta = delta + (timex[timeindex[j]] - timex[rd["charge_idx"]] - first_profile_event_time)
+                                            break
                             else:
-                                delta = timex[rd["charge_idx"]]
-                                for j in range(6,0,-1):
-                                    if aw.qmc.alignEvent in [j] and timeindex[j]:
-                                        delta = delta + (timex[timeindex[j]] - timex[rd["charge_idx"]] - first_profile_event_time)
-                                        break
+                                delta = 0
                             timex = [t-delta for t in timex]
-                            min_start_time = min(min_start_time,timex[charge])
-                            max_end_time = max(max_end_time,timex[drop])
+                            if len(timex) > charge:
+                                min_start_time = min(min_start_time,timex[charge])
+                            if len(timex) > drop:
+                                max_end_time = max(max_end_time,timex[drop])
                             # cut-out only CHARGE to DROP
                             
                             labels.append(label)
@@ -25380,18 +25396,22 @@ class ApplicationWindow(QMainWindow):
                             ax.text( n + 100 - rd["DEV_percent"] + rd["DEV_percent"]/2,                     i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
                             ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
                         else:    # no useful events
+                            if "DROP_time" in rd:
+                                drop_time = rd["DROP_time"]
+                            else:
+                                drop_time = 0
                             cl = cl[0],'white'
                             missingPhaseevents = u(QApplication.translate("Message", "Profile missing phase events",None))
                             ax.broken_barh( [ (0, m),
                                               (n, 100),
-                                              (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
+                                              (n+ 100 + g, m*(0 if max_drop_time == 0 else drop_time/max_drop_time))
                                             ], 
                                             (i*(barheight + barspacer), barheight), facecolors=cl
                                           )                      
                             ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
                             ax.text( n + 100/2,                                                             i*(barheight + barspacer) + textoffset, missingPhaseevents, ha='center', color=lightfontcolor, fontproperties=prop)
-                            ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
-                                                          
+                            ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(drop_time), ha='left', color=fontcolor, fontproperties=prop)
+                    
                     # save graph
                     graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
                     try:
@@ -25565,15 +25585,15 @@ class ApplicationWindow(QMainWindow):
                     ws['H1'].font = bf
                     ws['I1'] = u(QApplication.translate("HTML Report Template", "DROP",None)) + u" (" + u(aw.qmc.mode) + u")"
                     ws['I1'].font = bf
-                    ws['J1'] = u(QApplication.translate("HTML Report Template", "DRY",None)) 
+                    ws['J1'] = u(QApplication.translate("HTML Report Template", "DRY",None))  + u" (%)"
                     ws['J1'].font = bf
-                    ws['K1'] = u(QApplication.translate("HTML Report Template", "MAI",None)) 
+                    ws['K1'] = u(QApplication.translate("HTML Report Template", "MAI",None))  + u" (%)"
                     ws['K1'].font = bf
-                    ws['L1'] = u(QApplication.translate("HTML Report Template", "DEV",None)) 
+                    ws['L1'] = u(QApplication.translate("HTML Report Template", "DEV",None))  + u" (%)"
                     ws['L1'].font = bf
                     ws['M1'] = u(QApplication.translate("HTML Report Template", "AUC",None)) 
                     ws['M1'].font = bf
-                    ws['N1'] = u(QApplication.translate("HTML Report Template", "Loss",None)) 
+                    ws['N1'] = u(QApplication.translate("HTML Report Template", "Loss",None)) + u" (%)"
                     ws['N1'].font = bf
                     ws['O1'] = u(QApplication.translate("HTML Report Template", "Color",None)) 
                     ws['o1'].font = bf
@@ -25596,7 +25616,7 @@ class ApplicationWindow(QMainWindow):
                                 ws['B{0}'.format(c)].number_format = 'YYYY-MM-DD HH:MM'
                             if "title" in d:
                                 ws['C{0}'.format(c)] = d["title"]
-                            if unit == "Kg" or unit == "lb":
+                            if unit in ["Kg", "lb", "oz"]:
                                 num_format = '0.00'
                             else:
                                 num_format = '0'
@@ -25656,45 +25676,49 @@ class ApplicationWindow(QMainWindow):
                             pass
                     # write trailer
                     if c > 1:
+                        def avgFormat(c,s,e):
+                            range = "{0}{1}:{0}{2}".format(c,s,e)
+                            return '=IF(SUMPRODUCT(--(' + range + '<>""))=0,"",AVERAGE(' + range + '))'
+                        
                         ws['A{0}'.format(c+1)] = u(QApplication.translate("HTML Report Template", "AVG", None))
                         ws['A{0}'.format(c+1)].font = bf 
-                        ws['D{0}'.format(c+1)] = "=AVERAGE(D2:D{0})".format(c)
+                        ws['D{0}'.format(c+1)] = avgFormat("D",2,c)
                         ws['D{0}'.format(c+1)].font = bf
                         ws['D{0}'.format(c+1)].number_format = num_format
-                        ws['E{0}'.format(c+1)] = "=AVERAGE(E2:E{0})".format(c)
+                        ws['E{0}'.format(c+1)] = avgFormat("E",2,c)                       
                         ws['E{0}'.format(c+1)].font = bf
                         ws['E{0}'.format(c+1)].number_format = "0"
-                        ws['F{0}'.format(c+1)] = "=AVERAGE(F2:F{0})".format(c)
+                        ws['F{0}'.format(c+1)] = avgFormat("F",2,c)
                         ws['F{0}'.format(c+1)].font = bf
                         ws['F{0}'.format(c+1)].number_format = 'H:MM'
-                        ws['G{0}'.format(c+1)] = "=AVERAGE(G2:G{0})".format(c)
+                        ws['G{0}'.format(c+1)] = avgFormat("G",2,c)
                         ws['G{0}'.format(c+1)].font = bf
                         ws['G{0}'.format(c+1)].number_format = "0"
-                        ws['H{0}'.format(c+1)] = "=AVERAGE(H2:H{0})".format(c)
+                        ws['H{0}'.format(c+1)] = avgFormat("H",2,c)
                         ws['H{0}'.format(c+1)].font = bf
                         ws['H{0}'.format(c+1)].number_format = 'H:MM'
-                        ws['I{0}'.format(c+1)] = "=AVERAGE(I2:I{0})".format(c)
+                        ws['I{0}'.format(c+1)] = avgFormat("I",2,c)
                         ws['I{0}'.format(c+1)].font = bf
                         ws['I{0}'.format(c+1)].number_format = "0"
-                        ws['J{0}'.format(c+1)] = "=AVERAGE(J2:J{0})".format(c)
+                        ws['J{0}'.format(c+1)] = avgFormat("J",2,c)
                         ws['J{0}'.format(c+1)].font = bf
                         ws['J{0}'.format(c+1)].number_format = "0.0%"
-                        ws['K{0}'.format(c+1)] = "=AVERAGE(K2:K{0})".format(c)
+                        ws['K{0}'.format(c+1)] = avgFormat("K",2,c)
                         ws['K{0}'.format(c+1)].font = bf
                         ws['K{0}'.format(c+1)].number_format = "0.0%"
-                        ws['L{0}'.format(c+1)] = "=AVERAGE(L2:L{0})".format(c)
+                        ws['L{0}'.format(c+1)] = avgFormat("L",2,c)
                         ws['L{0}'.format(c+1)].font = bf
                         ws['L{0}'.format(c+1)].number_format = "0.0%"
-                        ws['M{0}'.format(c+1)] = "=AVERAGE(M2:M{0})".format(c)
+                        ws['M{0}'.format(c+1)] = avgFormat("M",2,c)
                         ws['M{0}'.format(c+1)].font = bf
                         ws['M{0}'.format(c+1)].number_format = "0"
-                        ws['N{0}'.format(c+1)] = "=AVERAGE(N2:N{0})".format(c)
+                        ws['N{0}'.format(c+1)] = avgFormat("N",2,c)
                         ws['N{0}'.format(c+1)].font = bf
                         ws['N{0}'.format(c+1)].number_format = "0.0%"   
-                        ws['O{0}'.format(c+1)] = "=AVERAGE(O2:O{0})".format(c)
+                        ws['O{0}'.format(c+1)] = avgFormat("O",2,c)
                         ws['O{0}'.format(c+1)].font = bf
                         ws['O{0}'.format(c+1)].number_format = "0"
-                        ws['P{0}'.format(c+1)] = "=AVERAGE(P2:P{0})".format(c)
+                        ws['P{0}'.format(c+1)] = avgFormat("P",2,c)
                         ws['P{0}'.format(c+1)].font = bf   
                         ws['P{0}'.format(c+1)].number_format = "0.00"                                      
                     # close file
@@ -26829,6 +26853,7 @@ class ApplicationWindow(QMainWindow):
             # deleteLater() will not work here as the dialog is still bound via the parent
             dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
             # the following will immedately release the memory dispite this parent link
+            QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
             sip.delete(dialog)
             #print(sip.isdeleted(dialog))
 
