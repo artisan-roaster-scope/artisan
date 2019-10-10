@@ -25677,8 +25677,8 @@ class ApplicationWindow(QMainWindow):
                     # write trailer
                     if c > 1:
                         def avgFormat(c,s,e):
-                            range = "{0}{1}:{0}{2}".format(c,s,e)
-                            return '=IF(SUMPRODUCT(--(' + range + '<>""))=0,"",AVERAGE(' + range + '))'
+                            rng = "{0}{1}:{0}{2}".format(c,s,e)
+                            return '=IF(SUMPRODUCT(--(' + rng + '<>""))=0,"",AVERAGE(' + rng + '))'
                         
                         ws['A{0}'.format(c+1)] = u(QApplication.translate("HTML Report Template", "AVG", None))
                         ws['A{0}'.format(c+1)].font = bf 

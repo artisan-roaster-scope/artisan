@@ -23,7 +23,7 @@ except:
 
 try:
     # PyQt new exit scheme (default from 5.14 on)
-    from PyQt5.QtCore import pyqt5_enable_new_onexit_scheme
+    from PyQt5.QtCore import pyqt5_enable_new_onexit_scheme  # @UnresolvedImport
     pyqt5_enable_new_onexit_scheme(True)
 except:
     pass
@@ -33,7 +33,7 @@ except:
 if system() == 'Darwin':
     try:
         if str(sys.frozen) == "macosx_app":
-            from PyQt5.QtWidgets import QApplication
+            from PyQt5.QtWidgets import QApplication # @Reimport
             QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
     except Exception:
         pass
@@ -43,7 +43,7 @@ elif system().startswith("Windows"):
             hasattr(sys, "importers") # old py2exe
 #            or imp.is_frozen("__main__")) # tools/freeze
              or getattr(sys, 'frozen', False)) # tools/freeze           
-        from PyQt5.QtWidgets import QApplication # @Reimport
+        from PyQt5.QtWidgets import QApplication # @Reimport 
         if ib:
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
         else:
@@ -60,7 +60,7 @@ else: # Linux
         if ib:
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "Resources/qt_plugins"))            
         else:
-            import site # @Reimport# @Reimport
+            import site # @Reimport
             QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "/PyQt5/qt_plugins")
     except Exception:
         pass
