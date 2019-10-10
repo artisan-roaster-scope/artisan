@@ -57875,6 +57875,10 @@ def main():
             elif file_suffix == "athm":
                 # load Artisan setings on double-click on *.athm file
                 aw.loadSettings(fn=u(argv_file),reset=False)
+            elif platf == 'Windows' and re.match("artisan\:\/\/roast",argv_file):
+                url = QUrl()
+                url.setUrl(argv_file)
+                app.open_url(url)
         else:
             # we try to reload the last loaded profile or background
             if aw.lastLoadedProfile:
@@ -57903,20 +57907,16 @@ def main():
             # first we dig out the path of the artisan.exe file
             if getattr(sys, 'frozen', False):
                 application_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
-                # application_path = "C:\Program Files\Artisan"
+                application_path += "\\artisan.exe"
+                cmdLine = "\"" + application_path + "\" \"%1\""
             else:
-                try:
-                    this_file = __file__
-                except NameError:
-                    this_file = sys.argv[0]
-                this_file = os.path.abspath(this_file)
-                application_path = os.path.dirname(this_file)
-                exe_name = 'artisan.exe'
-                application_path = os.path.join(application_path, exe_name)
+                # executing from source, get the python path and source path
+                python_path = sys.executable
+                application_path = sys.argv[0]
+                cmdLine = "\"" + python_path + "\" \"" + application_path + "\" \"%1\""
             mxKey = QSettings("HKEY_CLASSES_ROOT\\artisan", QSettings.NativeFormat)
             mxKey.setValue("URL Protocol", "")
             mxOpenKey = QSettings("HKEY_CLASSES_ROOT\\artisan\\shell\\open\\command", QSettings.NativeFormat)
-            cmdLine = "\"" + application_path + "\" \"%1\""
             mxOpenKey.setValue(".", cmdLine)
         except:
             pass
