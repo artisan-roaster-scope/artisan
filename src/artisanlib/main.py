@@ -6225,9 +6225,14 @@ class tgraphcanvas(FigureCanvas):
                                 self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                             else: # we don't smooth, but remove the dropouts
                                 self.extrastemp1[i] = self.fill_gaps(self.extratemp1[i])
-                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
+                            if aw.extraDelta1[i]:
+                                trans = self.delta_ax.transData
+                            else:
+                                trans = self.ax.transData
+                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],                        
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
+                                markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],
+                                drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
                     except Exception as ex:
                         _, _, exc_tb = sys.exc_info() 
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)                        
@@ -6237,7 +6242,11 @@ class tgraphcanvas(FigureCanvas):
                                 self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                             else:
                                 self.extrastemp2[i] = self.fill_gaps(self.extratemp2[i])
-                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
+                            if aw.extraDelta2[i]:
+                                trans = self.delta_ax.transData
+                            else:
+                                trans = self.ax.transData
+                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                     except Exception as ex:
@@ -14113,6 +14122,7 @@ class ApplicationWindow(QMainWindow):
         self.extraLCDframe1,self.extraLCDframe2 = [],[]
         self.extraLCDvisibility1,self.extraLCDvisibility2 = [False]*self.nLCDS,[False]*self.nLCDS
         self.extraCurveVisibility1,self.extraCurveVisibility2 = [True]*self.nLCDS,[True]*self.nLCDS
+        self.extraDelta1,self.extraDelta2 = [False]*self.nLCDS,[False]*self.nLCDS
         for i in range(self.nLCDS):
             #configure LCDs
             self.extraLCDframe1.append(QFrame())
@@ -22781,6 +22791,10 @@ class ApplicationWindow(QMainWindow):
                     self.extraCurveVisibility1 = [toBool(x) for x in toList(settings.value("extraCurveVisibility1",self.extraCurveVisibility1))]
                 if settings.contains("extraCurveVisibility2"):
                     self.extraCurveVisibility2 = [toBool(x) for x in toList(settings.value("extraCurveVisibility2",self.extraCurveVisibility2))]
+                if settings.contains("extraDelta1"):
+                    self.extraDelta1 = [toBool(x) for x in toList(settings.value("extraDelta1",self.extraDelta1))]
+                if settings.contains("extraDelta2"):
+                    self.extraDelta2 = [toBool(x) for x in toList(settings.value("extraDelta2",self.extraDelta2))]
             #create empty containers
             settings.endGroup()
             
@@ -24019,6 +24033,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraLCDvisibility2",self.extraLCDvisibility2)
             settings.setValue("extraCurveVisibility1",self.extraCurveVisibility1)
             settings.setValue("extraCurveVisibility2",self.extraCurveVisibility2)
+            settings.setValue("extraDelta1",self.extraDelta1)
+            settings.setValue("extraDelta2",self.extraDelta2)
             settings.endGroup()
             #save extra serial comm ports settings
             settings.beginGroup("ExtraComm")
@@ -48591,7 +48607,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
 #                self.devicetable.clearContents() # this crashes Ubuntu 16.04 if device table is empty
             self.devicetable.clearSelection()
             self.devicetable.setRowCount(nddevices)
-            self.devicetable.setColumnCount(11)
+            self.devicetable.setColumnCount(13)
             self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None),
                                                         QApplication.translate("Table", "Color 1",None),
                                                         QApplication.translate("Table", "Color 2",None),
@@ -48602,7 +48618,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                                                         QApplication.translate("Table", "LCD 1",None),
                                                         QApplication.translate("Table", "LCD 2",None),
                                                         QApplication.translate("Table", "Curve 1",None),
-                                                        QApplication.translate("Table", "Curve 2",None)])
+                                                        QApplication.translate("Table", "Curve 2",None),
+                                                        deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None) + " 1",
+                                                        deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None) + " 2"])
             self.devicetable.setAlternatingRowColors(True)
             self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -48669,6 +48687,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
                         else:
                             Curve2visibilityComboBox.setCheckState(Qt.Unchecked)
                         Curve2visibilityComboBox.stateChanged.connect(self.updateCurveVisibility2)
+                        Delta1ComboBox =  QCheckBox()
+                        if aw.extraDelta1[i]:
+                            Delta1ComboBox.setCheckState(Qt.Checked)
+                        else:
+                            Delta1ComboBox.setCheckState(Qt.Unchecked)
+                        Delta1ComboBox.stateChanged.connect(self.updateDelta1)
+                        Delta2ComboBox =  QCheckBox()
+                        if aw.extraDelta2[i]:
+                            Delta2ComboBox.setCheckState(Qt.Checked)
+                        else:
+                            Delta2ComboBox.setCheckState(Qt.Unchecked)
+                        Delta2ComboBox.stateChanged.connect(self.updateDelta2)
                         #add widgets to the table
                         self.devicetable.setCellWidget(i,0,typeComboBox)
                         self.devicetable.setCellWidget(i,1,color1Button)
@@ -48681,6 +48711,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                         self.devicetable.setCellWidget(i,8,LCD2visibilityComboBox)
                         self.devicetable.setCellWidget(i,9,Curve1visibilityComboBox)
                         self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)
+                        self.devicetable.setCellWidget(i,11,Delta1ComboBox)
+                        self.devicetable.setCellWidget(i,12,Delta2ComboBox)
                     except Exception as e:
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
@@ -48835,6 +48867,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.extraCurveVisibility1.append(True) # keep length constant (aw.nLCDS)
             aw.extraCurveVisibility2.pop(x)
             aw.extraCurveVisibility2.append(True) # keep length constant (aw.nLCDS)
+            aw.extraDelta1.pop(x)
+            aw.extraDelta1.append(False) # keep length constant (aw.nLCDS)
+            aw.extraDelta2.pop(x)
+            aw.extraDelta2.append(False) # keep length constant (aw.nLCDS)
 
             aw.qmc.extraname1.pop(x)
             aw.qmc.extraname2.pop(x)
@@ -48961,6 +48997,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
         if r is not None:
             aw.extraCurveVisibility2[r] = bool(x)
             aw.qmc.resetlinecountcaches()
+
+    @pyqtSlot(int)
+    def updateDelta1(self,x):
+        r = aw.findWidgetsRow(self.devicetable,self.sender(),11)
+        if r is not None:
+            aw.extraDelta1[r] = bool(x)
+
+    @pyqtSlot(int)
+    def updateDelta2(self,x):
+        r = aw.findWidgetsRow(self.devicetable,self.sender(),12)
+        if r is not None:
+            aw.extraDelta2[r] = bool(x)
 
     @pyqtSlot(bool)
     def setextracolor1(self,_):
