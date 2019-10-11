@@ -1319,6 +1319,9 @@ class tgraphcanvas(FigureCanvas):
 
         #applies a Y(x) function to ET or BT 
         self.ETfunction,self.BTfunction = "",""
+        
+        #applies a Y(x) function to DeltaET or DeltaBT
+        self.DeltaETfunction,self.DeltaBTfunction = "",""
 
         #put a "aw.qmc.safesaveflag = True" whenever there is a change of a profile like at [DROP], edit properties Dialog, etc
         #prevents accidentally deleting a modified profile. ("dirty file")
@@ -3142,8 +3145,6 @@ class tgraphcanvas(FigureCanvas):
                 QApplication.beep()
             try:
                 if self.alarmaction[alarmnumber] == 0:
-                    # alarm popup message
-                    #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber])
                     # alarm popup message with 10sec timeout
                     amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=aw.qmc.alarm_popup_timout)
                     amb.show()
@@ -3311,6 +3312,30 @@ class tgraphcanvas(FigureCanvas):
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
                         aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(u(self.alarmstrings[alarmnumber])))
+                elif self.alarmaction[alarmnumber] == 22:
+                    # Replay ON
+                    aw.qmc.backgroundPlaybackEvents = True
+                elif self.alarmaction[alarmnumber] == 23:
+                    # Replay OFF
+                    aw.qmc.backgroundPlaybackEvents = False
+                elif self.alarmaction[alarmnumber] == 24:
+                    # Set Canvas Color
+                    c = self.alarmstrings[alarmnumber].strip()
+                    try:
+                        QColor(c) # test if color is valid
+                        aw.qmc.palette["canvas_alt"] = aw.qmc.palette["canvas"]
+                        aw.qmc.palette["canvas"] = c
+                        aw.updateCanvasColors()
+                        QApplication.processEvents() # needed to establish the change
+                    except Exception as e:
+                        print(e)
+                        pass
+                elif self.alarmaction[alarmnumber] == 25:
+                    # Set Canvas Color
+                    if "canvas_alt" in aw.qmc.palette:
+                        aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
+                        aw.updateCanvasColors()
+                        QApplication.processEvents()
     
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
@@ -3524,7 +3549,7 @@ class tgraphcanvas(FigureCanvas):
                               "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
                               "sqrt":math.sqrt,"degrees":math.degrees}
             #if sampling 
-            if RTsname:
+            if RTsname is not None and RTsname != "":
                 if len(self.timex):
                     index = len(self.timex)-1
                 else:
@@ -3644,13 +3669,13 @@ class tgraphcanvas(FigureCanvas):
             #timeshift working vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
             timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
-                        
+            
             try:
                 t = float(t)
                 #extract Ys
                 Yval = []                   #stores value number example Y9 = 9
                 mlen = len(mathexpression)
-                for i in range(mlen): 
+                for i in range(mlen):
                     #Start symbolic assignment
                     #Y + one digit
                     if mathexpression[i] == "Y":
@@ -3764,7 +3789,16 @@ class tgraphcanvas(FigureCanvas):
                                 mathdictionary['o'] = aw.qmc.ylimit_min - (aw.qmc.zlimit_min * (aw.qmc.ylimit - aw.qmc.ylimit_min) / float(aw.qmc.zlimit - aw.qmc.zlimit_min))
                             except Exception:
                                 mathdictionary['o'] = 0
-    
+                                
+                    elif mathexpression[i] == "R":
+                        try:
+                            if mathexpression[i+1] == "1":
+                                mathdictionary['R1'] = self.delta1[index]                   
+                            elif mathexpression[i+1] == "2":
+                                mathdictionary['R2'] = self.delta2[index]
+                        except Exception:
+                            pass
+                            
                     #Add to dict Event1-4 external value
                     elif mathexpression[i] == "E":
                         if i+1 < mlen:                          #check for out of range
@@ -4070,6 +4104,9 @@ class tgraphcanvas(FigureCanvas):
                     return res
     
             except Exception as e:
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
+                
                 #if plotter
                 if equeditnumber:
                     e = str(e)
@@ -4922,7 +4959,16 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),exc_tb.tb_lineno)
-            
+    
+    def apply_symbolic_delta_formula(self,fct,deltas,timex,RTsname):
+        try:
+            if len(deltas) == len(timex):
+                return [aw.qmc.eval_math_expression(fct,timex[i],RTsname=RTsname,RTsval=d) for i,d in enumerate(deltas)]
+            else:
+                return deltas
+        except:
+            return deltas
+    
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
     # timex_lin: a linear spaced version of timex
@@ -4959,7 +5005,10 @@ class tgraphcanvas(FigureCanvas):
                 # make lists equal in length
                 if lt > ld1:
                     z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
-#                    z1 = numpy.append([None]*(lt - ld1),z1)
+                # apply smybolic formula
+                if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
+                    z1 = self.apply_symbolic_delta_formula(aw.qmc.DeltaETfunction,z1,timex,RTsname="R1")
+                # apply smoothing
                 if optimalSmoothing:
                     user_filter = self.deltaETfilter
                 else:
@@ -4984,7 +5033,10 @@ class tgraphcanvas(FigureCanvas):
                 # make lists equal in length
                 if lt > ld2:
                     z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
-#                    z2 = numpy.append([None]*(lt - ld2),z2)
+                # apply smybolic formula
+                if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
+                    z2 = self.apply_symbolic_delta_formula(aw.qmc.DeltaBTfunction,z2,timex,RTsname="R2")
+                # apply smoothing
                 if optimalSmoothing:
                     user_filter = self.deltaBTfilter
                 else:
@@ -6484,7 +6536,10 @@ class tgraphcanvas(FigureCanvas):
             if self.statssummary:   
                 
                 #Admin Info Section
-                statstr += aw.qmc.roastbatchprefix + str(aw.qmc.roastbatchnr) + " " + aw.qmc.title
+                if aw.qmc.roastbatchnr > 0:
+                    statstr += aw.qmc.roastbatchprefix + str(aw.qmc.roastbatchnr) + " " + aw.qmc.title
+                else:                    
+                    statstr += aw.qmc.title
                 statstr += skipline
                 statstr += aw.qmc.roastdate.date().toString() + ' '
                 statstr += aw.qmc.roastdate.time().toString()
@@ -6511,7 +6566,7 @@ class tgraphcanvas(FigureCanvas):
                     beans_lines = textwrap.wrap(aw.qmc.beans, width=statstrmaxlinelen)
                     statstr += beans_lines[0]
                     statstr += skipline
-                    statstr += " " + beans_lines[1]
+                    statstr += "  " + beans_lines[1]
                     if len(beans_lines)>2:
                         statstr += ".."
                 if aw.qmc.beansize_min or aw.qmc.beansize_max:
@@ -11565,13 +11620,6 @@ class SampleThread(QThread):
                         else:
                             aw.qmc.ctimex1.append(tx)
                             
-                    # update lines data using the lists with new data (use stempX instead of tempX to supress dropouts
-#                    if local_flagstart:
-#                        if aw.qmc.ETcurve:
-#                            aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.ctemp1)
-#                        if aw.qmc.BTcurve:
-#                            aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.ctemp2)
-                            
                     #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
                     cf = aw.qmc.curvefilter*2 - 1 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                     if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
@@ -11660,6 +11708,8 @@ class SampleThread(QThread):
                             left_index = min(len(aw.qmc.ctimex1),max(2,(aw.qmc.deltaETsamples + 1)))
                             timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
                             aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                            if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
+                                aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
                         # compute T2 RoR
                         if t2_final == -1:  # we repeat the last RoR if underlying temperature dropped
                             if aw.qmc.unfiltereddelta2:
@@ -11671,6 +11721,8 @@ class SampleThread(QThread):
                             left_index = min(len(aw.qmc.ctimex2),max(2,(aw.qmc.deltaBTsamples + 1)))
                             timed = aw.qmc.ctimex2[-1] - aw.qmc.ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings                                
                             aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                            if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
+                                aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
 
                         aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                         aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
@@ -22885,6 +22937,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("BTfunction"):
                 self.qmc.BTfunction = s2a(toString(settings.value("BTfunction",self.qmc.BTfunction)))
                 self.qmc.ETfunction = s2a(toString(settings.value("ETfunction",self.qmc.ETfunction)))
+            if settings.contains("DeltaBTfunction"):
+                self.qmc.DeltaBTfunction = s2a(toString(settings.value("DeltaBTfunction",self.qmc.DeltaBTfunction)))
+                self.qmc.DeltaETfunction = s2a(toString(settings.value("DeltaETfunction",self.qmc.DeltaETfunction)))                
             if settings.contains("plotcurves"):
                 self.qmc.plotcurves = list(toStringList(settings.value("plotcurves",self.qmc.plotcurves)))
                 self.qmc.plotcurvecolor = list(toStringList(settings.value("plotcurvecolor",self.qmc.plotcurvecolor)))
@@ -23977,6 +24032,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ChannelTares",self.channel_tare_values)
             settings.setValue("BTfunction",self.qmc.BTfunction)
             settings.setValue("ETfunction",self.qmc.ETfunction)
+            settings.setValue("DeltaBTfunction",self.qmc.DeltaBTfunction)
+            settings.setValue("DeltaETfunction",self.qmc.DeltaETfunction)
             settings.setValue("resetqsettings",self.resetqsettings)
             settings.setValue("plotcurves",self.qmc.plotcurves)
             settings.setValue("plotcurvecolor",self.qmc.plotcurvecolor)
@@ -29763,6 +29820,26 @@ class HUDDlg(ArtisanDialog):
         rorGroupLayout.setLayout(rorBoxLayout)
         rorLCDGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise LCDs",None))
         rorLCDGroupLayout.setLayout(lcdsLayout)
+        
+        
+        labelETDeltaFormula = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "ET Y(x)",None))
+        labelBTDeltaFormula = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "BT Y(x)",None))
+        self.DeltaETfunctionedit = QLineEdit(str(aw.qmc.DeltaETfunction))
+        self.DeltaBTfunctionedit = QLineEdit(str(aw.qmc.DeltaBTfunction))
+        
+        rorSymbolicFormulaLabelsLayout = QHBoxLayout()
+        rorSymbolicFormulaLabelsLayout.addWidget(labelETDeltaFormula)
+        rorSymbolicFormulaLabelsLayout.addWidget(labelBTDeltaFormula)
+        rorSymbolicFormulaLayout = QHBoxLayout()
+        rorSymbolicFormulaLayout.addWidget(self.DeltaETfunctionedit)
+        rorSymbolicFormulaLayout.addWidget(self.DeltaBTfunctionedit)
+        rorSymbolicFormulas = QVBoxLayout()
+        rorSymbolicFormulas.addLayout(rorSymbolicFormulaLabelsLayout)
+        rorSymbolicFormulas.addLayout(rorSymbolicFormulaLayout)
+        
+        rorSymbolicFormulaGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Symbolic Assignments",None))
+        rorSymbolicFormulaGroupLayout.setLayout(rorSymbolicFormulas)
+        
         hudHBox = QHBoxLayout()
         hudHBox.addStretch()
         hudHBox.addLayout(hudLayout)
@@ -29877,6 +29954,7 @@ class HUDDlg(ArtisanDialog):
         tab0Layout = QVBoxLayout()
         tab0Layout.addWidget(rorGroupLayout)
         tab0Layout.addWidget(rorLCDGroupLayout)
+        tab0Layout.addWidget(rorSymbolicFormulaGroupLayout)
         tab0Layout.addStretch()
         #tab1
         tab1Layout = QVBoxLayout()
@@ -31395,6 +31473,8 @@ class HUDDlg(ArtisanDialog):
     #button OK
     @pyqtSlot()
     def updatetargets(self):
+        aw.qmc.DeltaETfunction = str(self.DeltaETfunctionedit.text())
+        aw.qmc.DeltaBTfunction = str(self.DeltaBTfunctionedit.text())
         aw.LCD4frame.setVisible((aw.qmc.DeltaBTlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaETlcdflag))
         aw.LCD5frame.setVisible((aw.qmc.DeltaETlcdflag if aw.qmc.swapdeltalcds else aw.qmc.DeltaBTlcdflag))
         if aw.largeDeltaLCDs_dialog is not None:
@@ -52492,7 +52572,11 @@ class AlarmDlg(ArtisanDialog):
                                  QApplication.translate("ComboBox","RampSoak OFF",None),
                                  QApplication.translate("ComboBox","PID ON",None),
                                  QApplication.translate("ComboBox","PID OFF",None),
-                                 QApplication.translate("ComboBox","SV",None)])
+                                 QApplication.translate("ComboBox","SV",None),
+                                 QApplication.translate("ComboBox","Replay ON",None),
+                                 QApplication.translate("ComboBox","Replay OFF",None),
+                                 QApplication.translate("ComboBox","Set Canvas Color",None),
+                                 QApplication.translate("ComboBox","Reset Canvas Color",None)])
         actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i] + 1)
         #beep
         beepWidget = QWidget()
