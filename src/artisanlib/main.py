@@ -50040,7 +50040,7 @@ class graphColorDlg(ArtisanDialog):
         self.intensitySpinBox.setFocusPolicy(Qt.NoFocus)      
             
         #TAB1
-        self.backgroundLabel = self.colorLabel("background")
+        self.backgroundLabel = self.colorLabel(aw.qmc.palette["background"])
         self.backgroundButton = QPushButton(QApplication.translate("Button","Background", None))
         self.backgroundButton.setFocusPolicy(Qt.NoFocus)
         self.backgroundButton.clicked.connect(self.setColorSlot)
@@ -50132,7 +50132,7 @@ class graphColorDlg(ArtisanDialog):
         self.bgeventmarkerButton = QPushButton(QApplication.translate("Button","Bkgd Event Marker", None))
         self.bgeventmarkerButton.setFocusPolicy(Qt.NoFocus)
         self.bgeventmarkerButton.clicked.connect(self.setColorSlot)
-        self.bgeventtextLabel = self.colorLabel(aw.qmc.palette["specialeventtext"])
+        self.bgeventtextLabel = self.colorLabel(aw.qmc.palette["bgeventtext"])
         self.bgeventtextButton = QPushButton(QApplication.translate("Button","Bkgd Event Text", None))
         self.bgeventtextButton.setFocusPolicy(Qt.NoFocus)
         self.bgeventtextButton.clicked.connect(self.setColorSlot)
