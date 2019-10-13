@@ -39455,7 +39455,7 @@ class flavorDlg(ArtisanDialog):
         aw.qmc.flavorchart()
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
-    @pyqtSlot(int)
+    @pyqtSlot(float)
     def setaspect(self,_):
         aw.qmc.flavoraspect = self.aspectSpinBox.value()
         aw.qmc.flavorchart()
@@ -39545,15 +39545,15 @@ class flavorDlg(ArtisanDialog):
 
     @pyqtSlot()
     def setlabel(self):
-        x = aw.findWidgetsRow(self.eventbuttontable,self.sender(),0)
+        x = aw.findWidgetsRow(self.flavortable,self.sender(),0)
         if x is not None:
             labeledit = self.flavortable.cellWidget(x,0)
             aw.qmc.flavorlabels[x] = labeledit.text()
             aw.qmc.flavorchart()
 
-    @pyqtSlot(int)
+    @pyqtSlot(float)
     def setvalue(self,_):
-        x = aw.findWidgetsRow(self.eventbuttontable,self.sender(),1)
+        x = aw.findWidgetsRow(self.flavortable,self.sender(),1)
         if x is not None:
             valueSpinBox = self.flavortable.cellWidget(x,1)
             aw.qmc.flavors[x] = valueSpinBox.value()
