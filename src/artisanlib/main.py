@@ -6574,10 +6574,11 @@ class tgraphcanvas(FigureCanvas):
                     statstr += skipline
                     beans_lines = textwrap.wrap(aw.qmc.beans, width=statstrmaxlinelen)
                     statstr += beans_lines[0]
-                    statstr += skipline
-                    statstr += "  " + beans_lines[1]
-                    if len(beans_lines)>2:
-                        statstr += ".."
+                    if len(beans_lines)>1:
+                        statstr += skipline
+                        statstr += "  " + beans_lines[1]
+                        if len(beans_lines)>2:
+                            statstr += ".."
                 if aw.qmc.beansize_min or aw.qmc.beansize_max:
                     screen = ""
                     if aw.qmc.beansize_min:
