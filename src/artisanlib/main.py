@@ -3327,8 +3327,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.palette["canvas"] = c
                         aw.updateCanvasColors()
                         QApplication.processEvents() # needed to establish the change
-                    except Exception as e:
-                        print(e)
+                    except Exception:
                         pass
                 elif self.alarmaction[alarmnumber] == 25:
                     # Set Canvas Color
@@ -43835,28 +43834,30 @@ class serialport(object):
 #  commands: set(n,0), set(n,1), toggle(n) with n channel number
 
     def phidgetBinaryOUTattach(self,channel):
-        if not aw.ser.PhidgetBinaryOut and aw.qmc.phidgetManager is not None:
-            aw.qmc.startPhidgetManager()
-            ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1014,channel,
-                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-            ports = 4
-            if ser is None:
-                ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1017,
+        if aw.ser.PhidgetBinaryOut is None:
+            if aw.qmc.phidgetManager is None:
+                aw.qmc.startPhidgetManager()
+            if aw.qmc.phidgetManager is not None:
+                ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1014,channel,
                             remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-                ports = 8
-            # try to attach up to 8 IO channels of the first Phidget 1010, 1013, 1018, 1019 module
-            if ser is None:
-                ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019,
-                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-                ports = 8
-            if ser is not None:
-                aw.ser.PhidgetBinaryOut = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]                
-                for i in range(ports):
-                    aw.ser.PhidgetBinaryOut[i].setChannel(i)
-                    aw.ser.PhidgetBinaryOut[i].setDeviceSerialNumber(ser)
-                    if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetBinaryOut[i].setIsRemote(True)
-                        aw.ser.PhidgetBinaryOut[i].setIsLocal(False)
+                ports = 4
+                if ser is None:
+                    ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1017,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                    ports = 8
+                # try to attach up to 8 IO channels of the first Phidget 1010, 1013, 1018, 1019 module
+                if ser is None:
+                    ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                    ports = 8
+                if ser is not None:
+                    aw.ser.PhidgetBinaryOut = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]                
+                    for i in range(ports):
+                        aw.ser.PhidgetBinaryOut[i].setChannel(i)
+                        aw.ser.PhidgetBinaryOut[i].setDeviceSerialNumber(ser)
+                        if aw.qmc.phidgetRemoteFlag:
+                            aw.ser.PhidgetBinaryOut[i].setIsRemote(True)
+                            aw.ser.PhidgetBinaryOut[i].setIsLocal(False)
         try:
             if not aw.ser.PhidgetBinaryOut[channel].getAttached():
                 aw.ser.PhidgetBinaryOut[channel].openWaitForAttachment(1000)
@@ -43878,7 +43879,7 @@ class serialport(object):
     def phidgetBinaryOUTset(self,channel,value):
         res = False
         self.phidgetBinaryOUTattach(channel)
-        if aw.ser.PhidgetBinaryOut:
+        if aw.ser.PhidgetBinaryOut is not None:
             # set state of the given channel
             try:
                 if len(aw.ser.PhidgetBinaryOut) > channel and aw.ser.PhidgetBinaryOut[channel] and aw.ser.PhidgetBinaryOut[channel].getAttached():
@@ -43893,7 +43894,7 @@ class serialport(object):
     def phidgetBinaryOUTget(self,channel):
         self.phidgetBinaryOUTattach(channel)
         res = False
-        if aw.ser.PhidgetBinaryOut:
+        if aw.ser.PhidgetBinaryOut is not None:
             # set PWM of the given channel
             try:
                 if len(aw.ser.PhidgetBinaryOut) > channel and aw.ser.PhidgetBinaryOut[channel] and aw.ser.PhidgetBinaryOut[channel].getAttached():
@@ -43906,7 +43907,7 @@ class serialport(object):
         self.phidgetBinaryOUTset(channel,not self.phidgetBinaryOUTget(channel))
         
     def phidgetBinaryOUTclose(self):
-        if aw.ser.PhidgetBinaryOut and len(aw.ser.PhidgetBinaryOut)==8:
+        if aw.ser.PhidgetBinaryOut is not None and len(aw.ser.PhidgetBinaryOut)==8:
             try:
                 for i in range(8):
                     if aw.ser.PhidgetBinaryOut[i].getAttached():
@@ -43922,28 +43923,30 @@ class serialport(object):
 #    toggle switches between last value != 0 and 0
 
     def phidgetOUTattach(self,channel):
-        if not aw.ser.PhidgetDigitalOut and aw.qmc.phidgetManager is not None:
-            aw.qmc.startPhidgetManager()
-            # try to attach the 4 channels of the Phidget OUT1100 module
-            ser = None
-            port = None
-            for phidget_id in [DeviceID.PHIDID_OUT1100,DeviceID.PHIDID_REL1000,DeviceID.PHIDID_REL1100,DeviceID.PHIDID_REL1101]:
-                if ser is None:
-                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,
-                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-            if ser is not None:
-                aw.ser.PhidgetDigitalOut = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
-                for i in range(4):
-                    if port is not None:
-                        aw.ser.PhidgetDigitalOut[i].setHubPort(port)
-                    aw.ser.PhidgetDigitalOut[i].setChannel(i)
-                    aw.ser.PhidgetDigitalOut[i].setDeviceSerialNumber(ser)
-                    if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
-                        aw.ser.PhidgetDigitalOut[i].setIsRemote(True)
-                        aw.ser.PhidgetDigitalOut[i].setIsLocal(False)
-                    elif not aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetDigitalOut[i].setIsRemote(False)
-                        aw.ser.PhidgetDigitalOut[i].setIsLocal(True)
+        if aw.ser.PhidgetDigitalOut is None:
+            if aw.qmc.phidgetManager is None:
+                aw.qmc.startPhidgetManager()
+            if aw.qmc.phidgetManager is not None:
+                # try to attach the 4 channels of the Phidget OUT1100 module
+                ser = None
+                port = None
+                for phidget_id in [DeviceID.PHIDID_OUT1100,DeviceID.PHIDID_REL1000,DeviceID.PHIDID_REL1100,DeviceID.PHIDID_REL1101]:
+                    if ser is None:
+                        ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                if ser is not None:
+                    aw.ser.PhidgetDigitalOut = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
+                    for i in range(4):
+                        if port is not None:
+                            aw.ser.PhidgetDigitalOut[i].setHubPort(port)
+                        aw.ser.PhidgetDigitalOut[i].setChannel(i)
+                        aw.ser.PhidgetDigitalOut[i].setDeviceSerialNumber(ser)
+                        if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
+                            aw.ser.PhidgetDigitalOut[i].setIsRemote(True)
+                            aw.ser.PhidgetDigitalOut[i].setIsLocal(False)
+                        elif not aw.qmc.phidgetRemoteFlag:
+                            aw.ser.PhidgetDigitalOut[i].setIsRemote(False)
+                            aw.ser.PhidgetDigitalOut[i].setIsLocal(True)
         try:
             if not aw.ser.PhidgetDigitalOut[channel].getAttached():
                 aw.ser.PhidgetDigitalOut[channel].openWaitForAttachment(1000) # we don't wait for the attach and might mis some data
@@ -43979,7 +43982,7 @@ class serialport(object):
     # value: 0-100
     def phidgetOUTsetPWM(self,channel,value): 
         self.phidgetOUTattach(channel)
-        if aw.ser.PhidgetDigitalOut:
+        if aw.ser.PhidgetDigitalOut is not None:
             # set PWM of the given channel
             try:
                 if len(aw.ser.PhidgetDigitalOut) > channel and aw.ser.PhidgetDigitalOut[channel].getAttached():
@@ -43990,7 +43993,7 @@ class serialport(object):
                 pass
     
     def phidgetOUTclose(self):
-        if aw.ser.PhidgetDigitalOut and len(aw.ser.PhidgetDigitalOut)==4:
+        if aw.ser.PhidgetDigitalOut is not None and len(aw.ser.PhidgetDigitalOut)==4:
             try:
                 for i in range(4):
                     if aw.ser.PhidgetDigitalOut[i].getAttached():
@@ -44003,21 +44006,23 @@ class serialport(object):
 #  only supporting 6 channel Phidget HUB module
 
     def phidgetOUTattachHub(self,channel):
-        if not aw.ser.PhidgetDigitalOutHub and aw.qmc.phidgetManager is not None:
-            aw.qmc.startPhidgetManager()
-            # try to attach the 6 channels of the Phidget HUB module
-            ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_DIGITALOUTPUT_PORT,channel,
-                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-            if ser is not None:
-                aw.ser.PhidgetDigitalOutHub = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
-                for i in range(6):
-                    aw.ser.PhidgetDigitalOutHub[i].setChannel(0)
-                    aw.ser.PhidgetDigitalOutHub[i].setHubPort(i)
-                    aw.ser.PhidgetDigitalOutHub[i].setDeviceSerialNumber(ser)
-                    aw.ser.PhidgetDigitalOutHub[i].setIsHubPortDevice(True)
-                    if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
-                        aw.ser.PhidgetDigitalOutHub[i].setIsRemote(True)
-                        aw.ser.PhidgetDigitalOutHub[i].setIsLocal(False)
+        if aw.ser.PhidgetDigitalOutHub is not None:
+            if aw.qmc.phidgetManager is None:
+                aw.qmc.startPhidgetManager()
+            if aw.qmc.phidgetManager is not None:
+                # try to attach the 6 channels of the Phidget HUB module
+                ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_DIGITALOUTPUT_PORT,channel,
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                if ser is not None:
+                    aw.ser.PhidgetDigitalOutHub = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
+                    for i in range(6):
+                        aw.ser.PhidgetDigitalOutHub[i].setChannel(0)
+                        aw.ser.PhidgetDigitalOutHub[i].setHubPort(i)
+                        aw.ser.PhidgetDigitalOutHub[i].setDeviceSerialNumber(ser)
+                        aw.ser.PhidgetDigitalOutHub[i].setIsHubPortDevice(True)
+                        if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
+                            aw.ser.PhidgetDigitalOutHub[i].setIsRemote(True)
+                            aw.ser.PhidgetDigitalOutHub[i].setIsLocal(False)
         try:
             if not aw.ser.PhidgetDigitalOutHub[channel].getAttached():
                 aw.ser.PhidgetDigitalOutHub[channel].openWaitForAttachment(1000) # we don't wait for the attach and might mis some data
@@ -44053,7 +44058,7 @@ class serialport(object):
     # value: 0-100
     def phidgetOUTsetPWMhub(self,channel,value):
         self.phidgetOUTattachHub(channel)
-        if aw.ser.PhidgetDigitalOutHub:
+        if aw.ser.PhidgetDigitalOutHub is not None:
             # set PWM of the given channel
             try:
                 if len(aw.ser.PhidgetDigitalOutHub) > channel and aw.ser.PhidgetDigitalOutHub[channel].getAttached():
@@ -44063,7 +44068,7 @@ class serialport(object):
                 pass
     
     def phidgetOUTcloseHub(self):
-        if aw.ser.PhidgetDigitalOutHub and len(aw.ser.PhidgetDigitalOutHub)==6:
+        if aw.ser.PhidgetDigitalOutHub is not None and len(aw.ser.PhidgetDigitalOutHub)==6:
             try:
                 for i in range(6):
                     if aw.ser.PhidgetDigitalOutHub[i].getAttached():
@@ -44078,34 +44083,36 @@ class serialport(object):
 #  commands: out(n,v) with n channel number and value v voltage in V as a float
 
     def phidgetVOUTattach(self,channel):
-        if not aw.ser.PhidgetAnalogOut and aw.qmc.phidgetManager is not None:
-            aw.qmc.startPhidgetManager()
-            # try to attach the Phidget OUT100x module
-            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1000,
-                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-            ports = 1
-            if ser is None:
-                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1001,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+        if aw.ser.PhidgetAnalogOut is None:
+            if aw.qmc.phidgetManager is None:
+                aw.qmc.startPhidgetManager()
+            if aw.qmc.phidgetManager is not None:
+                # try to attach the Phidget OUT100x module
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1000,
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 1
-            if ser is None:
-                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1002,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-                ports = 1
-            if ser is None:
-                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_1002,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-                ports = 4
-            if ser is not None:
-                aw.ser.PhidgetAnalogOut = [VoltageOutput(),VoltageOutput(),VoltageOutput(),VoltageOutput()]
-                for i in range(ports):
-                    if port is not None:
-                        aw.ser.PhidgetAnalogOut[i].setHubPort(port)
-                    aw.ser.PhidgetAnalogOut[i].setDeviceSerialNumber(ser)
-                    aw.ser.PhidgetAnalogOut[i].setChannel(i)
-                    if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetAnalogOut[i].setIsRemote(True)
-                        aw.ser.PhidgetAnalogOut[i].setIsLocal(False)
+                if ser is None:
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1001,
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                    ports = 1
+                if ser is None:
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1002,
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                    ports = 1
+                if ser is None:
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_1002,
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                    ports = 4
+                if ser is not None:
+                    aw.ser.PhidgetAnalogOut = [VoltageOutput(),VoltageOutput(),VoltageOutput(),VoltageOutput()]
+                    for i in range(ports):
+                        if port is not None:
+                            aw.ser.PhidgetAnalogOut[i].setHubPort(port)
+                        aw.ser.PhidgetAnalogOut[i].setDeviceSerialNumber(ser)
+                        aw.ser.PhidgetAnalogOut[i].setChannel(i)
+                        if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
+                            aw.ser.PhidgetAnalogOut[i].setIsRemote(True)
+                            aw.ser.PhidgetAnalogOut[i].setIsLocal(False)
         try:
             if not aw.ser.PhidgetAnalogOut[channel].getAttached():
                 aw.ser.PhidgetAnalogOut[channel].openWaitForAttachment(1000)
@@ -44117,7 +44124,7 @@ class serialport(object):
     def phidgetVOUTsetVOUT(self,channel,value):
         res = False
         self.phidgetVOUTattach(channel)
-        if aw.ser.PhidgetAnalogOut:
+        if aw.ser.PhidgetAnalogOut is not None:
             # set voltage output
             try:
                 if len(aw.ser.PhidgetAnalogOut) > channel and aw.ser.PhidgetAnalogOut[channel] and aw.ser.PhidgetAnalogOut[channel].getAttached():
@@ -44133,7 +44140,7 @@ class serialport(object):
         return res
 
     def phidgetVOUTclose(self):
-        if aw.ser.PhidgetAnalogOut:
+        if aw.ser.PhidgetAnalogOut is not None:
             for i in range(4):
                 try:
                     aw.ser.PhidgetAnalogOut[i].setEnabled(False)
@@ -44153,7 +44160,7 @@ class serialport(object):
 #     move(ch,pos) # sets position, enables servo, disables servo once target position is reached
 
     def phidgetRCattach(self,channel):
-        if not aw.ser.PhidgetRCServo:
+        if aw.ser.PhidgetRCServo is None:
             aw.qmc.startPhidgetManager()
             # try to attach an Phidget RCC1000 module
             ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_RCC1000,
@@ -44193,39 +44200,39 @@ class serialport(object):
     # sets min/max pulse width
     def phidgetRCpulse(self,channel,min_pulse,max_pulse):
         self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
             aw.ser.PhidgetRCServo[channel].setMinPulseWidth(min_pulse)
             aw.ser.PhidgetRCServo[channel].setMaxPulseWidth(max_pulse)
 
     # sets min/max position
     def phidgetRCpos(self,channel,min_pos,max_pos):
         self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
             aw.ser.PhidgetRCServo[channel].setMinPosition(min_pos)
             aw.ser.PhidgetRCServo[channel].setMaxPosition(max_pos)
 
     # engage channel
     def phidgetRCengaged(self,channel,state):
         self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
             aw.ser.PhidgetRCServo[channel].setEngaged(state)
 
     # sets position
     def phidgetRCset(self,channel,position):
         self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
             aw.ser.PhidgetRCServo[channel].setTargetPosition(position)
 
     # set speed rampling state per channel
     def phidgetRCspeedRamping(self,channel,state):
         self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
             aw.ser.PhidgetRCServo[channel].setSpeedRampingState(state)
 
     # set voltage per channel
     def phidgetRCvoltage(self,channel,volt):
         self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
             from Phidget22.RCServoVoltage import RCServoVoltage
             if volt>6:
                 # set to 7.4V
@@ -44241,17 +44248,17 @@ class serialport(object):
     # sets acceleration
     def phidgetRCaccel(self,channel,accel):
         self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
             aw.ser.PhidgetRCServo[channel].setAcceleration(accel)
             
     # sets velocity
     def phidgetRCveloc(self,channel,veloc):
         self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo)>channel:
+        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
             aw.ser.PhidgetRCServo[channel].setVelocityLimit(veloc)
 
     def phidgetRCclose(self):
-        if aw.ser.PhidgetRCServo:
+        if aw.ser.PhidgetRCServo is not None:
             for i in range(len(aw.ser.PhidgetRCServo)):
                 try:
                     aw.ser.PhidgetRCServo[i].setEngaged(False)
