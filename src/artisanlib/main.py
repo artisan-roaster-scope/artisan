@@ -56931,7 +56931,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVbuttonsFlag.stateChanged.connect(self.activateONOFFeasySVslot)
         self.pidSVsliderFlag = QCheckBox(QApplication.translate("Label","Slider",None))
         self.pidSVsliderFlag.setChecked(aw.pidcontrol.svSlider)
-        self.pidSVsliderFlag.stateChanged.connect(aw.pidcontrol.activateSVSlider)
+        self.pidSVsliderFlag.stateChanged.connect(self.activateSVSlider)
         
         self.pidSVSliderMin = QSpinBox()
         self.pidSVSliderMin.setAlignment(Qt.AlignRight)
@@ -56947,7 +56947,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVSliderMax.setSingleStep(10)
         self.pidSVSliderMax.setValue(aw.pidcontrol.svSliderMax)   
         pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","Max",None))
-        self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangeSlot)
+        self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangedSlot)
         
         if aw.qmc.mode == "F":
             self.pidSVSliderMin.setSuffix(" F")
@@ -57129,6 +57129,10 @@ class PID_DlgControl(ArtisanDialog):
         self.setLayout(mainLayout)
         okButton.setFocus()
     
+    @pyqtSlot(int)
+    def activateSVSlider(self,i):
+        aw.pidcontrol.activateSVSlider(i)
+        
     @pyqtSlot(bool)
     def pidONAction(self,_):
         aw.pidcontrol.pidOn()
@@ -57719,7 +57723,6 @@ class PIDcontrol(object):
     def adjustsv(self,diff):
         self.setSV(self.sv + diff,True)
     
-    @pyqtSlot(int)
     def activateSVSlider(self,flag):
         if flag:
             aw.sliderGrpBoxSV.setVisible(True)
