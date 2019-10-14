@@ -36391,7 +36391,7 @@ class calculatorDlg(ArtisanDialog):
         self.convertTemp("FtoC")
     
     @pyqtSlot()
-    def convertTempFtoF(self):
+    def convertTempCtoF(self):
         self.convertTemp("CtoF")
     
     def convertTemp(self,x):
