@@ -24743,7 +24743,7 @@ class ApplicationWindow(QMainWindow):
                     ws['E1'].font = bf 
                     ws['F1'] = u(QApplication.translate("HTML Report Template", "Out",None)) + u" (" + u(unit.lower()) + u")"
                     ws['F1'].font = bf
-                    ws['G1'] = u(QApplication.translate("HTML Report Template", "Loss",None)) + u" (%)"
+                    ws['G1'] = u(QApplication.translate("HTML Report Template", "Loss",None))
                     ws['G1'].font = bf 
 
                     def avgFormat(c,r1,r2):
@@ -25658,15 +25658,15 @@ class ApplicationWindow(QMainWindow):
                     ws['H1'].font = bf
                     ws['I1'] = u(QApplication.translate("HTML Report Template", "DROP",None)) + u" (" + u(aw.qmc.mode) + u")"
                     ws['I1'].font = bf
-                    ws['J1'] = u(QApplication.translate("HTML Report Template", "DRY",None))  + u" (%)"
+                    ws['J1'] = u(QApplication.translate("HTML Report Template", "DRY",None))
                     ws['J1'].font = bf
-                    ws['K1'] = u(QApplication.translate("HTML Report Template", "MAI",None))  + u" (%)"
+                    ws['K1'] = u(QApplication.translate("HTML Report Template", "MAI",None))
                     ws['K1'].font = bf
-                    ws['L1'] = u(QApplication.translate("HTML Report Template", "DEV",None))  + u" (%)"
+                    ws['L1'] = u(QApplication.translate("HTML Report Template", "DEV",None))
                     ws['L1'].font = bf
                     ws['M1'] = u(QApplication.translate("HTML Report Template", "AUC",None)) 
                     ws['M1'].font = bf
-                    ws['N1'] = u(QApplication.translate("HTML Report Template", "Loss",None)) + u" (%)"
+                    ws['N1'] = u(QApplication.translate("HTML Report Template", "Loss",None))
                     ws['N1'].font = bf
                     ws['O1'] = u(QApplication.translate("HTML Report Template", "Color",None)) 
                     ws['o1'].font = bf
