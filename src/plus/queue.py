@@ -58,12 +58,9 @@ class Concur(threading.Thread):
     def addSyncItem(self,item):
         # successfully transmitted, we add/update the roasts UUID sync-cache
         if "roast_id" in item["data"] and "modified_at" in item["data"]:
-            # we update the plus status icon if the given roast_id was not yet in the sync cache and thus new
-            if sync.getSync(item["data"]["roast_id"]) is None:
-                sync.addSync(item["data"]["roast_id"],util.ISO86012epoch(item["data"]["modified_at"]))
-                config.app_window.updatePlusStatusSignal.emit() # @UndefinedVariable
-            else:
-                sync.addSync(item["data"]["roast_id"],util.ISO86012epoch(item["data"]["modified_at"]))
+            # we update the plus status icon
+            sync.addSync(item["data"]["roast_id"],util.ISO86012epoch(item["data"]["modified_at"]))
+            config.app_window.updatePlusStatusSignal.emit() # @UndefinedVariable
         
     def run(self):
         global queue

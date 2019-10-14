@@ -319,7 +319,9 @@ def fetchServerUpdate(uuid,file=None):
         status = res.status_code
         if status == 204: # NO CONTENT: data on server is older then ours
             config.logger.debug("sync:fetchServerUpdate() -> 204 data on server is older")
-            pass # we do nothing
+            #no newer data found on server, do nothing; controller.is_synced() might report an unsynced status
+            # if file modification date is newer than what is known on the version from the server via the sync cache
+            pass
         elif status == 404:
             try:
                 data = res.json()

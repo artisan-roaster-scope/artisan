@@ -43,7 +43,7 @@ import keyring # @Reimport # imported last to make py2app work
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QSemaphore, QTimer
 
-from plus import config, connection, stock, queue, sync, roast
+from plus import config, connection, stock, queue, sync, roast, util
 
 connect_semaphore = QSemaphore(1)
 
@@ -61,14 +61,23 @@ def is_on():
     aw = config.app_window
     return aw.plus_account is not None
 
-# returns True if current profile is under sync (i.e. in the sync-cache) or no profile is loaded currently
+# returns True if current profile is under sync (i.e. in the sync-cache) and not newer than server or no profile is loaded currently
 def is_synced():
     aw = config.app_window
     if aw.qmc.roastUUID is None:
         return not bool(aw.curFile)
     else:
         res = sync.getSync(aw.qmc.roastUUID)
-        return bool(res)
+        if bool(aw.curFile):
+            if bool(res):
+                # only up to the second, thus we round
+                file_last_modified = int(round(util.getModificationDate(aw.curFile))) 
+                res = int(round(res))
+                return res == file_last_modified
+            else:
+                return False # not in sync cache
+        else:
+            return True # something wrong, a UUID without a file!? Should not occur...
             
 def start(app_window):
     config.app_window = app_window

@@ -514,7 +514,7 @@
         <translation>Tout sur OFF</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57287"/>
+        <location filename="../artisanlib/main.py" line="57291"/>
         <source>Read</source>
         <translation>Lire</translation>
     </message>
@@ -751,7 +751,7 @@ REFROIDISSEMENT</translation>
         <translation>Lire Valeurs PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57288"/>
+        <location filename="../artisanlib/main.py" line="57292"/>
         <source>Write</source>
         <translation>Ecrire</translation>
     </message>
@@ -3580,7 +3580,7 @@ Extra Device</source>
         <translation>Erreur de valeur:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57197"/>
+        <location filename="../artisanlib/main.py" line="57201"/>
         <source>Exception:</source>
         <translation>Exception:</translation>
     </message>
@@ -3951,7 +3951,7 @@ Extra Device</source>
         <translation type="obsolete">Sauvegarde automatique  [a]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57280"/>
+        <location filename="../artisanlib/main.py" line="57284"/>
         <source>Delta DTA PID Control</source>
         <translation>Contrôle Delta DTA PID</translation>
     </message>
@@ -5375,7 +5375,7 @@ Extra Device</source>
         <translation>Taille</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57284"/>
+        <location filename="../artisanlib/main.py" line="57288"/>
         <source>SV</source>
         <translation>SV</translation>
     </message>
@@ -8120,22 +8120,22 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57158"/>
+        <location filename="../artisanlib/main.py" line="57162"/>
         <source>Load Ramp/Soak Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57179"/>
+        <location filename="../artisanlib/main.py" line="57183"/>
         <source>Save Ramp/Soak Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57501"/>
+        <location filename="../artisanlib/main.py" line="57505"/>
         <source>PID turned on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57543"/>
+        <location filename="../artisanlib/main.py" line="57547"/>
         <source>PID turned off</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8831,7 +8831,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57818"/>
+        <location filename="../artisanlib/main.py" line="57821"/>
         <source>p-i-d values updated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9720,27 +9720,27 @@ Modify your setup?</source>
         <translation>S&apos;enregistrer</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="134"/>
+        <location filename="../plus/controller.py" line="143"/>
         <source>Keyring error: Ensure that gnome-keyring is installed.</source>
         <translation>Keyring error: Vérifiez que gnome-keyring est installé.</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="138"/>
+        <location filename="../plus/controller.py" line="147"/>
         <source>Login aborted</source>
         <translation>Login abandoné</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="143"/>
+        <location filename="../plus/controller.py" line="152"/>
         <source>authentified</source>
         <translation>authentifié</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="144"/>
+        <location filename="../plus/controller.py" line="153"/>
         <source>Connected to artisan.plus</source>
         <translation>Connecté à artisan plus</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="186"/>
+        <location filename="../plus/controller.py" line="195"/>
         <source>artisan.plus turned off</source>
         <translation>artisan plus desactivé</translation>
     </message>
@@ -9750,12 +9750,12 @@ Modify your setup?</source>
         <translation type="obsolete">Authtification échouée</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="167"/>
+        <location filename="../plus/controller.py" line="176"/>
         <source>Couldn&apos;t connect to artisan.plus</source>
         <translation>Impossible de se connecter à artisan.plus</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="188"/>
+        <location filename="../plus/controller.py" line="197"/>
         <source>artisan.plus disconnected</source>
         <translation>artisan plus déconnecté</translation>
     </message>
@@ -9780,7 +9780,7 @@ Modify your setup?</source>
         <translation>Mémoriser</translation>
     </message>
     <message>
-        <location filename="../plus/queue.py" line="227"/>
+        <location filename="../plus/queue.py" line="224"/>
         <source>Queuing roast for upload to artisan.plus</source>
         <translation>Torréfaction mise en attente pour le télécharger sur le serveur artisan.plus</translation>
     </message>
@@ -9820,7 +9820,7 @@ Modify your setup?</source>
         <translation>Données mises à jour depuis artisan plus</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="154"/>
+        <location filename="../plus/controller.py" line="163"/>
         <source>Authentication failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10167,7 +10167,7 @@ Modify your setup?</source>
         <translation>getallpid(): Incapable de lire sv actuel</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57283"/>
+        <location filename="../artisanlib/main.py" line="57287"/>
         <source>Work in Progress</source>
         <translation>Travail en cours</translation>
     </message>
@@ -10300,7 +10300,7 @@ Modify your setup?</source>
         <translation>Style</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57300"/>
+        <location filename="../artisanlib/main.py" line="57304"/>
         <source>General</source>
         <translation>Général</translation>
     </message>

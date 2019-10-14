@@ -620,7 +620,7 @@ END</source>
         <translation>讀取 PID 值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57287"/>
+        <location filename="../artisanlib/main.py" line="57291"/>
         <source>Read</source>
         <translation>讀取</translation>
     </message>
@@ -735,7 +735,7 @@ END</source>
         <translation>設定  PID 環境溫度 時間單位至MM:SS</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57288"/>
+        <location filename="../artisanlib/main.py" line="57292"/>
         <source>Write</source>
         <translation>寫入</translation>
     </message>
@@ -3479,7 +3479,7 @@ Extra Device</source>
 <context>
     <name>Error Message</name>
     <message>
-        <location filename="../artisanlib/main.py" line="57197"/>
+        <location filename="../artisanlib/main.py" line="57201"/>
         <source>Exception:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3890,7 +3890,7 @@ Extra Device</source>
         <translation>Fuji PXG PID 控制</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57280"/>
+        <location filename="../artisanlib/main.py" line="57284"/>
         <source>Delta DTA PID Control</source>
         <translation>Delta DTA PID 控制</translation>
     </message>
@@ -5364,7 +5364,7 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57284"/>
+        <location filename="../artisanlib/main.py" line="57288"/>
         <source>SV</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7878,22 +7878,22 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57158"/>
+        <location filename="../artisanlib/main.py" line="57162"/>
         <source>Load Ramp/Soak Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57179"/>
+        <location filename="../artisanlib/main.py" line="57183"/>
         <source>Save Ramp/Soak Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57501"/>
+        <location filename="../artisanlib/main.py" line="57505"/>
         <source>PID turned on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57543"/>
+        <location filename="../artisanlib/main.py" line="57547"/>
         <source>PID turned off</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9130,7 +9130,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57818"/>
+        <location filename="../artisanlib/main.py" line="57821"/>
         <source>p-i-d values updated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9508,37 +9508,37 @@ Repeat Operation at the end: {0}</source>
 <context>
     <name>Plus</name>
     <message>
-        <location filename="../plus/controller.py" line="134"/>
+        <location filename="../plus/controller.py" line="143"/>
         <source>Keyring error: Ensure that gnome-keyring is installed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="138"/>
+        <location filename="../plus/controller.py" line="147"/>
         <source>Login aborted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="143"/>
+        <location filename="../plus/controller.py" line="152"/>
         <source>authentified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="144"/>
+        <location filename="../plus/controller.py" line="153"/>
         <source>Connected to artisan.plus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="186"/>
+        <location filename="../plus/controller.py" line="195"/>
         <source>artisan.plus turned off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="167"/>
+        <location filename="../plus/controller.py" line="176"/>
         <source>Couldn&apos;t connect to artisan.plus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="188"/>
+        <location filename="../plus/controller.py" line="197"/>
         <source>artisan.plus disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9568,7 +9568,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/queue.py" line="227"/>
+        <location filename="../plus/queue.py" line="224"/>
         <source>Queuing roast for upload to artisan.plus</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9608,7 +9608,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="154"/>
+        <location filename="../plus/controller.py" line="163"/>
         <source>Authentication failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9980,7 +9980,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57283"/>
+        <location filename="../artisanlib/main.py" line="57287"/>
         <source>Work in Progress</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10103,7 +10103,7 @@ Repeat Operation at the end: {0}</source>
         <translation>用戶界面</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57300"/>
+        <location filename="../artisanlib/main.py" line="57304"/>
         <source>General</source>
         <translation>一般</translation>
     </message>

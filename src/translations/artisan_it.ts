@@ -429,7 +429,7 @@
         <translation>Autoadattamento OFF</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57287"/>
+        <location filename="../artisanlib/main.py" line="57291"/>
         <source>Read</source>
         <translation>Legge</translation>
     </message>
@@ -689,7 +689,7 @@ END</source>
         <translation type="unfinished">Legge valori PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57288"/>
+        <location filename="../artisanlib/main.py" line="57292"/>
         <source>Write</source>
         <translation type="unfinished">Scrive</translation>
     </message>
@@ -3518,7 +3518,7 @@ Extra Device</source>
         <translation>Errore valore:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57197"/>
+        <location filename="../artisanlib/main.py" line="57201"/>
         <source>Exception:</source>
         <translation>Eccezione:</translation>
     </message>
@@ -3884,7 +3884,7 @@ Extra Device</source>
         <translation>Controllo Fuji PXG PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57280"/>
+        <location filename="../artisanlib/main.py" line="57284"/>
         <source>Delta DTA PID Control</source>
         <translation>Controllo Delta DTA PID</translation>
     </message>
@@ -5298,7 +5298,7 @@ Extra Device</source>
         <translation>Misura</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57284"/>
+        <location filename="../artisanlib/main.py" line="57288"/>
         <source>SV</source>
         <translation>SV</translation>
     </message>
@@ -8549,22 +8549,22 @@ Continue?</source>
         <translation type="obsolete">Phidget 1018 IO non collegato</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57158"/>
+        <location filename="../artisanlib/main.py" line="57162"/>
         <source>Load Ramp/Soak Table</source>
         <translation>Carica tabella temperatura a rampa</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57179"/>
+        <location filename="../artisanlib/main.py" line="57183"/>
         <source>Save Ramp/Soak Table</source>
         <translation>Salva tabella temperatura a rampa</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57501"/>
+        <location filename="../artisanlib/main.py" line="57505"/>
         <source>PID turned on</source>
         <translation>PID acceso</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57543"/>
+        <location filename="../artisanlib/main.py" line="57547"/>
         <source>PID turned off</source>
         <translation>PID spento</translation>
     </message>
@@ -9039,7 +9039,7 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57818"/>
+        <location filename="../artisanlib/main.py" line="57821"/>
         <source>p-i-d values updated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9928,27 +9928,27 @@ Modify your setup?</source>
         <translation>Registro</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="134"/>
+        <location filename="../plus/controller.py" line="143"/>
         <source>Keyring error: Ensure that gnome-keyring is installed.</source>
         <translation>Errore portachiavi: assicurarsi che gnome-keyring sia installato.</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="138"/>
+        <location filename="../plus/controller.py" line="147"/>
         <source>Login aborted</source>
         <translation>Login interrotto</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="143"/>
+        <location filename="../plus/controller.py" line="152"/>
         <source>authentified</source>
         <translation>autenticato</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="144"/>
+        <location filename="../plus/controller.py" line="153"/>
         <source>Connected to artisan.plus</source>
         <translation>Collegato ad artisan.plus</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="186"/>
+        <location filename="../plus/controller.py" line="195"/>
         <source>artisan.plus turned off</source>
         <translation>artisan.plus spento</translation>
     </message>
@@ -9958,12 +9958,12 @@ Modify your setup?</source>
         <translation type="obsolete">Autenticazione fallita</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="167"/>
+        <location filename="../plus/controller.py" line="176"/>
         <source>Couldn&apos;t connect to artisan.plus</source>
         <translation>Impossibile connettersi a artisan.plus</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="188"/>
+        <location filename="../plus/controller.py" line="197"/>
         <source>artisan.plus disconnected</source>
         <translation>artisan.plus disconnesso</translation>
     </message>
@@ -9988,7 +9988,7 @@ Modify your setup?</source>
         <translation>Ricorda</translation>
     </message>
     <message>
-        <location filename="../plus/queue.py" line="227"/>
+        <location filename="../plus/queue.py" line="224"/>
         <source>Queuing roast for upload to artisan.plus</source>
         <translation>Arresto in coda per il caricamento su artisan.plus</translation>
     </message>
@@ -10028,7 +10028,7 @@ Modify your setup?</source>
         <translation>Dati aggiornati ricevuti da artisan.plus</translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="154"/>
+        <location filename="../plus/controller.py" line="163"/>
         <source>Authentication failed</source>
         <translation>Autenticazione fallita</translation>
     </message>
@@ -10355,7 +10355,7 @@ Modify your setup?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57283"/>
+        <location filename="../artisanlib/main.py" line="57287"/>
         <source>Work in Progress</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10483,7 +10483,7 @@ Modify your setup?</source>
         <translation type="unfinished">Stile</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="57300"/>
+        <location filename="../artisanlib/main.py" line="57304"/>
         <source>General</source>
         <translation>Generale</translation>
     </message>
