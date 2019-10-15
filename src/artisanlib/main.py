@@ -666,6 +666,7 @@ class tgraphcanvas(FigureCanvas):
 #                        "mettext":'white',"metbox":'red',
 #                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'}
         # Artisan 2.x
+        self.alpha = {"analysismask":0.4,"analysisresult":0.1,"legendbg":0.4}
         self.palette = {"background":'white',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
                         "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#bde0ee',"rect5":'lightgrey',
                         "et":'#cc0f50',"bt":'#0A5C90',"xt":'#404040',"deltaet":'#cc0f50',
@@ -674,7 +675,8 @@ class tgraphcanvas(FigureCanvas):
                         "specialeventbox":'#ff5871',"specialeventtext":'white', 
                         "bgeventmarker":'white',"bgeventtext":'black',
                         "mettext":'white',"metbox":'#CC0F50',
-                        "aucguide":'#0c6aa6',"messages":'black',"aucarea":'#767676',"analysismask":'#bababa'}
+                        "aucguide":'#0c6aa6',"messages":'black',"aucarea":'#767676',
+                        "analysismask":'#bababa',"analysisresult":"#b1bab5"}
         self.palette1 = self.palette.copy()
         self.EvalueColor_default = ['#43a7cf','#49B160','#800080','#ad0427']
         self.EvalueTextColor_default = ['white','white','white','white']
@@ -6385,6 +6387,7 @@ class tgraphcanvas(FigureCanvas):
                     frame = leg.get_frame()
                     frame.set_facecolor(self.palette["legendbg"])
 #                    frame.set_alpha(self.legendbgalpha)
+                    frame.set_alpha(self.alpha["legendbg"])
                     frame.set_edgecolor(self.palette["legendborder"])
                     frame.set_linewidth(0.5)
                     for line,text in zip(leg.get_lines(), leg.get_texts()):
@@ -7110,41 +7113,41 @@ class tgraphcanvas(FigureCanvas):
         if color == 3:
             dialog = graphColorDlg(aw)
             if dialog.exec_():
-                self.palette["background"] = str(dialog.backgroundLabel.text())
-                self.palette["grid"] = str(dialog.gridLabel.text())
-                self.palette["ylabel"] = str(dialog.yLabel.text())
-                self.palette["xlabel"] = str(dialog.xLabel.text())
-                self.palette["title"] = str(dialog.titleLabel.text())
-                self.palette["rect1"] = str(dialog.rect1Label.text())
-                self.palette["rect2"] = str(dialog.rect2Label.text())
-                self.palette["rect3"] = str(dialog.rect3Label.text())
-                self.palette["rect4"] = str(dialog.rect4Label.text())
-                self.palette["rect5"] = str(dialog.rect5Label.text())
-                self.palette["et"] = str(dialog.metLabel.text())
-                self.palette["bt"] = str(dialog.btLabel.text())
-                self.palette["deltaet"] = str(dialog.deltametLabel.text())
-                self.palette["deltabt"] = str(dialog.deltabtLabel.text())
-                self.palette["markers"] = str(dialog.markersLabel.text())
-                self.palette["text"] = str(dialog.textLabel.text())
-                self.palette["watermarks"] = str(dialog.watermarksLabel.text())
-                self.palette["timeguide"] = str(dialog.timeguideLabel.text())
-                self.palette["aucguide"] = str(dialog.aucguideLabel.text())
-                self.palette["aucarea"] = str(dialog.aucareaLabel.text())
-                self.palette["canvas"] = str(dialog.canvasLabel.text())
-                self.palette["legendbg"] = str(dialog.legendbgLabel.text())
-#                self.palette["legendbgalpha"] = str(dialog.legendbgalphaLabel.text())
-                self.palette["legendborder"] = str(dialog.legendborderLabel.text())
-                self.palette["specialeventbox"] = str(dialog.specialeventboxLabel.text())
-                self.palette["specialeventtext"] = str(dialog.specialeventtextLabel.text())
-                self.palette["bgeventmarker"] = str(dialog.bgeventmarkerLabel.text())
-                self.palette["bgeventtext"] = str(dialog.bgeventtextLabel.text())
-                self.palette["mettext"] = str(dialog.mettextLabel.text())
-                self.palette["metbox"] = str(dialog.metboxLabel.text())
-                self.backgroundmetcolor = str(dialog.bgmetLabel.text())
-                self.backgroundbtcolor  = str(dialog.bgbtLabel.text())
-                self.backgrounddeltaetcolor = str(dialog.bgdeltametLabel.text())
-                self.backgrounddeltabtcolor = str(dialog.bgdeltabtLabel.text())
-                self.backgroundxtcolor = str(dialog.bgextraLabel.text())
+                self.palette["background"] = str(dialog.backgroundButton.text())
+                self.palette["grid"] = str(dialog.gridButton.text())
+                self.palette["ylabel"] = str(dialog.yButton.text())
+                self.palette["xlabel"] = str(dialog.xButton.text())
+                self.palette["title"] = str(dialog.titleButton.text())
+                self.palette["rect1"] = str(dialog.rect1Button.text())
+                self.palette["rect2"] = str(dialog.rect2Button.text())
+                self.palette["rect3"] = str(dialog.rect3Button.text())
+                self.palette["rect4"] = str(dialog.rect4Button.text())
+                self.palette["rect5"] = str(dialog.rect5Button.text())
+                self.palette["et"] = str(dialog.metButton.text())
+                self.palette["bt"] = str(dialog.btButton.text())
+                self.palette["deltaet"] = str(dialog.deltametButton.text())
+                self.palette["deltabt"] = str(dialog.deltabtButton.text())
+                self.palette["markers"] = str(dialog.markersButton.text())
+                self.palette["text"] = str(dialog.textButton.text())
+                self.palette["watermarks"] = str(dialog.watermarksButton.text())
+                self.palette["timeguide"] = str(dialog.timeguideButton.text())
+                self.palette["aucguide"] = str(dialog.aucguideButton.text())
+                self.palette["aucarea"] = str(dialog.aucareaButton.text())
+                self.palette["canvas"] = str(dialog.canvasButton.text())
+                self.palette["legendbg"] = str(dialog.legendbgButton.text())
+#                self.palette["legendbgalpha"] = str(dialog.legendbgalphaButton.text())
+                self.palette["legendborder"] = str(dialog.legendborderButton.text())
+                self.palette["specialeventbox"] = str(dialog.specialeventboxButton.text())
+                self.palette["specialeventtext"] = str(dialog.specialeventtextButton.text())
+                self.palette["bgeventmarker"] = str(dialog.bgeventmarkerButton.text())
+                self.palette["bgeventtext"] = str(dialog.bgeventtextButton.text())
+                self.palette["mettext"] = str(dialog.mettextButton.text())
+                self.palette["metbox"] = str(dialog.metboxButton.text())
+                self.backgroundmetcolor = str(dialog.bgmetButton.text())
+                self.backgroundbtcolor  = str(dialog.bgbtButton.text())
+                self.backgrounddeltaetcolor = str(dialog.bgdeltametButton.text())
+                self.backgrounddeltabtcolor = str(dialog.bgdeltabtButton.text())
+                self.backgroundxtcolor = str(dialog.bgextraButton.text())
                 #deleteLater() will not work here as the dialog is still bound via the parent
                 #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
                 # the following will immedately release the memory dispite this parent link
@@ -22253,6 +22256,11 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("LEDColors"):
                 for (k, v) in list(toMap(settings.value("LEDColors")).items()):
                     self.lcdpaletteF[str(k)] = s2a(toString(v))
+#?            self.qmc.palette["alpha"] = 'None'  #revert the canvas element to default if it does not exist in the settings.
+            if settings.contains("Alphas"):
+                for (k, v) in list(toMap(settings.value("Alphas")).items()):
+                    self.qmc.alpha[str(k)] = (v)
+                
             #restore colors
             self.lcd1.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
             self.lcd2.setStyleSheet("QLCDNumber { border-radius:4; color: %s; background: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
@@ -23712,6 +23720,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ExtraEventSamplingDelay",self.qmc.extra_event_sampling_delay)
             #save colors
             settings.setValue("Colors",self.qmc.palette)
+            settings.setValue("Alphas",self.qmc.alpha)
             settings.setValue("LCDColors",self.lcdpaletteB)
             settings.setValue("LEDColors",self.lcdpaletteF)
             settings.setValue("ETBColor",self.qmc.backgroundmetcolor)
@@ -24250,6 +24259,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("watermarks",self.qmc.watermarksflag)
             #save colors
             settings.setValue("Colors",self.qmc.palette)
+            settings.setValue("Alphas",self.qmc.alpha)
             settings.setValue("LCDColors",self.lcdpaletteB)
             settings.setValue("LEDColors",self.lcdpaletteF)
             settings.setValue("ETBColor",self.qmc.backgroundmetcolor)
@@ -29308,7 +29318,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.analysisresultsstr = resultstr
         try:
             # draw analysis mask
-            a = 0.4
+            a = aw.qmc.alpha["analysismask"]
             fc = aw.qmc.palette["analysismask"]
             z = 20
             self.qmc.ax.axvspan(aw.qmc.ax.get_xlim()[0], analysis_starttime, facecolor=fc, alpha=a, zorder=z)
@@ -29322,14 +29332,18 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.analysisresultsloc = [0.5,0.5]
 
             # create the analysis results annotation box
+            a = aw.qmc.alpha["analysisresult"]
+            fc = aw.qmc.palette["analysisresult"]
+            tc = aw.labelBorW(fc)
             self.analysisresultsanno = self.qmc.ax.annotate(resultstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
                        ha="left", va="center",
                        fontfamily='monospace',
-                       fontsize='small',
-                       color=self.qmc.palette["text"],
-                       zorder=11,
+                       fontsize='x-small',
+#                       color=self.qmc.palette["text"],
+                       color=tc,
+                       zorder=21,
                        picker=True,
-                       bbox=dict(boxstyle="round", fc="0.8", alpha=0.1))
+                       bbox=dict(boxstyle="round", fc=fc, alpha=a))
             try:
                 self.analysisresultsanno.set_in_layout(False) # remove from tight_layout calculation
             except: # set_in_layout not available in mpl<3.x
@@ -49987,176 +50001,280 @@ class graphColorDlg(ArtisanDialog):
         titlefont = QFont()
         titlefont.setBold(True)
         titlefont.setWeight(75)
+        self.commonstyle = "border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;"
         
         #TAB0
         profilecolorlabel = QLabel(QApplication.translate("Label","Profile Colors",None))
         profilecolorlabel.setFont(titlefont)
         bgcolorlabel = QLabel(QApplication.translate("Label","Background Profile Colors",None))
         bgcolorlabel.setFont(titlefont)
-        profilecolorlabel.setMaximumSize(2180,20)
-        bgcolorlabel.setMaximumSize(2180,20)
-        profilecolorlabel.setMinimumSize(80,20)
-        bgcolorlabel.setMinimumSize(80,20)
+        profilecolorlabel.setMaximumSize(180,20)
+        bgcolorlabel.setMaximumSize(180,20)
+        profilecolorlabel.setMinimumSize(150,20)
+        bgcolorlabel.setMinimumSize(150,20)
         
-        self.metLabel = self.colorLabel(aw.qmc.palette["et"])
-        self.metButton = QPushButton(QApplication.translate("Button","ET", None))
+        self.metLabel = QLabel(QApplication.translate("Button","ET", None))
+        self.metLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.metButton = QPushButton()
         self.metButton.setFocusPolicy(Qt.NoFocus)
         self.metButton.clicked.connect(self.setColorSlot)
-        self.btLabel = self.colorLabel(aw.qmc.palette["bt"])
-        self.btButton = QPushButton(QApplication.translate("Button","BT", None))
+        self.btLabel = QLabel(QApplication.translate("Button","BT", None))
+        self.btLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.btButton = QPushButton()
         self.btButton.setFocusPolicy(Qt.NoFocus)
         self.btButton.clicked.connect(self.setColorSlot)
-        self.deltametLabel = self.colorLabel(aw.qmc.palette["deltaet"])
-        self.deltametButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Label","ET", None))
+        self.deltametLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Button","ET", None))
+        self.deltametLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.deltametButton = QPushButton()
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametButton.clicked.connect(self.setColorSlot)
-        self.deltabtLabel = self.colorLabel(aw.qmc.palette["deltabt"])
-        self.deltabtButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Label","BT", None))
+        self.deltabtLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Button","BT", None))
+        self.deltabtLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.deltabtButton = QPushButton()
         self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtButton.clicked.connect(self.setColorSlot)
 
-        self.bgmetLabel = self.colorLabel(aw.qmc.backgroundmetcolor)
-        self.bgmetButton = QPushButton(QApplication.translate("Button","ET", None))
+        self.bgmetLabel = QLabel(QApplication.translate("Button","ET", None))
+        self.bgmetLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.bgmetButton = QPushButton()
         self.bgmetButton.setFocusPolicy(Qt.NoFocus)
         self.bgmetButton.clicked.connect(self.setbgColorSlot)
-        self.bgbtLabel = self.colorLabel(aw.qmc.backgroundbtcolor)
-        self.bgbtButton = QPushButton(QApplication.translate("Button","BT", None))
+        self.bgbtLabel = QLabel(QApplication.translate("Button","BT", None))
+        self.bgbtLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.bgbtButton = QPushButton()
         self.bgbtButton.setFocusPolicy(Qt.NoFocus)
         self.bgbtButton.clicked.connect(self.setbgColorSlot)
-        self.bgdeltametLabel = self.colorLabel(aw.qmc.backgrounddeltaetcolor)
-        self.bgdeltametButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Label","ET", None))
+        self.bgdeltametLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Button","ET", None))
+        self.bgdeltametLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.bgdeltametButton = QPushButton()
         self.bgdeltametButton.setFocusPolicy(Qt.NoFocus)
         self.bgdeltametButton.clicked.connect(self.setbgColorSlot)
-        self.bgdeltabtLabel = self.colorLabel(aw.qmc.backgrounddeltabtcolor)
-        self.bgdeltabtButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Label","BT", None))
+        self.bgdeltabtLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Button","BT", None))
+        self.bgdeltabtLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.bgdeltabtButton = QPushButton()
         self.bgdeltabtButton.setFocusPolicy(Qt.NoFocus)
         self.bgdeltabtButton.clicked.connect(self.setbgColorSlot)
 
-        self.bgextraLabel = self.colorLabel(aw.qmc.backgroundxtcolor)
-        self.bgextraButton = QPushButton(QApplication.translate("Button","Extra", None))
+        self.bgextraLabel = QLabel(QApplication.translate("Button","Extra", None))
+        self.bgextraLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.bgextraButton = QPushButton()
         self.bgextraButton.setFocusPolicy(Qt.NoFocus)
         self.bgextraButton.clicked.connect(self.setbgColorSlot)
             
-        intensitylabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
-        intensitylabel.setAlignment(Qt.AlignRight)
-        self.intensitySpinBox = QSpinBox()
-        self.intensitySpinBox.setAlignment(Qt.AlignRight)
-        self.intensitySpinBox.setRange(1,5)
-        self.intensitySpinBox.setSingleStep(1)
-        self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
-        self.intensitySpinBox.valueChanged.connect(self.adjustintensity)        
-        self.intensitySpinBox.setFocusPolicy(Qt.NoFocus)      
+        opaqbgLabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
+        opaqbgLabel.setAlignment(Qt.AlignRight)
+        self.opaqbgSpinBox = QSpinBox()
+        self.opaqbgSpinBox.setAlignment(Qt.AlignRight)
+        self.opaqbgSpinBox.setRange(1,5)
+        self.opaqbgSpinBox.setSingleStep(1)
+        self.opaqbgSpinBox.setValue(aw.qmc.backgroundalpha * 10)
+        self.opaqbgSpinBox.valueChanged.connect(self.adjustintensity)        
+        self.opaqbgSpinBox.setFocusPolicy(Qt.NoFocus)      
+        self.opaqbgLayout = QHBoxLayout()
+        self.opaqbgLayout.addWidget(opaqbgLabel)
+        self.opaqbgLayout.addWidget(self.opaqbgSpinBox)
             
         #TAB1
-        self.backgroundLabel = self.colorLabel(aw.qmc.palette["background"])
-        self.backgroundButton = QPushButton(QApplication.translate("Button","Background", None))
+        self.backgroundLabel = QLabel(QApplication.translate("Button","Background", None))
+        self.backgroundLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.backgroundButton = QPushButton()
+        self.backgroundButton = self.colorButton(aw.qmc.palette["background"])
         self.backgroundButton.setFocusPolicy(Qt.NoFocus)
         self.backgroundButton.clicked.connect(self.setColorSlot)
-        self.gridLabel = self.colorLabel(aw.qmc.palette["grid"])
-        self.gridButton = QPushButton(QApplication.translate("Button","Grid", None))
+        self.gridLabel = QLabel(QApplication.translate("Button","Grid", None))
+        self.gridLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.gridButton = QPushButton()
+        self.gridButton = self.colorButton(aw.qmc.palette["grid"])
         self.gridButton.setFocusPolicy(Qt.NoFocus)
         self.gridButton.clicked.connect(self.setColorSlot)
-        self.titleLabel = self.colorLabel(aw.qmc.palette["title"])
-        self.titleButton = QPushButton(QApplication.translate("Label","Title", None))
+        self.titleLabel = QLabel(QApplication.translate("Button","Title", None))
+        self.titleLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.titleButton = QPushButton()
+        self.titleButton = self.colorButton(aw.qmc.palette["title"])
         self.titleButton.setFocusPolicy(Qt.NoFocus)
         self.titleButton.clicked.connect(self.setColorSlot)
-        self.yLabel = self.colorLabel(aw.qmc.palette["ylabel"])
-        self.yButton = QPushButton(QApplication.translate("Button","Y Label", None))
+        self.yLabel = QLabel(QApplication.translate("Button","Y Label", None))
+        self.yLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.yButton = QPushButton()
+        self.yButton = self.colorButton(aw.qmc.palette["ylabel"])
         self.yButton.setFocusPolicy(Qt.NoFocus)
         self.yButton.clicked.connect(self.setColorSlot)
-        self.xLabel = self.colorLabel(aw.qmc.palette["xlabel"])
-        self.xButton = QPushButton(QApplication.translate("Button","X Label", None))
+        self.xLabel = QLabel(QApplication.translate("Button","X Label", None))
+        self.xLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.xButton = self.colorButton(aw.qmc.palette["xlabel"])
         self.xButton.setFocusPolicy(Qt.NoFocus)
         self.xButton.clicked.connect(self.setColorSlot)
-        self.rect1Label = self.colorLabel(aw.qmc.palette["rect1"])
-        self.rect1Button = QPushButton(QApplication.translate("Button","Drying Phase", None))
+        self.rect1Label = QLabel(QApplication.translate("Button","Drying Phase", None))
+        self.rect1Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.rect1Button = QPushButton()
+        self.rect1Button = self.colorButton(aw.qmc.palette["rect1"])
         self.rect1Button.setFocusPolicy(Qt.NoFocus)
         self.rect1Button.clicked.connect(self.setColorSlot)
-        self.rect2Label = self.colorLabel(aw.qmc.palette["rect2"])
-        self.rect2Button = QPushButton(QApplication.translate("Button","Maillard Phase", None))
+        self.rect2Label = QLabel(QApplication.translate("Button","Maillard Phase", None))
+        self.rect2Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.rect2Button = QPushButton()
+        self.rect2Button = self.colorButton(aw.qmc.palette["rect2"])
         self.rect2Button.setFocusPolicy(Qt.NoFocus)
         self.rect2Button.clicked.connect(self.setColorSlot)
-        self.rect3Label = self.colorLabel(aw.qmc.palette["rect3"])
-        self.rect3Button = QPushButton(QApplication.translate("Button","Finishing Phase", None))
+        self.rect3Label = QLabel(QApplication.translate("Button","Finishing Phase", None))
+        self.rect3Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.rect3Button = QPushButton()
+        self.rect3Button = self.colorButton(aw.qmc.palette["rect3"])
         self.rect3Button.setFocusPolicy(Qt.NoFocus)
         self.rect3Button.clicked.connect(self.setColorSlot)
-        self.rect4Label = self.colorLabel(aw.qmc.palette["rect4"])
-        self.rect4Button = QPushButton(QApplication.translate("Button","Cooling Phase", None))
+        self.rect4Label = QLabel(QApplication.translate("Button","Cooling Phase", None))
+        self.rect4Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.rect4Button = QPushButton()
+        self.rect4Button = self.colorButton(aw.qmc.palette["rect4"])
         self.rect4Button.setFocusPolicy(Qt.NoFocus)
         self.rect4Button.clicked.connect(self.setColorSlot)
-        self.rect5Label = self.colorLabel(aw.qmc.palette["rect5"])
-        self.rect5Button = QPushButton(QApplication.translate("Button","Bars Bkgnd", None))
+        self.rect5Label = QLabel(QApplication.translate("Button","Bars Bkgnd", None))
+        self.rect5Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.rect5Button = QPushButton()
+        self.rect5Button = self.colorButton(aw.qmc.palette["rect5"])
         self.rect5Button.setFocusPolicy(Qt.NoFocus)
         self.rect5Button.clicked.connect(self.setColorSlot)
-        self.markersLabel = self.colorLabel(aw.qmc.palette["markers"])
-        self.markersButton = QPushButton(QApplication.translate("Button","Markers", None))
+        self.markersLabel = QLabel(QApplication.translate("Button","Markers", None))
+        self.markersLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.markersButton = QPushButton()
+        self.markersButton = self.colorButton(aw.qmc.palette["markers"])
         self.markersButton.setFocusPolicy(Qt.NoFocus)
         self.markersButton.clicked.connect(self.setColorSlot)
-        self.textLabel = self.colorLabel(aw.qmc.palette["text"])
-        self.textButton = QPushButton(QApplication.translate("Button","Text", None))
+        self.textLabel = QLabel(QApplication.translate("Button","Text", None))
+        self.textLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.textButton = QPushButton()
+        self.textButton = self.colorButton(aw.qmc.palette["text"])
         self.textButton.setFocusPolicy(Qt.NoFocus)
         self.textButton.clicked.connect(self.setColorSlot)
-        self.watermarksLabel = self.colorLabel(aw.qmc.palette["watermarks"])
-        self.watermarksButton = QPushButton(QApplication.translate("Button","Watermarks", None))
+        self.watermarksLabel = QLabel(QApplication.translate("Button","Watermarks", None))
+        self.watermarksLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.watermarksButton = QPushButton()
+        self.watermarksButton = self.colorButton(aw.qmc.palette["watermarks"])
         self.watermarksButton.setFocusPolicy(Qt.NoFocus)
         self.watermarksButton.clicked.connect(self.setColorSlot)
-        self.timeguideLabel = self.colorLabel(aw.qmc.palette["timeguide"])
-        self.timeguideButton = QPushButton(QApplication.translate("Button","Time Guide", None))
+        self.timeguideLabel = QLabel(QApplication.translate("Button","Time Guide", None))
+        self.timeguideLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.timeguideButton = QPushButton()
+        self.timeguideButton = self.colorButton(aw.qmc.palette["timeguide"])
         self.timeguideButton.setFocusPolicy(Qt.NoFocus)
         self.timeguideButton.clicked.connect(self.setColorSlot)
-        self.aucguideLabel = self.colorLabel(aw.qmc.palette["aucguide"])
-        self.aucguideButton = QPushButton(QApplication.translate("Button","AUC Guide", None))
+        self.aucguideLabel = QLabel(QApplication.translate("Button","AUC Guide", None))
+        self.aucguideLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.aucguideButton = QPushButton()
+        self.aucguideButton = self.colorButton(aw.qmc.palette["aucguide"])
         self.aucguideButton.setFocusPolicy(Qt.NoFocus)
         self.aucguideButton.clicked.connect(self.setColorSlot)
-        self.aucareaLabel = self.colorLabel(aw.qmc.palette["aucarea"])
-        self.aucareaButton = QPushButton(QApplication.translate("Button","AUC Area", None))
+        self.aucareaLabel = QLabel(QApplication.translate("Button","AUC Area", None))
+        self.aucareaLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.aucareaButton = QPushButton()
+        self.aucareaButton = self.colorButton(aw.qmc.palette["aucarea"])
         self.aucareaButton.setFocusPolicy(Qt.NoFocus)
         self.aucareaButton.clicked.connect(self.setColorSlot)
-        self.legendbgLabel = self.colorLabel(aw.qmc.palette["legendbg"])
-        self.legendbgButton = QPushButton(QApplication.translate("Button","Legend bkgnd", None))
+        self.legendbgLabel = QLabel(QApplication.translate("Button","Legend bkgnd", None))
+        self.legendbgLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.legendbgButton = QPushButton()
+        self.legendbgButton = self.colorButton(aw.qmc.palette["legendbg"])
         self.legendbgButton.setFocusPolicy(Qt.NoFocus)
         self.legendbgButton.clicked.connect(self.setColorSlot)
-        self.legendborderLabel = self.colorLabel(aw.qmc.palette["legendborder"])
-        self.legendborderButton = QPushButton(QApplication.translate("Button","Legend border", None))
+        self.legendbgSpinBox = QSpinBox()
+        self.legendbgSpinBox.setAlignment(Qt.AlignRight)
+        self.legendbgSpinBox.setRange(1,10)
+        self.legendbgSpinBox.setSingleStep(1)
+        self.legendbgSpinBox.setValue(aw.qmc.alpha["legendbg"] * 10)
+        self.legendbgSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)        
+        self.legendbgSpinBox.setFocusPolicy(Qt.NoFocus)      
+        self.legendbgLayout = QHBoxLayout()
+        self.legendbgLayout.addWidget(self.legendbgButton)
+        self.legendbgLayout.addWidget(self.legendbgSpinBox)
+        self.legendborderLabel = QLabel(QApplication.translate("Button","Legend border", None))
+        self.legendborderLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.legendborderButton = QPushButton()
+        self.legendborderButton = self.colorButton(aw.qmc.palette["legendborder"])
         self.legendborderButton.setFocusPolicy(Qt.NoFocus)
         self.legendborderButton.clicked.connect(self.setColorSlot)
-        self.canvasLabel = self.colorLabel(aw.qmc.palette["canvas"])
+
+        aw.qmc.palette["canvas"] = 'None'  #dave
+        self.canvasLabel = QLabel(QApplication.translate("Button","Canvas", None))
+        self.canvasLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.canvasButton = QPushButton()
+        self.canvasButton = self.colorButton(aw.qmc.palette["canvas"])
         if str(aw.qmc.palette["canvas"]) == 'None':
-            self.canvasLabel.setPalette(QPalette(QColor("#f0f0f0")))
+            self.canvasButton.setPalette(QPalette(QColor("#ff0000")))  #f0f0f0")))   #dave
         else:
-            self.canvasLabel.setPalette(QPalette(QColor(aw.qmc.palette["canvas"])))
-        self.canvasButton = QPushButton(QApplication.translate("Button","Canvas", None))
+            self.canvasButton.setPalette(QPalette(QColor(aw.qmc.palette["canvas"])))
         self.canvasButton.setFocusPolicy(Qt.NoFocus)
         self.canvasButton.clicked.connect(self.setColorSlot)
-        self.specialeventboxLabel = self.colorLabel(aw.qmc.palette["specialeventbox"])
-        self.specialeventboxButton = QPushButton(QApplication.translate("Button","SpecialEvent Marker", None))
+
+        self.specialeventboxLabel = QLabel(QApplication.translate("Button","SpecialEvent Marker", None))
+        self.specialeventboxLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.specialeventboxButton = QPushButton()
+        self.specialeventboxButton = self.colorButton(aw.qmc.palette["specialeventbox"])
         self.specialeventboxButton.setFocusPolicy(Qt.NoFocus)
         self.specialeventboxButton.clicked.connect(self.setColorSlot)
-        self.specialeventtextLabel = self.colorLabel(aw.qmc.palette["specialeventtext"])
-        self.specialeventtextButton = QPushButton(QApplication.translate("Button","SpecialEvent Text", None))
+        self.specialeventtextLabel = QLabel(QApplication.translate("Button","SpecialEvent Text", None))
+        self.specialeventtextLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.specialeventtextButton = QPushButton()
+        self.specialeventtextButton = self.colorButton(aw.qmc.palette["specialeventtext"])
         self.specialeventtextButton.setFocusPolicy(Qt.NoFocus)
         self.specialeventtextButton.clicked.connect(self.setColorSlot)
-        self.bgeventmarkerLabel = self.colorLabel(aw.qmc.palette["bgeventmarker"])
-        self.bgeventmarkerButton = QPushButton(QApplication.translate("Button","Bkgd Event Marker", None))
+        self.bgeventmarkerLabel = QLabel(QApplication.translate("Button","Bkgd Event Marker", None))
+        self.bgeventmarkerLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.bgeventmarkerButton = QPushButton()
+        self.bgeventmarkerButton = self.colorButton(aw.qmc.palette["bgeventmarker"])
         self.bgeventmarkerButton.setFocusPolicy(Qt.NoFocus)
         self.bgeventmarkerButton.clicked.connect(self.setColorSlot)
-        self.bgeventtextLabel = self.colorLabel(aw.qmc.palette["bgeventtext"])
-        self.bgeventtextButton = QPushButton(QApplication.translate("Button","Bkgd Event Text", None))
+        self.bgeventtextLabel = QLabel(QApplication.translate("Button","Bkgd Event Text", None))
+        self.bgeventtextLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.bgeventtextButton = QPushButton()
+        self.bgeventtextButton = self.colorButton(aw.qmc.palette["bgeventtext"])
         self.bgeventtextButton.setFocusPolicy(Qt.NoFocus)
         self.bgeventtextButton.clicked.connect(self.setColorSlot)
-        self.mettextLabel = self.colorLabel(aw.qmc.palette["mettext"])
-        self.mettextButton = QPushButton(QApplication.translate("Button","MET Text", None))
+        self.mettextLabel = QLabel(QApplication.translate("Button","MET Text", None))
+        self.mettextLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.mettextButton = QPushButton()
+        self.mettextButton = self.colorButton(aw.qmc.palette["mettext"])
         self.mettextButton.setFocusPolicy(Qt.NoFocus)
         self.mettextButton.clicked.connect(self.setColorSlot)
-        self.metboxLabel = self.colorLabel(aw.qmc.palette["metbox"])
-        self.metboxButton = QPushButton(QApplication.translate("Button","MET Box", None))
+        self.metboxLabel = QLabel(QApplication.translate("Button","MET Box", None))
+        self.metboxLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.metboxButton = QPushButton()
+        self.metboxButton = self.colorButton(aw.qmc.palette["metbox"])
         self.metboxButton.setFocusPolicy(Qt.NoFocus)
         self.metboxButton.clicked.connect(self.setColorSlot)
-        self.analysismaskLabel = self.colorLabel(aw.qmc.palette["analysismask"])
-        self.analysismaskButton = QPushButton(QApplication.translate("Button","Analysis Mask", None))
+        self.analysismaskLabel = QLabel(QApplication.translate("Button","Analysis Mask", None))
+        self.analysismaskLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.analysismaskButton = QPushButton()
+        self.analysismaskButton = self.colorButton(aw.qmc.palette["analysismask"])
         self.analysismaskButton.setFocusPolicy(Qt.NoFocus)
         self.analysismaskButton.clicked.connect(self.setColorSlot)
+        self.analysismaskSpinBox = QSpinBox()
+        self.analysismaskSpinBox.setAlignment(Qt.AlignRight)
+        self.analysismaskSpinBox.setRange(1,10)
+        self.analysismaskSpinBox.setSingleStep(1)
+        self.analysismaskSpinBox.setValue(aw.qmc.alpha["analysismask"] * 10)
+        self.analysismaskSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)        
+        self.analysismaskSpinBox.setFocusPolicy(Qt.NoFocus)      
+        self.analysismaskLayout = QHBoxLayout()
+        self.analysismaskLayout.addWidget(self.analysismaskButton)
+        self.analysismaskLayout.addWidget(self.analysismaskSpinBox)
+        self.analysisresultLabel = QLabel(QApplication.translate("Button","Analysis Result", None))
+        self.analysisresultLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.analysisresultButton = QPushButton()
+        self.analysisresultButton = self.colorButton(aw.qmc.palette["analysisresult"])
+        self.analysisresultButton.setFocusPolicy(Qt.NoFocus)
+        self.analysisresultButton.clicked.connect(self.setColorSlot)
+        self.analysisresultSpinBox = QSpinBox()
+        self.analysisresultSpinBox.setAlignment(Qt.AlignRight)
+        self.analysisresultSpinBox.setRange(1,10)
+        self.analysisresultSpinBox.setSingleStep(1)
+        self.analysisresultSpinBox.setValue(aw.qmc.alpha["analysisresult"] * 10)
+        self.analysisresultSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)        
+        self.analysisresultSpinBox.setFocusPolicy(Qt.NoFocus)      
+        self.analysisresultLayout = QHBoxLayout()
+        self.analysisresultLayout.addWidget(self.analysisresultButton)
+        self.analysisresultLayout.addWidget(self.analysisresultSpinBox)
 
+        #TAB2
         self.lcd1LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd1LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd2LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
@@ -50196,102 +50314,106 @@ class graphColorDlg(ArtisanDialog):
         #tab0 layout
         lines = QGridLayout()
         lines.setVerticalSpacing(1)
-        lines.setColumnMinimumWidth(0,80)
-        lines.setColumnMinimumWidth(1,180)
-        lines.setColumnMinimumWidth(2,80)
-        lines.setColumnMinimumWidth(3,180)
+        lines.setColumnMinimumWidth(0,0)   #0,80
+        lines.setColumnMaximumWidth(0,30)
+        lines.setColumnMinimumWidth(1,150)   #1,180
+        lines.setColumnMinimumWidth(2,50)   #2,80
+        lines.setColumnMinimumWidth(3,150)   #3,180
 
         lines.addWidget(profilecolorlabel,0,1)
-        lines.addWidget(self.metButton,1,0)
-        lines.addWidget(self.metLabel,1,1)
-        lines.addWidget(self.btButton,2,0)
-        lines.addWidget(self.btLabel,2,1)
-        lines.addWidget(self.deltametButton,3,0)
-        lines.addWidget(self.deltametLabel,3,1)
-        lines.addWidget(self.deltabtButton,4,0)
-        lines.addWidget(self.deltabtLabel,4,1)
+        lines.addWidget(self.metButton,1,1)
+        lines.addWidget(self.metLabel,1,0)
+        lines.addWidget(self.btButton,2,1)
+        lines.addWidget(self.btLabel,2,0)
+        lines.addWidget(self.deltametButton,3,1)
+        lines.addWidget(self.deltametLabel,3,0)
+        lines.addWidget(self.deltabtButton,4,1)
+        lines.addWidget(self.deltabtLabel,4,0)
 
         lines.addWidget(bgcolorlabel,0,3)
-        lines.addWidget(self.bgmetButton,1,2)
-        lines.addWidget(self.bgmetLabel,1,3)
-        lines.addWidget(self.bgbtButton,2,2)
-        lines.addWidget(self.bgbtLabel,2,3)
-        lines.addWidget(self.bgdeltametButton,3,2)
-        lines.addWidget(self.bgdeltametLabel,3,3)
-        lines.addWidget(self.bgdeltabtButton,4,2)
-        lines.addWidget(self.bgdeltabtLabel,4,3)
-        lines.addWidget(self.bgextraButton,5,2)
-        lines.addWidget(self.bgextraLabel,5,3)
-        lines.addWidget(intensitylabel,6,2)
-        lines.addWidget(self.intensitySpinBox,6,3)
-        self.intensitySpinBox.setMaximumWidth(100)        
+        lines.addWidget(self.bgmetButton,1,3)
+        lines.addWidget(self.bgmetLabel,1,2)
+        lines.addWidget(self.bgbtButton,2,3)
+        lines.addWidget(self.bgbtLabel,2,2)
+        lines.addWidget(self.bgdeltametButton,3,3)
+        lines.addWidget(self.bgdeltametLabel,3,2)
+        lines.addWidget(self.bgdeltabtButton,4,3)
+        lines.addWidget(self.bgdeltabtLabel,4,2)
+        lines.addWidget(self.bgextraButton,5,3)
+        lines.addWidget(self.bgextraLabel,5,2)
+#        lines.addWidget(opaqbgLabel,6,2)
+        lines.addLayout(self.opaqbgLayout,6,3)
 
         graphlinesLayout = QVBoxLayout()
         graphlinesLayout.addLayout(lines)
         
         #tab1 layout
         grid = QGridLayout()
-        grid.setColumnStretch(1,12)   
-        grid.setColumnStretch(3,12)   
+#        grid.setColumnStretch(1,12)   
+#        grid.setColumnStretch(3,12)   
         grid.setVerticalSpacing(1)
-        grid.setColumnMinimumWidth(1,80)
-        grid.setColumnMinimumWidth(3,80)
-        grid.addWidget(self.canvasButton,0,0) 
-        grid.addWidget(self.canvasLabel,0,1) 
-        grid.addWidget(self.backgroundButton,1,0)
-        grid.addWidget(self.backgroundLabel,1,1)
-        grid.addWidget(self.titleButton,2,0)
-        grid.addWidget(self.titleLabel,2,1)
-        grid.addWidget(self.gridButton,3,0)
-        grid.addWidget(self.gridLabel,3,1)
-        grid.addWidget(self.yButton,4,0)
-        grid.addWidget(self.yLabel,4,1)
-        grid.addWidget(self.xButton,5,0)
-        grid.addWidget(self.xLabel,5,1)
-        grid.addWidget(self.markersButton,6,0)
-        grid.addWidget(self.markersLabel,6,1)
-        grid.addWidget(self.textButton,7,0)
-        grid.addWidget(self.textLabel,7,1)
-        grid.addWidget(self.legendbgButton,8,0) 
-        grid.addWidget(self.legendbgLabel,8,1) 
-        grid.addWidget(self.legendborderButton,9,0)
-        grid.addWidget(self.legendborderLabel,9,1) 
-        grid.addWidget(self.watermarksButton,10,0)
-        grid.addWidget(self.watermarksLabel,10,1)
-        grid.addWidget(self.aucguideButton,11,0)
-        grid.addWidget(self.aucguideLabel,11,1)
-        grid.addWidget(self.aucareaButton,12,0)
-        grid.addWidget(self.aucareaLabel,12,1)
-        grid.addWidget(self.rect1Button,0,2)
-        grid.addWidget(self.rect1Label,0,3)
-        grid.addWidget(self.rect2Button,1,2)
-        grid.addWidget(self.rect2Label,1,3)
-        grid.addWidget(self.rect3Button,2,2)
-        grid.addWidget(self.rect3Label,2,3)
-        grid.addWidget(self.rect4Button,3,2)
-        grid.addWidget(self.rect4Label,3,3)
-        grid.addWidget(self.rect5Button,4,2)
-        grid.addWidget(self.rect5Label,4,3)
-        grid.addWidget(self.specialeventboxButton,5,2) 
-        grid.addWidget(self.specialeventboxLabel,5,3) 
-        grid.addWidget(self.specialeventtextButton,6,2) 
-        grid.addWidget(self.specialeventtextLabel,6,3) 
-        grid.addWidget(self.bgeventmarkerButton,7,2) 
-        grid.addWidget(self.bgeventmarkerLabel,7,3) 
-        grid.addWidget(self.bgeventtextButton,8,2) 
-        grid.addWidget(self.bgeventtextLabel,8,3) 
-        grid.addWidget(self.metboxButton,9,2) 
-        grid.addWidget(self.metboxLabel,9,3) 
-        grid.addWidget(self.mettextButton,10,2) 
-        grid.addWidget(self.mettextLabel,10,3) 
-        grid.addWidget(self.timeguideButton,11,2)
-        grid.addWidget(self.timeguideLabel,11,3)
-        grid.addWidget(self.analysismaskButton,12,2)
-        grid.addWidget(self.analysismaskLabel,12,3)
+        grid.setColumnMinimumWidth(0,80)  
+        grid.setColumnMinimumWidth(2,80)  
+        grid.setColumnMinimumWidth(1,110)  #1,80
+        grid.setColumnMinimumWidth(3,110)  #3,80
+        grid.addWidget(self.canvasButton,0,1) 
+        grid.addWidget(self.canvasLabel,0,0) 
+        grid.addWidget(self.backgroundButton,1,1)
+        grid.addWidget(self.backgroundLabel,1,0)
+        grid.addWidget(self.titleButton,2,1)
+        grid.addWidget(self.titleLabel,2,0)
+        grid.addWidget(self.gridButton,3,1)
+        grid.addWidget(self.gridLabel,3,0)
+        grid.addWidget(self.yButton,4,1)
+        grid.addWidget(self.yLabel,4,0)
+        grid.addWidget(self.xButton,5,1)
+        grid.addWidget(self.xLabel,5,0)
+        grid.addWidget(self.markersButton,6,1)
+        grid.addWidget(self.markersLabel,6,0)
+        grid.addWidget(self.textButton,7,1)
+        grid.addWidget(self.textLabel,7,0)
+        grid.addLayout(self.legendbgLayout,8,1) 
+        grid.addWidget(self.legendbgLabel,8,0) 
+        grid.addWidget(self.legendborderButton,9,1)
+        grid.addWidget(self.legendborderLabel,9,0) 
+        grid.addWidget(self.watermarksButton,10,1)
+        grid.addWidget(self.watermarksLabel,10,0)
+        grid.addWidget(self.aucguideButton,11,1)
+        grid.addWidget(self.aucguideLabel,11,0)
+        grid.addWidget(self.aucareaButton,12,1)
+        grid.addWidget(self.aucareaLabel,12,0)
+        grid.addWidget(self.rect1Button,0,3)
+        grid.addWidget(self.rect1Label,0,2)
+        grid.addWidget(self.rect2Button,1,3)
+        grid.addWidget(self.rect2Label,1,2)
+        grid.addWidget(self.rect3Button,2,3)
+        grid.addWidget(self.rect3Label,2,2)
+        grid.addWidget(self.rect4Button,3,3)
+        grid.addWidget(self.rect4Label,3,2)
+        grid.addWidget(self.rect5Button,4,3)
+        grid.addWidget(self.rect5Label,4,2)
+        grid.addWidget(self.specialeventboxButton,5,3) 
+        grid.addWidget(self.specialeventboxLabel,5,2) 
+        grid.addWidget(self.specialeventtextButton,6,3) 
+        grid.addWidget(self.specialeventtextLabel,6,2) 
+        grid.addWidget(self.bgeventmarkerButton,7,3) 
+        grid.addWidget(self.bgeventmarkerLabel,7,2) 
+        grid.addWidget(self.bgeventtextButton,8,3) 
+        grid.addWidget(self.bgeventtextLabel,8,2) 
+        grid.addWidget(self.metboxButton,9,3) 
+        grid.addWidget(self.metboxLabel,9,2) 
+        grid.addWidget(self.mettextButton,10,3) 
+        grid.addWidget(self.mettextLabel,10,2) 
+        grid.addWidget(self.timeguideButton,11,3)
+        grid.addWidget(self.timeguideLabel,11,2)
+        grid.addLayout(self.analysismaskLayout,12,3)
+        grid.addWidget(self.analysismaskLabel,12,2)
+        grid.addLayout(self.analysisresultLayout,13,3)
+        grid.addWidget(self.analysisresultLabel,13,2)
         graphLayout = QVBoxLayout()
         graphLayout.addLayout(grid)
 
-        #tab 2
+        #tab 2 layout
         lcd1layout = QHBoxLayout()
         lcd1layout.addWidget(self.lcd1LEDButton,0)
         lcd1layout.addWidget(self.lcd1backButton,1)
@@ -50328,7 +50450,7 @@ class graphColorDlg(ArtisanDialog):
         LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV LCD",None))
         LCD6GroupLayout.setLayout(lcd6layout)
         lcd6layout.setContentsMargins(0,0,0,0)
-        buttonlayout  = QHBoxLayout()
+        buttonlayout = QHBoxLayout()
         buttonlayout.addStretch()
         buttonlayout.addWidget(LCDdefaultButton)
         buttonlayout.setContentsMargins(0,0,0,0)
@@ -50393,13 +50515,13 @@ class graphColorDlg(ArtisanDialog):
         Mlayout.setContentsMargins(5,10,5,0)
         Mlayout.setSpacing(0)
         self.setLayout(Mlayout)
-        self.setColorLabels()
+        self.setColorButtons()
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     @pyqtSlot(bool)
     def setLCD_bw(self,_):
         aw.setLCDsBW()
-        self.setColorLabels()
+        self.setColorButtons()
         
     def setLED(self,hue,lcd):
         if lcd == 1:
@@ -50456,49 +50578,49 @@ class graphColorDlg(ArtisanDialog):
         lcdButton = self.sender()
         if lcdButton in [self.lcd1LEDButton,self.lcd1backButton]:
             if lcdButton == self.lcd1backButton:
-                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"timer")
+                self.setlcdColor(aw.lcdpaletteB,aw.lcdpaletteF,"timer")
             else:
-                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"timer")
+                self.setlcdColor(aw.lcdpaletteF,aw.lcdpaletteB,"timer")
             aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd2LEDButton,self.lcd2backButton]:
             if lcdButton == self.lcd2backButton:
-                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"et")
+                self.setlcdColor(aw.lcdpaletteB,aw.lcdpaletteF,"et")
             else:
-                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"et")
+                self.setlcdColor(aw.lcdpaletteF,aw.lcdpaletteB,"et")
             aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd3LEDButton,self.lcd3backButton]:
             if lcdButton == self.lcd3backButton:
-                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"bt")
+                self.setlcdColor(aw.lcdpaletteB,aw.lcdpaletteF,"bt")
             else:
-                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"bt")
+                self.setlcdColor(aw.lcdpaletteF,aw.lcdpaletteB,"bt")
             aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd4LEDButton,self.lcd4backButton]:
             if lcdButton == self.lcd4backButton:
-                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltaet")
+                self.setlcdColor(aw.lcdpaletteB,aw.lcdpaletteF,"deltaet")
             else:
-                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltaet")
+                self.setlcdColor(aw.lcdpaletteF,aw.lcdpaletteB,"deltaet")
             aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
             if aw.largeDeltaLCDs_dialog:
                 aw.largeDeltaLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd5LEDButton,self.lcd5backButton]:
             if lcdButton == self.lcd5backButton:
-                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltabt")
+                self.setlcdColor(aw.lcdpaletteB,aw.lcdpaletteF,"deltabt")
             else:
-                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltabt")
+                self.setlcdColor(aw.lcdpaletteF,aw.lcdpaletteB,"deltabt")
             aw.lcd5.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
             if aw.largeDeltaLCDs_dialog:
                 aw.largeDeltaLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd6LEDButton,self.lcd6backButton]:
             if lcdButton == self.lcd6backButton:
-                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"sv")
+                self.setlcdColor(aw.lcdpaletteB,aw.lcdpaletteF,"sv")
             else:
-                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"sv")
+                self.setlcdColor(aw.lcdpaletteF,aw.lcdpaletteB,"sv")
             aw.lcd6.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             for i in range(len(aw.qmc.extradevices)):
@@ -50508,112 +50630,128 @@ class graphColorDlg(ArtisanDialog):
                 aw.largePIDLCDs_dialog.updateStyles()
             if aw.largeExtraLCDs_dialog:
                 aw.largeExtraLCDs_dialog.updateStyles()
-        self.setColorLabels()
+        self.setColorButtons()
 
-    def setColorLabels(self):
+    def setColorButtons(self):
         for l,t in [
-                # Curves
-                (self.metLabel,"et"),
-                (self.btLabel,"bt"),
-                (self.deltametLabel,"deltaet"),
-                (self.deltabtLabel,"deltabt"),
+                # Curves (background curves handled separately)
+                (self.metButton,"et"),
+                (self.btButton,"bt"),
+                (self.deltametButton,"deltaet"),
+                (self.deltabtButton,"deltabt"),
                 # Graph
-                (self.canvasLabel,"canvas"),
-                (self.backgroundLabel,"background"),
-                (self.titleLabel,"title"),
-                (self.gridLabel,"grid"),
-                (self.yLabel,"ylabel"),
-                (self.yLabel,"xlabel"),
-                (self.timeguideLabel,"timeguide"),
-                (self.aucguideLabel,"aucguide"),
-                (self.aucareaLabel,"aucarea"),
-                (self.watermarksLabel,"watermarks"),
-                (self.rect1Label,"rect1"),
-                (self.rect2Label,"rect2"),
-                (self.rect3Label,"rect3"),
-                (self.rect4Label,"rect4"),
-                (self.rect5Label,"rect5"),
-                (self.markersLabel,"markers"),
-                (self.textLabel,"text"),
-                (self.legendbgLabel,"legendbg"),
-                (self.legendborderLabel,"legendborder"),
-                (self.specialeventboxLabel,"specialeventbox"),
-                (self.specialeventtextLabel,"specialeventtext"),
-                (self.bgeventmarkerLabel,"bgeventmarker"),
-                (self.bgeventtextLabel,"bgeventtext"),
-                (self.mettextLabel,"mettext"),
-                (self.metboxLabel,"metbox"),
+                (self.canvasButton,"canvas"),
+                (self.backgroundButton,"background"),
+                (self.titleButton,"title"),
+                (self.gridButton,"grid"),
+                (self.yButton,"ylabel"),
+                (self.xButton,"xlabel"),
+                (self.timeguideButton,"timeguide"),
+                (self.aucguideButton,"aucguide"),
+                (self.aucareaButton,"aucarea"),
+                (self.watermarksButton,"watermarks"),
+                (self.rect1Button,"rect1"),
+                (self.rect2Button,"rect2"),
+                (self.rect3Button,"rect3"),
+                (self.rect4Button,"rect4"),
+                (self.rect5Button,"rect5"),
+                (self.markersButton,"markers"),
+                (self.textButton,"text"),
+                (self.legendbgButton,"legendbg"),
+                (self.legendborderButton,"legendborder"),
+                (self.specialeventboxButton,"specialeventbox"),
+                (self.specialeventtextButton,"specialeventtext"),
+                (self.bgeventmarkerButton,"bgeventmarker"),
+                (self.bgeventtextButton,"bgeventtext"),
+                (self.mettextButton,"mettext"),
+                (self.metboxButton,"metbox"),
+                (self.analysismaskButton,"analysismask"),
+                (self.analysisresultButton,"analysisresult"),
                 ]:
-            self.setColorLabel(l,t)
+            self.setColorButton(l,t)
             
         # Curves, set background colors and alpha
-        self.bgmetLabel.setText(aw.qmc.backgroundmetcolor)
-        self.bgbtLabel.setText(aw.qmc.backgroundbtcolor)
-        self.bgdeltametLabel.setText(aw.qmc.backgrounddeltaetcolor)
-        self.bgdeltabtLabel.setText(aw.qmc.backgrounddeltabtcolor)
-        self.bgextraLabel.setText(aw.qmc.backgroundxtcolor)
-        self.bgmetLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundmetcolor + " ;}")
-        self.bgbtLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundbtcolor + " ;}")
-        self.bgdeltametLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgrounddeltaetcolor + " ;}")
-        self.bgdeltabtLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgrounddeltabtcolor + " ;}")
-        self.bgextraLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundxtcolor + " ;}")
-        self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
+        self.bgmetButton.setText(aw.qmc.backgroundmetcolor)
+        self.bgbtButton.setText(aw.qmc.backgroundbtcolor)
+        self.bgdeltametButton.setText(aw.qmc.backgrounddeltaetcolor)
+        self.bgdeltabtButton.setText(aw.qmc.backgrounddeltabtcolor)
+        self.bgextraButton.setText(aw.qmc.backgroundxtcolor)
+        self.bgmetButton.setStyleSheet("QPushButton { background-color: " + aw.qmc.backgroundmetcolor + "; color: " + aw.labelBorW(aw.qmc.backgroundmetcolor) + ";" + self.commonstyle + "}")
+        self.bgbtButton.setStyleSheet("QPushButton { background-color: " + aw.qmc.backgroundbtcolor + "; color: " + aw.labelBorW(aw.qmc.backgroundbtcolor) + ";" + self.commonstyle + "}")
+        self.bgdeltametButton.setStyleSheet("QPushButton { background-color: " + aw.qmc.backgrounddeltaetcolor + "; color: " + aw.labelBorW(aw.qmc.backgrounddeltaetcolor) + ";" + self.commonstyle + "}")
+        self.bgdeltabtButton.setStyleSheet("QPushButton { background-color: " + aw.qmc.backgrounddeltabtcolor + "; color: " + aw.labelBorW(aw.qmc.backgrounddeltabtcolor) + ";" + self.commonstyle + "}")
+        self.bgextraButton.setStyleSheet("QPushButton { background-color: " + aw.qmc.backgroundxtcolor + "; color: " + aw.labelBorW(aw.qmc.backgroundxtcolor) + ";" + self.commonstyle + "}")
+        self.opaqbgSpinBox.setValue(aw.qmc.backgroundalpha * 10)
 
         # LEDs
-        self.lcd1backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['timer'] + "; color: " + aw.lcdpaletteF['timer'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd1LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['timer'] + "; color: " + aw.lcdpaletteF['timer'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd2backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['et'] + "; color: " + aw.lcdpaletteF['et'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd2LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['et'] + "; color: " + aw.lcdpaletteF['et'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd3backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['bt'] + "; color: " + aw.lcdpaletteF['bt'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd3LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['bt'] + "; color: " + aw.lcdpaletteF['bt'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd4backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltaet'] + "; color: " + aw.lcdpaletteF['deltaet'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd4LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltaet'] + "; color: " + aw.lcdpaletteF['deltaet'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd5backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltabt'] + "; color: " + aw.lcdpaletteF['deltabt'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd5LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltabt'] + "; color: " + aw.lcdpaletteF['deltabt'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd6backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['sv'] + "; color: " + aw.lcdpaletteF['sv'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
-        self.lcd6LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['sv'] + "; color: " + aw.lcdpaletteF['sv'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd1backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['timer'] + "; color: " + aw.lcdpaletteF['timer'] + ";" + self.commonstyle)
+        self.lcd1LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['timer'] + "; color: " + aw.lcdpaletteF['timer'] + ";" + self.commonstyle)
+        self.lcd2backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['et'] + "; color: " + aw.lcdpaletteF['et'] + ";" + self.commonstyle)
+        self.lcd2LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['et'] + "; color: " + aw.lcdpaletteF['et'] + ";" + self.commonstyle)
+        self.lcd3backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['bt'] + "; color: " + aw.lcdpaletteF['bt'] + ";" + self.commonstyle)
+        self.lcd3LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['bt'] + "; color: " + aw.lcdpaletteF['bt'] + ";" + self.commonstyle)
+        self.lcd4backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltaet'] + "; color: " + aw.lcdpaletteF['deltaet'] + ";" + self.commonstyle)
+        self.lcd4LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltaet'] + "; color: " + aw.lcdpaletteF['deltaet'] + ";" + self.commonstyle)
+        self.lcd5backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltabt'] + "; color: " + aw.lcdpaletteF['deltabt'] + ";" + self.commonstyle)
+        self.lcd5LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltabt'] + "; color: " + aw.lcdpaletteF['deltabt'] + ";" + self.commonstyle)
+        self.lcd6backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['sv'] + "; color: " + aw.lcdpaletteF['sv'] + ";" + self.commonstyle)
+        self.lcd6LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['sv'] + "; color: " + aw.lcdpaletteF['sv'] + ";" + self.commonstyle)
             
         if str(aw.qmc.palette["canvas"]) == 'None':
-            self.canvasLabel.setStyleSheet("QLabel { background-color: #f0f0f0 }")
+#            self.canvasLabel.setStyleSheet("QLabel { background-color: #f0f0f0 }")
+            self.canvasLabel.setStyleSheet("QPushButton {background-color: #f0f0f0 ;" + self.commonstyle + "}")
             
-    def setColorLabel(self,label,tag):
+    def setColorButton(self,button,tag):
         c = aw.qmc.palette[tag]
-        label.setText(c)
-        label.setStyleSheet("QLabel { background-color: " + c + " }");
+        button.setText(c)
+        tc = aw.labelBorW(c)
+        button.setStyleSheet("QPushButton {background: " + c + "; color: " + tc + ";" + self.commonstyle + "}")
 
     # adds a new event to the Dlg
     @pyqtSlot(bool)
     def recolor1(self,_):
         aw.qmc.changeGColor(1)
-        self.setColorLabels()
+        self.setColorButtons()
     
     @pyqtSlot(bool)
     def recolor2(self,_):
         aw.qmc.changeGColor(2)
-        self.setColorLabels()
+        self.setColorButtons()
 
-    @pyqtSlot(int)
-    def adjustintensity(self,_):
+    def adjustOpaqenesss(self,spinbox,coloralpha):
         #block button
-        self.intensitySpinBox.setDisabled(True)
-        aw.qmc.backgroundalpha = self.intensitySpinBox.value()/10.
+        spinbox.setDisabled(True)
+        aw.qmc.alpha[coloralpha] = spinbox.value()/10.
+#        coloralpha = spinbox.value()/10.
         aw.qmc.redraw(recomputeAllDeltas=False)
         #reactivate button
-        self.intensitySpinBox.setDisabled(False)
+        spinbox.setDisabled(False)
+
+    @pyqtSlot(int)
+    def adjustOpaqenesssSlot(self,_):
+        widget = self.sender()
+#        if widget == self.opaqbgSpinBox:
+#            self.adjustOpaqenesss(self.opaqbgSpinBox,aw.qmc.backgroundalpha)
+        if widget == self.legendbgSpinBox:
+            self.adjustOpaqenesss(self.legendbgSpinBox,"legendbg")
+        if widget == self.analysismaskSpinBox:
+            self.adjustOpaqenesss(self.analysismaskSpinBox,"analysismask")
+        if widget == self.analysisresultSpinBox:
+            self.adjustOpaqenesss(self.analysisresultSpinBox,"analysisresult")
 
     @pyqtSlot(bool)
     def setbgColorSlot(self,_):
         widget = self.sender()
         if widget == self.bgmetButton:
-            self.setbgColor("ET",self.bgmetLabel,aw.qmc.backgroundmetcolor)
+            self.setbgColor("ET",self.bgmetButton,aw.qmc.backgroundmetcolor)
         elif widget == self.bgbtButton:
-            self.setbgColor("BT",self.bgbtLabel,aw.qmc.backgroundbtcolor)
+            self.setbgColor("BT",self.bgbtButton,aw.qmc.backgroundbtcolor)
         elif widget == self.bgdeltametButton:
-            self.setbgColor("DeltaET",self.bgdeltametLabel,aw.qmc.backgrounddeltaetcolor)
+            self.setbgColor("DeltaET",self.bgdeltametButton,aw.qmc.backgrounddeltaetcolor)
         elif widget == self.bgdeltabtButton:
-            self.setbgColor("DeltaBT",self.bgdeltabtLabel,aw.qmc.backgrounddeltabtcolor)
+            self.setbgColor("DeltaBT",self.bgdeltabtButton,aw.qmc.backgrounddeltabtcolor)
         elif widget == self.bgextraButton:
-            self.setbgColor("Extra",self.bgextraLabel,aw.qmc.backgroundxtcolor)
+            self.setbgColor("Extra",self.bgextraButton,aw.qmc.backgroundxtcolor)
 
     def setbgColor(self,title,var,color):
         labelcolor = QColor(color)
@@ -50621,9 +50759,10 @@ class graphColorDlg(ArtisanDialog):
         if colorf.isValid():
             color = str(colorf.name())
             aw.updateCanvasColors()
+            tc = aw.labelBorW(color)
             var.setText(colorf.name())
-            var.setStyleSheet("QLabel { background-color: " + color + " }");
-            var.setPalette(QPalette(colorf))
+            var.setStyleSheet("QPushButton { background-color: " + color + "; color: " + tc + ";" + self.commonsetyle + "}");
+#  is this needed?            var.setPalette(QPalette(colorf))
             aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
             if title == "ET":
                 aw.qmc.backgroundmetcolor = color
@@ -50637,7 +50776,7 @@ class graphColorDlg(ArtisanDialog):
                 aw.qmc.backgroundxtcolor = color
             aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(color)))
 
-    def setcolor(self,palette,disj_palette,select):
+    def setlcdColor(self,palette,disj_palette,select):
         res = aw.colordialog(QColor(palette[select]))
         if QColor.isValid(res):
             nc = str(res.name())
@@ -50651,72 +50790,73 @@ class graphColorDlg(ArtisanDialog):
     def setColorSlot(self,_):
         widget = self.sender()
         if widget == self.metButton:
-            self.setColor("ET",self.metLabel,"et")
+            self.setColor("ET",self.metButton,"et")
         elif widget == self.btButton:
-            self.setColor("BT",self.btLabel,"bt")
+            self.setColor("BT",self.btButton,"bt")
         elif widget == self.deltametButton:
-            self.setColor("DeltaET",self.deltametLabel,"deltaet")
+            self.setColor("DeltaET",self.deltametButton,"deltaet")
         elif widget == self.deltabtButton:
-            self.setColor("DeltaBT",self.deltabtLabel,"deltabt")
+            self.setColor("DeltaBT",self.deltabtButton,"deltabt")
         elif widget == self.backgroundButton:
-            self.setColor("Background",self.backgroundLabel,"background")
+            self.setColor("Background",self.backgroundButton,"background")
         elif widget == self.gridButton:
-            self.setColor("Grid",self.gridLabel,"grid")
+            self.setColor("Grid",self.gridButton,"grid")
         elif widget == self.titleButton:
-            self.setColor("Title",self.titleLabel,"title")
+            self.setColor("Title",self.titleButton,"title")
         elif widget ==self.yButton:
-            self.setColor("Y Label",self.yLabel,"ylabel")
+            self.setColor("Y Button",self.yButton,"ylabel")
         elif widget == self.xButton:
-            self.setColor("X Label",self.xLabel,"xlabel")
+            self.setColor("X Button",self.xButton,"xlabel")
         elif widget == self.rect1Button:
-            self.setColor("Drying Phase",self.rect1Label,"rect1")
+            self.setColor("Drying Phase",self.rect1Button,"rect1")
         elif widget == self.rect2Button:
-            self.setColor("Maillard Phase",self.rect2Label,"rect2")
+            self.setColor("Maillard Phase",self.rect2Button,"rect2")
         elif widget == self.rect3Button:
-            self.setColor("Finishing Phase",self.rect3Label,"rect3")
+            self.setColor("Finishing Phase",self.rect3Button,"rect3")
         elif widget == self.rect4Button:
-            self.setColor("Cooling Phase",self.rect4Label,"rect4")
+            self.setColor("Cooling Phase",self.rect4Button,"rect4")
         elif widget == self.rect5Button:
-            self.setColor("Bars Bkgnd",self.rect5Label,"rect5")
+            self.setColor("Bars Bkgnd",self.rect5Button,"rect5")
         elif widget == self.markersButton:
-            self.setColor("Markers",self.markersLabel,"markers")
+            self.setColor("Markers",self.markersButton,"markers")
         elif widget == self.textButton:
-            self.setColor("Text",self.textLabel,"text")
+            self.setColor("Text",self.textButton,"text")
         elif widget == self.watermarksButton:
-            self.setColor("Watermarks",self.watermarksLabel,"watermarks")
+            self.setColor("Watermarks",self.watermarksButton,"watermarks")
         elif widget == self.timeguideButton:
-            self.setColor("Time Guide",self.timeguideLabel,"timeguide")
+            self.setColor("Time Guide",self.timeguideButton,"timeguide")
         elif widget == self.aucguideButton:
-            self.setColor("AUC Guide",self.aucguideLabel,"aucguide")
+            self.setColor("AUC Guide",self.aucguideButton,"aucguide")
         elif widget == self.aucareaButton:
-            self.setColor("AUC Area",self.aucareaLabel,"aucarea")
+            self.setColor("AUC Area",self.aucareaButton,"aucarea")
         elif widget == self.legendbgButton:
-            self.setColor("legendbg",self.legendbgLabel,"legendbg")
+            self.setColor("legendbg",self.legendbgButton,"legendbg")
         elif widget == self.legendborderButton:
-            self.setColor("legendborder",self.legendborderLabel,"legendborder")
+            self.setColor("legendborder",self.legendborderButton,"legendborder")
         elif widget == self.canvasButton:
-            self.setColor("canvas",self.canvasLabel,"canvas")
+            self.setColor("canvas",self.canvasButton,"canvas")
         elif widget == self.specialeventboxButton:
-            self.setColor("specialeventbox",self.specialeventboxLabel,"specialeventbox")
+            self.setColor("specialeventbox",self.specialeventboxButton,"specialeventbox")
         elif widget == self.specialeventtextButton:
-            self.setColor("specialeventtext",self.specialeventtextLabel,"specialeventtext")
+            self.setColor("specialeventtext",self.specialeventtextButton,"specialeventtext")
         elif widget == self.bgeventmarkerButton:
-            self.setColor("bgeventmarker",self.bgeventmarkerLabel,"bgeventmarker")
+            self.setColor("bgeventmarker",self.bgeventmarkerButton,"bgeventmarker")
         elif widget == self.bgeventtextButton:
-            self.setColor("bgeventtext",self.bgeventtextLabel,"bgeventtext")
+            self.setColor("bgeventtext",self.bgeventtextButton,"bgeventtext")
         elif widget == self.mettextButton:
-            self.setColor("mettext",self.mettextLabel,"mettext")
+            self.setColor("mettext",self.mettextButton,"mettext")
         elif widget == self.metboxButton:
-            self.setColor("metbox",self.metboxLabel,"metbox")
+            self.setColor("metbox",self.metboxButton,"metbox")
         elif widget == self.analysismaskButton:
-            self.setColor("Analysis Mask",self.analysismaskLabel,"analysismask")
+            self.setColor("Analysis Mask",self.analysismaskButton,"analysismask")
+        elif widget == self.analysisresultButton:
+            self.setColor("Analysis Result",self.analysisresultButton,"analysisresult")
             
-    def colorLabel(self,s):
-        label = QLabel(s)
-        label.setPalette(QPalette(QColor(s)))
-        label.setAutoFillBackground(True)
-        label.setFrameStyle(QFrame.Sunken | QFrame.Panel)
-        return label
+    def colorButton(self,s):
+        button = QPushButton(s)
+        button.setPalette(QPalette(QColor(s)))
+        button.setStyleSheet("QPushButton {background-color:" + s + ";" + self.commonstyle + "}")
+        return button
 
     def setColor(self,title,var,color):
         labelcolor = QColor(aw.qmc.palette[color])
@@ -50727,7 +50867,8 @@ class graphColorDlg(ArtisanDialog):
             aw.applyStandardButtonVisibility()
             aw.update_extraeventbuttons_visibility()
             var.setText(colorf.name())
-            var.setStyleSheet("QLabel { background-color: " + aw.qmc.palette[color] + " }");
+            tc = aw.labelBorW(aw.qmc.palette[color])
+            var.setStyleSheet("QPushButton { background: " + aw.qmc.palette[color] + "; color: " + tc + ";" + self.commonstyle + "}")
 #            var.setPalette(QPalette(colorf))
             aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
             if title == "ET":
@@ -50739,6 +50880,15 @@ class graphColorDlg(ArtisanDialog):
             elif title == "DeltaBT":
                 aw.setLabelColor(aw.label5,QColor(aw.qmc.palette[color]))
             aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(aw.qmc.palette[color])))
+
+    @pyqtSlot(int)
+    def adjustintensity(self,_):
+        #block button
+        self.opaqbgSpinBox.setDisabled(True)
+        aw.qmc.backgroundalpha = self.opaqbgSpinBox.value()/10.
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        #reactivate button
+        self.opaqbgSpinBox.setDisabled(False)
 
 ############################################################
 #######################  LARGE LCDs DIALOG  ################
