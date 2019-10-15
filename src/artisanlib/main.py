@@ -50193,7 +50193,6 @@ class graphColorDlg(ArtisanDialog):
         self.legendborderButton.setFocusPolicy(Qt.NoFocus)
         self.legendborderButton.clicked.connect(self.setColorSlot)
 
-        aw.qmc.palette["canvas"] = 'None'  #dave
         self.canvasLabel = QLabel(QApplication.translate("Button","Canvas", None))
         self.canvasLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.canvasButton = QPushButton()
