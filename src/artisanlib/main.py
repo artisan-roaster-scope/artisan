@@ -50198,7 +50198,7 @@ class graphColorDlg(ArtisanDialog):
         self.canvasButton = QPushButton()
         self.canvasButton = self.colorButton(aw.qmc.palette["canvas"])
         if str(aw.qmc.palette["canvas"]) == 'None':
-            self.canvasButton.setPalette(QPalette(QColor("#ff0000")))  #f0f0f0")))   #dave
+            self.canvasButton.setPalette(QPalette(QColor("#f0f0f0")))
         else:
             self.canvasButton.setPalette(QPalette(QColor(aw.qmc.palette["canvas"])))
         self.canvasButton.setFocusPolicy(Qt.NoFocus)
