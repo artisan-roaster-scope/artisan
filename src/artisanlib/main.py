@@ -50315,7 +50315,7 @@ class graphColorDlg(ArtisanDialog):
         lines = QGridLayout()
         lines.setVerticalSpacing(1)
         lines.setColumnMinimumWidth(0,0)   #0,80
-        lines.setColumnMaximumWidth(0,30)
+#        lines.setColumnMaximumWidth(0,30)
         lines.setColumnMinimumWidth(1,150)   #1,180
         lines.setColumnMinimumWidth(2,50)   #2,80
         lines.setColumnMinimumWidth(3,150)   #3,180
