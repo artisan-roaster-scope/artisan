@@ -186,7 +186,7 @@ from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
 
 
-# maps Artisan thermocouple types (order as listed in the menu; see phidget1048_types) to Phdiget thermocouple types
+# maps Artisan thermocouple types (order as listed in the menu; see phidgetxs_types) to Phdiget thermocouple types
 # 1 => k-type (default)
 # 2 => j-type
 # 3 => e-type
@@ -9999,7 +9999,7 @@ class tgraphcanvas(FigureCanvas):
         if lpindex != -1:
             self.currentx = lptime
             self.currenty = lptemp2
-            self.addpoint(0,manual=False)
+            self.addpoint(manual=False)
 
         self.xaxistosm(redraw=False)
         self.redrawdesigner()                                   #redraw the designer screen
@@ -11472,7 +11472,7 @@ class SampleThread(QThread):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)
                                 aw.qmc.RTextratemp1.append(extrat1)
                                 aw.qmc.RTextratemp2.append(extrat2)
-                                aw.qmc.RTextratx.append(extratx)                                
+                                aw.qmc.RTextratx.append(extratx)
                             #3 evaluate symbolic expressions
                             for i in range(nxdevices):
                                 extrat1 = aw.qmc.RTextratemp1[i]
@@ -11483,10 +11483,9 @@ class SampleThread(QThread):
                                 if len(aw.qmc.extramathexpression2) > i and aw.qmc.extramathexpression2[i] is not None and len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
                                     aw.qmc.RTextratemp2[i] = extrat2
-                               
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
                                     extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
-                                    extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)                                                                                                   
+                                    extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                 if local_flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
                                     aw.qmc.extratemp2[i].append(float(extrat2))                                       
@@ -43545,7 +43544,7 @@ class serialport(object):
             if self.PhidgetTemperatureSensor and ((mode == 2) or (len(self.PhidgetTemperatureSensor)>1 and self.PhidgetTemperatureSensor[0].getAttached() and self.PhidgetTemperatureSensor[1].getAttached())):
                 # now just harvest both temps (or one in case type is 2)
                 if mode in [0,1]:
-                    probe1 = probe2 = -1
+                    probe1 = probe2 = -1                    
                     try:
                         probe1 = self.phidget1048getSensorReading(mode*2,0)
                         if aw.qmc.mode == "F":
