@@ -2062,6 +2062,7 @@ class tgraphcanvas(FigureCanvas):
         self.extendevents = True
         self.statssummary = False        
         self.showtimeguide = True
+        self.statsmaxchrperline = 30
         
         #mouse cross lines measurement 
         self.baseX,self.baseY = None, None
@@ -6496,7 +6497,7 @@ class tgraphcanvas(FigureCanvas):
             ll_corner_axes = self.ax.transData.inverted().transform_point((corner_pixels[0],corner_pixels[1]))
             ur_corner_axes = self.ax.transData.inverted().transform_point((corner_pixels[2],corner_pixels[3]))            
             extent = [ll_corner_axes[0], ur_corner_axes[0], ll_corner_axes[1], ur_corner_axes[1]]
-            self.ai = self.ax.imshow(self.logoimg, zorder=0, extent=extent, alpha=aw.logoimgalpha/100, aspect='auto', resample=False)
+            self.ai = self.ax.imshow(self.logoimg, zorder=0, extent=extent, alpha=aw.logoimgalpha/10, aspect='auto', resample=False)
             
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -6513,6 +6514,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.logoimg = imread(filename)
             aw.logofilename = filename
             aw.sendmessage(QApplication.translate("Message","Loaded watermark image {0}", None).format(filename))           
+            QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False)) #some time needed before the redraw on artisan start with no profile loaded.  processevents() does not work here.
         except Exception as ex:
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " logoloadfile() {0}").format(str(ex)),exc_tb.tb_lineno)                        
@@ -6520,7 +6522,6 @@ class tgraphcanvas(FigureCanvas):
 
     #add stats summmary to graph 
     def statsSummary(self):
-        statstrmaxlinelen = 30  # maximum number of characters in each line before the line is truncated 
         try:
             # build roast of the day string
             if aw.qmc.roastbatchnr != None and aw.qmc.roastbatchnr != 0 and aw.qmc.roastbatchpos != None and aw.qmc.roastbatchpos != 0:
@@ -6574,7 +6575,7 @@ class tgraphcanvas(FigureCanvas):
                 statstr += skipline
                 if aw.qmc.beans is not None and len(aw.qmc.beans)>0:
                     statstr += skipline
-                    beans_lines = textwrap.wrap(aw.qmc.beans, width=statstrmaxlinelen)
+                    beans_lines = textwrap.wrap(aw.qmc.beans, width=aw.qmc.statsmaxchrperline)
                     statstr += beans_lines[0]
                     if len(beans_lines)>1:
                         statstr += skipline
@@ -6626,15 +6627,17 @@ class tgraphcanvas(FigureCanvas):
                 for l in lines:
                     if trimmedstatstr != "":
                         trimmedstatstr += '\n' 
-                    trimmedstatstr += l[:statstrmaxlinelen]
-                    if len(l) > statstrmaxlinelen:
+                    trimmedstatstr += l[:aw.qmc.statsmaxchrperline]
+                    if len(l) > aw.qmc.statsmaxchrperline:
                         trimmedstatstr += ".."
                 statstr = trimmedstatstr
 
                 #defaults appropriate for default font
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("small")
-                fc = aw.qmc.palette["text"]  #text color
+                fc = aw.qmc.palette["statsanalysisbkgnd"]  #fill color
+                tc = aw.labelBorW(fc)                   #text color
+                a = aw.qmc.alpha["statsanalysisbkgnd"]     #alpha
                 ls = 1.7                     #linespacing
                 border = 10                  #space around outside of text box (in seconds)
                 margin = 4                   #text to edge of text box
@@ -6689,10 +6692,10 @@ class tgraphcanvas(FigureCanvas):
                     pos_x = droptext_end + border + start
                 
                 pos_y = statsheight
-                rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=QColor(aw.qmc.palette["background"]).lighter(150).name(),fill=True,alpha=0.8,zorder=10)
+                rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
                 self.ax.add_patch(rect)
                 
-                text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,zorder=11,path_effects=[])
+                text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=tc,zorder=11,path_effects=[])
                 text.set_in_layout(False)
                 
         except Exception as e:
@@ -12412,7 +12415,7 @@ class ApplicationWindow(QMainWindow):
         self.readingslcdsflags = [0,1,1] # readings LCD visibility per state OFF, ON, START
         
         #watermark image
-        self.logoimgalpha = 20
+        self.logoimgalpha = 2.0
         self.logoimgflag = False # display during OnMonitor?
         self.logofilename = ""
 
@@ -23144,6 +23147,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.showmet = bool(toBool(settings.value("showmet",self.qmc.showmet)))
             if settings.contains("statssummary"):
                 self.qmc.statssummary = bool(toBool(settings.value("statssummary")))                
+            if settings.contains("statsmaxchrperline"):
+                self.qmc.statsmaxchrperline = int(settings.value("statsmaxchrperline", aw.qmc.statsmaxchrperline))
             if settings.contains("showtimeguide"):
                 self.qmc.showtimeguide = bool(toBool(settings.value("showtimeguide",self.qmc.showtimeguide)))
             settings.endGroup()
@@ -23175,7 +23180,7 @@ class ApplicationWindow(QMainWindow):
             
             #watermark image
             if settings.contains("logoimgalpha"):
-                self.logoimgalpha = toInt(settings.value("logoimgalpha"))
+                self.logoimgalpha = toFloat(settings.value("logoimgalpha"))
             if settings.contains("logoimgflag"):
                 self.logoimgflag = bool(toBool(settings.value("logoimgflag", self.logoimgflag)))
             if settings.contains("logofilename"):
@@ -24213,6 +24218,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ExtrasMoreInfo")
             settings.setValue("showmet",self.qmc.showmet)
             settings.setValue("statssummary",self.qmc.statssummary)            
+            settings.setValue("statsmaxchrperline", self.qmc.statsmaxchrperline)
             settings.setValue("showtimeguide",self.qmc.showtimeguide)
             settings.endGroup()
             try:
@@ -30438,11 +30444,12 @@ class HUDDlg(ArtisanDialog):
         self.logopathedit.setFocusPolicy(Qt.NoFocus)
         self.logopathedit.setText(aw.logofilename)
         logoalphalabel = QLabel(QApplication.translate("Label","Opacity", None))
-        self.logoalpha = QSpinBox()
-        self.logoalpha.setSingleStep(10)
-        self.logoalpha.setRange(0,100)
+        self.logoalpha = MyQDoubleSpinBox()
+        self.logoalpha.setDecimals(1)
+        self.logoalpha.setSingleStep(0.5)
+        self.logoalpha.setRange(0.,10.)
         self.logoalpha.setValue(aw.logoimgalpha)
-        self.logoalpha.setMinimumWidth(40)
+        self.logoalpha.setMinimumWidth(50)
         self.logoalpha.setAlignment(Qt.AlignRight)
         self.logoalpha.editingFinished.connect(self.changelogoalpha)
         logoshowCheck = QCheckBox(QApplication.translate("CheckBox", "Hide Image During Roast",None))
@@ -40388,6 +40395,7 @@ class StatisticsDlg(ArtisanDialog):
         flagsLayout.addWidget(self.area,0,4)
         flagsLayout.addWidget(self.ShowStatsSummary,0,5)
         layout = QGridLayout()
+        layout.setAlignment(Qt.AlignTop)
         layout.addWidget(minf,0,1,Qt.AlignCenter)
         layout.addWidget(maxf,0,2,Qt.AlignCenter)
         layout.addWidget(drylabel,1,0,Qt.AlignRight)
@@ -40402,11 +40410,8 @@ class StatisticsDlg(ArtisanDialog):
         layout.addWidget(coollabel,4,0,Qt.AlignRight)
         layout.addWidget(self.mincooledit,4,1)
         layout.addWidget(self.maxcooledit,4,2)
-        layoutHorizontal = QHBoxLayout()
-        layoutHorizontal.addLayout(layout)
-        layoutHorizontal.addStretch()
         eventsGroupLayout = QGroupBox(QApplication.translate("GroupBox","Evaluation",None))
-        eventsGroupLayout.setLayout(layoutHorizontal)
+        eventsGroupLayout.setLayout(layout)
         
         beginlabel =QLabel(QApplication.translate("Label", "From",None))
         beginitems = [
@@ -40449,7 +40454,20 @@ class StatisticsDlg(ArtisanDialog):
         self.AUCshowFlag = QCheckBox(QApplication.translate("CheckBox","Show Area", None))
         self.AUCshowFlag.setChecked(aw.qmc.AUCshowFlag)
         self.AUCshowFlag.stateChanged.connect(self.changeAUCshowFlag)
-        
+
+        statsmaxchrperlinelabel =QLabel(QApplication.translate("Label", "Max characters per line",None))
+        self.statsmaxchrperlineedit = QSpinBox()
+        self.statsmaxchrperlineedit.setAlignment(Qt.AlignRight)
+        self.statsmaxchrperlineedit.setRange(1,120)
+        self.statsmaxchrperlineedit.setValue(aw.qmc.statsmaxchrperline)
+        self.statsmaxchrperlineedit.setFocusPolicy(Qt.StrongFocus)
+        statsmaxchrperlineHorizontal = QHBoxLayout()
+        statsmaxchrperlineHorizontal.addWidget(statsmaxchrperlinelabel)
+        statsmaxchrperlineHorizontal.addWidget(self.statsmaxchrperlineedit)
+        statsmaxchrperlineHorizontal.addStretch()
+        statsmaxchrperlineGroupLayout = QGroupBox(QApplication.translate("GroupBox","Stats Summary",None))
+        statsmaxchrperlineGroupLayout.setLayout(statsmaxchrperlineHorizontal)
+
         AUCgrid = QGridLayout()
         AUCgrid.addWidget(beginlabel,0,0)
         AUCgrid.addWidget(self.beginComboBox,0,1,1,2)
@@ -40472,9 +40490,13 @@ class StatisticsDlg(ArtisanDialog):
         displayGroupLayout.setLayout(flagsLayout)
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(self.dialogbuttons)
+        vgroupLayout = QVBoxLayout()
+        vgroupLayout.addWidget(AUCgroupLayout)
+        vgroupLayout.addWidget(statsmaxchrperlineGroupLayout)
         hgroupLayout = QHBoxLayout()
         hgroupLayout.addWidget(eventsGroupLayout)
-        hgroupLayout.addWidget(AUCgroupLayout)
+        hgroupLayout.addLayout(vgroupLayout)
+#        hgroupLayout.addWidget(AUCgroupLayout)
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(displayGroupLayout)
         mainLayout.addLayout(hgroupLayout)
@@ -40560,6 +40582,7 @@ class StatisticsDlg(ArtisanDialog):
         mincool = aw.qmc.stringtoseconds(str(self.mincooledit.text()))
         maxcool = aw.qmc.stringtoseconds(str(self.maxcooledit.text()))
         if mindry != -1 and maxdry != -1 and minmid != -1 and maxmid != -1 and minfinish != -1 and maxfinish != -1 and mincool != -1 and maxcool != -1:
+            aw.qmc.statsmaxchrperline = self.statsmaxchrperlineedit.value()
             aw.qmc.AUCbegin = self.beginComboBox.currentIndex()
             aw.qmc.AUCbase = self.baseedit.value()
             aw.qmc.AUCbaseFlag = self.baseFlag.isChecked()
