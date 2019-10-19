@@ -666,7 +666,7 @@ class tgraphcanvas(FigureCanvas):
 #                        "mettext":'white',"metbox":'red',
 #                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'}
         # Artisan 2.x
-        self.alpha = {"analysismask":0.4,"analysisresult":0.1,"legendbg":0.4}
+        self.alpha = {"analysismask":0.4,"statsanalysisbkgnd":0.1,"legendbg":0.4}
         self.palette = {"background":'white',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
                         "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#bde0ee',"rect5":'lightgrey',
                         "et":'#cc0f50',"bt":'#0A5C90',"xt":'#404040',"deltaet":'#cc0f50',
@@ -676,7 +676,7 @@ class tgraphcanvas(FigureCanvas):
                         "bgeventmarker":'white',"bgeventtext":'black',
                         "mettext":'white',"metbox":'#CC0F50',
                         "aucguide":'#0c6aa6',"messages":'black',"aucarea":'#767676',
-                        "analysismask":'#bababa',"analysisresult":"#b1bab5"}
+                        "analysismask":'#bababa',"statsanalysisbkgnd":"#b1bab5"}
         self.palette1 = self.palette.copy()
         self.EvalueColor_default = ['#43a7cf','#49B160','#800080','#ad0427']
         self.EvalueTextColor_default = ['white','white','white','white']
@@ -29331,8 +29331,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.analysisresultsloc = [0.5,0.5]
 
             # create the analysis results annotation box
-            a = aw.qmc.alpha["analysisresult"]
-            fc = aw.qmc.palette["analysisresult"]
+            a = aw.qmc.alpha["statsanalysisbkgnd"]
+            fc = aw.qmc.palette["statsanalysisbkgnd"]
             tc = aw.labelBorW(fc)
             self.analysisresultsanno = self.qmc.ax.annotate(resultstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
                        ha="left", va="center",
@@ -50181,7 +50181,7 @@ class graphColorDlg(ArtisanDialog):
         self.legendbgSpinBox.setSingleStep(1)
         self.legendbgSpinBox.setValue(aw.qmc.alpha["legendbg"] * 10)
         self.legendbgSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)        
-        self.legendbgSpinBox.setFocusPolicy(Qt.NoFocus)      
+        self.legendbgSpinBox.setFocusPolicy(Qt.StrongFocus)      
         self.legendbgLayout = QHBoxLayout()
         self.legendbgLayout.addWidget(self.legendbgButton)
         self.legendbgLayout.addWidget(self.legendbgSpinBox)
@@ -50189,7 +50189,7 @@ class graphColorDlg(ArtisanDialog):
         self.legendborderLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.legendborderButton = QPushButton()
         self.legendborderButton = self.colorButton(aw.qmc.palette["legendborder"])
-        self.legendborderButton.setFocusPolicy(Qt.NoFocus)
+        self.legendborderButton.setFocusPolicy(Qt.StrongFocus)
         self.legendborderButton.clicked.connect(self.setColorSlot)
 
         self.canvasLabel = QLabel(QApplication.translate("Button","Canvas", None))
@@ -50243,7 +50243,7 @@ class graphColorDlg(ArtisanDialog):
         self.analysismaskLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.analysismaskButton = QPushButton()
         self.analysismaskButton = self.colorButton(aw.qmc.palette["analysismask"])
-        self.analysismaskButton.setFocusPolicy(Qt.NoFocus)
+        self.analysismaskButton.setFocusPolicy(Qt.StrongFocus)
         self.analysismaskButton.clicked.connect(self.setColorSlot)
         self.analysismaskSpinBox = QSpinBox()
         self.analysismaskSpinBox.setAlignment(Qt.AlignRight)
@@ -50251,26 +50251,25 @@ class graphColorDlg(ArtisanDialog):
         self.analysismaskSpinBox.setSingleStep(1)
         self.analysismaskSpinBox.setValue(aw.qmc.alpha["analysismask"] * 10)
         self.analysismaskSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)        
-        self.analysismaskSpinBox.setFocusPolicy(Qt.NoFocus)      
         self.analysismaskLayout = QHBoxLayout()
         self.analysismaskLayout.addWidget(self.analysismaskButton)
         self.analysismaskLayout.addWidget(self.analysismaskSpinBox)
-        self.analysisresultLabel = QLabel(QApplication.translate("Button","Analysis Result", None))
-        self.analysisresultLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.analysisresultButton = QPushButton()
-        self.analysisresultButton = self.colorButton(aw.qmc.palette["analysisresult"])
-        self.analysisresultButton.setFocusPolicy(Qt.NoFocus)
-        self.analysisresultButton.clicked.connect(self.setColorSlot)
-        self.analysisresultSpinBox = QSpinBox()
-        self.analysisresultSpinBox.setAlignment(Qt.AlignRight)
-        self.analysisresultSpinBox.setRange(1,10)
-        self.analysisresultSpinBox.setSingleStep(1)
-        self.analysisresultSpinBox.setValue(aw.qmc.alpha["analysisresult"] * 10)
-        self.analysisresultSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)        
-        self.analysisresultSpinBox.setFocusPolicy(Qt.NoFocus)      
-        self.analysisresultLayout = QHBoxLayout()
-        self.analysisresultLayout.addWidget(self.analysisresultButton)
-        self.analysisresultLayout.addWidget(self.analysisresultSpinBox)
+        self.statsanalysisbkgndLabel = QLabel(QApplication.translate("Button","Stats&Analysis Bkgnd", None))
+        self.statsanalysisbkgndLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.statsanalysisbkgndButton = QPushButton()
+        self.statsanalysisbkgndButton = self.colorButton(aw.qmc.palette["statsanalysisbkgnd"])
+        self.statsanalysisbkgndButton.setFocusPolicy(Qt.StrongFocus)
+        self.statsanalysisbkgndButton.clicked.connect(self.setColorSlot)
+        self.statsanalysisbkgndSpinBox = QSpinBox()
+        self.statsanalysisbkgndSpinBox.setAlignment(Qt.AlignRight)
+        self.statsanalysisbkgndSpinBox.setRange(1,10)
+        self.statsanalysisbkgndSpinBox.setSingleStep(1)
+        self.statsanalysisbkgndSpinBox.setValue(aw.qmc.alpha["statsanalysisbkgnd"] * 10)
+        self.statsanalysisbkgndSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)        
+        self.statsanalysisbkgndSpinBox.setFocusPolicy(Qt.StrongFocus)      
+        self.statsanalysisbkgndLayout = QHBoxLayout()
+        self.statsanalysisbkgndLayout.addWidget(self.statsanalysisbkgndButton)
+        self.statsanalysisbkgndLayout.addWidget(self.statsanalysisbkgndSpinBox)
 
         #TAB2
         self.lcd1LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
@@ -50311,6 +50310,7 @@ class graphColorDlg(ArtisanDialog):
         #LAYOUTS
         #tab0 layout
         lines = QGridLayout()
+        lines.setAlignment(Qt.AlignCenter)
         lines.setVerticalSpacing(1)
         lines.setColumnMinimumWidth(0,0)   #0,80
 #        lines.setColumnMaximumWidth(0,30)
@@ -50347,6 +50347,7 @@ class graphColorDlg(ArtisanDialog):
         
         #tab1 layout
         grid = QGridLayout()
+        grid.setAlignment(Qt.AlignCenter)
 #        grid.setColumnStretch(1,12)   
 #        grid.setColumnStretch(3,12)   
         grid.setVerticalSpacing(1)
@@ -50406,8 +50407,8 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.timeguideLabel,11,2)
         grid.addLayout(self.analysismaskLayout,12,3)
         grid.addWidget(self.analysismaskLabel,12,2)
-        grid.addLayout(self.analysisresultLayout,13,3)
-        grid.addWidget(self.analysisresultLabel,13,2)
+        grid.addLayout(self.statsanalysisbkgndLayout,13,3)
+        grid.addWidget(self.statsanalysisbkgndLabel,13,2)
         graphLayout = QVBoxLayout()
         graphLayout.addLayout(grid)
 
@@ -50664,7 +50665,7 @@ class graphColorDlg(ArtisanDialog):
                 (self.mettextButton,"mettext"),
                 (self.metboxButton,"metbox"),
                 (self.analysismaskButton,"analysismask"),
-                (self.analysisresultButton,"analysisresult"),
+                (self.statsanalysisbkgndButton,"statsanalysisbkgnd"),
                 ]:
             self.setColorButton(l,t)
             
@@ -50734,8 +50735,8 @@ class graphColorDlg(ArtisanDialog):
             self.adjustOpaqenesss(self.legendbgSpinBox,"legendbg")
         if widget == self.analysismaskSpinBox:
             self.adjustOpaqenesss(self.analysismaskSpinBox,"analysismask")
-        if widget == self.analysisresultSpinBox:
-            self.adjustOpaqenesss(self.analysisresultSpinBox,"analysisresult")
+        if widget == self.statsanalysisbkgndSpinBox:
+            self.adjustOpaqenesss(self.statsanalysisbkgndSpinBox,"statsanalysisbkgnd")
 
     @pyqtSlot(bool)
     def setbgColorSlot(self,_):
@@ -50847,8 +50848,8 @@ class graphColorDlg(ArtisanDialog):
             self.setColor("metbox",self.metboxButton,"metbox")
         elif widget == self.analysismaskButton:
             self.setColor("Analysis Mask",self.analysismaskButton,"analysismask")
-        elif widget == self.analysisresultButton:
-            self.setColor("Analysis Result",self.analysisresultButton,"analysisresult")
+        elif widget == self.statsanalysisbkgndButton:
+            self.setColor("Analysis Result",self.statsanalysisbkgndButton,"statsanalysisbkgnd")
             
     def colorButton(self,s):
         button = QPushButton(s)
