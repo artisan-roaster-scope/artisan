@@ -66,7 +66,7 @@ ssh_control()
 	   break
 	fi
     done
-    (cd Phidget22Python && sudo python3 setup.py install)
+#    (cd Phidget22Python && sudo python3 setup.py install) # now installed via pip
     cd artisan
     cd src
     ./build-linux.sh
