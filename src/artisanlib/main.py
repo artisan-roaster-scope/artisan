@@ -36790,13 +36790,8 @@ class EventsDlg(ArtisanDialog):
                     QApplication.translate("ComboBox", "small",None),
                     QApplication.translate("ComboBox", "large",None)
                 ]
-#        # hack to ensure the popup items are not cutted (PyQt 5.13.0, fixed in PyQt 5.13.1)
-#        if sys.platform.startswith("darwin"):
-#            size_items = [s + " " for s in size_items]
         self.nbuttonsSizeBox.addItems(size_items)
         self.nbuttonsSizeBox.setCurrentIndex(aw.buttonsize)
-#        self.nbuttonsSizeBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-#        self.nbuttonsSizeBox.setSizePolicy(QSizePolicy.Expanding,self.nbuttonsSizeBox.sizePolicy().verticalPolicy())
         #table for showing events
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
@@ -52055,8 +52050,7 @@ class MyQComboBox(QComboBox):
     def __init__(self, *args, **kwargs):
         super(MyQComboBox, self).__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.StrongFocus)
-        self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
-#        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
@@ -52206,7 +52200,7 @@ class AlarmDlg(ArtisanDialog):
         addButton.setFocusPolicy(Qt.NoFocus)   
         
         self.insertButton = QPushButton(QApplication.translate("Button","Insert",None))
-        self.insertButton.clicked.connect(lambda _:self.insertalarm())
+        self.insertButton.clicked.connect(self.insertalarm)
         self.insertButton.setMinimumWidth(80)
         self.insertButton.setFocusPolicy(Qt.NoFocus)
         self.insertButton.setEnabled(False)
@@ -52391,7 +52385,8 @@ class AlarmDlg(ArtisanDialog):
             self.markNotEnabledAlarmRows()
             self.alarmtable.setSortingEnabled(True)
 
-    def insertalarm(self):
+    @pyqtSlot(bool)
+    def insertalarm(self,_:
         self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         if nalarms:
