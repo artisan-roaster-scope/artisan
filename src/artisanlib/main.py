@@ -1465,7 +1465,7 @@ class tgraphcanvas(FigureCanvas):
 #        self.altsmoothing = False # toggle between standard and alternative smoothing approach
 #        self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
 
-        self.optimalSmoothing = True
+        self.optimalSmoothing = False
 
         self.patheffects = 1
         self.graphstyle = 0
