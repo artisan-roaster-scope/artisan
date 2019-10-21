@@ -52386,7 +52386,7 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.setSortingEnabled(True)
 
     @pyqtSlot(bool)
-    def insertalarm(self,_:
+    def insertalarm(self,_):
         self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         if nalarms:
