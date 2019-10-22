@@ -63,6 +63,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
 
+import prettytable
 
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith("Windows"):
@@ -14986,7 +14987,7 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
-    def copy_cells_to_clipboard(self,table_widget, adjustment=0):  # adjustment bitwise 0:None, 1: add leading tab to header, 2: add leading tab to first data row 
+    def copy_cells_to_clipboard(self,table_widget, adjustment=0):  # adjustment bitwise 0:None, 1: add leading tab to header, 2: add leading tab to first data row, 4: remove extra cell at the end of header
         if len(table_widget.selectionModel().selectedIndexes()) > 0:
             # sort select indexes into rows and columns
             previous = table_widget.selectionModel().selectedIndexes()[0]
@@ -15004,27 +15005,59 @@ class ApplicationWindow(QMainWindow):
             clipboard = ""
             nrows = len(columns)
             ncols = len(columns[0])
-            if adjustment & 1:
-                clipboard += "" + '\t'
-            for c in range(ncols):
-                clipboard += u(table_widget.horizontalHeaderItem(c).text())
-                if c != (ncols-1):
-                    clipboard += '\t'
-            clipboard += '\n'
-            if adjustment & 2:
-                clipboard += "" + '\t'
-            for r in range(nrows):
-                for c in range(ncols):
-                    if columns[r][c] is not None:
-                        entry = columns[r][c]
-                        idx = entry.rfind(" ")
-                        if idx > -1:
-                            entry = entry[:idx] + "\t" + entry[idx+1:]
-                        clipboard += entry
-                        if c != (ncols-1):
-                            clipboard += '\t'
-                clipboard = clipboard[:-1] + '\n'
+            if adjustment & 4:
+                ncols = ncols - 1
 
+            modifiers = QApplication.keyboardModifiers()
+            if modifiers == Qt.AltModifier:  #alt click
+                tbl = prettytable.PrettyTable()
+                re_strip = re.compile(u'[\u2009]')  #thin space is not read properly by prettytable
+                fields = []
+                if adjustment & 1:
+                    fields.append(u(" "))
+                for c in range(ncols):
+                    hdr = re_strip.sub('',u(table_widget.horizontalHeaderItem(c).text()))
+                    #protect against duplicate header labels
+                    while hdr in fields:
+                        hdr = hdr + " "
+                    fields.append(hdr)
+                tbl.field_names = fields
+                for r in range(nrows):
+                    tblrows = []
+                    if adjustment & 2 and r == 0:
+                        tblrows.append(" ")
+                    for c in range(ncols):
+                        if columns[r][c] is not None:
+                            entry = columns[r][c]
+                            idx = entry.rfind(" ")
+                            if idx > -1 and c == 0:
+                                tblrows.append(entry[:idx])
+                                tblrows.append(entry[idx+1:])
+                            else:
+                                tblrows.append(entry)
+                    tbl.add_row(tblrows)
+                clipboard = tbl.get_string()
+            else:
+                if adjustment & 1:
+                    clipboard += "" + '\t'
+                for c in range(ncols):
+                    clipboard += u(table_widget.horizontalHeaderItem(c).text())
+                    if c != (ncols-1):
+                        clipboard += '\t'
+                clipboard += '\n'
+                if adjustment & 2:
+                    clipboard += "" + '\t'
+                for r in range(nrows):
+                    for c in range(ncols):
+                        if columns[r][c] is not None:
+                            entry = columns[r][c]
+                            idx = entry.rfind(" ")
+                            if idx > -1 and c == 0:
+                                entry = entry[:idx] + "\t" + entry[idx+1:]
+                            clipboard += entry
+                            if c != (ncols-1):
+                                clipboard += '\t'
+                    clipboard = clipboard[:-1] + '\n'
             # copy to the system clipboard
             sys_clip = QApplication.clipboard()
             sys_clip.setText(clipboard)
@@ -32138,7 +32171,7 @@ class equDataDlg(ArtisanDialog):
         self.datatable.setMinimumSize(self.datatable.minimumSizeHint())
 
         self.copydataTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
-        self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copydataTableButton.setFocusPolicy(Qt.NoFocus)
         self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
         self.copydataTableButton.setMinimumSize(self.copydataTableButton.minimumSizeHint())
@@ -32308,17 +32341,31 @@ class equDataDlg(ArtisanDialog):
         nrows = self.datatable.rowCount() 
         ncols = self.datatable.columnCount() - 1 #there is a dummy column at the end on the right
         clipboard = ""
-        for c in range(ncols):
-            clipboard += u(self.datatable.horizontalHeaderItem(c).text())
-            if c != (ncols-1):
-                clipboard += '\t'
-        clipboard += '\n'
-        for r in range(nrows):
+        modifiers = QApplication.keyboardModifiers()
+        if modifiers == Qt.AltModifier:  #alt click
+            tbl = prettytable.PrettyTable()
+            fields = []
             for c in range(ncols):
-                clipboard += u(self.datatable.item(r,c).text())
+                fields.append(u(self.datatable.horizontalHeaderItem(c).text()))
+            tbl.field_names = fields
+            for r in range(nrows):
+                rows = []
+                for c in range(ncols):
+                    rows.append(u(self.datatable.item(r,c).text()))
+                tbl.add_row(rows)
+            clipboard = tbl.get_string()
+        else:
+            for c in range(ncols):
+                clipboard += u(self.datatable.horizontalHeaderItem(c).text())
                 if c != (ncols-1):
                     clipboard += '\t'
             clipboard += '\n'
+            for r in range(nrows):
+                for c in range(ncols):
+                    clipboard += u(self.datatable.item(r,c).text())
+                    if c != (ncols-1):
+                        clipboard += '\t'
+                clipboard += '\n'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         sys_clip.setText(clipboard)
@@ -32666,7 +32713,7 @@ class editGraphDlg(ArtisanDialog):
         self.deleventTableButton.setMinimumSize(self.deleventTableButton.minimumSizeHint())
         self.deleventTableButton.clicked.connect(self.deleteEventTable)
         self.copyeventTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
-        self.copyeventTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copyeventTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copyeventTableButton.setFocusPolicy(Qt.NoFocus)
         self.copyeventTableButton.setMaximumSize(self.copyeventTableButton.sizeHint())
         self.copyeventTableButton.setMinimumSize(self.copyeventTableButton.minimumSizeHint())
@@ -32676,7 +32723,7 @@ class editGraphDlg(ArtisanDialog):
         self.datatable = QTableWidget()
         self.datatable.setTabKeyNavigation(True)     
         self.copydataTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
-        self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copydataTableButton.setFocusPolicy(Qt.NoFocus)
         self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
         self.copydataTableButton.setMinimumSize(self.copydataTableButton.minimumSizeHint())
@@ -34652,7 +34699,7 @@ class editGraphDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def copyDataTabletoClipboard(self,_=False):
         self.datatable.selectAll()
-        aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
+        aw.copy_cells_to_clipboard(self.datatable,adjustment=5)
         self.datatable.clearSelection()
         aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
 
@@ -34661,18 +34708,36 @@ class editGraphDlg(ArtisanDialog):
         nrows = self.eventtable.rowCount() 
         ncols = self.eventtable.columnCount()
         clipboard = ""
-        for c in range(ncols):
-            clipboard += u(self.eventtable.horizontalHeaderItem(c).text())
-            if c != (ncols-1):
-                clipboard += '\t'
-        clipboard += '\n'
-        for i in range(nrows):
-            clipboard += u(self.eventtable.cellWidget(i,0).text()) + "\t"
-            clipboard += u(self.eventtable.cellWidget(i,1).text()) + "\t"
-            clipboard += u(self.eventtable.cellWidget(i,2).text()) + "\t"
-            clipboard += u(self.eventtable.cellWidget(i,3).text()) + "\t"
-            clipboard += u(self.eventtable.cellWidget(i,4).currentText()) + "\t"
-            clipboard += u(self.eventtable.cellWidget(i,5).text()) + "\n"
+        modifiers = QApplication.keyboardModifiers()
+        if modifiers == Qt.AltModifier:  #alt click
+            tbl = prettytable.PrettyTable()
+            fields = []
+            for c in range(ncols):
+                fields.append(u(self.eventtable.horizontalHeaderItem(c).text()))
+            tbl.field_names = fields
+            for i in range(nrows):
+                rows = []
+                rows.append(u(self.eventtable.cellWidget(i,0).text()))
+                rows.append(u(self.eventtable.cellWidget(i,1).text()))
+                rows.append(u(self.eventtable.cellWidget(i,2).text()))
+                rows.append(u(self.eventtable.cellWidget(i,3).text()))
+                rows.append(u(self.eventtable.cellWidget(i,4).currentText()))
+                rows.append(u(self.eventtable.cellWidget(i,5).text()))
+                tbl.add_row(rows)
+            clipboard = tbl.get_string()
+        else:
+            for c in range(ncols):
+                clipboard += u(self.eventtable.horizontalHeaderItem(c).text())
+                if c != (ncols-1):
+                    clipboard += '\t'
+            clipboard += '\n'
+            for r in range(nrows):
+                clipboard += u(self.eventtable.cellWidget(r,0).text()) + "\t"
+                clipboard += u(self.eventtable.cellWidget(r,1).text()) + "\t"
+                clipboard += u(self.eventtable.cellWidget(r,2).text()) + "\t"
+                clipboard += u(self.eventtable.cellWidget(r,3).text()) + "\t"
+                clipboard += u(self.eventtable.cellWidget(r,4).currentText()) + "\t"
+                clipboard += u(self.eventtable.cellWidget(r,5).text()) + "\n"
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         sys_clip.setText(clipboard)
@@ -36884,7 +36949,7 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.itemSelectionChanged.connect(self.selectionChanged)
         self.createEventbuttonTable()
         self.copyeventbuttonTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
-        self.copyeventbuttonTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copyeventbuttonTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copyeventbuttonTableButton.setFocusPolicy(Qt.NoFocus)
         self.copyeventbuttonTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
         addButton = QPushButton(QApplication.translate("Button","Add",None))
@@ -38522,21 +38587,42 @@ class EventsDlg(ArtisanDialog):
         nrows = self.eventbuttontable.rowCount() 
         ncols = self.eventbuttontable.columnCount() - 1 #there is a dummy column at the end on the right
         clipboard = ""
-        for c in range(ncols):
-            clipboard += u(self.eventbuttontable.horizontalHeaderItem(c).text())
-            if c != (ncols-1):
-                clipboard += '\t'
-        clipboard += '\n'
-        for i in range(nrows):
-            clipboard += u(self.eventbuttontable.cellWidget(i,0).text()) + "\t"
-            clipboard += u(self.eventbuttontable.cellWidget(i,1).text()) + '\t'
-            clipboard += u(self.eventbuttontable.cellWidget(i,2).currentText()) + '\t'
-            clipboard += u(self.eventbuttontable.cellWidget(i,3).text()) + '\t'
-            clipboard += u(self.eventbuttontable.cellWidget(i,4).currentText()) + '\t'
-            clipboard += u(self.eventbuttontable.cellWidget(i,5).text()) + '\t'
-            clipboard += u(self.eventbuttontable.cellWidget(i,6).currentText()) + '\t'
-            clipboard += u(self.eventbuttontable.cellWidget(i,7).palette().button().color().name()) + "\t"
-            clipboard += u(self.eventbuttontable.cellWidget(i,8).palette().button().color().name()) + "\n"
+        modifiers = QApplication.keyboardModifiers()
+        if modifiers == Qt.AltModifier:  #alt click
+            tbl = prettytable.PrettyTable()
+            fields = []
+            for c in range(ncols):
+                fields.append(u(self.eventbuttontable.horizontalHeaderItem(c).text()))
+            tbl.field_names = fields
+            for r in range(nrows):
+                rows = []
+                rows.append(u(self.eventbuttontable.cellWidget(r,0).text()))
+                rows.append(u(self.eventbuttontable.cellWidget(r,1).text()))
+                rows.append(u(self.eventbuttontable.cellWidget(r,2).currentText()))
+                rows.append(u(self.eventbuttontable.cellWidget(r,3).text()))
+                rows.append(u(self.eventbuttontable.cellWidget(r,4).currentText()))
+                rows.append(u(self.eventbuttontable.cellWidget(r,5).text()))
+                rows.append(u(self.eventbuttontable.cellWidget(r,6).currentText()))
+                rows.append(u(self.eventbuttontable.cellWidget(r,7).palette().button().color().name()))
+                rows.append(u(self.eventbuttontable.cellWidget(r,8).palette().button().color().name()))
+                tbl.add_row(rows)
+            clipboard = tbl.get_string()
+        else:
+            for c in range(ncols):
+                clipboard += u(self.eventbuttontable.horizontalHeaderItem(c).text())
+                if c != (ncols-1):
+                    clipboard += '\t'
+            clipboard += '\n'
+            for r in range(nrows):
+                clipboard += u(self.eventbuttontable.cellWidget(r,0).text()) + "\t"
+                clipboard += u(self.eventbuttontable.cellWidget(r,1).text()) + '\t'
+                clipboard += u(self.eventbuttontable.cellWidget(r,2).currentText()) + '\t'
+                clipboard += u(self.eventbuttontable.cellWidget(r,3).text()) + '\t'
+                clipboard += u(self.eventbuttontable.cellWidget(r,4).currentText()) + '\t'
+                clipboard += u(self.eventbuttontable.cellWidget(r,5).text()) + '\t'
+                clipboard += u(self.eventbuttontable.cellWidget(r,6).currentText()) + '\t'
+                clipboard += u(self.eventbuttontable.cellWidget(r,7).palette().button().color().name()) + "\t"
+                clipboard += u(self.eventbuttontable.cellWidget(r,8).palette().button().color().name()) + "\n"
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         sys_clip.setText(clipboard)
@@ -39865,7 +39951,7 @@ class backgroundDlg(ArtisanDialog):
         self.eventtable.setTabKeyNavigation(True)
         self.createEventTable()
         self.copyeventTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
-        self.copyeventTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copyeventTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copyeventTableButton.setFocusPolicy(Qt.NoFocus)
         self.copyeventTableButton.setMaximumSize(self.copyeventTableButton.sizeHint())
         self.copyeventTableButton.setMinimumSize(self.copyeventTableButton.minimumSizeHint())
@@ -39876,7 +39962,7 @@ class backgroundDlg(ArtisanDialog):
         self.datatable.setTabKeyNavigation(True)
         self.createDataTable()
         self.copydataTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
-        self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copydataTableButton.setFocusPolicy(Qt.NoFocus)
         self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
         self.copydataTableButton.setMinimumSize(self.copydataTableButton.minimumSizeHint())
@@ -40426,7 +40512,7 @@ class backgroundDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def copyDataTabletoClipboard(self,_=False):
         self.datatable.selectAll()
-        aw.copy_cells_to_clipboard(self.datatable,adjustment=3)
+        aw.copy_cells_to_clipboard(self.datatable,adjustment=7)
         self.datatable.clearSelection()
         aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
 
@@ -47884,7 +47970,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.devicetable.setTabKeyNavigation(True)
         self.createDeviceTable()
         self.copydeviceTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
-        self.copydeviceTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copydeviceTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copydeviceTableButton.setFocusPolicy(Qt.NoFocus)
         self.copydeviceTableButton.clicked.connect(self.copyDeviceTabletoClipboard)
         self.addButton = QPushButton(QApplication.translate("Button","Add",None))
@@ -48958,25 +49044,51 @@ class DeviceAssignmentDlg(ArtisanDialog):
         nrows = self.devicetable.rowCount() 
         ncols = self.devicetable.columnCount()
         clipboard = ""
-        for c in range(ncols):
-            clipboard += u(self.devicetable.horizontalHeaderItem(c).text())
-            if c != (ncols-1):
-                clipboard += '\t'
-        clipboard += '\n'
-        for i in range(nrows):
-            clipboard += u(self.devicetable.cellWidget(i,0).currentText()) + "\t"
-            clipboard += u(self.devicetable.cellWidget(i,1).palette().button().color().name()) + '\t'
-            clipboard += u(self.devicetable.cellWidget(i,2).palette().button().color().name()) + '\t'
-            clipboard += u(self.devicetable.cellWidget(i,3).text()) + '\t'
-            clipboard += u(self.devicetable.cellWidget(i,4).text()) + '\t'
-            clipboard += u(self.devicetable.cellWidget(i,5).text()) + '\t'
-            clipboard += u(self.devicetable.cellWidget(i,6).text()) + '\t'
-            clipboard += u(self.devicetable.cellWidget(i,7).isChecked()) + "\t"
-            clipboard += u(self.devicetable.cellWidget(i,8).isChecked()) + "\t"
-            clipboard += u(self.devicetable.cellWidget(i,9).isChecked()) + "\t"
-            clipboard += u(self.devicetable.cellWidget(i,10).isChecked()) + "\t"
-            clipboard += u(self.devicetable.cellWidget(i,11).text()) + '\t'
-            clipboard += u(self.devicetable.cellWidget(i,12).text()) + '\n'
+        modifiers = QApplication.keyboardModifiers()
+        if modifiers == Qt.AltModifier:  #alt click
+            tbl = prettytable.PrettyTable()
+            fields = []
+            re_strip = re.compile(u'[\u2009]')  #thin space is not read properly by prettytable
+            for c in range(ncols):
+                fields.append(re_strip.sub('',u(self.devicetable.horizontalHeaderItem(c).text())))
+            tbl.field_names = fields
+            for r in range(nrows):
+                rows = []
+                rows.append(u(self.devicetable.cellWidget(r,0).currentText()))
+                rows.append(u(self.devicetable.cellWidget(r,1).palette().button().color().name()))
+                rows.append(u(self.devicetable.cellWidget(r,2).palette().button().color().name()))
+                rows.append(u(self.devicetable.cellWidget(r,3).text()))
+                rows.append(u(self.devicetable.cellWidget(r,4).text()))
+                rows.append(u(self.devicetable.cellWidget(r,5).text()))
+                rows.append(u(self.devicetable.cellWidget(r,6).text()))
+                rows.append(u(self.devicetable.cellWidget(r,7).isChecked()))
+                rows.append(u(self.devicetable.cellWidget(r,8).isChecked()))
+                rows.append(u(self.devicetable.cellWidget(r,9).isChecked()))
+                rows.append(u(self.devicetable.cellWidget(r,10).isChecked()))
+                rows.append(u(self.devicetable.cellWidget(r,11).isChecked()))
+                rows.append(u(self.devicetable.cellWidget(r,12).isChecked()))
+                tbl.add_row(rows)
+            clipboard = tbl.get_string()
+        else:
+            for c in range(ncols):
+                clipboard += u(self.devicetable.horizontalHeaderItem(c).text())
+                if c != (ncols-1):
+                    clipboard += '\t'
+            clipboard += '\n'
+            for r in range(nrows):
+                clipboard += u(self.devicetable.cellWidget(r,0).currentText()) + "\t"
+                clipboard += u(self.devicetable.cellWidget(r,1).palette().button().color().name()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,2).palette().button().color().name()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,3).text()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,4).text()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,5).text()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,6).text()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,7).isChecked()) + "\t"
+                clipboard += u(self.devicetable.cellWidget(r,8).isChecked()) + "\t"
+                clipboard += u(self.devicetable.cellWidget(r,9).isChecked()) + "\t"
+                clipboard += u(self.devicetable.cellWidget(r,10).isChecked()) + "\t"
+                clipboard += u(self.devicetable.cellWidget(r,11).isChecked()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,12).isChecked()) + '\n'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         sys_clip.setText(clipboard)
