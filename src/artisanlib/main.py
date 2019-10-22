@@ -14985,7 +14985,7 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
-    def copy_cells_to_clipboard(self,table_widget):
+    def copy_cells_to_clipboard(self,table_widget, adjustment=0):  # adjustment bitwise 0:None, 1: add leading tab to header, 2: add leading tab to first data row 
         if len(table_widget.selectionModel().selectedIndexes()) > 0:
             # sort select indexes into rows and columns
             previous = table_widget.selectionModel().selectedIndexes()[0]
@@ -15003,6 +15003,15 @@ class ApplicationWindow(QMainWindow):
             clipboard = ""
             nrows = len(columns)
             ncols = len(columns[0])
+            if adjustment & 1:
+                clipboard += "" + '\t'
+            for c in range(ncols):
+                clipboard += u(table_widget.horizontalHeaderItem(c).text())
+                if c != (ncols-1):
+                    clipboard += '\t'
+            clipboard += '\n'
+            if adjustment & 2:
+                clipboard += "" + '\t'
             for r in range(nrows):
                 for c in range(ncols):
                     if columns[r][c] is not None:
@@ -29344,7 +29353,6 @@ class ApplicationWindow(QMainWindow):
                        ha="left", va="center",
                        fontfamily='monospace',
                        fontsize='x-small',
-#                       color=self.qmc.palette["text"],
                        color=tc,
                        zorder=21,
                        picker=True,
@@ -32130,6 +32138,13 @@ class equDataDlg(ArtisanDialog):
         header.setStretchLastSection(True)
         self.datatable.setMinimumSize(self.datatable.minimumSizeHint())
 
+        self.copydataTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
+        self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copydataTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
+        self.copydataTableButton.setMinimumSize(self.copydataTableButton.minimumSizeHint())
+        self.copydataTableButton.clicked.connect(self.copyDataTabletoClipboard)
+
         self.dataprecision = ["%.1f","%.2f","%.3f","%.4f","%.5f","%.6f"]
         self.dataprecisionval = 1
         self.precisionSpinBox = QSpinBox()
@@ -32144,11 +32159,16 @@ class equDataDlg(ArtisanDialog):
         self.createDataTable()
 
         #layout
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.copydataTableButton)
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(self.dataprecisionlabel)
+        buttonLayout.addWidget(self.precisionSpinBox)
+
         dataplotterLayout = QVBoxLayout()
         dataplotterLayout.addWidget(self.datalabel)
         dataplotterLayout.addWidget(self.datatable)
-        dataplotterLayout.addWidget(self.dataprecisionlabel)
-        dataplotterLayout.addWidget(self.precisionSpinBox)
+        dataplotterLayout.addLayout(buttonLayout)
             
         self.setLayout(dataplotterLayout)
 
@@ -32284,6 +32304,27 @@ class equDataDlg(ArtisanDialog):
 #            traceback.print_exc(file=sys.stdout)
             pass
             
+    @pyqtSlot(bool)
+    def copyDataTabletoClipboard(self,_=False):
+        nrows = self.datatable.rowCount() 
+        ncols = self.datatable.columnCount() - 1 #there is a dummy column at the end on the right
+        clipboard = ""
+        for c in range(ncols):
+            clipboard += u(self.datatable.horizontalHeaderItem(c).text())
+            if c != (ncols-1):
+                clipboard += '\t'
+        clipboard += '\n'
+        for r in range(nrows):
+            for c in range(ncols):
+                clipboard += u(self.datatable.item(r,c).text())
+                if c != (ncols-1):
+                    clipboard += '\t'
+            clipboard += '\n'
+        # copy to the system clipboard
+        sys_clip = QApplication.clipboard()
+        sys_clip.setText(clipboard)
+        aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
+
 ########################################################################################
 #####################  RECENT ROAST POPUP  #############################################
 
@@ -32619,16 +32660,28 @@ class editGraphDlg(ArtisanDialog):
         self.neweventTableButton.setFocusPolicy(Qt.NoFocus)
         self.neweventTableButton.setMaximumSize(self.neweventTableButton.sizeHint())
         self.neweventTableButton.setMinimumSize(self.neweventTableButton.minimumSizeHint())
-        self.neweventTableButton.clicked.connect(lambda _:self.addEventTable())
+        self.neweventTableButton.clicked.connect(self.addEventTable)
         self.deleventTableButton = QPushButton(QApplication.translate("Button", "Delete",None))
         self.deleventTableButton.setFocusPolicy(Qt.NoFocus)
         self.deleventTableButton.setMaximumSize(self.deleventTableButton.sizeHint())
         self.deleventTableButton.setMinimumSize(self.deleventTableButton.minimumSizeHint())
         self.deleventTableButton.clicked.connect(self.deleteEventTable)
+        self.copyeventTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
+        self.copyeventTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copyeventTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copyeventTableButton.setMaximumSize(self.copyeventTableButton.sizeHint())
+        self.copyeventTableButton.setMinimumSize(self.copyeventTableButton.minimumSizeHint())
+        self.copyeventTableButton.clicked.connect(self.copyEventTabletoClipboard)
         
         #DATA Table
         self.datatable = QTableWidget()
         self.datatable.setTabKeyNavigation(True)     
+        self.copydataTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
+        self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copydataTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
+        self.copydataTableButton.setMinimumSize(self.copydataTableButton.minimumSizeHint())
+        self.copydataTableButton.clicked.connect(self.copyDataTabletoClipboard)
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
         self.titleedit = RoastsComboBox(selection = aw.qmc.title)
@@ -33333,6 +33386,7 @@ class editGraphDlg(ArtisanDialog):
 #        mainLayout.addLayout(timeLayoutBox)
 #        mainLayout.addStretch()
         eventbuttonLayout = QHBoxLayout()
+        eventbuttonLayout.addWidget(self.copyeventTableButton)
         eventbuttonLayout.addWidget(self.createalarmTableButton)
         eventbuttonLayout.addStretch()
         eventbuttonLayout.addWidget(self.clusterEventsButton)
@@ -33342,6 +33396,9 @@ class editGraphDlg(ArtisanDialog):
         eventbuttonLayout.addStretch()
         eventbuttonLayout.addWidget(self.deleventTableButton)
         eventbuttonLayout.addWidget(self.neweventTableButton)
+        databuttonLayout = QHBoxLayout()
+        databuttonLayout.addWidget(self.copydataTableButton)
+        databuttonLayout.addStretch()
         #tab 1
         self.tab1aLayout = QVBoxLayout()
         self.tab1aLayout.setContentsMargins(0,0,0,0)
@@ -33376,6 +33433,7 @@ class editGraphDlg(ArtisanDialog):
         #tab 4 data
         tab4Layout = QVBoxLayout()
         tab4Layout.addWidget(self.datatable) 
+        tab4Layout.addLayout(databuttonLayout)
         tab4Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom 
         #tabwidget
         self.TabWidget = QTabWidget()
@@ -34144,7 +34202,8 @@ class editGraphDlg(ArtisanDialog):
         key = int(event.key())
         if event.matches(QKeySequence.Copy):
             if self.TabWidget.currentIndex() == 3: # datatable
-                aw.copy_cells_to_clipboard(self.datatable)
+                aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
+                aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
         if key == 16777220 and aw.scale.device is not None and aw.scale.device != "" and aw.scale.device != "None": # ENTER key pressed and scale connected
             if self.weightinedit.hasFocus():
                 self.inWeight(overwrite=True) # we don't add to current reading but overwrite
@@ -34512,7 +34571,6 @@ class editGraphDlg(ArtisanDialog):
         
         self.eventtable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.eventtable.setShowGrid(True) 
         etypes = aw.qmc.getetypes()
         #populate table
         for i in range(nevents):
@@ -34591,6 +34649,35 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.specialeventstype[i] = etype.currentIndex()
             evalue = self.eventtable.cellWidget(i,5).text()
             aw.qmc.specialeventsvalue[i] = aw.qmc.str2eventsvalue(str(evalue))
+
+    @pyqtSlot(bool)
+    def copyDataTabletoClipboard(self,_=False):
+        self.datatable.selectAll()
+        aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
+        self.datatable.clearSelection()
+        aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
+
+    @pyqtSlot(bool)
+    def copyEventTabletoClipboard(self,_=False):
+        nrows = self.eventtable.rowCount() 
+        ncols = self.eventtable.columnCount()
+        clipboard = ""
+        for c in range(ncols):
+            clipboard += u(self.eventtable.horizontalHeaderItem(c).text())
+            if c != (ncols-1):
+                clipboard += '\t'
+        clipboard += '\n'
+        for i in range(nrows):
+            clipboard += u(self.eventtable.cellWidget(i,0).text()) + "\t"
+            clipboard += u(self.eventtable.cellWidget(i,1).text()) + "\t"
+            clipboard += u(self.eventtable.cellWidget(i,2).text()) + "\t"
+            clipboard += u(self.eventtable.cellWidget(i,3).text()) + "\t"
+            clipboard += u(self.eventtable.cellWidget(i,4).currentText()) + "\t"
+            clipboard += u(self.eventtable.cellWidget(i,5).text()) + "\n"
+        # copy to the system clipboard
+        sys_clip = QApplication.clipboard()
+        sys_clip.setText(clipboard)
+        aw.sendmessage(QApplication.translate("Message","Event table copied to clipboard",None))
 
     def createAlarmEventRows(self,rows):
         for r in rows:
@@ -36797,6 +36884,10 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.setTabKeyNavigation(True)
         self.eventbuttontable.itemSelectionChanged.connect(self.selectionChanged)
         self.createEventbuttonTable()
+        self.copyeventbuttonTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
+        self.copyeventbuttonTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copyeventbuttonTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copyeventbuttonTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
         addButton = QPushButton(QApplication.translate("Button","Add",None))
         addButton.setToolTip(QApplication.translate("Tooltip","Add new extra Event button",None))
         #addButton.setMaximumWidth(100)
@@ -37445,6 +37536,7 @@ class EventsDlg(ArtisanDialog):
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(self.insertButton)
         tab2buttonlayout.addWidget(delButton)
+        tab2buttonlayout.addWidget(self.copyeventbuttonTableButton)
         tab2buttonlayout.addStretch()
         tab2buttonlayout.addWidget(helpDialogButton)
         ### tab2 layout
@@ -38425,6 +38517,32 @@ class EventsDlg(ArtisanDialog):
                 self.eventbuttontable.setColumnWidth(i,aw.eventbuttontablecolumnwidths[i])
             except Exception:
                 pass
+
+    @pyqtSlot(bool)
+    def copyEventButtonTabletoClipboard(self,_=False):
+        nrows = self.eventbuttontable.rowCount() 
+        ncols = self.eventbuttontable.columnCount() - 1 #there is a dummy column at the end on the right
+        clipboard = ""
+        for c in range(ncols):
+            clipboard += u(self.eventbuttontable.horizontalHeaderItem(c).text())
+            if c != (ncols-1):
+                clipboard += '\t'
+        clipboard += '\n'
+        for i in range(nrows):
+            clipboard += u(self.eventbuttontable.cellWidget(i,0).text()) + "\t"
+            clipboard += u(self.eventbuttontable.cellWidget(i,1).text()) + '\t'
+            clipboard += u(self.eventbuttontable.cellWidget(i,2).currentText()) + '\t'
+            clipboard += u(self.eventbuttontable.cellWidget(i,3).text()) + '\t'
+            clipboard += u(self.eventbuttontable.cellWidget(i,4).currentText()) + '\t'
+            clipboard += u(self.eventbuttontable.cellWidget(i,5).text()) + '\t'
+            clipboard += u(self.eventbuttontable.cellWidget(i,6).currentText()) + '\t'
+            clipboard += u(self.eventbuttontable.cellWidget(i,7).palette().button().color().name()) + "\t"
+            clipboard += u(self.eventbuttontable.cellWidget(i,8).palette().button().color().name()) + "\n"
+        # copy to the system clipboard
+        sys_clip = QApplication.clipboard()
+        sys_clip.setText(clipboard)
+        aw.sendmessage(QApplication.translate("Message","Event Button table copied to clipboard",None))
+
 
     def savetableextraeventbutton(self):
         maxButton = len(self.extraeventstypes)
@@ -39747,11 +39865,23 @@ class backgroundDlg(ArtisanDialog):
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
         self.createEventTable()
+        self.copyeventTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
+        self.copyeventTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copyeventTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copyeventTableButton.setMaximumSize(self.copyeventTableButton.sizeHint())
+        self.copyeventTableButton.setMinimumSize(self.copyeventTableButton.minimumSizeHint())
+        self.copyeventTableButton.clicked.connect(self.copyEventTabletoClipboard)
         #TAB 3 DATA
         #table for showing data
         self.datatable = QTableWidget()
         self.datatable.setTabKeyNavigation(True)
         self.createDataTable()
+        self.copydataTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
+        self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copydataTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
+        self.copydataTableButton.setMinimumSize(self.copydataTableButton.minimumSizeHint())
+        self.copydataTableButton.clicked.connect(self.copyDataTabletoClipboard)
         #TAB 4
         self.replayComboBox = QComboBox()
         replayVariants = [
@@ -39851,11 +39981,19 @@ class backgroundDlg(ArtisanDialog):
         tab1layout.addLayout(alignButtonBoxed)
         tab1layout.addLayout(tab4content)
         tab1layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
+        eventbuttonLayout = QHBoxLayout()
+        eventbuttonLayout.addWidget(self.copyeventTableButton)
+        eventbuttonLayout.addStretch()
         tab2layout = QVBoxLayout()
         tab2layout.addWidget(self.eventtable)
+        tab2layout.addLayout(eventbuttonLayout)
         tab2layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
+        databuttonLayout = QHBoxLayout()
+        databuttonLayout.addWidget(self.copydataTableButton)
+        databuttonLayout.addStretch()
         tab3layout = QVBoxLayout()
         tab3layout.addWidget(self.datatable)
+        tab3layout.addLayout(databuttonLayout)
         tab3layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         #tab layout
         tab1layout.setSpacing(5)
@@ -39891,6 +40029,7 @@ class backgroundDlg(ArtisanDialog):
         if event.matches(QKeySequence.Copy):
             if self.TabWidget.currentIndex() == 2: # datatable
                 aw.copy_cells_to_clipboard(self.datatable)
+                aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
 
     @pyqtSlot()
     def accept(self):
@@ -40115,7 +40254,7 @@ class backgroundDlg(ArtisanDialog):
         self.eventtable.setAlternatingRowColors(True)
         self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
+        self.eventtable.setSelectionMode(QTableWidget.ExtendedSelection)
         self.eventtable.setShowGrid(True)
         self.eventtable.verticalHeader().setSectionResizeMode(2)
         if aw.qmc.timeindex[0] != -1:
@@ -40284,6 +40423,21 @@ class backgroundDlg(ArtisanDialog):
         else:
             header.setSectionResizeMode(5, QHeaderView.Stretch)
         self.datatable.resizeColumnsToContents()
+
+    @pyqtSlot(bool)
+    def copyDataTabletoClipboard(self,_=False):
+        self.datatable.selectAll()
+        aw.copy_cells_to_clipboard(self.datatable,adjustment=3)
+        self.datatable.clearSelection()
+        aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
+
+    @pyqtSlot(bool)
+    def copyEventTabletoClipboard(self,_=False):
+        self.eventtable.selectAll()
+        aw.copy_cells_to_clipboard(self.eventtable,adjustment=0)
+        self.eventtable.clearSelection()
+        aw.sendmessage(QApplication.translate("Message","Event table copied to clipboard",None))
+
 
 #############################################################################
 ################  Statistics DIALOG ########################
@@ -47707,6 +47861,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.devicetable = QTableWidget()
         self.devicetable.setTabKeyNavigation(True)
         self.createDeviceTable()
+        self.copydeviceTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
+        self.copydeviceTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard",None))
+        self.copydeviceTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copydeviceTableButton.clicked.connect(self.copyDeviceTabletoClipboard)
         self.addButton = QPushButton(QApplication.translate("Button","Add",None))
         self.addButton.setFocusPolicy(Qt.NoFocus)
         self.addButton.setMinimumWidth(100)
@@ -48509,6 +48667,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         bLayout = QHBoxLayout()
         bLayout.addWidget(self.addButton)
         bLayout.addWidget(self.delButton)
+        bLayout.addWidget(self.copydeviceTableButton)
         bLayout.addStretch()
         bLayout.addSpacing(10)
         bLayout.addWidget(self.recalcButton)
@@ -48770,6 +48929,35 @@ class DeviceAssignmentDlg(ArtisanDialog):
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createDeviceTable(): {0}").format(str(e)),exc_tb.tb_lineno)
+
+    @pyqtSlot(bool)
+    def copyDeviceTabletoClipboard(self,_=False):
+        nrows = self.devicetable.rowCount() 
+        ncols = self.devicetable.columnCount()
+        clipboard = ""
+        for c in range(ncols):
+            clipboard += u(self.devicetable.horizontalHeaderItem(c).text())
+            if c != (ncols-1):
+                clipboard += '\t'
+        clipboard += '\n'
+        for i in range(nrows):
+            clipboard += u(self.devicetable.cellWidget(i,0).currentText()) + "\t"
+            clipboard += u(self.devicetable.cellWidget(i,1).palette().button().color().name()) + '\t'
+            clipboard += u(self.devicetable.cellWidget(i,2).palette().button().color().name()) + '\t'
+            clipboard += u(self.devicetable.cellWidget(i,3).text()) + '\t'
+            clipboard += u(self.devicetable.cellWidget(i,4).text()) + '\t'
+            clipboard += u(self.devicetable.cellWidget(i,5).text()) + '\t'
+            clipboard += u(self.devicetable.cellWidget(i,6).text()) + '\t'
+            clipboard += u(self.devicetable.cellWidget(i,7).isChecked()) + "\t"
+            clipboard += u(self.devicetable.cellWidget(i,8).isChecked()) + "\t"
+            clipboard += u(self.devicetable.cellWidget(i,9).isChecked()) + "\t"
+            clipboard += u(self.devicetable.cellWidget(i,10).isChecked()) + "\t"
+            clipboard += u(self.devicetable.cellWidget(i,11).text()) + '\t'
+            clipboard += u(self.devicetable.cellWidget(i,12).text()) + '\n'
+        # copy to the system clipboard
+        sys_clip = QApplication.clipboard()
+        sys_clip.setText(clipboard)
+        aw.sendmessage(QApplication.translate("Message","Device table copied to clipboard",None))
 
     @pyqtSlot(bool)
     def showhelpprogram(self,_):
