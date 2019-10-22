@@ -55,6 +55,7 @@ import threading
 import multiprocessing
 import re
 import textwrap
+import gc
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -24371,7 +24372,6 @@ class ApplicationWindow(QMainWindow):
         if aw.qmc.checkSaved(): # if not canceled
             self.stopActivities()
             self.closeEventSettings()
-            import gc
             gc.collect()
             QApplication.exit()
             return True
@@ -27560,7 +27560,6 @@ class ApplicationWindow(QMainWindow):
         if self.editgraphdialog != False: # Roast Properties dialog is not blocked!
             self.editgraphdialog = editGraphDlg(self)
             self.editgraphdialog.show()
-            #editgraphdialog.setFixedSize(editgraphdialog.size())
             self.editgraphdialog = None
 
     @pyqtSlot()
@@ -27574,7 +27573,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def eventsconf(self,_=False):
         dialog = EventsDlg(self)
-        dialog.exec_()
+        dialog.show()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -41062,6 +41061,19 @@ class YoctoThread(threading.Thread):
 class serialport(object):
     """ this class handles the communications with all the devices"""
 
+    __slots__ = ['comport','baudrate','bytesize','parity','stopbits','timeout','SP','COMsemaphore','commavailable',\
+        'PhidgetTemperatureSensor','Phidget1048values','Phidget1048lastvalues','Phidget1048semaphores',\
+        'PhidgetIRSensor','PhidgetIRSensorIC','Phidget1045values','Phidget1045lastvalue','Phidget1045tempIRavg',\
+        'Phidget1045semaphore','PhidgetBridgeSensor','Phidget1046values','Phidget1046lastvalues','Phidget1046semaphores',\
+        'PhidgetIO','PhidgetIOvalues','PhidgetIOlastvalues','PhidgetIOsemaphores','PhidgetDigitalOut',\
+        'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
+        'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetAnalogOutHub','PhidgetRCServo','PhidgetBinaryOut',\
+        'YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
+        'YOCTOthread','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
+        'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
+        'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
+        'externaloutprogram','externaloutprogramFlag']
+
     def __init__(self):
         
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
@@ -42842,6 +42854,14 @@ class serialport(object):
 
     def NONEtmp(self):
         dialogx = nonedevDlg()
+        
+        # NOT CORRECT:
+        ##from sys import getsizeof  # getsizesof not reporting the full size here!
+        ##print(getsizeof(dialogx)) # 192bytes using slots; 152bytes without slots;
+        
+        # # sudo -H python3 -m pip install pympler 
+        #from pympler import asizeof
+        #print(asizeof.asizeof(dialogx)) # 2440 using slots; 2568 without using slots
         if dialogx.exec_():
             try:
                 ET = (int(str(dialogx.etEdit.text())) * 10)/10.
@@ -46173,7 +46193,8 @@ class pointDlg(ArtisanDialog):
 #########################################################################
 
 #inputs temperature
-class nonedevDlg(QDialog):
+class nonedevDlg(QDialog,object):
+    __slots__ = ['etEdit','btEdit','ETbox','okButton','cancelButton'] # save some memory by using slots
     def __init__(self, parent = None):
         super(nonedevDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Manual Temperature Logger",None))
@@ -46236,6 +46257,7 @@ class nonedevDlg(QDialog):
 
 
 class PortComboBox(QComboBox):
+    __slots__ = ['selection','ports','edited'] # save some memory by using slots
     def __init__(self, parent = None, selection = None):
         super(PortComboBox, self).__init__(parent)
         self.installEventFilter(self)
@@ -48837,6 +48859,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 for i in range(nddevices):
                     try:
                         typeComboBox =  MyQComboBox()
+                        typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
                         typeComboBox.addItems(devices[:])
                         try:
                             dev_name = aw.qmc.devices[max(0,aw.qmc.extradevices[i]-1)]
@@ -52264,6 +52287,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox):
         super(MyQDoubleSpinBox, self).mouseReleaseEvent(event)
 
 class MyTableWidgetItemQLineEdit(QTableWidgetItem):
+    __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
         #QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
@@ -52286,6 +52310,7 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem):
                 return a < b
       
 class MyTableWidgetItemInt(QTableWidgetItem):
+    __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, text, sortKey):
         super(QTableWidgetItem,self).__init__(text, QTableWidgetItem.UserType)
         self.sortKey = sortKey
@@ -52295,6 +52320,7 @@ class MyTableWidgetItemInt(QTableWidgetItem):
         return self.sortKey < other.sortKey 
         
 class MyTableWidgetItemQCheckBox(QTableWidgetItem):
+    __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
         super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
@@ -52305,6 +52331,7 @@ class MyTableWidgetItemQCheckBox(QTableWidgetItem):
         return self.sortKey.isChecked() < other.sortKey.isChecked()
         
 class MyTableWidgetItemQComboBox(QTableWidgetItem):
+    __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
         super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
@@ -52316,6 +52343,7 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem):
 
 # QLabel that automatically resizes its text font
 class myQLabel(QLabel):
+    __slots__ = [] # save some memory by using slots
     def __init__(self, *args, **kargs):
         super(myQLabel, self).__init__(*args, **kargs)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Ignored,QSizePolicy.Ignored))
@@ -53031,6 +53059,7 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setItem(i, 10, MyTableWidgetItemQCheckBox(beepWidget.layout().itemAt(1).widget()))
         self.alarmtable.setCellWidget(i,11,descriptionedit)
         self.alarmtable.setItem(i, 11, MyTableWidgetItemQLineEdit(descriptionedit))
+        
 
     # puts a gray background on alarm rows that have already been fired
     def markNotEnabledAlarmRows(self):
@@ -53089,6 +53118,7 @@ class AlarmDlg(ArtisanDialog):
                 self.markNotEnabledAlarmRows()
                 self.alarmtable.setSortingEnabled(True)
             self.alarmtable.sortItems(0)
+            
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createalarmtable() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -58443,6 +58473,10 @@ def main():
             mxOpenKey.setValue(".", cmdLine)
         except:
             pass
+            
+    # write gc debug messages to stdout
+#    gc.set_debug(gc.DEBUG_STATS)
+
 
 #    if platf == 'Windows' and appFrozen():
 #        try:

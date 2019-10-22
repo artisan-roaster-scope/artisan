@@ -17,7 +17,10 @@
 import time
 
 # higher resultion time signal (at least on Mac OS X)
-class ArtisanTime():
+class ArtisanTime(object):
+
+    __slots__ = ['clock']
+    
     def __init__(self):
         self.clock = time.perf_counter()
 
