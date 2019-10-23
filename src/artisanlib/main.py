@@ -6694,11 +6694,30 @@ class tgraphcanvas(FigureCanvas):
                     pos_x = droptext_end + border + start
                 
                 pos_y = statsheight
-                rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
+#                rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
+                rect = patches.Rectangle((pos_x-margin,pos_y - (stats_textbox_height + 2*margin)),stats_textbox_width+2*margin,stats_textbox_height+3*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
                 self.ax.add_patch(rect)
                 
+
                 text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=tc,zorder=11,path_effects=[])
                 text.set_in_layout(False)
+                    
+#                try:
+#                    # 0. MPL coordinate systems & transformations: 
+#                    #   https://matplotlib.org/3.1.1/tutorials/advanced/transforms_tutorial.html
+#                    # 1.get bounding box in axis cooridnates
+#                    rect_extents = rect.get_bbox()
+#                    # 2. convert those to display coordinates
+#                    rect_extents_display = aw.qmc.ax.transData.transform(rect_extents)
+#                    # 3. convert display coordinates to figure-inches
+#                    rect_extents_bbox_inches = self.fig.dpi_scale_trans.inverted().transform(rect_extents_display)
+#                    # 4. generate
+#                    rect_bbox_inches =  mpl.transforms.Bbox.from_extents(rect_extents_bbox_inches)
+#                    # 5. fig.save
+#                    #self.fig.savefig("/tmp/test.png",bbox_inches=rect_bbox_inches,pad_inches=0)
+#                    self.fig.savefig("/tmp/test.pdf",bbox_inches=rect_bbox_inches,pad_inches=0)
+#                except Exception as e:
+#                    print(e)
                 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -18482,6 +18501,7 @@ class ApplicationWindow(QMainWindow):
                     aw.toggleFullscreen()
                 elif aw.buttonpalette_shortcuts and control_modifier and key in numberkeys: # palette switch via SHIFT-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(key))
+
                 elif key == 72:                       #H
                     if not aw.qmc.designerflag:
                         if alt_modifier:
