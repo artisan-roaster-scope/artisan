@@ -33528,7 +33528,6 @@ class editGraphDlg(ArtisanDialog):
 
         self.titleedit.setFocus()
 
-        
         self.updateTemplateLine()
         
         settings = QSettings()
@@ -47809,9 +47808,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
         super(DeviceAssignmentDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment", None))
         self.setModal(True)
-        settings = QSettings()
-        if settings.contains("DeviceAssignmentGeometry"):
-            self.restoreGeometry(settings.value("DeviceAssignmentGeometry"))
             
         ################ TAB 1   WIDGETS
         #ETcurve
@@ -48853,6 +48849,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout.setContentsMargins(5,10,5,5)
         self.setLayout(Mlayout)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        settings = QSettings()
+        if settings.contains("DeviceAssignmentGeometry"):
+            self.restoreGeometry(settings.value("DeviceAssignmentGeometry"))
+
     
     @pyqtSlot(int)
     def changeOutprogramFlag(self,_):
