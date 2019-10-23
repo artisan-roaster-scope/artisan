@@ -63,7 +63,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
 
-import prettytable
+import prettytable  # @UnresolvedImport
 
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith("Windows"):
@@ -29345,7 +29345,6 @@ class ApplicationWindow(QMainWindow):
                 bestfit = -1
         
             # build the results table
-            import prettytable  # @UnresolvedImport
             x = prettytable.PrettyTable()
             x.field_names = ["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"] 
             x.float_format = "5.2"
@@ -29696,6 +29695,22 @@ class HUDDlg(ArtisanDialog):
         self.org_graphstyle = aw.qmc.graphstyle
         self.org_graphfont = aw.qmc.graphfont
         self.org_HUDbuttonflag = aw.qmc.HUDbuttonflag
+        self.org_filterDropOuts = aw.qmc.filterDropOuts
+        self.org_dropSpikes = aw.qmc.dropSpikes
+        self.org_swapETBT = aw.qmc.swapETBT
+        self.org_optimalSmoothing = aw.qmc.optimalSmoothing
+        self.org_soundflag = aw.soundflag
+        self.org_logoimgflag = aw.logoimgflag
+        self.org_logoimgalpha = aw.logoimgalpha
+        self.org_curvefilter = aw.qmc.curvefilter
+        self.org_deltaETfilter = aw.qmc.deltaETfilter
+        self.org_deltaBTfilter = aw.qmc.deltaBTfilter
+        self.org_deltaBTspan = aw.qmc.deltaBTspan
+        self.org_deltaETspan = aw.qmc.deltaETspan
+        self.org_graphstyle = aw.qmc.graphstyle
+        self.org_ETname = aw.ETname
+        self.org_BTname = aw.BTname
+        
         self.showHUDbutton = QCheckBox(QApplication.translate("Label", "HUD Button", None))
         self.showHUDbutton.setChecked(aw.qmc.HUDbuttonflag)
         self.showHUDbutton.setFocusPolicy(Qt.NoFocus)
@@ -31567,6 +31582,23 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.patheffects = self.org_patheffects
         aw.qmc.graphstyle = self.org_graphstyle
         aw.qmc.graphfont = self.org_graphfont
+        aw.qmc.HUDbuttonflag = self.org_HUDbuttonflag
+        aw.qmc.filterDropOuts = self.org_filterDropOuts
+        aw.qmc.dropSpikes = self.org_dropSpikes
+        aw.qmc.swapETBT = self.org_swapETBT
+        aw.qmc.optimalSmoothing = self.org_optimalSmoothing
+        aw.soundflag = self.org_soundflag
+        aw.logoimgflag = self.org_logoimgflag
+        aw.logoimgalpha = self.org_logoimgalpha
+        aw.qmc.curvefilter = self.org_curvefilter
+        aw.qmc.deltaETfilter = self.org_deltaETfilter
+        aw.qmc.deltaBTfilter = self.org_deltaBTfilter
+        aw.qmc.deltaBTspan = self.org_deltaBTspan
+        aw.qmc.deltaETspan = self.org_deltaETspan
+        aw.qmc.graphstyle = self.org_graphstyle
+        aw.ETname = self.org_ETname
+        aw.BTname = self.org_BTname
+        
         aw.setFonts(False)
         aw.qmc.resetlinecountcaches()
         aw.qmc.resetdeltalines()
