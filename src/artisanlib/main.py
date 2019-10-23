@@ -29526,7 +29526,7 @@ class ApplicationWindow(QMainWindow):
 ########################################################################################
 #####################  Artisan QDialog Subclass  #######################################
 ########################################################################################
-
+    
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None):
         super(ArtisanDialog,self).__init__(parent)
@@ -29579,6 +29579,15 @@ class ArtisanDialog(QDialog):
         modifiers = event.modifiers()
         if key == 16777216 or (key == 87 and modifiers == Qt.ControlModifier): #ESCAPE or CMD-W
             self.close()
+
+class ArtisanResizeablDialog(ArtisanDialog):
+    def __init__(self, parent=None):
+        super(ArtisanResizeablDialog,self).__init__(parent)
+        if platf == 'Windows':
+            windowFlags = self.windowFlags()
+            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
+            self.setWindowFlags(windowFlags)
+
 
 class ArtisanMessageBox(QMessageBox):
     def __init__(self, parent = None, title=None, text=None, timeout=0): 
@@ -32492,7 +32501,7 @@ class ClickableTextEdit(QTextEdit):
         self._changed = False            
             
 
-class editGraphDlg(ArtisanDialog):
+class editGraphDlg(ArtisanResizeablDialog):
     scaleWeightUpdated = pyqtSignal(float)
     connectScaleSignal = pyqtSignal()
     readScaleSignal = pyqtSignal()
@@ -36650,7 +36659,7 @@ class calculatorDlg(ArtisanDialog):
 ##########################################################################
 #accessed through menu conf
 
-class EventsDlg(ArtisanDialog):
+class EventsDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None):
         super(EventsDlg,self).__init__(parent)
         titlefont = QFont()
@@ -39595,7 +39604,7 @@ class phasesGraphDlg(ArtisanDialog):
 #####################   FLAVOR STAR PROPERTIES DIALOG   ####################
 ############################################################################
 
-class flavorDlg(ArtisanDialog):
+class flavorDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None):
         super(flavorDlg,self).__init__(parent)
         self.setModal(True)
@@ -39867,7 +39876,7 @@ class flavorDlg(ArtisanDialog):
 #################### BACKGROUND DIALOG  #########################
 #################################################################
 
-class backgroundDlg(ArtisanDialog):
+class backgroundDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None):
         super(backgroundDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Profile Background", None))
@@ -46421,7 +46430,7 @@ class PortComboBox(QComboBox):
             pass
         self.blockSignals(False)
 
-class comportDlg(ArtisanDialog):
+class comportDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None):
         super(comportDlg,self).__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
@@ -47803,7 +47812,7 @@ class scanModbusDlg(ArtisanDialog):
 ##################   Device assignments DIALOG for reading temperature   ########
 #################################################################################
 
-class DeviceAssignmentDlg(ArtisanDialog):
+class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None):
         super(DeviceAssignmentDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment", None))
@@ -50877,6 +50886,7 @@ class graphColorDlg(ArtisanDialog):
         self.setLayout(Mlayout)
         self.setColorButtons()
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.layout().setSizeConstraint(QLayout.SetFixedSize) # don't allow resizing
 
     @pyqtSlot(bool)
     def setLCD_bw(self,_):
@@ -52516,16 +52526,11 @@ class myQLabel(QLabel):
         #--- update font size --- 
         self.setFont(f)
 
-class AlarmDlg(ArtisanDialog):
+class AlarmDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None):
         super(AlarmDlg,self).__init__(parent)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Alarms",None))
-        
-        if platf == 'Windows':
-            windowFlags = self.windowFlags()
-            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
-            self.setWindowFlags(windowFlags)
                     
         # restore window position
         settings = QSettings()
