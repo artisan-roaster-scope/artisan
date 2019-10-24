@@ -1498,6 +1498,8 @@ class tgraphcanvas(FigureCanvas):
         # flags to control automatic DRY and FCs events based on phases limits
         self.autoDRYflag = False
         self.autoFCsFlag = False
+        self.autoDRYenabled = True # get's disabled on undo of the DRY event and prevents further autoDRY marks
+        self.autoFCsenabled = True # get's disabled on undo of the FCs event and prevents further autoFCs marks
         self.autoDryIdx = 0 # set by sample() on recognition and cleared once DRY is marked
         self.autoFCsIdx = 0 # set by sample() on recognition and cleared once FCs is marked
 
@@ -4507,6 +4509,10 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.tipping_flag = False
                 aw.qmc.scorching_flag = False
                 aw.qmc.divots_flag = False
+                
+                # renable autoDRY/autoFCs
+                aw.qmc.autoDRYenabled = True
+                aw.qmc.autoFCsenabled = True
                 
                 #Designer variables
                 self.indexpoint = 0
@@ -8005,6 +8011,8 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if aw.button_19.isFlat() and self.timeindex[1] > 0:
                         # undo wrongly set DRY
+                        # deactivate autoDRY
+                        aw.qmc.autoDRYenabled = False
                         st = self.stringfromseconds(self.timex[self.timeindex[1]]-start,False)
                         DE_str = aw.arabicReshape(QApplication.translate("Scope Annotation","DE {0}", None).format(st))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == DE_str:
@@ -8092,6 +8100,8 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if aw.button_3.isFlat() and self.timeindex[2] > 0:
                         # undo wrongly set FCs
+                        # deactivate autoFCs
+                        aw.qmc.autoFCsenabled = False
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[2]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
@@ -11891,12 +11901,12 @@ class SampleThread(QThread):
                                 # we found a BT break at the current index minus b
                                 aw.qmc.autoDropIdx = length_of_qmc_timex - b
                         #check for autoDRY: # only after CHARGE and TP and before FCs if not yet set
-                        if aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
+                        if aw.qmc.autoDRYflag and aw.qmc.autoDRYenabled and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
                             # if DRY event not yet set check for BT exceeding Dry-max as specified in the phases dialog
                             if aw.qmc.temp2[-1] >= aw.qmc.phases[1]:
                                 aw.qmc.autoDryIdx = 1
                         #check for autoFCs: # only after CHARGE and TP and before FCe if not yet set
-                        if aw.qmc.autoFCsFlag and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
+                        if aw.qmc.autoFCsFlag and aw.qmc.autoFCsenabled and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
                             # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
                             if aw.qmc.temp2[-1] >= aw.qmc.phases[2]:
                                 aw.qmc.autoFCsIdx = 1
@@ -53178,6 +53188,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         negguardedit.setAlignment(Qt.AlignRight)
         #Effective time from
         timeComboBox = MyQComboBox()
+        timeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         timeComboBox.addItems([QApplication.translate("ComboBox","ON",None), # qmc.alarmtime 9
                                QApplication.translate("ComboBox","START",None), # qmc.alarmtime -1
                                QApplication.translate("ComboBox","CHARGE",None), # qmc.alarmtime 0
@@ -53198,6 +53209,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         timeoffsetedit.setValidator(QRegExpValidator(regextime,self))
         #type/source
         typeComboBox = MyQComboBox()
+        typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         aitems = self.buildAlarmSourceList()
         typeComboBox.addItems(aitems)
         if aw.qmc.alarmsource[i] + 3 < len(aitems):
@@ -53206,6 +53218,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             typeComboBox.setCurrentIndex(3)
         #condition
         condComboBox = MyQComboBox()
+        condComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         condComboBox.addItems([QApplication.translate("ComboBox","below",None),
                                QApplication.translate("ComboBox","above",None)])
         condComboBox.setCurrentIndex(aw.qmc.alarmcond[i])
@@ -53217,6 +53230,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         tempedit.setValidator(aw.createCLocaleDoubleValidator(0., 999.9,1,tempedit))
         #action
         actionComboBox = MyQComboBox()
+        actionComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         actionComboBox.addItems(["",
                                  QApplication.translate("ComboBox","Pop Up",None),
                                  QApplication.translate("ComboBox","Call Program",None),
