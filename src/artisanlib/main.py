@@ -12370,7 +12370,7 @@ class ApplicationWindow(QMainWindow):
         
         # recent roasts, an ordered list (first-in, first-out) of dictionaries holding partial roast-properties and a link to the background profile if any
         self.recentRoasts = []
-        self.maxRecentRoasts = 20 # the maximum number of recent roasts held
+        self.maxRecentRoasts = 25 # the maximum number of recent roasts held
 
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv seetings)
         self.lcdpaletteB = {
@@ -15099,28 +15099,39 @@ class ApplicationWindow(QMainWindow):
             weightUnit,volumeIn,volumeUnit,densityWeight,beanSize_min, beanSize_max,
             moistureGreen,colorSystem,file,roastUUID,
             batchnr,batchprefix,plus_account,plus_store,plus_store_label,plus_coffee,
-            plus_coffee_label,plus_blend_label,plus_blend_spec,plus_blend_spec_labels):
+            plus_coffee_label,plus_blend_label,plus_blend_spec,plus_blend_spec_labels,
+            weightOut, volumeOut, densityRoasted, moistureRoasted, wholeColor, groundColor):
+        print("createRecentRoast")
+        print(weightOut, volumeOut, moistureRoasted, wholeColor, groundColor)
         d = {
             "title": title,
             "weightIn": weightIn,
             "weightUnit": weightUnit,
         }
         d["beans"] = beans
-#        d["weightOut"] = weightOut
+        if weightOut is not None:
+            d["weightOut"] = weightOut
         d["volumeIn"] = volumeIn
-#        d["volumeOut"] = volumeOut
+        if volumeOut is not None:
+            d["volumeOut"] = volumeOut
         d["volumeUnit"] = volumeUnit
         d["densityWeight"] = densityWeight
 #        d["densityWeightUnit"] = densityWeightUnit
 #        d["densityVolume"] = densityVolume
 #        d["densityVolumeUnit"] = densityVolumeUnit
+        if densityRoasted is not None:
+            d["densityRoasted"] = densityRoasted
         d["beanSize_min"] = beanSize_min
         d["beanSize_max"] = beanSize_max
         d["moistureGreen"] = moistureGreen
-#        d["moistureRoasted"] = moistureRoasted
-#        d["wholeColor"] = wholeColor
-#        d["groundColor"] = groundColor
-        d["colorSystem"] = colorSystem
+        if moistureRoasted is not None:
+            d["moistureRoasted"] = moistureRoasted
+        if wholeColor is not None:
+            d["wholeColor"] = wholeColor
+        if groundColor is not None:
+            d["groundColor"] = groundColor
+        if colorSystem is not None:
+            d["colorSystem"] = colorSystem
         d["background"] = file
         d["roastUUID"] = roastUUID
         d["batchnr"] = batchnr
@@ -15135,31 +15146,41 @@ class ApplicationWindow(QMainWindow):
         d["plus_blend_spec_labels"] = plus_blend_spec_labels
         return d
     
+    # recentRoast activated from within RoastProperties dialog
     def setRecentRoast(self,rr):
-        if "title" in rr:
+        print("setRecentRoast")
+        print("rr",rr)
+        if "title" in rr and rr["title"] is not None:
             self.qmc.title = rr["title"]
-        if "weightIn" in rr and "weightUnit" in rr:
+        if "weightIn" in rr and "weightUnit" in rr and rr["weightIn"] is not None and rr["weightUnit"] is not None:
             self.qmc.weight = [rr["weightIn"],self.qmc.weight[1],rr["weightUnit"]]
-        if "volumeIn" in rr and "volumeUnit" in rr:
+        if "weightOut" in rr and "weightUnit" in rr and rr["weightOut"] is not None and rr["weightUnit"] is not None:
+            self.qmc.weight = [self.qmc.weight[0],rr["weightOut"],rr["weightUnit"]]
+        if "volumeIn" in rr and "volumeUnit" in rr and rr["volumeIn"] is not None and rr["volumeUnit"] is not None:
             self.qmc.volume = [rr["volumeIn"],self.qmc.volume[1],rr["volumeUnit"]]
-        if "densityWeight" in rr:
+        if "volumeOut" in rr and "volumeUnit" in rr and rr["volumeOut"] is not None and rr["volumeUnit"] is not None:
+            self.qmc.volume = [self.qmc.volume[0],rr["volumeOut"],rr["volumeUnit"]]
+        if "densityWeight" in rr and rr["densityWeight"] is not None:
             self.qmc.density[0] = rr["densityWeight"]
-        if "beans" in rr:
+        if "densityRoasted" in rr and rr["densityRoasted"] is not None:
+            self.qmc.density_roasted[0] = rr["densityRoasted"]
+        if "beans" in rr and rr["beans"] is not None:
             aw.qmc.beans = rr["beans"]
-        if "beanSize_min" in rr:
+        if "beanSize_min" in rr and rr["beanSize_min"] is not None:
             self.qmc.beansize_min = rr["beanSize_min"]
-        if "beanSize_max" in rr:
+        if "beanSize_max" in rr and rr["beanSize_max"] is not None:
             self.qmc.beansize_max = rr["beanSize_max"]
-        if "moistureGreen" in rr:
+        if "moistureGreen" in rr and rr["moistureGreen"] is not None:
             self.qmc.moisture_green = rr["moistureGreen"]
-#        if "moistureRoasted" in rr:
-#            self.qmc.moisture_roasted = rr["moistureRoasted"]
-#        if "wholeColor" in rr:
-#            self.qmc.whole_color = rr["wholeColor"]
-#        if "groundColor" in rr:
-#            self.qmc.ground_color = rr["groundColor"]
-        if "colorSystem" in rr:
+        if "moistureRoasted" in rr and rr["moistureRoasted"] is not None:
+            self.qmc.moisture_roasted = rr["moistureRoasted"]
+        if "wholeColor" in rr and rr["wholeColor"] is not None:
+            self.qmc.whole_color = rr["wholeColor"]
+        if "groundColor" in rr and rr["groundColor"] is not None:
+            self.qmc.ground_color = rr["groundColor"]
+        if "colorSystem" in rr and rr["colorSystem"] is not None:
             self.qmc.color_system_idx = rr["colorSystem"]
+        # Note: the background profile will not be changed if recent roast is activated from Roast Properties
 #PLUS
         if self.plus_account is not None and "plus_account" in rr and self.plus_account == rr["plus_account"]:
             if "plus_store" in rr:
@@ -15195,6 +15216,7 @@ class ApplicationWindow(QMainWindow):
 
     # d is a recentRoast dict
     def addRecentRoast(self,d):
+        print("aw.addRecentRoast",d)
         try:
             # check for duplications
             rr = self.delRecentRoast(d["title"],d["weightIn"],d["weightUnit"])
@@ -34084,58 +34106,62 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.fillBlendData(selected_blend,prev_coffee_label,prev_blend_label)            
         self.checkWeightIn()
         self.updatePlusSelectedLine()
-        
+
+    # recentRoast activated via NEW
     def recentRoastActivated(self,n):
+        print("recentRoastActivated",n)
         # note, the first item is the edited text!
         if n > 0 and n <= len(aw.recentRoasts):
             rr = aw.recentRoasts[n-1]
-            if "title" in rr:
+            print("rr",rr)
+            if "title" in rr and rr["title"] is not None:
                 self.titleedit.textEdited(rr["title"])
                 self.titleedit.setEditText(rr["title"])
-            if "weightUnit" in rr:
+            if "weightUnit" in rr and rr["weightUnit"] is not None:
                 self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["weightUnit"]))
-            if "weightIn" in rr:
+            if "weightIn" in rr and rr["weightIn"] is not None:
                 self.weightinedit.setText("%g" % rr["weightIn"])
             # all of the following items might not be in the dict
-            if "beans" in rr:
+            if "beans" in rr and rr["beans"] is not None:
                 self.beansedit.setPlainText(rr["beans"])
-#            if "weightOut" in rr:
-#                self.weightoutedit.setText("%g" % rr["weightOut"])
-            if "volumeIn" in rr:
+            if "weightOut" in rr and rr["weightOut"] is not None:
+                self.weightoutedit.setText("%g" % rr["weightOut"])
+            if "volumeIn" in rr and rr["volumeIn"] is not None:
                 self.volumeinedit.setText("%g" % rr["volumeIn"])
-#            if "volumeOut" in rr:
-#                self.volumeoutedit.setText("%g" % rr["volumeOut"])
-#            self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
-            if "densityWeight" in rr:
+            if "volumeOut" in rr and rr["volumeOut"] is not None:
+                self.volumeoutedit.setText("%g" % rr["volumeOut"])
+            if "volumeUnit" in rr and rr["volumeUnit"] is not None:
+                self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
+            if "densityWeight" in rr and rr["densityWeight"] is not None:
                 self.bean_density_in_edit.setText("%g" % aw.float2float(rr["densityWeight"]))
-#            if "densityVolume" in rr:
-#                self.bean_density_out_edit.setText("%g" % aw.float2float(rr["densityVolume"]))
-            if "moistureGreen" in rr:
+            if "densityRoasted" in rr and rr["densityRoasted"] is not None:
+                self.bean_density_out_edit.setText("%g" % aw.float2float(rr["densityRoasted"]))
+            if "moistureGreen" in rr and rr["moistureGreen"] is not None:
                 self.moisture_greens_edit.setText("%g" % aw.float2float(rr["moistureGreen"]))
-#            if "moistureRoasted" in rr:
-#                self.moisture_roasted_edit.setText("%g" % aw.float2float(rr["moistureRoasted"]))
-#            if "wholeColor" in rr:
-#                self.whole_color_edit.setText(str(rr["wholeColor"]))
-#            if "groundColor" in rr:
-#                self.ground_color_edit.setText(str(rr["groundColor"]))
-            if "colorSystem" in rr:
+            if "moistureRoasted" in rr and rr["moistureRoasted"] is not None:
+                self.moisture_roasted_edit.setText("%g" % aw.float2float(rr["moistureRoasted"]))
+            if "wholeColor" in rr and rr["wholeColor"] is not None:
+                self.whole_color_edit.setText(str(rr["wholeColor"]))
+            if "groundColor" in rr and rr["groundColor"] is not None:
+                self.ground_color_edit.setText(str(rr["groundColor"]))
+            if "colorSystem" in rr and rr["colorSystem"] is not None:
                 self.colorSystemComboBox.setCurrentIndex(rr["colorSystem"])
             # items added in v1.4 might not be in the data set of previous stored recent roasts
-            if "beanSize_min" in rr:
+            if "beanSize_min" in rr and rr["beanSize_min"] is not None:
                 self.bean_size_min_edit.setText(str(int(rr["beanSize_min"])))
-            if "beanSize_max" in rr:
+            if "beanSize_max" in rr and rr["beanSize_max"] is not None:
                 self.bean_size_max_edit.setText(str(int(rr["beanSize_max"])))
             # Note: the background profile will not be changed if recent roast is activated from Roast Properties
-            if "background" in rr:
+            if "background" in rr and rr["background"] is not None:
                 self.template_file = rr["background"]
-                if "title" in rr:
+                if "title" in rr and rr["title"] is not None:
                     self.template_name = rr["title"]
-                if "roastUUID" in rr:
+                if "roastUUID" in rr and rr["roastUUID"] is not None:
                     self.template_uuid = rr["roastUUID"]
-                if "batchnr" in rr:
+                if "batchnr" in rr and rr["batchnr"] is not None:
                     self.template_batchnr = rr["batchnr"]
-                if "batchprefix" in rr:
-                    self.template_batchprefix = rr["batchprefix"]                
+                if "batchprefix" in rr and rr["batchprefix"] is not None:
+                    self.template_batchprefix = rr["batchprefix"]
             else:
                 self.template_file = None
                 self.template_name = None
@@ -34144,9 +34170,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.template_batchprefix = None
             self.updateTemplateLine()
             self.percent()
-                
-            
-#PLUS            
+
+#PLUS
             if aw.plus_account is not None and "plus_account" in rr and aw.plus_account == rr["plus_account"]:
                 if "plus_store" in rr:
                     self.plus_store_selected = rr["plus_store"]
@@ -34196,9 +34221,10 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     @pyqtSlot(bool)
     def addRecentRoast(self,_):
+        print("addRecentRoast")
         try:
             title = ' '.join(u(self.titleedit.currentText()).split())
-            weightIn = float(str(self.weightinedit.text()))
+            weightIn = float(aw.comma2dot(str(self.weightinedit.text())))
             # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
             if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
                 beans = u(self.beansedit.toPlainText())
@@ -34224,7 +34250,19 @@ class editGraphDlg(ArtisanResizeablDialog):
                     moistureGreen = float(aw.comma2dot(self.moisture_greens_edit.text()))
                 else:
                     moistureGreen = 0.0
-                colorSystem = self.colorSystemComboBox.currentIndex()                      
+                colorSystem = self.colorSystemComboBox.currentIndex()
+                
+                modifiers = QApplication.keyboardModifiers()
+                weightOut = volumeOut = densityRoasted = moistureRoasted = wholeColor = groundColor = None
+                if modifiers == Qt.AltModifier:  #alt click
+                    # we add weightOut, volumeOut, moistureRoasted, wholeColor, groundColor
+                    weightOut = float(aw.comma2dot(str(self.weightoutedit.text())))
+                    volumeOut = float(aw.comma2dot(str(self.volumeoutedit.text())))
+                    densityRoasted = float(aw.comma2dot(str(self.bean_density_out_edit.text())))
+                    moistureRoasted = float(aw.comma2dot(self.moisture_roasted_edit.text()))
+                    wholeColor = int(self.whole_color_edit.text())
+                    groundColor = int(self.ground_color_edit.text())
+                                 
                 rr = aw.createRecentRoast(
                     title,
                     beans,
@@ -34236,11 +34274,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                     beanSize_min,
                     beanSize_max,
                     moistureGreen,
-                    colorSystem,                    
+                    colorSystem,
                     aw.curFile, # could be empty
-                    aw.qmc.roastUUID, # could be empty                    
+                    aw.qmc.roastUUID, # could be empty
                     aw.qmc.roastbatchnr, #self.batchcounterSpinBox # aw.superusermode and aw.qmc.batchcounter > -1
-                    aw.qmc.roastbatchprefix,  #self.batchprefixedit                    
+                    aw.qmc.roastbatchprefix,  #self.batchprefixedit
                     aw.plus_account,
                     self.plus_store_selected,
                     self.plus_store_selected_label,
@@ -34248,7 +34286,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.plus_coffee_selected_label,
                     self.plus_blend_selected_label,
                     self.plus_blend_selected_spec,
-                    self.plus_blend_selected_spec_labels
+                    self.plus_blend_selected_spec_labels,
+                    weightOut,
+                    volumeOut,
+                    densityRoasted,
+                    moistureRoasted, 
+                    wholeColor, 
+                    groundColor
                     )
                 aw.addRecentRoast(rr)
         except Exception as e:
