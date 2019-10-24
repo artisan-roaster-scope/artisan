@@ -3,9 +3,10 @@
 set -ex # reduced logging
 #set -e
 
+# avoid issues with brew auto updates
+HOMEBREW_NO_AUTO_UPDATE=1
 
-
-#brew update # this seems to help to work around some homebrew issues
+#brew update # this seems to help to work around some homebrew issues; and fails on others
 
 # for Python 3.7:
 brew upgrade python
