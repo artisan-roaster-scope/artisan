@@ -15101,8 +15101,6 @@ class ApplicationWindow(QMainWindow):
             batchnr,batchprefix,plus_account,plus_store,plus_store_label,plus_coffee,
             plus_coffee_label,plus_blend_label,plus_blend_spec,plus_blend_spec_labels,
             weightOut, volumeOut, densityRoasted, moistureRoasted, wholeColor, groundColor):
-        print("createRecentRoast")
-        print(weightOut, volumeOut, moistureRoasted, wholeColor, groundColor)
         d = {
             "title": title,
             "weightIn": weightIn,
@@ -15148,8 +15146,6 @@ class ApplicationWindow(QMainWindow):
     
     # recentRoast activated from within RoastProperties dialog
     def setRecentRoast(self,rr):
-        print("setRecentRoast")
-        print("rr",rr)
         if "title" in rr and rr["title"] is not None:
             self.qmc.title = rr["title"]
         if "weightIn" in rr and "weightUnit" in rr and rr["weightIn"] is not None and rr["weightUnit"] is not None:
@@ -15216,7 +15212,6 @@ class ApplicationWindow(QMainWindow):
 
     # d is a recentRoast dict
     def addRecentRoast(self,d):
-        print("aw.addRecentRoast",d)
         try:
             # check for duplications
             rr = self.delRecentRoast(d["title"],d["weightIn"],d["weightUnit"])
@@ -34109,11 +34104,9 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     # recentRoast activated via NEW
     def recentRoastActivated(self,n):
-        print("recentRoastActivated",n)
         # note, the first item is the edited text!
         if n > 0 and n <= len(aw.recentRoasts):
             rr = aw.recentRoasts[n-1]
-            print("rr",rr)
             if "title" in rr and rr["title"] is not None:
                 self.titleedit.textEdited(rr["title"])
                 self.titleedit.setEditText(rr["title"])
@@ -34221,7 +34214,6 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     @pyqtSlot(bool)
     def addRecentRoast(self,_):
-        print("addRecentRoast")
         try:
             title = ' '.join(u(self.titleedit.currentText()).split())
             weightIn = float(aw.comma2dot(str(self.weightinedit.text())))
