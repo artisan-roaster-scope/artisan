@@ -1530,9 +1530,6 @@ class tgraphcanvas(FigureCanvas):
                 if not QSettings().value('AppleMetricUnits'):
                     self.weight = [0,0,self.weight_units[2]]
                     self.volume = [0,0,self.volume_units[1]]
-                    #self.density = [0.,self.weight_units[2],1.,self.volume_units[1]]
-                    self.density = [0.,"g",1.,"l"] # now fixed to g/l
-                    self.density_roasted = [0.,"g",1.,"l"] # now fixed to g/l
             except:
                 pass
         
@@ -6561,8 +6558,10 @@ class tgraphcanvas(FigureCanvas):
                 
                 #Admin Info Section
                 if aw.qmc.roastbatchnr > 0:
-                    statstr += aw.qmc.roastbatchprefix + str(aw.qmc.roastbatchnr) + " " + aw.qmc.title
-                else:                    
+                    statstr += aw.qmc.roastbatchprefix + str(aw.qmc.roastbatchnr) 
+                if aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None):
+                    if statstr != "":
+                        statstr += " "
                     statstr += aw.qmc.title
                 statstr += skipline
                 statstr += aw.qmc.roastdate.date().toString() + ' '
@@ -6629,10 +6628,26 @@ class tgraphcanvas(FigureCanvas):
                 if cp["AUC"]:
                     statstr += '\n' + QApplication.translate("AddlInfo", "AUC", None) + ': ' + str(cp["AUC"]) + 'C*min [' + str(cp["AUCbase"]) + aw.qmc.mode + "]"
 
-                # Notes Section
                 if aw.qmc.roastingnotes is not None and len(aw.qmc.roastingnotes)>0:
                     statstr += skipline
-                    statstr += '\n' + aw.qmc.roastingnotes.split("\n")[0]
+                    roasting_notes_lines = textwrap.wrap(aw.qmc.roastingnotes, width=aw.qmc.statsmaxchrperline)
+                    statstr += roasting_notes_lines[0]
+                    if len(roasting_notes_lines)>1:
+                        statstr += skipline
+                        statstr += "  " + roasting_notes_lines[1]
+                        if len(roasting_notes_lines)>2:
+                            statstr += ".."
+
+                if aw.qmc.cuppingnotes is not None and len(aw.qmc.cuppingnotes)>0:
+                    statstr += skipline
+                    cupping_notes_lines = textwrap.wrap(aw.qmc.cuppingnotes, width=aw.qmc.statsmaxchrperline)
+                    statstr += cupping_notes_lines[0]
+                    if len(cupping_notes_lines)>1:
+                        statstr += skipline
+                        statstr += "  " + cupping_notes_lines[1]
+                        if len(cupping_notes_lines)>2:
+                            statstr += ".."
+
                 # Trim the long lines
                 trimmedstatstr = ""
                 lines = statstr.split('\n')
