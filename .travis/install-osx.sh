@@ -10,7 +10,7 @@ set -ex # reduced logging
 # avoid issues with brew auto updates by deactivating them
 #   
 #brew upgrade python
-HOMEBREW_NO_AUTO_UPDATE=1 brew install python37
+HOMEBREW_NO_AUTO_UPDATE=1 brew install python3
 
 # following https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew/51125014#51125014
 # to install Python 3.6.5
