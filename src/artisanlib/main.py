@@ -52842,19 +52842,50 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.createalarmtable()
 
     @pyqtSlot(bool)
-    def addalarm(self,_):        
-        aw.qmc.alarmflag.append(1)
-        aw.qmc.alarmguard.append(-1)
-        aw.qmc.alarmnegguard.append(-1)
-        aw.qmc.alarmtime.append(-1)
-        aw.qmc.alarmoffset.append(0)
-        aw.qmc.alarmcond.append(1)
-        aw.qmc.alarmstate.append(0)
-        aw.qmc.alarmsource.append(1)
-        aw.qmc.alarmtemperature.append(500.)
-        aw.qmc.alarmaction.append(0)
-        aw.qmc.alarmbeep.append(0)
-        aw.qmc.alarmstrings.append(QApplication.translate("Label","Enter description",None))
+    def addalarm(self,_):
+        alarm_flag = 1
+        alarm_guard = -1
+        alarm_negguard = -1
+        alarm_time = -1
+        alarm_offset = 0
+        alarm_cond = 1
+        alarm_state = 0
+        alarm_source = 1
+        alarm_temperature = 500.
+        alarm_action = 0
+        alarm_beep = 0
+        alarm_string = QApplication.translate("Label","Enter description",None)
+        selected = self.alarmtable.selectedRanges()
+        if len(selected) > 0:
+            selected_idx = selected[0].topRow()
+            selected_idx = int(self.alarmtable.item(selected_idx,0).text()) -1 # we derref the rows number that might be different per sorting order
+            try:
+                alarm_flag = aw.qmc.alarmflag[selected_idx]
+                alarm_guard = aw.qmc.alarmguard[selected_idx]
+                alarm_negguard = aw.qmc.alarmnegguard[selected_idx]
+                alarm_time = aw.qmc.alarmtime[selected_idx]
+                alarm_offset = aw.qmc.alarmoffset[selected_idx]
+                alarm_cond = aw.qmc.alarmcond[selected_idx]
+                alarm_state = aw.qmc.alarmstate[selected_idx]
+                alarm_source = aw.qmc.alarmsource[selected_idx]
+                alarm_temperature = aw.qmc.alarmtemperature[selected_idx]
+                alarm_action = aw.qmc.alarmaction[selected_idx]
+                alarm_beep = aw.qmc.alarmbeep[selected_idx]
+                alarm_string= aw.qmc.alarmstrings[selected_idx]
+            except:
+                pass
+        aw.qmc.alarmflag.append(alarm_flag)
+        aw.qmc.alarmguard.append(alarm_guard)
+        aw.qmc.alarmnegguard.append(alarm_negguard)
+        aw.qmc.alarmtime.append(alarm_time)
+        aw.qmc.alarmoffset.append(alarm_offset)
+        aw.qmc.alarmcond.append(alarm_cond)
+        aw.qmc.alarmstate.append(alarm_state)
+        aw.qmc.alarmsource.append(alarm_source)
+        aw.qmc.alarmtemperature.append(alarm_temperature)
+        aw.qmc.alarmaction.append(alarm_action)
+        aw.qmc.alarmbeep.append(alarm_beep)
+        aw.qmc.alarmstrings.append(alarm_string)
         self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         self.alarmtable.setRowCount(nalarms + 1)
@@ -52895,23 +52926,50 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         if nalarms:
+            alarm_flag = 1
+            alarm_guard = -1
+            alarm_negguard = -1
+            alarm_time = -1
+            alarm_offset = 0
+            alarm_cond = 1
+            alarm_state = 0
+            alarm_source = 1
+            alarm_temperature = 500.
+            alarm_action = 0
+            alarm_beep = 0
+            alarm_string = QApplication.translate("Label","Enter description",None)
             # check for selection
             selected = self.alarmtable.selectedRanges()
             if selected and len(selected) > 0:
                 selected_row = selected[0].topRow()
                 selected_row = int(self.alarmtable.item(selected_row,0).text()) -1 # we derref the rows number that might be different per sorting order
-                aw.qmc.alarmflag.insert(selected_row,1)
-                aw.qmc.alarmguard.insert(selected_row,-1)
-                aw.qmc.alarmnegguard.insert(selected_row,-1)
-                aw.qmc.alarmtime.insert(selected_row,-1)
-                aw.qmc.alarmoffset.insert(selected_row,0)
-                aw.qmc.alarmcond.insert(selected_row,1)
-                aw.qmc.alarmstate.insert(selected_row,0)
-                aw.qmc.alarmsource.insert(selected_row,1)
-                aw.qmc.alarmtemperature.insert(selected_row,500)
-                aw.qmc.alarmaction.insert(selected_row,0)
-                aw.qmc.alarmbeep.insert(selected_row,0)
-                aw.qmc.alarmstrings.insert(selected_row,QApplication.translate("Label","Enter description",None))
+                try:
+                    alarm_flag = aw.qmc.alarmflag[selected_row]
+                    alarm_guard = aw.qmc.alarmguard[selected_row]
+                    alarm_negguard = aw.qmc.alarmnegguard[selected_row]
+                    alarm_time = aw.qmc.alarmtime[selected_row]
+                    alarm_offset = aw.qmc.alarmoffset[selected_row]
+                    alarm_cond = aw.qmc.alarmcond[selected_row]
+                    alarm_state = aw.qmc.alarmstate[selected_row]
+                    alarm_source = aw.qmc.alarmsource[selected_row]
+                    alarm_temperature = aw.qmc.alarmtemperature[selected_row]
+                    alarm_action = aw.qmc.alarmaction[selected_row]
+                    alarm_beep = aw.qmc.alarmbeep[selected_row]
+                    alarm_string= aw.qmc.alarmstrings[selected_row]
+                except:
+                    pass  
+                aw.qmc.alarmflag.insert(selected_row,alarm_flag)
+                aw.qmc.alarmguard.insert(selected_row,alarm_guard)
+                aw.qmc.alarmnegguard.insert(selected_row,alarm_negguard)
+                aw.qmc.alarmtime.insert(selected_row,alarm_time)
+                aw.qmc.alarmoffset.insert(selected_row,alarm_offset)
+                aw.qmc.alarmcond.insert(selected_row,alarm_cond)
+                aw.qmc.alarmstate.insert(selected_row,alarm_state)
+                aw.qmc.alarmsource.insert(selected_row,alarm_source)
+                aw.qmc.alarmtemperature.insert(selected_row,alarm_temperature)
+                aw.qmc.alarmaction.insert(selected_row,alarm_action)
+                aw.qmc.alarmbeep.insert(selected_row,alarm_beep)
+                aw.qmc.alarmstrings.insert(selected_row,alarm_string)
                 self.alarmtable.insertRow(selected_row)
                 self.setalarmtablerow(selected_row)
 #                self.alarmtable.resizeColumnsToContents()
