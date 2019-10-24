@@ -24426,6 +24426,7 @@ class ApplicationWindow(QMainWindow):
     
     # returns True if confirmed, False if canceled by the user
     def closeApp(self):
+        aw.quitAction.setEnabled(False)
         if aw.qmc.checkSaved(): # if not canceled
             self.stopActivities()
             self.closeEventSettings()
@@ -24433,6 +24434,7 @@ class ApplicationWindow(QMainWindow):
             QApplication.exit()
             return True
         else:
+            aw.quitAction.setEnabled(True)
             return False
 
     def closeserialports(self):
@@ -38902,19 +38904,44 @@ class EventsDlg(ArtisanResizeablDialog):
         bindex = len(self.extraeventstypes)
         selected = self.eventbuttontable.selectedRanges()
 
-        if len(selected) > 0 and insert:
-            bindex = selected[0].topRow()
+        # defaults for new entries
+        event_description = ""
+        event_type = 4
+        event_value = 0
+        event_action = 0
+        event_string = ""
+        event_visibility = 1
+        event_buttoncolor = "#808080"
+        event_textcolor = "white"
+        event_label = "E"
+        
+        if len(selected) > 0:
+            selected_idx = selected[0].topRow()
+            if insert:
+                bindex = selected_idx
+            try:
+                event_description = self.extraeventsdescriptions[selected_idx]
+                event_type = self.extraeventstypes[selected_idx]
+                event_value = self.extraeventsvalues[selected_idx]
+                event_action = self.extraeventsactions[selected_idx]
+                event_string = self.extraeventsactionstrings[selected_idx]
+                event_visibility = self.extraeventsvisibility[selected_idx]
+                event_buttoncolor = self.extraeventbuttoncolor[selected_idx]
+                event_textcolor = self.extraeventbuttontextcolor[selected_idx]
+                event_label = self.extraeventslabels[selected_idx]
+            except:
+                pass
 
         if bindex >= 0:
-            self.extraeventsdescriptions.insert(bindex,"")
-            self.extraeventstypes.insert(bindex,4)
-            self.extraeventsvalues.insert(bindex,0)
-            self.extraeventsactions.insert(bindex,0)
-            self.extraeventsactionstrings.insert(bindex,"")
-            self.extraeventsvisibility.insert(bindex,1)
-            self.extraeventbuttoncolor.insert(bindex,"#808080")
-            self.extraeventbuttontextcolor.insert(bindex,"white")
-            self.extraeventslabels.insert(bindex,u("E"))
+            self.extraeventsdescriptions.insert(bindex,event_description)
+            self.extraeventstypes.insert(bindex,event_type)
+            self.extraeventsvalues.insert(bindex,event_value)
+            self.extraeventsactions.insert(bindex,event_action)
+            self.extraeventsactionstrings.insert(bindex,event_string)
+            self.extraeventsvisibility.insert(bindex,event_visibility)
+            self.extraeventbuttoncolor.insert(bindex,event_buttoncolor)
+            self.extraeventbuttontextcolor.insert(bindex,event_textcolor)
+            self.extraeventslabels.insert(bindex,event_label)
 
             self.createEventbuttonTable()
 
