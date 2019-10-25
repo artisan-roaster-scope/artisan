@@ -12279,7 +12279,7 @@ class ApplicationWindow(QMainWindow):
         #path of last loadded QSettings
         self.settingspath = "" # if empty string, the settingspath will be ignored, otherwise it will be used to update the batchcounter of those settings
         
-        # path of last laoded WheelGraph
+        # path of last loaded WheelGraph
         self.wheelpath = ""
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month file-open/save will point to profilepath
@@ -39786,7 +39786,8 @@ class flavorDlg(ArtisanResizeablDialog):
         delButton.clicked.connect(self.poplabel)
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
-        saveImgButton.clicked.connect(aw.resizeImg_0_1)
+        #saveImgButton.clicked.connect(aw.resizeImg_0_1) # save as PNG (raster)
+        saveImgButton.clicked.connect(aw.saveVectorGraph_PDF) # save as PDF (vector)
         
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.close)
@@ -52034,7 +52035,8 @@ class WheelDlg(ArtisanDialog):
         
         saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None))
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
-        saveImgButton.clicked.connect(aw.resizeImg_0_1)
+        #saveImgButton.clicked.connect(aw.resizeImg_0_1) # save as PNG (raster)
+        saveImgButton.clicked.connect(aw.saveVectorGraph_PDF) # save as PDF (vector)
         self.main_buttons.addButton(saveImgButton,QDialogButtonBox.ActionRole)
         
         openButton = self.main_buttons.addButton(QDialogButtonBox.Open)
