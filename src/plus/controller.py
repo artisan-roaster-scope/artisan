@@ -40,7 +40,7 @@ if platform.system().startswith("Windows") or platform.system() == 'Darwin':
 import keyring # @Reimport # imported last to make py2app work
 
 
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QMessageBox
 from PyQt5.QtCore import QSemaphore, QTimer
 
 from plus import config, connection, stock, queue, sync, roast, util
@@ -94,7 +94,7 @@ def toggle(app_window):
     else:
         if config.connected:
             if is_synced():
-                disconnect()
+                disconnect(interactive=True)
             else:
                 # we (manually) turn syncing for the current roast on
                 if app_window.qmc.checkSaved():
@@ -182,17 +182,28 @@ def connect(clear_on_failure=False,interactive=True):
         if interactive and is_connected():
             stock.update()
 
-def disconnect(remove_credentials = True, stop_queue = True):
+# show a dialog to have the user confirm the disconnect action
+def disconnect_confirmed():
+    string = QApplication.translate("Plus","Disconnect artisan.plus?", None)
+    aw = config.app_window
+    reply = QMessageBox.question(aw,QApplication.translate("Plus","Disconnect?", None),string,
+                                QMessageBox.Ok | QMessageBox.Cancel)
+    if reply == QMessageBox.Ok:
+        return True
+    else:
+        return False
+
+def disconnect(remove_credentials = True, stop_queue = True, interactive = False):
     config.logger.info("controller:disconnect(%s,%s)",remove_credentials,stop_queue)
-    if is_connected():
+    if is_connected() and (not interactive or disconnect_confirmed()):
         try:
             connect_semaphore.acquire(1)
             # disconnect
             config.connected = False
             # remove credentials
             if remove_credentials:
-                connection.clearCredentials()                
-                config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None)) # @UndefinedVariable              
+                connection.clearCredentials()
+                config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None)) # @UndefinedVariable
             else:
                 config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus disconnected",None)) # @UndefinedVariable
             if stop_queue:

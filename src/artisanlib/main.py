@@ -21723,18 +21723,20 @@ class ApplicationWindow(QMainWindow):
                     if copy:
                         pf["roastUUID"] = uuid.uuid4().hex # generate UUID
 
-                    if aw.plus_account is not None:
-                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-                        if sync_record_hash is not None:
-                            # we add the hash over the sync record to be able to detect offline changes
-                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
-
                     self.serialize(filename,pf)
                     self.sendmessage(QApplication.translate("Message","Profile saved", None))
                     if not copy:
                         self.setCurrentFile(filename)
                         aw.curFile = filename
                         self.qmc.safesaveflag = False
+
+                    # only after the filename was set and the file was saved we update the sync record
+                    if aw.plus_account is not None:
+                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                        if sync_record_hash is not None:
+                            # we add the hash over the sync record to be able to detect offline changes
+                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+                
                     if self.qmc.autosaveimage:
                         if ".alog" in filename:
                             filename = filename[0:-5]

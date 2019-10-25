@@ -171,7 +171,8 @@ def stop():
         worker_thread.pause()
 
 # check if a full roast record (one with date) with roast_id is in the queue
-# this is used to add only items that
+# this is used to add only items to the queue that are registered already in the sync cache
+# but not yet uploaded as they are still in the queue
 def full_roast_in_queue(roast_id):
     q = persistqueue.SQLiteQueue(queue_path,multithreading=True,auto_commit=False)
     try:
