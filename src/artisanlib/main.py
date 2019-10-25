@@ -15165,22 +15165,30 @@ class ApplicationWindow(QMainWindow):
         d["plus_blend_spec_labels"] = plus_blend_spec_labels
         return d
     
-    # recentRoast activated from within RoastProperties dialog
+    # recentRoast activated via NEW
     def setRecentRoast(self,rr):
         if "title" in rr and rr["title"] is not None:
             self.qmc.title = rr["title"]
+            if not aw.qmc.flagstart or aw.qmc.title_show_always:
+                aw.qmc.setProfileTitle(self.qmc.title,updatebackground=True)
         if "weightIn" in rr and "weightUnit" in rr and rr["weightIn"] is not None and rr["weightUnit"] is not None:
             self.qmc.weight = [rr["weightIn"],self.qmc.weight[1],rr["weightUnit"]]
         if "weightOut" in rr and "weightUnit" in rr and rr["weightOut"] is not None and rr["weightUnit"] is not None:
             self.qmc.weight = [self.qmc.weight[0],rr["weightOut"],rr["weightUnit"]]
+        else:
+            self.qmc.weight[1] = 0
         if "volumeIn" in rr and "volumeUnit" in rr and rr["volumeIn"] is not None and rr["volumeUnit"] is not None:
             self.qmc.volume = [rr["volumeIn"],self.qmc.volume[1],rr["volumeUnit"]]
         if "volumeOut" in rr and "volumeUnit" in rr and rr["volumeOut"] is not None and rr["volumeUnit"] is not None:
             self.qmc.volume = [self.qmc.volume[0],rr["volumeOut"],rr["volumeUnit"]]
+        else:
+            self.qmc.volume[1] = 0
         if "densityWeight" in rr and rr["densityWeight"] is not None:
             self.qmc.density[0] = rr["densityWeight"]
         if "densityRoasted" in rr and rr["densityRoasted"] is not None:
             self.qmc.density_roasted[0] = rr["densityRoasted"]
+        else:
+            self.qmc.density_roasted[0] = 0
         if "beans" in rr and rr["beans"] is not None:
             aw.qmc.beans = rr["beans"]
         if "beanSize_min" in rr and rr["beanSize_min"] is not None:
@@ -15188,13 +15196,19 @@ class ApplicationWindow(QMainWindow):
         if "beanSize_max" in rr and rr["beanSize_max"] is not None:
             self.qmc.beansize_max = rr["beanSize_max"]
         if "moistureGreen" in rr and rr["moistureGreen"] is not None:
-            self.qmc.moisture_green = rr["moistureGreen"]
+            self.qmc.moisture_greens = rr["moistureGreen"]
         if "moistureRoasted" in rr and rr["moistureRoasted"] is not None:
             self.qmc.moisture_roasted = rr["moistureRoasted"]
+        else:
+            self.qmc.moisture_roasted = 0
         if "wholeColor" in rr and rr["wholeColor"] is not None:
             self.qmc.whole_color = rr["wholeColor"]
+        else:
+            self.qmc.whole_color = 0
         if "groundColor" in rr and rr["groundColor"] is not None:
             self.qmc.ground_color = rr["groundColor"]
+        else:
+            self.qmc.ground_color = 0
         if "colorSystem" in rr and rr["colorSystem"] is not None:
             self.qmc.color_system_idx = rr["colorSystem"]
         # Note: the background profile will not be changed if recent roast is activated from Roast Properties
@@ -15216,6 +15230,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.plus_blend_spec_labels = rr["plus_blend_spec_labels"]
             if self.qmc.plus_default_store is not None and self.qmc.plus_default_store != self.qmc.plus_store:
                 self.qmc.plus_default_store = None # we reset the defaultstore
+                
+        aw.sendmessage(QApplication.translate("Message","Recent roast properties '{0}' set".format(aw.recentRoastLabel(rr))))
         
     # returns the list of recentRoasts with the first entry with the given title, weight and weightunit removed
     def delRecentRoast(self,title,weightIn,weightUnit):
@@ -15263,9 +15279,18 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.redraw()
                 except:
                     pass
-            if not alt_modifier:        
-                self.newRoast()
-            self.setRecentRoast(rr)
+            if alt_modifier:
+                if self.qmc.flagon:
+                    self.setRecentRoast(rr)
+                # only in off mode we first do a reset
+                elif self.qmc.reset():
+                    # and if successfull (not canceled) we set just the recent roast properties without starting a new roast
+                    self.setRecentRoast(rr)
+            else:
+                # in "normal" mode, we do the NEW action
+                if self.newRoast():
+                    # and then set the recent roast properties selected
+                    self.setRecentRoast(rr)
                 
         
     def updateNewMenuRecentRoasts(self):
@@ -18959,7 +18984,7 @@ class ApplicationWindow(QMainWindow):
         return filename
         
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting.
-    def automaticsave(self):
+    def automaticsave(self,interactive=True):
         try:
             if self.qmc.autosavepath and self.qmc.autosaveflag:
                 prefix = ""
@@ -18992,7 +19017,7 @@ class ApplicationWindow(QMainWindow):
                     return filename
                 else:
                     self.sendmessage(QApplication.translate("Message","Autosave path does not exist. Autosave failed.", None))                    
-            else:
+            elif interactive:
                 self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None))
                 self.autosaveconf()
         except Exception as e:
@@ -19249,17 +19274,17 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.flagstart:
             if self.qmc.timeindex[0] == -1:
                 self.sendmessage(QApplication.translate("Message","NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found", None))
-                return
+                return False
             #mark drop if not yet done
             if self.qmc.timeindex[6] == 0:
 #                self.qmc.markDrop()
                 self.sendmessage(QApplication.translate("Message","NEW ROAST canceled: incomplete profile lacking DROP found", None))
-                return
+                return False
             #invoke "OFF"
             self.qmc.OffMonitor()
 
 
-            filename = self.automaticsave()
+            filename = self.automaticsave(interactive=False)
 # the call to automaticsave() moved to OffRecorder() which is triggered by the above OffMonitor
             if self.qmc.reset():
                 #start new roast
@@ -19273,7 +19298,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.OffMonitor()                 
                 if self.qmc.reset():
                     self.qmc.ToggleRecorder()
-        self.qmc.flagKeepON = tmpKeepON   
+        self.qmc.flagKeepON = tmpKeepON
+        return True
     
     @pyqtSlot() 
     @pyqtSlot(bool)
@@ -34136,7 +34162,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.checkWeightIn()
         self.updatePlusSelectedLine()
 
-    # recentRoast activated via NEW
+    # recentRoast activated from within RoastProperties dialog
     def recentRoastActivated(self,n):
         # note, the first item is the edited text!
         if n > 0 and n <= len(aw.recentRoasts):
@@ -34153,24 +34179,36 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.beansedit.setPlainText(rr["beans"])
             if "weightOut" in rr and rr["weightOut"] is not None:
                 self.weightoutedit.setText("%g" % rr["weightOut"])
+            else:
+                self.weightoutedit.setText("%g" % 0)
             if "volumeIn" in rr and rr["volumeIn"] is not None:
                 self.volumeinedit.setText("%g" % rr["volumeIn"])
             if "volumeOut" in rr and rr["volumeOut"] is not None:
                 self.volumeoutedit.setText("%g" % rr["volumeOut"])
+            else:
+                self.volumeoutedit.setText("%g" % 0)
             if "volumeUnit" in rr and rr["volumeUnit"] is not None:
                 self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
             if "densityWeight" in rr and rr["densityWeight"] is not None:
                 self.bean_density_in_edit.setText("%g" % aw.float2float(rr["densityWeight"]))
             if "densityRoasted" in rr and rr["densityRoasted"] is not None:
                 self.bean_density_out_edit.setText("%g" % aw.float2float(rr["densityRoasted"]))
+            else:
+                self.bean_density_out_edit.setText("%g" % 0)
             if "moistureGreen" in rr and rr["moistureGreen"] is not None:
                 self.moisture_greens_edit.setText("%g" % aw.float2float(rr["moistureGreen"]))
             if "moistureRoasted" in rr and rr["moistureRoasted"] is not None:
                 self.moisture_roasted_edit.setText("%g" % aw.float2float(rr["moistureRoasted"]))
+            else:
+                self.moisture_roasted_edit.setText("%g" % 0)
             if "wholeColor" in rr and rr["wholeColor"] is not None:
                 self.whole_color_edit.setText(str(rr["wholeColor"]))
+            else:
+                self.whole_color_edit.setText(str(0))
             if "groundColor" in rr and rr["groundColor"] is not None:
                 self.ground_color_edit.setText(str(rr["groundColor"]))
+            else:
+                self.ground_color_edit.setText(str(0))
             if "colorSystem" in rr and rr["colorSystem"] is not None:
                 self.colorSystemComboBox.setCurrentIndex(rr["colorSystem"])
             # items added in v1.4 might not be in the data set of previous stored recent roasts
@@ -34217,6 +34255,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.plus_default_store = None # we reset the defaultstore                                    
                 # we now set the actual values from the stock
                 self.populatePlusCoffeeBlendCombos()
+            
+            aw.sendmessage(QApplication.translate("Message","Recent roast properties '{0}' set".format(aw.recentRoastLabel(rr))))
         self.recentRoastEnabled()
     
     @pyqtSlot("QString")
