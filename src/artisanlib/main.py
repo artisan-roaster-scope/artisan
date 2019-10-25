@@ -13118,6 +13118,7 @@ class ApplicationWindow(QMainWindow):
         self.analyzeMenu = self.ToolkitMenu.addMenu("Analyze")
         self.fitIdealautoAction = QAction("Auto All",self)
         self.fitIdealautoAction.triggered.connect(self.analysisfitCurvesALL)
+        self.fitIdealautoAction.setShortcut("Ctrl+K")
         self.analyzeMenu.addAction(self.fitIdealautoAction)
         self.analyzeMenu.addSeparator()
         self.fitIdealx2Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to",None) + " x\xb2",self)
@@ -13129,6 +13130,11 @@ class ApplicationWindow(QMainWindow):
         self.fitIdealx0Action = QAction(QApplication.translate("Menu","Fit DE->DROP to",None) + " ln()",self)
         self.fitIdealx0Action.triggered.connect(self.analysisfitCurvesLN)
         self.analyzeMenu.addAction(self.fitIdealx0Action)
+        self.analyzeMenu.addSeparator()
+        self.clearresultsAction = QAction(QApplication.translate("Menu",u"Clear results",None),self)
+        self.clearresultsAction.triggered.connect(self.clearResults)
+        self.clearresultsAction.setShortcut("Ctrl+Alt+K")
+        self.analyzeMenu.addAction(self.clearresultsAction)
             
                     
         # VIEW menu
@@ -18537,6 +18543,7 @@ class ApplicationWindow(QMainWindow):
                 modifiers = event.modifiers()
                 control_modifier = modifiers == Qt.ControlModifier
                 alt_modifier = modifiers == Qt.AltModifier
+                control_alt_modifier = modifiers == (Qt.ControlModifier | Qt.AltModifier)
                 #meta_modifier = modifiers == Qt.MetaModifier
                 #uncomment next line to find the integer value of a key
                 #print(key)
@@ -18564,6 +18571,12 @@ class ApplicationWindow(QMainWindow):
                                 aw.qmc.background = True
                                 aw.qmc.timealign(redraw=False)
                                 aw.qmc.redraw()  
+                elif key == 75:                       #K
+                    if not aw.qmc.flagon:
+                        if control_alt_modifier:
+                            aw.clearResults()
+                        elif control_modifier:
+                            aw.analysisfitCurvesALL()
                 elif key == 76:                       #L
                     self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Alarms",None),ext="*.alrm")
                     if len(u(self.filename)) == 0:
@@ -29291,6 +29304,10 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def analysisfitCurvesLN(self,_=False):
         self.analysisfitCurves(0)
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def clearResults(self,_=False):
+        aw.qmc.redraw(recomputeAllDeltas=True)
     
     def analysisfitCurves(self, exp=-1):
         # exp == 0 -> ln(), 1 -> unused, 2 -> quadratic, 3 -> cubic, -1 -> all of them 
@@ -50586,7 +50603,7 @@ class graphColorDlg(ArtisanDialog):
         opaqbgLabel.setAlignment(Qt.AlignRight)
         self.opaqbgSpinBox = QSpinBox()
         self.opaqbgSpinBox.setAlignment(Qt.AlignRight)
-        self.opaqbgSpinBox.setRange(1,5)
+        self.opaqbgSpinBox.setRange(1,10)
         self.opaqbgSpinBox.setSingleStep(1)
         self.opaqbgSpinBox.setValue(aw.qmc.backgroundalpha * 10)
         self.opaqbgSpinBox.valueChanged.connect(self.adjustintensity)        
