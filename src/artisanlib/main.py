@@ -51343,7 +51343,7 @@ class graphColorDlg(ArtisanDialog):
             aw.updateCanvasColors()
             tc = aw.labelBorW(color)
             var.setText(colorf.name())
-            var.setStyleSheet("QPushButton { background-color: " + color + "; color: " + tc + ";" + self.commonsetyle + "}");
+            var.setStyleSheet("QPushButton { background-color: " + color + "; color: " + tc + ";" + self.commonstyle + "}");
 #  is this needed?            var.setPalette(QPalette(colorf))
             aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
             if title == "ET":
