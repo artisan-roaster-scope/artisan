@@ -41537,7 +41537,7 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_56, #65
                                    self.HH806W,             #66
                                    self.VOLTCRAFTPL125T2,   #67
-                                   self.PHIDGET_TMP1200,    #68                                   
+                                   self.PHIDGET_TMP1200,    #68
                                    self.PHIDGET1018_D,        #69
                                    self.PHIDGET1018_D_34,     #70
                                    self.PHIDGET1018_D_56,     #71
@@ -43730,7 +43730,7 @@ class serialport(object):
                 if ser:
                     self.PhidgetIRSensor = PhidgetTemperatureSensor()
                     if deviceType == DeviceID.PHIDID_TMP1200:
-                        self.phidgetIRSensorIC = None # the TMP1200 does not has an internal temperature sensor
+                        self.PhidgetIRSensorIC = None # the TMP1200 does not has an internal temperature sensor
                     else:
                         self.PhidgetIRSensorIC = PhidgetTemperatureSensor()
                     try:

@@ -236,7 +236,7 @@ class PhidgetManager():
 #            self.print_list2(matching_channels)
 
             # sort by serial number (local first)
-            matching_channels.sort(key=lambda x:x.getDeviceSerialNumber())
+            matching_channels.sort(key=lambda x:(x.getDeviceSerialNumber(),(x.getHubPort() if x.getIsHubPortDevice() else 0)))
             # return smallest / first item
             if len(matching_channels) > 0:
                 p = matching_channels[0]
