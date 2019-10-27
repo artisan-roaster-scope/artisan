@@ -17788,6 +17788,12 @@ class ApplicationWindow(QMainWindow):
                                         aw.setTare(cmds-1)
                                 except Exception:
                                     pass
+                            elif cs == "PIDon":
+                                aw.pidcontrol.pidOn()
+                            elif cs == "PIDoff":
+                                aw.pidcontrol.pidOff()
+                            elif cs == "PIDtoggle":
+                                aw.pidcontrol.togglePID()
                 elif action == 21: # RC Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
