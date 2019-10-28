@@ -2088,6 +2088,8 @@ class tgraphcanvas(FigureCanvas):
         self.analysisresultsloc = [.5,.5]
         self.analysispickflag = False
         self.analysisresultsstr = ""
+        self.analysis_iteration = 0   #dave
+        self.analysis_iterate = True  #dave
 
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
@@ -9601,53 +9603,43 @@ class tgraphcanvas(FigureCanvas):
             return None
     
     #ln() regression. ln() will be used when power does not equal 2 (quadratic) or 3 (cubic).
-    def lnRegression(self,power=0, timeoffset=0):
+    def lnRegression(self,power=0, timeoffset=0, plot=True):
         res = ""
         try:
-            if self.timeindex[0] > -1: # only if CHARGE is set
-                from scipy.optimize import curve_fit
+            from scipy.optimize import curve_fit
+            if self.timeindex[0] > -1 and self.timeindex[6] > -1:  #CHARGE and DROP events exist
                 charge = self.timex[self.timeindex[0]]
-                if timeoffset != None and timeoffset > 0:
-                    timeidx = aw.time2index(timeoffset)
-                    a = [self.timex[timeidx]-charge]
-                    n = [self.temp2[timeidx]]
-                elif aw.qmc.ambientTemp != None and aw.qmc.ambientTemp > 0:
-                    timeidx = 0
-                    a = [0]
-                    n = [aw.qmc.ambientTemp]                    
+                if timeoffset != None and timeoffset > charge:
+                    begin = aw.time2index(timeoffset)
+                    time_l = []
+                    temp_l = []
                 else:
-                    timeidx = 0
-                    a = [0]
-                    if aw.qmc.mode == "F":
-                        roomTemp = 70.0
+                    a = [charge]
+                    # find the DRY END point
+                    if self.timeindex[1]: # take DRY if available
+                        begin = self.timeindex[1]
+                    else: # take DRY as specificed in phases
+                        pi = aw.findDryEnd(phasesindex=1)
+                        begin = aw.time2index(self.timex[pi])
+                    # intial bean temp set to ambient
+                    if aw.qmc.ambientTemp != None and aw.qmc.ambientTemp > 0:
+                        time_l = [charge]
+                        temp_l = [aw.qmc.ambientTemp]
                     else:
-                        roomTemp = 21.0
-                    n = [roomTemp]
-                if self.timeindex[1]: # take DRY if available
-                    x = self.timex[self.timeindex[1]] - charge
-                    a = a + [x]
-                    n = n + [self.temp2[self.timeindex[1]]]
-                else: # take DRY as specificed in phases
-                    i = aw.findDryEnd(phasesindex=1)
-                    x = self.timex[i] - charge
-                    a = a + [x]
-                    n = n + [self.temp2[i]]
-                if self.timeindex[2]: # take FCs if available
-                    x = self.timex[self.timeindex[2]] - charge
-                    a = a + [x]
-                    n = n + [self.temp2[self.timeindex[2]]]
-                else: # take FCs as defined in phases
-                    i = aw.findDryEnd(phasesindex=2)
-                    x = self.timex[i] - charge
-                    a = a + [x]
-                    n = n + [self.temp2[i]]
-                if self.timeindex[6]:
-                    x = self.timex[self.timeindex[6]] - charge
-                    a = a + [x]
-                    n = n + [self.temp2[self.timeindex[6]]]
+                        time_l = [charge]
+                        if aw.qmc.mode == "F":
+                            roomTemp = 70.0
+                        else:
+                            roomTemp = 21.0
+                        temp_l = [roomTemp]
+                end = self.timeindex[6]
+                time_l = time_l + self.timex[begin:end]
+                temp_l = temp_l + self.temp2[begin:end]
                     
-                xa = numpy.array(a)
-                yn = numpy.array(n)
+                xa = numpy.array(time_l) - charge
+                yn = numpy.array(temp_l)
+#                print(xa)  #dave
+#                print(yn)  #dave
                 if power == 2:
                     func = lambda x,a,b,c: a*x*x + b*x + c
                 elif power == 3:
@@ -9658,12 +9650,13 @@ class tgraphcanvas(FigureCanvas):
                     warnings.simplefilter("ignore")
                     popt,_ = curve_fit(func, xa, yn)
                 #perr = numpy.sqrt(numpy.diag(pcov))
-                xb = numpy.array(self.timex)
-                xxb = xb + charge
-                xxa = xa + charge                                    
-                self.ax.plot(xxb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
-                self.ax.plot(xxa, yn, "ro")
-                self.fig.canvas.draw()
+                if plot:
+                    xb = numpy.array(self.timex)
+                    xxb = xb + charge
+                    xxa = xa + charge                                    
+                    self.ax.plot(xxb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
+                    self.ax.plot(xxa, yn, "ro")
+                    self.fig.canvas.draw()
                 if len(popt)>2:
                     if power == 2:
                         res = "%.8f * t*t %s %.8f * t %s %.8f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
@@ -16249,6 +16242,20 @@ class ApplicationWindow(QMainWindow):
                     diff_array = np_dbt - np_dbtb
                     zerocrosses = ((diff_array[:-1] * diff_array[1:]) < 0).sum()
 
+                    crossings = numpy.sign(diff_array)
+                    starts = numpy.r_[0, numpy.flatnonzero(~numpy.isclose(crossings[1:], crossings[:-1])) + 1]
+                    lengths = numpy.diff(numpy.r_[starts, len(crossings)])
+                    signs = crossings[starts]
+                
+#                    print(starts,lengths,signs)
+                    idelta = (np_dbt - np_dbtb) * crossings
+#                    print(idelta)
+                    ideltamax = []
+                    for i in range(len(starts)):
+                        ideltamax.append(numpy.amax(idelta[starts[i]:starts[i]+lengths[i]]))
+#                    print(ideltamax)
+                    
+  
                 else:
                     RoR_FCs_act = 0
                     RoR_FCs_templ = 0
@@ -29386,8 +29393,8 @@ class ApplicationWindow(QMainWindow):
                 i = self.findDryEnd(phasesindex=2)
                 fcstime = self.qmc.timex[i]
 
+            # set the interval of interest from analysis_starttime to analysis_endtime
             analysis_starttime = fcstime - 120
-            #analysis_endtime = fcstime + 30
             analysis_endtime = aw.qmc.timex[aw.qmc.timeindex[6]]
 
             #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after DROP.
@@ -29414,7 +29421,7 @@ class ApplicationWindow(QMainWindow):
                 progress.setValue(1)
             # cubic or all
             if exp == 3 or exp == -1:
-                res = self.analysisGetResults(exp=3,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                res = self.analysisGetResults(exp=3,timeoffset=analysis_starttime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_cubic"] = res["equ"]
                 self.cfr["dbt_cubic"] = res["rmse_BT"]
                 self.cfr["dbdbt_cubic"] = res["rmse_deltaBT"]
@@ -29424,9 +29431,33 @@ class ApplicationWindow(QMainWindow):
                 self.cfr['ror_min_delta_cubic'] = res['ror_min_delta']
                 self.cfr['ror_maxmin_delta_cubic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(2)
+#            # cubic or all
+            if exp == 3 or exp == -1:
+                res = self.analysisGetResults(exp=3,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                self.cfr["equ_cubicDRY"] = res["equ"]
+                self.cfr["dbt_cubicDRY"] = res["rmse_BT"]
+                self.cfr["dbdbt_cubicDRY"] = res["rmse_deltaBT"]
+                self.cfr["r2_deltabt_cubicDRY"] = res["r2_deltaBT"]
+                self.cfr['ror_fcs_delta_cubicDRY'] = res['ror_fcs_delta']
+                self.cfr['ror_max_delta_cubicDRY'] = res['ror_max_delta']
+                self.cfr['ror_min_delta_cubicDRY'] = res['ror_min_delta']
+                self.cfr['ror_maxmin_delta_cubicDRY'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                progress.setValue(2)
             # quadratic or all
             if exp == 2 or exp == -1:
                 res = self.analysisGetResults(exp=2,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                self.cfr["equ_quadraticDRY"] = res["equ"]
+                self.cfr["dbt_quadraticDRY"] = res["rmse_BT"]
+                self.cfr["dbdbt_quadraticDRY"] = res["rmse_deltaBT"]
+                self.cfr["r2_deltabt_quadraticDRY"] = res["r2_deltaBT"]
+                self.cfr['ror_fcs_delta_quadraticDRY'] = res['ror_fcs_delta']
+                self.cfr['ror_max_delta_quadraticDRY'] = res['ror_max_delta']
+                self.cfr['ror_min_delta_quadraticDRY'] = res['ror_min_delta']
+                self.cfr['ror_maxmin_delta_quadraticDRY'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                progress.setValue(3)
+            # quadratic or all
+            if exp == 2 or exp == -1:
+                res = self.analysisGetResults(exp=2,timeoffset=analysis_starttime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_quadratic"] = res["equ"]
                 self.cfr["dbt_quadratic"] = res["rmse_BT"]
                 self.cfr["dbdbt_quadratic"] = res["rmse_deltaBT"]
@@ -29436,6 +29467,24 @@ class ApplicationWindow(QMainWindow):
                 self.cfr['ror_min_delta_quadratic'] = res['ror_min_delta']
                 self.cfr['ror_maxmin_delta_quadratic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(3)
+
+#dave  analysis_iteration
+#            if aw.qmc.analysis_iteration == 0 and aw.qmc.analysis_iterate and exp == -1:
+#                res = self.analysisGetResults(exp=2,timeoffset=analysis_starttime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+#                aw.sendmessage("This curve fit: x^2 FCs-120 to DROP")
+#                aw.qmc.analysis_iteration += 1
+#            elif aw.qmc.analysis_iteration == 1 and aw.qmc.analysis_iterate and exp == -1:
+#                res = self.analysisGetResults(exp=2,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+#                aw.sendmessage("This curve fit: x^2 DRY to DROP")
+#                aw.qmc.analysis_iteration += 1
+#            elif aw.qmc.analysis_iteration == 2 and aw.qmc.analysis_iterate and exp == -1:
+#                res = self.analysisGetResults(exp=3,timeoffset=analysis_starttime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+#                aw.sendmessage("This curve fit: x^3 FCs-120 to DROP")
+#                aw.qmc.analysis_iteration += 1
+#            elif aw.qmc.analysis_iteration == 3 and aw.qmc.analysis_iterate and exp == -1:
+#                res = self.analysisGetResults(exp=3,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+#                aw.sendmessage("This curve fit: x^3 DRY to DROP")
+#                aw.qmc.analysis_iteration = -1
             
             # find the curve with the best fit
             try:
@@ -29449,8 +29498,12 @@ class ApplicationWindow(QMainWindow):
             x.float_format = "5.2"
             if "equ_quadratic" in self.cfr:
                 x.add_row(["*" if self.cfr["dbdbt_quadratic"] == bestfit else "", "x\u00b2", self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"], self.cfr["r2_deltabt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
+            if "equ_quadraticDRY" in self.cfr:
+                x.add_row(["*" if self.cfr["dbdbt_quadraticDRY"] == bestfit else "", "x\u00b2DRY", self.cfr["dbt_quadraticDRY"], self.cfr["dbdbt_quadraticDRY"], self.cfr["r2_deltabt_quadraticDRY"], self.cfr['ror_fcs_delta_quadraticDRY'], self.cfr['ror_maxmin_delta_quadraticDRY']])
             if "equ_cubic" in self.cfr:
                 x.add_row(["*" if self.cfr["dbdbt_cubic"] == bestfit else "", "x\u00b3", self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"], self.cfr["r2_deltabt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
+            if "equ_cubicDRY" in self.cfr:
+                x.add_row(["*" if self.cfr["dbdbt_cubicDRY"] == bestfit else "", "x\u00b3DRY", self.cfr["dbt_cubicDRY"], self.cfr["dbdbt_cubicDRY"], self.cfr["r2_deltabt_cubicDRY"], self.cfr['ror_fcs_delta_cubicDRY'], self.cfr['ror_maxmin_delta_cubicDRY']])
             if "equ_naturallog" in self.cfr:
                 x.add_row(["*" if self.cfr["dbdbt_naturallog"] == bestfit else "", "ln()", self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"], self.cfr["r2_deltabt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
             
@@ -29528,7 +29581,7 @@ class ApplicationWindow(QMainWindow):
             restoreF = False
 
         res = {}  #use dict to allow more flexible expansion in the future
-        res['equ'] = self.qmc.lnRegression(power=exp, timeoffset=timeoffset)
+        res['equ'] = self.qmc.lnRegression(power=exp, timeoffset=timeoffset, plot=False)
         self.deleteBackground()
         self.setbackgroundequ(EQU=["",res['equ']], silent=True)
         #QApplication.processEvents()  #occasionally the fit curve remains showing.
