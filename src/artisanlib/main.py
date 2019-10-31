@@ -17832,6 +17832,43 @@ class ApplicationWindow(QMainWindow):
                                 aw.pidcontrol.pidOff()
                             elif cs == "PIDtoggle":
                                 aw.pidcontrol.togglePID()
+                            # pidmode(<n>) : 0: manual, 1: RS, 2: background follow
+                            if cs.startswith("pidmode(") and cs.endswith(")"):
+                                try:
+                                    value = int(cs[len("pidmode("):-1])
+                                    if value == 0:
+                                        aw.pidcontrol.svMode = 0
+                                        aw.sendmessage(QApplication.translate("Message","PID mode manual", None))
+                                    elif value == 1:
+                                        aw.pidcontrol.svMode = 1
+                                        aw.sendmessage(QApplication.translate("Message","PID mode Ramp/Soak", None))
+                                    elif value == 2:
+                                        aw.pidcontrol.svMode = 2
+                                        aw.sendmessage(QApplication.translate("Message","PID mode background", None))
+                                except Exception:
+                                    pass
+                            # playbackmode(<n> 0: off, 1: time, 2: BT, 3: ET
+                            if cs.startswith("playbackmode(") and cs.endswith(")"):
+                                try:
+                                    value = int(cs[len("playbackmode("):-1])
+                                    if value == 0:
+                                        aw.qmc.replayType = 0
+                                        aw.qmc.backgroundPlaybackEvents = False
+                                        aw.sendmessage(QApplication.translate("Message","playback off", None))
+                                    elif value == 1:
+                                        aw.qmc.replayType = 0
+                                        aw.qmc.backgroundPlaybackEvents = True
+                                        aw.sendmessage(QApplication.translate("Message","playback by time", None))
+                                    elif value == 2:
+                                        aw.qmc.replayType = 1
+                                        aw.qmc.backgroundPlaybackEvents = True
+                                        aw.sendmessage(QApplication.translate("Message","playback by BT", None))
+                                    elif value == 3:
+                                        aw.qmc.replayType = 2
+                                        aw.qmc.backgroundPlaybackEvents = True
+                                        aw.sendmessage(QApplication.translate("Message","playback by ET", None))
+                                except Exception:
+                                    pass
                 elif action == 21: # RC Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
