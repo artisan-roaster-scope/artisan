@@ -135,6 +135,8 @@ def clearSyncRecordHash():
         if sync_record_semaphore.available() < 1:
             sync_record_semaphore.release(1) 
 
+# verifies if the given roast_records hash (or the one of the current roast data)
+#   equals the cached_sync_record_hash
 # if provided, roast_record is assumed to be a full roast record as provided by roast.getRoast()
 def syncRecordUpdated(roast_record = None):
     try:
@@ -291,7 +293,7 @@ def applyServerUpdates(data):
         if title_changed:
             aw.setTitleSignal.emit(aw.qmc.title,True) # we force an updatebackground to ensure proper repainting   
         if dirty:
-            aw.qmc.safesaveflag = True
+            aw.qmc.fileDirty()
             aw.sendmessageSignal.emit(QApplication.translate("Plus","Updated data received from artisan.plus", None),True,None)
             if "modified_at" in data: # we remember the timestamp of the applied server updates
                 setApplidedServerUpdatesModifiedAt(data["modified_at"])
@@ -389,7 +391,7 @@ def sync():
         _,computed_sync_record_hash = roast.getSyncRecord(rr)
         if aw.qmc.plus_sync_record_hash is None or aw.qmc.plus_sync_record_hash != computed_sync_record_hash:
             # the sync record of the loaded profile is not consistent or missing, offline changes (might) have been applied
-            aw.qmc.safesaveflag = True # set file dirty flag
+            aw.qmc.fileDirty() # set file dirty flag
             clearSyncRecordHash() # clear sync record hash cash to trigger an upload of the modified plus sync record on next save
         else:
             setSyncRecordHash(h = computed_sync_record_hash) # we remember that consistent state to be able to detect future modifications

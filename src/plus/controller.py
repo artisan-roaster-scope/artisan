@@ -41,7 +41,7 @@ import keyring # @Reimport # imported last to make py2app work
 
 
 from PyQt5.QtWidgets import QApplication, QMessageBox
-from PyQt5.QtCore import QSemaphore, QTimer
+from PyQt5.QtCore import QSemaphore, QTimer, Qt
 
 from plus import config, connection, stock, queue, sync, roast, util
 
@@ -59,25 +59,19 @@ def is_connected():
 # Note that artisan.plus might be on, while not being connected due to connectivity issues
 def is_on():
     aw = config.app_window
-    return aw.plus_account is not None
+    if aw is None:
+        return False
+    else:
+        return aw.plus_account is not None
 
-# returns True if current profile is under sync (i.e. in the sync-cache) and not newer than server or no profile is loaded currently
+# returns True if current profile is under sync (i.e. in the sync-cache) or no profile is loaded currently
 def is_synced():
     aw = config.app_window
     if aw.qmc.roastUUID is None:
         return not bool(aw.curFile)
     else:
         res = sync.getSync(aw.qmc.roastUUID)
-        if bool(aw.curFile):
-            if bool(res):
-                # only up to the second, thus we round
-                file_last_modified = int(round(util.getModificationDate(aw.curFile))) 
-                res = int(round(res))
-                return res == file_last_modified
-            else:
-                return False # not in sync cache
-        else:
-            return True # something wrong, a UUID without a file!? Should not occur...
+        return bool(res)
             
 def start(app_window):
     config.app_window = app_window
@@ -87,20 +81,25 @@ def start(app_window):
 def toggle(app_window):
     config.logger.info("controller:toggle()")
     config.app_window = app_window
-    if config.app_window.plus_account is None: # @UndefinedVariable
-        connect()
-        if is_connected() and is_synced() and config.app_window.curFile is not None: # @UndefinedVariable
-            sync.sync()         
+    modifiers = QApplication.keyboardModifiers()
+    if modifiers == Qt.ControlModifier:
+        # send log file by email
+        util.sendLog()
     else:
-        if config.connected:
-            if is_synced():
-                disconnect(interactive=True)
-            else:
-                # we (manually) turn syncing for the current roast on
-                if app_window.qmc.checkSaved():
-                    queue.addRoast()
+        if config.app_window.plus_account is None: # @UndefinedVariable
+            connect()
+            if is_connected() and is_synced() and config.app_window.curFile is not None: # @UndefinedVariable
+                sync.sync()         
         else:
-            connect(True) # we try to re-connect and disconnect on failure
+            if config.connected:
+                if is_synced():
+                    disconnect(interactive=True)
+                else:
+                    # we (manually) turn syncing for the current roast on
+                    if app_window.qmc.checkSaved(allow_discard=False):
+                        queue.addRoast()
+            else:
+                connect(True) # we try to re-connect and disconnect on failure
 
 def connect(clear_on_failure=False,interactive=True):
     if not is_connected():
@@ -225,7 +224,7 @@ def reconnected():
         config.app_window.updatePlusStatus() # @UndefinedVariable
         if is_connected():
             queue.start() # restart the outbox queue
-
+    
 # if on and synced, computes the sync record hash, updates the sync record cache and returns the sync record hash
 # otherwise return None
 # this function is called by filesave() and returns the sync_record hash to be added to the saved file
@@ -235,7 +234,7 @@ def updateSyncRecordHashAndSync():
         if is_on():
             roast_record = roast.getRoast()
             sync_record,sync_record_hash = roast.getSyncRecord(roast_record)
-            if is_synced():
+            if is_synced(): # check if profile is under sync already
                 server_updates_modified_at = sync.getApplidedServerUpdatesModifiedAt()
                 if server_updates_modified_at is not None and "roast_id" in roast_record:
                     sync.addSync(roast_record["roast_id"],server_updates_modified_at)

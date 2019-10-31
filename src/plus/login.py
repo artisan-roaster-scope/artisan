@@ -104,6 +104,7 @@ class Login(QDialog):
         
     @pyqtSlot()
     def reject(self):
+        self.login = self.textName.text()
         super(Login,self).reject()
 
     @pyqtSlot(int)

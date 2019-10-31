@@ -28,7 +28,8 @@ import os
 import datetime
 import dateutil.parser
 
-from PyQt5.QtCore import QStandardPaths,QCoreApplication
+from PyQt5.QtCore import QStandardPaths,QCoreApplication, QTemporaryFile, QDir, QUrl
+from PyQt5.QtGui import QDesktopServices
 
 from artisanlib.util import d as decode
 
@@ -244,3 +245,42 @@ def blendLink(plus_blend):
 
 def roastLink(plus_roast):
     return config.web_base_url + "/" + getLanguage() + "/roasts;id=" + str(plus_roast)
+
+
+## Send Log Files
+
+def sendLog():
+    config.logger.info("util:sendLog()")
+    from email import encoders, generator
+    from email.mime.base import MIMEBase
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    message = MIMEMultipart()
+    if config.app_window.plus_email is not None:
+        message['From'] = config.app_window.plus_email
+    message["To"] = "info@artisan.plus"
+    message["Subject"] = "artisan.plus client log"
+    message.attach(MIMEText("Please find attached the artisan.plus log file written by Artisan!\n--\n", "plain"))
+    with open(config.log_file_path, "rb") as attachment:
+        # Add file as application/octet-stream
+        # Email client can usually download this automatically as attachment
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+    # Encode file in ASCII characters to send by email
+    encoders.encode_base64(part)
+    # Add header as key/value pair to attachment part
+    part.add_header(
+        "Content-Disposition",
+        "attachment; filename= {}{}".format(config.log_file,".log"))
+    # Add attachment to message and convert message to string
+    message.attach(part)    
+    # Save message to file tmp file
+    tmpfile = QDir(QDir.tempPath()).filePath("plus-log.eml")
+    try:
+        os.remove(tmpfile)
+    except OSError:
+        pass
+    with open(tmpfile, 'w') as outfile:
+        gen = generator.Generator(outfile)
+        gen.flatten(message)
+    QDesktopServices.openUrl(QUrl.fromLocalFile(tmpfile))

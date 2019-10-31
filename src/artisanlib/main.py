@@ -188,7 +188,7 @@ from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
 
 
-# maps Artisan thermocouple types (order as listed in the menu; see phidgetxs_types) to Phdiget thermocouple types
+# maps Artisan thermocouple types (order as listed in the menu; see phidget1048_types) to Phidget thermocouple types
 # 1 => k-type (default)
 # 2 => j-type
 # 3 => e-type
@@ -1329,6 +1329,7 @@ class tgraphcanvas(FigureCanvas):
 
         #put a "aw.qmc.safesaveflag = True" whenever there is a change of a profile like at [DROP], edit properties Dialog, etc
         #prevents accidentally deleting a modified profile. ("dirty file")
+        #ATTENTION: never change this flag directly. Use the methods aw.qmc.fileDirty() and aw.qmc.fileClean() instead!!
         self.safesaveflag = False
         
         self.pid = pid.PID()
@@ -2096,6 +2097,26 @@ class tgraphcanvas(FigureCanvas):
     #################################    FUNCTIONS    ###################################
     #####################################################################################
 
+    def fileDirty(self):
+        try:
+            if aw.curFile:
+                aw.setWindowTitle("* {} - {}".format(aw.strippedName(aw.curFile),aw.windowTitle))
+            else:
+                aw.setWindowTitle("* {}".format(aw.windowTitle))
+        except:
+            pass
+        self.safesaveflag = True
+    
+    def fileClean(self):
+        try:
+            if aw.curFile:
+                aw.setWindowTitle("{} - {}".format(aw.strippedName(aw.curFile),aw.windowTitle))
+            else:
+                aw.setWindowTitle(aw.windowTitle)
+        except:
+            pass
+        self.safesaveflag = False
+
     def resizeEvent(self, event):
         super(tgraphcanvas,self).resizeEvent(event)
         # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
@@ -2546,7 +2567,7 @@ class tgraphcanvas(FigureCanvas):
             self.specialeventstype.append(4) # "--"
             self.specialeventsStrings.append("")
             self.specialeventsvalue.append(0)
-        aw.qmc.safesaveflag = True
+        aw.qmc.fileDirty()
         self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
         
     def updateWebLCDs(self,bt=None,et=None,time=None,alertTitle=None,alertText=None,alertTimeout=None):
@@ -4262,16 +4283,21 @@ class tgraphcanvas(FigureCanvas):
                     return '-%d'%m
 
     # returns True if nothing to save, discard or save was selected and False if canceled by the user
-    def checkSaved(self):
+    def checkSaved(self,allow_discard=True):
         #prevents deleting accidentally a finished roast
         if self.safesaveflag == True and len(aw.qmc.timex) > 3:
-            string = QApplication.translate("Message","Save the profile, Discard the profile (Reset), or Cancel?", None)
+            if allow_discard:
+                string = QApplication.translate("Message","Save the profile, Discard the profile (Reset), or Cancel?", None)
+                buttons = QMessageBox.Discard|QMessageBox.Save|QMessageBox.Cancel
+            else:
+                string = QApplication.translate("Message","Save the profile or Cancel?", None)
+                buttons = QMessageBox.Save|QMessageBox.Cancel
             reply = QMessageBox.warning(aw,QApplication.translate("Message","Profile unsaved", None),string,
-                                QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
+                                buttons)
             if reply == QMessageBox.Save:
-                return aw.fileSave(aw.curFile)  #if accepted, makes safesaveflag = False
+                return aw.fileSave(aw.curFile)  #if accepted, calls fileClean() and thus turns safesaveflag = False
             elif reply == QMessageBox.Discard:
-                self.safesaveflag = False
+                self.fileClean()
                 return True
             elif reply == QMessageBox.Cancel:
                 aw.sendmessage(QApplication.translate("Message","Action canceled",None))
@@ -4307,7 +4333,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             #### lock shared resources #####
             aw.qmc.samplingsemaphore.acquire(1)
-            self.safesaveflag = False  #now flag is cleared (OFF)
+            self.fileClean()
             self.rateofchange1 = 0.0
             self.rateofchange2 = 0.0
             self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2, self.ctimex1, self.ctimex2, self.ctemp1, self.ctemp2 = [],[],[],[],[],[],[],[],[],[],[]
@@ -5178,10 +5204,9 @@ class tgraphcanvas(FigureCanvas):
             bnr = self.batchcounter + 1
         else:
             bnr = self.roastbatchnr
-        if bnr == 0 or title == "":
-            title = title
-        else:
-            title = self.roastbatchprefix + u(bnr) + u(" ") + title
+        
+        if bnr != 0 and title != "":
+            title = "{}{} {}".format(self.roastbatchprefix,u(bnr),title)
 
         if self.background and self.titleB and len(self.titleB) > 10:
             stl = 33
@@ -7029,7 +7054,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
 
                         #prevents accidentally deleting a modified profile. 
-                        self.safesaveflag = True
+                        self.fileDirty()
 
                         #background
                         for i in range(len(self.timeB)):
@@ -7087,7 +7112,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
 
                         #prevents accidentally deleting a modified profile. 
-                        self.safesaveflag = True
+                        self.fileDirty()
 
                         #background
                         for i in range(len(self.timeB)):
@@ -7738,7 +7763,10 @@ class tgraphcanvas(FigureCanvas):
                     self.OnMonitor()
         #turn OFF
         else:
-            aw.soundpop()
+            try:
+                aw.soundpop()
+            except:
+                pass
             self.OffMonitor()
 
     def OnRecorder(self):
@@ -7824,7 +7852,7 @@ class tgraphcanvas(FigureCanvas):
             self.updateLCDtime()
             #prevents accidentally deleting a modified profile:
             if len(self.timex) > 2:
-                self.safesaveflag = True
+                self.fileDirty()
                 aw.autoAdjustAxis() # automatic adjust axis after roast if auto axis is enabled
             try:
                 if aw.clusterEventsFlag:
@@ -7876,7 +7904,7 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
-                    self.safesaveflag = True
+                    self.fileDirty()
                     
                     removed = False
                     if aw.button_8.isFlat() and self.timeindex[1] > -1:
@@ -8020,7 +8048,7 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
-                    self.safesaveflag = True
+                    self.fileDirty()
                     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -8109,7 +8137,7 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
-                    self.safesaveflag = True
+                    self.fileDirty()
                     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -8201,7 +8229,7 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
-                    self.safesaveflag = True
+                    self.fileDirty()
                     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -8283,7 +8311,7 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile. 
-                    self.safesaveflag = True
+                    self.fileDirty()
                     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -8370,7 +8398,7 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
-                    self.safesaveflag = True
+                    self.fileDirty()
                     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -8457,7 +8485,7 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
-                    self.safesaveflag = True
+                    self.fileDirty()
                     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -8656,7 +8684,7 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
-                    self.safesaveflag = True
+                    self.fileDirty()
                     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -8783,7 +8811,7 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.timex) > 0 or self.device == 18:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
-                    self.safesaveflag = True                    
+                    self.fileDirty()
                     Nevents = len(self.specialevents)
                     #if in manual mode record first the last point in self.timex[]
                     if self.device == 18:
@@ -8991,7 +9019,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 #prevents accidentally deleting a modified profile.
-                self.safesaveflag = True
+                self.fileDirty()
                 #number of events
                 Nevents = len(self.specialevents)
                 #index number            
@@ -9255,7 +9283,8 @@ class tgraphcanvas(FigureCanvas):
             dryEndIndex, statisticstimes = self.calcStatistics(TP_index)
             
             if statisticstimes[0] == 0:
-                aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [FCs] + [DROP]", None))
+# not sure we want this warning message to display on each redraw of a profile without proper events, maybe better to just silently don't render the statistics
+#                aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [FCs] + [DROP]", None))
                 return
             else:
                 self.statisticstimes = statisticstimes
@@ -10546,7 +10575,7 @@ class tgraphcanvas(FigureCanvas):
             #pylint: disable=E0611
             from scipy.interpolate import UnivariateSpline
             #prevents accidentally deleting a modified profile.
-            self.safesaveflag = True
+            self.fileDirty()
             #create functions
             funcBT = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
             funcET = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
@@ -12111,8 +12140,10 @@ class SampleThread(QThread):
                         
                         #collect information
                         aw.qmc.flagsampling = True # we signal that we are sampling
-                        self.sample()
-                        aw.qmc.flagsampling = False # we signal that we are done with sampling
+                        try:
+                            self.sample()
+                        finally:
+                            aw.qmc.flagsampling = False # we signal that we are done with sampling
                         
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)                    
                     # apply sampling interval here
@@ -19016,7 +19047,7 @@ class ApplicationWindow(QMainWindow):
                     QDir.setCurrent(oldDir)
                     self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
                     #self.setCurrentFile(filename) # we do not add autosaved files any longer to the recent file menu
-                    self.qmc.safesaveflag = False
+                    self.qmc.fileClean()
                     
                     if self.qmc.autosaveimage and not aw.qmc.flagon:
                         if ".alog" in filename:
@@ -19347,7 +19378,7 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
                 res = False
             if res:
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading                               
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
                 #update etypes combo box
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
@@ -19355,10 +19386,10 @@ class ApplicationWindow(QMainWindow):
                 self.setCurrentFile(filename) #update recent file list
                 if profile_changed:
                     # profiles was adjusted, ensure that it does not overwrite the original file on saving
-                    self.qmc.safesaveflag = True
+                    self.qmc.fileDirty()
                     self.curFile = None
                 else:
-                    self.qmc.safesaveflag = False
+                    self.qmc.fileClean()
                 #Plot everything
                 self.qmc.redraw()
                 message = u(QApplication.translate("Message","{0}  loaded ", None).format(u(filename)))
@@ -19367,7 +19398,7 @@ class ApplicationWindow(QMainWindow):
                 if aw is not None:
                     aw.updatePlusStatus()
                     if aw.plus_account is not None:
-                        if plus.config.uuid_tag in obj:                            
+                        if plus.config.uuid_tag in obj:
                             QTimer.singleShot(100,lambda : plus.sync.sync())
                                     
                 #check colors
@@ -19476,7 +19507,7 @@ class ApplicationWindow(QMainWindow):
                         y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.timex[i],t_offset=toff))
                     self.qmc.extratemp2[j] = y_range2[:]
 
-            self.qmc.safesaveflag = True
+            self.qmc.fileDirty()
        
         except Exception as ex:
             #import traceback
@@ -19772,7 +19803,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timeindex[7] = self.time2index(COOL)
             self.qmc.endofx = self.qmc.timex[-1]
             self.sendmessage(QApplication.translate("Message","Artisan CSV file loaded successfully", None))
-            self.qmc.safesaveflag = True            
+            self.qmc.fileDirty()
             aw.autoAdjustAxis()
             self.qmc.redraw()
         except Exception as ex:
@@ -20145,7 +20176,7 @@ class ApplicationWindow(QMainWindow):
                 self.importRoastLoggerEnc(filename,'utf-8')
             except Exception:
                 self.importRoastLoggerEnc(filename,'latin1')
-            aw.qmc.safesaveflag = True
+            aw.qmc.fileDirty()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -20972,7 +21003,6 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.qmc.plus_sync_record_hash = None
                 
-                
             if "beans" in profile:
                 self.qmc.beans = d(profile["beans"])
             else:
@@ -21082,7 +21112,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastUUID = d(profile["roastUUID"])
             else:
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
-                self.qmc.safesaveflag = True
+                self.qmc.fileDirty()
             if "roastbatchnr" in profile:
                 try:
                     self.qmc.roastbatchnr = int(profile["roastbatchnr"])
@@ -21165,7 +21195,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmtemperature = [(self.qmc.fromFtoC(t) if t != 500 else t) for t in self.qmc.alarmtemperature]
                 if self.qmc.greens_temp != 0.:
                     self.qmc.greens_temp = self.qmc.fromFtoC(self.qmc.greens_temp)
-                self.qmc.safesaveflag = True
+                self.qmc.fileDirty()
             elif self.qmc.mode == "F" and m == "C":
                 self.qmc.temp1 = [self.qmc.fromCtoF(t) for t in self.qmc.temp1]
                 self.qmc.temp2 = [self.qmc.fromCtoF(t) for t in self.qmc.temp2]
@@ -21180,7 +21210,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmtemperature = [self.qmc.fromCtoF(t) for t in self.qmc.alarmtemperature]
                 if self.qmc.greens_temp != 0.:
                     self.qmc.greens_temp = self.qmc.fromCtoF(self.qmc.greens_temp)
-                self.qmc.safesaveflag = True
+                self.qmc.fileDirty()
             else:
                 # only if the temperature mode of the profile equals to our current mode, we respect the temp/RoR axis limits
                 if "zmax" in profile:
@@ -21762,20 +21792,19 @@ class ApplicationWindow(QMainWindow):
                     if copy:
                         pf["roastUUID"] = uuid.uuid4().hex # generate UUID
 
+                    sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                    if sync_record_hash is not None:
+                        # we add the hash over the sync record to be able to detect offline changes
+                        pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+
+                    # we save the file and set the filename
                     self.serialize(filename,pf)
                     self.sendmessage(QApplication.translate("Message","Profile saved", None))
                     if not copy:
                         self.setCurrentFile(filename)
                         aw.curFile = filename
-                        self.qmc.safesaveflag = False
+                        self.qmc.fileClean()
 
-                    # only after the filename was set and the file was saved we update the sync record
-                    if aw.plus_account is not None:
-                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-                        if sync_record_hash is not None:
-                            # we add the hash over the sync record to be able to detect offline changes
-                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
-                
                     if self.qmc.autosaveimage:
                         if ".alog" in filename:
                             filename = filename[0:-5]
@@ -21864,7 +21893,7 @@ class ApplicationWindow(QMainWindow):
                     except Exception:
                         pass
                     i += 1
-                    aw.qmc.safesaveflag = False
+                    aw.qmc.fileClean()
                     aw.qmc.reset(soundOn=False)
                 if loaded_profile:
                     self.loadFile(loaded_profile)
@@ -21957,7 +21986,7 @@ class ApplicationWindow(QMainWindow):
                     except:
                         pass
                     i += 1
-                    aw.qmc.safesaveflag = False
+                    aw.qmc.fileClean()
                     aw.qmc.reset(soundOn=False)
                 if loaded_profile:
                     self.loadFile(loaded_profile)
@@ -22045,7 +22074,7 @@ class ApplicationWindow(QMainWindow):
                     except:
                         pass
                     i += 1
-                    aw.qmc.safesaveflag = False
+                    aw.qmc.fileClean()
                     aw.qmc.reset(soundOn=False)
                 if loaded_profile:
                     self.loadFile(loaded_profile)
@@ -24523,13 +24552,14 @@ class ApplicationWindow(QMainWindow):
     # returns True if confirmed, False if canceled by the user
     def closeApp(self):
         aw.quitAction.setEnabled(False)
-        if aw.qmc.checkSaved(): # if not canceled
-            self.stopActivities()
-            self.closeEventSettings()
-            gc.collect()
-            QApplication.exit()
-            return True
-        else:
+        try:
+            if aw.qmc.checkSaved(): # if not canceled
+                self.stopActivities()
+                self.closeEventSettings()
+                gc.collect()
+                QApplication.exit()
+                return True
+        finally:
             aw.quitAction.setEnabled(True)
             return False
 
@@ -27628,7 +27658,7 @@ class ApplicationWindow(QMainWindow):
         aw.qmc.temp2 = aw.qmc.temp1
         aw.qmc.temp1 = t2
         aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
-        aw.qmc.safesaveflag = True
+        aw.qmc.fileDirty()
         
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -27664,7 +27694,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.timeindex = _timeindex[:]
                 if not foreground_profile_path:
                     aw.qmc.redraw(recomputeAllDeltas=True)
-                aw.qmc.safesaveflag = True
+                aw.qmc.fileDirty()
             else:
                 # reset
                 aw.qmc.reset(soundOn=False)
@@ -28301,7 +28331,7 @@ class ApplicationWindow(QMainWindow):
                 
                 self.sendmessage(QApplication.translate("Message","Probat Pilot data imported successfully", None))
                 self.qmc.redraw()
-                aw.qmc.safesaveflag = True
+                aw.qmc.fileDirty()
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importPilot(): {0}").format(str(ex)))
         except ValueError as ex:
@@ -29362,7 +29392,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.backgroundDetails = False
         
         #prevent accidental overwrite of the original file 
-        self.qmc.safesaveflag = True
+        self.qmc.fileDirty()
         self.curFile = None
                     
         # initialize progress dialog
@@ -33534,7 +33564,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             propGrid.addWidget(self.tareComboBox,1,7)
             propGrid.addLayout(inButtonLayout,1,8)
             propGrid.addLayout(outButtonLayout,1,9)
-            
             if aw.scale.device == "acaia":
                 try:
                     with suppress_stdout_stderr():
@@ -33544,9 +33573,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                         acaia = AcaiaBLE()
                         self.ble = BleInterface(acaia.SERVICE_UUID,acaia.CHAR_UUID,acaia.processData,acaia.sendHeartbeat,acaia.reset)
                         # start BLE loop
-                        self.ble.scanDevices()
                         self.ble.weightChanged.connect(self.ble_weight_changed)
                         self.ble.deviceDisconnected.connect(self.ble_scan_failed)
+                        self.ble.scanDevices()
                 except:
                     pass
             elif aw.scale.device in ["KERN NDE","Shore 930"]:
@@ -35017,7 +35046,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             aw.clusterEvents()
             self.createEventTable()
             aw.qmc.redraw(recomputeAllDeltas=False)
-            aw.qmc.safesaveflag = True
+            aw.qmc.fileDirty()
             
     @pyqtSlot(bool)
     def clearEvents(self,_=False):
@@ -35029,7 +35058,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             aw.qmc.specialeventsvalue = []
             self.createEventTable()
             aw.qmc.redraw(recomputeAllDeltas=False)
-            aw.qmc.safesaveflag = True
+            aw.qmc.fileDirty()
     
     @pyqtSlot(bool)
     def createAlarmEventTable(self,_=False):
@@ -35058,7 +35087,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def orderEventTable(self,_=False):
         self.saveEventTable()
         self.orderEventTableLoop()
-        aw.qmc.safesaveflag = True
+        aw.qmc.fileDirty()
         
     def orderEventTableLoop(self):
         nevents = len(aw.qmc.specialevents)
@@ -35119,7 +35148,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 aw.qmc.specialeventsStrings.pop()
                 aw.qmc.specialeventsvalue.pop()
                 message = QApplication.translate("Message"," Event #{0} deleted", None).format(str(len(aw.qmc.specialevents)+1))
-            aw.qmc.safesaveflag = True
+            aw.qmc.fileDirty()
             self.createEventTable()
             aw.qmc.redraw(recomputeAllDeltas=False)
             aw.sendmessage(message)
@@ -35346,7 +35375,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         #check for graph
         if len(aw.qmc.timex):
             #prevents accidentally deleting a modified profile.
-            aw.qmc.safesaveflag = True
+            aw.qmc.fileDirty()
             if self.chargeedit.text() == "":
                 aw.qmc.timeindex[0] = -1
                 aw.qmc.xaxistosm(redraw=False)
@@ -38177,7 +38206,7 @@ class EventsDlg(ArtisanResizeablDialog):
                                     aw.qmc.specialeventstype.append(i)
                                     aw.qmc.specialeventsStrings.append("Q"+ aw.qmc.eventsvalues(float(d+1)))
                                     aw.qmc.specialeventsvalue.append(float(d+1))
-                                    aw.qmc.safesaveflag = True
+                                    aw.qmc.fileDirty()
                     redraw = True
         if aw.clusterEventsFlag:
             aw.clusterEvents(True)
@@ -40110,7 +40139,7 @@ class flavorDlg(ArtisanResizeablDialog):
         #save window geometry
         settings.setValue("FlavorProperties",self.saveGeometry())  
         self.savetable()
-        aw.qmc.safesaveflag = True
+        aw.qmc.fileDirty()
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.showControls()
         self.accept()

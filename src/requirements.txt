@@ -1,5 +1,5 @@
 pyserial==3.4
-pymodbus==2.2.0 #1.5.2
+pymodbus==2.3.0 #2.2.0
 unidecode==1.1.1
 bottle==0.12.17
 qrcode==6.1
@@ -14,4 +14,4 @@ setuptools==41.4.0
 persist-queue==0.4.2
 portalocker==1.5.1
 prettytable==0.7.2
-Phidget22==1.4.20190927
+Phidget22==1.5.20191018
