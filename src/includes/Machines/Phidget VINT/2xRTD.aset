@@ -1,0 +1,47 @@
+[General]
+Delay=2000
+ETfunction=Y3
+Oversampling=false
+curvefilter=1
+filterDropOuts=true
+optimalSmoothing=false
+
+[Device]
+id=68
+phidget1200_async=true
+phidget1200_changeTrigger=0
+phidget1200_dataRate=250
+phidget1200_formula=2
+phidget1200_wire=2
+
+[ExtraComm]
+extrabaudrate=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0K\0)
+extrabytesize=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\b)
+extracomport=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0\x43\0O\0M\0\x31)
+extraparity=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x2\0\x45)
+extrastopbits=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
+extratimeout=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x6?\xf0\0\0\0\0\0\0)
+
+[ExtraDev]
+extraCurveVisibility1=false, true, true, true, true, true, true, true, true, true
+extraCurveVisibility2=false, true, true, true, true, true, true, true, true, true
+extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility1=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
+extradevicecolor1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k)
+extradevicecolor2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k)
+extradevices=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x44)
+extramathexpression1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
+extramathexpression2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
+extraname1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0\x32\0n\0\x64\0 \0R\0T\0\x44)
+extraname2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0\x45\0x\0t\0r\0\x61\0 \0\x32)
+
+[RoC]
+DeltaETspan=5
+DeltaSpan=5
+deltaETfilter=7
+deltafilter=7
+
+[RoastProperties]
+roastertype=Phidget 2xRTD

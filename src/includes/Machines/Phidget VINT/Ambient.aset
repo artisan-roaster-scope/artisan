@@ -1,0 +1,4 @@
+[Device]
+ambient_humidity_device=1
+ambient_pressure_device=1
+ambient_temperature_device=1
