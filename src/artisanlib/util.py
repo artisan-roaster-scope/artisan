@@ -32,8 +32,6 @@ def stringp(x):
     return isinstance(x, str)
 def uchr(x):
     return chr(x)
-def o(x): # converts char to byte
-    return x
 def u(x): # convert to unicode string
     return str(x)
 def d(x):

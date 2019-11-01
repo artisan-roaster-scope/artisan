@@ -180,7 +180,7 @@ import unicodedata # @UnresolvedImport
 from unidecode import unidecode
 
 import artisanlib.arabic_reshaper
-from artisanlib.util import appFrozen, decs2string, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
+from artisanlib.util import appFrozen, decs2string, stringp, uchr, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
 from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
@@ -289,7 +289,7 @@ def toInt(x):
         except:
             return 0
 def toString(x):
-    return u(x)
+    return str(x)
 def toList(x):
     if x is None:
         return []
@@ -3413,8 +3413,11 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.beepedBackgroundEvents.append(i)
                                 QApplication.beep()
                             #write text message
-                            message = "> " + " [" + u(self.Betypesf(self.backgroundEtypes[i]))
-                            message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : <b>" +  self.stringfromseconds(timed) + "</b> : " + self.backgroundEStrings[i]  
+                            message = "> [{}] [{}] : <b>{}</b> : {}".format(
+                                u(self.Betypesf(self.backgroundEtypes[i])),
+                                self.eventsvalues(self.backgroundEvalues[i]),
+                                self.stringfromseconds(timed),
+                                self.backgroundEStrings[i])
                             #rotate colors to get attention
                             if int(round(timed))%2:
                                 style = "background-color:'transparent';"
@@ -3423,16 +3426,16 @@ class tgraphcanvas(FigureCanvas):
                                 
                             aw.sendmessage(message,style=style)
                             reproducing = i
-    
+
                         if delta <= 0:
                             #for devices that support automatic roaster control
                             #if Fuji PID
                             if self.device == 0:
-    
+
                                 # COMMAND SET STRINGS
                                 #  (adjust the SV PID to the float VALUE1)
                                 # SETRS::VALUE1::VALUE2::VALUE3  (VALUE1 = target SV. float VALUE2 = time to reach int VALUE 1 (ramp) in minutes. int VALUE3 = hold (soak) time in minutes)
-    
+
                                 # IMPORTANT: VALUES are for controlling ET only (not BT). The PID should control ET not BT. The PID should be connected to ET only.
                                 # Therefore, these values don't reflect a BT defined profile. They define an ET profile.
                                 # They reflect the changes in ET, which indirectly define BT after some time lag
@@ -15372,7 +15375,7 @@ class ApplicationWindow(QMainWindow):
                 if len(keys) == 1 and not forceSubmenu:
                     for e in res[k]:
                         a = QAction(self, visible=True, triggered=triggered)
-                        a.setData(e[1])
+                        a.setData((e[1],u(k)))
                         if k == resourceName:
                             a.setText(u(e[0])) # + u("...")
                         else:
@@ -15383,14 +15386,14 @@ class ApplicationWindow(QMainWindow):
                     submenu = menu.addMenu(k)
                     for e in res[k]:
                         a = QAction(self, visible=True, triggered=triggered)
-                        a.setData(e[1])
+                        a.setData((e[1],u(k)))
                         a.setText(u(e[0]))
                         submenu.addAction(a)
                         one_added = True
             else:
                 entry = res[k][0]
                 a = QAction(self, visible=True, triggered=triggered)
-                a.setData(entry[1])
+                a.setData((entry[1],""))
                 if k == resourceName:
                     a.setText(u(entry[0])) # + u("...")
                 else:
@@ -15406,72 +15409,88 @@ class ApplicationWindow(QMainWindow):
     def openMachineSettings(self):
         action = self.sender()
         if action:
+            label = (action.text() if action.data()[1] == "" else "{} {}".format(action.data()[1],action.text()))
             string = QApplication.translate("Message", "Configure for {0}?<br>Your current settings will be overwritten!<br><br>"+
-                    "It is advisable to save your current settings beforehand via menu Help >> Save Settings.",None).format(action.text())
+                    "It is advisable to save your current settings beforehand via menu Help >> Save Settings.",None).format(label)
             reply = QMessageBox.question(aw,QApplication.translate("Message", "Adjust Settings",None),string,
                 QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Cancel:
                 return 
             elif reply == QMessageBox.Yes:
                 aw.qmc.etypes = aw.qmc.etypesdefault
-                aw.loadSettings(fn=action.data(),remember=False)
-                aw.establish_etypes()
-                aw.qmc.machinesetup = action.text()
+                aw.loadSettings(fn=action.data()[0],remember=False)
                 aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(action.text()))
-                if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
-                    host,res = QInputDialog.getText(self,
-                        QApplication.translate("Message", "Machine",None),
-                        QApplication.translate("Message", "Network name or IP address",None),text=aw.modbus.host) #"127.0.0.1"
-                    if res:
-                        aw.modbus.host = host
+                if action.data()[1] == "Phidget VINT":
+                    if action.text() == "Ambient":
+                        elevation,res = QInputDialog.getInt(self,
+                            QApplication.translate("Message", "Ambient",None),
+                            QApplication.translate("Message", "Elevation (MASL)",None),value=aw.qmc.elevation)
+                        if res:
+                            try:
+                                aw.qmc.elevation = int(elevation)
+                            except:
+                                pass
+                        else:
+                            aw.sendmessage(QApplication.translate("Message","Action canceled",None))
                     else:
-                        aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                elif aw.qmc.device == 79: # S7
-                    host,res = QInputDialog.getText(self,
-                        QApplication.translate("Message", "Machine",None),
-                        QApplication.translate("Message", "Network name or IP address",None),text=aw.s7.host) #"127.0.0.1"
-                    if res:
-                        aw.s7.host = host
-                    else:
-                        aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                elif aw.qmc.device in [0,9,19,53,101] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
-                    import serial.tools.list_ports
-                    comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
-                    if platf == 'Darwin':
-                        ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
-                            '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])])
-                        ports = list(filter (lambda x: 'Bluetooth-Inc' not in x[0],ports))
-                    else:
-                        ports = list(comports)
-                    if aw.ser.comport not in [p[0] for p in ports]:
-                        ports.append([aw.ser.comport,"",""])
-                    ports = sorted(ports,key=lambda p: p[0])
-                    items = [(p[1] if (p[1] and p[1]!="n/a") else p[0]) for p in ports]
-                    current = 0
-                    try:
-                        current = [p[0] for p in ports].index(aw.ser.comport)
-                    except Exception:
-                        pass
-                    if aw.qmc.device == 53: # Hottop 2k+
+                        aw.qmc.machinesetup = action.text()
+                else:
+                    aw.establish_etypes()
+                    aw.qmc.machinesetup = action.text()
+                    if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
+                        host,res = QInputDialog.getText(self,
+                            QApplication.translate("Message", "Machine",None),
+                            QApplication.translate("Message", "Network name or IP address",None),text=aw.modbus.host) #"127.0.0.1"
+                        if res:
+                            aw.modbus.host = host
+                        else:
+                            aw.sendmessage(QApplication.translate("Message","Action canceled",None))
+                    elif aw.qmc.device == 79: # S7
+                        host,res = QInputDialog.getText(self,
+                            QApplication.translate("Message", "Machine",None),
+                            QApplication.translate("Message", "Network name or IP address",None),text=aw.s7.host) #"127.0.0.1"
+                        if res:
+                            aw.s7.host = host
+                        else:
+                            aw.sendmessage(QApplication.translate("Message","Action canceled",None))
+                    elif aw.qmc.device in [0,9,19,53,101] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
+                        import serial.tools.list_ports
+                        comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
+                        if platf == 'Darwin':
+                            ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
+                                '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])])
+                            ports = list(filter (lambda x: 'Bluetooth-Inc' not in x[0],ports))
+                        else:
+                            ports = list(comports)
+                        if aw.ser.comport not in [p[0] for p in ports]:
+                            ports.append([aw.ser.comport,"",""])
+                        ports = sorted(ports,key=lambda p: p[0])
+                        items = [(p[1] if (p[1] and p[1]!="n/a") else p[0]) for p in ports]
+                        current = 0
                         try:
-                            current = [p[0] for p in ports].index("FT230X Basic UART")
+                            current = [p[0] for p in ports].index(aw.ser.comport)
                         except Exception:
                             pass
-                    port_name,res = QInputDialog.getItem(self,
-                        QApplication.translate("Message", "Port Configuration",None),
-                        QApplication.translate("Message", "Comm Port",None),
-                        items,
-                        current,
-                        False)
-                    if res:
-                        try:
-                            pos = items.index(port_name)
-                            if aw.qmc.device == 29: # MODBUS serial
-                                aw.modbus.comport = ports[pos][0]
-                            else: # Fuji or HOTTOP
-                                aw.ser.comport = ports[pos][0]
-                        except:
-                            pass
+                        if aw.qmc.device == 53: # Hottop 2k+
+                            try:
+                                current = [p[0] for p in ports].index("FT230X Basic UART")
+                            except Exception:
+                                pass
+                        port_name,res = QInputDialog.getItem(self,
+                            QApplication.translate("Message", "Port Configuration",None),
+                            QApplication.translate("Message", "Comm Port",None),
+                            items,
+                            current,
+                            False)
+                        if res:
+                            try:
+                                pos = items.index(port_name)
+                                if aw.qmc.device == 29: # MODBUS serial
+                                    aw.modbus.comport = ports[pos][0]
+                                else: # Fuji or HOTTOP
+                                    aw.ser.comport = ports[pos][0]
+                            except:
+                                pass
 
                                 
     def populateThemeMenu(self):
@@ -15496,13 +15515,14 @@ class ApplicationWindow(QMainWindow):
     def openThemeSettings(self):
         action = self.sender()
         if action:
-            string = QApplication.translate("Message", "Load theme {0}?",None).format(action.text())
+            label = (action.text() if action.data()[1] == "" else "{} {}".format(action.data()[1],action.text()))
+            string = QApplication.translate("Message", "Load theme {0}?",None).format(label)
             reply = QMessageBox.question(aw,QApplication.translate("Message", "Adjust Theme Related Settings",None),string,
                 QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Cancel:
                 return 
             elif reply == QMessageBox.Yes:
-                aw.loadSettings(fn=action.data(),remember=False,reset=False)
+                aw.loadSettings(fn=action.data()[0],remember=False,reset=False)
                 self.sendmessage(QApplication.translate("Message","Loaded theme {0}", None).format(action.text()))
                 libtime.sleep(.8)
                 aw.qmc.redraw(True)
@@ -22308,7 +22328,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ambient_temperature_device = toInt(settings.value("ambient_temperature_device",self.qmc.ambient_temperature_device))
                 self.qmc.ambient_humidity_device = toInt(settings.value("ambient_humidity_device",self.qmc.ambient_humidity_device))
                 self.qmc.ambient_pressure_device = toInt(settings.value("ambient_pressure_device",self.qmc.ambient_pressure_device))
-                self.qmc.elevation = toInt(settings.value("elevation",self.qmc.elevation))                
+                self.qmc.elevation = toInt(settings.value("elevation",self.qmc.elevation))
             # activate CONTROL BUTTON
             aw.showControlButton()
             if settings.contains("controlETpid"):
@@ -23194,6 +23214,7 @@ class ApplicationWindow(QMainWindow):
                 self.channel_tare_values = [toDouble(x) for x in toList(settings.value("ChannelTares",self.channel_tare_values))]
             if settings.contains("BTfunction"):
                 self.qmc.BTfunction = s2a(toString(settings.value("BTfunction",self.qmc.BTfunction)))
+            if settings.contains("ETfunction"):
                 self.qmc.ETfunction = s2a(toString(settings.value("ETfunction",self.qmc.ETfunction)))
             if settings.contains("DeltaBTfunction"):
                 self.qmc.DeltaBTfunction = s2a(toString(settings.value("DeltaBTfunction",self.qmc.DeltaBTfunction)))
@@ -26495,7 +26516,7 @@ class ApplicationWindow(QMainWindow):
     def note2html(self,notes):
         notes_html = ""
         for i in range(len(notes)):
-            if o(u(notes[i])) == 9:
+            if u(notes[i]) == 9:
                 notes_html += u(" &nbsp&nbsp&nbsp&nbsp ")
             elif u(notes[i]) == "\n":
                 notes_html += u("<br>\n")
@@ -41765,16 +41786,16 @@ class serialport(object):
                 lenstring = len(r)
                 if lenstring:
                     # CHECK FOR RECEIVED ERROR CODES
-                    if o(r[1]) == 128:
-                        if o(r[2]) == 1:
+                    if r[1] == 128:
+                        if r[2] == 1:
                             errorcode = QApplication.translate("Error Message","F80h Error",None) + u(" 1: A nonexistent function code was specified. Please check the function code.")
                             errorcode += (QApplication.translate("Error Message","Exception:",None) + u(" SendFUJIcommand() 1: Illegal Function in unit {0}")).format(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
-                        if o(r[2]) == 2:
+                        if r[2] == 2:
                             errorcode = QApplication.translate("Error Message","F80h Error",None) + u(" 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code.")
                             errorcode += (QApplication.translate("Error Message","Exception:",None) + u(" SendFUJIcommand() 2 Illegal Address for unit {0}")).format(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
-                        if o(r[2]) == 3:
+                        if r[2] == 3:
                             errorcode = QApplication.translate("Error Message","F80h Error",None) + u(" 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers.")
                             errorcode += (QApplication.translate("Error Message","Exception:",None) + u(" SendFUJIcommand() 3 Illegal Data Value for unit {0}")).format(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
@@ -42861,13 +42882,13 @@ class serialport(object):
 #                self.SP.write(command)
                 r = self.SP.read(18)
                 index = -1
-                if(len(r) == 18 and o(r[0]) == 101 and o(r[1]) == 20):  # 101="\x65"  20="\x14"
+                if(len(r) == 18 and r[0] == 101 and r[1] == 20):  # 101="\x65"  20="\x14"
                     index = 0
                 else:
                     if(len(r) >= 9):
                         # find 0x65 0x14
                         for i in range(len(r)-1):
-                            if(o(r[i]) == 101 and o(r[i+1]) == 20): # "\x65" and "\x14"
+                            if(r[i] == 101 and r[i+1] == 20): # "\x65" and "\x14"
                                 index = i
                                 break
                 
@@ -42879,12 +42900,12 @@ class serialport(object):
                         if(len(r) >= 9):
                             # find 0x65 0x14
                             for i in range(len(r)-1):
-                                if(o(r[i]) == 101 and o(r[i+1]) == 20):  # "\x65" and "\x14"
+                                if (r[i] == 101 and r[i+1] == 20):  # "\x65" and "\x14"
                                     index = i
                                     break
                 
                 if(index >= 0 and len(r) >= index+18):
-                    if(o(r[index+16]) == 13 and o(r[index+17]) == 10):  # 13="\x0d" and  10="\x0a"
+                    if (r[index+16] == 13 and r[index+17] == 10):  # 13="\x0d" and  10="\x0a"
                         #convert to binary to hex string
                         # Display [5-6] [7-8]  [11]                                          [12]
                         #   T1     T1    T2    T1: OK(08), NC(40)                            T2: OK(08), NC(40)
@@ -42895,31 +42916,31 @@ class serialport(object):
                         s2 = hex2int(r[index+7],r[index+8])/10.
 
                         # 64="\x40"  67="\x43" 194="\xC2" 195="\xC3"
-                        if((o(r[index+11]) >= 64 and o(r[index+11]) <= 67) or (o(r[index+11]) >= 194 and o(r[index+11]) <= 195)):
+                        if ((r[index+11] >= 64 and r[index+11] <= 67) or (r[index+11] >= 194 and r[index+11] <= 195)):
                             s1 = -1
                     
-                        if(o(r[index+12]) == 64): # 64="\x40"
+                        if(r[index+12] == 64): # 64="\x40"
                             s2 = -1
 
                         #return original T1 T2
-                        if(o(r[index+11]) == 9 or o(r[index+11]) == 65): # 9="\x09" 65="\x41"
+                        if(r[index+11] == 9 or r[index+11] == 65): # 9="\x09" 65="\x41"
                             temp = s2
                             s2 = s1
                             s1 = temp
-                        elif(o(r[index+11]) == 10): # 10="\x0a"
+                        elif(r[index+11] == 10): # 10="\x0a"
                             temp = s2
                             s2 = s2-s1
                             s1 = temp
-                        elif(o(r[index+11]) == 138): # 138="\x8a"
+                        elif(r[index+11] == 138): # 138="\x8a"
                             temp = s2
                             s2 = s2+s1
                             s1 = temp
-                        elif(o(r[index+11]) == 66 or o(r[index+11]) == 194):  # 66="\x42" and 194="\xc2"
+                        elif(r[index+11] == 66 or r[index+11] == 194):  # 66="\x42" and 194="\xc2"
                             s1 = s2
                             s2 = -1
-                        elif(o(r[index+11]) == 11): # 11="\x0b"
+                        elif(r[index+11] == 11): # 11="\x0b"
                             s1 += s2
-                        elif(o(r[index+11]) == 139): # 139="\x8b"
+                        elif(r[index+11] == 139): # 139="\x8b"
                             s1 = s2-s1
 
                         #we convert the strings to integers. Divide by 10.0 (decimal position)
@@ -43441,7 +43462,7 @@ class serialport(object):
                     #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
                     #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
                     #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = self.binary(o(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
+                    b3bin = self.binary(r[2])              #bit"[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     #extract T1
                     B34 = cmd2str(binascii.hexlify(r[3:5])) # select byte 3 and 4
@@ -43493,7 +43514,7 @@ class serialport(object):
                     #if bit 5 of byte 3 = 1 then T2 = ####
                     #if bit 5 of byte 3 = 0 then T2 = ###.#
                     #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = self.binary(o(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
+                    b3bin = self.binary(r[2])              #bit"[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     bit5 = b3bin[2]
                     #extract T1
@@ -45952,19 +45973,19 @@ class serialport(object):
             for i in range(28):  #any number > 14 will be OK
                 r = self.SP.read(1)
                 if r:
-                    fb = (o(r[0]) & 0xf0) >> 4
+                    fb = (r[0] & 0xf0) >> 4
                     if fb == 1:
                         r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
                         break
                 else:
                     raise ValueError(str("No Data received"))
-##                if (o(r[0]) & 0xf0) >> 4 == 1:
+##                if (r[0] & 0xf0) >> 4 == 1:
 ##                    r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
 ##                    break
             frame = r + r2
             #check bytes
             for i in range(14):
-                number = fb = (o(frame[i]) & 0xf0) >> 4
+                number = fb = (frame[i] & 0xf0) >> 4
                 if number != i+1:
                     #find device index
                     raise ValueError(str("Data corruption"))
@@ -45972,7 +45993,7 @@ class serialport(object):
                 #extract data from frame in to a list containing the hex string values of the data
                 data = []
                 for i in range(14):
-                    data.append(hex((o(frame[i]) & 0x0f))[2:])
+                    data.append(hex((frame[i] & 0x0f))[2:])
                 #The four LCD digits are BC + DE + FG + HI   
                 digits = [data[1]+data[2],data[3]+data[4],data[5]+data[6],data[7]+data[8]]
                 #find sign 
@@ -48686,12 +48707,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         try:
             self.wireCombo1200.setCurrentIndex(aw.qmc.phidget1200_wire)
         except Exception:
-            pass                                   
+            pass
         self.wireCombo1200.setMinimumContentsLength(5)
         width = self.wireCombo1200.minimumSizeHint().width()
         self.wireCombo1200.setMinimumWidth(width)
 #        self.wireCombo1200.setMaximumWidth(width)
-            
+
         self.asyncCheckBoxe1200 = QCheckBox()
         self.asyncCheckBoxe1200.setFocusPolicy(Qt.NoFocus)
         self.asyncCheckBoxe1200.setChecked(aw.qmc.phidget1200_async)
@@ -49193,12 +49214,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab3Layout.setContentsMargins(2,10,2,5)
         #LAYOUT TAB 4 (Phidgets)
         tab4Layout = QVBoxLayout()
-        tab4Layout.addLayout(phidgetVBox)        
+        tab4Layout.addLayout(phidgetVBox)
         tab4Layout.setContentsMargins(2,10,2,5)
         tab4Layout.setSpacing(3)
         #LAYOUT TAB 5 (Yoctopuce)
         tab5Layout = QVBoxLayout()
-        tab5Layout.addLayout(yoctoVBox)        
+        tab5Layout.addLayout(yoctoVBox)
         tab5Layout.setContentsMargins(2,10,2,5)
         #LAYOUT TAB 6 (Ambient)
         tab6Layout = QVBoxLayout()
@@ -54939,7 +54960,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.pidSVSliderMax.setAlignment(Qt.AlignRight)
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
-        self.pidSVSliderMax.setValue(aw.pidcontrol.svSliderMax)   
+        self.pidSVSliderMax.setValue(aw.pidcontrol.svSliderMax)
         self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangedSlot)
         pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","SV max",None))
         if aw.qmc.mode == "F":
@@ -54948,7 +54969,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         elif aw.qmc.mode == "C":
             self.pidSVSliderMin.setSuffix(" C")
             self.pidSVSliderMax.setSuffix(" C")
-                    
+
         tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV (7-0)",None))
         tab2getsvbutton.setFocusPolicy(Qt.NoFocus)
         tab2putsvbutton = QPushButton(QApplication.translate("Button","Write SV (7-0)",None))
@@ -57677,7 +57698,7 @@ class FujiPID(object):
                     0x84C1, 0x8581, 0x4540, 0x8701, 0x47C0, 0x4680, 0x8641, 0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040)
         cr=0xFFFF 
         for j in string:
-            tmp = cr ^(o(j))
+            tmp = cr ^(j)
             cr =(cr >> 8)^crc16tab[(tmp & 0xff)]
         return cr
 
