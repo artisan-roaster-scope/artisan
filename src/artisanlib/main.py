@@ -12778,6 +12778,9 @@ class ApplicationWindow(QMainWindow):
         self.rankingExcelAction.triggered.connect(self.rankingExcelReport)
         self.rankingMenu.addAction(self.rankingExcelAction)
 
+        self.savestatisticsAction = QAction(UIconst.FILE_MENU_SAVESTATISTICS,self)
+        self.savestatisticsAction.triggered.connect(self.saveStatistics)        
+        self.fileMenu.addAction(self.savestatisticsAction)
 
         self.fileMenu.addSeparator()
 
@@ -18554,6 +18557,8 @@ class ApplicationWindow(QMainWindow):
         self.WindowconfigAction.setEnabled(True)
         self.colorsAction.setEnabled(True)
         self.themeMenu.setEnabled(True)
+        if self.qmc.statssummary:
+            self.savestatisticsAction.setEnabled(True)
         self.displayonlymenus()
         
 
@@ -18609,6 +18614,7 @@ class ApplicationWindow(QMainWindow):
         self.switchAction.setEnabled(False)
         self.machineMenu.setEnabled(False)
         self.themeMenu.setEnabled(False)
+        self.savestatisticsAction.setEnabled(False)
         self.displayonlymenus()
 
     def displayonlymenus(self):
@@ -23376,6 +23382,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.showmet = bool(toBool(settings.value("showmet",self.qmc.showmet)))
             if settings.contains("statssummary"):
                 self.qmc.statssummary = bool(toBool(settings.value("statssummary")))                
+                if self.qmc.statssummary:
+                    self.savestatisticsAction.setEnabled(True)
+                else:
+                    self.savestatisticsAction.setEnabled(False)
             if settings.contains("statsmaxchrperline"):
                 self.qmc.statsmaxchrperline = int(settings.value("statsmaxchrperline", aw.qmc.statsmaxchrperline))
             if settings.contains("showtimeguide"):
@@ -24909,6 +24919,41 @@ class ApplicationWindow(QMainWindow):
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionReport() {0}").format(str(e)),exc_tb.tb_lineno)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def saveStatistics(self,_=False):
+        try:
+            aw.qmc.redraw()
+            QApplication.processEvents()
+            # 0. MPL coordinate systems & transformations: 
+            #   https://matplotlib.org/3.1.1/tutorials/advanced/transforms_tutorial.html
+            # 1.get bounding box in axis cooridnates
+            try:
+                rect_extents = aw.qmc.rect.get_bbox()
+            except:
+                return
+            # 2. convert those to display coordinates
+            rect_extents_display = aw.qmc.ax.transData.transform(rect_extents)
+            # 3. convert display coordinates to figure-inches
+            rect_extents_bbox_inches = aw.qmc.fig.dpi_scale_trans.inverted().transform(rect_extents_display)
+            # 4. generate
+            rect_bbox_inches =  mpl.transforms.Bbox.from_extents(rect_extents_bbox_inches)
+            # 5. fig.save
+            # MPL 3.1.1 does not properly handle saving pdf on Windows when figure dpi not 72.  Maybe fixed in a future version.
+            # ref: https://github.com/matplotlib/matplotlib/issues/15497#issuecomment-548072609
+            if platf == 'Windows':
+                ext = "*.png"
+            else:
+                ext = "*,pdf"
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Statistics",None), ext=ext)
+            if filename:
+                aw.qmc.fig.savefig(filename,bbox_inches=rect_bbox_inches,pad_inches=0)
+                aw.sendmessage(QApplication.translate("Message","Statistics Saved",None))
+
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " saveStatistics() {0}").format(str(e)),exc_tb.tb_lineno)
     
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -41111,6 +41156,10 @@ class StatisticsDlg(ArtisanDialog):
         if aw.qmc.autotimex and not aw.qmc.statssummary:
             aw.autoAdjustAxis()
         aw.qmc.redraw(recomputeAllDeltas=False)
+        if aw.qmc.statssummary and not aw.qmc.flagon:
+            aw.savestatisticsAction.setEnabled(True)
+        else:
+            aw.savestatisticsAction.setEnabled(False)
     
     @pyqtSlot(int)
     def changeStatisticsflag(self,value):
