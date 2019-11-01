@@ -258,7 +258,7 @@ def sendLog():
     message = MIMEMultipart()
     if config.app_window.plus_email is not None:
         message['From'] = config.app_window.plus_email
-    message["To"] = "info@artisan.plus"
+    message["To"] = "{}@{}".format(config.log_file_account,config.log_file_domain)
     message["Subject"] = "artisan.plus client log"
     message.attach(MIMEText("Please find attached the artisan.plus log file written by Artisan!\n--\n", "plain"))
     with open(config.log_file_path, "rb") as attachment:

@@ -25,11 +25,12 @@ install:
   - curl -k -L -O https://netcologne.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip
   - 7z x libusb-win32-bin-1.2.6.0.zip
   - copy libusb-win32-bin-1.2.6.0\bin\amd64\libusb0.dll C:\Windows\SysWOW64
-  - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
-  - 7z x Phidget22Python.zip
-  - cd Phidget22Python
-  - python setup.py install
-  - cd ..
+# Phidget Python lib no installed via pip
+#  - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
+#  - 7z x Phidget22Python.zip
+#  - cd Phidget22Python
+#  - python setup.py install
+#  - cd ..
 
 build_script:
   - cmd: cd src

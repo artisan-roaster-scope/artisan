@@ -100,6 +100,10 @@ outbox_cache = "outbox"
 # the log_file logs communication and other important events
 log_file = "artisan_plus"
 
+# logfile email destination
+log_file_domain = "artisan.plus"
+log_file_account = "logfile"
+
 
 # Logging
 
