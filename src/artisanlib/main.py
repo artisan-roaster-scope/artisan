@@ -15410,7 +15410,7 @@ class ApplicationWindow(QMainWindow):
         action = self.sender()
         if action:
             label = (action.text() if action.data()[1] == "" else "{} {}".format(action.data()[1],action.text()))
-            string = QApplication.translate("Message", "Configure for {0}?<br>Your current settings will be overwritten!<br><br>"+
+            string = QApplication.translate("Message", "Configure for {0}?<br><br>Your current settings will be overwritten!<br><br>"+
                     "It is advisable to save your current settings beforehand via menu Help >> Save Settings.",None).format(label)
             reply = QMessageBox.question(aw,QApplication.translate("Message", "Adjust Settings",None),string,
                 QMessageBox.Yes|QMessageBox.Cancel)
@@ -15419,7 +15419,7 @@ class ApplicationWindow(QMainWindow):
             elif reply == QMessageBox.Yes:
                 aw.qmc.etypes = aw.qmc.etypesdefault
                 aw.loadSettings(fn=action.data()[0],remember=False)
-                aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(action.text()))
+                aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(label))
                 if action.data()[1] == "Phidget VINT":
                     if action.text() == "Ambient":
                         elevation,res = QInputDialog.getInt(self,
