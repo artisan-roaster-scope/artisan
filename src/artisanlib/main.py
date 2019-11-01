@@ -20710,6 +20710,7 @@ class ApplicationWindow(QMainWindow):
                     ["Time2",  "time2"             ],
                     ["ET",     "self.qmc.temp1[i]" ],
                     ["BT",     "self.qmc.temp2[i]" ],
+                    [deltaLabelUTF8 + "BT","self.qmc.delta2[i]"],
                     ["Event",  "event"             ],
                     ]
                 extraslist = list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)]))
@@ -20742,6 +20743,18 @@ class ApplicationWindow(QMainWindow):
                             event = events[e][1] #@UnusedVariable
                             events[e][2] = True
                             break
+                    if i in aw.qmc.specialevents:
+#                        a = [k for k, j in enumerate(aw.qmc.specialevents) if j == i]
+                        for n,m in enumerate(aw.qmc.specialevents):
+                            if m == i:
+                                if len(event) > 0:
+                                    event += ","
+                                #if aw.qmc.specialeventstype[n] == 4:       # only export the event Description for -- type events
+                                if len(aw.qmc.specialeventsStrings[n]) > 0: # always export the event Description if it exist
+                                    event += aw.qmc.specialeventsStrings[n]
+                                else:
+                                    event += aw.qmc.etypesf(aw.qmc.specialeventstype[n])[0] + aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[n])
+
                     time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
                     if not last_time or last_time != time1:
                         extratemps = []
@@ -20760,9 +20773,10 @@ class ApplicationWindow(QMainWindow):
                         ws.cell(row=r+i, column=3).value = eval(fieldlist[2][1])
                         ws.cell(row=r+i, column=4).value = eval(fieldlist[3][1])
                         ws.cell(row=r+i, column=5).value = eval(fieldlist[4][1])
+                        ws.cell(row=r+i, column=6).value = eval(fieldlist[5][1])
 
                         for j in range(len(extratemps)):
-                            ws.cell(row=r+i, column=6+j).value = extratemps[j]
+                            ws.cell(row=r+i, column=7+j).value = extratemps[j]
 
                     last_time = time1
 
