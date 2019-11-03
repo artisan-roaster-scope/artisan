@@ -29562,18 +29562,17 @@ class ApplicationWindow(QMainWindow):
                 curvefit_starttime = drytime
             curvefit_endtime = aw.qmc.timex[aw.qmc.timeindex[6]]
 
-            #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after CHARGE.
-            tpidx = self.findTP()
-            if tpidx > 1:
-                tptime = self.qmc.timex[tpidx]
-                curvefit_starttime = .25 * (drytime - tptime) + tptime
-            else:
-                curvefit_starttime = .33 * (drytime - aw.qmc.timex[aw.qmc.timeindex[0]]) + aw.qmc.timex[aw.qmc.timeindex[0]]
-
             # curve fit results
             self.cfr = {} #use dict to allow more flexible expansion in the future
             # ln() or all
             if exp == 0 or exp == -1:
+                #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after CHARGE.
+                tpidx = self.findTP()
+                if tpidx > 1:
+                    tptime = self.qmc.timex[tpidx]
+                    curvefit_starttime = .25 * (drytime - tptime) + tptime
+                else:
+                    curvefit_starttime = .33 * (drytime - aw.qmc.timex[aw.qmc.timeindex[0]]) + aw.qmc.timex[aw.qmc.timeindex[0]]
                 res = self.analysisGetResults(exp=0, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_naturallog"] = res["equ"]
                 self.cfr["dbt_naturallog"] = res["rmse_BT"]
