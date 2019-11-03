@@ -2089,6 +2089,9 @@ class tgraphcanvas(FigureCanvas):
         self.analysisresultsloc = [.5,.5]
         self.analysispickflag = False
         self.analysisresultsstr = ""
+        self.analysisstartchoice = 0
+        self.analysisoffset = 180
+
         self.analysis_iteration = 0   #dave
         self.analysis_iterate = True  #dave
 
@@ -16253,6 +16256,20 @@ class ApplicationWindow(QMainWindow):
                 analysis_DeltaBT = aw.qmc.delta2[analysis_start:analysis_end]
                 analysis_BTB = aw.qmc.stemp2B[analysis_start:analysis_end]
                 analysis_DeltaBTB = aw.qmc.delta2B[analysis_start:analysis_end]
+                    
+                # Replace None values in the Delta curves with the closest numeric value on the right
+                for i in range(len(analysis_DeltaBT) - 1, -1, -1):
+                    if analysis_DeltaBT[i] == None:
+                        try:
+                            analysis_DeltaBT[i] = analysis_DeltaBT[i+1]
+                        except:
+                            analysis_DeltaBT[i] = 0
+                for i in range(len(analysis_DeltaBTB) - 1, -1, -1):
+                    if analysis_DeltaBTB[i] == None:
+                        try:
+                            analysis_DeltaBTB[i] = analysis_DeltaBTB[i+1]
+                        except:
+                            analysis_DeltaBTB[i] = 0
                 
                 np_bt = numpy.array(analysis_BT)
                 np_btb = numpy.array(analysis_BTB)
@@ -22451,6 +22468,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.statisticsconditions = tmpconds
             if settings.contains("AnalysisResultsLoc"):
                 self.qmc.analysisresultsloc = [toFloat(x) for x in toList(settings.value("AnalysisResultsLoc",self.qmc.analysisresultsloc))]
+            if settings.contains("analysisstartchoice"):
+                self.qmc.analysisstartchoice = toInt(settings.value("analysisstartchoice",int()))
+            if settings.contains("analysisoffset"):
+                self.qmc.analysisoffset = toInt(settings.value("analysisoffset",int()))
             if settings.contains("AUCbegin"):
                 self.qmc.AUCbegin = toInt(settings.value("AUCbegin",int()))
                 self.qmc.AUCbase = toInt(settings.value("AUCbase",int()))
@@ -23931,6 +23952,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Statistics",self.qmc.statisticsflags)
             settings.setValue("StatisticsConds",self.qmc.statisticsconditions)
             settings.setValue("AnalysisResultsLoc",aw.qmc.analysisresultsloc)
+            settings.setValue("analysisstartchoice",aw.qmc.analysisstartchoice)
+            settings.setValue("analysisoffset",aw.qmc.analysisoffset)
             #save AUC
             settings.setValue("AUCbegin",self.qmc.AUCbegin)
             settings.setValue("AUCbase",self.qmc.AUCbase)
@@ -29519,7 +29542,15 @@ class ApplicationWindow(QMainWindow):
                 fcstime = self.qmc.timex[i]
 
             # set the interval of interest from analysis_starttime to analysis_endtime
-            analysis_starttime = fcstime - 120
+            if self.qmc.analysisstartchoice == 1:  
+                #120 sec before FCs
+                analysis_starttime = fcstime - 120
+            elif self.qmc.analysisstartchoice == 2:  
+                #Custom
+                analysis_starttime = self.qmc.analysisoffset + aw.qmc.timex[aw.qmc.timeindex[0]]
+            else:  
+                #DRY END
+                analysis_starttime = drytime
             analysis_endtime = aw.qmc.timex[aw.qmc.timeindex[6]]
 
             #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after DROP.
@@ -30564,6 +30595,41 @@ class HUDDlg(ArtisanDialog):
         self.exptimeoffsetLabel = QLabel(QApplication.translate("Label", "Offset seconds from CHARGE", None))
         self.exptimeoffset = QLineEdit("180")   #default to 180 seconds past CHARGE
         self.exptimeoffset.editingFinished.connect(self.exptimeoffsetChanged) 
+        
+        self.analyzecombobox = QComboBox()
+        self.analyzecomboboxLabel = QLabel(QApplication.translate("Label", "Start of Analyze window", None))
+        self.analyzecombobox.addItems([QApplication.translate("ComboBox","DRY END",None),
+                                       QApplication.translate("ComboBox","120 secs before FCs",None),
+                                       QApplication.translate("ComboBox","Custom",None)])
+        width = self.analyzecombobox.minimumSizeHint().width()
+        self.analyzecombobox.setMinimumWidth(width)
+        self.analyzecombobox.setToolTip(QApplication.translate("Tooltip", "Choose the start point of Analyze curve fitting", None))
+        self.analyzecombobox.setFocusPolicy(Qt.NoFocus)
+        self.analyzecombobox.setCurrentIndex(aw.qmc.analysisstartchoice)
+        self.analyzecombobox.currentIndexChanged.connect(self.changeAnalyzecombobox)
+        self.analyzetimeoffsetLabel = QLabel(QApplication.translate("Label", "Custom offset seconds from CHARGE", None))
+        self.analyzetimeoffset = QLineEdit(str(aw.qmc.analysisoffset))   #default to 180 seconds past CHARGE
+        self.analyzetimeoffset.setMaximumWidth(100)
+        self.analyzetimeoffset.setMinimumWidth(55)
+        self.analyzetimeoffset.editingFinished.connect(self.analyzetimeoffsetChanged)
+        if self.analyzecombobox.currentIndex() in [0,1]:
+            self.analyzetimeoffset.setEnabled(False)
+        else:
+            self.analyzetimeoffset.setEnabled(True)
+        analyzeHLayout1 = QHBoxLayout()
+        analyzeHLayout1.addWidget(self.analyzecomboboxLabel)
+        analyzeHLayout1.addStretch()
+        analyzeHLayout1.addWidget(self.analyzetimeoffsetLabel)
+        analyzeHLayout2 = QHBoxLayout()
+        analyzeHLayout2.addWidget(self.analyzecombobox)
+        analyzeHLayout2.addStretch()
+        analyzeHLayout2.addWidget(self.analyzetimeoffset)
+        analyzeVLayout = QVBoxLayout()
+        analyzeVLayout.addLayout(analyzeHLayout1)
+        analyzeVLayout.addLayout(analyzeHLayout2)
+        analyzeLayoutGroupLayout = QGroupBox(QApplication.translate("GroupBox","Analyze Options",None))
+        analyzeLayoutGroupLayout.setLayout(analyzeVLayout)
+        
         self.bkgndButton = QPushButton(QApplication.translate("Button","Create Background Curve",None))
         self.bkgndButton.setFocusPolicy(Qt.NoFocus)
         self.bkgndButton.setMaximumSize(self.bkgndButton.sizeHint())
@@ -30683,6 +30749,7 @@ class HUDDlg(ArtisanDialog):
         tab3Layout.addLayout(interUniLayout)
         tab3Layout.addLayout(lnvarexpvarLayout)
         tab3Layout.addWidget(polyfitGroupLayout)
+        tab3Layout.addWidget(analyzeLayoutGroupLayout)
         tab3Layout.addStretch()
         ##### TAB 4
         self.styleComboBox = QComboBox()
@@ -30914,6 +30981,20 @@ class HUDDlg(ArtisanDialog):
         else:
             return
     
+    @pyqtSlot(int)
+    def changeAnalyzecombobox(self,i):
+        aw.qmc.analysisstartchoice = i
+        if i == 2:  # Custom
+            self.analyzetimeoffset.setEnabled(True)
+        else:
+            self.analyzetimeoffset.setEnabled(False)
+        return
+        
+    @pyqtSlot()
+    def analyzetimeoffsetChanged(self):
+        aw.qmc.analysisoffset = int(self.analyzetimeoffset.text())
+        return
+        
     @pyqtSlot()
     def exptimeoffsetChanged(self):
         self.expvarCheck.setChecked(False)
