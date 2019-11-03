@@ -2089,11 +2089,10 @@ class tgraphcanvas(FigureCanvas):
         self.analysisresultsloc = [.5,.5]
         self.analysispickflag = False
         self.analysisresultsstr = ""
-        self.analysisstartchoice = 0
+        self.analysisstartchoice = 1
         self.analysisoffset = 180
-
-        self.analysis_iteration = 0   #dave
-        self.analysis_iterate = True  #dave
+        self.curvefitstartchoice = 0
+        self.curvefitoffset = 180
 
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
@@ -13147,13 +13146,13 @@ class ApplicationWindow(QMainWindow):
         self.fitIdealautoAction.setShortcut("Ctrl+K")
         self.analyzeMenu.addAction(self.fitIdealautoAction)
         self.analyzeMenu.addSeparator()
-        self.fitIdealx2Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to",None) + " x\xb2",self)
+        self.fitIdealx2Action = QAction(QApplication.translate("Menu",u"Fit BT to",None) + " x\xb2",self)
         self.fitIdealx2Action.triggered.connect(self.analysisfitCurvesX2)
         self.analyzeMenu.addAction(self.fitIdealx2Action)
-        self.fitIdealx3Action = QAction(QApplication.translate("Menu",u"Fit DE->DROP to",None) + " x\xb3",self)
+        self.fitIdealx3Action = QAction(QApplication.translate("Menu",u"Fit BT to",None) + " x\xb3",self)
         self.fitIdealx3Action.triggered.connect(self.analysisfitCurvesX3)
         self.analyzeMenu.addAction(self.fitIdealx3Action)
-        self.fitIdealx0Action = QAction(QApplication.translate("Menu","Fit DE->DROP to",None) + " ln()",self)
+        self.fitIdealx0Action = QAction(QApplication.translate("Menu","Fit BT to",None) + " ln()",self)
         self.fitIdealx0Action.triggered.connect(self.analysisfitCurvesLN)
         self.analyzeMenu.addAction(self.fitIdealx0Action)
         self.analyzeMenu.addSeparator()
@@ -16311,9 +16310,7 @@ class ApplicationWindow(QMainWindow):
                     lengths = numpy.diff(numpy.r_[starts, len(crossings)])
                     signs = crossings[starts]
 
-#                    print(starts,lengths,signs)
                     idelta = (np_dbt - np_dbtb) * crossings
-#                    print(idelta)
                     ideltamax = []
                     for i in range(len(starts)):
                         ideltamax.append(numpy.amax(idelta[starts[i]:starts[i]+lengths[i]]))
@@ -22472,6 +22469,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.analysisstartchoice = toInt(settings.value("analysisstartchoice",int()))
             if settings.contains("analysisoffset"):
                 self.qmc.analysisoffset = toInt(settings.value("analysisoffset",int()))
+            if settings.contains("curvefitstartchoice"):
+                self.qmc.curvefitstartchoice = toInt(settings.value("curvefitstartchoice",int()))
+            if settings.contains("curvefitoffset"):
+                self.qmc.curvefitoffset = toInt(settings.value("curvefitoffset",int()))
             if settings.contains("AUCbegin"):
                 self.qmc.AUCbegin = toInt(settings.value("AUCbegin",int()))
                 self.qmc.AUCbase = toInt(settings.value("AUCbase",int()))
@@ -23954,6 +23955,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("AnalysisResultsLoc",aw.qmc.analysisresultsloc)
             settings.setValue("analysisstartchoice",aw.qmc.analysisstartchoice)
             settings.setValue("analysisoffset",aw.qmc.analysisoffset)
+            settings.setValue("curvefitstartchoice",aw.qmc.curvefitstartchoice)
+            settings.setValue("curvefitoffset",aw.qmc.curvefitoffset)
             #save AUC
             settings.setValue("AUCbegin",self.qmc.AUCbegin)
             settings.setValue("AUCbase",self.qmc.AUCbase)
@@ -29541,31 +29544,37 @@ class ApplicationWindow(QMainWindow):
                 i = self.findDryEnd(phasesindex=2)
                 fcstime = self.qmc.timex[i]
 
-            # set the interval of interest from analysis_starttime to analysis_endtime
-            if self.qmc.analysisstartchoice == 1:  
-                #120 sec before FCs
+            # set the interval of interest
+            if self.qmc.analysisstartchoice == 1:   #120 sec before FCs
                 analysis_starttime = fcstime - 120
-            elif self.qmc.analysisstartchoice == 2:  
-                #Custom
+            elif self.qmc.analysisstartchoice == 2: #Custom
                 analysis_starttime = self.qmc.analysisoffset + aw.qmc.timex[aw.qmc.timeindex[0]]
-            else:  
-                #DRY END
+            else:                                   #DRY END
                 analysis_starttime = drytime
             analysis_endtime = aw.qmc.timex[aw.qmc.timeindex[6]]
 
-            #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after DROP.
+            # set the curve fit time
+            if self.qmc.curvefitstartchoice == 1:   #120 sec before FCs
+                curvefit_starttime = fcstime - 120
+            elif self.qmc.curvefitstartchoice == 2: #Custom
+                curvefit_starttime = self.qmc.curvefitoffset + aw.qmc.timex[aw.qmc.timeindex[0]]
+            else:                                   #DRY END
+                curvefit_starttime = drytime
+            curvefit_endtime = aw.qmc.timex[aw.qmc.timeindex[6]]
+
+            #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after CHARGE.
             tpidx = self.findTP()
             if tpidx > 1:
                 tptime = self.qmc.timex[tpidx]
-                lnoffset = .25 * (drytime - tptime) + tptime
+                curvefit_starttime = .25 * (drytime - tptime) + tptime
             else:
-                lnoffset = .33 * (drytime - aw.qmc.timex[aw.qmc.timeindex[0]]) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                curvefit_starttime = .33 * (drytime - aw.qmc.timex[aw.qmc.timeindex[0]]) + aw.qmc.timex[aw.qmc.timeindex[0]]
 
             # curve fit results
             self.cfr = {} #use dict to allow more flexible expansion in the future
             # ln() or all
             if exp == 0 or exp == -1:
-                res = self.analysisGetResults(exp=0,timeoffset=lnoffset, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                res = self.analysisGetResults(exp=0, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_naturallog"] = res["equ"]
                 self.cfr["dbt_naturallog"] = res["rmse_BT"]
                 self.cfr["dbdbt_naturallog"] = res["rmse_deltaBT"]
@@ -29577,7 +29586,7 @@ class ApplicationWindow(QMainWindow):
                 progress.setValue(1)
             # cubic or all
             if exp == 3 or exp == -1:
-                res = self.analysisGetResults(exp=3,timeoffset=analysis_starttime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                res = self.analysisGetResults(exp=3, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_cubic"] = res["equ"]
                 self.cfr["dbt_cubic"] = res["rmse_BT"]
                 self.cfr["dbdbt_cubic"] = res["rmse_deltaBT"]
@@ -29587,33 +29596,9 @@ class ApplicationWindow(QMainWindow):
                 self.cfr['ror_min_delta_cubic'] = res['ror_min_delta']
                 self.cfr['ror_maxmin_delta_cubic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(2)
-#            # cubic or all
-            if exp == 3 or exp == -1:
-                res = self.analysisGetResults(exp=3,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-                self.cfr["equ_cubicDRY"] = res["equ"]
-                self.cfr["dbt_cubicDRY"] = res["rmse_BT"]
-                self.cfr["dbdbt_cubicDRY"] = res["rmse_deltaBT"]
-                self.cfr["r2_deltabt_cubicDRY"] = res["r2_deltaBT"]
-                self.cfr['ror_fcs_delta_cubicDRY'] = res['ror_fcs_delta']
-                self.cfr['ror_max_delta_cubicDRY'] = res['ror_max_delta']
-                self.cfr['ror_min_delta_cubicDRY'] = res['ror_min_delta']
-                self.cfr['ror_maxmin_delta_cubicDRY'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
-                progress.setValue(2)
             # quadratic or all
             if exp == 2 or exp == -1:
-                res = self.analysisGetResults(exp=2,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-                self.cfr["equ_quadraticDRY"] = res["equ"]
-                self.cfr["dbt_quadraticDRY"] = res["rmse_BT"]
-                self.cfr["dbdbt_quadraticDRY"] = res["rmse_deltaBT"]
-                self.cfr["r2_deltabt_quadraticDRY"] = res["r2_deltaBT"]
-                self.cfr['ror_fcs_delta_quadraticDRY'] = res['ror_fcs_delta']
-                self.cfr['ror_max_delta_quadraticDRY'] = res['ror_max_delta']
-                self.cfr['ror_min_delta_quadraticDRY'] = res['ror_min_delta']
-                self.cfr['ror_maxmin_delta_quadraticDRY'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
-                progress.setValue(3)
-            # quadratic or all
-            if exp == 2 or exp == -1:
-                res = self.analysisGetResults(exp=2,timeoffset=analysis_starttime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                res = self.analysisGetResults(exp=2, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_quadratic"] = res["equ"]
                 self.cfr["dbt_quadratic"] = res["rmse_BT"]
                 self.cfr["dbdbt_quadratic"] = res["rmse_deltaBT"]
@@ -29623,24 +29608,6 @@ class ApplicationWindow(QMainWindow):
                 self.cfr['ror_min_delta_quadratic'] = res['ror_min_delta']
                 self.cfr['ror_maxmin_delta_quadratic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(3)
-
-#dave  analysis_iteration
-#            if aw.qmc.analysis_iteration == 0 and aw.qmc.analysis_iterate and exp == -1:
-#                res = self.analysisGetResults(exp=2,timeoffset=analysis_starttime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-#                aw.sendmessage("This curve fit: x^2 FCs-120 to DROP")
-#                aw.qmc.analysis_iteration += 1
-#            elif aw.qmc.analysis_iteration == 1 and aw.qmc.analysis_iterate and exp == -1:
-#                res = self.analysisGetResults(exp=2,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-#                aw.sendmessage("This curve fit: x^2 DRY to DROP")
-#                aw.qmc.analysis_iteration += 1
-#            elif aw.qmc.analysis_iteration == 2 and aw.qmc.analysis_iterate and exp == -1:
-#                res = self.analysisGetResults(exp=3,timeoffset=analysis_starttime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-#                aw.sendmessage("This curve fit: x^3 FCs-120 to DROP")
-#                aw.qmc.analysis_iteration += 1
-#            elif aw.qmc.analysis_iteration == 3 and aw.qmc.analysis_iterate and exp == -1:
-#                res = self.analysisGetResults(exp=3,timeoffset=drytime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-#                aw.sendmessage("This curve fit: x^3 DRY to DROP")
-#                aw.qmc.analysis_iteration = -1
             
             # find the curve with the best fit
             try:
@@ -29654,12 +29621,8 @@ class ApplicationWindow(QMainWindow):
             x.float_format = "5.2"
             if "equ_quadratic" in self.cfr:
                 x.add_row(["*" if self.cfr["dbdbt_quadratic"] == bestfit else "", "x\u00b2", self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"], self.cfr["r2_deltabt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
-            if "equ_quadraticDRY" in self.cfr:
-                x.add_row(["*" if self.cfr["dbdbt_quadraticDRY"] == bestfit else "", "x\u00b2DRY", self.cfr["dbt_quadraticDRY"], self.cfr["dbdbt_quadraticDRY"], self.cfr["r2_deltabt_quadraticDRY"], self.cfr['ror_fcs_delta_quadraticDRY'], self.cfr['ror_maxmin_delta_quadraticDRY']])
             if "equ_cubic" in self.cfr:
                 x.add_row(["*" if self.cfr["dbdbt_cubic"] == bestfit else "", "x\u00b3", self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"], self.cfr["r2_deltabt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
-            if "equ_cubicDRY" in self.cfr:
-                x.add_row(["*" if self.cfr["dbdbt_cubicDRY"] == bestfit else "", "x\u00b3DRY", self.cfr["dbt_cubicDRY"], self.cfr["dbdbt_cubicDRY"], self.cfr["r2_deltabt_cubicDRY"], self.cfr['ror_fcs_delta_cubicDRY'], self.cfr['ror_maxmin_delta_cubicDRY']])
             if "equ_naturallog" in self.cfr:
                 x.add_row(["*" if self.cfr["dbdbt_naturallog"] == bestfit else "", "ln()", self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"], self.cfr["r2_deltabt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
             
@@ -29672,7 +29635,7 @@ class ApplicationWindow(QMainWindow):
             RMSEstr += "\n{0}   {1}{2:4.1f}".format(QApplication.translate("Label", "Note: All values calculated in Celsius",None), QApplication.translate("Label", "Actual RoR at FCs=",None), res['ror_fcs_act']) 
 
             # create the results annotation and update the graph 
-            self.analysisShowResults(RMSEstr,analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+            self.analysisShowResults(RMSEstr,  curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -29682,7 +29645,7 @@ class ApplicationWindow(QMainWindow):
         progress.cancel()
         progress = None
             
-    def analysisShowResults(self,resultstr="",redraw=True,analysis_starttime=0, analysis_endtime=0):
+    def analysisShowResults(self,resultstr="",redraw=True, curvefit_starttime=0, curvefit_endtime=0, analysis_starttime=0, analysis_endtime=0):
         if redraw:
             self.qmc.redraw(recomputeAllDeltas=True)
         if len(resultstr) == 0:
@@ -29691,15 +29654,25 @@ class ApplicationWindow(QMainWindow):
             self.qmc.analysisresultsstr = resultstr
         try:
             # draw analysis mask
-            a = aw.qmc.alpha["analysismask"]
+            a = aw.qmc.alpha["analysismask"]/2
             fc = aw.qmc.palette["analysismask"]
             z = 20
+            self.qmc.ax.axvspan(aw.qmc.ax.get_xlim()[0], curvefit_starttime, facecolor=fc, alpha=a, zorder=z)
+            self.qmc.ax.axvspan(curvefit_endtime, aw.qmc.ax.get_xlim()[1], facecolor=fc, alpha=a, zorder=z)
+            self.qmc.ax.axvspan(curvefit_starttime, curvefit_endtime, ymin=0, ymax=0.025, facecolor=fc, alpha=a, zorder=z)
+            self.qmc.ax.axvspan(curvefit_starttime, curvefit_endtime, ymin=0.975, ymax=1.00,  facecolor=fc, alpha=a, zorder=z)
+            
             self.qmc.ax.axvspan(aw.qmc.ax.get_xlim()[0], analysis_starttime, facecolor=fc, alpha=a, zorder=z)
             self.qmc.ax.axvspan(analysis_endtime, aw.qmc.ax.get_xlim()[1], facecolor=fc, alpha=a, zorder=z)
             self.qmc.ax.axvspan(analysis_starttime, analysis_endtime, ymin=0, ymax=0.025, facecolor=fc, alpha=a, zorder=z)
             self.qmc.ax.axvspan(analysis_starttime, analysis_endtime, ymin=0.975, ymax=1.00,  facecolor=fc, alpha=a, zorder=z)
-            
-            #reset the annotationi location if the origin is out of the screen
+
+            # show warning if the analysis starts earlier than curve fit
+            if curvefit_starttime > analysis_starttime:
+                string = QApplication.translate("Message","Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.", None)
+                QMessageBox.warning(self,QApplication.translate("Message","Analysis earlier than Curve fit", None),string)
+
+            #reset the annotation location if the origin is out of the screen
             for dim in self.qmc.analysisresultsloc:
                 if dim >= 1 or dim <=0:
                     self.qmc.analysisresultsloc = [0.5,0.5]
@@ -29728,7 +29701,7 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisShowResults(): {0}").format(str(e)),exc_tb.tb_lineno)
 
-    def analysisGetResults(self,exp=2,timeoffset=0, analysis_starttime=0, analysis_endtime=0):
+    def analysisGetResults(self,exp=2, curvefit_starttime=0, curvefit_endtime=0, analysis_starttime=0, analysis_endtime=0):
         #run all analysis in celsius
         if aw.qmc.mode == "F":
             restoreF = True
@@ -29737,7 +29710,7 @@ class ApplicationWindow(QMainWindow):
             restoreF = False
 
         res = {}  #use dict to allow more flexible expansion in the future
-        res['equ'] = self.qmc.lnRegression(power=exp, timeoffset=timeoffset, plot=False)
+        res['equ'] = self.qmc.lnRegression(power=exp, timeoffset=curvefit_starttime, plot=False)
         self.deleteBackground()
         self.setbackgroundequ(EQU=["",res['equ']], silent=True)
         #QApplication.processEvents()  #occasionally the fit curve remains showing.
@@ -30597,13 +30570,13 @@ class HUDDlg(ArtisanDialog):
         self.exptimeoffset.editingFinished.connect(self.exptimeoffsetChanged) 
         
         self.analyzecombobox = QComboBox()
-        self.analyzecomboboxLabel = QLabel(QApplication.translate("Label", "Start of Analyze window", None))
+        self.analyzecomboboxLabel = QLabel(QApplication.translate("Label", "Start of Analyze interval of interest", None))
         self.analyzecombobox.addItems([QApplication.translate("ComboBox","DRY END",None),
                                        QApplication.translate("ComboBox","120 secs before FCs",None),
                                        QApplication.translate("ComboBox","Custom",None)])
         width = self.analyzecombobox.minimumSizeHint().width()
         self.analyzecombobox.setMinimumWidth(width)
-        self.analyzecombobox.setToolTip(QApplication.translate("Tooltip", "Choose the start point of Analyze curve fitting", None))
+        self.analyzecombobox.setToolTip(QApplication.translate("Tooltip", "Choose the start point of analysis interval of interest", None))
         self.analyzecombobox.setFocusPolicy(Qt.NoFocus)
         self.analyzecombobox.setCurrentIndex(aw.qmc.analysisstartchoice)
         self.analyzecombobox.currentIndexChanged.connect(self.changeAnalyzecombobox)
@@ -30616,19 +30589,57 @@ class HUDDlg(ArtisanDialog):
             self.analyzetimeoffset.setEnabled(False)
         else:
             self.analyzetimeoffset.setEnabled(True)
-        analyzeHLayout1 = QHBoxLayout()
-        analyzeHLayout1.addWidget(self.analyzecomboboxLabel)
-        analyzeHLayout1.addStretch()
-        analyzeHLayout1.addWidget(self.analyzetimeoffsetLabel)
-        analyzeHLayout2 = QHBoxLayout()
-        analyzeHLayout2.addWidget(self.analyzecombobox)
-        analyzeHLayout2.addStretch()
-        analyzeHLayout2.addWidget(self.analyzetimeoffset)
-        analyzeVLayout = QVBoxLayout()
-        analyzeVLayout.addLayout(analyzeHLayout1)
-        analyzeVLayout.addLayout(analyzeHLayout2)
+
+        self.curvefitcombobox = QComboBox()
+        self.curvefitcomboboxLabel = QLabel(QApplication.translate("Label", "Start of Curve Fit window", None))
+        self.curvefitcombobox.addItems([QApplication.translate("ComboBox","DRY END",None),
+                                       QApplication.translate("ComboBox","120 secs before FCs",None),
+                                       QApplication.translate("ComboBox","Custom",None)])
+        width = self.curvefitcombobox.minimumSizeHint().width()
+        self.curvefitcombobox.setMinimumWidth(width)
+        self.curvefitcombobox.setToolTip(QApplication.translate("Tooltip", "Choose the start point of curve fitting", None))
+        self.curvefitcombobox.setFocusPolicy(Qt.NoFocus)
+        self.curvefitcombobox.setCurrentIndex(aw.qmc.curvefitstartchoice)
+        self.curvefitcombobox.currentIndexChanged.connect(self.changeCurvefitcombobox)
+        self.curvefittimeoffsetLabel = QLabel(QApplication.translate("Label", "Custom offset seconds from CHARGE", None))
+        self.curvefittimeoffset = QLineEdit(str(aw.qmc.curvefitoffset))   #default to 180 seconds past CHARGE
+        self.curvefittimeoffset.setMaximumWidth(100)
+        self.curvefittimeoffset.setMinimumWidth(55)
+        self.curvefittimeoffset.editingFinished.connect(self.curvefittimeoffsetChanged)
+        if self.curvefitcombobox.currentIndex() in [0,1]:
+            self.curvefittimeoffset.setEnabled(False)
+        else:
+            self.curvefittimeoffset.setEnabled(True)
+        analyzeVLayout1 = QVBoxLayout()
+        analyzeVLayout1.addWidget(self.analyzecomboboxLabel)
+        analyzeVLayout1.addWidget(self.analyzecombobox)
+        analyzeVLayout1.addWidget(self.analyzetimeoffsetLabel)
+        analyzeVLayout1.addWidget(self.analyzetimeoffset)
+        analyzeVLayout2 = QVBoxLayout()
+        analyzeVLayout2.addWidget(self.curvefitcomboboxLabel)
+        analyzeVLayout2.addWidget(self.curvefitcombobox)
+        analyzeVLayout2.addWidget(self.curvefittimeoffsetLabel)
+        analyzeVLayout2.addWidget(self.curvefittimeoffset)
+
+        analyzeHLayout = QHBoxLayout()
+        analyzeHLayout.addLayout(analyzeVLayout2)
+        analyzeHLayout.addStretch()
+        analyzeHLayout.addLayout(analyzeVLayout1)
         analyzeLayoutGroupLayout = QGroupBox(QApplication.translate("GroupBox","Analyze Options",None))
-        analyzeLayoutGroupLayout.setLayout(analyzeVLayout)
+        analyzeLayoutGroupLayout.setLayout(analyzeHLayout)
+#        analyzeHLayout1 = QHBoxLayout()
+#        analyzeHLayout1.addWidget(self.analyzecomboboxLabel)
+#        analyzeHLayout1.addStretch()
+#        analyzeHLayout1.addWidget(self.analyzetimeoffsetLabel)
+#        analyzeHLayout2 = QHBoxLayout()
+#        analyzeHLayout2.addWidget(self.analyzecombobox)
+#        analyzeHLayout2.addStretch()
+#        analyzeHLayout2.addWidget(self.analyzetimeoffset)
+#        analyzeVLayout = QVBoxLayout()
+#        analyzeVLayout.addLayout(analyzeHLayout1)
+#        analyzeVLayout.addLayout(analyzeHLayout2)
+#        analyzeLayoutGroupLayout = QGroupBox(QApplication.translate("GroupBox","Analyze Options",None))
+#        analyzeLayoutGroupLayout.setLayout(analyzeVLayout)
         
         self.bkgndButton = QPushButton(QApplication.translate("Button","Create Background Curve",None))
         self.bkgndButton.setFocusPolicy(Qt.NoFocus)
@@ -30993,6 +31004,20 @@ class HUDDlg(ArtisanDialog):
     @pyqtSlot()
     def analyzetimeoffsetChanged(self):
         aw.qmc.analysisoffset = int(self.analyzetimeoffset.text())
+        return
+        
+    @pyqtSlot(int)
+    def changeCurvefitcombobox(self,i):
+        aw.qmc.curvefitstartchoice = i
+        if i == 2:  # Custom
+            self.curvefittimeoffset.setEnabled(True)
+        else:
+            self.curvefittimeoffset.setEnabled(False)
+        return
+        
+    @pyqtSlot()
+    def curvefittimeoffsetChanged(self):
+        aw.qmc.curvefitoffset = int(self.curvefittimeoffset.text())
         return
         
     @pyqtSlot()
