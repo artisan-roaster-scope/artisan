@@ -2239,30 +2239,54 @@ class tgraphcanvas(FigureCanvas):
             res = aw.float2float(res)
         return res
 
-    def updateAmbientTemp(self):
-        if self.ambientTempSource != 0 and aw.qmc.device in [34,58]: # Phidget 1048 or TMP1101 channel 4 (use internal temp)
+    def updateAmbientTempFromPhidgetModulesOrCurve(self):
+        if not self.ambientTempSource:
+            AT_device = None
             try:
-                if aw.ser.PhidgetTemperatureSensor is not None and aw.ser.PhidgetTemperatureSensor[0].getAttached():
-                    ambient = PhidgetTemperatureSensor()
-                    ambient.setDeviceSerialNumber(aw.ser.PhidgetTemperatureSensor[0].getDeviceSerialNumber())
-                    if aw.qmc.device == 58:
-                        ambient.setHubPort(aw.ser.PhidgetTemperatureSensor[0].getHubPort())
-                    ambient.setChannel(4)
-                    ambient.openWaitForAttachment(1500) # timeout in ms
-                    libtime.sleep(.5)
-                    t = ambient.getTemperature()
-                    if aw.qmc.mode == "F":
-                        aw.qmc.ambientTemp = aw.float2float(aw.qmc.fromCtoF(t))
-                    else:
-                        aw.qmc.ambientTemp = aw.float2float(t)
-                    if ambient.getAttached():
-                        ambient.close()
-            except Exception:
-                pass
-        else:
-            res = aw.qmc.ambientTempSourceAvg()
-            if res is not None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
-                aw.qmc.ambientTemp = aw.float2float(float(res))
+                AT_device = aw.qmc.extradevices.index(36)
+            except:
+                try:
+                    AT_device = aw.qmc.extradevices.index(60)
+                except:
+                    pass
+            if AT_device is not None:
+                # 1048_AT channel #36, TMP1101_AT channel #60
+                # we try to access that devices first channel to retrieve the temperature data
+                try:
+                    ser = aw.extraser[AT_device]
+                    if ser.PhidgetTemperatureSensor is not None:
+                        at = ser.PhidgetTemperatureSensor[0].getTemperature()
+                        if aw.qmc.mode == "F":
+                                at = aw.float2float(aw.qmc.fromCtoF(at))
+                        aw.qmc.ambientTemp = aw.float2float(at)
+                except:
+                    pass
+            # in case the AT channel of the 1048 or the TMP1101 is not used as extra device, we try to attach to it anyhow and read the temp off
+            elif aw.qmc.ambientTemp == 0.0 and aw.qmc.device in [34,58]: # Phidget 1048 or TMP1101 channel 4 (use internal temp)
+                try:
+                    if aw.ser.PhidgetTemperatureSensor is not None and aw.ser.PhidgetTemperatureSensor[0].getAttached():
+                        ambient = PhidgetTemperatureSensor()
+                        ambient.setDeviceSerialNumber(aw.ser.PhidgetTemperatureSensor[0].getDeviceSerialNumber())
+                        if aw.qmc.device == 58:
+                            ambient.setHubPort(aw.ser.PhidgetTemperatureSensor[0].getHubPort())
+                        ambient.setChannel(4)
+                        ambient.openWaitForAttachment(1000) # timeout in ms
+                        libtime.sleep(.5)
+                        t = ambient.getTemperature()
+                        if aw.qmc.mode == "F":
+                            aw.qmc.ambientTemp = aw.float2float(aw.qmc.fromCtoF(t))
+                        else:
+                            aw.qmc.ambientTemp = aw.float2float(t)
+                        if ambient.getAttached():
+                            ambient.close()
+                except:
+                    pass
+        res = aw.qmc.ambientTempSourceAvg()
+        if res is not None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
+            aw.qmc.ambientTemp = aw.float2float(float(res))
+
+    def updateAmbientTemp(self):
+        self.updateAmbientTempFromPhidgetModulesOrCurve()
         try:
             aw.qmc.startPhidgetManager()
             aw.qmc.getAmbientData()
@@ -8538,6 +8562,12 @@ class tgraphcanvas(FigureCanvas):
                             pass
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
+                        
+                        try:
+                            # update ambient temperature if a ambient temperature source is configured and no value yet established
+                            aw.qmc.updateAmbientTempFromPhidgetModulesOrCurve()
+                        except Exception:
+                            pass                        
 
 #PLUS
                         if aw.plus_account is not None:
@@ -9641,7 +9671,7 @@ class tgraphcanvas(FigureCanvas):
                     time_l = []
                     temp_l = []
                 else:
-                    a = [charge]
+                    #a = [charge] # not used!?
                     # find the DRY END point
                     if self.timeindex[1]: # take DRY if available
                         begin = self.timeindex[1]
@@ -25430,7 +25460,7 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
                         continue
                     i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
-                    o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
+                    #o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
                     if i > 0:
                         charges += i
                         charges_count += 1
@@ -26711,7 +26741,7 @@ class ApplicationWindow(QMainWindow):
                     o = offset
                 else:
                     o = offset * 1.8
-                b = self.BTbreak(i,offset)
+                b = self.BTbreak(i,o)
                 if b > 0:
                     result = i + 1 - b
                     break
@@ -34835,8 +34865,11 @@ class editGraphDlg(ArtisanResizeablDialog):
     def updateAmbientTemp(self,_):
         aw.qmc.updateAmbientTemp()
         self.ambientedit.setText("%g" % aw.float2float(aw.qmc.ambientTemp))
+        self.ambientedit.repaint() # seems to be necessary in some PyQt versions!?
         self.ambient_humidity_edit.setText("%g" % aw.float2float(aw.qmc.ambient_humidity))
+        self.ambient_humidity_edit.repaint() # seems to be necessary in some PyQt versions!?
         self.pressureedit.setText("%g" % aw.float2float(aw.qmc.ambient_pressure))
+        self.pressureedit.repaint() # seems to be necessary in some PyQt versions!?
 
     @pyqtSlot(bool)
     def scanWholeColor(self,_):
@@ -43767,7 +43800,7 @@ class serialport(object):
                     #if bit 5 of byte 3 = 1 then T2 = ####
                     #if bit 5 of byte 3 = 0 then T2 = ###.#
                     #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = self.binary(o(r[2]))          #bits string order "[7][6][5][4][3][2][1][0]"
+                    b3bin = self.binary(r[2])          #bits string order "[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     bit5 = b3bin[2]
                     #extract T1
@@ -44324,7 +44357,7 @@ class serialport(object):
             if self.PhidgetTemperatureSensor and ((mode == 2) or (len(self.PhidgetTemperatureSensor)>1 and self.PhidgetTemperatureSensor[0].getAttached() and self.PhidgetTemperatureSensor[1].getAttached())):
                 # now just harvest both temps (or one in case type is 2)
                 if mode in [0,1]:
-                    probe1 = probe2 = -1                    
+                    probe1 = probe2 = -1
                     try:
                         probe1 = self.phidget1048getSensorReading(mode*2,0)
                         if aw.qmc.mode == "F":
@@ -57777,7 +57810,7 @@ class FujiPID(object):
             return s1
         else:
             #bad number of RX bytes 
-            errorcode = QApplication.translate("Error Message","pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}",None).format(len(r),o(command[0]))
+            errorcode = QApplication.translate("Error Message","pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}",None).format(len(r),command[0])
             aw.qmc.adderror(errorcode)
             return -1
 
