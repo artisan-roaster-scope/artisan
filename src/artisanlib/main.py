@@ -33800,11 +33800,17 @@ class editGraphDlg(ArtisanResizeablDialog):
                         from artisanlib.ble import BleInterface
                         from artisanlib.acaia import AcaiaBLE
                         acaia = AcaiaBLE()
-                        self.ble = BleInterface(acaia.SERVICE_UUID,acaia.CHAR_UUID,acaia.processData,acaia.sendHeartbeat,acaia.reset)
-                        # start BLE loop
-                        self.ble.weightChanged.connect(self.ble_weight_changed)
-                        self.ble.deviceDisconnected.connect(self.ble_scan_failed)
-                        self.ble.scanDevices()
+                        self.ble = BleInterface(
+                            acaia.SERVICE_UUID,
+                            acaia.CHAR_UUID,
+                            acaia.processData,
+                            acaia.sendHeartbeat,
+                            acaia.sendStop,
+                            acaia.reset)
+                    # start BLE loop
+                    self.ble.weightChanged.connect(self.ble_weight_changed)
+                    self.ble.deviceDisconnected.connect(self.ble_scan_failed)
+                    self.ble.scanDevices()
                 except:
                     pass
             elif aw.scale.device in ["KERN NDE","Shore 930"]:

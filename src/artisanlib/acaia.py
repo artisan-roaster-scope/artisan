@@ -52,7 +52,7 @@ class AcaiaBLE():
     TIMER_STATE_STOPPED = 0
     TIMER_STATE_STARTED = 1
     TIMER_STATE_PAUSED = 2
-        
+    
     def __init__(self):
         self.notificationConfSent = False
         # holds msgType on messages split in header and payload
@@ -86,6 +86,9 @@ class AcaiaBLE():
     def sendHeartbeat(self,write):
         self.sendMessage(write,self.MSG_SYSTEM,b'\x02,\x00')
 
+    def sendStop(self,write):
+        self.sendMessage(write,self.MSG_SYSTEM,b'\x00,\x00')
+
     def sendTare(self,write):
         self.sendMessage(write,self.MSG_TARE,b'\x00')
 
@@ -104,14 +107,16 @@ class AcaiaBLE():
         self.sendEvent(write,
             bytes([ # pairs of key/setting
                     0,  # weight
-                    1,  #5,  # weight argument (speed of notifications in 1/10 sec)
-                    1,  # battery
-                    2,  # battery argument (if 0 : fast, 1 : slow)
-                    2,  # timer
-                    5,  # timer argument
-                    3,  # key
-                    4   # setting
-                ]))
+                    5,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec)
+                       # 5 or 7 seems to be good values for this app in Artisan
+#                    1,  # battery
+#                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
+#                    2,  # timer
+#                    255, #5,  # timer argument
+#                    3,  # key
+#                    255, #4   # setting
+                ])
+                )
 
     def parseInfo(self,data):
         pass
