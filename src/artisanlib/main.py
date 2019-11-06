@@ -16428,30 +16428,6 @@ class ApplicationWindow(QMainWindow):
                         else:
                             maxdeltas2.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:])) * signs2[i])
                                 
-                                
-#dave
-                    print("\n\n***************************************\n" + aw.qmc.title + "\n***************************************")              
-
-                    if True:
-#                        print("analysis_start, analysis_end",analysis_start, analysis_end)
-#                        print(aw.qmc.timex[analysis_start])
-#                        print("deltas_all\n{0}".format(deltas_all))
-#                        print("signs_all\n{0}".format(signs_all))
-                        print("starts\n{0}\nlengths\n{1}\nsigns\n{2}".format(starts,lengths,signs))
-#                        print("seconds\n{0}".format(seconds))
-#                        print("maxdeltas\n{0}".format(maxdeltas))
-#                        print("reductions\n{0}".format(reductions))
-#                        print("addtoprev\n{0}".format(addtoprev))
-#                        print("r2\n{0}".format(r2))
-                        print("mask\n{0}".format(mask))
-                        print("starts2\n{0}\nlengths2\n{1}\nsigns2\n{2}".format(starts2,lengths2,signs2))
-#                        print("reductions2\n{0}".format(reductions2))
-#                        print("maxdeltas2\n{0}".format(maxdeltas2))
-#                        print("timeindexs_all\n{0}".format(timeindexs_all))
-#                        print("timeindexs\n{0}".format(timeindexs))
-#                        print("timeindexs2\n{0}".format(timeindexs2))
-
-#                    print("***************************************\n" + aw.qmc.title + "\n***************************************")              
                     filler = "-----"
                     tbl = prettytable.PrettyTable()
                     tbl.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","Swing"] 
@@ -29742,18 +29718,19 @@ class ApplicationWindow(QMainWindow):
                 curvefit_starttime = drytime
             curvefit_endtime = aw.qmc.timex[aw.qmc.timeindex[6]]
 
+            #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after CHARGE.
+            tpidx = self.findTP()
+            if tpidx > 1:
+                tptime = self.qmc.timex[tpidx]
+                curvefit_starttime_ln = .25 * (drytime - tptime) + tptime
+            else:
+                curvefit_starttime_ln = .33 * (drytime - aw.qmc.timex[aw.qmc.timeindex[0]]) + aw.qmc.timex[aw.qmc.timeindex[0]]
+
             # curve fit results
             self.cfr = {} #use dict to allow more flexible expansion in the future
             # ln() or all
             if exp == 0 or exp == -1:
-                #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after CHARGE.
-                tpidx = self.findTP()
-                if tpidx > 1:
-                    tptime = self.qmc.timex[tpidx]
-                    curvefit_starttime = .25 * (drytime - tptime) + tptime
-                else:
-                    curvefit_starttime = .33 * (drytime - aw.qmc.timex[aw.qmc.timeindex[0]]) + aw.qmc.timex[aw.qmc.timeindex[0]]
-                res = self.analysisGetResults(exp=0, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                res = self.analysisGetResults(exp=0, curvefit_starttime=curvefit_starttime_ln, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_naturallog"] = res["equ"]
                 self.cfr["dbt_naturallog"] = res["rmse_BT"]
                 self.cfr["dbdbt_naturallog"] = res["rmse_deltaBT"]
