@@ -17563,6 +17563,27 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.08
                                 except Exception:
                                     pass
+                            elif cs.startswith('writeWord'): # writing directly floats
+                                try:
+                                    cmds = eval(cs[len('writeWord'):])
+                                    if isinstance(cmds,tuple):
+                                        if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                            # cmd has format "write(s,r,v)"
+                                            aw.modbus.writeWord(*cmds)
+                                            followupCmd = 0.08
+                                        else:
+                                        # cmd has format "write([s,r,v],..,[s,r,v])"
+                                            for cmd in cmds:
+                                                if followupCmd:
+                                                    libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
+                                                aw.modbus.writeWord(*cmd)
+                                                followupCmd = 0.08
+                                    else:
+                                        # cmd has format "write([s,r,v])"
+                                        aw.modbus.writeWord(*cmds)
+                                        followupCmd = 0.08
+                                except Exception:
+                                    pass
                             elif cs.startswith('write'):
                                 try:
                                     cmds = eval(cs[len('write'):])
