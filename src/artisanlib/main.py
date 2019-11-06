@@ -2098,6 +2098,8 @@ class tgraphcanvas(FigureCanvas):
         self.segmentpickflag = False
         self.flcrdeltathreshold = 0.5
         self.flcrdurationthreshold = 3
+        
+        self.stats_summary_rect = None
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -6405,6 +6407,8 @@ class tgraphcanvas(FigureCanvas):
                 
                 if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.statssummary:
                     self.statsSummary()
+                else:
+                    self.stats_summary_rect = None
 
                 if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.AUCshowFlag:
                     self.drawAUC()
@@ -6784,9 +6788,9 @@ class tgraphcanvas(FigureCanvas):
                     pos_x = droptext_end + border + start
                 
                 pos_y = statsheight
-#                rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
-                rect = patches.Rectangle((pos_x-margin,pos_y - (stats_textbox_height + 2*margin)),stats_textbox_width+2*margin,stats_textbox_height+3*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
-                self.ax.add_patch(rect)
+#               self.stats_summary_rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
+                self.stats_summary_rect = patches.Rectangle((pos_x-margin,pos_y - (stats_textbox_height + 2*margin)),stats_textbox_width+2*margin,stats_textbox_height+3*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
+                self.ax.add_patch(self.stats_summary_rect)
                 
 
                 text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=tc,zorder=11,path_effects=[])
@@ -25132,8 +25136,9 @@ class ApplicationWindow(QMainWindow):
             #   https://matplotlib.org/3.1.1/tutorials/advanced/transforms_tutorial.html
             # 1.get bounding box in axis cooridnates
             try:
-                rect_extents = aw.qmc.rect.get_bbox()
-            except:
+                rect_extents = aw.qmc.stats_summary_rect.get_bbox()
+            except Exception as e:
+                aw.sendmessage(QApplication.translate("Message","No statistics found", None))
                 return
             # 2. convert those to display coordinates
             rect_extents_display = aw.qmc.ax.transData.transform(rect_extents)
@@ -25147,7 +25152,7 @@ class ApplicationWindow(QMainWindow):
             if platf == 'Windows':
                 ext = "*.png"
             else:
-                ext = "*,pdf"
+                ext = "*.pdf"
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Statistics",None), ext=ext)
             if filename:
                 aw.qmc.fig.savefig(filename,bbox_inches=rect_bbox_inches,pad_inches=0)
