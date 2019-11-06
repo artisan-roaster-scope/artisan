@@ -2093,7 +2093,10 @@ class tgraphcanvas(FigureCanvas):
         self.analysisoffset = 180
         self.curvefitstartchoice = 0
         self.curvefitoffset = 180
-
+        self.segmentresultsloc = [.5,.5]
+        self.segmentpickflag = False
+        self.flcrdeltathreshold = 0.5
+        self.flcrdurationthreshold = 3
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -2402,6 +2405,10 @@ class tgraphcanvas(FigureCanvas):
             elif aw.analysisresultsanno is not None and isinstance(event.artist, matplotlib.text.Annotation) and event.artist in [aw.analysisresultsanno]:
                 self.analysispickflag = True
 
+            # the segment results were clicked
+            elif aw.segmentresultsanno is not None and isinstance(event.artist, matplotlib.text.Annotation) and event.artist in [aw.segmentresultsanno]:
+                self.segmentpickflag = True
+
             # toggle visibility of graph lines by clicking on the legend 
             elif self.legend is not None and event.artist != self.legend and (isinstance(event.artist, matplotlib.lines.Line2D) or isinstance(event.artist, matplotlib.text.Text)) \
                 and event.artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
@@ -2500,6 +2507,11 @@ class tgraphcanvas(FigureCanvas):
                 self.analysispickflag = False
                 corners = aw.qmc.ax.transAxes.inverted().transform(aw.analysisresultsanno.get_bbox_patch().get_extents())
                 aw.qmc.analysisresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
+            # save the location of segment results after dragging
+            if self.segmentpickflag:
+                self.segmentpickflag = False
+                corners = aw.qmc.ax.transAxes.inverted().transform(aw.segmentresultsanno.get_bbox_patch().get_extents())
+                aw.qmc.segmentresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -16331,21 +16343,144 @@ class ApplicationWindow(QMainWindow):
                     maxdelta = numpy.max(np_dbt - np_dbtb)
                     mindelta = numpy.min(np_dbt - np_dbtb)
                     
-                    #count of times the actual RoR crosses the template RoR
-                    diff_array = np_dbt - np_dbtb
-                    zerocrosses = ((diff_array[:-1] * diff_array[1:]) < 0).sum()
+#                    #count of times the actual RoR crosses the template RoR
+#                    diff_array = np_dbt - np_dbtb
+#                    zerocrosses = ((diff_array[:-1] * diff_array[1:]) < 0).sum()
 
-                    crossings = numpy.sign(diff_array)
-                    starts = numpy.r_[0, numpy.flatnonzero(~numpy.isclose(crossings[1:], crossings[:-1])) + 1]
-                    lengths = numpy.diff(numpy.r_[starts, len(crossings)])
-                    signs = crossings[starts]
-
-                    idelta = (np_dbt - np_dbtb) * crossings
-                    ideltamax = []
+                    # calculate the flicks and crashes
+                    #create array of differences between actual curve and the fit curve
+                    deltas_all = numpy.array(np_dbt - np_dbtb)
+                    #array indicating actual curve is greater than fit curve (+1) or is less than (-1)
+                    signs_all = numpy.sign(deltas_all)
+                    #array with start index of each interal between crossings
+                    starts = numpy.r_[0, numpy.flatnonzero(~numpy.isclose(signs_all[1:], signs_all[:-1])) + 1]  # <<<- what is the plus 1 ??
+                    #array with the length of each interal between crossings
+                    lengths = numpy.diff(numpy.r_[starts, len(signs_all)])
+                    #array indicating segment has actual greater than fit (+1) or actual less than fit (-1)
+                    signs = signs_all[starts]
+                    #array of max difference for each segment
+                    maxdeltas = []
                     for i in range(len(starts)):
-                        ideltamax.append(numpy.amax(idelta[starts[i]:starts[i]+lengths[i]]))
-#                    print(ideltamax)
+                        maxdeltas.append(numpy.amax(numpy.absolute(deltas_all[starts[i]:starts[i]+lengths[i]])) * signs[i])
+                    #array of lengths in seconds
+                    seconds = lengths * self.qmc.profile_sampling_interval
+                    
+                    #array of all the time index values
+                    timeindexs_all = numpy.arange(analysis_start, analysis_end, 1)
+                    #time intdexes of the segements
+                    timeindexs = timeindexs_all[starts]
+                    
+                    #thresholds
+                    segtimethreshold = aw.qmc.flcrdurationthreshold
+                    segdeltathreshold = aw.qmc.flcrdeltathreshold
+                    reductions = numpy.zeros_like(signs)
+                    for i in range(len(starts)):
+                        if seconds[i] < segtimethreshold or abs(maxdeltas[i]) < segdeltathreshold:
+                            reductions[i] = 1
 
+                    # extend the reduction to the right when the sign matches the sign of the first segment in the reduction
+                    prevsign = signs[0]
+                    prevreduction = 0        
+                    addtoprev = numpy.copy(reductions)   #can replace 'addtoprev[]' with change -in-place 'reductions[]' once debugged 
+                    addtoprev[0] = 0  # the first entry is never combined to the left.
+                    for i in range(1,len(starts)):
+                        # reductions = 1
+                        if reductions[i] == 1:
+                            prevreduction = 1
+                        # reductions=0 & signs2=prevsign & prevreduction=1
+                        elif signs[i] == prevsign and prevreduction == 1:
+                            addtoprev[i] = 1
+                        # reductions=0
+                        else:
+                            prevreduction = 0
+                            prevsign = signs[i]
+ 
+                    #generate the reduction arrays
+                    starts_ = numpy.zeros_like(starts)
+                    lengths_ = numpy.zeros_like(starts)
+                    seconds_ = numpy.zeros_like(starts)
+                    addtoprev[0] = 0
+                    lasti = 0
+                    for i in range(0,len(starts)):
+                        if addtoprev[i] == 1 and i+1 < len(starts):
+                            lengths_[lasti] += lengths[i]
+                            seconds_[lasti] += seconds[i]
+                        elif addtoprev[i] == 1 :
+                            lengths_[lasti] += numpy.sum(lengths[i:])
+                            seconds_[lasti] += numpy.sum(seconds[i:])
+                        else:   
+                            lengths_[i] = lengths[i]
+                            seconds_[i] = seconds[i]
+                            starts_[i] = starts[i]
+                            lasti = i
+                                        
+                    mask = numpy.r_[0, numpy.flatnonzero(starts_)]
+                    starts2 = starts_[mask]
+                    lengths2 = lengths_[mask]
+                    signs2 = signs[mask]
+                    seconds2 = seconds_[mask]
+                    timeindexs2 = timeindexs[mask]
+                    maxdeltas2 = []
+                    for i in range(len(mask)):
+                        if i < len(mask) -1:
+                            maxdeltas2.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:mask[i+1]])) * signs2[i])
+                        else:
+                            maxdeltas2.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:])) * signs2[i])
+                                
+                                
+#dave
+                    print("\n\n***************************************\n" + aw.qmc.title + "\n***************************************")              
+
+                    if True:
+#                        print("analysis_start, analysis_end",analysis_start, analysis_end)
+#                        print(aw.qmc.timex[analysis_start])
+#                        print("deltas_all\n{0}".format(deltas_all))
+#                        print("signs_all\n{0}".format(signs_all))
+                        print("starts\n{0}\nlengths\n{1}\nsigns\n{2}".format(starts,lengths,signs))
+#                        print("seconds\n{0}".format(seconds))
+#                        print("maxdeltas\n{0}".format(maxdeltas))
+#                        print("reductions\n{0}".format(reductions))
+#                        print("addtoprev\n{0}".format(addtoprev))
+#                        print("r2\n{0}".format(r2))
+                        print("mask\n{0}".format(mask))
+                        print("starts2\n{0}\nlengths2\n{1}\nsigns2\n{2}".format(starts2,lengths2,signs2))
+#                        print("reductions2\n{0}".format(reductions2))
+#                        print("maxdeltas2\n{0}".format(maxdeltas2))
+#                        print("timeindexs_all\n{0}".format(timeindexs_all))
+#                        print("timeindexs\n{0}".format(timeindexs))
+#                        print("timeindexs2\n{0}".format(timeindexs2))
+
+#                    print("***************************************\n" + aw.qmc.title + "\n***************************************")              
+                    filler = "-----"
+                    tbl = prettytable.PrettyTable()
+                    tbl.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","Swing"] 
+                    tbl.float_format = "5.2"
+                    for i in range(len(mask)):
+                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs2[i]-aw.qmc.timeindex[0]])
+                        duration = self.eventtime2string(seconds2[i])
+                        if i > 0:
+                            swing = maxdeltas2[i] - maxdeltas[i-1]
+                        else:
+                            swing = ""
+                        if signs2[i] == 1:
+                            abovebelow = "Above"
+                        else:
+                            abovebelow = "Below"
+                        tbl.add_row([thistime,duration,lengths2[i],maxdeltas2[i],abovebelow,'',swing])
+#                    tbl.add_row([filler, filler, filler, filler, filler, filler])
+#                    for i in range(len(maxdeltas)):
+#                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs[i]-aw.qmc.timeindex[0]])
+#                        tbl.add_row([thistime,seconds[i],lengths[i],maxdeltas[i],signs[i],reductions[i]],swing)
+#                    segmentresultstr = tbl.get_string(border=False)
+                    segmentresultstr = tbl.get_string(border=True, fields=["Start","Duration","Max Delta","Sign","Swing"])
+                    segmentresultstr += "\nDuration Threshold " + str(aw.qmc.flcrdurationthreshold)
+                    segmentresultstr += "\nDelta Threshold " + str(aw.qmc.flcrdeltathreshold)
+                    segmentresultstr += "\nSmooth Curves " + str(int((aw.qmc.curvefilter-1)/2))
+                    segmentresultstr += "\nDelta Span " + str(aw.qmc.deltaBTspan)
+                    segmentresultstr += "\nDelta Smoothing " + str(int((aw.qmc.deltaBTfilter-1)/2))
+                    result['segmentresultstr'] = segmentresultstr
+#                    print(segmentresultstr)
+ 
                 else:
                     RoR_FCs_act = 0
                     RoR_FCs_templ = 0
@@ -16353,6 +16488,7 @@ class ApplicationWindow(QMainWindow):
                     maxdelta = 0
                     mindelta = 0
                     zerocrosses = 0
+                    result['segmentresultstr'] = ""
                 
                 # build the dict to return
                 result['rmse_BT'] = rmse_BT
@@ -16363,7 +16499,7 @@ class ApplicationWindow(QMainWindow):
                 result['ror_fcs_delta'] = RoR_FCs_delta
                 result['ror_max_delta'] = maxdelta
                 result['ror_min_delta'] = mindelta
-                result['zerocrosses'] = zerocrosses
+#                result['zerocrosses'] = zerocrosses
 
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
@@ -22495,6 +22631,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.statisticsconditions = tmpconds
             if settings.contains("AnalysisResultsLoc"):
                 self.qmc.analysisresultsloc = [toFloat(x) for x in toList(settings.value("AnalysisResultsLoc",self.qmc.analysisresultsloc))]
+            if settings.contains("SegmentResultsLoc"):
+                self.qmc.segmentresultsloc = [toFloat(x) for x in toList(settings.value("SegmentResultsLoc",self.qmc.segmentresultsloc))]
             if settings.contains("analysisstartchoice"):
                 self.qmc.analysisstartchoice = toInt(settings.value("analysisstartchoice",int()))
             if settings.contains("analysisoffset"):
@@ -22503,6 +22641,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.curvefitstartchoice = toInt(settings.value("curvefitstartchoice",int()))
             if settings.contains("curvefitoffset"):
                 self.qmc.curvefitoffset = toInt(settings.value("curvefitoffset",int()))
+            if settings.contains("flcrdurationthreshold"):
+                self.qmc.flcrdurationthreshold = toInt(settings.value("flcrdurationthreshold",int()))
+            if settings.contains("flcrdeltathreshold"):
+                self.qmc.flcrdeltathreshold = aw.float2float(toFloat(settings.value("flcrdeltathreshold",self.qmc.flcrdeltathreshold)),4)
             if settings.contains("AUCbegin"):
                 self.qmc.AUCbegin = toInt(settings.value("AUCbegin",int()))
                 self.qmc.AUCbase = toInt(settings.value("AUCbase",int()))
@@ -23983,10 +24125,13 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Statistics",self.qmc.statisticsflags)
             settings.setValue("StatisticsConds",self.qmc.statisticsconditions)
             settings.setValue("AnalysisResultsLoc",aw.qmc.analysisresultsloc)
+            settings.setValue("SegmentResultsLoc",aw.qmc.segmentresultsloc)
             settings.setValue("analysisstartchoice",aw.qmc.analysisstartchoice)
             settings.setValue("analysisoffset",aw.qmc.analysisoffset)
             settings.setValue("curvefitstartchoice",aw.qmc.curvefitstartchoice)
             settings.setValue("curvefitoffset",aw.qmc.curvefitoffset)
+            settings.setValue("flcrdurationthreshold",aw.qmc.flcrdurationthreshold)
+            settings.setValue("flcrdeltathreshold",aw.qmc.flcrdeltathreshold)
             #save AUC
             settings.setValue("AUCbegin",self.qmc.AUCbegin)
             settings.setValue("AUCbase",self.qmc.AUCbase)
@@ -29663,8 +29808,10 @@ class ApplicationWindow(QMainWindow):
             
             RMSEstr += "\n{0}   {1}{2:4.1f}".format(QApplication.translate("Label", "Note: All values calculated in Celsius",None), QApplication.translate("Label", "Actual RoR at FCs=",None), res['ror_fcs_act']) 
 
+            self.cfr['segmentresultstr'] = res['segmentresultstr'] 
+            
             # create the results annotation and update the graph 
-            self.analysisShowResults(RMSEstr,  curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+            self.analysisShowResults(RMSEstr, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -29705,6 +29852,32 @@ class ApplicationWindow(QMainWindow):
             for dim in self.qmc.analysisresultsloc:
                 if dim >= 1 or dim <=0:
                     self.qmc.analysisresultsloc = [0.5,0.5]
+
+            #reset the annotation location if the origin is out of the screen
+            for dim in self.qmc.segmentresultsloc:
+                if dim >= 1 or dim <=0:
+                    self.qmc.segmentresultsloc = [0.5,0.5]
+
+            # create the segement results annotation box
+            a = aw.qmc.alpha["statsanalysisbkgnd"]
+            fc = aw.qmc.palette["statsanalysisbkgnd"]
+            tc = aw.labelBorW(fc)
+            segmentresultstr = self.cfr['segmentresultstr']
+            self.segmentresultsanno = self.qmc.ax.annotate(segmentresultstr, xy=self.qmc.segmentresultsloc, xycoords='axes fraction',
+                       ha="left", va="center",
+                       fontfamily='monospace',
+                       fontsize='x-small',
+                       color=tc,
+                       zorder=121,
+                       picker=True,
+                       bbox=dict(boxstyle="round", fc=fc, alpha=a))
+            try:
+                self.segmentresultsanno.set_in_layout(False) # remove from tight_layout calculation
+            except: # set_in_layout not available in mpl<3.x
+                pass
+            self.segmentresultsanno.draggable(use_blit=True)
+            self.segmentresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
+#            self.qmc.fig.canvas.draw()
 
             # create the analysis results annotation box
             a = aw.qmc.alpha["statsanalysisbkgnd"]
@@ -30618,6 +30791,17 @@ class HUDDlg(ArtisanDialog):
             self.analyzetimeoffset.setEnabled(False)
         else:
             self.analyzetimeoffset.setEnabled(True)
+        self.flcrdurationthresholdLabel = QLabel(QApplication.translate("Label", "Number of samples considerd significant", None))
+        self.flcrdurationthreshold = QLineEdit(str(int(round(aw.qmc.flcrdurationthreshold))))   #default
+        self.flcrdurationthreshold.setMaximumWidth(100)
+        self.flcrdurationthreshold.setMinimumWidth(55)
+        self.flcrdurationthreshold.editingFinished.connect(self.flcrdurationthresholdChanged)
+        self.flcrdurationthreshold.setValidator(QIntValidator(0,50,self.flcrdurationthreshold))
+        self.flcrdeltathresholdLabel = QLabel(QApplication.translate("Label", "Delta RoR Actual-to-Fit considerd significant", None))
+        self.flcrdeltathreshold = QLineEdit(str(aw.qmc.flcrdeltathreshold))   #default
+        self.flcrdeltathreshold.setMaximumWidth(100)
+        self.flcrdeltathreshold.setMinimumWidth(55)
+        self.flcrdeltathreshold.editingFinished.connect(self.flcrdeltathresholdChanged)
 
         self.curvefitcombobox = QComboBox()
         self.curvefitcomboboxLabel = QLabel(QApplication.translate("Label", "Start of Curve Fit window", None))
@@ -30639,37 +30823,6 @@ class HUDDlg(ArtisanDialog):
             self.curvefittimeoffset.setEnabled(False)
         else:
             self.curvefittimeoffset.setEnabled(True)
-        analyzeVLayout1 = QVBoxLayout()
-        analyzeVLayout1.addWidget(self.analyzecomboboxLabel)
-        analyzeVLayout1.addWidget(self.analyzecombobox)
-        analyzeVLayout1.addWidget(self.analyzetimeoffsetLabel)
-        analyzeVLayout1.addWidget(self.analyzetimeoffset)
-        analyzeVLayout2 = QVBoxLayout()
-        analyzeVLayout2.addWidget(self.curvefitcomboboxLabel)
-        analyzeVLayout2.addWidget(self.curvefitcombobox)
-        analyzeVLayout2.addWidget(self.curvefittimeoffsetLabel)
-        analyzeVLayout2.addWidget(self.curvefittimeoffset)
-
-        analyzeHLayout = QHBoxLayout()
-        analyzeHLayout.addLayout(analyzeVLayout2)
-        analyzeHLayout.addStretch()
-        analyzeHLayout.addLayout(analyzeVLayout1)
-        analyzeLayoutGroupLayout = QGroupBox(QApplication.translate("GroupBox","Analyze Options",None))
-        analyzeLayoutGroupLayout.setLayout(analyzeHLayout)
-#        analyzeHLayout1 = QHBoxLayout()
-#        analyzeHLayout1.addWidget(self.analyzecomboboxLabel)
-#        analyzeHLayout1.addStretch()
-#        analyzeHLayout1.addWidget(self.analyzetimeoffsetLabel)
-#        analyzeHLayout2 = QHBoxLayout()
-#        analyzeHLayout2.addWidget(self.analyzecombobox)
-#        analyzeHLayout2.addStretch()
-#        analyzeHLayout2.addWidget(self.analyzetimeoffset)
-#        analyzeVLayout = QVBoxLayout()
-#        analyzeVLayout.addLayout(analyzeHLayout1)
-#        analyzeVLayout.addLayout(analyzeHLayout2)
-#        analyzeLayoutGroupLayout = QGroupBox(QApplication.translate("GroupBox","Analyze Options",None))
-#        analyzeLayoutGroupLayout.setLayout(analyzeVLayout)
-        
         self.bkgndButton = QPushButton(QApplication.translate("Button","Create Background Curve",None))
         self.bkgndButton.setFocusPolicy(Qt.NoFocus)
         self.bkgndButton.setMaximumSize(self.bkgndButton.sizeHint())
@@ -30789,9 +30942,43 @@ class HUDDlg(ArtisanDialog):
         tab3Layout.addLayout(interUniLayout)
         tab3Layout.addLayout(lnvarexpvarLayout)
         tab3Layout.addWidget(polyfitGroupLayout)
-        tab3Layout.addWidget(analyzeLayoutGroupLayout)
         tab3Layout.addStretch()
         ##### TAB 4
+        analyzeVLayout1 = QVBoxLayout()
+        analyzeVLayout1.addWidget(self.analyzecomboboxLabel)
+        analyzeVLayout1.addWidget(self.analyzecombobox)
+        analyzeVLayout1.addWidget(self.analyzetimeoffsetLabel)
+        analyzeVLayout1.addWidget(self.analyzetimeoffset)
+        analyzeVLayout2 = QVBoxLayout()
+        analyzeVLayout2.addWidget(self.curvefitcomboboxLabel)
+        analyzeVLayout2.addWidget(self.curvefitcombobox)
+        analyzeVLayout2.addWidget(self.curvefittimeoffsetLabel)
+        analyzeVLayout2.addWidget(self.curvefittimeoffset)
+        analyzeHLayout = QHBoxLayout()
+        analyzeHLayout.addLayout(analyzeVLayout2)
+        analyzeHLayout.addStretch()
+        analyzeHLayout.addLayout(analyzeVLayout1)
+        analyzeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curve Fit Options",None))
+        analyzeGroupLayout.setLayout(analyzeHLayout)
+
+        flcrVLayout1 = QVBoxLayout()
+        flcrVLayout1.addWidget(self.flcrdurationthresholdLabel)
+        flcrVLayout1.addWidget(self.flcrdurationthreshold)
+        flcrVLayout2 = QVBoxLayout()
+        flcrVLayout2.addWidget(self.flcrdeltathresholdLabel)
+        flcrVLayout2.addWidget(self.flcrdeltathreshold)
+        
+        flcrHLayout = QHBoxLayout()
+        flcrHLayout.addLayout(flcrVLayout1)
+        flcrHLayout.addStretch()
+        flcrHLayout.addLayout(flcrVLayout2)
+        flcrGroupLayout = QGroupBox(QApplication.translate("GroupBox","Analyze Options",None))
+        flcrGroupLayout.setLayout(flcrHLayout)
+        tab4Layout = QVBoxLayout()
+        tab4Layout.addWidget(analyzeGroupLayout)
+        tab4Layout.addWidget(flcrGroupLayout)
+        tab4Layout.addStretch()
+        ##### TAB 5
         self.styleComboBox = QComboBox()
         available = list(map(str, list(QStyleFactory.keys())))
         self.styleComboBox.addItems(available)
@@ -30980,6 +31167,11 @@ class HUDDlg(ArtisanDialog):
         tab3Layout.setContentsMargins(10,10,10,10)
         C3Widget.setContentsMargins(0,0,0,0)
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","Math",None))
+        C4Widget = QWidget()
+        C4Widget.setLayout(tab4Layout)
+        tab4Layout.setContentsMargins(10,10,10,10)
+        C3Widget.setContentsMargins(0,0,0,0)
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Analyze",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
         tab5Layout.setContentsMargins(10,10,10,10)
@@ -31042,6 +31234,16 @@ class HUDDlg(ArtisanDialog):
             self.curvefittimeoffset.setEnabled(True)
         else:
             self.curvefittimeoffset.setEnabled(False)
+        return
+        
+    @pyqtSlot()
+    def flcrdurationthresholdChanged(self):
+        aw.qmc.flcrdurationthreshold = int(self.flcrdurationthreshold.text())
+        return
+        
+    @pyqtSlot()
+    def flcrdeltathresholdChanged(self):
+        aw.qmc.flcrdeltathreshold = aw.float2float(toFloat(self.flcrdeltathreshold.text(),),4)
         return
         
     @pyqtSlot()
