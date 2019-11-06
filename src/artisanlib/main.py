@@ -132,7 +132,8 @@ import matplotlib.backends.backend_pdf # @UnusedImport
 import matplotlib.backends.backend_svg # @UnusedImport
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
-
+from matplotlib.backend_bases import LocationEvent as mplLocationevent
+    
 import matplotlib.backends.qt_editor.figureoptions as figureoptions
 
 
@@ -18996,6 +18997,10 @@ class ApplicationWindow(QMainWindow):
                         self.automaticsave()
                 elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
                     self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
+                    try:
+                        aw.ntb.mouse_move(mplLocationevent.lastevent)
+                    except:
+                        pass
                 elif key == 67:                     #letter C (controls)
                     self.toggleControls()
                 elif key == 88:                     #letter X (readings)
