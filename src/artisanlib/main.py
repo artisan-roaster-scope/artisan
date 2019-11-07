@@ -3610,6 +3610,20 @@ class tgraphcanvas(FigureCanvas):
 
         return ETreachTime, BTreachTime, ET2reachTime, BT2reachTime
 
+    # takes array with readings, the current index, the sign of the shift as character and the shift value
+    # returns val, evalsign
+    def shiftValueEvalsign(self,readings,index,sign,shiftval):
+        if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
+            evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
+            shiftedindex = index - shiftval
+            if shiftedindex < 0:
+                shiftedindex = 0
+        elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
+            evalsign = "1"      #digit 1 = "+"
+            shiftedindex = index + shiftval
+            if shiftedindex >= len(self.timex):
+                shiftedindex = len(self.timex)- 1
+        return readings[shiftedindex], evalsign
 
     # mathexpression = formula; t = a number to evaluate(usually time);
     # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTsval = RealTime var val
@@ -3759,34 +3773,23 @@ class tgraphcanvas(FigureCanvas):
 
                                     #timeshift with two digits
                                     if mathexpression[i+5].isdigit():
-                                        seconddigit = int(mathexpression[i+5])
                                         seconddigitstr = mathexpression[i+5]
                                         mathexpression = mathexpression[:i+5]+mathexpression[i+6:]
-                                        Yshiftval = 10*Yshiftval + seconddigit
-
-                                    #ET,BT, and Extras
-                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
-                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
-                                        shiftedindex = index - Yshiftval   
-                                        if shiftedindex < 0:
-                                            shiftedindex = 0
-                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
-                                        evalsign = "1"      #digit 1 = "+"
-                                        shiftedindex = index + Yshiftval
-                                        if shiftedindex >= len(self.timex):
-                                            shiftedindex = len(self.timex)- 1
+                                        Yshiftval = 10*Yshiftval + int(seconddigitstr)
+                                    
                                     if nint == 1: #ET
-                                        val = self.temp1[shiftedindex]
+                                        readings = self.temp1
                                     elif nint == 2: #BT
-                                        val = self.temp2[shiftedindex]
+                                        readings = self.temp2
                                     elif nint > 2: 
                                         #map the extra device
                                         b = [0,0,1,1,2,2,3]
                                         edindex = b[nint-3]
                                         if nint%2:
-                                            val = self.extratemp1[edindex][shiftedindex]
+                                            readings = self.extratemp1[edindex]
                                         else:
-                                            val = self.extratemp2[edindex][shiftedindex]
+                                            readings = self.extratemp2[edindex]
+                                    val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
 
                                     #add expression and values found
                                     evaltimeexpression = "Y" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + seconddigitstr + evalsign
@@ -3859,10 +3862,65 @@ class tgraphcanvas(FigureCanvas):
                                 
                     elif mathexpression[i] == "R":
                         try:
-                            if mathexpression[i+1] == "1":
-                                mathdictionary['R1'] = self.delta1[index]
-                            elif mathexpression[i+1] == "2":
-                                mathdictionary['R2'] = self.delta2[index]
+                            if i+1 < mlen:
+                                seconddigitstr = ""
+                                if mathexpression[i+1].isdigit():
+                                    nint = int(mathexpression[i+1])              #Rnumber int
+                                    #check for TIMESHIFT 0-9 (one digit). Example: "R1[-2]" 
+                                    if i+5 < len(mathexpression) and mathexpression[i+2] == "[":
+                                        Yshiftval = int(mathexpression[i+4])
+                                        sign = mathexpression[i+3]
+    
+                                        # TWO digits shifting
+                                        if mathexpression[i+5].isdigit():
+                                            seconddigit = int(mathexpression[i+5])
+                                            seconddigitstr = mathexpression[i+5]
+                                            mathexpression = mathexpression[:i+5]+mathexpression[i+6:]
+                                            Yshiftval = 10*Yshiftval + seconddigit
+                                        if nint == 1: #DeltaET
+                                            readings = self.delta1
+                                        elif nint == 2: #DeltaBT
+                                            readings = self.delta2
+                                        val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
+                                        
+                                        #add expression and values found
+                                        evaltimeexpression = "R" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + seconddigitstr + evalsign
+                                        timeshiftexpressions.append(evaltimeexpression)
+                                        timeshiftexpressionsvalues.append(val)
+                                        #convert "R2[+9]" to Rnumber compatible for python eval() to add to dictionary
+                                        #METHOD USED: replace all non digits chars with sign value.
+                                        #Example1 "R2[-7]" = "R20070"   Example2 "R2[+9]" = "R21191"
+                                        mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                    
+                                    #direct index access: e.g. "R2{CHARGE}" or "R2{12}"
+                                    elif i+5 < len(mathexpression) and mathexpression[i+2] == "{" and mathexpression.find("}",i+3) > -1:
+                                        end_idx = mathexpression.index("}",i+3)
+                                        body = mathexpression[i+3:end_idx]
+                                        val = -1
+                                        try:
+                                            absolute_index = eval(body,{"__builtins__":None},mathdictionary)
+                                            if absolute_index > -1:
+                                                if nint == 1: #DeltaET
+                                                    val = self.delta1[absolute_index]
+                                                else: # nint == 2: #DeltaBT
+                                                    val = self.delta2[absolute_index]
+                                        except:
+                                            pass
+                                        #add expression and values found
+                                        literal_body = body
+                                        for k, v in replacements.items():
+                                            literal_body = literal_body.replace(k,v)
+                                        evaltimeexpression = "R" + mathexpression[i+1] + "z" + literal_body + "z" # curle brackets replaced by "z"
+                                        timeshiftexpressions.append(evaltimeexpression)
+                                        timeshiftexpressionsvalues.append(val)
+                                        mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
+                                        
+                                    #no shift
+                                    else:
+                                        if mathexpression[i+1] == "1":
+                                            mathdictionary['R1'] = self.delta1[index]
+                                        elif mathexpression[i+1] == "2":
+                                            mathdictionary['R2'] = self.delta2[index]
                         except Exception:
                             pass
 
@@ -3901,20 +3959,9 @@ class tgraphcanvas(FigureCanvas):
                                 seconddigitstr = mathexpression[i+4]
                                 mathexpression = mathexpression[:i+4]+mathexpression[i+5:]
                                 Yshiftval = 10*Yshiftval + seconddigit
+
+                            val, evalsign = self.shiftValueEvalsign(timex,index,sign,Yshiftval)
                             
-                            if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
-                                evalsign = "0"      # digit "0" = "-"
-                                shiftedindex = index - Yshiftval   
-                                if shiftedindex < 0:
-                                    shiftedindex = 0
-                                val = timex[shiftedindex]
-                            elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
-                                evalsign = "1"      #digit 1 = "+"
-                                shiftedindex = index + Yshiftval
-                                
-                                if shiftedindex >= len(timex):
-                                    shiftedindex = len(timex)- 1
-                                val = timex[shiftedindex]
                             val = val - t_offset
                             evaltimeexpression = mathexpression[i] + evalsign*2 + mathexpression[i+3] + seconddigitstr + evalsign
                             timeshiftexpressions.append(evaltimeexpression)
@@ -3953,18 +4000,7 @@ class tgraphcanvas(FigureCanvas):
                                 if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
                                     Yshiftval = int(mathexpression[i+4])
                                     sign = mathexpression[i+3]
-                                    #ET,BT, and Extrasy
-                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
-                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
-                                        shiftedindex = index - Yshiftval   
-                                        if shiftedindex < 0:
-                                            shiftedindex = 0
-                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
-                                        evalsign = "1"      #digit 1 = "+"
-                                        shiftedindex = index + Yshiftval
-                                        if shiftedindex >= len(self.timex):
-                                            shiftedindex = len(self.timex)- 1
-                                    val = self.plotterequationresults[nint-1][shiftedindex]
+
                                     evaltimeexpression = "P" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
@@ -3995,40 +4031,32 @@ class tgraphcanvas(FigureCanvas):
                                         seconddigitstr = mathexpression[i+5]
                                         mathexpression = mathexpression[:i+5]+mathexpression[i+6:]
                                         Yshiftval = 10*Yshiftval + seconddigit
-                                                      
-                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
-                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
-                                        shiftedindex = bindex - Yshiftval   
-                                        if shiftedindex < 0:
-                                            shiftedindex = 0
-                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
-                                        evalsign = "1"      #digit 1 = "+"
-                                        shiftedindex = bindex + Yshiftval
-                                        if shiftedindex >= len(self.timeB):
-                                            shiftedindex = len(self.timeB)- 1
+                                    
                                     if not len(self.timeB):
                                         # no background, set to 0
                                         val = 0
+                                        evalsign = "0"
                                     else:
                                         if nint == 1: #ETbackground
-                                            val = self.temp1B[shiftedindex]
+                                            readings = self.temp1B
                                         elif nint == 2: #BTbackground
-                                            val = self.temp2B[shiftedindex]
+                                            readings = self.temp2B
                                         #B3, B4, B5, ...
                                         elif nint > 2:
                                             idx3 = aw.qmc.xtcurveidx - 1
                                             n3 = idx3//2
                                             if aw.qmc.xtcurveidx%2:
-                                                val = self.temp1BX[n3][shiftedindex]
+                                                readings = self.temp1BX[n3]
                                             else:
-                                                val = self.temp2BX[n3][shiftedindex]
+                                                readings = self.temp2BX[n3]
+                                        val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
 
                                     evaltimeexpression = "B" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + seconddigitstr+ evalsign
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
                                 #direct index access: e.g. "B2{CHARGE}" or "B2{12}"
-                                if i+5 < len(mathexpression) and mathexpression[i+2] == "{" and mathexpression.find("}",i+3) > -1:
+                                elif i+5 < len(mathexpression) and mathexpression[i+2] == "{" and mathexpression.find("}",i+3) > -1:
                                     end_idx = mathexpression.index("}",i+3)
                                     body = mathexpression[i+3:end_idx]
                                     val = -1
@@ -6307,13 +6335,15 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
-                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],                        
+                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],
                                 drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
+                            if aw.extraFill1[i] > 0:
+                                self.ax.fill_between(self.extratimex[i], 0, self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],alpha=aw.extraFill1[i]/100.,sketch_params=None)
                     except Exception as ex:
                         _, _, exc_tb = sys.exc_info() 
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)                        
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
                     try:
                         if aw.extraCurveVisibility2[i]:
                             if (not aw.qmc.flagon or aw.qmc.smooth_curves_on_recording) and (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
@@ -6327,9 +6357,11 @@ class tgraphcanvas(FigureCanvas):
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
+                            if aw.extraFill2[i] > 0:
+                                self.ax.fill_between(self.extratimex[i], 0, self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],alpha=aw.extraFill2[i]/100.,sketch_params=None)
                     except Exception as ex:
                         _, _, exc_tb = sys.exc_info() 
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)                        
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
                 ##### ET,BT curves
                 if aw.qmc.swaplcds:
                     self.drawET()
@@ -12328,6 +12360,7 @@ class ApplicationWindow(QMainWindow):
         
         # analyzer
         self.analysisresultsanno = None
+        self.segmentresultsanno = None
         
         # large LCDs
         self.largeLCDs_dialog = None
@@ -14256,6 +14289,7 @@ class ApplicationWindow(QMainWindow):
         self.extraLCDvisibility1,self.extraLCDvisibility2 = [False]*self.nLCDS,[False]*self.nLCDS
         self.extraCurveVisibility1,self.extraCurveVisibility2 = [True]*self.nLCDS,[True]*self.nLCDS
         self.extraDelta1,self.extraDelta2 = [False]*self.nLCDS,[False]*self.nLCDS
+        self.extraFill1,self.extraFill2 = [0]*self.nLCDS,[0]*self.nLCDS # alpha values 0-100 in % of fill between extra curve and x-axis
         for i in range(self.nLCDS):
             #configure LCDs
             self.extraLCDframe1.append(QFrame())
@@ -23292,6 +23326,10 @@ class ApplicationWindow(QMainWindow):
                     self.extraDelta1 = [toBool(x) for x in toList(settings.value("extraDelta1",self.extraDelta1))]
                 if settings.contains("extraDelta2"):
                     self.extraDelta2 = [toBool(x) for x in toList(settings.value("extraDelta2",self.extraDelta2))]
+                if settings.contains("extraFill1"):
+                    self.extraFill1 = [toInt(x) for x in toList(settings.value("extraFill1",self.extraFill1))]
+                if settings.contains("extraFill2"):
+                    self.extraFill2 = [toInt(x) for x in toList(settings.value("extraFill2",self.extraFill2))]
             #create empty containers
             settings.endGroup()
             
@@ -24547,6 +24585,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraCurveVisibility2",self.extraCurveVisibility2)
             settings.setValue("extraDelta1",self.extraDelta1)
             settings.setValue("extraDelta2",self.extraDelta2)
+            settings.setValue("extraFill1",self.extraFill1)
+            settings.setValue("extraFill2",self.extraFill2)
             settings.endGroup()
             #save extra serial comm ports settings
             settings.beginGroup("ExtraComm")
@@ -29460,7 +29500,7 @@ class ApplicationWindow(QMainWindow):
         copy.append(self.eventquantifiermax[:])
         copy.append(self.eventquantifiercoarse[:])
         # added slider min/max
-        copy.append(self.eventslidermin[:])        
+        copy.append(self.eventslidermin[:])
         copy.append(self.eventslidermax[:])
         # added slider coarse
         copy.append(self.eventslidercoarse[:])
@@ -37755,7 +37795,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.transferpalettecombobox.setMinimumWidth(120)
         self.transferpalettecombobox.addItems(palettelist)
         
-        transferpalettebutton.clicked.connect(self.transferbuttonsto)
+        transferpalettebutton.clicked.connect(self.transferbuttonstoSlot)
         self.switchPaletteByNumberKey = QCheckBox(QApplication.translate("CheckBox","Switch Using Number Keys + Cmd",None))
         self.switchPaletteByNumberKey.setChecked(aw.buttonpalette_shortcuts)
         self.switchPaletteByNumberKey.setFocusPolicy(Qt.NoFocus)
@@ -39294,13 +39334,19 @@ class EventsDlg(ArtisanResizeablDialog):
             self.colorButton = QPushButton("Select")
             self.colorButton.setFocusPolicy(Qt.NoFocus)
             self.colorButton.clicked.connect(self.setbuttoncolor)
-            self.colorButton.setText(u(self.extraeventslabels[i]))
+            label = u(self.extraeventslabels[i])[:]
+            et = self.extraeventstypes[i]
+            if et > 4 and et < 9:
+                et = et - 5
+            if et < 4:
+                label = label.replace("\\t",aw.qmc.etypes[et])
+            self.colorButton.setText(label)
             self.colorButton.setStyleSheet("background-color: %s; color: %s;"%(self.extraeventbuttoncolor[i],self.extraeventbuttontextcolor[i]))
             #Text Color
             self.colorTextButton = QPushButton("Select")
             self.colorTextButton.setFocusPolicy(Qt.NoFocus)
             self.colorTextButton.clicked.connect(self.setbuttontextcolor)
-            self.colorTextButton.setText(u(self.extraeventslabels[i]))
+            self.colorTextButton.setText(label)
             self.colorTextButton.setStyleSheet("background-color: %s; color: %s;"%(self.extraeventbuttoncolor[i],self.extraeventbuttontextcolor[i]))
             #Empty Cell
             emptyCell = QLabel("")
@@ -39447,10 +39493,9 @@ class EventsDlg(ArtisanResizeablDialog):
                 et = self.extraeventstypes[i]
                 if et > 4 and et < 9:
                     et = et - 5
-                if et < 4:
-                    label = label.replace("\\t",aw.qmc.etypes[et])
-    
                 self.extraeventslabels[i] = label
+                if et < 4:
+                    label = label[:].replace("\\t",aw.qmc.etypes[et])
     
             #Update Color Buttons
             self.eventbuttontable.cellWidget(i,7).setText(label)
@@ -49724,7 +49769,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #                self.devicetable.clearContents() # this crashes Ubuntu 16.04 if device table is empty
             self.devicetable.clearSelection()
             self.devicetable.setRowCount(nddevices)
-            self.devicetable.setColumnCount(13)
+            self.devicetable.setColumnCount(15)
             self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None),
                                                         QApplication.translate("Table", "Color 1",None),
                                                         QApplication.translate("Table", "Color 2",None),
@@ -49737,7 +49782,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                                                         QApplication.translate("Table", "Curve 1",None),
                                                         QApplication.translate("Table", "Curve 2",None),
                                                         deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None) + " 1",
-                                                        deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None) + " 2"])
+                                                        deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None) + " 2",
+                                                        QApplication.translate("Table", "Fill 1",None),
+                                                        QApplication.translate("Table", "Fill 2",None)])
             self.devicetable.setAlternatingRowColors(True)
             self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -49817,6 +49864,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         else:
                             Delta2ComboBox.setCheckState(Qt.Unchecked)
                         Delta2ComboBox.stateChanged.connect(self.updateDelta2)
+                        Fill1SpinBox =  QSpinBox()
+                        Fill1SpinBox.setSingleStep(1)
+                        Fill1SpinBox.setRange(0,100)
+                        Fill1SpinBox.setAlignment(Qt.AlignRight)
+                        Fill1SpinBox.setValue(aw.extraFill1[i])
+                        Fill1SpinBox.editingFinished.connect(self.updateFill1)
+                        Fill2SpinBox =  QSpinBox()
+                        Fill2SpinBox.setSingleStep(1)
+                        Fill2SpinBox.setRange(0,100)
+                        Fill2SpinBox.setAlignment(Qt.AlignRight)
+                        Fill2SpinBox.setValue(aw.extraFill2[i])
+                        Fill2SpinBox.editingFinished.connect(self.updateFill2)
                         #add widgets to the table
                         self.devicetable.setCellWidget(i,0,typeComboBox)
                         self.devicetable.setCellWidget(i,1,color1Button)
@@ -49831,6 +49890,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)
                         self.devicetable.setCellWidget(i,11,Delta1ComboBox)
                         self.devicetable.setCellWidget(i,12,Delta2ComboBox)
+                        self.devicetable.setCellWidget(i,13,Fill1SpinBox)
+                        self.devicetable.setCellWidget(i,14,Fill2SpinBox)
                     except Exception as e:
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
@@ -49845,7 +49906,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         pass
                 header = self.devicetable.horizontalHeader()
                 header.setStretchLastSection(True)
-                
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createDeviceTable(): {0}").format(str(e)),exc_tb.tb_lineno)
@@ -50044,6 +50104,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             aw.extraDelta1.append(False) # keep length constant (aw.nLCDS)
             aw.extraDelta2.pop(x)
             aw.extraDelta2.append(False) # keep length constant (aw.nLCDS)
+            aw.extraFilter1.pop(x)
+            aw.extraFilter1.append(0) # keep length constant (aw.nLCDS)
+            aw.extraFilter2.pop(x)
+            aw.extraFilter2.append(0) # keep length constant (aw.nLCDS)
 
             aw.qmc.extraname1.pop(x)
             aw.qmc.extraname2.pop(x)
@@ -50182,6 +50246,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         r = aw.findWidgetsRow(self.devicetable,self.sender(),12)
         if r is not None:
             aw.extraDelta2[r] = bool(x)
+    
+    @pyqtSlot()
+    def updateFill1(self):
+        r = aw.findWidgetsRow(self.devicetable,self.sender(),13)
+        if r is not None:
+            aw.extraFill1[r] = self.sender().value()
+    
+    @pyqtSlot()
+    def updateFill2(self):
+        r = aw.findWidgetsRow(self.devicetable,self.sender(),14)
+        if r is not None:
+            aw.extraFill2[r] = self.sender().value()
 
     @pyqtSlot(bool)
     def setextracolor1(self,_):
