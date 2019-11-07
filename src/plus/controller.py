@@ -85,6 +85,8 @@ def toggle(app_window):
     if modifiers == Qt.ControlModifier:
         # send log file by email
         util.sendLog()
+    elif modifiers == Qt.AltModifier:
+        util.debugLogON()
     else:
         if config.app_window.plus_account is None: # @UndefinedVariable
             connect()

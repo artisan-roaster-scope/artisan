@@ -27,9 +27,11 @@ from pathlib import Path
 import os
 import datetime
 import dateutil.parser
+import logging
 
 from PyQt5.QtCore import QStandardPaths,QCoreApplication, QTemporaryFile, QDir, QUrl
 from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtWidgets import QApplication
 
 from artisanlib.util import d as decode
 
@@ -247,7 +249,19 @@ def roastLink(plus_roast):
     return config.web_base_url + "/" + getLanguage() + "/roasts;id=" + str(plus_roast)
 
 
-## Send Log Files
+
+## Logging
+
+def debugLogON():
+    config.logger.setLevel(logging.DEBUG)
+    config.handler.setLevel(logging.DEBUG)
+    config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus debug logging ON.",None)) # @UndefinedVariable 
+
+def debugLogOFF():
+    config.logger.setLevel(logging.DEBUG)
+    config.handler.setLevel(logging.DEBUG)
+    config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus debug logging OFF.",None)) # @UndefinedVariable 
+
 
 def sendLog():
     config.logger.info("util:sendLog()")
@@ -262,7 +276,7 @@ def sendLog():
     message["Subject"] = "artisan.plus client log"
     message["X-Unsent"] = "1"
     #message["X-Uniform-Type-Identifier"] = "com.apple.mail-draft"
-    message.attach(MIMEText("Please find attached the artisan.plus log file written by Artisan!\n--\n", "plain"))
+    message.attach(MIMEText("Please find attached the artisan.plus log file written by Artisan!\nPlease forward this email to {}\n--\n".format(message["To"]), "plain"))
     with open(config.log_file_path, "rb") as attachment:
         # Add file as application/octet-stream
         # Email client can usually download this automatically as attachment

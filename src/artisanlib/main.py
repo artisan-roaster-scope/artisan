@@ -7625,8 +7625,8 @@ class tgraphcanvas(FigureCanvas):
 #            QApplication.processEvents()
             if recording and self.flagKeepON:
                 self.OnMonitor()
-            else:
-                self.stopPhidgetManager()
+#            else:
+#                self.stopPhidgetManager()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -24822,6 +24822,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.closePhidgetOUTPUTs()
         except Exception:
             pass
+        aw.qmc.stopPhidgetManager()
     
     # returns True if confirmed, False if canceled by the user
     def closeApp(self):
@@ -27786,7 +27787,6 @@ class ApplicationWindow(QMainWindow):
                 if reply == QMessageBox.Cancel:
                     return 
                 try:
-#                    aw.stopActivities()
                     res = aw.settingsLoad(filename)
                     self.sendmessage(QApplication.translate("Message","Loaded theme {0}", None).format(filename))
                     if reset:
@@ -59431,6 +59431,8 @@ def main():
 #            sys.stderr = sys.stdout
 #        except:
 #            pass
+
+    aw.qmc.startPhidgetManager()
 
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
