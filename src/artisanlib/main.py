@@ -2096,8 +2096,8 @@ class tgraphcanvas(FigureCanvas):
         self.curvefitoffset = 180
         self.segmentresultsloc = [.5,.5]
         self.segmentpickflag = False
-        self.flcrdeltathreshold = 0.5
-        self.flcrdurationthreshold = 3
+        self.segmentdeltathreshold = 0.5
+        self.segmentsamplesthreshold = 3
         
         self.stats_summary_rect = None
 
@@ -16288,13 +16288,13 @@ class ApplicationWindow(QMainWindow):
         else:
             r = (numpy.digitize([v],ls)[0]+aw.eventslidermin[i] - 1) / 10.
         return max(aw.eventslidermin[i]/10., min(aw.eventslidermax[i] / 10.,r))
-        
-    
-    def curveSimilarity2(self,analysis_starttime=0,analysis_endtime=0):
+
+
+    def curveSimilarity2(self,exp=-1,analysis_starttime=0,analysis_endtime=0):
         result = {}
         # if background profile is loaded and both profiles have a DROP even set
         if aw.qmc.background and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
-            
+
             try:
                 analysis_start = aw.qmc.time2index(analysis_starttime)
                 analysis_end = aw.qmc.time2index(analysis_endtime)
@@ -16302,7 +16302,7 @@ class ApplicationWindow(QMainWindow):
                 analysis_DeltaBT = aw.qmc.delta2[analysis_start:analysis_end]
                 analysis_BTB = aw.qmc.stemp2B[analysis_start:analysis_end]
                 analysis_DeltaBTB = aw.qmc.delta2B[analysis_start:analysis_end]
-                    
+
                 # Replace None values in the Delta curves with the closest numeric value on the right
                 for i in range(len(analysis_DeltaBT) - 1, -1, -1):
                     if analysis_DeltaBT[i] == None:
@@ -16316,7 +16316,7 @@ class ApplicationWindow(QMainWindow):
                             analysis_DeltaBTB[i] = analysis_DeltaBTB[i+1]
                         except:
                             analysis_DeltaBTB[i] = 0
-                
+
                 np_bt = numpy.array(analysis_BT)
                 np_btb = numpy.array(analysis_BTB)
                 np_dbt = numpy.array(analysis_DeltaBT)
@@ -16336,7 +16336,7 @@ class ApplicationWindow(QMainWindow):
                 # r-squared
                 r2_BT = 1 - (ss_res_bt / ss_tot_bt)
                 r2_deltaBT = 1 - (ss_res_dbt / ss_tot_dbt)
-                
+
                 # Tests that require FCs is marked
                 if aw.qmc.timeindex[2]:
                     # RoR at time of FCs, and Actual RoR versus Template RoR at FCs
@@ -16347,7 +16347,7 @@ class ApplicationWindow(QMainWindow):
                     #max and min difference between actual RoR and template RoR 
                     maxdelta = numpy.max(np_dbt - np_dbtb)
                     mindelta = numpy.min(np_dbt - np_dbtb)
-                    
+
 #                    #count of times the actual RoR crosses the template RoR
 #                    diff_array = np_dbt - np_dbtb
 #                    zerocrosses = ((diff_array[:-1] * diff_array[1:]) < 0).sum()
@@ -16358,7 +16358,7 @@ class ApplicationWindow(QMainWindow):
                     #array indicating actual curve is greater than fit curve (+1) or is less than (-1)
                     signs_all = numpy.sign(deltas_all)
                     #array with start index of each interal between crossings
-                    starts = numpy.r_[0, numpy.flatnonzero(~numpy.isclose(signs_all[1:], signs_all[:-1])) + 1]  # <<<- what is the plus 1 ??
+                    starts = numpy.r_[0, numpy.flatnonzero(~numpy.isclose(signs_all[1:], signs_all[:-1])) + 1]
                     #array with the length of each interal between crossings
                     lengths = numpy.diff(numpy.r_[starts, len(signs_all)])
                     #array indicating segment has actual greater than fit (+1) or actual less than fit (-1)
@@ -16376,14 +16376,16 @@ class ApplicationWindow(QMainWindow):
                     timeindexs = timeindexs_all[starts]
                     
                     #thresholds
-                    segtimethreshold = aw.qmc.flcrdurationthreshold
-                    segdeltathreshold = aw.qmc.flcrdeltathreshold
+                    segtimethreshold = aw.qmc.segmentsamplesthreshold * self.qmc.profile_sampling_interval
+                    segdeltathreshold = aw.qmc.segmentdeltathreshold
                     reductions = numpy.zeros_like(signs)
+
+                    #mark segments that are insignificant and should be combine to the left
                     for i in range(len(starts)):
-                        if seconds[i] < segtimethreshold or abs(maxdeltas[i]) < segdeltathreshold:
+                        if seconds[i] <= segtimethreshold or abs(maxdeltas[i]) <= segdeltathreshold:
                             reductions[i] = 1
 
-                    # extend the reduction to the right when the sign matches the sign of the first segment in the reduction
+                    # extend the reduction to include the sample on the right when its sign matches the sign of the first segment in the reduction
                     prevsign = signs[0]
                     prevreduction = 0        
                     addtoprev = numpy.copy(reductions)   #can replace 'addtoprev[]' with change -in-place 'reductions[]' once debugged 
@@ -16392,7 +16394,7 @@ class ApplicationWindow(QMainWindow):
                         # reductions = 1
                         if reductions[i] == 1:
                             prevreduction = 1
-                        # reductions=0 & signs2=prevsign & prevreduction=1
+                        # reductions=0 & signs=prevsign & prevreduction=1
                         elif signs[i] == prevsign and prevreduction == 1:
                             addtoprev[i] = 1
                         # reductions=0
@@ -16400,68 +16402,99 @@ class ApplicationWindow(QMainWindow):
                             prevreduction = 0
                             prevsign = signs[i]
  
-                    #generate the reduction arrays
-                    starts_ = numpy.zeros_like(starts)
-                    lengths_ = numpy.zeros_like(starts)
-                    seconds_ = numpy.zeros_like(starts)
+                    #generate the per segement arrays
+                    _starts = numpy.zeros_like(starts)
+                    _lengths = numpy.zeros_like(starts)
+                    _seconds = numpy.zeros_like(starts)
                     addtoprev[0] = 0
                     lasti = 0
                     for i in range(0,len(starts)):
                         if addtoprev[i] == 1 and i+1 < len(starts):
-                            lengths_[lasti] += lengths[i]
-                            seconds_[lasti] += seconds[i]
+                            _lengths[lasti] += lengths[i]
+                            _seconds[lasti] += seconds[i]
                         elif addtoprev[i] == 1 :
-                            lengths_[lasti] += numpy.sum(lengths[i:])
-                            seconds_[lasti] += numpy.sum(seconds[i:])
+                            _lengths[lasti] += numpy.sum(lengths[i:])
+                            _seconds[lasti] += numpy.sum(seconds[i:])
                         else:   
-                            lengths_[i] = lengths[i]
-                            seconds_[i] = seconds[i]
-                            starts_[i] = starts[i]
+                            _lengths[i] = lengths[i]
+                            _seconds[i] = seconds[i]
+                            _starts[i] = starts[i]
                             lasti = i
-                                        
-                    mask = numpy.r_[0, numpy.flatnonzero(starts_)]
-                    starts2 = starts_[mask]
-                    lengths2 = lengths_[mask]
-                    signs2 = signs[mask]
-                    seconds2 = seconds_[mask]
-                    timeindexs2 = timeindexs[mask]
-                    maxdeltas2 = []
+                    mask = numpy.r_[0, numpy.flatnonzero(_starts)]
+                    starts_seg = _starts[mask]
+                    lengths_seg = _lengths[mask]
+                    signs_seg = signs[mask]
+                    seconds_seg = _seconds[mask]
+                    timeindexs_seg = timeindexs[mask]
+                    maxdeltas_seg = []
                     for i in range(len(mask)):
                         if i < len(mask) -1:
-                            maxdeltas2.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:mask[i+1]])) * signs2[i])
+                            maxdeltas_seg.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:mask[i+1]])) * signs_seg[i])
                         else:
-                            maxdeltas2.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:])) * signs2[i])
-                                
-                    filler = "-----"
+                            maxdeltas_seg.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:])) * signs_seg[i])
+
+                    # Per segment metrics
+                    segment_rmse_deltas = [] #segement root mean square error (difference)
+                    segment_mse_deltas = []  #segement mean square error (difference)
+                    segment_abc_deltas = []  #segemnt area between the curves
+                    for i in range(len(starts_seg)):
+                        segment_deltas = deltas_all[starts_seg[i]:starts_seg[i]+lengths_seg[i]]
+                        segment_abs_deltas = numpy.absolute(segment_deltas)
+                        segment_rmse_deltas.append(numpy.sqrt(numpy.mean(numpy.square(segment_deltas))))
+                        segment_mse_deltas.append(numpy.mean(numpy.square(segment_deltas)))
+                        segment_abc_deltas.append(numpy.sum((segment_abs_deltas[1:] + segment_abs_deltas [:-1]) * self.qmc.profile_sampling_interval /2))  #trapazoidal area height*(base1+base2)/2
+                        #segment_abc_deltas.append(numpy.trapz(segment_abs_deltas, dx=self.qmc.profile_sampling_interval))  #alternate method 
+
+                    # build a table of results
                     tbl = prettytable.PrettyTable()
-                    tbl.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","Swing"] 
+                    tbl.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","Swing", "RMSE", "MSE", "ABC", "ABC/secs"  ]
                     tbl.float_format = "5.2"
                     for i in range(len(mask)):
-                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs2[i]-aw.qmc.timeindex[0]])
-                        duration = self.eventtime2string(seconds2[i])
+                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs_seg[i]-aw.qmc.timeindex[0]])
+                        duration = self.eventtime2string(seconds_seg[i])
                         if i > 0:
-                            swing = maxdeltas2[i] - maxdeltas[i-1]
+                            swing = maxdeltas_seg[i] - maxdeltas_seg[i-1]
                         else:
                             swing = ""
-                        if signs2[i] == 1:
+                        if signs_seg[i] == 1:
                             abovebelow = "Above"
                         else:
                             abovebelow = "Below"
-                        tbl.add_row([thistime,duration,lengths2[i],maxdeltas2[i],abovebelow,'',swing])
-#                    tbl.add_row([filler, filler, filler, filler, filler, filler])
-#                    for i in range(len(maxdeltas)):
-#                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs[i]-aw.qmc.timeindex[0]])
-#                        tbl.add_row([thistime,seconds[i],lengths[i],maxdeltas[i],signs[i],reductions[i]],swing)
-#                    segmentresultstr = tbl.get_string(border=False)
-                    segmentresultstr = tbl.get_string(border=True, fields=["Start","Duration","Max Delta","Sign","Swing"])
-                    segmentresultstr += "\nDuration Threshold " + str(aw.qmc.flcrdurationthreshold)
-                    segmentresultstr += "\nDelta Threshold " + str(aw.qmc.flcrdeltathreshold)
-                    segmentresultstr += "\nSmooth Curves " + str(int((aw.qmc.curvefilter-1)/2))
-                    segmentresultstr += "\nDelta Span " + str(aw.qmc.deltaBTspan)
-                    segmentresultstr += "\nDelta Smoothing " + str(int((aw.qmc.deltaBTfilter-1)/2))
+                        abcprime = segment_abc_deltas[i] / seconds_seg[i]
+                        tbl.add_row([thistime,duration,lengths_seg[i],maxdeltas_seg[i],abovebelow,'',swing,segment_rmse_deltas[i],segment_mse_deltas[i], segment_abc_deltas[i], abcprime ])
+
+                    segmentresultstr = tbl.get_string(border=True, fields=["Start","Duration","Max Delta","Sign","Swing", "MSE", "ABC", "ABC/secs" ])
+
+                    fitRoR = 60*(analysis_DeltaBTB[-1] - analysis_DeltaBTB[0]) / (aw.qmc.timex[timeindexs_all[-1]] - aw.qmc.timex[timeindexs_all[0]])
+                    fitTypes = ["ln()", "", "x\u00b2", "x\u00b3", ""]
+                    fitType = fitTypes[exp]
+                    notabene = QApplication.translate("Label", "Note: All values calculated in Celsius",None)
+
+                    tbl2 = prettytable.PrettyTable()
+                    tbl2.field_names = ["A","A1", "B", "B1"  ]
+                    tbl2.align = 'l'
+                    tbl2.align["A1"] = "r"
+                    tbl2.align["B1"] = "r"
+                    tbl2.float_format = "5.2"
+                    tbl2.add_row(["Samples Threshold", aw.qmc.segmentsamplesthreshold, "Delta Threshold", aw.qmc.segmentdeltathreshold])
+                    tbl2.add_row(["Sample rate (secs)", self.qmc.profile_sampling_interval, "Smooth Curves", int((aw.qmc.curvefilter-1)/2) ])
+                    tbl2.add_row(["Delta Span", aw.qmc.deltaBTspan, "Delta Smoothing", int((aw.qmc.deltaBTfilter-1)/2) ])
+                    tbl2.add_row(["Curve Fit", fitType, "Fit RoR (C/min/min)", fitRoR ])
+                    tbl2.add_row(["Actual RoR at FCs", RoR_FCs_act, "", ""])
+                    segmentresultstr += "{}{}{}{}".format("\n", tbl2.get_string(border=False,header=False), "\n",notabene)
+
+                    # this table is here just to help with validation
+                    if aw.superusermode: 
+                        tbl3 = prettytable.PrettyTable()
+                        tbl3.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","TimeIndex"  ]
+                        tbl3.float_format = "5.2"
+                        for i in range(len(maxdeltas)):
+                            thistime = self.eventtime2string(aw.qmc.timex[timeindexs[i]-aw.qmc.timeindex[0]])
+                            tbl3.add_row([thistime,seconds[i],lengths[i],maxdeltas[i],signs[i],reductions[i],timeindexs[i]])
+                        segmentresultstr += "{}{}".format("\n", tbl3.get_string(border=False))
+
                     result['segmentresultstr'] = segmentresultstr
-#                    print(segmentresultstr)
- 
+
                 else:
                     RoR_FCs_act = 0
                     RoR_FCs_templ = 0
@@ -16470,7 +16503,7 @@ class ApplicationWindow(QMainWindow):
                     mindelta = 0
                     zerocrosses = 0
                     result['segmentresultstr'] = ""
-                
+
                 # build the dict to return
                 result['rmse_BT'] = rmse_BT
                 result['rmse_deltaBT'] = rmse_deltaBT
@@ -22647,10 +22680,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.curvefitstartchoice = toInt(settings.value("curvefitstartchoice",int()))
             if settings.contains("curvefitoffset"):
                 self.qmc.curvefitoffset = toInt(settings.value("curvefitoffset",int()))
-            if settings.contains("flcrdurationthreshold"):
-                self.qmc.flcrdurationthreshold = toInt(settings.value("flcrdurationthreshold",int()))
-            if settings.contains("flcrdeltathreshold"):
-                self.qmc.flcrdeltathreshold = aw.float2float(toFloat(settings.value("flcrdeltathreshold",self.qmc.flcrdeltathreshold)),4)
+            if settings.contains("segmentsamplesthreshold"):
+                self.qmc.segmentsamplesthreshold = toInt(settings.value("segmentsamplesthreshold",int()))
+            if settings.contains("segmentdeltathreshold"):
+                self.qmc.segmentdeltathreshold = aw.float2float(toFloat(settings.value("segmentdeltathreshold",self.qmc.segmentdeltathreshold)),4)
             if settings.contains("AUCbegin"):
                 self.qmc.AUCbegin = toInt(settings.value("AUCbegin",int()))
                 self.qmc.AUCbase = toInt(settings.value("AUCbase",int()))
@@ -24136,8 +24169,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("analysisoffset",aw.qmc.analysisoffset)
             settings.setValue("curvefitstartchoice",aw.qmc.curvefitstartchoice)
             settings.setValue("curvefitoffset",aw.qmc.curvefitoffset)
-            settings.setValue("flcrdurationthreshold",aw.qmc.flcrdurationthreshold)
-            settings.setValue("flcrdeltathreshold",aw.qmc.flcrdeltathreshold)
+            settings.setValue("segmentsamplesthreshold",aw.qmc.segmentsamplesthreshold)
+            settings.setValue("segmentdeltathreshold",aw.qmc.segmentdeltathreshold)
             #save AUC
             settings.setValue("AUCbegin",self.qmc.AUCbegin)
             settings.setValue("AUCbase",self.qmc.AUCbase)
@@ -29798,21 +29831,22 @@ class ApplicationWindow(QMainWindow):
                 bestfit = -1
         
             # build the results table
-            x = prettytable.PrettyTable()
-            x.field_names = ["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"] 
-            x.float_format = "5.2"
+            tbl = prettytable.PrettyTable()
+            tbl.field_names = ["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"] 
+            tbl.float_format = "5.2"
             if "equ_quadratic" in self.cfr:
-                x.add_row(["*" if self.cfr["dbdbt_quadratic"] == bestfit else "", "x\u00b2", self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"], self.cfr["r2_deltabt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
+                tbl.add_row(["*" if self.cfr["dbdbt_quadratic"] == bestfit else "", "x\u00b2", self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"], self.cfr["r2_deltabt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
             if "equ_cubic" in self.cfr:
-                x.add_row(["*" if self.cfr["dbdbt_cubic"] == bestfit else "", "x\u00b3", self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"], self.cfr["r2_deltabt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
+                tbl.add_row(["*" if self.cfr["dbdbt_cubic"] == bestfit else "", "x\u00b3", self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"], self.cfr["r2_deltabt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
             if "equ_naturallog" in self.cfr:
-                x.add_row(["*" if self.cfr["dbdbt_naturallog"] == bestfit else "", "ln()", self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"], self.cfr["r2_deltabt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
+                tbl.add_row(["*" if self.cfr["dbdbt_naturallog"] == bestfit else "", "ln()", self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"], self.cfr["r2_deltabt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
             
-            # highlight the best curve fit
-            if exp == -1:
-                RMSEstr = x.get_string(fields=["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
-            else:
-                RMSEstr = x.get_string(fields=[" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
+#            # highlight the best curve fit
+#            if exp == -1:
+#                RMSEstr = tbl.get_string(fields=["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
+#            else:
+#                RMSEstr = tbl.get_string(fields=[" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
+            RMSEstr = tbl.get_string(fields=[" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
             
             RMSEstr += "\n{0}   {1}{2:4.1f}".format(QApplication.translate("Label", "Note: All values calculated in Celsius",None), QApplication.translate("Label", "Actual RoR at FCs=",None), res['ror_fcs_act']) 
 
@@ -29925,7 +29959,7 @@ class ApplicationWindow(QMainWindow):
         self.setbackgroundequ(EQU=["",res['equ']], silent=True)
         #QApplication.processEvents()  #occasionally the fit curve remains showing.
         self.qmc.redraw(recomputeAllDeltas=True, silent=True)
-        result = self.curveSimilarity2(analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime) # analyze from DRY-END as specified in the phases dialog to DROP
+        result = self.curveSimilarity2(exp=exp, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
         if restoreF:
             self.qmc.convertTemperature("F", silent=True)
@@ -30799,17 +30833,17 @@ class HUDDlg(ArtisanDialog):
             self.analyzetimeoffset.setEnabled(False)
         else:
             self.analyzetimeoffset.setEnabled(True)
-        self.flcrdurationthresholdLabel = QLabel(QApplication.translate("Label", "Number of samples considerd significant", None))
-        self.flcrdurationthreshold = QLineEdit(str(int(round(aw.qmc.flcrdurationthreshold))))   #default
-        self.flcrdurationthreshold.setMaximumWidth(100)
-        self.flcrdurationthreshold.setMinimumWidth(55)
-        self.flcrdurationthreshold.editingFinished.connect(self.flcrdurationthresholdChanged)
-        self.flcrdurationthreshold.setValidator(QIntValidator(0,50,self.flcrdurationthreshold))
-        self.flcrdeltathresholdLabel = QLabel(QApplication.translate("Label", "Delta RoR Actual-to-Fit considerd significant", None))
-        self.flcrdeltathreshold = QLineEdit(str(aw.qmc.flcrdeltathreshold))   #default
-        self.flcrdeltathreshold.setMaximumWidth(100)
-        self.flcrdeltathreshold.setMinimumWidth(55)
-        self.flcrdeltathreshold.editingFinished.connect(self.flcrdeltathresholdChanged)
+        self.segmentsamplesthresholdLabel = QLabel(QApplication.translate("Label", "Number of samples considerd significant", None))
+        self.segmentsamplesthreshold = QLineEdit(str(int(round(aw.qmc.segmentsamplesthreshold))))   #default
+        self.segmentsamplesthreshold.setMaximumWidth(100)
+        self.segmentsamplesthreshold.setMinimumWidth(55)
+        self.segmentsamplesthreshold.editingFinished.connect(self.segmentsamplesthresholdChanged)
+        self.segmentsamplesthreshold.setValidator(QIntValidator(0,50,self.segmentsamplesthreshold))
+        self.segmentdeltathresholdLabel = QLabel(QApplication.translate("Label", "Delta RoR Actual-to-Fit considerd significant", None))
+        self.segmentdeltathreshold = QLineEdit(str(aw.qmc.segmentdeltathreshold))   #default
+        self.segmentdeltathreshold.setMaximumWidth(100)
+        self.segmentdeltathreshold.setMinimumWidth(55)
+        self.segmentdeltathreshold.editingFinished.connect(self.segmentdeltathresholdChanged)
 
         self.curvefitcombobox = QComboBox()
         self.curvefitcomboboxLabel = QLabel(QApplication.translate("Label", "Start of Curve Fit window", None))
@@ -30970,11 +31004,11 @@ class HUDDlg(ArtisanDialog):
         analyzeGroupLayout.setLayout(analyzeHLayout)
 
         flcrVLayout1 = QVBoxLayout()
-        flcrVLayout1.addWidget(self.flcrdurationthresholdLabel)
-        flcrVLayout1.addWidget(self.flcrdurationthreshold)
+        flcrVLayout1.addWidget(self.segmentsamplesthresholdLabel)
+        flcrVLayout1.addWidget(self.segmentsamplesthreshold)
         flcrVLayout2 = QVBoxLayout()
-        flcrVLayout2.addWidget(self.flcrdeltathresholdLabel)
-        flcrVLayout2.addWidget(self.flcrdeltathreshold)
+        flcrVLayout2.addWidget(self.segmentdeltathresholdLabel)
+        flcrVLayout2.addWidget(self.segmentdeltathreshold)
         
         flcrHLayout = QHBoxLayout()
         flcrHLayout.addLayout(flcrVLayout1)
@@ -31245,13 +31279,13 @@ class HUDDlg(ArtisanDialog):
         return
         
     @pyqtSlot()
-    def flcrdurationthresholdChanged(self):
-        aw.qmc.flcrdurationthreshold = int(self.flcrdurationthreshold.text())
+    def segmentsamplesthresholdChanged(self):
+        aw.qmc.segmentsamplesthreshold = int(self.segmentsamplesthreshold.text())
         return
         
     @pyqtSlot()
-    def flcrdeltathresholdChanged(self):
-        aw.qmc.flcrdeltathreshold = aw.float2float(toFloat(self.flcrdeltathreshold.text(),),4)
+    def segmentdeltathresholdChanged(self):
+        aw.qmc.segmentdeltathreshold = aw.float2float(toFloat(self.segmentdeltathreshold.text(),),4)
         return
         
     @pyqtSlot()
