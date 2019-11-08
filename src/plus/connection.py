@@ -83,10 +83,10 @@ def setToken(token,nickname=None):
         if token_semaphore.available() < 1:
             token_semaphore.release(1)  
 
-def clearCredentials():
+def clearCredentials(remove_from_keychain=True):
     config.logger.info("clearCredentials()")
     # remove credentials from keychain
-    if config.app_window is not None and config.app_window.plus_account is not None: # @UndefinedVariable
+    if config.app_window is not None and config.app_window.plus_account is not None and remove_from_keychain: # @UndefinedVariable
         try:
             keyring.delete_password(config.app_name,config.app_window.plus_account) # @UndefinedVariable
         except:

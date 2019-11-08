@@ -253,15 +253,22 @@ def roastLink(plus_roast):
 ## Logging
 
 def debugLogON():
+    config.logger.info("util:debugLogON()")
     config.logger.setLevel(logging.DEBUG)
     config.handler.setLevel(logging.DEBUG)
     config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus debug logging ON.",None)) # @UndefinedVariable 
 
 def debugLogOFF():
-    config.logger.setLevel(logging.DEBUG)
-    config.handler.setLevel(logging.DEBUG)
+    config.logger.info("util:debugLogOFF()")
+    config.logger.setLevel(logging.INFO)
+    config.handler.setLevel(logging.INFO)
     config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus debug logging OFF.",None)) # @UndefinedVariable 
 
+def debugLogToggle():
+    if config.logger.isEnabledFor(logging.DEBUG):
+        debugLogOFF()
+    else:
+        debugLogON()
 
 def sendLog():
     config.logger.info("util:sendLog()")

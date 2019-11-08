@@ -82,11 +82,12 @@ def toggle(app_window):
     config.logger.info("controller:toggle()")
     config.app_window = app_window
     modifiers = QApplication.keyboardModifiers()
-    if modifiers == Qt.ControlModifier:
-        # send log file by email
+    if modifiers == Qt.AltModifier:
+        # ALT-click (OPTION on macOS) sends the log file by email
         util.sendLog()
-    elif modifiers == Qt.AltModifier:
-        util.debugLogON()
+    elif modifiers == (Qt.AltModifier | Qt.ControlModifier):
+        # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles the plus debug logging 
+        util.debugLogToggle()
     else:
         if config.app_window.plus_account is None: # @UndefinedVariable
             connect()
@@ -95,7 +96,8 @@ def toggle(app_window):
         else:
             if config.connected:
                 if is_synced():
-                    disconnect(interactive=True)
+                    # a CTR-click (COMMAND on macOS) logs out and discards the credentials
+                    disconnect(interactive=True,remove_credentials=(modifiers == Qt.ControlModifier))
                 else:
                     # we (manually) turn syncing for the current roast on
                     if app_window.qmc.checkSaved(allow_discard=False):
@@ -110,10 +112,14 @@ def connect(clear_on_failure=False,interactive=True):
             connect_semaphore.acquire(1)
             if config.app_window is not None:
                 connection.setKeyring()
-                if config.app_window.plus_account is not None: # @UndefinedVariable
+                account = config.app_window.plus_account
+                if account is None:
+                    account = config.app_window.plus_email
+                    interactive = True
+                if account is not None: # @UndefinedVariable
                     try:
                         # try-catch as the keyring might not work
-                        config.passwd = keyring.get_password(config.app_name, config.app_window.plus_account) # @UndefinedVariable
+                        config.passwd = keyring.get_password(config.app_name, account) # @UndefinedVariable
                         if config.passwd is None:
                             config.logger.debug("controller: -> keyring.get_password returned None")
                         else:
@@ -123,26 +129,27 @@ def connect(clear_on_failure=False,interactive=True):
                 if interactive and (config.app_window.plus_account is None or config.passwd is None): # @UndefinedVariable
                     # ask user for credentials
                     import plus.login
-                    login,passwd,remember = plus.login.plus_login(config.app_window,config.app_window.plus_email,config.app_window.plus_remember_credentials) # @UndefinedVariable
-                    config.app_window.plus_remember_credentials = remember
-                    # store credentials
-                    config.app_window.plus_account = login
-                    if remember:
-                        config.app_window.plus_email = login
-                    else:
-                        config.app_window.plus_email = None                    
-                    # store the passwd in the keychain
-                    if login is not None and passwd is not None and remember:
-                        try:
-                            # try-catch as the keyring might not work
-                            keyring.set_password(config.app_name, login, passwd)
-                            config.logger.debug("controller: -> keyring set password (%s)",login)
-                        except Exception as e:
-                            config.logger.error("controller: keyring Exception %s",e)
-                            if not platform.system().startswith("Windows") and platform.system() != 'Darwin':
-                                # on Linux remind to install the gnome-keyring
-                                config.app_window.sendmessage(QApplication.translate("Plus","Keyring error: Ensure that gnome-keyring is installed.",None)) # @UndefinedVariable 
-                    config.passwd = passwd # remember password in memory for this session
+                    login,passwd,remember,res = plus.login.plus_login(config.app_window,config.app_window.plus_email,config.passwd,config.app_window.plus_remember_credentials) # @UndefinedVariable
+                    if res: # Login dialog not Canceled
+                        config.app_window.plus_remember_credentials = remember
+                        # store credentials
+                        config.app_window.plus_account = login
+                        if remember:
+                            config.app_window.plus_email = login
+                        else:
+                            config.app_window.plus_email = None                    
+                        # store the passwd in the keychain
+                        if login is not None and passwd is not None and remember:
+                            try:
+                                # try-catch as the keyring might not work
+                                keyring.set_password(config.app_name, login, passwd)
+                                config.logger.debug("controller: -> keyring set password (%s)",login)
+                            except Exception as e:
+                                config.logger.error("controller: keyring Exception %s",e)
+                                if not platform.system().startswith("Windows") and platform.system() != 'Darwin':
+                                    # on Linux remind to install the gnome-keyring
+                                    config.app_window.sendmessage(QApplication.translate("Plus","Keyring error: Ensure that gnome-keyring is installed.",None)) # @UndefinedVariable 
+                        config.passwd = passwd # remember password in memory for this session
             if config.app_window.plus_account is None: # @UndefinedVariable
                 if interactive:
                     config.app_window.sendmessage(QApplication.translate("Plus","Login aborted",None)) # @UndefinedVariable
@@ -202,8 +209,8 @@ def disconnect(remove_credentials = True, stop_queue = True, interactive = False
             # disconnect
             config.connected = False
             # remove credentials
+            connection.clearCredentials(remove_from_keychain=remove_credentials)
             if remove_credentials:
-                connection.clearCredentials()
                 config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None)) # @UndefinedVariable
             else:
                 config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus disconnected",None)) # @UndefinedVariable
