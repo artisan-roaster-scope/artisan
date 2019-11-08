@@ -1,7 +1,7 @@
 [General]
 BTcurve=true
 BTlcd=true
-Delay=1000
+Delay=2000
 ETcurve=false
 ETlcd=false
 ExtraEventSamplingDelay=0

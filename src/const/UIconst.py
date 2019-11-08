@@ -65,7 +65,7 @@ FILE_MENU_RANKINGREPORT = QApplication.translate("Menu", "Ranking", None)
 FILE_MENU_REPORT_WEB = QApplication.translate("Menu", "Web...", None)
 FILE_MENU_REPORT_CSV = QApplication.translate("Menu", "CSV...", None)
 FILE_MENU_REPORT_EXCEL = QApplication.translate("Menu", "Excel...", None)
-FILE_MENU_SAVESTATISTICS = QApplication.translate("Menu", "Save Statistics", None)
+FILE_MENU_SAVESTATISTICS = QApplication.translate("Menu", "Save Statistics...", None)
 FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None)
 if platf == 'Darwin':
     FILE_MENU_QUIT = "Quit"

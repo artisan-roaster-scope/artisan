@@ -1193,7 +1193,8 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=[""]*9
         self.plotcurvecolor = ["black"]*9
 
-        self.tight_layout_params = {"pad":.3,"h_pad":0.0,"w_pad":0.0}
+#        self.tight_layout_params = {"pad":.3,"h_pad":0.0,"w_pad":0.0}
+        self.tight_layout_params = True
         self.fig = Figure(tight_layout=self.tight_layout_params,frameon=True,dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
 
@@ -3870,7 +3871,7 @@ class tgraphcanvas(FigureCanvas):
                                     if i+5 < len(mathexpression) and mathexpression[i+2] == "[":
                                         Yshiftval = int(mathexpression[i+4])
                                         sign = mathexpression[i+3]
-    
+
                                         # TWO digits shifting
                                         if mathexpression[i+5].isdigit():
                                             seconddigit = int(mathexpression[i+5])
@@ -12857,7 +12858,7 @@ class ApplicationWindow(QMainWindow):
         self.rankingMenu.addAction(self.rankingExcelAction)
 
         self.savestatisticsAction = QAction(UIconst.FILE_MENU_SAVESTATISTICS,self)
-        self.savestatisticsAction.triggered.connect(self.saveStatistics)        
+        self.savestatisticsAction.triggered.connect(self.saveStatistics)
         self.fileMenu.addAction(self.savestatisticsAction)
 
         self.fileMenu.addSeparator()
@@ -23672,7 +23673,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("showmet"):
                 self.qmc.showmet = bool(toBool(settings.value("showmet",self.qmc.showmet)))
             if settings.contains("statssummary"):
-                self.qmc.statssummary = bool(toBool(settings.value("statssummary")))                
+                self.qmc.statssummary = bool(toBool(settings.value("statssummary")))
                 if self.qmc.statssummary:
                     self.savestatisticsAction.setEnabled(True)
                 else:
@@ -30873,13 +30874,13 @@ class HUDDlg(ArtisanDialog):
             self.analyzetimeoffset.setEnabled(False)
         else:
             self.analyzetimeoffset.setEnabled(True)
-        self.segmentsamplesthresholdLabel = QLabel(QApplication.translate("Label", "Number of samples considerd significant", None))
+        self.segmentsamplesthresholdLabel = QLabel(QApplication.translate("Label", "Number of samples considered significant", None))
         self.segmentsamplesthreshold = QLineEdit(str(int(round(aw.qmc.segmentsamplesthreshold))))   #default
         self.segmentsamplesthreshold.setMaximumWidth(100)
         self.segmentsamplesthreshold.setMinimumWidth(55)
         self.segmentsamplesthreshold.editingFinished.connect(self.segmentsamplesthresholdChanged)
         self.segmentsamplesthreshold.setValidator(QIntValidator(0,50,self.segmentsamplesthreshold))
-        self.segmentdeltathresholdLabel = QLabel(QApplication.translate("Label", "Delta RoR Actual-to-Fit considerd significant", None))
+        self.segmentdeltathresholdLabel = QLabel(QApplication.translate("Label", "Delta RoR Actual-to-Fit considered significant", None))
         self.segmentdeltathreshold = QLineEdit(str(aw.qmc.segmentdeltathreshold))   #default
         self.segmentdeltathreshold.setMaximumWidth(100)
         self.segmentdeltathreshold.setMinimumWidth(55)
