@@ -558,7 +558,7 @@ supported_languages = [
     "fr",
     "he",
     "hu",
-    "id",    
+    "id",
     "it",
     "ja",
     "ko",
@@ -17577,7 +17577,7 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cmds = eval(cs[len('writem'):])
                                     if isinstance(cmds,tuple) and len(cmds) == 3:
-                                        # cmd has format "writem(s,r,[v1,..,vn])" or "writem(s,r,v)"
+                                        # cmd has format "writem(s,r,[v1,..,vn])"
                                         aw.modbus.writeRegisters(*cmds)
                                         followupCmd = 0.08
                                 except Exception:
@@ -38664,6 +38664,7 @@ class EventsDlg(ArtisanResizeablDialog):
         string += u(QApplication.translate("Message", "<li><b>mwrite</b>(slaveId,register,andMask,orMask)<br>mask write register: <i>MODBUS function 22</i>",None))
         string += u(QApplication.translate("Message", "<li><b>writem</b>(slaveId,register,value) or <b>writem</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write registers: <i>MODBUS function 16</i>",None))
         string += u(QApplication.translate("Message", "<li><b>writeBCD</b>(slaveId,register,value) or <b>writeBCD</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write BCD encoded int register: <i>MODBUS function 16 (BCD)</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>writeWord</b>(slaveId,register,value) or <b>writeWord</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write 32bit float to two 16bit int registers: <i>MODBUS function 16 (Float)</i>",None))
         string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given id",None))
         string += u(QApplication.translate("Message", "<li>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None)) + "</ul>"
         string += u(QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None)) + "<br>"
@@ -40924,6 +40925,8 @@ class backgroundDlg(ArtisanResizeablDialog):
             if self.TabWidget.currentIndex() == 2: # datatable
                 aw.copy_cells_to_clipboard(self.datatable)
                 aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
+        else:
+            super(backgroundDlg,self).keyPressEvent(event)
 
     @pyqtSlot()
     def accept(self):
@@ -40933,7 +40936,7 @@ class backgroundDlg(ArtisanResizeablDialog):
     def closeEvent(self,_):
         settings = QSettings()
         #save window geometry
-        settings.setValue("BackgroundGeometry",self.saveGeometry())    
+        settings.setValue("BackgroundGeometry",self.saveGeometry())
         
     def getColorIdx(self,c):
         try:
@@ -40942,7 +40945,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             try:
                 return self.colors.index(c) + 5
             except Exception: 
-                return 0       
+                return 0
 
     @pyqtSlot(int)
     def setplaybackevent(self,_):
