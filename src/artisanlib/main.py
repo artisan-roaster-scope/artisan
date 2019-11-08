@@ -1193,8 +1193,8 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=[""]*9
         self.plotcurvecolor = ["black"]*9
 
-#        self.tight_layout_params = {"pad":.3,"h_pad":0.0,"w_pad":0.0}
-        self.tight_layout_params = True
+        self.tight_layout_params = {"pad":.3,"h_pad":0.0,"w_pad":0.0} # slightly less space for axis labels
+#        self.tight_layout_params = True
         self.fig = Figure(tight_layout=self.tight_layout_params,frameon=True,dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
 
@@ -6656,7 +6656,7 @@ class tgraphcanvas(FigureCanvas):
 
             skipline = '\n'
             statstr = ''
-            if self.statssummary:   
+            if self.statssummary:
                 
                 #Admin Info Section
                 if aw.qmc.roastbatchnr > 0:
@@ -6804,6 +6804,7 @@ class tgraphcanvas(FigureCanvas):
                     prev_stats_textbox_width = 0
                     #set the maximum number of iterations
                     for _ in range(2, 20):
+                        aw.qmc.fig.set_tight_layout(False)
                         _,_,droptext_end = self.droptextBounds(drop_label,start,statsheight,ls,prop,fc)
                         stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                         stats_textbox_width = stats_textbox_bounds[2]
@@ -6824,28 +6825,9 @@ class tgraphcanvas(FigureCanvas):
 #               self.stats_summary_rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
                 self.stats_summary_rect = patches.Rectangle((pos_x-margin,pos_y - (stats_textbox_height + 2*margin)),stats_textbox_width+2*margin,stats_textbox_height+3*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=fc,fill=True,alpha=a,zorder=10)
                 self.ax.add_patch(self.stats_summary_rect)
-                
 
                 text = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=tc,zorder=11,path_effects=[])
                 text.set_in_layout(False)
-                    
-#                try:
-#                    # 0. MPL coordinate systems & transformations: 
-#                    #   https://matplotlib.org/3.1.1/tutorials/advanced/transforms_tutorial.html
-#                    # 1.get bounding box in axis cooridnates
-#                    rect_extents = rect.get_bbox()
-#                    # 2. convert those to display coordinates
-#                    rect_extents_display = aw.qmc.ax.transData.transform(rect_extents)
-#                    # 3. convert display coordinates to figure-inches
-#                    rect_extents_bbox_inches = self.fig.dpi_scale_trans.inverted().transform(rect_extents_display)
-#                    # 4. generate
-#                    rect_bbox_inches =  mpl.transforms.Bbox.from_extents(rect_extents_bbox_inches)
-#                    # 5. fig.save
-#                    #self.fig.savefig("/tmp/test.png",bbox_inches=rect_bbox_inches,pad_inches=0)
-#                    self.fig.savefig("/tmp/test.pdf",bbox_inches=rect_bbox_inches,pad_inches=0)
-#                except Exception as e:
-#                    print(e)
-                
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " statsSummary() {0}").format(str(e)),exc_tb.tb_lineno)
@@ -25251,8 +25233,10 @@ class ApplicationWindow(QMainWindow):
                 ext = "*.pdf"
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Statistics",None), ext=ext)
             if filename:
+                aw.qmc.fig.set_tight_layout(False)
                 aw.qmc.fig.savefig(filename,bbox_inches=rect_bbox_inches,pad_inches=0)
                 aw.sendmessage(QApplication.translate("Message","Statistics Saved",None))
+                aw.qmc.fig.set_tight_layout(aw.qmc.tight_layout_params)
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -29960,7 +29944,6 @@ class ApplicationWindow(QMainWindow):
                 pass
             self.segmentresultsanno.draggable(use_blit=True)
             self.segmentresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
-#            self.qmc.fig.canvas.draw()
 
             # create the analysis results annotation box
             a = aw.qmc.alpha["statsanalysisbkgnd"]
