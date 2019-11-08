@@ -6804,7 +6804,6 @@ class tgraphcanvas(FigureCanvas):
                     prev_stats_textbox_width = 0
                     #set the maximum number of iterations
                     for _ in range(2, 20):
-                        aw.qmc.fig.set_tight_layout(False)
                         _,_,droptext_end = self.droptextBounds(drop_label,start,statsheight,ls,prop,fc)
                         stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                         stats_textbox_width = stats_textbox_bounds[2]
