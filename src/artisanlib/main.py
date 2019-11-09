@@ -2129,7 +2129,7 @@ class tgraphcanvas(FigureCanvas):
     def resizeEvent(self, event):
         super(tgraphcanvas,self).resizeEvent(event)
         # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
-        if aw.logofilename != "" and aw.logoimgflag:
+        if aw.logofilename != "":
             dw = event.size().width() - event.oldSize().width()   # width change
             dh = event.size().height() - event.oldSize().height() # height change
             t = libtime.time()
