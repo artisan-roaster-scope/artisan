@@ -5329,7 +5329,7 @@ class tgraphcanvas(FigureCanvas):
     
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
-    def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False, silent=False):
+    def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
         if aw.qmc.designerflag:
             aw.qmc.redrawdesigner()
         else:
@@ -5364,8 +5364,7 @@ class tgraphcanvas(FigureCanvas):
 
                 self.fig.clf()   #wipe out figure. keep_observers=False
 
-                if not silent:
-                    self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
+                self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
 
                 self.ax.set_ylim(self.ylimit_min, self.ylimit)
                 self.ax.set_autoscale_on(False)
@@ -30008,9 +30007,7 @@ class ApplicationWindow(QMainWindow):
         res = {}  #use dict to allow more flexible expansion in the future
         res['equ'] = self.qmc.lnRegression(power=exp, timeoffset=curvefit_starttime, plot=False)
         self.deleteBackground()
-        self.setbackgroundequ(EQU=["",res['equ']], silent=True)
-        #QApplication.processEvents()  #occasionally the fit curve remains showing.
-        self.qmc.redraw(recomputeAllDeltas=True, silent=True)
+        self.setbackgroundequ(EQU=["",res['equ']],recomputeAllDeltas=True)
         result = self.curveSimilarity2(exp=exp, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
         if restoreF:
@@ -30019,7 +30016,7 @@ class ApplicationWindow(QMainWindow):
         retval = {**result, **res}
         return retval
                 
-    def setbackgroundequ(self,foreground=False, EQU=['',''], silent=False):
+    def setbackgroundequ(self,foreground=False, EQU=['',''],recomputeAllDeltas=False):
         # Check for incompatible vars from in the equations
         incompatiblevars = ["P","F","$","#"]
         error = ""
@@ -30092,7 +30089,7 @@ class ApplicationWindow(QMainWindow):
                             t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
                             aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
                         aw.qmc.background = True
-                        aw.qmc.redraw(recomputeAllDeltas=False, silent=silent)
+                        aw.qmc.redraw(recomputeAllDeltas=False)
                         aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1]), None))
 
             except Exception as e:
@@ -32626,8 +32623,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(cancelButton)
         buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(cancelButton)
 
         mainlayout = QVBoxLayout()
         mainlayout.addLayout(unitLayout)
