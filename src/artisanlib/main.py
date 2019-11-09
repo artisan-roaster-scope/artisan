@@ -25671,6 +25671,12 @@ class ApplicationWindow(QMainWindow):
                 first_profile_event_time = 0
                 max_drop_time = 0
                 label_chr_nr = 0
+                
+                if sys.platform.startswith("darwin") and darkdetect.isDark():
+                    path_effects_color = "black"
+                else:
+                    path_effects_color = self.qmc.palette["background"]
+                
                 for p in profiles:
                     pd = self.profileProductionData(p)
                     c += 1
@@ -25825,7 +25831,8 @@ class ApplicationWindow(QMainWindow):
     #                                    dlinestyle = ':' # dotted
                                 trans = self.qmc.delta_ax.transData
                                 self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
+#                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=path_effects_color)],
+                                sketch_params=None,path_effects=[],
                                 linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
                                     
                             first_profile = False
@@ -25835,7 +25842,7 @@ class ApplicationWindow(QMainWindow):
     #                        traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
-                    
+                
                 # draw BT curves on top of all others
                 for i in range(len(timex_list)):
                     label = labels[i]
@@ -25843,7 +25850,8 @@ class ApplicationWindow(QMainWindow):
                     stemp = stemp_list[i]
                     cl = cl_list[i]
                     self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
+#                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=path_effects_color)],
+                        sketch_params=None,path_effects=[],
                         linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
                     handles.append(self.l_temp)
                         
@@ -25965,7 +25973,10 @@ class ApplicationWindow(QMainWindow):
                     ind = 7            # width of color legend indicator
     
                     # setup the font 
-                    fontcolor = 'black'
+                    if sys.platform.startswith("darwin") and darkdetect.isDark():
+                        fontcolor = 'lightgrey'
+                    else:
+                        fontcolor = 'darkgrey'
                     lightfontcolor = 'grey'
                     prop.set_family(mpl.rcParams['font.family'])
     
