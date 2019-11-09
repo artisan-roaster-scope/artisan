@@ -9691,14 +9691,14 @@ class tgraphcanvas(FigureCanvas):
             return None
     
     #ln() regression. ln() will be used when power does not equal 2 (quadratic) or 3 (cubic).
-    def lnRegression(self,power=0, timeoffset=0, plot=True):
+    def lnRegression(self,power=0, curvefit_starttime=0, curvefit_endtime=0, plot=True):
         res = ""
         try:
             from scipy.optimize import curve_fit
             if self.timeindex[0] > -1 and self.timeindex[6] > -1:  #CHARGE and DROP events exist
                 charge = self.timex[self.timeindex[0]]
-                if timeoffset != None and timeoffset > charge:
-                    begin = aw.time2index(timeoffset)
+                if curvefit_starttime != None and curvefit_starttime > charge:
+                    begin = aw.time2index(curvefit_starttime)
                     time_l = []
                     temp_l = []
                 else:
@@ -9720,7 +9720,10 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             roomTemp = 21.0
                         temp_l = [roomTemp]
-                end = self.timeindex[6]
+                if curvefit_endtime > 0:
+                    end = aw.time2index(curvefit_endtime)
+                else:
+                    end = self.timeindex[6]
                 time_l = time_l + self.timex[begin:end]
                 temp_l = temp_l + self.temp2[begin:end]
                     
@@ -25251,8 +25254,8 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 aw.qmc.fig.set_tight_layout(False)
                 aw.qmc.fig.savefig(filename,bbox_inches=rect_bbox_inches,pad_inches=0)
-                aw.sendmessage(QApplication.translate("Message","Statistics Saved",None))
                 aw.qmc.fig.set_tight_layout(aw.qmc.tight_layout_params)
+                aw.sendmessage(QApplication.translate("Message","Statistics Saved",None))
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -30000,7 +30003,7 @@ class ApplicationWindow(QMainWindow):
             restoreF = False
 
         res = {}  #use dict to allow more flexible expansion in the future
-        res['equ'] = self.qmc.lnRegression(power=exp, timeoffset=curvefit_starttime, plot=False)
+        res['equ'] = self.qmc.lnRegression(power=exp, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, plot=False)
         self.deleteBackground()
         self.setbackgroundequ(EQU=["",res['equ']],recomputeAllDeltas=True)
         result = self.curveSimilarity2(exp=exp, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
@@ -30084,7 +30087,7 @@ class ApplicationWindow(QMainWindow):
                             t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
                             aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
                         aw.qmc.background = True
-                        aw.qmc.redraw(recomputeAllDeltas=False)
+                        aw.qmc.redraw(recomputeAllDeltas=recomputeAllDeltas)
                         aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1]), None))
 
             except Exception as e:
@@ -31804,10 +31807,10 @@ class HUDDlg(ArtisanDialog):
             #check for finished roast
             if aw.qmc.timeindex[0] > -1:
                 try:
-                    _timeoffset = int(self.exptimeoffset.text()) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                    curvefit_starttime = int(self.exptimeoffset.text()) + aw.qmc.timex[aw.qmc.timeindex[0]]
                 except:
-                    _timeoffset = 0
-                res = aw.qmc.lnRegression(timeoffset=_timeoffset)
+                    curvefit_starttime = 0
+                res = aw.qmc.lnRegression(curvefit_starttime=curvefit_starttime)
                 self.lnresult.setText(res)
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "ln(): no profile data available", None))
@@ -31824,10 +31827,10 @@ class HUDDlg(ArtisanDialog):
             #check for finished roast
             if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
                 try:
-                    _timeoffset = int(self.exptimeoffset.text()) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                    curvefit_starttime = int(self.exptimeoffset.text()) + aw.qmc.timex[aw.qmc.timeindex[0]]
                 except:
-                    _timeoffset = 0
-                res = aw.qmc.lnRegression(power=self.exppower, timeoffset=_timeoffset)
+                    curvefit_starttime = 0
+                res = aw.qmc.lnRegression(power=self.exppower, curvefit_starttime=curvefit_starttime)
                 self.expresult.setText(res)
                 self.bkgndButton.setEnabled(True)                
             else:
