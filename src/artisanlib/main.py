@@ -7488,10 +7488,11 @@ class tgraphcanvas(FigureCanvas):
             if self.phidgetManager is None:
                 try:
                     self.phidgetManager = PhidgetManager()
-                    if self.phidgetRemoteFlag:
-                        libtime.sleep(1.3)
-                    else:
-                        libtime.sleep(0.5)
+# as the PhidgetManager is now started at app start we do not need to wait anymore for attaches
+#                    if self.phidgetRemoteFlag:
+#                        libtime.sleep(1.3)
+#                    else:
+#                        libtime.sleep(0.5)
                 except Exception:
                     if aw.qmc.device in aw.qmc.phidgetDevices:
                         aw.qmc.adderror(QApplication.translate("Error Message","Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!",None))
@@ -15128,7 +15129,8 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ##################################### 
 
-    def copy_cells_to_clipboard(self,table_widget, adjustment=0):  # adjustment bitwise 0:None, 1: add leading tab to header, 2: add leading tab to first data row, 4: remove extra cell at the end of header
+    # if recurse is True (default) and no selection exists, all is selected before calling the copy function again
+    def copy_cells_to_clipboard(self,table_widget, adjustment=0,recurse=True):  # adjustment bitwise 0:None, 1: add leading tab to header, 2: add leading tab to first data row, 4: remove extra cell at the end of header
         if len(table_widget.selectionModel().selectedIndexes()) > 0:
             # sort select indexes into rows and columns
             previous = table_widget.selectionModel().selectedIndexes()[0]
@@ -15202,6 +15204,11 @@ class ApplicationWindow(QMainWindow):
             # copy to the system clipboard
             sys_clip = QApplication.clipboard()
             sys_clip.setText(clipboard)
+        # if nothing is selected, temporary select all and try to copy
+        else:
+            table_widget.selectAll()
+            self.copy_cells_to_clipboard(table_widget, adjustment, False)
+            table_widget.clearSelection()
             
     def createRecentRoast(self,title,beans,weightIn,
             weightUnit,volumeIn,volumeUnit,densityWeight,beanSize_min, beanSize_max,
@@ -35488,9 +35495,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def copyDataTabletoClipboard(self,_=False):
-        self.datatable.selectAll()
         aw.copy_cells_to_clipboard(self.datatable,adjustment=5)
-        self.datatable.clearSelection()
         aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
 
     @pyqtSlot(bool)
@@ -41341,9 +41346,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def copyEventTabletoClipboard(self,_=False):
-        self.eventtable.selectAll()
         aw.copy_cells_to_clipboard(self.eventtable,adjustment=0)
-        self.eventtable.clearSelection()
         aw.sendmessage(QApplication.translate("Message","Event table copied to clipboard",None))
 
 
