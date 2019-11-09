@@ -15179,7 +15179,7 @@ class ApplicationWindow(QMainWindow):
                                 tblrows.append(entry)
                     tbl.add_row(tblrows)
                 clipboard = tbl.get_string()
-            else:
+            elif recurse:
                 if adjustment & 1:
                     clipboard += "" + '\t'
                 for c in range(ncols):
@@ -25671,11 +25671,6 @@ class ApplicationWindow(QMainWindow):
                 max_drop_time = 0
                 label_chr_nr = 0
                 
-                if sys.platform.startswith("darwin") and darkdetect.isDark():
-                    path_effects_color = "black"
-                else:
-                    path_effects_color = self.qmc.palette["background"]
-                
                 for p in profiles:
                     pd = self.profileProductionData(p)
                     c += 1
@@ -30547,7 +30542,7 @@ class HUDDlg(ArtisanDialog):
         inputFilter1 = QHBoxLayout()
         inputFilter1.addWidget(self.DropSpikes)
         inputFilter1.addStretch()
-        inputFilter1.addWidget(self.swapETBT)        
+        inputFilter1.addWidget(self.swapETBT)
         inputFilter2 = QHBoxLayout()
         inputFilter2.addWidget(self.MinMaxLimits)
         inputFilter2.addStretch()
@@ -30555,7 +30550,7 @@ class HUDDlg(ArtisanDialog):
         inputFilter2.addWidget(self.minLimit)
         inputFilter2.addSpacing(20)
         inputFilter2.addWidget(maxlabel)
-        inputFilter2.addWidget(self.maxLimit)        
+        inputFilter2.addWidget(self.maxLimit)
         inputFilterVBox = QVBoxLayout()
         inputFilterVBox.addLayout(inputFilter1)
         inputFilterVBox.addLayout(inputFilter2) 
@@ -50112,10 +50107,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             aw.extraDelta1.append(False) # keep length constant (aw.nLCDS)
             aw.extraDelta2.pop(x)
             aw.extraDelta2.append(False) # keep length constant (aw.nLCDS)
-            aw.extraFilter1.pop(x)
-            aw.extraFilter1.append(0) # keep length constant (aw.nLCDS)
-            aw.extraFilter2.pop(x)
-            aw.extraFilter2.append(0) # keep length constant (aw.nLCDS)
+            aw.extraFill1.pop(x)
+            aw.extraFill1.append(0) # keep length constant (aw.nLCDS)
+            aw.extraFill2.pop(x)
+            aw.extraFill2.append(0) # keep length constant (aw.nLCDS)
 
             aw.qmc.extraname1.pop(x)
             aw.qmc.extraname2.pop(x)
