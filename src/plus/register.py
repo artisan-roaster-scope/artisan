@@ -78,7 +78,7 @@ def scanDir(path=None):
         for currentFile in currentDictory.glob("*." + config.profile_ext):  
             d = config.app_window.deserialize(currentFile) # @UndefinedVariable
             if config.uuid_tag in d:
-                add_path(d[config.uuid_tag],currentFile) # @UndefinedVariable
+                addPath(d[config.uuid_tag],currentFile) # @UndefinedVariable
     except Exception as e:
         config.logger.error("roast: Exception in scanDir() %s",e)
 

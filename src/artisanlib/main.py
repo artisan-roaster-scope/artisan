@@ -9993,6 +9993,7 @@ class tgraphcanvas(FigureCanvas):
                 res = self.initfromprofile()
                 if res:
                     self.connect_designer()
+                    aw.disableEditMenus(designer=True)
                     self.redraw(True)
                 else:
                     aw.designerAction.setChecked(False)
@@ -10010,7 +10011,7 @@ class tgraphcanvas(FigureCanvas):
             self.reset(redraw=False,soundOn=False)
             self.connect_designer()
             self.designerinit()
-        aw.disableEditMenus(designer=True)
+            aw.disableEditMenus(designer=True)
     
     @pyqtSlot()
     @pyqtSlot(bool)
