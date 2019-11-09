@@ -669,7 +669,7 @@ class tgraphcanvas(FigureCanvas):
 #                        "mettext":'white',"metbox":'red',
 #                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'}
         # Artisan 2.x
-        self.alpha = {"analysismask":0.4,"statsanalysisbkgnd":0.1,"legendbg":0.4}
+        self.alpha = {"analysismask":0.4,"statsanalysisbkgnd":1.0,"legendbg":0.4}
         self.palette = {"background":'white',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
                         "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#bde0ee',"rect5":'lightgrey',
                         "et":'#cc0f50',"bt":'#0A5C90',"xt":'#404040',"deltaet":'#cc0f50',
@@ -679,7 +679,7 @@ class tgraphcanvas(FigureCanvas):
                         "bgeventmarker":'white',"bgeventtext":'black',
                         "mettext":'white',"metbox":'#CC0F50',
                         "aucguide":'#0c6aa6',"messages":'black',"aucarea":'#767676',
-                        "analysismask":'#bababa',"statsanalysisbkgnd":"#b1bab5"}
+                        "analysismask":'#bababa',"statsanalysisbkgnd":"#ffffff"}
         self.palette1 = self.palette.copy()
         self.EvalueColor_default = ['#43a7cf','#49B160','#800080','#ad0427']
         self.EvalueTextColor_default = ['white','white','white','white']
@@ -9726,8 +9726,6 @@ class tgraphcanvas(FigureCanvas):
                     
                 xa = numpy.array(time_l) - charge
                 yn = numpy.array(temp_l)
-#                print(xa)  #dave
-#                print(yn)  #dave
                 if power == 2:
                     func = lambda x,a,b,c: a*x*x + b*x + c
                 elif power == 3:
@@ -16386,17 +16384,17 @@ class ApplicationWindow(QMainWindow):
                     #array of lengths in seconds
                     seconds = lengths * self.qmc.profile_sampling_interval
                     
-                    #array of all the time index values
+                    # array of all the time index values
                     timeindexs_all = numpy.arange(analysis_start, analysis_end, 1)
-                    #time intdexes of the segements
+                    # time indexes of the segements
                     timeindexs = timeindexs_all[starts]
                     
-                    #thresholds
+                    # thresholds
                     segtimethreshold = aw.qmc.segmentsamplesthreshold * self.qmc.profile_sampling_interval
                     segdeltathreshold = aw.qmc.segmentdeltathreshold
                     reductions = numpy.zeros_like(signs)
 
-                    #mark segments that are insignificant and should be combine to the left
+                    # mark segments that are insignificant and should be combined to the left
                     for i in range(len(starts)):
                         if seconds[i] <= segtimethreshold or abs(maxdeltas[i]) <= segdeltathreshold:
                             reductions[i] = 1
@@ -16405,7 +16403,7 @@ class ApplicationWindow(QMainWindow):
                     prevsign = signs[0]
                     prevreduction = 0        
                     addtoprev = numpy.copy(reductions)   #can replace 'addtoprev[]' with change -in-place 'reductions[]' once debugged 
-                    addtoprev[0] = 0  # the first entry is never combined to the left.
+                    addtoprev[0] = 0      #the first entry is never combined to the left.
                     for i in range(1,len(starts)):
                         # reductions = 1
                         if reductions[i] == 1:
@@ -16418,7 +16416,7 @@ class ApplicationWindow(QMainWindow):
                             prevreduction = 0
                             prevsign = signs[i]
  
-                    #generate the per segement arrays
+                    # generate the per segement arrays
                     _starts = numpy.zeros_like(starts)
                     _lengths = numpy.zeros_like(starts)
                     _seconds = numpy.zeros_like(starts)
@@ -16454,19 +16452,29 @@ class ApplicationWindow(QMainWindow):
                     segment_mse_deltas = []  #segement mean square error (difference)
                     segment_abc_deltas = []  #segemnt area between the curves
                     for i in range(len(starts_seg)):
-                        segment_deltas = deltas_all[starts_seg[i]:starts_seg[i]+lengths_seg[i]]
+                        segment_deltas = deltas_all[starts_seg[i]:starts_seg[i]+lengths_seg[i]+1]
                         segment_abs_deltas = numpy.absolute(segment_deltas)
                         segment_rmse_deltas.append(numpy.sqrt(numpy.mean(numpy.square(segment_deltas))))
                         segment_mse_deltas.append(numpy.mean(numpy.square(segment_deltas)))
-                        segment_abc_deltas.append(numpy.sum((segment_abs_deltas[1:] + segment_abs_deltas [:-1]) * self.qmc.profile_sampling_interval /2))  #trapazoidal area height*(base1+base2)/2
+                        segment_abc_deltas.append(numpy.sum((segment_abs_deltas[1:] + segment_abs_deltas[:-1]) * self.qmc.profile_sampling_interval /2))  #trapazoidal area height*(base1+base2)/2
                         #segment_abc_deltas.append(numpy.trapz(segment_abs_deltas, dx=self.qmc.profile_sampling_interval))  #alternate method 
+
+                    # intervval of interest metrics
+                    ioi_start = self.eventtime2string(aw.qmc.timex[timeindexs_seg[0]] - aw.qmc.timex[aw.qmc.timeindex[0]])
+                    ioi_seconds = (analysis_end - analysis_start) * self.qmc.profile_sampling_interval
+                    ioi_duration = self.eventtime2string(ioi_seconds)
+                    ioi_abs_deltas = numpy.absolute(deltas_all)
+                    ioi_maxdelta = deltas_all[numpy.where(ioi_abs_deltas == numpy.amax(ioi_abs_deltas))[0][0]]
+                    ioi_mse_deltas = numpy.mean(numpy.square(deltas_all))
+                    ioi_abc_deltas = numpy.sum((ioi_abs_deltas[1:] + ioi_abs_deltas[:-1]) * self.qmc.profile_sampling_interval /2)  #trapazoidal area height*(base1+base2)/2
+                    ioi_abcprime = ioi_abc_deltas / ioi_seconds
 
                     # build a table of results
                     tbl = prettytable.PrettyTable()
-                    tbl.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","Swing", "RMSE", "MSE", "ABC", "ABC/secs"  ]
+                    tbl.field_names = ["Start", "Duration", "Max Delta", "Sign", "Swing", "MSE", "ABC", "ABC/secs"  ]
                     tbl.float_format = "5.2"
                     for i in range(len(mask)):
-                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs_seg[i]-aw.qmc.timeindex[0]])
+                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs_seg[i]] - aw.qmc.timex[aw.qmc.timeindex[0]])
                         duration = self.eventtime2string(seconds_seg[i])
                         if i > 0:
                             swing = maxdeltas_seg[i] - maxdeltas_seg[i-1]
@@ -16477,10 +16485,12 @@ class ApplicationWindow(QMainWindow):
                         else:
                             abovebelow = "Below"
                         abcprime = segment_abc_deltas[i] / seconds_seg[i]
-                        tbl.add_row([thistime,duration,lengths_seg[i],maxdeltas_seg[i],abovebelow,'',swing,segment_rmse_deltas[i],segment_mse_deltas[i], segment_abc_deltas[i], abcprime ])
+                        tbl.add_row([thistime, duration, maxdeltas_seg[i], abovebelow, swing, segment_mse_deltas[i], segment_abc_deltas[i], abcprime ])
+                    tbl.add_row(['~~~~~','~~~~~','~~~~~','~~~~~','~~~~~','~~~~~','~~~~~','~~~~~'])
+                    tbl.add_row([ioi_start, ioi_duration, ioi_maxdelta, '-', '-', ioi_mse_deltas, ioi_abc_deltas, ioi_abcprime ])
+                    segmentresultstr = tbl.get_string(border=True)
 
-                    segmentresultstr = tbl.get_string(border=True, fields=["Start","Duration","Max Delta","Sign","Swing", "MSE", "ABC", "ABC/secs" ])
-
+                    # build table of genral information
                     fitRoR = 60*(analysis_DeltaBTB[-1] - analysis_DeltaBTB[0]) / (aw.qmc.timex[timeindexs_all[-1]] - aw.qmc.timex[timeindexs_all[0]])
                     fitTypes = ["ln()", "", "x\u00b2", "x\u00b3", ""]
                     fitType = fitTypes[exp]
