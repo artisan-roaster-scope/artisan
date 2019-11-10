@@ -171,7 +171,7 @@ with open('Info.plist', 'r+b') as fp:
     plistlib.dump(plist, fp)
 
 OPTIONS = {
-    'strip':True,
+    'strip': True,
 #    'xref': True,
     'argv_emulation': False, # this would confuses GUI processing
 # this does not work on Python3.4/PyQt5 for unknown reasons
@@ -192,7 +192,7 @@ OPTIONS = {
 #                    'QtOpenGL','QtScript','QtScriptTools',
 #                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
     'packages': ['yoctopuce','gevent','openpyxl','certifi'],
-    'optimize':  2,
+    'optimize':  1,
     'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',

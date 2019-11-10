@@ -358,6 +358,7 @@ class Artisan(QtSingleApplication):
             if self.isRunningViewer(): sys.exit(0) # there is already one ArtisanViewer running, we terminate
         else:
             self.artisanviewerMode = False
+        self.messageReceived.connect(self.receiveMessage)
     
     @pyqtSlot("QWidget*","QWidget*")
     def appRaised(self,oldFocusWidget,newFocusWidget):
@@ -391,6 +392,12 @@ class Artisan(QtSingleApplication):
                     if profile_path:
                         aw.sendmessage(QApplication.translate("Message","URL open profile: {0}",None).format(profile_path))
                         QTimer.singleShot(20,lambda : aw.loadFile(profile_path))
+    
+    @pyqtSlot(str)
+    def receiveMessage(self,msg):
+        url = QUrl()
+        url.setUrl(msg)
+        self.open_url(url)
 
     def event(self, event):
         if event.type() == QEvent.FileOpen:
@@ -59470,7 +59477,7 @@ def main():
         tmp.setLayout(aw.LCD4frame.layout())
         aw.LCD4frame.setLayout(aw.LCD5frame.layout())
         aw.LCD5frame.setLayout(tmp.layout())
-    aw.show()    
+    aw.show()
     
     try:
         if sys.argv and len(sys.argv) > 1:
@@ -59493,9 +59500,13 @@ def main():
                 # load Artisan setings on double-click on *.athm file
                 aw.loadSettings(fn=u(argv_file),reset=False)
             elif platf == 'Windows' and re.match("artisan\:\/\/roast",argv_file):
-                url = QUrl()
-                url.setUrl(argv_file)
-                app.open_url(url)
+                if app.isRunning():
+                    app.sendMessage(argv_file)
+                    sys.exit(0)
+                else:
+                    url = QUrl()
+                    url.setUrl(argv_file)
+                    app.open_url(url)
         else:
             # we try to reload the last loaded profile or background
             if aw.lastLoadedProfile:
