@@ -42,7 +42,7 @@ def addPath(uuid,path):
         config.logger.debug("register:setPath(" + str(uuid) + "," + str(path) + ")")
         register_semaphore.acquire(1)
         with shelve.open(uuid_cache_path) as db:
-            db[uuid] = path
+            db[uuid] = str(path)
     except Exception as e:
         config.logger.error("roast: Exception in addPath() %s",e)
     finally:
@@ -56,7 +56,7 @@ def getPath(uuid):
         register_semaphore.acquire(1)
         with shelve.open(uuid_cache_path) as db:
             try:
-                return db[uuid]
+                return str(db[uuid])
             except:
                 return None
     except Exception as e:
