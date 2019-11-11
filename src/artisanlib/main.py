@@ -2403,13 +2403,19 @@ class tgraphcanvas(FigureCanvas):
         try:
             # display MET information by clicking on the MET marker
             if isinstance(event.artist, matplotlib.text.Annotation) and self.showmet and event.artist in [self.met_annotate]:
-                message = ""
-                message += u("MET ") + str(aw.float2float(self.met_timex_temp1_delta[1],1)) + aw.qmc.mode
-                message += u(" @ ") + self.stringfromseconds(self.met_timex_temp1_delta[0])
-                if self.met_timex_temp1_delta[2] is not None and self.met_timex_temp1_delta[2] >= 0:   #met_delta
-                    message += u(", ") + str(self.met_timex_temp1_delta[2]) + u(" ") + QApplication.translate("Message","seconds before FCs", None)
-                elif self.met_timex_temp1_delta[2] is not None and self.met_timex_temp1_delta[2] < 0:   #met_delta
-                    message += u(", ") + str(-self.met_timex_temp1_delta[2]) + u(" ") + QApplication.translate("Message","seconds after FCs", None)
+                if self.met_timex_temp1_delta[2] is not None and self.met_timex_temp1_delta[2] >= 0:
+                    met_time_str = str(self.met_timex_temp1_delta[2])
+                    met_time_msg = QApplication.translate("Message","seconds before FCs", None)
+                else:
+                    met_time_str = str(-self.met_timex_temp1_delta[2])
+                    met_time_msg = QApplication.translate("Message","seconds after FCs", None)
+                    
+                message = "MET {}{} @ {}, {} {}".format(
+                    str(aw.float2float(self.met_timex_temp1_delta[1],1)),
+                    aw.qmc.mode,
+                    self.stringfromseconds(self.met_timex_temp1_delta[0]),
+                    met_time_str,
+                    met_time_msg)
                 aw.sendmessage(message)
 
             # the analysis results were clicked
@@ -3233,7 +3239,7 @@ class tgraphcanvas(FigureCanvas):
     # take care, the QDir().current() directory changes with loads and saves                
     #                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
                     if False and platf == 'Windows': # this Windows version fails on commands with arguments
-                        f = u("file:///") + u(QApplication.applicationDirPath()) + "/" + u(fname)
+                        f = "file:///{}/{}".format(u(QApplication.applicationDirPath()),u(fname))
                         res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
                     else:
                         # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
@@ -3800,7 +3806,7 @@ class tgraphcanvas(FigureCanvas):
                                     val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
 
                                     #add expression and values found
-                                    evaltimeexpression = "Y" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + seconddigitstr + evalsign
+                                    evaltimeexpression = "Y{}{}{}{}{}".format(mathexpression[i+1],evalsign*2,mathexpression[i+4],seconddigitstr,evalsign)
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     #convert "Y2[+9]" to Ynumber compatible for python eval() to add to dictionary
@@ -3833,7 +3839,7 @@ class tgraphcanvas(FigureCanvas):
                                     literal_body = body
                                     for k, v in replacements.items():
                                         literal_body = literal_body.replace(k,v)
-                                    evaltimeexpression = "Y" + mathexpression[i+1] + "u" + literal_body + "u" # curle brackets replaced by "u"
+                                    evaltimeexpression = "Y{}u{}u".format(mathexpression[i+1],literal_body) # curle brackets replaced by "u"
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
@@ -3892,7 +3898,7 @@ class tgraphcanvas(FigureCanvas):
                                         val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
                                         
                                         #add expression and values found
-                                        evaltimeexpression = "R" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + seconddigitstr + evalsign
+                                        evaltimeexpression = "".join(("R",mathexpression[i+1],evalsign*2,mathexpression[i+4],seconddigitstr,evalsign))
                                         timeshiftexpressions.append(evaltimeexpression)
                                         timeshiftexpressionsvalues.append(val)
                                         #convert "R2[+9]" to Rnumber compatible for python eval() to add to dictionary
@@ -3918,7 +3924,7 @@ class tgraphcanvas(FigureCanvas):
                                         literal_body = body
                                         for k, v in replacements.items():
                                             literal_body = literal_body.replace(k,v)
-                                        evaltimeexpression = "R" + mathexpression[i+1] + "z" + literal_body + "z" # curle brackets replaced by "z"
+                                        evaltimeexpression = "".join(("R",mathexpression[i+1],"z",literal_body,"z")) # curle brackets replaced by "z"
                                         timeshiftexpressions.append(evaltimeexpression)
                                         timeshiftexpressionsvalues.append(val)
                                         mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
@@ -3971,7 +3977,7 @@ class tgraphcanvas(FigureCanvas):
                             val, evalsign = self.shiftValueEvalsign(timex,index,sign,Yshiftval)
                             
                             val = val - t_offset
-                            evaltimeexpression = mathexpression[i] + evalsign*2 + mathexpression[i+3] + seconddigitstr + evalsign
+                            evaltimeexpression = "".join((mathexpression[i],evalsign*2,mathexpression[i+3],seconddigitstr,evalsign))
                             timeshiftexpressions.append(evaltimeexpression)
                             timeshiftexpressionsvalues.append(val)
                             mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+5:]))
@@ -3989,7 +3995,7 @@ class tgraphcanvas(FigureCanvas):
                             literal_body = body
                             for k, v in replacements.items():
                                 literal_body = literal_body.replace(k,v)
-                            evaltimeexpression = mathexpression[i] + "q" + literal_body + "q" # curle brackets replaced by "q"
+                            evaltimeexpression = "".join((mathexpression[i],"q",literal_body,"q")) # curle brackets replaced by "q"
                             timeshiftexpressions.append(evaltimeexpression)
                             timeshiftexpressionsvalues.append(val)
                             mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
@@ -4008,8 +4014,7 @@ class tgraphcanvas(FigureCanvas):
                                 if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
                                     Yshiftval = int(mathexpression[i+4])
                                     sign = mathexpression[i+3]
-
-                                    evaltimeexpression = "P" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
+                                    evaltimeexpression = "".join(("P",mathexpression[i+1],evalsign*2,mathexpression[i+4],evalsign))
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
@@ -4058,8 +4063,7 @@ class tgraphcanvas(FigureCanvas):
                                             else:
                                                 readings = self.temp2BX[n3]
                                         val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
-
-                                    evaltimeexpression = "B" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + seconddigitstr+ evalsign
+                                    evaltimeexpression = "".join(("B",mathexpression[i+1],evalsign*2,mathexpression[i+4],seconddigitstr,evalsign))
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
@@ -4091,7 +4095,7 @@ class tgraphcanvas(FigureCanvas):
                                     literal_body = body
                                     for k, v in replacements.items():
                                         literal_body = literal_body.replace(k,v)
-                                    evaltimeexpression = "B" + mathexpression[i+1] + "z" + literal_body + "z" # curle brackets replaced by "z"
+                                    evaltimeexpression = "".join(("B",mathexpression[i+1],"z",literal_body,"z")) # curle brackets replaced by "z"
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
@@ -6015,7 +6019,7 @@ class tgraphcanvas(FigureCanvas):
                             elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                 netypes[3].append(self.timex[self.specialevents[i]])
                                 
-                        letters = char1+char2+char3+char4   #"NPDF" first letter for each type (None, Power, Damper, Fan)
+                        letters = "".join((char1,char2,char3,char4))   #"NPDF" first letter for each type (None, Power, Damper, Fan)
                         colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
                         for p in range(len(letters)):
                             if len(netypes[p]) > 1:
@@ -11201,8 +11205,8 @@ class tgraphcanvas(FigureCanvas):
             if self.baseX and self.baseY:
                 deltaX = aw.qmc.stringfromseconds(event.xdata - self.baseX)
                 deltaY = str(aw.float2float(event.ydata - self.baseY,1))
-                RoR = str(aw.float2float(60 * (event.ydata - self.baseY) / (event.xdata - self.baseX),1))  
-                message = "delta Time= " + deltaX + ",    delta Temp= " + deltaY + " " + aw.qmc.mode + ",    RoR= " + RoR + " " + aw.qmc.mode + "/min"
+                RoR = str(aw.float2float(60 * (event.ydata - self.baseY) / (event.xdata - self.baseX),1))
+                message = "delta Time= {},    delta Temp= {} {},    RoR= {} {}/min".format(deltaX,deltaY,aw.qmc.mode,RoR,aw.qmc.mode)
                 aw.sendmessage(message)
                 self.base_messagevisible = True
             elif self.base_messagevisible:
@@ -11575,7 +11579,7 @@ class SampleThread(QThread):
         gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
         if gotlock:
             try:
-                # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
+                # duplicate system state flag flagstart locally and only refer to this copy within this function to make it behaving uniquely (either append or overwrite mode)
                 local_flagstart = aw.qmc.flagstart
                 
                 # if we are not yet recording, but sampling we keep on reseting the timer (only if not already a profile was recorded)
@@ -11840,8 +11844,6 @@ class SampleThread(QThread):
                             else:             
                                 aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.ctemp2)
 
-                            
-                    
                     if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
                             not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
                         if aw.pidcontrol.pidSource == 1:
@@ -12043,7 +12045,7 @@ class SampleThread(QThread):
                                 # aw.pidcontrol.setSV(sv,init=False) # this is called in updategraphics() within the GUI thread to move the sliders
                                 
                     # update AUC running value
-                    if aw.qmc.flagstart: # only during recording
+                    if local_flagstart: # only during recording
                         try:
                             aw.updateAUC()
                             if aw.qmc.AUCguideFlag:
@@ -15866,7 +15868,7 @@ class ApplicationWindow(QMainWindow):
         aw.setStyleSheet("QMainWindow{background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                    + "border: 0px solid black;"
                                    + "}" )
-        
+
         if current_background_color is None or current_background_color != str(aw.qmc.palette["canvas"]) or (whitep and aw.qmc.palette["messages"] != 'white'): # canvas color did not change, we do not need to redo the navigation bar        
             # update navigationbar
             aw.level1layout.removeWidget(aw.ntb) # remove current bar
@@ -19721,7 +19723,7 @@ class ApplicationWindow(QMainWindow):
         except IOError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()  
+            _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " {0}: {1}").format(str(ex),str(filename))),exc_tb.tb_lineno
             # remove file from the recent file list
             settings = QSettings()
@@ -21073,7 +21075,7 @@ class ApplicationWindow(QMainWindow):
 #PLUS        
         # fill plus UUID register
         try:
-            if self.plus_account is not None and obj is not None:
+            if obj is not None:
                 if plus.config.uuid_tag in obj:
                     plus.register.addPath(obj[plus.config.uuid_tag],fn)
         except:
@@ -21092,7 +21094,7 @@ class ApplicationWindow(QMainWindow):
 #PLUS
             # fill plus UUID register
             try:
-                if self.plus_account is not None and obj is not None:
+                if obj is not None:
                     if plus.config.uuid_tag in obj:
                         plus.register.addPath(obj[plus.config.uuid_tag],fn)
             except:
@@ -25459,20 +25461,29 @@ class ApplicationWindow(QMainWindow):
             # DRY_time
             dry_time = timex[timeindex[1]] - start
             # DRY_percent
-            res["DRY_percent"] = (dry_time/total_time) * 100.
+            if total_time > 0:
+                res["DRY_percent"] = (dry_time/total_time) * 100.
+            else:
+                res["DRY_percent"] = 0
             res["DRY_time"] = dry_time
         # MAI_time
         if timeindex[1] > 0 and timeindex[2] > 0:
             # MAI_time
             mai_time = timex[timeindex[2]] - timex[timeindex[1]]
             # MAI_percent
-            res["MAI_percent"] = (mai_time/total_time) * 100.
+            if total_time > 0:
+                res["MAI_percent"] = (mai_time/total_time) * 100.
+            else:
+                res["MAI_percent"] = 0
             res["MAI_time"] = mai_time
         if timeindex[2] > 0 and timeindex[6] > 0:
             # DEV_time
             dev_time = timex[timeindex[6]] - timex[timeindex[2]]
             # DEV_percent
-            res["DEV_percent"] = (dev_time/total_time) * 100.
+            if total_time > 0:
+                res["DEV_percent"] = (dev_time/total_time) * 100.
+            else:
+                res["DEV_percent"] = 0
             res["DEV_time"] = dev_time
         # AUC
         if "computed" in profile:
@@ -25775,8 +25786,8 @@ class ApplicationWindow(QMainWindow):
                                 pd["batchprefix"] = label
                                 label_chr_nr = label_chr_nr + 1
                             # surpress default description
-                            if pd["title"] == QApplication.translate("Scope Title", "Roaster Scope",None):
-                                pd["title"] = ""
+#                            if pd["title"] == QApplication.translate("Scope Title", "Roaster Scope",None):
+#                                pd["title"] = ""
                             
                             entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
                             
@@ -26033,8 +26044,8 @@ class ApplicationWindow(QMainWindow):
                         try:
                             rd = self.profileRankingData(p)
                         except Exception as e:
-            #                    import traceback
-            #                    traceback.print_exc(file=sys.stdout)
+#                            import traceback
+#                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
                             i += 1   #avoid a blank line
@@ -26055,7 +26066,7 @@ class ApplicationWindow(QMainWindow):
                                               (n+rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g, m*rd["DROP_time"]/max_drop_time)
                                             ], 
                                             (i*(barheight + barspacer), barheight), facecolors=cl
-                                          )                      
+                                          )
                             ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
                             ax.text( n + rd["DRY_percent"]/2,                                               i*(barheight + barspacer) + textoffset, str(round(rd["DRY_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DRY_time"]), ha='center', color=fontcolor, fontproperties=prop)
                             ax.text( n + rd["DRY_percent"] + rd["MAI_percent"]/2,                           i*(barheight + barspacer) + textoffset, str(round(rd["MAI_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["MAI_time"]), ha='center', color=fontcolor, fontproperties=prop)
@@ -26446,6 +26457,12 @@ class ApplicationWindow(QMainWindow):
                 os.remove(graph_image)
             except OSError:
                 pass
+            
+            org_patheffects = aw.qmc.patheffects
+            if sys.platform.startswith("darwin") and darkdetect.isDark():
+                aw.qmc.patheffects = 0
+            self.qmc.redraw(recomputeAllDeltas=False)
+            
             self.qmc.fig.savefig(graph_image,transparent=True)
             #add some random number to force HTML reloading
             graph_image = path2url(graph_image)
@@ -26462,6 +26479,8 @@ class ApplicationWindow(QMainWindow):
             flavor_image = path2url(flavor_image)
             flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
             #return screen to GRAPH profile mode
+            if sys.platform.startswith("darwin") and darkdetect.isDark():
+                aw.qmc.patheffects = org_patheffects
             self.qmc.redraw(recomputeAllDeltas=False)
             met = u("--")
             if "MET" in cp:
