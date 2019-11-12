@@ -14,4 +14,4 @@ setuptools==41.4.0
 persist-queue==0.4.2
 portalocker==1.5.1
 prettytable==0.7.2
-Phidget22==1.5.20191101
+Phidget22==1.5.20191106

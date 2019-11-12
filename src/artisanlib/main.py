@@ -4175,7 +4175,7 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(len(timeshiftexpressions)):
                             if timeshiftexpressions[i] not in mathdictionary:
                                 mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
-                except:
+                except Exception:
                     pass
 
                 #background symbols just in case there was no profile loaded but a background loaded.
@@ -4185,18 +4185,20 @@ class tgraphcanvas(FigureCanvas):
                             mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
                 try:
                     # we exclude the main_events as they occur as substrings in others like CHARGE in dCHARGE
-                    if any([k in mathexpression for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
+                    # the special case of a variable Y1 overlapping with a variable Y11,..,Y12 in this simple test has to be excluded to avoid
+                    # that if mathexpression="Y11" and mathdictionary contains {"Y1":-1} -1 is returned instead of the correct value of Y11
+                    if any([((k in mathexpression) if k!="Y1" else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
                         return -1
                     else:
                         res = float(eval(mathexpression,{"__builtins__":None},mathdictionary))
-                except TypeError as e:
+                except TypeError:
                     res = -1
-                except ValueError as e:
+                except ValueError:
                     res = -1
-                except ZeroDivisionError as e:
+                except ZeroDivisionError:
                     res = -1
-                except IndexError as e:
+                except IndexError:
                     res = -1
                 if res is None:
                     return -1
@@ -7423,7 +7425,7 @@ class tgraphcanvas(FigureCanvas):
     
     def AsyncSamplingActionTrigger(self):
         if aw.AsyncSamplingAction and aw.qmc.extra_event_sampling_delay and aw.qmc.extrabuttonactions[2]:
-            self.samplingAction()       
+            self.samplingAction()
             QTimer.singleShot(aw.qmc.extra_event_sampling_delay,self.AsyncSamplingActionTrigger)
         
     def StartAsyncSamplingAction(self):
@@ -7589,7 +7591,7 @@ class tgraphcanvas(FigureCanvas):
             self.flagon = False
             # now wait until the current sampling round is done
             while self.flagsampling:
-                libtime.sleep(0.02)
+                libtime.sleep(0.05)
                 QApplication.processEvents()
             if len(self.timex) < 3:
                 # clear data from monitoring-only mode
@@ -7609,7 +7611,7 @@ class tgraphcanvas(FigureCanvas):
                     except:
                         pass
                     aw.fujipid.sv = 0
-            self.disconnectProbes()
+            QTimer.singleShot(5,self.disconnectProbes)
 #            QApplication.processEvents()
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
@@ -7631,13 +7633,13 @@ class tgraphcanvas(FigureCanvas):
                 self.updateWebLCDs(bt=resLCD,et=resLCD)
             if not aw.HottopControlActive:
                 aw.hideExtraButtons(changeDefault=False)
-            aw.updateSlidersVisibility() # update visibility of sliders based on the users preference    
-            aw.updateExtraButtonsVisibility()            
+            aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            aw.updateExtraButtonsVisibility()
             aw.pidcontrol.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
             aw.enableEditMenus()
 #            QApplication.processEvents()
-            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)            
+            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
             if len(self.timex) > 2:
                 # we autosave after full redraw after OFF to have the optional generated PDF containing all information
                 if aw.qmc.autosaveflag and aw.qmc.autosavepath:
@@ -7650,8 +7652,6 @@ class tgraphcanvas(FigureCanvas):
 #            QApplication.processEvents()
             if recording and self.flagKeepON:
                 self.OnMonitor()
-#            else:
-#                self.stopPhidgetManager()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -7728,23 +7728,40 @@ class tgraphcanvas(FigureCanvas):
         except Exception:
             pass
         # disconnect phidgets
-        if ser.PhidgetTemperatureSensor:
+        if ser.PhidgetTemperatureSensor is not None:
             try:
                 if ser.PhidgetTemperatureSensor[0].getAttached():
+                    serial = ser.PhidgetTemperatureSensor[0].getDeviceSerialNumber()
+                    port = ser.PhidgetTemperatureSensor[0].getHubPort()  # returns 0 for USB Phidgets!
+                    deviceType = ser.PhidgetTemperatureSensor[0].getDeviceID()
                     ser.PhidgetTemperatureSensor[0].close()
+                    ser.phidget1048detached(serial,port,deviceType,0) # call detach handler to release from PhidgetManager
+            except Exception:
+                pass
+            try:
                 if len(ser.PhidgetTemperatureSensor) > 1 and ser.PhidgetTemperatureSensor[1].getAttached():
+                    serial = ser.PhidgetTemperatureSensor[1].getDeviceSerialNumber()
+                    port = ser.PhidgetTemperatureSensor[1].getHubPort()  # returns 0 for USB Phidgets!
+                    deviceType = ser.PhidgetTemperatureSensor[1].getDeviceID()
                     ser.PhidgetTemperatureSensor[1].close()
+                    ser.phidget1048detached(serial,port,deviceType,1) # call detach handler to release from PhidgetManager
             except Exception:
                 pass
             ser.Phidget1048values = [[],[],[],[]]
             ser.Phidget1048lastvalues = [-1]*4
             ser.PhidgetTemperatureSensor = None
-        if ser.PhidgetIRSensor:
+        if ser.PhidgetIRSensor is not None:
             try:
                 if ser.PhidgetIRSensor.getAttached():
+                    serial = ser.PhidgetIRSensor.getDeviceSerialNumber()
+                    port = ser.PhidgetIRSensor.getHubPort() # returns 0 for USB Phidgets!
+                    deviceType = ser.PhidgetIRSensor.getDeviceID()
                     ser.PhidgetIRSensor.close()
-                
-                if ser.PhidgetIRSensorIC.getAttached():
+                    ser.phidget1045detached(serial,port,deviceType) # call detach handler to release from PhidgetManager
+            except Exception:
+                pass
+            try:
+                if ser.PhidgetIRSensorIC is not None and ser.PhidgetIRSensorIC.getAttached():
                     ser.PhidgetIRSensorIC.close()
             except Exception:
                 pass
@@ -7753,29 +7770,53 @@ class tgraphcanvas(FigureCanvas):
             ser.Phidget1045lastvalue = -1
             ser.Phidget1045tempIRavg = None
             ser.PhidgetIRSensorIC = None
-        if ser.PhidgetBridgeSensor:
+        if ser.PhidgetBridgeSensor is not None:
             try:
                 if ser.PhidgetBridgeSensor[0].getAttached():
+                    serial = ser.PhidgetBridgeSensor[0].getDeviceSerialNumber()
+                    port = ser.PhidgetBridgeSensor[0].getHubPort()   # returns 0 for USB Phidgets!
+                    deviceType = ser.PhidgetBridgeSensor[0].getDeviceID()
                     ser.PhidgetBridgeSensor[0].close()
+                    ser.phidget1046detached(serial,port,deviceType,0) # call detach handler to release from PhidgetManager
+            except Exception:
+                pass
+            try:
                 if len(ser.PhidgetBridgeSensor) > 1 and ser.PhidgetBridgeSensor[1].getAttached():
+                    serial = ser.PhidgetBridgeSensor[1].getDeviceSerialNumber()
+                    port = ser.PhidgetBridgeSensor[1].getHubPort()   # returns 0 for USB Phidgets!
+                    deviceType = ser.PhidgetBridgeSensor[1].getDeviceID()
                     ser.PhidgetBridgeSensor[1].close()
+                    ser.phidget1046detached(serial,port,deviceType,1) # call detach handler to release from PhidgetManager
             except Exception:
                 pass
             ser.Phidget1046values = [[],[],[],[]]
             ser.Phidget1046lastvalues = [-1]*4
             ser.PhidgetBridgeSensor = None
-        if ser.PhidgetIO:
+        if ser.PhidgetIO is not None:
             try:
                 if ser.PhidgetIO[0].getAttached():
+                    serial = ser.PhidgetIO[0].getDeviceSerialNumber()
+                    port = ser.PhidgetIO[0].getHubPort()   # returns 0 for USB Phidgets!
+                    className = ser.PhidgetIO[0].getChannelClassName()
+                    deviceType = ser.PhidgetIO[0].getDeviceID()
                     ser.PhidgetIO[0].close()
+                    ser.phidget1018detached(serial,port,className,deviceType,0)
+            except Exception:
+                pass
+            try:
                 if len(ser.PhidgetIO) > 1 and ser.PhidgetIO[1].getAttached():
+                    serial = ser.PhidgetIO[1].getDeviceSerialNumber()
+                    port = ser.PhidgetIO[1].getHubPort()   # returns 0 for USB Phidgets!
+                    className = ser.PhidgetIO[1].getChannelClassName()
+                    deviceType = ser.PhidgetIO[1].getDeviceID()
                     ser.PhidgetIO[1].close()
+                    ser.phidget1018detached(serial,port,className,deviceType,1)
             except Exception:
                 pass
             ser.PhidgetIO = None
             ser.PhidgetIOvalues = [[],[],[],[],[],[],[],[]]
             ser.PhidgetIOlastvalues = [-1]*8
-        if ser.YOCTOsensor:
+        if ser.YOCTOsensor is not None:
             try:
                 ser.YOCTOsensor = None
                 ser.YOCTOchan1 = None
@@ -25989,9 +26030,10 @@ class ApplicationWindow(QMainWindow):
     
                     # setup the font 
                     if sys.platform.startswith("darwin") and darkdetect.isDark():
-                        fontcolor = 'lightgrey'
+                        headerfontcolor = '#B2B2B2'
                     else:
-                        fontcolor = 'darkgrey'
+                        headerfontcolor = '#707070'
+                    fontcolor = '#303030'
                     lightfontcolor = 'grey'
                     prop.set_family(mpl.rcParams['font.family'])
     
@@ -26024,11 +26066,11 @@ class ApplicationWindow(QMainWindow):
                                     ], 
                                     (i*(barheight + barspacer), barheight*0.75), facecolors=facecolors
                                   )                      
-                    ax.text(    m/2,             i*(barheight + barspacer) + textoffset/3, 'Nr', ha='center', color=fontcolor, fontproperties=prop)
-                    ax.text( 1+ n+g,             i*(barheight + barspacer) + textoffset/3, 'Dry', ha='left', color=fontcolor, fontproperties=prop)
-                    ax.text( 1+ n+g+ind+g,       i*(barheight + barspacer) + textoffset/3, 'Mai', ha='left', color=fontcolor, fontproperties=prop)
-                    ax.text( 1+ n+g+ind+g+ind+g, i*(barheight + barspacer) + textoffset/3, 'Dev', ha='left', color=fontcolor, fontproperties=prop)
-                    ax.text(    n+100 + 10/2,    i*(barheight + barspacer) + textoffset/3, 'Drop', ha='center', color=fontcolor, fontproperties=prop)
+                    ax.text(    m/2,             i*(barheight + barspacer) + textoffset/3, 'Nr', ha='center', color=headerfontcolor, fontproperties=prop)
+                    ax.text( 1+ n+g,             i*(barheight + barspacer) + textoffset/3, 'Dry', ha='left', color=headerfontcolor, fontproperties=prop)
+                    ax.text( 1+ n+g+ind+g,       i*(barheight + barspacer) + textoffset/3, 'Mai', ha='left', color=headerfontcolor, fontproperties=prop)
+                    ax.text( 1+ n+g+ind+g+ind+g, i*(barheight + barspacer) + textoffset/3, 'Dev', ha='left', color=headerfontcolor, fontproperties=prop)
+                    ax.text(    n+100 + 10/2,    i*(barheight + barspacer) + textoffset/3, 'Drop', ha='center', color=headerfontcolor, fontproperties=prop)
                         
                     # generate the bar graph 
                     prop.set_size("small")  
@@ -38712,7 +38754,7 @@ class EventsDlg(ArtisanResizeablDialog):
         string += u(QApplication.translate("Message", "<li><b>mwrite</b>(slaveId,register,andMask,orMask)<br>mask write register: <i>MODBUS function 22</i>",None))
         string += u(QApplication.translate("Message", "<li><b>writem</b>(slaveId,register,value) or <b>writem</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write registers: <i>MODBUS function 16</i>",None))
         string += u(QApplication.translate("Message", "<li><b>writeBCD</b>(slaveId,register,value) or <b>writeBCD</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write BCD encoded int register: <i>MODBUS function 16 (BCD)</i>",None))
-        string += u(QApplication.translate("Message", "<li><b>writeWord</b>(slaveId,register,value) or <b>writeWord</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write 32bit float to two 16bit int registers: <i>MODBUS function 16 (Float)</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>writeWord</b>(slaveId,register,value)<br>write 32bit float to two 16bit int registers: <i>MODBUS function 16</i>",None))
         string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given id",None))
         string += u(QApplication.translate("Message", "<li>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None)) + "</ul>"
         string += u(QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None)) + "<br>"
@@ -40087,6 +40129,7 @@ class EventsDlg(ArtisanResizeablDialog):
         string += u(QApplication.translate("Message", "<li><b>wcoils</b>(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])<br>write coils: <i>MODBUS function 15</i>",None))
         string += u(QApplication.translate("Message", "<li><b>mwrite</b>(slaveId,register,andMask,orMask)<br>mask write register: <i>MODBUS function 22</i>",None))
         string += u(QApplication.translate("Message", "<li><b>writem</b>(slaveId,register,value) or <b>writem</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write registers: <i>MODBUS function 16</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>writeWord</b>(slaveId,register,value)<br>write 32bit float to two 16bit int registers: <i>MODBUS function 16</i>",None))
         string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given id",None))
         string += u(QApplication.translate("Message", "<LI>S7 Command: <ul><li><b>getDBint</b>(&lt;dbnumber&gt;,&lt;start&gt;): read int from S7 DB",None))
         string += u(QApplication.translate("Message", "<li><b>getDBfloat</b>(&lt;dbnumber&gt;,&lt;start&gt;): read float from S7 DB",None))
@@ -43321,7 +43364,7 @@ class serialport(object):
         try:
             if self.SP and self.SP.isOpen():
                 self.SP.close()
-                libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
+                libtime.sleep(0.1) # on OS X opening a serial port too fast after closing the port get's disabled
         except Exception:
             pass
 
@@ -44398,7 +44441,7 @@ class serialport(object):
                             if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetIRSensor.setIsRemote(True)
                                 self.PhidgetIRSensor.setIsLocal(False)
-                            self.PhidgetIRSensor.open() #.openWaitForAttachment(timeout)
+                            self.PhidgetIRSensor.open() #.openWaitForAttachment(timeout) # wait attach for the TMP1200 takes about 1sec on USB
                         except:
                             pass
                         if deviceType != DeviceID.PHIDID_TMP1200:
@@ -44407,11 +44450,15 @@ class serialport(object):
                             if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetIRSensorIC.setIsRemote(True)
                                 self.PhidgetIRSensorIC.setIsLocal(False)
-                            try:                            
+                            try:
                                 self.PhidgetIRSensorIC.open() #.openWaitForAttachment(timeout)
                             except:
                                 pass
-                        libtime.sleep(.5)
+                        # we need to give this device a bit time to attach, otherwise it will be considered for another Artisan channel of the same type
+                        if aw.qmc.phidgetRemoteOnlyFlag:
+                            libtime.sleep(.8)
+                        else:
+                            libtime.sleep(.5)
                     except Exception as ex:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -44469,7 +44516,7 @@ class serialport(object):
                 except Exception:
                     pass
                 try:
-                    if self.PhidgetIRSensorIC and self.PhidgetIRSensorIC.getAttached():
+                    if self.PhidgetIRSensorIC is not None and self.PhidgetIRSensorIC.getAttached():
                         ambient = self.PhidgetIRSensorIC.getTemperature()
                         # we heavily average this ambient temperature IC readings not to introduce additional noise via emissivity calc to the IR reading
                         if self.Phidget1045tempIRavg is None:
@@ -44506,8 +44553,8 @@ class serialport(object):
             except Exception:
                 pass
             self.PhidgetIRSensor = None
-            self.Phidget1045values = []  
-            self.Phidget1045lastvalue = -1      
+            self.Phidget1045values = []
+            self.Phidget1045lastvalue = -1
             self.PhidgetIRSensorIC = None
             self.Phidget1045tempIRavg = None
             _, _, exc_tb = sys.exc_info()
@@ -44625,7 +44672,7 @@ class serialport(object):
                 # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
                 elif mode == 1: 
                     ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType,2,
-                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)                     
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 elif mode == 2:
                     ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType,4,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
@@ -44664,10 +44711,11 @@ class serialport(object):
                                 self.PhidgetTemperatureSensor[1].open() # .openWaitForAttachment(timeout)
                             except:
                                 pass
+                        # we need to give this device a bit time to attach, otherwise it will be considered for another Artisan channel of the same type
                         if aw.qmc.phidgetRemoteOnlyFlag:
-                            libtime.sleep(.5)
+                            libtime.sleep(.8)
                         else:
-                            libtime.sleep(.3)
+                            libtime.sleep(.5)
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
                         #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -44925,11 +44973,11 @@ class serialport(object):
                                 self.PhidgetBridgeSensor[i].open() #.openWaitForAttachment(timeout)
                             except:
                                 pass
-                        if aw.qmc.phidgetRemoteFlag:
-                            libtime.sleep(.5)
+                        # we need to give this device a bit time to attach, otherwise it will be considered for another Artisan channel of the same type
+                        if aw.qmc.phidgetRemoteOnlyFlag:
+                            libtime.sleep(.8)
                         else:
-                            libtime.sleep(.3)
-
+                            libtime.sleep(.5)
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
                         #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1046temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -45129,9 +45177,9 @@ class serialport(object):
                         aw.ser.PhidgetDigitalOut.append(do)
         try:
             if not aw.ser.PhidgetDigitalOut[channel].getAttached():
-                aw.ser.PhidgetDigitalOut[channel].openWaitForAttachment(1000) # we don't wait for the attach and might mis some data
+                aw.ser.PhidgetDigitalOut[channel].openWaitForAttachment(1200) # we don't wait for the attach and might mis some data
         except:
-            pass                    
+            pass
 
     def phidgetOUTtogglePWM(self,channel):
         lastPWM = aw.ser.PhidgetDigitalOutLastPWM[channel]
@@ -45150,11 +45198,11 @@ class serialport(object):
             
     def phidgetOUTpulsePWM(self,channel,millis):
         self.phidgetOUTsetPWM(channel,100)
-#        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWM(channel,0))        
+#        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWM(channel,0))
 #        # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
         # the following solution has the drawback to block the eventaction thread
 #        libtime.sleep(millis/1000.)
-#        self.phidgetOUTsetPWM(channel,0)    
+#        self.phidgetOUTsetPWM(channel,0)
         aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"OUTsetPWM")
 
     # value: 0-100
@@ -45585,7 +45633,7 @@ class serialport(object):
                     self.setDAQ1400inputMode(idx)
             self.PhidgetIOvalues[channel] = [[],[],[],[],[],[],[],[]]
             self.PhidgetIOlastvalues = [-1]*8
-            
+
     def setDAQ1400inputMode(self,idx):
         try:
             from Phidget22.InputMode import InputMode
@@ -45722,10 +45770,11 @@ class serialport(object):
                                 self.PhidgetIO[1].open() #.openWaitForAttachment(timeout)
                             except:
                                 pass
-                        if aw.qmc.phidgetRemoteFlag:
-                            libtime.sleep(.5)
+                        # we need to give this device a bit time to attach, otherwise it will be considered for another Artisan channel of the same type
+                        if aw.qmc.phidgetRemoteOnlyFlag:
+                            libtime.sleep(.8)
                         else:
-                            libtime.sleep(.3)
+                            libtime.sleep(.5)
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
                         #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1018values() {0}").format(str(ex)),exc_tb.tb_lineno)

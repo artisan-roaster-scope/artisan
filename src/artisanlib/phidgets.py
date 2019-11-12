@@ -132,7 +132,7 @@ class PhidgetManager():
                 if k.getIsHubPortDevice() or k.getDeviceClass() == DeviceClass.PHIDCLASS_VINT:
                     kport = k.getHubPort()
                 else:
-                    kport = None
+                    kport = 0  # getHubPort() returns 0 for USB Phidgets!
                 if k.getDeviceSerialNumber() == serial and (port is None or kport == port) and \
                     (hub or (k.getDeviceID() == device_id)) and \
                     ((remote and not remoteOnly) or (not remote and k.getIsLocal()) or (remote and remoteOnly and not k.getIsLocal())) and \
@@ -159,7 +159,7 @@ class PhidgetManager():
         try:
             self.managersemaphore.acquire(1)
             if channel is not None and channel in self.attachedPhidgetChannels:
-                self.attachedPhidgetChannels[channel] = False
+                self.attachedPhidgetChannels[channel] = False  # reserve channel
                 if channel.getIsHubPortDevice():
                     hub = channel.getHub()
                     port = channel.getHubPort()
@@ -183,7 +183,7 @@ class PhidgetManager():
         try:
             self.managersemaphore.acquire(1)
             if channel is not None and channel in self.attachedPhidgetChannels:
-                self.attachedPhidgetChannels[channel] = True
+                self.attachedPhidgetChannels[channel] = True # channel again available for attach
                 if channel.getIsHubPortDevice():
                     hub = channel.getHub()
                     port = channel.getHubPort()

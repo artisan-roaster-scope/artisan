@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="pt_BR" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.0" language="pt_BR">
 <context>
     <name>About</name>
     <message>
@@ -103,27 +104,27 @@
     <message>
         <location filename="../artisanlib/main.py" line="6716"/>
         <source>Screen Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamanho da Peneira</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6718"/>
         <source>Density Green</source>
-        <translation type="unfinished"></translation>
+        <translation>Densidade dos Grãos Verdes</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6726"/>
         <source>Batch Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamanho do Lote</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6733"/>
         <source>Density Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation>Densidade dos Grãos Torrados</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6741"/>
         <source>AUC</source>
-        <translation type="unfinished">ASC</translation>
+        <translation>ASC</translation>
     </message>
 </context>
 <context>
@@ -428,7 +429,7 @@ RESFRIADO</translation>
     <message>
         <location filename="../artisanlib/main.py" line="51349"/>
         <source>Title</source>
-        <translation type="unfinished">Título</translation>
+        <translation>Título</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="51355"/>
@@ -968,17 +969,17 @@ RESFRIADO</translation>
     <message>
         <location filename="../artisanlib/main.py" line="51478"/>
         <source>Bkgd Event Marker</source>
-        <translation type="unfinished"></translation>
+        <translation>Fundo do Marcador de Eventos</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="51484"/>
         <source>Bkgd Event Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Fundo do Texto de Eventos</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30941"/>
         <source>Create Background Curve</source>
-        <translation type="unfinished"></translation>
+        <translation>Criar Curva Modelo</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31554"/>
@@ -989,32 +990,32 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="37813"/>
         <source>&lt;&lt; Store Palette</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;&lt; Gravar Paleta</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37815"/>
         <source>Apply Palette &gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Aplicar Paleta &gt;&gt;</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48876"/>
         <source>Update Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Atualizar Perfil</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="51502"/>
         <source>Analysis Mask</source>
-        <translation type="unfinished"></translation>
+        <translation>Máscara de Análise</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48858"/>
         <source>Copy Table</source>
-        <translation type="unfinished"></translation>
+        <translation>Copiar Tabela</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="51517"/>
         <source>Stats&amp;Analysis Bkgnd</source>
-        <translation type="unfinished"></translation>
+        <translation>Fundo de Análise/Estatísticas</translation>
     </message>
 </context>
 <context>
@@ -1282,7 +1283,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="40186"/>
         <source>Auto DRY</source>
-        <translation>SECAGEM Automático</translation>
+        <translation>SECAGEM Automática</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40188"/>
@@ -1357,7 +1358,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="48696"/>
         <source>Swap</source>
-        <translation>Troca</translation>
+        <translation>Trocar</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="48825"/>
@@ -1452,7 +1453,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="37486"/>
         <source>Descr.</source>
-        <translation>Descrição</translation>
+        <translation>Descr.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37830"/>
@@ -1502,17 +1503,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="36798"/>
         <source>Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatura</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31225"/>
         <source>Hide Image During Roast</source>
-        <translation type="unfinished"></translation>
+        <translation>Esconder Imagem Durante a Torra</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36595"/>
         <source>Never overwrite counter</source>
-        <translation type="unfinished"></translation>
+        <translation>Nunca sobrescrever contador</translation>
     </message>
 </context>
 <context>
@@ -2205,17 +2206,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="37766"/>
         <source>tiny</source>
-        <translation type="unfinished"></translation>
+        <translation>minúsculo</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37767"/>
         <source>small</source>
-        <translation type="unfinished"></translation>
+        <translation>pequeno</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37768"/>
         <source>large</source>
-        <translation type="unfinished"></translation>
+        <translation>grande</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54082"/>
@@ -2240,7 +2241,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="30923"/>
         <source>120 secs before FCs</source>
-        <translation type="unfinished"></translation>
+        <translation>120 segundos antes do PCi</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30923"/>
@@ -4063,7 +4064,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="36494"/>
         <source>Autosave</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvar Automaticamente</translation>
     </message>
 </context>
 <context>
@@ -4406,7 +4407,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="49491"/>
         <source>Async</source>
-        <translation type="unfinished">Assíncrono</translation>
+        <translation>Assíncrono</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="49493"/>
@@ -4421,7 +4422,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31247"/>
         <source>Logo Image File</source>
-        <translation type="unfinished"></translation>
+        <translation>Arquivo de Imagem de Logomarca</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30557"/>
@@ -4431,7 +4432,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="41560"/>
         <source>Stats Summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Resumo das Estatisticas</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31076"/>
@@ -4441,7 +4442,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31090"/>
         <source>Analyze Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opções de Análise</translation>
     </message>
 </context>
 <context>
@@ -6521,22 +6522,22 @@ Fases LCDs</translation>
     <message>
         <location filename="../artisanlib/main.py" line="33621"/>
         <source>Green</source>
-        <translation type="unfinished"></translation>
+        <translation>Verde</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33739"/>
         <source>Whole</source>
-        <translation type="unfinished"></translation>
+        <translation>Grãos</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33745"/>
         <source>Ground</source>
-        <translation type="unfinished"></translation>
+        <translation>Moído</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33768"/>
         <source>Moisture</source>
-        <translation type="unfinished"></translation>
+        <translation>Umidade</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15664"/>
@@ -6551,7 +6552,7 @@ Fases LCDs</translation>
     <message>
         <location filename="../artisanlib/main.py" line="30335"/>
         <source>Smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>Suavização</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35869"/>
@@ -6581,12 +6582,12 @@ Fases LCDs</translation>
     <message>
         <location filename="../artisanlib/main.py" line="37763"/>
         <source>Button size</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamanho do botão</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="41550"/>
         <source>Max characters per line</source>
-        <translation type="unfinished"></translation>
+        <translation>Máximo de caracteres por linha</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30890"/>
@@ -6606,7 +6607,7 @@ Fases LCDs</translation>
     <message>
         <location filename="../artisanlib/main.py" line="30909"/>
         <source>Number of samples considered significant</source>
-        <translation type="unfinished"></translation>
+        <translation>Número de amostras consideradas significantes</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30915"/>
@@ -7195,37 +7196,37 @@ Fases LCDs</translation>
     <message>
         <location filename="../const/UIconst.py" line="55"/>
         <source>Save a Copy As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvar uma Cópia como...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="160"/>
         <source>Main LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDs Principais</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="161"/>
         <source>Delta LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDs de Delta</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="162"/>
         <source>PID LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDs de PID</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="163"/>
         <source>Extra LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDs Extras</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="164"/>
         <source>Convert Profile Temperature</source>
-        <translation type="unfinished">Converter Temperatura do Perfil</translation>
+        <translation>Converter Temperatura do Perfil</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13232"/>
         <source>Clear results</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpar resultados</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="13228"/>
@@ -7235,7 +7236,7 @@ Fases LCDs</translation>
     <message>
         <location filename="../const/UIconst.py" line="68"/>
         <source>Save Statistics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvar Estatísticas...</translation>
     </message>
 </context>
 <context>
@@ -7810,7 +7811,7 @@ Continuar?</translation>
     <message>
         <location filename="../artisanlib/main.py" line="28183"/>
         <source>Alarms are not available for device None</source>
-        <translation>Não há disponibilidade de alarmes para o dispositivo NONE</translation>
+        <translation>Não há disponibilidade de alarmes para o dispositivo Nenhum</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22460"/>
@@ -7910,7 +7911,7 @@ Continuar?</translation>
     <message>
         <location filename="../artisanlib/main.py" line="32875"/>
         <source>Convert angle x from radians to degrees.</source>
-        <translation>Converte o ângula x de radianos para graus.</translation>
+        <translation>Converte o ângulo x de radianos para graus.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32876"/>
@@ -9589,7 +9590,7 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../artisanlib/main.py" line="28365"/>
         <source>Switching the language needs a restart. Restart now?</source>
-        <translation>Alternar idioma requer reinício do aplicativo. Reiniciar agora?</translation>
+        <translation>Alternar idioma requer o reinício do aplicativo. Reiniciar agora?</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28366"/>
@@ -10075,12 +10076,12 @@ Modify your setup?</source>
     <message>
         <location filename="../artisanlib/main.py" line="15507"/>
         <source>Ambient</source>
-        <translation type="unfinished">Ambiente</translation>
+        <translation>Ambiente</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15507"/>
         <source>Elevation (MASL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Altitude (MANM)</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25267"/>
@@ -10873,7 +10874,7 @@ Modify your setup?</source>
     <message>
         <location filename="../artisanlib/main.py" line="31289"/>
         <source>Analyze</source>
-        <translation type="unfinished"></translation>
+        <translation>Analisar</translation>
     </message>
 </context>
 <context>
