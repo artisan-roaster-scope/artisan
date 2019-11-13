@@ -55,6 +55,7 @@ import threading
 import multiprocessing
 import re
 import textwrap
+import natsort
 import gc
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -523,6 +524,7 @@ def __dependencies_for_freezing():
     from scipy.special import _ufuncs_cxx # @UnresolvedImport @UnusedImport
     from scipy import integrate # @UnresolvedImport @UnusedImport
     from scipy import interpolate # @UnresolvedImport @UnusedImport
+    from scipy.optimize import curve_fit # @UnresolvedImport @UnusedImport
     # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
     import scipy.linalg.cython_blas # @UnresolvedImport @UnusedImport
     import scipy.linalg.cython_lapack # @UnresolvedImport @UnusedImport
@@ -15511,7 +15513,8 @@ class ApplicationWindow(QMainWindow):
                     one_added = True
                 else:
                     submenu = menu.addMenu(k)
-                    for e in res[k]:
+                    sorted_subentries = natsort.natsorted(res[k],key=lambda x: x[0])
+                    for e in sorted_subentries: #res[k]:
                         a = QAction(self, visible=True, triggered=triggered)
                         a.setData((e[1],u(k)))
                         a.setText(u(e[0]))

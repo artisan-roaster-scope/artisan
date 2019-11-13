@@ -70,7 +70,7 @@ type=3
 wordorderLittle=true
 
 [RoastProperties]
-roastertype=Coffed SR25
+roastertype=Coffed SR15 automatic
 
 [Sliders]
 ModeTempSliders=C
@@ -81,7 +81,7 @@ eventslidertemp=0, 0, 0, 0
 slideractions=2, 2, 0, 2
 slidercommands="write([1,20,{}])", "write([1,30,{}])", , "write([1,40,{}])"
 sliderfactors=1, 1, 1, 1
-slidermax=100, 60, 100, 100
-slidermin=60, 35, 0, 20
+slidermax=100, 70, 100, 100
+slidermin=55, 38, 0, 20
 slideroffsets=0, 0, 0, 0
 slidervisibilities=1, 1, 0, 1
