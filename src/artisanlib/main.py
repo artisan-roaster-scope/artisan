@@ -2104,7 +2104,7 @@ class tgraphcanvas(FigureCanvas):
         self.curvefitoffset = 180
         self.segmentresultsloc = [.5,.5]
         self.segmentpickflag = False
-        self.segmentdeltathreshold = 0.5
+        self.segmentdeltathreshold = 0.6
         self.segmentsamplesthreshold = 3
         
         self.stats_summary_rect = None
@@ -5732,7 +5732,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 dsBT = int(max(1,aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
                             self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
-                        
+
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
@@ -13270,6 +13270,10 @@ class ApplicationWindow(QMainWindow):
         self.fitIdealx0Action.triggered.connect(self.analysisfitCurvesLN)
         self.analyzeMenu.addAction(self.fitIdealx0Action)
         self.analyzeMenu.addSeparator()
+        self.fitBkgndAction = QAction(QApplication.translate("Menu",u"Fit BT to Bkgnd",None),self)
+        self.fitBkgndAction.triggered.connect(self.analysisfitCurvesBkgnd)
+        self.analyzeMenu.addAction(self.fitBkgndAction)
+        self.analyzeMenu.addSeparator()
         self.clearresultsAction = QAction(QApplication.translate("Menu",u"Clear results",None),self)
         self.clearresultsAction.triggered.connect(self.clearResults)
         self.clearresultsAction.setShortcut("Ctrl+Alt+K")
@@ -16366,244 +16370,248 @@ class ApplicationWindow(QMainWindow):
 
     def curveSimilarity2(self,exp=-1,analysis_starttime=0,analysis_endtime=0):
         result = {}
-        # if background profile is loaded and both profiles have a DROP even set
-        if aw.qmc.background and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
-
-            try:
-                analysis_start = aw.qmc.time2index(analysis_starttime)
-                analysis_end = aw.qmc.time2index(analysis_endtime)
-                analysis_BT = aw.qmc.stemp2[analysis_start:analysis_end]
-                analysis_DeltaBT = aw.qmc.delta2[analysis_start:analysis_end]
+        try:
+            analysis_start = aw.qmc.time2index(analysis_starttime)
+            analysis_end = aw.qmc.time2index(analysis_endtime)
+            analysis_BT = aw.qmc.stemp2[analysis_start:analysis_end]
+            analysis_DeltaBT = aw.qmc.delta2[analysis_start:analysis_end]
+            if exp == 4:
+                # create background BT and background delta BT arrays over the interval of interest
+                xarray = numpy.array(aw.qmc.timex[aw.time2index(analysis_starttime):aw.time2index(analysis_endtime)])
+                # replace None entries with 0 in the background delta list
+                _delta2B = [0 if i == None else i for i in aw.qmc.delta2B]
+                analysis_DeltaBTB = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,_delta2B,x) for x in xarray])
+                analysis_BTB = numpy.array([self.qmc.timetemparray2temp(aw.qmc.timeB,aw.qmc.temp2B,x) for x in xarray])
+            else:
                 analysis_BTB = aw.qmc.stemp2B[analysis_start:analysis_end]
                 analysis_DeltaBTB = aw.qmc.delta2B[analysis_start:analysis_end]
 
-                # Replace None values in the Delta curves with the closest numeric value on the right
-                for i in range(len(analysis_DeltaBT) - 1, -1, -1):
-                    if analysis_DeltaBT[i] == None:
-                        try:
-                            analysis_DeltaBT[i] = analysis_DeltaBT[i+1]
-                        except:
-                            analysis_DeltaBT[i] = 0
-                for i in range(len(analysis_DeltaBTB) - 1, -1, -1):
-                    if analysis_DeltaBTB[i] == None:
-                        try:
-                            analysis_DeltaBTB[i] = analysis_DeltaBTB[i+1]
-                        except:
-                            analysis_DeltaBTB[i] = 0
+            # Replace None values in the Delta curves with the closest numeric value on the right
+            for i in range(len(analysis_DeltaBT) - 1, -1, -1):
+                if analysis_DeltaBT[i] == None:
+                    try:
+                        analysis_DeltaBT[i] = analysis_DeltaBT[i+1]
+                    except:
+                        analysis_DeltaBT[i] = 0
+            for i in range(len(analysis_DeltaBTB) - 1, -1, -1):
+                if analysis_DeltaBTB[i] == None:
+                    try:
+                        analysis_DeltaBTB[i] = analysis_DeltaBTB[i+1]
+                    except:
+                        analysis_DeltaBTB[i] = 0
 
-                np_bt = numpy.array(analysis_BT)
-                np_btb = numpy.array(analysis_BTB)
-                np_dbt = numpy.array(analysis_DeltaBT)
-                np_dbtb = numpy.array(analysis_DeltaBTB)
+            np_bt = numpy.array(analysis_BT)
+            np_btb = numpy.array(analysis_BTB)
+            np_dbt = numpy.array(analysis_DeltaBT)
+            np_dbtb = numpy.array(analysis_DeltaBTB)
 
-                # RMSE
-                rmse_BT = numpy.sqrt(numpy.mean(numpy.square(np_bt - np_btb)))
-                rmse_deltaBT = numpy.sqrt(numpy.mean(numpy.square(np_dbt - np_dbtb)))
+            # RMSE
+            rmse_BT = numpy.sqrt(numpy.mean(numpy.square(np_bt - np_btb)))
+            rmse_deltaBT = numpy.sqrt(numpy.mean(numpy.square(np_dbt - np_dbtb)))
 
-                # R squared - Coefficient of determination (1 is a good result, 0 is not good)
-                # residual sum of squares
-                ss_res_bt = numpy.sum((np_bt - np_btb) ** 2)
-                ss_res_dbt = numpy.sum((np_dbt - np_dbtb) ** 2)
-                # total sum of squares
-                ss_tot_bt = numpy.sum((np_bt - numpy.mean(np_bt)) ** 2)
-                ss_tot_dbt = numpy.sum((np_dbt - numpy.mean(np_dbt)) ** 2)
-                # r-squared
-                r2_BT = 1 - (ss_res_bt / ss_tot_bt)
-                r2_deltaBT = 1 - (ss_res_dbt / ss_tot_dbt)
+            # R squared - Coefficient of determination (1 is a good result, 0 is not good)
+            # residual sum of squares
+            ss_res_bt = numpy.sum((np_bt - np_btb) ** 2)
+            ss_res_dbt = numpy.sum((np_dbt - np_dbtb) ** 2)
+            # total sum of squares
+            ss_tot_bt = numpy.sum((np_bt - numpy.mean(np_bt)) ** 2)
+            ss_tot_dbt = numpy.sum((np_dbt - numpy.mean(np_dbt)) ** 2)
+            # r-squared
+            r2_BT = 1 - (ss_res_bt / ss_tot_bt)
+            r2_deltaBT = 1 - (ss_res_dbt / ss_tot_dbt)
 
-                # Tests that require FCs is marked
-                if aw.qmc.timeindex[2]:
-                    # RoR at time of FCs, and Actual RoR versus Template RoR at FCs
-                    RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
-                    RoR_FCs_templ = aw.qmc.delta2B[aw.qmc.timeindex[2]]
+            # Tests that require FCs is marked
+            if aw.qmc.timeindex[2]:
+                # RoR at time of FCs, and Actual RoR versus Template RoR at FCs
+                RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
+                try:
+                    fcs_idx = numpy.where(np_dbt==aw.qmc.delta2[aw.qmc.timeindex[2]])
+                    RoR_FCs_templ = np_dbtb[fcs_idx[0]].item()
                     RoR_FCs_delta = RoR_FCs_act - RoR_FCs_templ
+                except:
+                    RoR_FCs_delta = float('nan')
 
-                    #max and min difference between actual RoR and template RoR 
-                    maxdelta = numpy.max(np_dbt - np_dbtb)
-                    mindelta = numpy.min(np_dbt - np_dbtb)
+                #max and min difference between actual RoR and template RoR 
+                maxdelta = numpy.max(np_dbt - np_dbtb)
+                mindelta = numpy.min(np_dbt - np_dbtb)
 
-#                    #count of times the actual RoR crosses the template RoR
-#                    diff_array = np_dbt - np_dbtb
-#                    zerocrosses = ((diff_array[:-1] * diff_array[1:]) < 0).sum()
+                # calculate the flicks and crashes
+                #create array of differences between actual curve and the fit curve
+                deltas_all = numpy.array(np_dbt - np_dbtb)
+                #array indicating actual curve is greater than fit curve (+1) or is less than (-1)
+                signs_all = numpy.sign(deltas_all)
+                #array with start index of each interal between crossings
+                starts = numpy.r_[0, numpy.flatnonzero(~numpy.isclose(signs_all[1:], signs_all[:-1])) + 1]
+                #array with the length of each interal between crossings
+                lengths = numpy.diff(numpy.r_[starts, len(signs_all)])
+                #array indicating segment has actual greater than fit (+1) or actual less than fit (-1)
+                signs = signs_all[starts]
+                #array of max difference for each segment
+                maxdeltas = []
+                for i in range(len(starts)):
+                    maxdeltas.append(numpy.amax(numpy.absolute(deltas_all[starts[i]:starts[i]+lengths[i]])) * signs[i])
+                #array of lengths in seconds
+                seconds = lengths * self.qmc.profile_sampling_interval
 
-                    # calculate the flicks and crashes
-                    #create array of differences between actual curve and the fit curve
-                    deltas_all = numpy.array(np_dbt - np_dbtb)
-                    #array indicating actual curve is greater than fit curve (+1) or is less than (-1)
-                    signs_all = numpy.sign(deltas_all)
-                    #array with start index of each interal between crossings
-                    starts = numpy.r_[0, numpy.flatnonzero(~numpy.isclose(signs_all[1:], signs_all[:-1])) + 1]
-                    #array with the length of each interal between crossings
-                    lengths = numpy.diff(numpy.r_[starts, len(signs_all)])
-                    #array indicating segment has actual greater than fit (+1) or actual less than fit (-1)
-                    signs = signs_all[starts]
-                    #array of max difference for each segment
-                    maxdeltas = []
-                    for i in range(len(starts)):
-                        maxdeltas.append(numpy.amax(numpy.absolute(deltas_all[starts[i]:starts[i]+lengths[i]])) * signs[i])
-                    #array of lengths in seconds
-                    seconds = lengths * self.qmc.profile_sampling_interval
-                    
-                    # array of all the time index values
-                    timeindexs_all = numpy.arange(analysis_start, analysis_end, 1)
-                    # time indexes of the segements
-                    timeindexs = timeindexs_all[starts]
-                    
-                    # thresholds
-                    segtimethreshold = aw.qmc.segmentsamplesthreshold * self.qmc.profile_sampling_interval
-                    segdeltathreshold = aw.qmc.segmentdeltathreshold
-                    reductions = numpy.zeros_like(signs)
+                # array of all the time index values
+                timeindexs_all = numpy.arange(analysis_start, analysis_end, 1)
+                # time indexes of the segements
+                timeindexs = timeindexs_all[starts]
+                
+                # thresholds
+                segtimethreshold = aw.qmc.segmentsamplesthreshold * self.qmc.profile_sampling_interval
+                segdeltathreshold = aw.qmc.segmentdeltathreshold
+                reductions = numpy.zeros_like(signs)
 
-                    # mark segments that are insignificant and should be combined to the left
-                    for i in range(len(starts)):
-                        if seconds[i] <= segtimethreshold or abs(maxdeltas[i]) <= segdeltathreshold:
-                            reductions[i] = 1
+                # mark segments that are insignificant and should be combined to the left
+                for i in range(len(starts)):
+                    if seconds[i] <= segtimethreshold or abs(maxdeltas[i]) <= segdeltathreshold:
+                        reductions[i] = 1
 
-                    # extend the reduction to include the sample on the right when its sign matches the sign of the first segment in the reduction
-                    prevsign = signs[0]
-                    prevreduction = 0        
-                    addtoprev = numpy.copy(reductions)   #can replace 'addtoprev[]' with change -in-place 'reductions[]' once debugged 
-                    addtoprev[0] = 0      #the first entry is never combined to the left.
-                    for i in range(1,len(starts)):
-                        # reductions = 1
-                        if reductions[i] == 1:
-                            prevreduction = 1
-                        # reductions=0 & signs=prevsign & prevreduction=1
-                        elif signs[i] == prevsign and prevreduction == 1:
-                            addtoprev[i] = 1
-                        # reductions=0
-                        else:
-                            prevreduction = 0
-                            prevsign = signs[i]
- 
-                    # generate the per segement arrays
-                    _starts = numpy.zeros_like(starts)
-                    _lengths = numpy.zeros_like(starts)
-                    _seconds = numpy.zeros_like(starts)
-                    addtoprev[0] = 0
-                    lasti = 0
-                    for i in range(0,len(starts)):
-                        if addtoprev[i] == 1 and i+1 < len(starts):
-                            _lengths[lasti] += lengths[i]
-                            _seconds[lasti] += seconds[i]
-                        elif addtoprev[i] == 1 :
-                            _lengths[lasti] += numpy.sum(lengths[i:])
-                            _seconds[lasti] += numpy.sum(seconds[i:])
-                        else:   
-                            _lengths[i] = lengths[i]
-                            _seconds[i] = seconds[i]
-                            _starts[i] = starts[i]
-                            lasti = i
-                    mask = numpy.r_[0, numpy.flatnonzero(_starts)]
-                    starts_seg = _starts[mask]
-                    lengths_seg = _lengths[mask]
-                    signs_seg = signs[mask]
-                    seconds_seg = _seconds[mask]
-                    timeindexs_seg = timeindexs[mask]
-                    maxdeltas_seg = []
-                    for i in range(len(mask)):
-                        if i < len(mask) -1:
-                            maxdeltas_seg.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:mask[i+1]])) * signs_seg[i])
-                        else:
-                            maxdeltas_seg.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:])) * signs_seg[i])
+                # extend the reduction to include the sample on the right when its sign matches the sign of the first segment in the reduction
+                prevsign = signs[0]
+                prevreduction = 0        
+                addtoprev = numpy.copy(reductions)   #can replace 'addtoprev[]' with change -in-place 'reductions[]' once debugged 
+                addtoprev[0] = 0      #the first entry is never combined to the left.
+                for i in range(1,len(starts)):
+                    # reductions = 1
+                    if reductions[i] == 1:
+                        prevreduction = 1
+                    # reductions=0 & signs=prevsign & prevreduction=1
+                    elif signs[i] == prevsign and prevreduction == 1:
+                        addtoprev[i] = 1
+                    # reductions=0
+                    else:
+                        prevreduction = 0
+                        prevsign = signs[i]
 
-                    # Per segment metrics
-                    segment_rmse_deltas = [] #segement root mean square error (difference)
-                    segment_mse_deltas = []  #segement mean square error (difference)
-                    segment_abc_deltas = []  #segemnt area between the curves
-                    for i in range(len(starts_seg)):
-                        segment_deltas = deltas_all[starts_seg[i]:starts_seg[i]+lengths_seg[i]+1]
-                        segment_abs_deltas = numpy.absolute(segment_deltas)
-                        segment_rmse_deltas.append(numpy.sqrt(numpy.mean(numpy.square(segment_deltas))))
-                        segment_mse_deltas.append(numpy.mean(numpy.square(segment_deltas)))
-                        segment_abc_deltas.append(numpy.sum((segment_abs_deltas[1:] + segment_abs_deltas[:-1]) * self.qmc.profile_sampling_interval /2))  #trapazoidal area height*(base1+base2)/2
-                        #segment_abc_deltas.append(numpy.trapz(segment_abs_deltas, dx=self.qmc.profile_sampling_interval))  #alternate method 
+                # generate the per segement arrays
+                _starts = numpy.zeros_like(starts)
+                _lengths = numpy.zeros_like(starts)
+                _seconds = numpy.zeros_like(starts)
+                addtoprev[0] = 0
+                lasti = 0
+                for i in range(0,len(starts)):
+                    if addtoprev[i] == 1 and i+1 < len(starts):
+                        _lengths[lasti] += lengths[i]
+                        _seconds[lasti] += seconds[i]
+                    elif addtoprev[i] == 1 :
+                        _lengths[lasti] += numpy.sum(lengths[i:])
+                        _seconds[lasti] += numpy.sum(seconds[i:])
+                    else:   
+                        _lengths[i] = lengths[i]
+                        _seconds[i] = seconds[i]
+                        _starts[i] = starts[i]
+                        lasti = i
+                mask = numpy.r_[0, numpy.flatnonzero(_starts)]
+                starts_seg = _starts[mask]
+                lengths_seg = _lengths[mask]
+                signs_seg = signs[mask]
+                seconds_seg = _seconds[mask]
+                timeindexs_seg = timeindexs[mask]
+                maxdeltas_seg = []
+                for i in range(len(mask)):
+                    if i < len(mask) -1:
+                        maxdeltas_seg.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:mask[i+1]])) * signs_seg[i])
+                    else:
+                        maxdeltas_seg.append(numpy.amax(numpy.absolute(maxdeltas[mask[i]:])) * signs_seg[i])
 
-                    # intervval of interest metrics
-                    ioi_start = self.eventtime2string(aw.qmc.timex[timeindexs_seg[0]] - aw.qmc.timex[aw.qmc.timeindex[0]])
-                    ioi_seconds = (analysis_end - analysis_start) * self.qmc.profile_sampling_interval
-                    ioi_duration = self.eventtime2string(ioi_seconds)
-                    ioi_abs_deltas = numpy.absolute(deltas_all)
-                    ioi_maxdelta = deltas_all[numpy.where(ioi_abs_deltas == numpy.amax(ioi_abs_deltas))[0][0]]
-                    ioi_mse_deltas = numpy.mean(numpy.square(deltas_all))
-                    ioi_abc_deltas = numpy.sum((ioi_abs_deltas[1:] + ioi_abs_deltas[:-1]) * self.qmc.profile_sampling_interval /2)  #trapazoidal area height*(base1+base2)/2
-                    ioi_abcprime = ioi_abc_deltas / ioi_seconds
+                # Per segment metrics
+                segment_rmse_deltas = [] #segement root mean square error (difference)
+                segment_mse_deltas = []  #segement mean square error (difference)
+                segment_abc_deltas = []  #segemnt area between the curves
+                for i in range(len(starts_seg)):
+                    segment_deltas = deltas_all[starts_seg[i]:starts_seg[i]+lengths_seg[i]+1]
+                    segment_abs_deltas = numpy.absolute(segment_deltas)
+                    segment_rmse_deltas.append(numpy.sqrt(numpy.mean(numpy.square(segment_deltas))))
+                    segment_mse_deltas.append(numpy.mean(numpy.square(segment_deltas)))
+                    segment_abc_deltas.append(numpy.sum((segment_abs_deltas[1:] + segment_abs_deltas[:-1]) * self.qmc.profile_sampling_interval /2))  #trapazoidal area height*(base1+base2)/2
+                    #segment_abc_deltas.append(numpy.trapz(segment_abs_deltas, dx=self.qmc.profile_sampling_interval))  #alternate method 
 
-                    # build a table of results
-                    tbl = prettytable.PrettyTable()
-                    tbl.field_names = ["Start", "Duration", "Max Delta", "Sign", "Swing", "MSE", "ABC", "ABC/secs"  ]
-                    tbl.float_format = "5.2"
-                    for i in range(len(mask)):
-                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs_seg[i]] - aw.qmc.timex[aw.qmc.timeindex[0]])
-                        duration = self.eventtime2string(seconds_seg[i])
-                        if i > 0:
-                            swing = maxdeltas_seg[i] - maxdeltas_seg[i-1]
-                        else:
-                            swing = ""
-                        if signs_seg[i] == 1:
-                            abovebelow = "Above"
-                        else:
-                            abovebelow = "Below"
-                        abcprime = segment_abc_deltas[i] / seconds_seg[i]
-                        tbl.add_row([thistime, duration, maxdeltas_seg[i], abovebelow, swing, segment_mse_deltas[i], segment_abc_deltas[i], abcprime ])
+                # interval of interest metrics
+                ioi_start = self.eventtime2string(aw.qmc.timex[timeindexs_seg[0]] - aw.qmc.timex[aw.qmc.timeindex[0]])
+                ioi_seconds = (analysis_end - analysis_start) * self.qmc.profile_sampling_interval
+                ioi_duration = self.eventtime2string(ioi_seconds)
+                ioi_abs_deltas = numpy.absolute(deltas_all)
+                ioi_maxdelta = deltas_all[numpy.where(ioi_abs_deltas == numpy.amax(ioi_abs_deltas))[0][0]]
+                ioi_mse_deltas = numpy.mean(numpy.square(deltas_all))
+                ioi_abc_deltas = numpy.sum((ioi_abs_deltas[1:] + ioi_abs_deltas[:-1]) * self.qmc.profile_sampling_interval /2)  #trapazoidal area height*(base1+base2)/2
+                ioi_abcprime = ioi_abc_deltas / ioi_seconds
+
+                # general information
+                fitRoR = 60*(analysis_DeltaBTB[-1] - analysis_DeltaBTB[0]) / (aw.qmc.timex[timeindexs_all[-1]] - aw.qmc.timex[timeindexs_all[0]])
+                fitTypes = ["ln()", "", "x\u00b2", "x\u00b3", "Bkgnd", ""]
+                fitType = fitTypes[exp]
+                notabene = QApplication.translate("Label", "Note: All values calculated in Celsius",None)
+
+                # build a table of results
+                tbl = prettytable.PrettyTable()
+                tbl.field_names = ["Start", "Duration", "Max Delta", "Sign", "Swing", "MSE", "ABC", "ABC/secs"  ]
+                tbl.float_format = "5.2"
+                for i in range(len(mask)):
+                    thistime = self.eventtime2string(aw.qmc.timex[timeindexs_seg[i]] - aw.qmc.timex[aw.qmc.timeindex[0]])
+                    duration = self.eventtime2string(seconds_seg[i])
+                    if i > 0:
+                        swing = maxdeltas_seg[i] - maxdeltas_seg[i-1]
+                    else:
+                        swing = ""
+                    if signs_seg[i] == 1:
+                        abovebelow = "Above"
+                    else:
+                        abovebelow = "Below"
+                    abcprime = segment_abc_deltas[i] / seconds_seg[i]
+                    tbl.add_row([thistime, duration, maxdeltas_seg[i], abovebelow, swing, segment_mse_deltas[i], segment_abc_deltas[i], abcprime ])
+                if len(mask) > 1:
                     tbl.add_row(['~~~~~','~~~~~','~~~~~','~~~~~','~~~~~','~~~~~','~~~~~','~~~~~'])
                     tbl.add_row([ioi_start, ioi_duration, ioi_maxdelta, '-', '-', ioi_mse_deltas, ioi_abc_deltas, ioi_abcprime ])
-                    segmentresultstr = tbl.get_string(border=True)
+                segmentresultstr = tbl.get_string(border=True)
 
-                    # build table of genral information
-                    fitRoR = 60*(analysis_DeltaBTB[-1] - analysis_DeltaBTB[0]) / (aw.qmc.timex[timeindexs_all[-1]] - aw.qmc.timex[timeindexs_all[0]])
-                    fitTypes = ["ln()", "", "x\u00b2", "x\u00b3", ""]
-                    fitType = fitTypes[exp]
-                    notabene = QApplication.translate("Label", "Note: All values calculated in Celsius",None)
+                # build table of general information
+                tbl2 = prettytable.PrettyTable()
+                tbl2.field_names = ["A","A1", "B", "B1"  ]
+                tbl2.align = 'l'
+                tbl2.align["A1"] = "r"
+                tbl2.align["B1"] = "r"
+                tbl2.float_format = "5.2"
+                tbl2.add_row(["Curve Fit", fitType, '', ''])
+                tbl2.add_row(["Samples Threshold", aw.qmc.segmentsamplesthreshold, "Delta Threshold", aw.qmc.segmentdeltathreshold])
+                tbl2.add_row(["Sample rate (secs)", self.qmc.profile_sampling_interval, "Smooth Curves", int((aw.qmc.curvefilter-1)/2) ])
+                tbl2.add_row(["Delta Span", aw.qmc.deltaBTspan, "Delta Smoothing", int((aw.qmc.deltaBTfilter-1)/2) ])
+                tbl2.add_row(["Fit RoRoR (C/min/min)", fitRoR, "Actual RoR at FCs", RoR_FCs_act])
+                segmentresultstr += "{}{}{}{}".format("\n", tbl2.get_string(border=False,header=False), "\n",notabene)
 
-                    tbl2 = prettytable.PrettyTable()
-                    tbl2.field_names = ["A","A1", "B", "B1"  ]
-                    tbl2.align = 'l'
-                    tbl2.align["A1"] = "r"
-                    tbl2.align["B1"] = "r"
-                    tbl2.float_format = "5.2"
-                    tbl2.add_row(["Samples Threshold", aw.qmc.segmentsamplesthreshold, "Delta Threshold", aw.qmc.segmentdeltathreshold])
-                    tbl2.add_row(["Sample rate (secs)", self.qmc.profile_sampling_interval, "Smooth Curves", int((aw.qmc.curvefilter-1)/2) ])
-                    tbl2.add_row(["Delta Span", aw.qmc.deltaBTspan, "Delta Smoothing", int((aw.qmc.deltaBTfilter-1)/2) ])
-                    tbl2.add_row(["Curve Fit", fitType, "Fit RoR (C/min/min)", fitRoR ])
-                    tbl2.add_row(["Actual RoR at FCs", RoR_FCs_act, "", ""])
-                    segmentresultstr += "{}{}{}{}".format("\n", tbl2.get_string(border=False,header=False), "\n",notabene)
+                # this table is here just to help with validation
+                if aw.superusermode: 
+                    tbl3 = prettytable.PrettyTable()
+                    tbl3.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","TimeIndex"  ]
+                    tbl3.float_format = "5.2"
+                    for i in range(len(maxdeltas)):
+                        thistime = self.eventtime2string(aw.qmc.timex[timeindexs[i]-aw.qmc.timeindex[0]])
+                        tbl3.add_row([thistime,seconds[i],lengths[i],maxdeltas[i],signs[i],reductions[i],timeindexs[i]])
+                    segmentresultstr += "{}{}".format("\n", tbl3.get_string(border=False))
 
-                    # this table is here just to help with validation
-                    if aw.superusermode: 
-                        tbl3 = prettytable.PrettyTable()
-                        tbl3.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","TimeIndex"  ]
-                        tbl3.float_format = "5.2"
-                        for i in range(len(maxdeltas)):
-                            thistime = self.eventtime2string(aw.qmc.timex[timeindexs[i]-aw.qmc.timeindex[0]])
-                            tbl3.add_row([thistime,seconds[i],lengths[i],maxdeltas[i],signs[i],reductions[i],timeindexs[i]])
-                        segmentresultstr += "{}{}".format("\n", tbl3.get_string(border=False))
+                result['segmentresultstr'] = segmentresultstr
 
-                    result['segmentresultstr'] = segmentresultstr
+            else:
+                RoR_FCs_act = 0
+                RoR_FCs_delta = 0
+                maxdelta = 0
+                mindelta = 0
+                result['segmentresultstr'] = ""
 
-                else:
-                    RoR_FCs_act = 0
-                    RoR_FCs_templ = 0
-                    RoR_FCs_delta = 0
-                    maxdelta = 0
-                    mindelta = 0
-                    zerocrosses = 0
-                    result['segmentresultstr'] = ""
+            # build the dict to return
+            result['rmse_BT'] = rmse_BT
+            result['rmse_deltaBT'] = rmse_deltaBT
+            result['r2_BT'] = r2_BT
+            result['r2_deltaBT'] = r2_deltaBT
+            result['ror_fcs_act'] = RoR_FCs_act
+            result['ror_fcs_delta'] = RoR_FCs_delta
+            result['ror_max_delta'] = maxdelta
+            result['ror_min_delta'] = mindelta
 
-                # build the dict to return
-                result['rmse_BT'] = rmse_BT
-                result['rmse_deltaBT'] = rmse_deltaBT
-                result['r2_BT'] = r2_BT
-                result['r2_deltaBT'] = r2_deltaBT
-                result['ror_fcs_act'] = RoR_FCs_act
-                result['ror_fcs_delta'] = RoR_FCs_delta
-                result['ror_max_delta'] = maxdelta
-                result['ror_min_delta'] = mindelta
-#                result['zerocrosses'] = zerocrosses
-
-            except Exception as e:
-                _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curvesimilatrity(): {0}").format(str(e)),exc_tb.tb_lineno)
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curvesimilatrity(): {0}").format(str(e)),exc_tb.tb_lineno)
         return result
 
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
@@ -29819,6 +29827,10 @@ class ApplicationWindow(QMainWindow):
         self.analysisfitCurves(-1)
     @pyqtSlot()
     @pyqtSlot(bool)
+    def analysisfitCurvesLN(self,_=False):
+        self.analysisfitCurves(0)
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def analysisfitCurvesX2(self,_=False):
         self.analysisfitCurves(2)
     @pyqtSlot()
@@ -29827,21 +29839,20 @@ class ApplicationWindow(QMainWindow):
         self.analysisfitCurves(3)
     @pyqtSlot()
     @pyqtSlot(bool)
-    def analysisfitCurvesLN(self,_=False):
-        self.analysisfitCurves(0)
+    def analysisfitCurvesBkgnd(self,_=False):
+        self.analysisfitCurves(4)
     @pyqtSlot()
     @pyqtSlot(bool)
     def clearResults(self,_=False):
         aw.qmc.redraw(recomputeAllDeltas=True)
     
     def analysisfitCurves(self, exp=-1):
-        # exp == 0 -> ln(), 1 -> unused, 2 -> quadratic, 3 -> cubic, -1 -> all of them 
-
+        # exp == 0 -> ln(), 1 -> unused, 2 -> quadratic, 3 -> cubic, 4 -> bkgnd, -1 -> all of 0,2,and 3 
         #check for finished roast
         if not (self.qmc.timeindex[0] > -1 and self.qmc.timeindex[6]):
             self.sendmessage(QApplication.translate("Error Message", "Analyze: no profile data available", None))
             return
-            
+
         #Turn off background annotations
         self.qmc.backgroundDetails = False
         
@@ -29858,6 +29869,16 @@ class ApplicationWindow(QMainWindow):
         QApplication.processEvents()
 
         try:
+            #run all analysis in celsius
+            if aw.qmc.mode == "F":
+                restoreF = True
+                self.qmc.convertTemperature("C", silent=True)
+                self.analysisRecomputeDeltas()
+            else:
+                restoreF = False
+
+            chargetime = aw.qmc.timex[aw.qmc.timeindex[0]]
+            
             #drytime is either the DRY event or as set in the Phases dialog
             if self.qmc.timeindex[1]:  
                 #use the DRY event
@@ -29881,7 +29902,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.analysisstartchoice == 1:   #120 sec before FCs
                 analysis_starttime = fcstime - 120
             elif self.qmc.analysisstartchoice == 2: #Custom
-                analysis_starttime = self.qmc.analysisoffset + aw.qmc.timex[aw.qmc.timeindex[0]]
+                analysis_starttime = self.qmc.analysisoffset + chargetime
             else:                                   #DRY END
                 analysis_starttime = drytime
             analysis_endtime = aw.qmc.timex[aw.qmc.timeindex[6]]
@@ -29890,21 +29911,52 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.curvefitstartchoice == 1:   #120 sec before FCs
                 curvefit_starttime = fcstime - 120
             elif self.qmc.curvefitstartchoice == 2: #Custom
-                curvefit_starttime = self.qmc.curvefitoffset + aw.qmc.timex[aw.qmc.timeindex[0]]
-            else:                                   #DRY END
+                curvefit_starttime = self.qmc.curvefitoffset + chargetime
+            else:
                 curvefit_starttime = drytime
             curvefit_endtime = aw.qmc.timex[aw.qmc.timeindex[6]]
 
-            #natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after CHARGE.
+            # natural log needs a curve fit point sometime earlier than drytime.  Pick one after TP if it exists. Otherwise after CHARGE.
             tpidx = self.findTP()
             if tpidx > 1:
                 tptime = self.qmc.timex[tpidx]
                 curvefit_starttime_ln = .25 * (drytime - tptime) + tptime
             else:
-                curvefit_starttime_ln = .33 * (drytime - aw.qmc.timex[aw.qmc.timeindex[0]]) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                curvefit_starttime_ln = .33 * (drytime - chargetime) + chargetime
+
+            # Parameters to curve fit the profile to the existing background.  Respects the background alignment set in the Background Dialog.
+            if exp == 4:
+                #check for finished background roast
+                if not aw.qmc.background:
+                    self.sendmessage(QApplication.translate("Error Message", "Analyze: no background profile data available", None))
+                    return
+                if not (self.qmc.timeindexB[0] > -1 and self.qmc.timeindexB[6]):
+                    self.sendmessage(QApplication.translate("Error Message", "Analyze: background profile requires CHARGE and DROP events", None))
+                    return
+
+                # set curvefit_starttime to match analysis_starttime
+                curvefit_starttime = analysis_starttime
+                # set curvefit_starttime analysis_endtime to the earlier of DROP or background DROP 
+                droptime = aw.qmc.timex[aw.qmc.timeindex[6]]
+                droptimeB = aw.qmc.timeB[aw.qmc.timeindexB[6]]
+                if droptime > droptimeB:
+                    curvefit_endtime = droptimeB
+                    analysis_endtime = droptimeB
 
             # curve fit results
-            self.cfr = {} #use dict to allow more flexible expansion in the future
+            self.cfr = {} #use dict to allow more flexible expansion
+
+            if exp == 4:
+                res = self.analysisGetResults(exp=4, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+                self.cfr["equ_background"] = "Bkgd"
+                self.cfr["dbt_background"] = res["rmse_BT"]
+                self.cfr["dbdbt_background"] = res["rmse_deltaBT"]
+                self.cfr["r2_deltabt_background"] = res["r2_deltaBT"]
+                self.cfr['ror_fcs_delta_background'] = res['ror_fcs_delta']
+                self.cfr['ror_max_delta_background'] = res['ror_max_delta']
+                self.cfr['ror_min_delta_background'] = res['ror_min_delta']
+                self.cfr['ror_maxmin_delta_background'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
+                progress.setValue(3)
             # ln() or all
             if exp == 0 or exp == -1:
                 res = self.analysisGetResults(exp=0, curvefit_starttime=curvefit_starttime_ln, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
@@ -29916,7 +29968,7 @@ class ApplicationWindow(QMainWindow):
                 self.cfr['ror_max_delta_naturallog'] = res['ror_max_delta']
                 self.cfr['ror_min_delta_naturallog'] = res['ror_min_delta']
                 self.cfr['ror_maxmin_delta_naturallog'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
-                progress.setValue(1)
+                progress.setValue(1 if exp == -1 else 3)
             # cubic or all
             if exp == 3 or exp == -1:
                 res = self.analysisGetResults(exp=3, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
@@ -29928,7 +29980,7 @@ class ApplicationWindow(QMainWindow):
                 self.cfr['ror_max_delta_cubic'] = res['ror_max_delta']
                 self.cfr['ror_min_delta_cubic'] = res['ror_min_delta']
                 self.cfr['ror_maxmin_delta_cubic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
-                progress.setValue(2)
+                progress.setValue(2 if exp == -1 else 3)
             # quadratic or all
             if exp == 2 or exp == -1:
                 res = self.analysisGetResults(exp=2, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
@@ -29942,34 +29994,30 @@ class ApplicationWindow(QMainWindow):
                 self.cfr['ror_maxmin_delta_quadratic'] = ("%4.1f%s%4.1f") % (res['ror_max_delta'], "/", res['ror_min_delta'])
                 progress.setValue(3)
             
-            # find the curve with the best fit
-            try:
-                bestfit = min(self.cfr["dbdbt_quadratic"], self.cfr["dbdbt_cubic"], self.cfr["dbdbt_quadratic"])
-            except:
-                bestfit = -1
-        
             # build the results table
             tbl = prettytable.PrettyTable()
-            tbl.field_names = ["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"] 
+            tbl.field_names = [" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"] 
             tbl.float_format = "5.2"
+            if "equ_background" in self.cfr:
+                tbl.add_row(["Bkgnd", self.cfr["dbt_background"], self.cfr["dbdbt_background"], self.cfr["r2_deltabt_background"], self.cfr['ror_fcs_delta_background'], self.cfr['ror_maxmin_delta_background']])
             if "equ_quadratic" in self.cfr:
-                tbl.add_row(["*" if self.cfr["dbdbt_quadratic"] == bestfit else "", "x\u00b2", self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"], self.cfr["r2_deltabt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
+                tbl.add_row(["x\u00b2", self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"], self.cfr["r2_deltabt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
             if "equ_cubic" in self.cfr:
-                tbl.add_row(["*" if self.cfr["dbdbt_cubic"] == bestfit else "", "x\u00b3", self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"], self.cfr["r2_deltabt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
+                tbl.add_row(["x\u00b3", self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"], self.cfr["r2_deltabt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
             if "equ_naturallog" in self.cfr:
-                tbl.add_row(["*" if self.cfr["dbdbt_naturallog"] == bestfit else "", "ln()", self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"], self.cfr["r2_deltabt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
+                tbl.add_row(["ln()", self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"], self.cfr["r2_deltabt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
+            tbl.fields = [" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"]
+            RMSEstr = tbl.get_string(sortby="RMSE BT")
             
-#            # highlight the best curve fit
-#            if exp == -1:
-#                RMSEstr = tbl.get_string(fields=["", " ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
-#            else:
-#                RMSEstr = tbl.get_string(fields=[" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
-            RMSEstr = tbl.get_string(fields=[" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"])
-            
-            RMSEstr += "\n{0}   {1}{2:4.1f}".format(QApplication.translate("Label", "Note: All values calculated in Celsius",None), QApplication.translate("Label", "Actual RoR at FCs=",None), res['ror_fcs_act']) 
+            RMSEstr += "\n{0}   {1}{2:5.2f}".format(QApplication.translate("Label", "Note: All values calculated in Celsius",None), QApplication.translate("Label", "Actual RoR at FCs=",None), res['ror_fcs_act']) 
 
             self.cfr['segmentresultstr'] = res['segmentresultstr'] 
             
+            # convert back to Fahrenheit if the profile was converted to Celsius
+            if restoreF:
+                self.qmc.convertTemperature("F", silent=True)
+                self.analysisRecomputeDeltas()
+
             # create the results annotation and update the graph 
             self.analysisShowResults(RMSEstr, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
@@ -29977,7 +30025,7 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
             RMSEstr = QApplication.translate("Error Message", "There was an error",None)
-        
+
         progress.cancel()
         progress = None
             
@@ -30005,7 +30053,7 @@ class ApplicationWindow(QMainWindow):
 
             # show warning if the analysis starts earlier than curve fit
             if curvefit_starttime > analysis_starttime:
-                string = QApplication.translate("Message","Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.", None)
+                string = QApplication.translate("Message","Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.\nCorrect this on the Config>Curves>Analyze tab.", None)
                 QMessageBox.warning(self,QApplication.translate("Message","Analysis earlier than Curve fit", None),string)
 
             #reset the annotation location if the origin is out of the screen
@@ -30063,25 +30111,85 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisShowResults(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def analysisGetResults(self,exp=2, curvefit_starttime=0, curvefit_endtime=0, analysis_starttime=0, analysis_endtime=0):
-        #run all analysis in celsius
-        if aw.qmc.mode == "F":
-            restoreF = True
-            self.qmc.convertTemperature("C", silent=True)
-        else:
-            restoreF = False
 
-        res = {}  #use dict to allow more flexible expansion in the future
-        res['equ'] = self.qmc.lnRegression(power=exp, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, plot=False)
-        self.deleteBackground()
-        self.setbackgroundequ(EQU=["",res['equ']],recomputeAllDeltas=True)
+        res = {}  #use dict for the results
+        
+        if exp != 4:  #not using existing background so perform a curve fit that sets the background 
+            res['equ'] = self.qmc.lnRegression(power=exp, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, plot=False)
+            self.deleteBackground()
+            self.setbackgroundequ(EQU=["",res['equ']],recomputeAllDeltas=True)  #redraw() called from setbackgroundequ()
+        
         result = self.curveSimilarity2(exp=exp, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-
-        if restoreF:
-            self.qmc.convertTemperature("F", silent=True)
 
         retval = {**result, **res}
         return retval
-                
+
+#dave
+    def analysisRecomputeDeltas(self):
+        try:
+            smooth=True
+            sampling=False
+            decay_smoothing_p = not aw.qmc.optimalSmoothing
+
+            # we resample the temperatures to regular interval timestamps
+            if aw.qmc.timeB is not None and aw.qmc.timeB:
+                timeB_lin = numpy.linspace(aw.qmc.timeB[0],aw.qmc.timeB[-1],len(aw.qmc.timeB))
+            else:
+                timeB_lin = None
+            # we resample the temperatures to regular interval timestamps
+            if aw.qmc.timex is not None and aw.qmc.timex and len(aw.qmc.timex)>1:
+                timex_lin = numpy.linspace(aw.qmc.timex[0],aw.qmc.timex[-1],len(aw.qmc.timex))
+            else:
+                timex_lin = None
+            temp1_nogaps = aw.qmc.fill_gaps(aw.qmc.resizeList(aw.qmc.temp1,len(aw.qmc.timex)))
+            temp2_nogaps = aw.qmc.fill_gaps(aw.qmc.resizeList(aw.qmc.temp2,len(aw.qmc.timex)))
+                    
+            if smooth or len(aw.qmc.stemp1) != len(aw.qmc.timex):
+                if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon: # we don't smooth, but remove the dropouts
+                    aw.qmc.stemp1 = temp1_nogaps
+                else:
+                    aw.qmc.stemp1 = aw.qmc.smooth_list(aw.qmc.timex,temp1_nogaps,window_len=aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+            if smooth or len(aw.qmc.stemp2) != len(aw.qmc.timex):
+                if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon:  # we don't smooth, but remove the dropouts
+                    aw.qmc.stemp2 = aw.qmc.fill_gaps(aw.qmc.temp2)
+                else:
+                    aw.qmc.stemp2 = aw.qmc.smooth_list(aw.qmc.timex,temp2_nogaps,window_len=aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+
+            #populate background delta ET (aw.qmc.delta1B) and delta BT (aw.qmc.delta2B)
+            # we populate temporary smoothed ET/BT data arrays
+            cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+            st1 = aw.qmc.smooth_list(aw.qmc.timeB,aw.qmc.fill_gaps(aw.qmc.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+            st2 = aw.qmc.smooth_list(aw.qmc.timeB,aw.qmc.fill_gaps(aw.qmc.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+            # we start RoR computation 10 readings after CHARGE to avoid this initial peak
+            if aw.qmc.timeindexB[0]>-1:
+                RoRstart = min(aw.qmc.timeindexB[0]+10, len(aw.qmc.timeB)-1)
+            else:
+                RoRstart = -1
+            if aw.qmc.background_profile_sampling_interval is None:
+                dsET = None
+            else:
+                dsET = int(max(1,aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
+            if aw.qmc.background_profile_sampling_interval is None:
+                dsBT = None
+            else:
+                dsBT = int(max(1,aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
+            aw.qmc.delta1B, aw.qmc.delta2B = aw.qmc.recomputeDeltas(aw.qmc.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
+
+            #populate delta ET (aw.qmc.delta1) and delta BT (aw.qmc.delta2)
+            cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+            decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
+            t1 = aw.qmc.smooth_list(aw.qmc.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+            t2 = aw.qmc.smooth_list(aw.qmc.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+            # we start RoR computation 10 readings after CHARGE to avoid this initial peak
+            if aw.qmc.timeindex[0]>-1:
+                RoR_start = min(aw.qmc.timeindex[0]+10, len(aw.qmc.timex)-1)
+            else:
+                RoR_start = -1
+            aw.qmc.delta1, aw.qmc.delta2 = aw.qmc.recomputeDeltas(aw.qmc.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisRecomputeDeltas(): {0}").format(str(e)),exc_tb.tb_lineno)
+
     def setbackgroundequ(self,foreground=False, EQU=['',''],recomputeAllDeltas=False):
         # Check for incompatible vars from in the equations
         incompatiblevars = ["P","F","$","#"]
@@ -31101,22 +31209,23 @@ class HUDDlg(ArtisanDialog):
         tab3Layout.addWidget(polyfitGroupLayout)
         tab3Layout.addStretch()
         ##### TAB 4
-        analyzeVLayout1 = QVBoxLayout()
-        analyzeVLayout1.addWidget(self.analyzecomboboxLabel)
-        analyzeVLayout1.addWidget(self.analyzecombobox)
-        analyzeVLayout1.addWidget(self.analyzetimeoffsetLabel)
-        analyzeVLayout1.addWidget(self.analyzetimeoffset)
-        analyzeVLayout2 = QVBoxLayout()
-        analyzeVLayout2.addWidget(self.curvefitcomboboxLabel)
-        analyzeVLayout2.addWidget(self.curvefitcombobox)
-        analyzeVLayout2.addWidget(self.curvefittimeoffsetLabel)
-        analyzeVLayout2.addWidget(self.curvefittimeoffset)
-        analyzeHLayout = QHBoxLayout()
-        analyzeHLayout.addLayout(analyzeVLayout2)
-        analyzeHLayout.addStretch()
-        analyzeHLayout.addLayout(analyzeVLayout1)
-        analyzeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curve Fit Options",None))
-        analyzeGroupLayout.setLayout(analyzeHLayout)
+        analyzeHLayout1 = QHBoxLayout()
+        analyzeHLayout1.addWidget(self.curvefitcomboboxLabel)
+        analyzeHLayout1.addWidget(self.curvefitcombobox)
+        analyzeHLayout1.addStretch()
+        analyzeHLayout1.addWidget(self.curvefittimeoffsetLabel)
+        analyzeHLayout1.addWidget(self.curvefittimeoffset)
+        analyzeGroupLayout1 = QGroupBox(QApplication.translate("GroupBox","Curve Fit Options",None))
+        analyzeGroupLayout1.setLayout(analyzeHLayout1)
+
+        analyzeHLayout2 = QHBoxLayout()
+        analyzeHLayout2.addWidget(self.analyzecomboboxLabel)
+        analyzeHLayout2.addWidget(self.analyzecombobox)
+        analyzeHLayout2.addStretch()
+        analyzeHLayout2.addWidget(self.analyzetimeoffsetLabel)
+        analyzeHLayout2.addWidget(self.analyzetimeoffset)
+        analyzeGroupLayout2 = QGroupBox(QApplication.translate("GroupBox","Interval of Interest Options",None))
+        analyzeGroupLayout2.setLayout(analyzeHLayout2)
 
         flcrVLayout1 = QVBoxLayout()
         flcrVLayout1.addWidget(self.segmentsamplesthresholdLabel)
@@ -31132,7 +31241,8 @@ class HUDDlg(ArtisanDialog):
         flcrGroupLayout = QGroupBox(QApplication.translate("GroupBox","Analyze Options",None))
         flcrGroupLayout.setLayout(flcrHLayout)
         tab4Layout = QVBoxLayout()
-        tab4Layout.addWidget(analyzeGroupLayout)
+        tab4Layout.addWidget(analyzeGroupLayout1)
+        tab4Layout.addWidget(analyzeGroupLayout2)
         tab4Layout.addWidget(flcrGroupLayout)
         tab4Layout.addStretch()
         ##### TAB 5
