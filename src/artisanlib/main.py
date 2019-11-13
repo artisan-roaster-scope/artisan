@@ -363,23 +363,25 @@ class Artisan(QtSingleApplication):
     
     @pyqtSlot("QWidget*","QWidget*")
     def appRaised(self,oldFocusWidget,newFocusWidget):
-        if not sip.isdeleted(aw):
-            if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
-                #focus gained
-    #PLUS
-                try:
-                    if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
-                            libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
-                            plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
-                except:
-                    pass
-                self.sentToBackground = None
-                    
-            elif oldFocusWidget is not None and newFocusWidget is None and aw is not None and aw.centralWidget() == oldFocusWidget:
-                # focus released
-                self.sentToBackground = libtime.time() # keep the timestamp on sending the app with the main window to background
-            else: # on raising another dialog/widget was open, reset timer
-                self.sentToBackground = None
+        try:
+            if not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
+                if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
+                    #focus gained
+                    try:
+                        if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
+                                libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
+                                plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
+                    except:
+                        pass
+                    self.sentToBackground = None
+                        
+                elif oldFocusWidget is not None and newFocusWidget is None and aw is not None and aw.centralWidget() == oldFocusWidget:
+                    # focus released
+                    self.sentToBackground = libtime.time() # keep the timestamp on sending the app with the main window to background
+                else: # on raising another dialog/widget was open, reset timer
+                    self.sentToBackground = None
+        except:
+            pass
         
     # takes a QUrl and interprets it as follows
     # artisan://roast/<UUID> : loads profile from path associated with the given roast <UUID>
@@ -7300,8 +7302,11 @@ class tgraphcanvas(FigureCanvas):
                 #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
                 # the following will immedately release the memory dispite this parent link
                 QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-                sip.delete(dialog)
-                #print(sip.isdeleted(dialog))
+                try: # sip not supported on older PyQt versions (RPi!)
+                    sip.delete(dialog)
+                    #print(sip.isdeleted(dialog))
+                except:
+                    pass
 
         #update screen with new colors
         aw.updateCanvasColors()
@@ -27625,8 +27630,11 @@ class ApplicationWindow(QMainWindow):
             dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
             # the following will immedately release the memory dispite this parent link
             QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-            sip.delete(dialog)
-            #print(sip.isdeleted(dialog))
+            try:
+                sip.delete(dialog)
+                #print(sip.isdeleted(dialog))
+            except:
+                pass
 
     def toggleHottopControl(self):
         if self.HottopControlActive:
