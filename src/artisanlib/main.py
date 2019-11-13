@@ -1072,8 +1072,8 @@ class tgraphcanvas(FigureCanvas):
                        "VICTOR 86B",                #103
                        "+Behmor 56",                #104
                        "+Behmor 78",                #105
-                       "Phidget HUB IO 0",      #106
-                       "Phidget HUB IO Digital 0", #107
+                       "Phidget HUB IO 0",          #106
+                       "Phidget HUB IO Digital 0",  #107
                        ]
 
         # ADD DEVICE:

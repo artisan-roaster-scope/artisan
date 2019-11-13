@@ -2,6 +2,101 @@ Detailed Release History
 ========================
 
 ----
+v2.1.0 (xx.11.2019)
+------------------
+
+* New Features
+  - ACTIONS: adds "Multiple Event" action to default buttons actions
+  - ACTIONS: adds sleep(<n.m>) command to multiple button event action
+  - ACTIONS: adds Modbus Command action "writeWord" to write 32bit decimal numbers using MODBUS
+  - ACTIONS: adds additional Artisan Commands
+     * PIDon, PIDoff, PIDtoggle to change the internal PID state
+     * pidmode(<n>) with 0: manual, 1: RS, 2: background follow
+     * playbackmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
+function 16
+  - ALARMS: adds alarm actions to set and reset the canvas color
+  - ALARMS: adds alarm actions to turn replay off and on
+  - ALARMS: the "insert" and "add" actions of the alarms table takes default values from selected item if any
+  - ANALYZER: first version that brings curve fit and RoR flick/crash analysis features
+  - BATCH COUNTER: increases batch counter also in last loaded settings file
+  - BATCH COUNTER: add a flag to control if the batch counter should be changed on loading a settings file
+  - EVENTS: the "insert" and "add" actions of the custom button table takes default values from selected item if any
+  - EXPORT: adds RoR and special event data to Excel exports
+  - EXPORT: adds copy table button to several tables in tab separated format (roast data, roast events,...).  ALT-click (OPTION on macOS) to Copy button will copy a rendered variant of the data
+  - EXPORT: adds ability to save the statistics summary box to a file
+  - EXTRA DEVICES: adds "Update Profile" button to recompute the symbolic formulas of all Virtual Devices
+  - EXTRA DEVICES: adds delta axis flags to have extra device curves drawn relative to the z-axis (C/min or F/min axis). Useful if a device sends directly RoR data (like potentially the TC4), if a Virtual Device is used to draw the RoR of a curve different to ET and BT
+  - MACHINE SUPPORT: extended Besca machine setups including the [Bee sample roaster](https://www.bescaroasters.com/roaster-detail/14/Sample-Roasters/Besca-Bee-Coffee-Roaster) and the setup "Besca BSC manual v2" for manual machines produced after 15.09.2019
+  - MACHINE SUPPORT: updated [Coffeetool Rxx](https://coffeetool.gr/product-category/coffeeroasters/) machine setup to allow for burner, air flow and drum speed control
+  - MACHINE SUPPORT: adds Drum Speed and Air Flow to Buhler Roastmaster setup
+  - MACHINE SUPPORT: adds machine configurations for popular Phidget sets
+  - MATH: adds x^2 to the exponent function as well as the possibility to define an offset from CHARGE
+  - PHIDGETS: adds Phidget HUB0000 IO 0 and Phidget HUB0000 IO Digital 0 one channel device types that allocate only that single one channel/port to allow the use of all HUB0000 ports with an uneven number of analog or digital IO channels
+  - PHIDGETS: attach IO Phidgets already in OFF mode on demand
+  - PHIDGETS: adds OUT1100, REL1000, REL1100, REL1101 to Phidget binary IO API
+  - PHIDGETS: fully supports all 16 ports of the REL1101 (not only the first 4 as before)
+  - PHIDGETS: adds ALT-RESET button action to additionally detach all IO Phidgets
+  - PHIDGETS: adds Phidgets driver version to the about dialog
+  - PLUS: adds [artisan.plus](artisan.plus) subscription status indicator
+  - PLUS: adds artisan://roast/<uuid> URL scheme to link back to Artisan (click to the batch number or title) and artisan.plus (click to the date) on html roast, production and ranking reports
+  - PLUS: adds confirmation dialog on disconnecting artisan.plus
+  - PLUS: adds CTR-click (COMMAND on macOS) on plus icon to disconnect and erase credentials from keychain
+  - PLUS: adds ALT+CTR-click (OPTION+COMMAND on macOS) on plus icon to toggle artisan.plus debug login (defaults to off)
+  - PLUS: adds ALT-click (OPTION on macOS) on plus icon to compose an email containing the plus log
+  - SYMBOLIC FORMULAS: adds symbolic formula variables R1 and R2 bound to the last ET/BT RoR values incl. indexed access
+  - SYMBOLIC FORMULAS: adds Rate of Rise symbolic assignments ([Issue #383](../../../issues/383)) to allow e.g. to divide C/min readings by 2 to show them as C/30sec
+  - SYMBOLIC FORMULAS: extends the roast calculus by additional symbolic variables to access the index of main events, predictions and AUC values and allows indexed access to profile, background time and curve values allowing to define forward looking alarms
+  - UI: adds size selector (tiny, small, large) for custom event buttons
+  - UI: adds extra device curve fills
+  - UI: adds dirty file indicator
+  - UI: adds ALT-h (OPTION-h on macOS) keyboard shortcut to remove the background profile
+  - UI: adds ALT-NEW (OPTION-NEW on macOS) keyboard shortcut to just load the recent roast settings (incl. the associated background) without actually starting the recording
+  - UI: holding ALT key (OPTION on macOS) while adding roast to the list of recent roast properties to also add the weight, volume, density, moisture and color of the roasted batch to the record
+  - UI: adds profile background images
+  - UI: graph annotations can be now be repositioned by dragging
+  - UI: adds large Delta, PID and Extra LCDs ([Issue #303](../../../issues/303))
+  - UI: adds transparency configuration in Color Dialog for analytics, legend and Statistic Summary boxes
+  - UI: adds dark mode support to OS X app (improves Roast Properties and HTML reports)
+
+* Changes
+  - DEVICE SUPPORT: reworked ambient temperature collection from 1048/TMP1101 Phidgets or selected ambient temperature curve (now again triggered automatically at DROP) ([Issue #420](../../../issues/420))
+  - TRANSLATIONS: adds back Farsi and Indonesian translations that got broken
+  - TRANSLATIONS: updated Brazilian, French and Greek translations
+  - UI: improve messages when clicking events in step, step+ and combo modes
+  - UI: retain readings LCD visibility when closing/starting roast ([Issue #364](../../../issues/364))
+  - UI: timer LCD hides and shows together with other main LCDs
+  - UI: clearer menu titles for Config>Temperature and Tools>Temperature
+  - UI: removed evaluations from the statistics bar
+  - UI: autosave profiles are no longer added to the recent file menu
+  - UI: reworked statistic summary incl. a configurable line length
+  - UI: don't move sliders on RESET
+
+* Fixes
+  - ACTIONS: fixes broken Artisan Command "tare" ([Issue #376](../../../issues/376))
+  - BATCH COUNTER: improves overwrite handling of counter on loading settings from .aset files ([Issue #372](../../../issues/372)) 
+  - DEVICE SUPPORT: fixes Acaia lunar random disconnect failures
+  - EVENTS: fixes random duplicate event entry on slider moves
+  - EXPORT: enhancements and fixes to Web and Excel reports ([Issue #401](../../../issues/401))
+  - EXPORT: fixed the broken Excel export
+  - EXTRA DEVICES: ensures that extra channels of profiles with no extra curves loaded into a setup with extra curves get correctly initialised ([Issue #373](../../../issues/373))
+  - EXTRA DEVICES: fixes extra LCD/Curve states on deleting the selected extra device if it is not the last (thanks Dave for spotting this!)
+  - PHIDGETS: fixes a regression introduced in v1.6.1 that broke the Phidget HUB VoltageRatio input on uneven channels
+  - PHIDGETS: ensure that VINT Phidgets are always assigned to Artisan device channels in order of the HUB port they are plugged in
+  - SYMBOLIC FORMULAS: fixes symbolic variables E1,E2,E3,E4 holding last event value ([Issue #277](../../../issues/277))
+  - UI: deactivate autoDRY and autoFCs for the current recording after the added event was undone to avoid further auto event triggers
+  - UI: fixed PhasesLCD labels color not adjusting to canvas color
+  - UI: fixes dpi not updating from saved settings
+  - UI: fixes cross-line bitblit after resize
+  - UI: fixed truncated menus on Windows by upgrading to PyQt 5.13.1
+  - UI: fixed truncated ComboBox items on Mac OS X by upgrading to PyQt 5.13.1
+  - UI: fixes density loss computation in Statistic Summary
+  - UI: set file dirty and reset file path if extra device setup of profile was adjusted on load
+  - UI: Roast/Cup Profile: value keep changing to max or min if double clicked ([Issue #360](../../../issues/360))
+  - UI: Roast Properties "Title" Font Color problem ([Issue #371](../../../issues/371))
+  - UI: toggling the mouse coordinates via key d updates the message line immediately ([Issue #422](../../../issues/422))
+
+  
+----
 v2.0.0 (04.06.2019)
 ------------------
 
@@ -766,7 +861,7 @@ v0.9.0 (17.11.2014)
    * adds MET calculation (maximum ET between TP and DROP)
    * adds moisture of roasted beans to roast properties
    * background title as subtitle
-   * adds flag to align of background profiles also wrt. FCs
+   * adds flag to align of background profiles also w.r.t. FCs
    * adds button action to set digital outputs on Phidgets IO
    * adds BT/ET rate-of-rise to the designer
    * adds "Delta Span" setting
@@ -1247,11 +1342,11 @@ v0.3.0 (11.01.2011)
 -------------------
 
  * fixed occasional ET/BT swap
- * fixed issues wrt. accent characters
+ * fixed issues w.r.t. accent characters
  * added OS X 10.5.x support for Intel-only
  * new file format to store profiles
  * added configurable min/max values for x/y axis
- * added alignment of background profile wrt. CHARGE during roast
+ * added alignment of background profile w.r.t. CHARGE during roast
  * added DeltaBT/DeltaET flags
  * added "green Flag" button on Windows
  * reorganized dialogs and menus
