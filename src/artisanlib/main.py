@@ -31357,7 +31357,10 @@ class HUDDlg(ArtisanDialog):
         self.polyfitdeg.valueChanged.connect(self.polyfitcurveschanged)
         self.c1ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
         self.c2ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        if platf == 'Windows':
+            self.dialogbuttons.button(QDialogButtonBox.Ok)
+        else:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     @pyqtSlot(bool)
     def fittoBackground(self,_):
@@ -34359,7 +34362,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                 QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
         except:
             pass
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        if platf == 'Windows':
+            self.dialogbuttons.button(QDialogButtonBox.Ok)
+        else:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     def readScale(self):
         if self.disconnecting:
@@ -38676,7 +38682,10 @@ class EventsDlg(ArtisanResizeablDialog):
         mainLayout.setContentsMargins(5, 15, 5, 5)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        if platf == 'Windows':
+            self.dialogbuttons.button(QDialogButtonBox.Ok)
+        else:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     @pyqtSlot(bool)
     def backuppaletteeventbuttonsSlot(self,_):
@@ -41004,7 +41013,10 @@ class backgroundDlg(ArtisanResizeablDialog):
         mainLayout.addLayout(buttonLayout)
         mainLayout.setContentsMargins(5, 10, 5, 5) # left, top, right, bottom 
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        if platf == 'Windows':
+            self.dialogbuttons.button(QDialogButtonBox.Ok)
+        else:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
     
     @pyqtSlot(bool)
     def timealign(self,_):
@@ -48345,7 +48357,10 @@ class comportDlg(ArtisanResizeablDialog):
         Mlayout.setContentsMargins(5,15,5,5)
         Mlayout.setSpacing(5)
         self.setLayout(Mlayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        if platf == 'Windows':
+            self.dialogbuttons.button(QDialogButtonBox.Ok)
+        else:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
     
     @pyqtSlot(int)
     def colorDeviceIndexChanged(self,i):
@@ -49766,7 +49781,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         Mlayout.setSpacing(0)
         Mlayout.setContentsMargins(5,10,5,5)
         self.setLayout(Mlayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        if platf == 'Windows':
+            self.dialogbuttons.button(QDialogButtonBox.Ok)
+        else:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         settings = QSettings()
         if settings.contains("DeviceAssignmentGeometry"):
             self.restoreGeometry(settings.value("DeviceAssignmentGeometry"))
@@ -51824,7 +51842,10 @@ class graphColorDlg(ArtisanDialog):
         Mlayout.setSpacing(0)
         self.setLayout(Mlayout)
         self.setColorButtons()
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        if platf == 'Windows':
+            self.dialogbuttons.button(QDialogButtonBox.Ok)
+        else:
+            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         self.layout().setSizeConstraint(QLayout.SetFixedSize) # don't allow resizing
 
     @pyqtSlot(bool)
