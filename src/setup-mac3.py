@@ -8,12 +8,13 @@ Usage:
 # manually remove sample-data mpl subdirectory from Python installation:
 # sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data
 
-from distutils import sysconfig
-their_parse_makefile = sysconfig.parse_makefile
-def my_parse_makefile(filename, g):
-    their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
-sysconfig.parse_makefile = my_parse_makefile
+# THIS PATCH SEEMS NOT TO BE NEEDED ANYMORE:
+#from distutils import sysconfig
+#their_parse_makefile = sysconfig.parse_makefile
+#def my_parse_makefile(filename, g):
+#    their_parse_makefile(filename, g)
+#    g['MACOSX_DEPLOYMENT_TARGET'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
+#sysconfig.parse_makefile = my_parse_makefile
 
 import sys, os
 import subprocess
@@ -174,7 +175,7 @@ OPTIONS = {
     'strip': True,
 #    'xref': True,
     'argv_emulation': False, # this would confuses GUI processing
-# this does not work on Python3.4/PyQt5 for unknown reasons
+# this does not work on Python3.4/PyQt5 for unknown reasons (seems only work for Qt4)
 #    'qt_plugins': [
 #                    'iconengines/libqsvgicon.dylib',
 #                    'imageformats/libqsvg.dylib',
@@ -191,7 +192,7 @@ OPTIONS = {
 #                    'QtHelp','QtMultimedia',
 #                    'QtOpenGL','QtScript','QtScriptTools',
 #                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
-    'packages': ['yoctopuce','gevent','openpyxl','certifi'],
+    'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi'],
     'optimize':  1,
     'compressed': True,
     'iconfile': 'artisan.icns',
@@ -203,7 +204,6 @@ OPTIONS = {
                  'PyQt5.QtGui',
                  'PyQt5.QtWidgets',
                  'PyQt5.QtSvg',
-                 'PyQt5.QtXml',
                  'PyQt5.QtDBus',
                  'PyQt5.QtNetwork',
                  'PyQt5.QtPrintSupport',
@@ -280,9 +280,9 @@ except Exception as e:
 # for Qt5
 print('*** Removing unused Qt frameworks ***')
 Qt_frameworks = [
-    'QtWidgets.framework',
     'QtCore.framework',
     'QtGui.framework',
+    'QtWidgets.framework',
     'QtSvg.framework',
     'QtPrintSupport.framework',
     'QtNetwork.framework',
@@ -310,9 +310,6 @@ for root, dirs, files in os.walk('.'):
         elif file.startswith('test_'):
 #            print('Deleting', file)
             os.remove(os.path.join(root,file))
-        elif '_tests' in file:
-#            print('Deleting', file)            
-            os.remove(os.path.join(root,file))               
         elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
 #            print('Deleting', file)
             os.remove(os.path.join(root,file))
@@ -349,3 +346,4 @@ else:
     subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r".dmg",shell = True)
     subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "artisan" -fs HFS+ -srcfolder "dist"',shell = True)
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
+#

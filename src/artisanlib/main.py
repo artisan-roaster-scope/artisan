@@ -99,7 +99,7 @@ from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VE
                           QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
-try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 private sip module
+try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
     from PyQt5 import sip # @UnusedImport
 except:
     pass

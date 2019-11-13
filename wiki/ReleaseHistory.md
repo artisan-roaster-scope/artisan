@@ -35,7 +35,7 @@ function 16
   - PHIDGETS: attach IO Phidgets already in OFF mode on demand
   - PHIDGETS: adds OUT1100, REL1000, REL1100, REL1101 to Phidget binary IO API
   - PHIDGETS: fully supports all 16 ports of the REL1101 (not only the first 4 as before)
-  - PHIDGETS: adds ALT-RESET button action to additionally detach all IO Phidgets
+  - PHIDGETS: adds ALT-RESET (OPTION-RESET on macOS) button action to additionally detach all IO Phidgets
   - PHIDGETS: adds Phidgets driver version to the about dialog
   - PLUS: adds [artisan.plus](artisan.plus) subscription status indicator
   - PLUS: adds artisan://roast/<uuid> URL scheme to link back to Artisan (click to the batch number or title) and artisan.plus (click to the date) on html roast, production and ranking reports
@@ -56,7 +56,7 @@ function 16
   - UI: graph annotations can be now be repositioned by dragging
   - UI: adds large Delta, PID and Extra LCDs ([Issue #303](../../../issues/303))
   - UI: adds transparency configuration in Color Dialog for analytics, legend and Statistic Summary boxes
-  - UI: adds dark mode support to OS X app (improves Roast Properties and HTML reports)
+  - UI: adds dark mode support on macOS (improves Roast Properties and HTML reports)
 
 * Changes
   - DEVICE SUPPORT: reworked ambient temperature collection from 1048/TMP1101 Phidgets or selected ambient temperature curve (now again triggered automatically at DROP) ([Issue #420](../../../issues/420))
@@ -68,7 +68,7 @@ function 16
   - UI: clearer menu titles for Config>Temperature and Tools>Temperature
   - UI: removed evaluations from the statistics bar
   - UI: autosave profiles are no longer added to the recent file menu
-  - UI: reworked statistic summary incl. a configurable line length
+  - UI: reworked statistic summary featuring a configurable line length
   - UI: don't move sliders on RESET
 
 * Fixes
