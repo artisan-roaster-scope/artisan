@@ -3222,7 +3222,9 @@ class tgraphcanvas(FigureCanvas):
             self.delta_ax.lines = []
 
     def setalarm(self,alarmnumber):
-        self.alarmstate[alarmnumber] = aw.qmc.timeclock.elapsed()/1000.    #turn off flag as it has been read
+        if len(self.timex) > 1:
+            self.alarmstate[alarmnumber] = max(1,len(self.timex) - 1) # we have to ensure that alarmstate of triggered alarms is never 0
+        
         aw.sendmessage(QApplication.translate("Message","Alarm {0} triggered", None).format(alarmnumber + 1))
         if not self.silent_alarms:
             if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
@@ -4132,7 +4134,7 @@ class tgraphcanvas(FigureCanvas):
                                 if "F"+mathexpression[i+1] not in mathdictionary:
                                     mathdictionary["F"+mathexpression[i+1]] = val
 
-                    # add channel tare values (T1 => ET, T2 => BT, T3 => E1c1, T4 => E1c2, T5 => E2c1,...
+                    # add channel tare values (T1 => ET, T2 => BT, T3 => E1c1, T4 => E1c2, T5 => E2c1,
                     # set by clicking on the corresponding LCD
                     elif mathexpression[i] == "T":
                         if i+1 < mlen:                          #check for out of range
@@ -7546,7 +7548,7 @@ class tgraphcanvas(FigureCanvas):
             
             #reset alarms
             self.temporaryalarmflag = -3
-            self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
+            self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; any other value = triggered; value indicates the index in self.timex at which the alarm was triggered
             #reset TPalarmtimeindex to trigger a new TP recognition during alarm processing
             aw.qmc.TPalarmtimeindex = None
             
@@ -12163,26 +12165,45 @@ class SampleThread(QThread):
                                     alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
                                 elif aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
                                     alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
-                                elif aw.qmc.alarmtime[i] == 10: # time after the trigger of the alarmguard (if one is set)
-                                    alarm_time = alarm_time - aw.qmc.alarmstate[aw.qmc.alarmguard[i]]
+                                elif aw.qmc.alarmtime[i] == 10: # time or temp after the trigger of the alarmguard (if one is set)
+                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.alarmstate[aw.qmc.alarmguard[i]]]
                                 if alarm_time >= aw.qmc.alarmoffset[i]:
                                     aw.qmc.temporaryalarmflag = i
                             #########
                             # check alarmtemp:
                             alarm_temp = None
+                            if aw.qmc.alarmtime[i] == 10: # IF ALARM
+                                # and this is a conditional alarm with alarm_time set to IF ALARM
+                                alarm_idx = aw.qmc.alarmstate[aw.qmc.alarmguard[i]] # reading when the IF ALARM triggered
+                                # we substract the reading at alarm_idx from the current reading of the channel determined by alarmsource
+                            else:
+                                alarm_idx = None
                             if aw.qmc.alarmsource[i] == -2 and aw.qmc.delta1[-1]:  #check DeltaET (might be None)
                                 alarm_temp = aw.qmc.delta1[-1]
+                                if alarm_idx != None:
+                                    alarm_temp -= aw.qmc.delta1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                             elif aw.qmc.alarmsource[i] == -1 and aw.qmc.delta2[-1]: #check DeltaBT (might be None
                                 alarm_temp = aw.qmc.delta2[-1]
+                                if alarm_idx != None:
+                                    alarm_temp -= aw.qmc.delta2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                             elif aw.qmc.alarmsource[i] == 0:                      #check ET
                                 alarm_temp = aw.qmc.temp1[-1]
+                                if alarm_idx != None:
+                                    alarm_temp -= aw.qmc.temp1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                             elif aw.qmc.alarmsource[i] == 1:                      #check BT
                                 alarm_temp = aw.qmc.temp2[-1]
+                                if alarm_idx != None:
+                                    alarm_temp -= aw.qmc.temp2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                             elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
                                 if (aw.qmc.alarmsource[i])%2==0:
                                     alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                                 else:
                                     alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                
                             alarm_limit = aw.qmc.alarmtemperature[i]
                             if alarm_temp is not None and alarm_temp != -1 and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
                                 aw.qmc.temporaryalarmflag = i
@@ -39469,6 +39490,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
             #Type
             typeComboBox = MyQComboBox()
+            typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
             typeComboBox.addItems(std_extra_events)
             if self.extraeventstypes[i] == 9:  # we add an offset of +1 here to jump over the new EVENT entry
                 idx = 5
@@ -39490,6 +39512,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
             #Action
             actionComboBox = MyQComboBox()
+            actionComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
             actionComboBox.addItems(["",
                                      QApplication.translate("ComboBox","Serial Command",None),
                                      QApplication.translate("ComboBox","Call Program",None),
@@ -39523,6 +39546,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
             #Visibility
             visibilityComboBox =  MyQComboBox()
+            visibilityComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
             visibilityComboBox.addItems(visibility)
             visibilityComboBox.setCurrentIndex(self.extraeventsvisibility[i])
             visibilityComboBox.currentIndexChanged.connect(self.setvisibilitytyeventbutton)
@@ -41932,7 +41956,7 @@ class extraserialport(object):
             aw.qmc.adderror(error + " Unable to open serial port",exc_tb.tb_lineno)
 
     def closeport(self):
-        if self.SP is None:
+        if self.SP is not None:
             self.SP.close()
             libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
 

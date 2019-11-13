@@ -17,6 +17,7 @@ function 16
   - ALARMS: adds alarm actions to set and reset the canvas color
   - ALARMS: adds alarm actions to turn replay off and on
   - ALARMS: the "insert" and "add" actions of the alarms table takes default values from selected item if any
+  - ALARMS: adds (If Alarm) alarms triggered by temperature differences
   - ANALYZER: first version that brings curve fit and RoR flick/crash analysis features
   - BATCH COUNTER: increases batch counter also in last loaded settings file
   - BATCH COUNTER: add a flag to control if the batch counter should be changed on loading a settings file
@@ -29,6 +30,8 @@ function 16
   - MACHINE SUPPORT: extended Besca machine setups including the [Bee sample roaster](https://www.bescaroasters.com/roaster-detail/14/Sample-Roasters/Besca-Bee-Coffee-Roaster) and the setup "Besca BSC manual v2" for manual machines produced after 15.09.2019
   - MACHINE SUPPORT: updated [Coffeetool Rxx](https://coffeetool.gr/product-category/coffeeroasters/) machine setup to allow for burner, air flow and drum speed control
   - MACHINE SUPPORT: adds Drum Speed and Air Flow to Buhler Roastmaster setup
+  - MACHINE SUPPORT: adds support for further [Coffed](https://coffed.pl/en) machines (SR3/5/15/25/60) automatic and manual variants
+  - MACHINE SUPPORT: adds support for the [Atilla](https://www.atilla.com.br/) GOLD_plus_7'' II
   - MACHINE SUPPORT: adds machine configurations for popular Phidget sets
   - MATH: adds x^2 to the exponent function as well as the possibility to define an offset from CHARGE
   - PHIDGETS: adds Phidget HUB0000 IO 0 and Phidget HUB0000 IO Digital 0 one channel device types that allocate only that single one channel/port to allow the use of all HUB0000 ports with an uneven number of analog or digital IO channels
