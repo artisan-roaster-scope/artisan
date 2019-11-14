@@ -27,6 +27,7 @@ function 16
   - EXPORT: adds ability to save the statistics summary box to a file
   - EXTRA DEVICES: adds "Update Profile" button to recompute the symbolic formulas of all Virtual Devices
   - EXTRA DEVICES: adds delta axis flags to have extra device curves drawn relative to the z-axis (C/min or F/min axis). Useful if a device sends directly RoR data (like potentially the TC4), if a Virtual Device is used to draw the RoR of a curve different to ET and BT
+  - EXTRA DEVICES: adds extra device curve fills, value sets the opacity of the fill
   - MACHINE SUPPORT: extended Besca machine setups including the [Bee sample roaster](https://www.bescaroasters.com/roaster-detail/14/Sample-Roasters/Besca-Bee-Coffee-Roaster) and the setup "Besca BSC manual v2" for manual machines produced after 15.09.2019
   - MACHINE SUPPORT: updated [Coffeetool Rxx](https://coffeetool.gr/product-category/coffeeroasters/) machine setup to allow for burner, air flow and drum speed control
   - MACHINE SUPPORT: adds Drum Speed and Air Flow to Buhler Roastmaster setup
@@ -41,7 +42,7 @@ function 16
   - PHIDGETS: adds ALT-RESET (OPTION-RESET on macOS) button action to additionally detach all IO Phidgets
   - PHIDGETS: adds Phidgets driver version to the about dialog
   - PLUS: adds [artisan.plus](artisan.plus) subscription status indicator
-  - PLUS: adds artisan://roast/<uuid> URL scheme to link back to Artisan (click to the batch number or title) and artisan.plus (click to the date) on html roast, production and ranking reports
+  - PLUS: adds artisan://roast/<uuid> URL scheme to link back to Artisan (click to the title) and artisan.plus (click to the date) on html roast, production and ranking reports
   - PLUS: adds confirmation dialog on disconnecting artisan.plus
   - PLUS: adds CTR-click (COMMAND on macOS) on plus icon to disconnect and erase credentials from keychain
   - PLUS: adds ALT+CTR-click (OPTION+COMMAND on macOS) on plus icon to toggle artisan.plus debug login (defaults to off)
@@ -50,7 +51,6 @@ function 16
   - SYMBOLIC FORMULAS: adds Rate of Rise symbolic assignments ([Issue #383](../../../issues/383)) to allow e.g. to divide C/min readings by 2 to show them as C/30sec
   - SYMBOLIC FORMULAS: extends the roast calculus by additional symbolic variables to access the index of main events, predictions and AUC values and allows indexed access to profile, background time and curve values allowing to define forward looking alarms
   - UI: adds size selector (tiny, small, large) for custom event buttons
-  - UI: adds extra device curve fills
   - UI: adds dirty file indicator
   - UI: adds ALT-h (OPTION-h on macOS) keyboard shortcut to remove the background profile
   - UI: adds ALT-NEW (OPTION-NEW on macOS) keyboard shortcut to just load the recent roast settings (incl. the associated background) without actually starting the recording
@@ -58,7 +58,7 @@ function 16
   - UI: adds profile background images
   - UI: graph annotations can be now be repositioned by dragging
   - UI: adds large Delta, PID and Extra LCDs ([Issue #303](../../../issues/303))
-  - UI: adds transparency configuration in Color Dialog for analytics, legend and Statistic Summary boxes
+  - UI: adds opacity configuration in Color Dialog for analytics, legend and Statistic Summary boxes
   - UI: adds dark mode support on macOS (improves Roast Properties and HTML reports)
 
 * Changes

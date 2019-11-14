@@ -26759,6 +26759,10 @@ class ApplicationWindow(QMainWindow):
             finally:
                 if f:
                     f.close()
+                # we only trigger a redraw if a watermark is displayed to fix its aspect ratio
+                if aw.logofilename != "":
+                    aw.qmc.redraw(recomputeAllDeltas=False)
+
         except Exception as e:
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
