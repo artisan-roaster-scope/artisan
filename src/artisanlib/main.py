@@ -526,7 +526,7 @@ def __dependencies_for_freezing():
     from scipy.special import _ufuncs_cxx # @UnresolvedImport @UnusedImport
     from scipy import integrate # @UnresolvedImport @UnusedImport
     from scipy import interpolate # @UnresolvedImport @UnusedImport
-    from scipy.optimize import curve_fit # @UnresolvedImport @UnusedImport
+#    from scipy.optimize import curve_fit # @UnresolvedImport @UnusedImport
     # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
     import scipy.linalg.cython_blas # @UnresolvedImport @UnusedImport
     import scipy.linalg.cython_lapack # @UnresolvedImport @UnusedImport

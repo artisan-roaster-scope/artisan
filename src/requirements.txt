@@ -15,4 +15,4 @@ persist-queue==0.5.0
 portalocker==1.5.2
 prettytable==0.7.2
 Phidget22==1.5.20191106
-natsort==6.1.0
+natsort==6.2.0
