@@ -13282,27 +13282,27 @@ class ApplicationWindow(QMainWindow):
             self.ConvertToCelsiusAction.setDisabled(True)
 
         self.ToolkitMenu.addSeparator()
-        self.analyzeMenu = self.ToolkitMenu.addMenu("Analyze")
-        self.fitIdealautoAction = QAction("Auto All",self)
+        self.analyzeMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_ANALYZE)
+        self.fitIdealautoAction = QAction(QApplication.translate("Menu","Auto All",None),self)
         self.fitIdealautoAction.triggered.connect(self.analysisfitCurvesALL)
         self.fitIdealautoAction.setShortcut("Ctrl+K")
         self.analyzeMenu.addAction(self.fitIdealautoAction)
         self.analyzeMenu.addSeparator()
-        self.fitIdealx2Action = QAction(QApplication.translate("Menu",u"Fit BT to",None) + " x\xb2",self)
+        self.fitIdealx2Action = QAction(QApplication.translate("Menu","Fit BT to",None) + " x\xb2",self)
         self.fitIdealx2Action.triggered.connect(self.analysisfitCurvesX2)
         self.analyzeMenu.addAction(self.fitIdealx2Action)
-        self.fitIdealx3Action = QAction(QApplication.translate("Menu",u"Fit BT to",None) + " x\xb3",self)
+        self.fitIdealx3Action = QAction(QApplication.translate("Menu","Fit BT to",None) + " x\xb3",self)
         self.fitIdealx3Action.triggered.connect(self.analysisfitCurvesX3)
         self.analyzeMenu.addAction(self.fitIdealx3Action)
         self.fitIdealx0Action = QAction(QApplication.translate("Menu","Fit BT to",None) + " ln()",self)
         self.fitIdealx0Action.triggered.connect(self.analysisfitCurvesLN)
         self.analyzeMenu.addAction(self.fitIdealx0Action)
         self.analyzeMenu.addSeparator()
-        self.fitBkgndAction = QAction(QApplication.translate("Menu",u"Fit BT to Bkgnd",None),self)
+        self.fitBkgndAction = QAction(QApplication.translate("Menu","Fit BT to Bkgnd",None),self)
         self.fitBkgndAction.triggered.connect(self.analysisfitCurvesBkgnd)
         self.analyzeMenu.addAction(self.fitBkgndAction)
         self.analyzeMenu.addSeparator()
-        self.clearresultsAction = QAction(QApplication.translate("Menu",u"Clear results",None),self)
+        self.clearresultsAction = QAction(QApplication.translate("Menu","Clear results",None),self)
         self.clearresultsAction.triggered.connect(self.clearResults)
         self.clearresultsAction.setShortcut("Ctrl+Alt+K")
         self.analyzeMenu.addAction(self.clearresultsAction)
@@ -21192,9 +21192,9 @@ class ApplicationWindow(QMainWindow):
         self.qmc.extraname2 = self.qmc.extraname2[:len(self.qmc.extradevices)]
         self.qmc.extraname2 = self.qmc.extraname2 + [u"Extra 2"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extraname2))
         self.qmc.extramathexpression1 = self.qmc.extramathexpression1[:len(self.qmc.extradevices)]
-        self.qmc.extramathexpression1 = self.qmc.extramathexpression1 + [u""]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramathexpression1))
+        self.qmc.extramathexpression1 = self.qmc.extramathexpression1 + [""]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramathexpression1))
         self.qmc.extramathexpression2 = self.qmc.extramathexpression2[:len(self.qmc.extradevices)]
-        self.qmc.extramathexpression2 = self.qmc.extramathexpression2 + [u""]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramathexpression2))
+        self.qmc.extramathexpression2 = self.qmc.extramathexpression2 + [""]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramathexpression2))
         self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:len(self.qmc.extradevices)]
         self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1 + ["black"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor1))
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
@@ -25423,9 +25423,9 @@ class ApplicationWindow(QMainWindow):
                     ws['D1'] = u(QApplication.translate("HTML Report Template", "Beans",None)) 
                     ws['D1'].font = bf 
                     ws.column_dimensions['D'].width = 25
-                    ws['E1'] = u(QApplication.translate("HTML Report Template", "In",None)) + u" (" + u(unit.lower()) + u")"
+                    ws['E1'] = u(QApplication.translate("HTML Report Template", "In",None)) + " (" + u(unit.lower()) + ")"
                     ws['E1'].font = bf 
-                    ws['F1'] = u(QApplication.translate("HTML Report Template", "Out",None)) + u" (" + u(unit.lower()) + u")"
+                    ws['F1'] = u(QApplication.translate("HTML Report Template", "Out",None)) + " (" + u(unit.lower()) + ")"
                     ws['F1'].font = bf
                     ws['G1'] = u(QApplication.translate("HTML Report Template", "Loss",None))
                     ws['G1'].font = bf 
@@ -26342,17 +26342,17 @@ class ApplicationWindow(QMainWindow):
                     ws['C1'] = u(QApplication.translate("HTML Report Template", "Profile",None)) 
                     ws['C1'].font = bf 
                     ws.column_dimensions['C'].width = 25
-                    ws['D1'] = u(QApplication.translate("HTML Report Template", "Load",None)) + u" (" + u(unit.lower()) + u")"
+                    ws['D1'] = u(QApplication.translate("HTML Report Template", "Load",None)) + " (" + u(unit.lower()) + ")"
                     ws['D1'].font = bf
-                    ws['E1'] = u(QApplication.translate("HTML Report Template", "Charge",None)) + u" (" + u(aw.qmc.mode) + u")"
+                    ws['E1'] = u(QApplication.translate("HTML Report Template", "Charge",None)) + " (" + u(aw.qmc.mode) + ")"
                     ws['E1'].font = bf 
                     ws['F1'] = u(QApplication.translate("HTML Report Template", "FCs",None)) 
                     ws['F1'].font = bf 
-                    ws['G1'] = u(QApplication.translate("HTML Report Template", "FCs",None)) + u" (" + u(aw.qmc.mode) + u")"
+                    ws['G1'] = u(QApplication.translate("HTML Report Template", "FCs",None)) + " (" + u(aw.qmc.mode) + ")"
                     ws['G1'].font = bf
                     ws['H1'] = u(QApplication.translate("HTML Report Template", "DROP",None)) 
                     ws['H1'].font = bf
-                    ws['I1'] = u(QApplication.translate("HTML Report Template", "DROP",None)) + u" (" + u(aw.qmc.mode) + u")"
+                    ws['I1'] = u(QApplication.translate("HTML Report Template", "DROP",None)) + " (" + u(aw.qmc.mode) + ")"
                     ws['I1'].font = bf
                     ws['J1'] = u(QApplication.translate("HTML Report Template", "DRY",None))
                     ws['J1'].font = bf
@@ -27369,7 +27369,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
         contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeye Coffee), Moshe Spinell")
         contributors += u(", Morris Beume (Morris.Coffee), Michael Herbert, Bill (San Franciscan Roaster), Chistopher Feran")
-        contributors += u(", Coffed, Bono Gargolov, Rodrigo Ramos, Nico Bigler, Saeed Abdinasab, Lewis Li<br>")
+        contributors += u(", Coffed, Bono Gargolov, Rodrigo Ramos (King Caf" + uchr(233) + "s), Nico Bigler, Saeed Abdinasab, Lewis Li<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -31130,7 +31130,7 @@ class HUDDlg(ArtisanDialog):
         self.bkgndButton.setMinimumSize(self.bkgndButton.minimumSizeHint())
         self.bkgndButton.clicked.connect(self.fittoBackground)
         self.bkgndButton.setEnabled(False)
-        polyfitdeglabel = QLabel("deg")
+        polyfitdeglabel = QLabel(QApplication.translate("Label","deg",None))
         self.polyfitdeg = QSpinBox()
         self.polyfitdeg.setFocusPolicy(Qt.NoFocus)
         self.polyfitdeg.setRange(1,4)
@@ -33141,7 +33141,7 @@ class equDataDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Plotter Data",None))
         self.setModal(True)
 
-        self.datalabel = QLabel(u"")
+        self.datalabel = QLabel("")
         self.dataprecisionlabel = QLabel(u(QApplication.translate("Label", "Data precision",None)))
         
         #DATA Table
@@ -33776,7 +33776,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         else:
             batch = ""
             if aw.qmc.roastbatchnr != 0:
-                roastpos = u" (" + u(aw.qmc.roastbatchpos) + u")"
+                roastpos = " (" + u(aw.qmc.roastbatchpos) + ")"
             else:
                 roastpos = ""
             if aw.qmc.roastbatchnr == 0:
@@ -58204,9 +58204,9 @@ class FujiPID(object):
         changeflag = 0
         for i in range(n):
             rs.append(segments[i].split("::"))
-            if len(rs[i][0]) == 0:          #remove first empty u"" [u"",u"300.5",u"3",u"0",u""] if one found
+            if len(rs[i][0]) == 0:          #remove first empty "" [u"",u"300.5",u"3",u"0",u""] if one found
                 rs[i] = rs[i][1:]
-            if len(rs[i][-1]) == 0:          #remove last empty u"" [u"300.5",u"3",u"0",u""] if one found
+            if len(rs[i][-1]) == 0:          #remove last empty "" [u"300.5",u"3",u"0",u""] if one found
                 rs[i] = rs[i][:-1]
             if len(rs[i]) == 3:
                 svkey = "segment" + str(i+1) + "sv"

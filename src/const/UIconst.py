@@ -162,6 +162,7 @@ TOOLKIT_MENU_DELTA_LCDS = QApplication.translate("Menu", "Delta LCDs", None)
 TOOLKIT_MENU_PID_LCDS = QApplication.translate("Menu", "PID LCDs", None)
 TOOLKIT_MENU_EXTRA_LCDS = QApplication.translate("Menu", "Extra LCDs", None)
 TOOLKIT_MENU_TEMPERATURE = QApplication.translate("Menu", "Convert Profile Temperature", None)
+TOOLKIT_MENU_ANALYZE = QApplication.translate("Menu", "Analyze", None)
 
 
 #Settings menu
