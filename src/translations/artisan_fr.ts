@@ -2219,13 +2219,13 @@ Extra Device</source>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54297"/>
-        <source>Replay ON</source>
-        <translation>Replay ON</translation>
+        <source>Playback ON</source>
+        <translation>Relecture ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54297"/>
-        <source>Replay OFF</source>
-        <translation>Replay OFF</translation>
+        <source>Playback OFF</source>
+        <translation>Relecture OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54297"/>
@@ -2326,1222 +2326,1222 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="28"/>
         <source>Afghanistan</source>
-        <translation type="unfinished"></translation>
+        <translation>Afghanistan </translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="29"/>
         <source>Aland Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Iles Aland</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="30"/>
         <source>Albania</source>
-        <translation type="unfinished"></translation>
+        <translation>Albanie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="31"/>
         <source>Algeria</source>
-        <translation type="unfinished"></translation>
+        <translation>Algérie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="32"/>
         <source>American Samoa</source>
-        <translation type="unfinished"></translation>
+        <translation>Samoa américaines</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="33"/>
         <source>Andorra</source>
-        <translation type="unfinished"></translation>
+        <translation>Andorre</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="34"/>
         <source>Angola</source>
-        <translation type="unfinished"></translation>
+        <translation>Angola</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="35"/>
         <source>Anguilla</source>
-        <translation type="unfinished"></translation>
+        <translation>Anguilla</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="36"/>
         <source>Antarctica</source>
-        <translation type="unfinished"></translation>
+        <translation>Antarctique</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="37"/>
         <source>Antigua and Barbuda</source>
-        <translation type="unfinished"></translation>
+        <translation>Antigua-et-Barbuda</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="38"/>
         <source>Argentina</source>
-        <translation type="unfinished"></translation>
+        <translation>Argentine</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="39"/>
         <source>Armenia</source>
-        <translation type="unfinished"></translation>
+        <translation>Arménie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="40"/>
         <source>Aruba</source>
-        <translation type="unfinished"></translation>
+        <translation>Aruba</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="41"/>
         <source>Australia</source>
-        <translation type="unfinished"></translation>
+        <translation>Australie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="42"/>
         <source>Austria</source>
-        <translation type="unfinished"></translation>
+        <translation>Autriche</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="43"/>
         <source>Azerbaijan</source>
-        <translation type="unfinished"></translation>
+        <translation>Azerbaïdjan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="44"/>
         <source>Bahamas</source>
-        <translation type="unfinished"></translation>
+        <translation>Bahamas</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="45"/>
         <source>Bahrain</source>
-        <translation type="unfinished"></translation>
+        <translation>Bahreïn</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="46"/>
         <source>Bangladesh</source>
-        <translation type="unfinished"></translation>
+        <translation>Bangladesh</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="47"/>
         <source>Barbados</source>
-        <translation type="unfinished"></translation>
+        <translation>Barbade</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="48"/>
         <source>Belarus</source>
-        <translation type="unfinished"></translation>
+        <translation>Biélorussie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="49"/>
         <source>Belgium</source>
-        <translation type="unfinished"></translation>
+        <translation>Belgique</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="50"/>
         <source>Belize</source>
-        <translation type="unfinished"></translation>
+        <translation>Belize</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="51"/>
         <source>Benin</source>
-        <translation type="unfinished"></translation>
+        <translation>Bénin</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="52"/>
         <source>Bermuda</source>
-        <translation type="unfinished"></translation>
+        <translation>Bermudes</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="53"/>
         <source>Bhutan</source>
-        <translation type="unfinished"></translation>
+        <translation>Bhoutan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="54"/>
         <source>Bolivia</source>
-        <translation type="unfinished"></translation>
+        <translation>Bolivie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="55"/>
         <source>Bonaire, Sint Eustatius and Saba</source>
-        <translation type="unfinished"></translation>
+        <translation>Bonaire, Sint Eustatius et Saba</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="56"/>
         <source>Bosnia and Herzegovina</source>
-        <translation type="unfinished"></translation>
+        <translation>Bosnie-Herzégovine</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="57"/>
         <source>Botswana</source>
-        <translation type="unfinished"></translation>
+        <translation>Botswana</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="58"/>
         <source>Bouvet Island</source>
-        <translation type="unfinished"></translation>
+        <translation>Île Bouvet</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="59"/>
         <source>Brazil</source>
-        <translation type="unfinished"></translation>
+        <translation>Brésil</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="60"/>
         <source>British Indian Ocean Territory</source>
-        <translation type="unfinished"></translation>
+        <translation>Territoire Britannique de l&apos;océan Indien</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="61"/>
         <source>Brunei Darussalam</source>
-        <translation type="unfinished"></translation>
+        <translation>Brunéi Darussalam</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="62"/>
         <source>Bulgaria</source>
-        <translation type="unfinished"></translation>
+        <translation>Bulgarie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="63"/>
         <source>Burkina Faso</source>
-        <translation type="unfinished"></translation>
+        <translation>Burkina Faso</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="64"/>
         <source>Burundi</source>
-        <translation type="unfinished"></translation>
+        <translation>Burundi</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="65"/>
         <source>Cape Verde</source>
-        <translation type="unfinished"></translation>
+        <translation>Cap Vert</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="66"/>
         <source>Cambodia</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambodge</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="67"/>
         <source>Cameroon</source>
-        <translation type="unfinished"></translation>
+        <translation>Cameroun</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="68"/>
         <source>Canada</source>
-        <translation type="unfinished"></translation>
+        <translation>Canada</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="69"/>
         <source>Cayman Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Iles Caïman</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="70"/>
         <source>Central African Republic</source>
-        <translation type="unfinished"></translation>
+        <translation>République Centrafricaine</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="71"/>
         <source>Chad</source>
-        <translation type="unfinished"></translation>
+        <translation>Tchad</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="72"/>
         <source>Chile</source>
-        <translation type="unfinished"></translation>
+        <translation>Chili</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="73"/>
         <source>China</source>
-        <translation type="unfinished"></translation>
+        <translation>Chine</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="74"/>
         <source>Christmas Island</source>
-        <translation type="unfinished"></translation>
+        <translation>Île Christmas</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="75"/>
         <source>Cocos (Keeling) Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Cocos (Keeling)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="76"/>
         <source>Colombia</source>
-        <translation type="unfinished"></translation>
+        <translation>Colombie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="77"/>
         <source>Comoros</source>
-        <translation type="unfinished"></translation>
+        <translation>Comores</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="78"/>
         <source>Congo, DR</source>
-        <translation type="unfinished"></translation>
+        <translation>Congo, RD</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="79"/>
         <source>Congo, Republic</source>
-        <translation type="unfinished"></translation>
+        <translation>Congo, République</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="80"/>
         <source>Cook Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Cook</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="81"/>
         <source>Costa Rica</source>
-        <translation type="unfinished"></translation>
+        <translation>Costa Rica</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="82"/>
         <source>Croatia</source>
-        <translation type="unfinished"></translation>
+        <translation>Croatie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="83"/>
         <source>Cuba</source>
-        <translation type="unfinished"></translation>
+        <translation>Cuba</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="84"/>
         <source>Cyprus</source>
-        <translation type="unfinished"></translation>
+        <translation>Chypre</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="85"/>
         <source>Czechia</source>
-        <translation type="unfinished"></translation>
+        <translation>Czechia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="86"/>
         <source>Denmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Danemark</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="87"/>
         <source>Djibouti</source>
-        <translation type="unfinished"></translation>
+        <translation>Djibouti</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="88"/>
         <source>Dominica</source>
-        <translation type="unfinished"></translation>
+        <translation>Dominique</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="89"/>
         <source>Dominican Republic</source>
-        <translation type="unfinished"></translation>
+        <translation>République Dominicaine</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="90"/>
         <source>Ecuador</source>
-        <translation type="unfinished"></translation>
+        <translation>Équateur</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="91"/>
         <source>Egypt</source>
-        <translation type="unfinished"></translation>
+        <translation>Egypte</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="92"/>
         <source>El Salvador</source>
-        <translation type="unfinished"></translation>
+        <translation>El Salvador</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="93"/>
         <source>Equatorial Guinea</source>
-        <translation type="unfinished"></translation>
+        <translation>Guinée Equatoriale</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="94"/>
         <source>Eritrea</source>
-        <translation type="unfinished"></translation>
+        <translation>Érythrée</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="95"/>
         <source>Estonia</source>
-        <translation type="unfinished"></translation>
+        <translation>Estonie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="96"/>
         <source>Eswatini</source>
-        <translation type="unfinished"></translation>
+        <translation>Eswatini</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="97"/>
         <source>Ethiopia</source>
-        <translation type="unfinished"></translation>
+        <translation>Ethiopie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="98"/>
         <source>Falkland Islands [Malvinas]</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Falkland [Malvinas]</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="99"/>
         <source>Faroe Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Féroé</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="100"/>
         <source>Fiji</source>
-        <translation type="unfinished"></translation>
+        <translation>Fidji</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="101"/>
         <source>Finland</source>
-        <translation type="unfinished"></translation>
+        <translation>Finlande</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="102"/>
         <source>France</source>
-        <translation type="unfinished"></translation>
+        <translation>France</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="103"/>
         <source>French Guiana</source>
-        <translation type="unfinished"></translation>
+        <translation>Guyane Française</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="104"/>
         <source>French Polynesia</source>
-        <translation type="unfinished"></translation>
+        <translation>Polynésie Française</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="105"/>
         <source>French Southern Territories</source>
-        <translation type="unfinished"></translation>
+        <translation>Terres Australes Françaises</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="106"/>
         <source>Gabon</source>
-        <translation type="unfinished"></translation>
+        <translation>Gabon</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="107"/>
         <source>Gambia</source>
-        <translation type="unfinished"></translation>
+        <translation>Gambie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="108"/>
         <source>Georgia</source>
-        <translation type="unfinished"></translation>
+        <translation>Géorgie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="109"/>
         <source>Germany</source>
-        <translation type="unfinished"></translation>
+        <translation>Allemagne</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="110"/>
         <source>Ghana</source>
-        <translation type="unfinished"></translation>
+        <translation>Ghana</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="111"/>
         <source>Gibraltar</source>
-        <translation type="unfinished"></translation>
+        <translation>Gibraltar</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="112"/>
         <source>Greece</source>
-        <translation type="unfinished"></translation>
+        <translation>Grèce</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="113"/>
         <source>Greenland</source>
-        <translation type="unfinished"></translation>
+        <translation>Groenland</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="114"/>
         <source>Grenada</source>
-        <translation type="unfinished"></translation>
+        <translation>Grenade</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="115"/>
         <source>Guadeloupe</source>
-        <translation type="unfinished"></translation>
+        <translation>Guadeloupe</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="116"/>
         <source>Guam</source>
-        <translation type="unfinished"></translation>
+        <translation>Guam</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="117"/>
         <source>Guatemala</source>
-        <translation type="unfinished"></translation>
+        <translation>Guatemala</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="118"/>
         <source>Guernsey</source>
-        <translation type="unfinished"></translation>
+        <translation>Guernesey</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="119"/>
         <source>Guinea</source>
-        <translation type="unfinished"></translation>
+        <translation>Guinée</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="120"/>
         <source>Guinea-Bissau</source>
-        <translation type="unfinished"></translation>
+        <translation>Guinée-Bissau</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="121"/>
         <source>Guyana</source>
-        <translation type="unfinished"></translation>
+        <translation>Guyana</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="122"/>
         <source>Haiti</source>
-        <translation type="unfinished"></translation>
+        <translation>Haïti</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="123"/>
         <source>Heard Island and McDonald Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Heard et McDonald</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="124"/>
         <source>Honduras</source>
-        <translation type="unfinished"></translation>
+        <translation>Honduras</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="125"/>
         <source>Hong Kong</source>
-        <translation type="unfinished"></translation>
+        <translation>Hong Kong</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="126"/>
         <source>Hungary</source>
-        <translation type="unfinished"></translation>
+        <translation>Hongrie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="127"/>
         <source>Iceland</source>
-        <translation type="unfinished"></translation>
+        <translation>Islande</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="128"/>
         <source>India</source>
-        <translation type="unfinished"></translation>
+        <translation>Inde</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="129"/>
         <source>Indonesia</source>
-        <translation type="unfinished"></translation>
+        <translation>Indonésie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="130"/>
         <source>Iran</source>
-        <translation type="unfinished"></translation>
+        <translation>Iran</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="131"/>
         <source>Iraq</source>
-        <translation type="unfinished"></translation>
+        <translation>Irak</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="132"/>
         <source>Ireland</source>
-        <translation type="unfinished"></translation>
+        <translation>Irlande</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="133"/>
         <source>Isle of Man</source>
-        <translation type="unfinished"></translation>
+        <translation>île de Man</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="134"/>
         <source>Israel</source>
-        <translation type="unfinished"></translation>
+        <translation>Israël</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="135"/>
         <source>Italy</source>
-        <translation type="unfinished"></translation>
+        <translation>Italie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="136"/>
         <source>Ivory Coast</source>
-        <translation type="unfinished"></translation>
+        <translation>Côte d&apos;Ivoire</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="137"/>
         <source>Jamaica</source>
-        <translation type="unfinished"></translation>
+        <translation>Jamaïque</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="138"/>
         <source>Japan</source>
-        <translation type="unfinished"></translation>
+        <translation>Japon</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="139"/>
         <source>Jersey</source>
-        <translation type="unfinished"></translation>
+        <translation>Jersey</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="140"/>
         <source>Jordan</source>
-        <translation type="unfinished"></translation>
+        <translation>Jordanie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="141"/>
         <source>Kazakhstan</source>
-        <translation type="unfinished"></translation>
+        <translation>Kazakhstan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="142"/>
         <source>Kenya</source>
-        <translation type="unfinished"></translation>
+        <translation>Kenya</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="143"/>
         <source>Kiribati</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiribati</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="144"/>
         <source>North Korea</source>
-        <translation type="unfinished"></translation>
+        <translation>Corée du Nord</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="145"/>
         <source>South Korea</source>
-        <translation type="unfinished"></translation>
+        <translation>Corée du Sud</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="146"/>
         <source>Kuwait</source>
-        <translation type="unfinished"></translation>
+        <translation>Koweït</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="147"/>
         <source>Kyrgyzstan</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirghizistan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="148"/>
         <source>Laos</source>
-        <translation type="unfinished"></translation>
+        <translation>Laos</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="149"/>
         <source>Latvia</source>
-        <translation type="unfinished"></translation>
+        <translation>Lettonie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="150"/>
         <source>Lebanon</source>
-        <translation type="unfinished"></translation>
+        <translation>Liban</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="151"/>
         <source>Lesotho</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesotho</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="152"/>
         <source>Liberia</source>
-        <translation type="unfinished"></translation>
+        <translation>Libéria</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="153"/>
         <source>Libya</source>
-        <translation type="unfinished"></translation>
+        <translation>Libye</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="154"/>
         <source>Liechtenstein</source>
-        <translation type="unfinished"></translation>
+        <translation>Liechtenstein</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="155"/>
         <source>Lithuania</source>
-        <translation type="unfinished"></translation>
+        <translation>Lituanie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="156"/>
         <source>Luxembourg</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxembourg</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="157"/>
         <source>Macao</source>
-        <translation type="unfinished"></translation>
+        <translation>Macao</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="158"/>
         <source>Macedonia, the former Yugoslav Republic of</source>
-        <translation type="unfinished"></translation>
+        <translation>Macédoine, Ancienne République Yougoslave</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="159"/>
         <source>Madagascar</source>
-        <translation type="unfinished"></translation>
+        <translation>Madagascar</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="160"/>
         <source>Malawi</source>
-        <translation type="unfinished"></translation>
+        <translation>Malawi</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="161"/>
         <source>Malaysia</source>
-        <translation type="unfinished"></translation>
+        <translation>Malaisie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="162"/>
         <source>Maldives</source>
-        <translation type="unfinished"></translation>
+        <translation>Maldives</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="163"/>
         <source>Mali</source>
-        <translation type="unfinished"></translation>
+        <translation>Mali</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="164"/>
         <source>Malta</source>
-        <translation type="unfinished"></translation>
+        <translation>Malte</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="165"/>
         <source>Marshall Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Marshall</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="166"/>
         <source>Martinique</source>
-        <translation type="unfinished"></translation>
+        <translation>Martinique</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="167"/>
         <source>Mauritania</source>
-        <translation type="unfinished"></translation>
+        <translation>Mauritanie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="168"/>
         <source>Mauritius</source>
-        <translation type="unfinished"></translation>
+        <translation>Maurice</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="169"/>
         <source>Mayotte</source>
-        <translation type="unfinished"></translation>
+        <translation>Mayotte</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="170"/>
         <source>Mexico</source>
-        <translation type="unfinished"></translation>
+        <translation>Mexique</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="171"/>
         <source>Micronesia, Federated States of</source>
-        <translation type="unfinished"></translation>
+        <translation>Micronésie, États Fédérés de</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="172"/>
         <source>Moldova, the Republic of</source>
-        <translation type="unfinished"></translation>
+        <translation>Moldavie, République de</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="173"/>
         <source>Monaco</source>
-        <translation type="unfinished"></translation>
+        <translation>Monaco</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="174"/>
         <source>Mongolia</source>
-        <translation type="unfinished"></translation>
+        <translation>Mongolie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="175"/>
         <source>Montenegro</source>
-        <translation type="unfinished"></translation>
+        <translation>Monténégro</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="176"/>
         <source>Montserrat</source>
-        <translation type="unfinished"></translation>
+        <translation>Montserrat</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="177"/>
         <source>Morocco</source>
-        <translation type="unfinished"></translation>
+        <translation>Maroc</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="178"/>
         <source>Mozambique</source>
-        <translation type="unfinished"></translation>
+        <translation>Mozambique</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="179"/>
         <source>Myanmar</source>
-        <translation type="unfinished"></translation>
+        <translation>Myanmar</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="180"/>
         <source>Namibia</source>
-        <translation type="unfinished"></translation>
+        <translation>Namibie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="181"/>
         <source>Nauru</source>
-        <translation type="unfinished"></translation>
+        <translation>Nauru</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="182"/>
         <source>Nepal</source>
-        <translation type="unfinished"></translation>
+        <translation>Népal</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="183"/>
         <source>Netherlands</source>
-        <translation type="unfinished"></translation>
+        <translation>Pays-Bas</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="184"/>
         <source>New Caledonia</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvelle-Calédonie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="185"/>
         <source>New Zealand</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvelle-Zélande</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="186"/>
         <source>Nicaragua</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicaragua</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="187"/>
         <source>Niger</source>
-        <translation type="unfinished"></translation>
+        <translation>Niger</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="188"/>
         <source>Nigeria</source>
-        <translation type="unfinished"></translation>
+        <translation>Nigeria</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="189"/>
         <source>Niue</source>
-        <translation type="unfinished"></translation>
+        <translation>Nioué</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="190"/>
         <source>Norfolk Island</source>
-        <translation type="unfinished"></translation>
+        <translation>Île Norfolk</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="191"/>
         <source>Northern Mariana Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Mariannes du Nord</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="192"/>
         <source>Norway</source>
-        <translation type="unfinished"></translation>
+        <translation>Norvège</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="193"/>
         <source>Oman</source>
-        <translation type="unfinished"></translation>
+        <translation>Oman</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="194"/>
         <source>Pakistan</source>
-        <translation type="unfinished"></translation>
+        <translation>Pakistan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="195"/>
         <source>Palau</source>
-        <translation type="unfinished"></translation>
+        <translation>Palaos</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="196"/>
         <source>Palestine, State of</source>
-        <translation type="unfinished"></translation>
+        <translation>Palestine, État de</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="197"/>
         <source>Panama</source>
-        <translation type="unfinished"></translation>
+        <translation>Panama</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="198"/>
         <source>PNG</source>
-        <translation type="unfinished"></translation>
+        <translation>PNG</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="199"/>
         <source>Paraguay</source>
-        <translation type="unfinished"></translation>
+        <translation>Paraguay</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="200"/>
         <source>Peru</source>
-        <translation type="unfinished"></translation>
+        <translation>Pérou</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="201"/>
         <source>Philippines</source>
-        <translation type="unfinished"></translation>
+        <translation>Philippines</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="202"/>
         <source>Pitcairn</source>
-        <translation type="unfinished"></translation>
+        <translation>Pitcairn</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="203"/>
         <source>Poland</source>
-        <translation type="unfinished"></translation>
+        <translation>Pologne</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="204"/>
         <source>Portugal</source>
-        <translation type="unfinished"></translation>
+        <translation>Portugal</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="205"/>
         <source>Puerto Rico</source>
-        <translation type="unfinished"></translation>
+        <translation>Porto Rico</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="206"/>
         <source>Qatar</source>
-        <translation type="unfinished"></translation>
+        <translation>Qatar</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="207"/>
         <source>Romania</source>
-        <translation type="unfinished"></translation>
+        <translation>Roumanie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="208"/>
         <source>Russian Federation</source>
-        <translation type="unfinished"></translation>
+        <translation>Russie, Fédération de </translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="209"/>
         <source>Rwanda</source>
-        <translation type="unfinished"></translation>
+        <translation>Rwanda</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="210"/>
         <source>St. Helena</source>
-        <translation type="unfinished"></translation>
+        <translation>Sainte-Hélène</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="211"/>
         <source>Saint Kitts and Nevis</source>
-        <translation type="unfinished"></translation>
+        <translation>Saint-Kitts-et-Nevis</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="212"/>
         <source>Saint Lucia</source>
-        <translation type="unfinished"></translation>
+        <translation>Sainte-Lucie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="213"/>
         <source>Saint Martin (French part)</source>
-        <translation type="unfinished"></translation>
+        <translation>Saint Martin (partie Française)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="214"/>
         <source>Saint Pierre and Miquelon</source>
-        <translation type="unfinished"></translation>
+        <translation>Saint-Pierre-et-Miquelon</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="215"/>
         <source>St. Vincent</source>
-        <translation type="unfinished"></translation>
+        <translation>St. Vincent</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="216"/>
         <source>Samoa</source>
-        <translation type="unfinished"></translation>
+        <translation>Samoa</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="217"/>
         <source>San Marino</source>
-        <translation type="unfinished"></translation>
+        <translation>Saint-Marin</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="218"/>
         <source>Saudi Arabia</source>
-        <translation type="unfinished"></translation>
+        <translation>Arabie Saoudite</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="219"/>
         <source>Senegal</source>
-        <translation type="unfinished"></translation>
+        <translation>Sénégal</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="220"/>
         <source>Serbia</source>
-        <translation type="unfinished"></translation>
+        <translation>Serbie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="221"/>
         <source>Seychelles</source>
-        <translation type="unfinished"></translation>
+        <translation>Seychelles</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="222"/>
         <source>Sierra Leone</source>
-        <translation type="unfinished"></translation>
+        <translation>Sierra Leone</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="223"/>
         <source>Singapore</source>
-        <translation type="unfinished"></translation>
+        <translation>Singapour</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="224"/>
         <source>Sint Maarten (Dutch part)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sint Maarten (partie Néerlandaise)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="225"/>
         <source>Slovakia</source>
-        <translation type="unfinished"></translation>
+        <translation>Slovaquie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="226"/>
         <source>Slovenia</source>
-        <translation type="unfinished"></translation>
+        <translation>Slovénie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="227"/>
         <source>Solomon Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Salomon</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="228"/>
         <source>Somalia</source>
-        <translation type="unfinished"></translation>
+        <translation>Somalie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="229"/>
         <source>South Africa</source>
-        <translation type="unfinished"></translation>
+        <translation>Afrique du Sud</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="230"/>
         <source>South Georgia and the South Sandwich Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Géorgie du Sud et îles Sandwich du Sud</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="231"/>
         <source>South Sudan</source>
-        <translation type="unfinished"></translation>
+        <translation>Soudan du Sud</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="232"/>
         <source>Spain</source>
-        <translation type="unfinished"></translation>
+        <translation>Espagne</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="233"/>
         <source>Sri Lanka</source>
-        <translation type="unfinished"></translation>
+        <translation>Sri Lanka</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="234"/>
         <source>Sudan</source>
-        <translation type="unfinished"></translation>
+        <translation>Soudan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="235"/>
         <source>Suriname</source>
-        <translation type="unfinished"></translation>
+        <translation>Suriname</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="236"/>
         <source>Svalbard and Jan Mayen</source>
-        <translation type="unfinished"></translation>
+        <translation>Svalbard et Jan Mayen</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="237"/>
         <source>Sweden</source>
-        <translation type="unfinished"></translation>
+        <translation>Suède</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="238"/>
         <source>Switzerland</source>
-        <translation type="unfinished"></translation>
+        <translation>Suisse</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="239"/>
         <source>Syrian Arab Republic</source>
-        <translation type="unfinished"></translation>
+        <translation>République Arabe Syrienne</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="240"/>
         <source>Taiwan (Province of China)</source>
-        <translation type="unfinished"></translation>
+        <translation>Taiwan (Province de Chine)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="241"/>
         <source>Tajikistan</source>
-        <translation type="unfinished"></translation>
+        <translation>Tadjikistan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="242"/>
         <source>Tanzania</source>
-        <translation type="unfinished"></translation>
+        <translation>Tanzanie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="243"/>
         <source>Thailand</source>
-        <translation type="unfinished"></translation>
+        <translation>Thaïlande</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="244"/>
         <source>Timor, East</source>
-        <translation type="unfinished"></translation>
+        <translation>Timor, Est</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="245"/>
         <source>Togo</source>
-        <translation type="unfinished"></translation>
+        <translation>Togo</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="246"/>
         <source>Tokelau</source>
-        <translation type="unfinished"></translation>
+        <translation>Tokelau</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="247"/>
         <source>Tonga</source>
-        <translation type="unfinished"></translation>
+        <translation>Tonga</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="248"/>
         <source>Trinidad &amp; Tobago</source>
-        <translation type="unfinished"></translation>
+        <translation>Trinidad &amp; Tobago</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="249"/>
         <source>Tunisia</source>
-        <translation type="unfinished"></translation>
+        <translation>Tunisie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="250"/>
         <source>Turkey</source>
-        <translation type="unfinished"></translation>
+        <translation>Turquie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="251"/>
         <source>Turkmenistan</source>
-        <translation type="unfinished"></translation>
+        <translation>Turkménistan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="252"/>
         <source>Turks and Caicos Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Turques et Caïques</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="253"/>
         <source>Tuvalu</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuvalu</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="254"/>
         <source>Uganda</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouganda</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="255"/>
         <source>Ukraine</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukraine</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="256"/>
         <source>United Arab Emirates</source>
-        <translation type="unfinished"></translation>
+        <translation>Émirats Arabes Unis</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="257"/>
         <source>United Kingdom of Great Britain and Northern Ireland</source>
-        <translation type="unfinished"></translation>
+        <translation>Royaume-Uni de Grande-Bretagne et d&apos;Irlande du Nord</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="258"/>
         <source>United States Minor Outlying Islands</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Mineures Eloignées des États-Unis</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="259"/>
         <source>United States of America</source>
-        <translation type="unfinished"></translation>
+        <translation>États-Unis d&apos;Amérique</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="260"/>
         <source>Uruguay</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruguay</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="261"/>
         <source>Uzbekistan</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouzbékistan</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="262"/>
         <source>Vanuatu</source>
-        <translation type="unfinished"></translation>
+        <translation>Vanuatu</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="263"/>
         <source>Venezuela</source>
-        <translation type="unfinished"></translation>
+        <translation>Venezuela</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="264"/>
         <source>Vietnam</source>
-        <translation type="unfinished"></translation>
+        <translation>Vietnam</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="265"/>
         <source>Virgin Islands (British)</source>
-        <translation type="unfinished"></translation>
+        <translation>Îles Vierges Britanniques</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="266"/>
         <source>Virgin Islands (U.S.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Virgin Islands (U.S.)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="267"/>
         <source>Wallis and Futuna</source>
-        <translation type="unfinished"></translation>
+        <translation>Wallis-et-Futuna</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="268"/>
         <source>Western Sahara</source>
-        <translation type="unfinished"></translation>
+        <translation>Sahara Occidental</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="269"/>
         <source>Yemen</source>
-        <translation type="unfinished"></translation>
+        <translation>Yemen</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="270"/>
         <source>Zambia</source>
-        <translation type="unfinished"></translation>
+        <translation>Zambie</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="271"/>
         <source>Zimbabwe</source>
-        <translation type="unfinished"></translation>
+        <translation>Zimbabwe</translation>
     </message>
 </context>
 <context>
@@ -6605,7 +6605,7 @@ Tous les LCDs</translation>
     <message>
         <location filename="../artisanlib/main.py" line="31104"/>
         <source>Start of Curve Fit window</source>
-        <translation type="unfinished">Début de la courbe ajuste fenêtre</translation>
+        <translation type="unfinished">Début de la courbe ajuste la fenêtre</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31091"/>
@@ -7247,12 +7247,12 @@ Tous les LCDs</translation>
     <message>
         <location filename="../artisanlib/main.py" line="11232"/>
         <source>Mouse Cross ON: move mouse around</source>
-        <translation type="unfinished"></translation>
+        <translation>Axes souris ON: bouger la souris</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="11244"/>
         <source>Mouse cross OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Axes souris OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3086"/>
@@ -7267,12 +7267,12 @@ Tous les LCDs</translation>
     <message>
         <location filename="../artisanlib/main.py" line="3237"/>
         <source>Alarm notice</source>
-        <translation type="unfinished"></translation>
+        <translation>Avis d&apos;alarme</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="4378"/>
         <source>Save the profile, Discard the profile (Reset), or Cancel?</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer le profil, Supprimer le profil (Réinitialiser) ou Annuler?</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="4383"/>
@@ -7282,162 +7282,162 @@ Tous les LCDs</translation>
     <message>
         <location filename="../artisanlib/main.py" line="4504"/>
         <source>Scope has been reset</source>
-        <translation type="unfinished"></translation>
+        <translation>l&apos;Analyseur a été réinitialisé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6914"/>
         <source>Time format error encountered</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur de format temps rencontrée</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7098"/>
         <source>Convert profile data to Fahrenheit?</source>
-        <translation type="unfinished"></translation>
+        <translation>Convertir données de profil en Fahrenheit?</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7203"/>
         <source>Convert Profile Temperature</source>
-        <translation type="unfinished">Convertir Profile Température</translation>
+        <translation>Convertir température du profil</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7142"/>
         <source>Profile changed to Fahrenheit</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil changé en  Fahrenheit</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7145"/>
         <source>Unable to comply. You already are in Fahrenheit</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibler. Vous êtes déjà en Fahrenheit</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7205"/>
         <source>Profile not changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Profile non changé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7154"/>
         <source>Convert profile data to Celsius?</source>
-        <translation type="unfinished"></translation>
+        <translation>Convertir données de profil en Celsius?</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7203"/>
         <source>Unable to comply. You already are in Celsius</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibler. Vous êtes déjà en Celsius</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7200"/>
         <source>Profile changed to Celsius</source>
-        <translation type="unfinished"></translation>
+        <translation>Profile changé en Celsius</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7212"/>
         <source>Convert Profile Scale</source>
-        <translation type="unfinished"></translation>
+        <translation>Convertir l&apos;échelle du Profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7212"/>
         <source>No profile data found</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de données de profile trouvée</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7239"/>
         <source>Colors set to defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Couleurs définies par défaut</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7243"/>
         <source>Colors set to grey</source>
-        <translation type="unfinished"></translation>
+        <translation>Couleurs définies sur gris</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7565"/>
         <source>Scope monitoring...</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyseur en lecture...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7632"/>
         <source>Scope stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyseur stoppé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7917"/>
         <source>Scope recording...</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyseur enregistre...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7984"/>
         <source>Scope recording stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyseur stop l&apos;enregistrement</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8123"/>
         <source>Roast time starts now 00:00 BT = {0}</source>
-        <translation type="unfinished">Cuisson démarre maintenant 00:00 TG = {0}</translation>
+        <translation>Temps Torréfaction démarre maintenant 00:00 TG = {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8848"/>
         <source>Scope is OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyseur est OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8241"/>
         <source>[DRY END] recorded at {0} BT = {1}</source>
-        <translation type="unfinished">[FIN SECHAGE] recorded at {0} TG = {1}</translation>
+        <translation>[FIN SECHAGE] recorded at {0} TG = {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8335"/>
         <source>[FC START] recorded at {0} BT = {1}</source>
-        <translation type="unfinished">[DEBUT 1erC] recorded at {0} TG = {1}</translation>
+        <translation>[DEBUT 1erC] recorded at {0} TG = {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8417"/>
         <source>[FC END] recorded at {0} BT = {1}</source>
-        <translation type="unfinished">[FIN 1erC] recorded at {0} TG = {1}</translation>
+        <translation>[FIN 1erC] recorded at {0} TG = {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8504"/>
         <source>[SC START] recorded at {0} BT = {1}</source>
-        <translation type="unfinished">[DEBUT 2emeC] recorded at {0} TG = {1}</translation>
+        <translation>[DEBUT 2emeC] recorded at {0} TG = {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8591"/>
         <source>[SC END] recorded at {0} BT = {1}</source>
-        <translation type="unfinished">[FIN 2emeC] recorded at {0} TG = {1}</translation>
+        <translation>[FIN 2emeC] recorded at {0} TG = {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8721"/>
         <source>Roast ended at {0} BT = {1}</source>
-        <translation type="unfinished">Cuisson finie à {0} TG = {1}</translation>
+        <translation>Torréfaction finie à {0} TG = {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8888"/>
         <source>[COOL END] recorded at {0} BT = {1}</source>
-        <translation type="unfinished">[FIN REFROIDISSEMENT] recorded at {0} TG = {1}</translation>
+        <translation>[FIN REFROIDISSEMENT] recorded at {0} TG = {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9108"/>
         <source>Event # {0} recorded at BT = {1} Time = {2}</source>
-        <translation type="unfinished">Evenement # {0} enregistré à TG = {1} Temps = {2}</translation>
+        <translation>Evenement # {0} enregistré à TG = {1} Temps = {2}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9126"/>
         <source>Timer is OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Timer est OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9631"/>
         <source>Unable to move background</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de bouger l&apos;arrière plan</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9690"/>
         <source>No finished profile found</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de profile terminé trouvé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9708"/>
         <source>Polynomial coefficients (Horner form):</source>
-        <translation type="unfinished"></translation>
+        <translation>Coefficients polynomiaux (forme de Horner):</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9711"/>
@@ -7447,33 +7447,34 @@ Tous les LCDs</translation>
     <message>
         <location filename="../artisanlib/main.py" line="9714"/>
         <source>Residual:</source>
-        <translation type="unfinished"></translation>
+        <translation>Résiduel:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9717"/>
         <source>Roots:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Racines:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9721"/>
         <source>Profile information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10053"/>
         <source>Designer Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Début du designer</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10155"/>
         <source>Designer Init</source>
-        <translation type="unfinished"></translation>
+        <translation>Initialiser Designer</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10155"/>
         <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de démarrer le designer..
+Profile manquant [CHARGE] ou [VIDAGE]</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10433"/>
@@ -7513,22 +7514,22 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="10761"/>
         <source>New profile created</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau profile créer</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53488"/>
         <source>Open Wheel Graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Graphe Roue</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10956"/>
         <source> added to cupping notes</source>
-        <translation type="unfinished"></translation>
+        <translation>ajouté aux notes de dégustation</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10967"/>
         <source> added to roasting notes</source>
-        <translation type="unfinished"></translation>
+        <translation>ajouté aux notes de torréfaction</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18526"/>
@@ -7538,17 +7539,17 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="19348"/>
         <source>Keyboard moves turned ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Mouvements clavier sur ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="19356"/>
         <source>Keyboard moves turned OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Mouvements clavier sur OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="19461"/>
         <source>Empty path or box unchecked in Autosave</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin vide ou case décochée dans Autosauve</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="19665"/>
@@ -7558,7 +7559,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="19675"/>
         <source>Select Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisir Dossier</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35855"/>
@@ -7568,232 +7569,232 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="20083"/>
         <source>Invalid artisan format</source>
-        <translation type="unfinished"></translation>
+        <translation>Format artisan invalide</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="20200"/>
         <source>Artisan CSV file loaded successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier Artisan CSV chargé correctement</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22190"/>
         <source>Save Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver le Profile</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22206"/>
         <source>Profile saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Profile sauvé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28031"/>
         <source>Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22239"/>
         <source>Readings exported</source>
-        <translation type="unfinished"></translation>
+        <translation>Lectures exportées</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22254"/>
         <source>Export CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter CSV</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22259"/>
         <source>Export JSON</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter JSON</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22264"/>
         <source>Export RoastLogger</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Exporter RoastLogger</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22496"/>
         <source>Readings imported</source>
-        <translation type="unfinished"></translation>
+        <translation>Lecures importée</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22506"/>
         <source>Import CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer CSV</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22511"/>
         <source>Import JSON</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer JSON</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22516"/>
         <source>Import RoastLogger</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importer RoastLogger</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30400"/>
         <source>Sampling Interval</source>
-        <translation type="unfinished">Intervalle d&apos;Échantillonnage</translation>
+        <translation>Intervalle d&apos;Échantillonnage</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28265"/>
         <source>Alarm Config</source>
-        <translation type="unfinished"></translation>
+        <translation>Config Alarme</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28265"/>
         <source>Alarms are not available for device None</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarmes non disponible pour périphérique Aucun</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28500"/>
         <source>Import K202 CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer K202 CSV</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28553"/>
         <source>K202 file loaded successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>fichier K202 importé correctement</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28569"/>
         <source>Import K204 CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer K204 CSV</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28636"/>
         <source>K204 file loaded successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>fichier K204 chargé correctement</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28995"/>
         <source>Import HH506RA CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer HH506RA CSV</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29047"/>
         <source>HH506RA file loaded successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>fichier HH506RA chargé correctement</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29180"/>
         <source>Save Graph as SVG</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver Graphique en SVG</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29391"/>
         <source>Invalid Wheel graph format</source>
-        <translation type="unfinished"></translation>
+        <translation>Format graph roue invalide</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33057"/>
         <source>Return the absolute value of x.</source>
-        <translation type="unfinished"></translation>
+        <translation>Retour à la valeur absolue de x.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33058"/>
         <source>Return the arc cosine (measured in radians) of x.</source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie l&apos;arc cosinus (mesuré en radians) de x.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33059"/>
         <source>Return the arc sine (measured in radians) of x.</source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie l&apos;arc sinus (mesuré en radians) de x.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33060"/>
         <source>Return the arc tangent (measured in radians) of x.</source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie l&apos;arc tangente (mesuré en radians) de x.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33061"/>
         <source>Return the cosine of x (measured in radians).</source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie le cosinus de x (mesuré en radians).</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33062"/>
         <source>Convert angle x from radians to degrees.</source>
-        <translation type="unfinished"></translation>
+        <translation>Convertis l&apos;angle x de radians en degrés.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33063"/>
         <source>Return e raised to the power of x.</source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie e élevé à la puissance de x.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33064"/>
         <source>Return the logarithm of x to the given base. </source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie le logarithme de x à la base donnée.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33065"/>
         <source>Return the base 10 logarithm of x.</source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie le logarithme en base 10 de x.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33068"/>
         <source>Return x**y (x to the power of y).</source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie  x**y (x à la puissance de y).</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33069"/>
         <source>Convert angle x from degrees to radians.</source>
-        <translation type="unfinished"></translation>
+        <translation>Convertit l&apos;angle x de degrés en radians.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33070"/>
         <source>Return the sine of x (measured in radians).</source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie le sinus de x (mesuré en radians).</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33071"/>
         <source>Return the square root of x.</source>
-        <translation type="unfinished"></translation>
+        <translation>Retourne la racine carrée de x.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33072"/>
         <source>Return the tangent of x (measured in radians).</source>
-        <translation type="unfinished"></translation>
+        <translation>Renvoie la tangente de x (mesurée en radians).</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33114"/>
         <source>MATHEMATICAL FUNCTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation>FONCTIONS MATHÉMATIQUES</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="33116"/>
         <source>SYMBOLIC VARIABLES</source>
-        <translation type="unfinished"></translation>
+        <translation>VARIABLES SYMBOLIQUES</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29742"/>
         <source>Save Palettes</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer palettes</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29746"/>
         <source>Palettes saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Palettes enregistrée</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29808"/>
         <source>Invalid palettes file format</source>
-        <translation type="unfinished"></translation>
+        <translation>Format fichier palette invalide</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29811"/>
         <source>Palettes loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Palettes chargées</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38838"/>
         <source>Load Palettes</source>
-        <translation type="unfinished"></translation>
+        <translation>Charger Palettes</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29845"/>
         <source>Alarms loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarmes chargées</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32322"/>
@@ -7808,12 +7809,12 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="35899"/>
         <source>No events found</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun événements trouvés</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36375"/>
         <source>Roast properties updated but profile not saved to disk</source>
-        <translation type="unfinished"></translation>
+        <translation>Propriétés de torréfaction mises à jour mais profile non sauvé sur le disque</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36749"/>
@@ -7823,67 +7824,67 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="38898"/>
         <source>&lt;b&gt;Event&lt;/b&gt; hide or show the corresponding slider</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Événement&lt;/b&gt; masquer ou afficher le curseur correspondant</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38899"/>
         <source>&lt;b&gt;Action&lt;/b&gt; Perform an action on slider release</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Action&lt;/b&gt; Effectuer une action sur la libération du curseur</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38911"/>
         <source>&lt;b&gt;Offset&lt;/b&gt; added as offset to the slider value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Décalage&lt;/b&gt; ajouté comme décalage à la valeur du curseur</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38912"/>
         <source>&lt;b&gt;Factor&lt;/b&gt; multiplicator of the slider value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Facteur&lt;/b&gt; multiplicateur de la valeur du curseur</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40302"/>
         <source>Event custom buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>Bouttons événements personalisé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40252"/>
         <source>Event configuration saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration événements sauvé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40255"/>
         <source>Found empty event type box</source>
-        <translation type="unfinished"></translation>
+        <translation>Case type événement trouvé vide</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40273"/>
         <source>&lt;b&gt;Event Description&lt;/b&gt; Description of the Event to be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Description de l&apos;événement&lt;/b&gt; Description de l&apos;événement à enregistrer.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40274"/>
         <source>&lt;b&gt;Event type&lt;/b&gt; Type of event to be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Type d&apos;événement&lt;/b&gt; Type d&apos;événement à enregistrer.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40276"/>
         <source>&lt;b&gt;Action&lt;/b&gt; Perform an action at the time of the event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Action&lt;/b&gt; Effectuer une action au moment de l&apos;événement</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40277"/>
         <source>&lt;b&gt;Documentation&lt;/b&gt; depends on the action type (&apos;{}&apos; is replaced by the event value):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Documentation&lt;/ b&gt; dépend du type d&apos;action (&quot;{}&quot; est remplacé par la valeur de l&apos;événement):</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40785"/>
         <source>Background does not match number of labels</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrière Plan ne correspond pas au nombre du label</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47045"/>
         <source>Not enough time points for an ET curviness of {0}. Set curviness to {1}</source>
-        <translation type="unfinished">Pas assez de points pour une courbure TE de {0}. Régler courbure à {1}</translation>
+        <translation>Pas assez de points pour une courbure TE de {0}. Régler courbure à {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47292"/>
@@ -7893,7 +7894,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="47052"/>
         <source>Not enough time points for an BT curviness of {0}. Set curviness to {1}</source>
-        <translation type="unfinished">Pas assez de points pour une courbure TG de {0}. Régler courbure à {1}</translation>
+        <translation>Pas assez de points pour une courbure TG de {0}. Régler courbure à {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="47284"/>
@@ -7933,72 +7934,72 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="47242"/>
         <source>Designer has been reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Designer a été reinitialisé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50224"/>
         <source>External program</source>
-        <translation type="unfinished"></translation>
+        <translation>Programme externe</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50635"/>
         <source>PID to control ET set to {0} {1} ; PID to read BT set to {2} {3}</source>
-        <translation type="unfinished">PID controle TE définir à {0} {1} ; PID lecture TG définir à {2} {3}</translation>
+        <translation>PID controle TE définir à {0} {1} ; PID lecture TG définir à {2} {3}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50699"/>
         <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port</source>
-        <translation type="unfinished"></translation>
+        <translation>Le périphérique est réglé sur CENTER 305, ce qui équivaut à CENTER 306. Choisissez maintenant le port série</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53477"/>
         <source>Save Wheel graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver Graphe roue</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53481"/>
         <source>Wheel Graph saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Graphe roue sauvé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54039"/>
         <source>Load Alarms</source>
-        <translation type="unfinished"></translation>
+        <translation>Charger alarmes</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54088"/>
         <source>Save Alarms</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver alarmes</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54134"/>
         <source>&lt;b&gt;Status:&lt;/b&gt; activate or deactive alarm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Status:&lt;/b&gt; activer ou desactiver alarme</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54135"/>
         <source>&lt;b&gt;If Alarm:&lt;/b&gt; alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Si alarme:&lt;/b&gt; une alarme déclenchée uniquement si l&apos;alarme portant le numéro indiqué a déjà été déclenchée. Utilisez 0 pour pas de garde.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54137"/>
         <source>&lt;b&gt;From:&lt;/b&gt; alarm only triggered after the given event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;De:&lt;/b&gt; alarme déclenchée uniquement après l&apos;événement donné</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54138"/>
         <source>&lt;b&gt;Time:&lt;/b&gt; if not 00:00, alarm is triggered mm:ss after the event &apos;From&apos; happend</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Temps:&lt;/b&gt; sinon 00:00, l&apos;alarme est déclenchée mm: ss après l&apos;événement &quot;De&quot; qui s&apos;est passé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54140"/>
         <source>&lt;b&gt;Condition:&lt;/b&gt; alarm is triggered if source rises above or below the specified temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Condition:&lt;/b&gt; une alarme est déclenchée si la source dépasse ou dépasse la température spécifiée</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54144"/>
         <source>&lt;b&gt;NOTE:&lt;/b&gt; each alarm is only triggered once</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;REMARQUE:&lt;/b&gt; chaque alarme n&apos;est déclenchée qu&apos;une fois</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="57083"/>
@@ -8008,7 +8009,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="57076"/>
         <source>CONTINUOUS CONTROL</source>
-        <translation>CONTROLE CONTINUE</translation>
+        <translation>CONTROLE CONTINU</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="57089"/>
@@ -8023,94 +8024,96 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="55197"/>
         <source>The rampsoak-mode tells how to start and end the ramp/soak</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Le mode rampsoak indique comment démarrer et terminer la rampe / immersion</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="55198"/>
         <source>Your rampsoak mode in this pid is:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Le mode rampsoak dans le pid est:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="55206"/>
         <source>Recomended Mode = 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode recommandé = 0</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="55207"/>
         <source>If you need to change it, change it now and come back later</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Si vous avez besoin de le changer, changez-le maintenant et revenez plus tard</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="55208"/>
         <source>Use the Parameter Loader Software by Fuji if you need to
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utilisez le logiciel Parameter Loader de Fuji si vous avez besoin de
+
+</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="55209"/>
         <source>Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Continue?</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="56479"/>
         <source>Change svN</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Changer svN</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="57267"/>
         <source>Ramp Soak start-end mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ramp Soak mode début fin</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="57193"/>
         <source>Pattern did not changed</source>
-        <translation type="unfinished">Le modèle n&apos;a pas changé</translation>
+        <translation>Le modèle n&apos;a pas changé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="57196"/>
         <source>Ramp/Soak was found ON! Turn it off before changing the pattern</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ramp / Soak a été trouvé sur ON! Éteignez-le avant de changer le modèle</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="57198"/>
         <source>Ramp/Soak was found in Hold! Turn it off before changing the pattern</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ramp / Soak a été trouvé en attente! Éteignez-le avant de changer le modèle</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="57961"/>
         <source>RS OFF</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RS OFF</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="57963"/>
         <source>RS on HOLD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RS en ATTENTE</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="58166"/>
         <source>Unable to set sv</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossible de fixer sv</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="58168"/>
         <source>Unable to set new sv</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossible de fixer nouveau sv</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="19117"/>
         <source>Exit Designer?</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter Designer?</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="19118"/>
         <source>Designer Mode ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode Designer ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15611"/>
         <source>Action canceled</source>
-        <translation type="unfinished"></translation>
+        <translation>Action annulée</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14150"/>
@@ -8125,28 +8128,29 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="32312"/>
         <source>Interpolation failed: no profile available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Interpolation échouée: aucun profil disponible</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="41361"/>
         <source>Reading background profile...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lecture profiles arrière plan...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="50564"/>
         <source>Device not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique non réglé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28869"/>
         <source>To load this profile the extra devices configuration needs to be changed.
 Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour charger ce profil, vous devez modifier la configuration des périphériques supplémentaires.
+Continuez?</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28870"/>
         <source>Found a different number of curves</source>
-        <translation type="unfinished"></translation>
+        <translation>Trouvé un nombre de courbes différent</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32586"/>
@@ -8156,83 +8160,84 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="40780"/>
         <source>Background profile not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Profile arrière plan non trouvé</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="57958"/>
         <source>RS ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RS ON</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29178"/>
         <source>Save Graph as PDF</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver Graph en PDF</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44805"/>
         <source>Phidget Temperature Sensor 4-input attached</source>
-        <translation type="unfinished"></translation>
+        <translation>Phidget capteur de température 4 entrées connecté</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45084"/>
         <source>Phidget Bridge 4-input attached</source>
-        <translation type="unfinished"></translation>
+        <translation>Phidget Bridge 4-entrées connecté</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54136"/>
         <source>&lt;b&gt;But Not:&lt;/b&gt; alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Mais pas&lt;/b&gt;: l’alarme ne s’est déclenchée que si l’alarme portant le numéro indiqué n’a pas été déclenchée auparavant. Utilisez 0 pour pas de garde.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10053"/>
         <source>Importing a profile in to Designer will decimate all data except the main [points].
 Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;importater un profil dans Designer va décimer toutes les données, à l&apos;exception des [points] principaux.
+Continuez?</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="56097"/>
         <source>Load PID Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Charger réglages PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="56187"/>
         <source>Save PID Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver réglages PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30454"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Avertissement</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30454"/>
         <source>A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.</source>
-        <translation type="unfinished"></translation>
+        <translation>Un intervalle d&apos;échantillonnage serré peut entraîner une instabilité sur certaines machines. Nous suggérons un minimum de 3s.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27459"/>
         <source>Oversampling is only active with a sampling interval equal or larger than 3s.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le suréchantillonnage est actif uniquement avec un intervalle d&apos;échantillonnage égal ou supérieur à 3 secondes.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="58852"/>
         <source>Load Ramp/Soak Table</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Charger Ramp/Soak Table</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="58873"/>
         <source>Save Ramp/Soak Table</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sauver  Ramp/Soak Table</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="59195"/>
         <source>PID turned on</source>
-        <translation type="unfinished"></translation>
+        <translation>PID sur on</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="59237"/>
         <source>PID turned off</source>
-        <translation type="unfinished"></translation>
+        <translation>PID sur off</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27650"/>
@@ -9198,7 +9203,7 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../artisanlib/main.py" line="44548"/>
         <source>Phidget Temperature Sensor 1-input attached</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phidget capteur de température 4 entrées connecté {1-?}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44551"/>

@@ -2098,16 +2098,6 @@ Extra Device</source>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54297"/>
-        <source>Replay ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="54297"/>
-        <source>Replay OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="54297"/>
         <source>Set Canvas Color</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2124,6 +2114,16 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31105"/>
         <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="54297"/>
+        <source>Playback ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="54297"/>
+        <source>Playback OFF</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

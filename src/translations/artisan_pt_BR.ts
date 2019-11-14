@@ -2220,16 +2220,6 @@ Virtual Extra</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54297"/>
-        <source>Replay ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="54297"/>
-        <source>Replay OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="54297"/>
         <source>Set Canvas Color</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2247,6 +2237,16 @@ Virtual Extra</translation>
         <location filename="../artisanlib/main.py" line="31105"/>
         <source>Custom</source>
         <translation>Personalizar</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="54297"/>
+        <source>Playback ON</source>
+        <translation>Reprodução EM</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="54297"/>
+        <source>Playback OFF</source>
+        <translation>Reprodução DESL</translation>
     </message>
 </context>
 <context>

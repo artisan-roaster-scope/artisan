@@ -3401,10 +3401,10 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
                         aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(u(self.alarmstrings[alarmnumber])))
                 elif self.alarmaction[alarmnumber] == 22:
-                    # Replay ON
+                    # Playback ON
                     aw.qmc.backgroundPlaybackEvents = True
                 elif self.alarmaction[alarmnumber] == 23:
-                    # Replay OFF
+                    # Playback OFF
                     aw.qmc.backgroundPlaybackEvents = False
                 elif self.alarmaction[alarmnumber] == 24:
                     # Set Canvas Color
@@ -54317,8 +54317,8 @@ class AlarmDlg(ArtisanResizeablDialog):
                                  QApplication.translate("ComboBox","PID ON",None),
                                  QApplication.translate("ComboBox","PID OFF",None),
                                  QApplication.translate("ComboBox","SV",None),
-                                 QApplication.translate("ComboBox","Replay ON",None),
-                                 QApplication.translate("ComboBox","Replay OFF",None),
+                                 QApplication.translate("ComboBox","Playback ON",None),
+                                 QApplication.translate("ComboBox","Playback OFF",None),
                                  QApplication.translate("ComboBox","Set Canvas Color",None),
                                  QApplication.translate("ComboBox","Reset Canvas Color",None)])
         actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i] + 1)

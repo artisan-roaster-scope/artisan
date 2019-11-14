@@ -15,7 +15,7 @@ v2.1.0 (xx.11.2019)
      * playbackmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
 function 16
   - ALARMS: adds alarm actions to set and reset the canvas color
-  - ALARMS: adds alarm actions to turn replay off and on
+  - ALARMS: adds alarm actions to turn playback off and on
   - ALARMS: the "insert" and "add" actions of the alarms table takes default values from selected item if any
   - ALARMS: adds (If Alarm) alarms triggered by temperature differences
   - ANALYZER: first version that brings curve fit and RoR flick/crash analysis features

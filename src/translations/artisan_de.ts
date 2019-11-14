@@ -2128,12 +2128,12 @@ anlegen</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54297"/>
-        <source>Replay ON</source>
+        <source>Playback ON</source>
         <translation>Wiedergabe AN</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="54297"/>
-        <source>Replay OFF</source>
+        <source>Playback OFF</source>
         <translation>Wiedergabe AUS</translation>
     </message>
     <message>
