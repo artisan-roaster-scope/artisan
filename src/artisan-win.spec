@@ -91,6 +91,7 @@ for tr in [
     'qtbase_ko.qm',
     'qtbase_pl.qm',
     'qtbase_ru.qm',
+    'qtbase_zh_TW.qm',
     ]:
   os.system(r'copy "' + PYQT_QT_TRANSLATIONS + '\\' + tr + '" ' + TARGET + 'translations')
 
