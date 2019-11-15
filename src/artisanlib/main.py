@@ -6360,8 +6360,8 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
-                            # first draw the fill if any
-                            if aw.extraFill1[i] > 0:
+                            # first draw the fill if any, but not during recording!
+                            if not aw.qmc.flagstart and aw.extraFill1[i] > 0:
                                 self.ax.fill_between(self.extratimex[i], 0, self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],alpha=aw.extraFill1[i]/100.,sketch_params=None)
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
@@ -6381,7 +6381,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 trans = self.ax.transData
                             # first draw the fill if any
-                            if aw.extraFill2[i] > 0:
+                            if not aw.qmc.flagstart and aw.extraFill2[i] > 0:
                                 self.ax.fill_between(self.extratimex[i], 0, self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],alpha=aw.extraFill2[i]/100.,sketch_params=None)
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
@@ -18998,7 +18998,7 @@ class ApplicationWindow(QMainWindow):
             self.autosaveAction.setEnabled(False)
             self.batchAction.setEnabled(False)
             self.readingsAction.setEnabled(False)
-            self.buttonsAction.setChecked(False)        
+            self.buttonsAction.setChecked(False)
             self.buttonsAction.setEnabled(False)
             self.slidersAction.setChecked(False)
             self.slidersAction.setEnabled(False)
@@ -19044,7 +19044,7 @@ class ApplicationWindow(QMainWindow):
                             if len(u(self.filename)) != 0:
                                 try:
                                     aw.qmc.resetlinecountcaches()
-                                    aw.loadbackground(u(self.filename))           
+                                    aw.loadbackground(u(self.filename))
                                 except:
                                     pass
                                 aw.qmc.background = True
