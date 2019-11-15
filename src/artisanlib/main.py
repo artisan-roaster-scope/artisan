@@ -2939,6 +2939,7 @@ class tgraphcanvas(FigureCanvas):
                                     # draw extra curves
                                     xtra_dev_lines1 = 0
                                     xtra_dev_lines2 = 0
+
                                     for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
                                         if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
                                             aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
@@ -2978,7 +2979,7 @@ class tgraphcanvas(FigureCanvas):
                                         aw.qmc.ax.draw_artist(self.l_AUCguide)
                                         
                                     self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
-                                        
+
                                 else:
                                     # we do not have a background to bitblit, so do a full redraw
                                     self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
@@ -3009,7 +3010,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.HUDflag:
                         aw.showHUD[aw.HUDfunction]()
                         
-                    #auto mark TP/DRY/FCs/DROP                        
+                    #auto mark TP/DRY/FCs/DROP
                     if self.autoTPIdx != 0:
                         self.markTP()
                         self.autoTPIdx = 0
@@ -4865,6 +4866,9 @@ class tgraphcanvas(FigureCanvas):
             return b
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):
+        fontprop_small = aw.mpl_fontproperties.copy()
+        fontsize = "x-small"
+        fontprop_small.set_size(fontsize)
         if aw.qmc.patheffects:
             rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette["background"])]
         else:
@@ -4875,7 +4879,8 @@ class tgraphcanvas(FigureCanvas):
         else:
             fmtstr = "%.0f"
         temp_anno = self.ax.annotate(fmtstr%(temp), xy=(x,y),xytext=(x+e,y + yup),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),
+                            fontsize=fontsize,alpha=a,fontproperties=fontprop_small)
         try:
             temp_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
             temp_anno.draggable(use_blit=not sys.platform.startswith("linux"))
@@ -4883,7 +4888,8 @@ class tgraphcanvas(FigureCanvas):
             pass
         #anotate time
         time_anno = self.ax.annotate(time_str,xy=(x,y),xytext=(x+e,y - ydown),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),
+                             fontsize=fontsize,alpha=a,fontproperties=fontprop_small)
         try:
             time_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
             time_anno.draggable(use_blit=not sys.platform.startswith("linux"))
@@ -4955,7 +4961,7 @@ class tgraphcanvas(FigureCanvas):
                         e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                 
-                #Add 1Cs markers            
+                #Add 1Cs markers
                 if timeindex[2]:
                     tidx = timeindex[2]
                     if timeindex[1]: #if dryend
@@ -5463,7 +5469,7 @@ class tgraphcanvas(FigureCanvas):
                                 horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
                         else:
                             st_artist = self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
-                                horizontalalignment="right",fontsize="xx-small",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
+                                horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
                     try:
                         st_artist.set_in_layout(False)  # remove title from tight_layout calculation
                     except:  # set_in_layout not available in mpl<3.x
@@ -6297,7 +6303,7 @@ class tgraphcanvas(FigureCanvas):
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             anno.draggable(use_blit=not sys.platform.startswith("linux"))
                                         except: # mpl before v3.0 do not have this set_in_layout() function
-                                            pass                          
+                                            pass
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:
@@ -6354,12 +6360,13 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
+                            # first draw the fill if any
+                            if aw.extraFill1[i] > 0:
+                                self.ax.fill_between(self.extratimex[i], 0, self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],alpha=aw.extraFill1[i]/100.,sketch_params=None)
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],
                                 drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
-                            if aw.extraFill1[i] > 0:
-                                self.ax.fill_between(self.extratimex[i], 0, self.extrastemp1[i],transform=trans,color=self.extradevicecolor1[i],alpha=aw.extraFill1[i]/100.,sketch_params=None)
                     except Exception as ex:
                         _, _, exc_tb = sys.exc_info() 
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -6373,11 +6380,12 @@ class tgraphcanvas(FigureCanvas):
                                 trans = self.delta_ax.transData
                             else:
                                 trans = self.ax.transData
+                            # first draw the fill if any
+                            if aw.extraFill2[i] > 0:
+                                self.ax.fill_between(self.extratimex[i], 0, self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],alpha=aw.extraFill2[i]/100.,sketch_params=None)
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
-                            if aw.extraFill2[i] > 0:
-                                self.ax.fill_between(self.extratimex[i], 0, self.extrastemp2[i],transform=trans,color=self.extradevicecolor2[i],alpha=aw.extraFill2[i]/100.,sketch_params=None)
                     except Exception as ex:
                         _, _, exc_tb = sys.exc_info() 
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -8907,7 +8915,7 @@ class tgraphcanvas(FigureCanvas):
                         extraevent=extraevent,
                         eventtype=4,  # we map back to the untyped event type
                         eventvalue=aw.extraeventsvalues[extraevent],
-                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock)                
+                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock)
                 else: # on "relative" event values, we take the last value set per event via the recordextraevent call before
                     self.EventRecordAction(
                         extraevent=extraevent,
@@ -8944,6 +8952,9 @@ class tgraphcanvas(FigureCanvas):
                     i = len(self.timex)-1
                     # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
                     if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(eventtype != 4 and self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
+                        fontprop_small = aw.mpl_fontproperties.copy()
+                        fontsize = "xx-small"
+                        fontprop_small.set_size(fontsize)
                         self.specialevents.append(i)
                         self.specialeventstype.append(4)
                         self.specialeventsStrings.append(str(Nevents+1))
@@ -8989,8 +9000,6 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     row = {0:self.phases[0]-10,1:self.phases[0]-20,2:self.phases[0]-30,3:self.phases[0]-40}
                                 #some times ET is not drawn (ET = 0) when using device NONE
-                                fontprop_small = aw.mpl_fontproperties.copy()
-                                fontprop_small.set_size("xx-small")
                                 # plot events on BT when showeventsonbt is true
                                 if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
                                     anno = self.ax.annotate(firstletter + secondletter, 
@@ -9002,7 +9011,7 @@ class tgraphcanvas(FigureCanvas):
                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                         color=self.EvalueTextColor[etype],
                                         arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),
-                                        fontsize="xx-small",
+                                        fontsize=fontsize,
                                         fontproperties=fontprop_small)
                                 else:
                                     anno = self.ax.annotate(firstletter + secondletter, 
@@ -9014,7 +9023,7 @@ class tgraphcanvas(FigureCanvas):
                                             path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                             color=self.EvalueTextColor[etype],
                                             arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
-                                            fontsize="xx-small",
+                                            fontsize=fontsize,
                                             fontproperties=fontprop_small)
                                 try:
                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
@@ -9079,8 +9088,8 @@ class tgraphcanvas(FigureCanvas):
                                                          va="center", ha="center",
                                                          arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4,relpos=(0,0)),
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
-                                                         fontsize="xx-small",
-                                                         fontproperties=aw.mpl_fontproperties,
+                                                         fontsize=fontsize,
+                                                         fontproperties=fontprop_small,
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          backgroundcolor=boxcolor)
                                     elif self.eventsGraphflag == 4:
@@ -9088,8 +9097,8 @@ class tgraphcanvas(FigureCanvas):
                                                          color=textcolor,
                                                          va="center", ha="center",
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
-                                                         fontsize="xx-small",
-                                                         fontproperties=aw.mpl_fontproperties,
+                                                         fontsize=fontsize,
+                                                         fontproperties=fontprop_small,
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          backgroundcolor=boxcolor)
 
@@ -9167,6 +9176,9 @@ class tgraphcanvas(FigureCanvas):
                 if self.eventsshowflag:
                     index = self.specialevents[-1]
                     if self.specialeventstype[-1] < 4 and aw.qmc.showEtypes[self.specialeventstype[-1]]:
+                        fontprop_small = aw.mpl_fontproperties.copy()
+                        fontsize = "xx-small"
+                        fontprop_small.set_size(fontsize)
                         firstletter = self.etypesf(self.specialeventstype[-1])[0]
                         secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
                         if self.eventsGraphflag == 0:
@@ -9181,7 +9193,8 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 temp = self.temp2[index]
                             anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                             color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
+                                             color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
+                                             fontsize=fontsize,fontproperties=fontprop_small,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             try:
                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                             except: # mpl before v3.0 do not have this set_in_layout() function
@@ -9196,10 +9209,14 @@ class tgraphcanvas(FigureCanvas):
                             # plot events on BT when showeventsonbt is true
                             if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
                                 anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
-                                                 color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
+                                                 color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',
+                                                 color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=fontsize,
+                                                 fontproperties=fontprop_small,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             else:
                                 anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
-                                                 color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
+                                                 color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',
+                                                 color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=fontsize,
+                                                 fontproperties=fontprop_small,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             try:
                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                             except: # mpl before v3.0 do not have this set_in_layout() function
@@ -11694,6 +11711,7 @@ class SampleThread(QThread):
                                         aw.qmc.extractimex2[i].append(float(extratx))
                                         aw.qmc.extractemp2[i].append(float(extrat2))
                                     # update extra lines
+                                    
                                     if aw.extraCurveVisibility1[i] and len(aw.qmc.extratemp1lines) > xtra_dev_lines1:
                                         aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extractimex1[i], aw.qmc.extractemp1[i])
                                         xtra_dev_lines1 = xtra_dev_lines1 + 1
@@ -20247,6 +20265,10 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDvisibility2[n-1] = True
             self.extraCurveVisibility1[n-1] = True
             self.extraCurveVisibility2[n-1] = True
+            self.extraDelta1[n-1] = False
+            self.extraDelta2[n-1] = False
+            self.extraFill1[n-1] = 0
+            self.extraFill2[n-1] = 0
 
             #create new serial port (but don't open it yet). Store initial settings
             self.addSerialPort()
@@ -28881,6 +28903,10 @@ class ApplicationWindow(QMainWindow):
                             aw.qmc.extraname1[0] = "Exhaust"
                             aw.extraCurveVisibility1[0] = toBool(True)
                             aw.extraCurveVisibility2[0] = toBool(False)
+                            aw.extraDelta1[0] = toBool(False)
+                            aw.extraDelta2[0] = toBool(False)
+                            aw.extraFill1[0] = 0
+                            aw.extraFill2[0] = 0
                         else:
                             return False
                     else:
