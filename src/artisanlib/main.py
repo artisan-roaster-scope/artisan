@@ -2539,7 +2539,6 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),exc_tb.tb_lineno)
 
-    
     def onclick(self,event):
         try:
             if not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==3:
@@ -4883,7 +4882,8 @@ class tgraphcanvas(FigureCanvas):
                             fontsize=fontsize,alpha=a,fontproperties=fontprop_small)
         try:
             temp_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-            temp_anno.draggable(use_blit=not sys.platform.startswith("linux"))
+            temp_anno.draggable(use_blit=True)
+            temp_anno.set_picker(aw.draggable_text_box_picker)
         except: # mpl before v3.0 do not have this set_in_layout() function
             pass
         #anotate time
@@ -4892,7 +4892,8 @@ class tgraphcanvas(FigureCanvas):
                              fontsize=fontsize,alpha=a,fontproperties=fontprop_small)
         try:
             time_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-            time_anno.draggable(use_blit=not sys.platform.startswith("linux"))
+            time_anno.draggable(use_blit=True)
+            time_anno.set_picker(aw.draggable_text_box_picker)
         except: # mpl before v3.0 do not have this set_in_layout() function
             pass
         if aw.qmc.patheffects:
@@ -5836,7 +5837,9 @@ class tgraphcanvas(FigureCanvas):
                                 elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if drop exists and last event was earlier
                                     self.E1backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
-                                self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
+                                self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], 
+                                                                            marker=(self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
+                                                                            markersize = self.EvalueMarkerSize[0],
                                                                             picker=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(0,True))                            
@@ -5847,7 +5850,9 @@ class tgraphcanvas(FigureCanvas):
                                 elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if drop exists and last event was earlier
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
-                                self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
+                                self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], 
+                                                                            marker=(self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
+                                                                            markersize = self.EvalueMarkerSize[1],
                                                                             picker=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(1,True))
@@ -5858,7 +5863,9 @@ class tgraphcanvas(FigureCanvas):
                                 elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if drop exists and last event was earlier
                                     self.E3backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
-                                self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
+                                self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], 
+                                                                            marker=(self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
+                                                                            markersize = self.EvalueMarkerSize[2],
                                                                             picker=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(2,True))
@@ -5869,7 +5876,9 @@ class tgraphcanvas(FigureCanvas):
                                 elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if drop exists and last event was earlier
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
-                                self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
+                                self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], 
+                                                                            marker=(self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
+                                                                            markersize = self.EvalueMarkerSize[3],
                                                                             picker=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(3,True))
@@ -5942,7 +5951,8 @@ class tgraphcanvas(FigureCanvas):
                                                          alpha=min(aw.qmc.backgroundalpha + 0.1, 1.0),
                                                          color=aw.qmc.palette["bgeventtext"],
                                                          va="center", ha="center",
-                                                         bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none',alpha=aw.qmc.backgroundalpha),
+                                                         bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none',
+                                                            alpha=min(aw.qmc.backgroundalpha + 0.1, 1.0)),
                                                          fontproperties=fontprop_small,
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          )
@@ -6077,8 +6087,8 @@ class tgraphcanvas(FigureCanvas):
                                         vert_offset = 5.0
                                     else:
                                         vert_offset = 2.5
-                                    anno = self.ax.annotate(firstletter + secondletter, 
-                                                     xy=(self.timex[int(self.specialevents[i])], 
+                                    anno = self.ax.annotate(firstletter + secondletter,
+                                                     xy=(self.timex[int(self.specialevents[i])],
                                                      temps[int(self.specialevents[i])]),
                                                      xytext=(self.timex[int(self.specialevents[i])],row[firstletter] + vert_offset),
                                                      alpha=1.,
@@ -6091,7 +6101,8 @@ class tgraphcanvas(FigureCanvas):
                                                      fontproperties=fontprop_small)
                                     try:
                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        anno.draggable(use_blit=not sys.platform.startswith("linux"))
+                                        # we do not allow to drag labels in bar graph!
+                                        #anno.draggable(use_blit=True)
                                     except: # mpl before v3.0 do not have this set_in_layout() function
                                         pass
 
@@ -6101,7 +6112,7 @@ class tgraphcanvas(FigureCanvas):
                         E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
                         E1_last = E2_last = E3_last = E4_last = 0  #not really necessary but guarantees that Ex_last is defined 
                         for i in range(Nevents):
-                            if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:           
+                            if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
                                 self.E1timex.append(self.timex[self.specialevents[i]])
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
                                     self.E1values.append(int(round((self.specialeventsvalue[i]-1)*10)))
@@ -6135,7 +6146,7 @@ class tgraphcanvas(FigureCanvas):
                                 E4_last = i
                                 
 #                        every = None
-    
+
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
                                 self.E1timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -6150,10 +6161,12 @@ class tgraphcanvas(FigureCanvas):
                             E1x = [None]
                             E1y = [None]
                             ds = "steps-post"
-                        self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                              picker=2,
-                                                              #markevery=every,
-                                                              linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
+                        self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0], 
+                                                            marker = (self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
+                                                            markersize = self.EvalueMarkerSize[0],
+                                                            picker=2,
+                                                            #markevery=every,
+                                                            linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex): 
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
                                 self.E2timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -6168,10 +6181,12 @@ class tgraphcanvas(FigureCanvas):
                             E2x = [None]
                             E2y = [None]
                             ds = "steps-post"
-                        self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                              picker=2,
-                                                              #markevery=every,
-                                                              linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
+                        self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1],
+                                                            marker = (self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
+                                                            markersize = self.EvalueMarkerSize[1],
+                                                            picker=2,
+                                                            #markevery=every,
+                                                            linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
                                 self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -6186,10 +6201,12 @@ class tgraphcanvas(FigureCanvas):
                             E3x = [None]
                             E3y = [None]
                             ds = "steps-post"
-                        self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                              picker=2,
-                                                              #markevery=every,
-                                                              linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
+                        self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2], 
+                                                            marker = (self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
+                                                            markersize = self.EvalueMarkerSize[2],
+                                                            picker=2,
+                                                            #markevery=every,
+                                                            linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -6204,9 +6221,11 @@ class tgraphcanvas(FigureCanvas):
                             E4x = [None]
                             E4y = [None]
                             ds = "steps-post"
-                        self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                              picker=2,#markevery=every,
-                                                              linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                        self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3],
+                                                            marker = (self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
+                                                            markersize = self.EvalueMarkerSize[3],
+                                                            picker=2,#markevery=every,
+                                                            linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                     if Nevents:
                         if self.eventsGraphflag == 4:
                             # we prepare copies of the Evalues
@@ -6286,7 +6305,8 @@ class tgraphcanvas(FigureCanvas):
                                                      )
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            anno.draggable(use_blit=not sys.platform.startswith("linux"))
+                                            anno.draggable(use_blit=True)
+                                            anno.set_picker(aw.draggable_text_box_picker)
                                         except: # mpl before v3.0 do not have this set_in_layout() function
                                             pass
                                     elif self.eventsGraphflag == 4:
@@ -6301,7 +6321,8 @@ class tgraphcanvas(FigureCanvas):
                                                      )
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            anno.draggable(use_blit=not sys.platform.startswith("linux"))
+                                            # we do not allow to drag labels in bar graph!
+                                            #anno.draggable(use_blit=True)
                                         except: # mpl before v3.0 do not have this set_in_layout() function
                                             pass
                             
@@ -6519,7 +6540,8 @@ class tgraphcanvas(FigureCanvas):
                     for l in leg.texts:
                         l.set_picker(5)
                     try:
-                        leg.set_draggable(state=True,use_blit=not sys.platform.startswith("linux"))  #,update='bbox')
+                        leg.set_draggable(state=True,use_blit=True)  #,update='bbox')
+                        leg.set_picker(aw.draggable_text_box_picker)
                     except: # not available in mpl<3.x
                         leg.draggable(state=True) # for mpl 2.x
                     frame = leg.get_frame()
@@ -11334,7 +11356,6 @@ def my_get_icon(name):
         return QIcon(p)
     else:
         None
-           
         
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
@@ -11425,7 +11446,7 @@ class VMToolbar(NavigationToolbar):
         if aw.qmc.zoom_follow:
             self.push_current()
 
-    def _icon(self, name):
+    def _icon(self, name, _=None):
         if aw is not None and name.startswith("plus"):
             basedir = os.path.join(aw.getResourcePath(),"Icons")
         else:
@@ -30090,7 +30111,47 @@ class ApplicationWindow(QMainWindow):
 
         progress.cancel()
         progress = None
-            
+    
+    # returns True as first result if draggable text box artist is contained in the given events region and
+    # and it is the one in the region with the highest z-order, otherwise False
+    # a dict of properties is returned as second argument
+    def draggable_text_box_picker(self,artist, evt):
+        if self.segmentresultsanno is not None and self.analysisresultsanno is not None:
+            # in case the analyzer boxes are displayed
+            seg_contained,seg_prop = self.segmentresultsanno.contains(evt)
+            ana_contained,ana_prop = self.analysisresultsanno.contains(evt)
+            segment_zorder = self.segmentresultsanno.get_zorder()
+            analysis_zorder = self.analysisresultsanno.get_zorder()
+            if artist == self.segmentresultsanno:
+                if  seg_contained and (not ana_contained or segment_zorder > analysis_zorder):
+                    # a click on the segmentresult box, but not on the analysisresult box, or the segment box is in front
+                    # ensure that the z-order of the segment box is higher than that of the analysis box as the bitblit brings the segment box to the front
+                    self.segmentresultsanno.set_zorder(max(segment_zorder,analysis_zorder))
+                    self.analysisresultsanno.set_zorder(min(segment_zorder,analysis_zorder))
+                    return True, seg_prop
+                else:
+                    # no click on the the segment box, or the anlysis box is clicked too and in front
+                    return False, {}
+            elif artist == self.analysisresultsanno:
+                if ana_contained and (not seg_contained or segment_zorder < analysis_zorder):
+                    # a click on the analysisresult box, but not on the segmentresult box, or the analyzer box is in front
+                    # ensure that the z-order of the analyse box is higher than that of the segment box as the bitblit brings the segment box to the front
+                    self.segmentresultsanno.set_zorder(min(segment_zorder,analysis_zorder))
+                    self.analysisresultsanno.set_zorder(max(segment_zorder,analysis_zorder))
+                    return True, ana_prop
+                else:
+                    # no click on the the analysis box, or the segment box is clicked too and in front
+                    return False, {}
+            elif not seg_contained and not ana_contained:
+                # neither of the two analyzer boxes was clicked, check the given artist is contained in the event region
+                return artist.contains(evt)
+            else:
+                # one of the two analyzer boxes was clicked, we ignore all other artists that might be contained in the events region
+                return False, {}
+        else:
+            # if analyzer boxes are not available we call the standard picker
+            return artist.contains(evt)
+
     def analysisShowResults(self,resultstr="",redraw=True, curvefit_starttime=0, curvefit_endtime=0, analysis_starttime=0, analysis_endtime=0):
         if redraw:
             self.qmc.redraw(recomputeAllDeltas=True)
@@ -30138,14 +30199,15 @@ class ApplicationWindow(QMainWindow):
                        fontfamily='monospace',
                        fontsize='x-small',
                        color=tc,
-                       zorder=121,
-                       picker=True,
+                       zorder=21,
+                       picker=False,
                        bbox=dict(boxstyle="round", fc=fc, alpha=a))
             try:
                 self.segmentresultsanno.set_in_layout(False) # remove from tight_layout calculation
+                self.segmentresultsanno.draggable(use_blit=True)
+                self.segmentresultsanno.set_picker(self.draggable_text_box_picker)
             except: # set_in_layout not available in mpl<3.x
                 pass
-            self.segmentresultsanno.draggable(use_blit=True)
             self.segmentresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
 
             # create the analysis results annotation box
@@ -30157,14 +30219,15 @@ class ApplicationWindow(QMainWindow):
                        fontfamily='monospace',
                        fontsize='x-small',
                        color=tc,
-                       zorder=21,
-                       picker=True,
+                       zorder=121,
+                       picker=False,
                        bbox=dict(boxstyle="round", fc=fc, alpha=a))
             try:
                 self.analysisresultsanno.set_in_layout(False) # remove from tight_layout calculation
+                self.analysisresultsanno.draggable(use_blit=True)
+                self.analysisresultsanno.set_picker(self.draggable_text_box_picker)
             except: # set_in_layout not available in mpl<3.x
                 pass
-            self.analysisresultsanno.draggable(use_blit=True)
             self.analysisresultsannoid = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
             self.qmc.fig.canvas.draw()
 
