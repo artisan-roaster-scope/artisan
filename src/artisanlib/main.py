@@ -2099,14 +2099,16 @@ class tgraphcanvas(FigureCanvas):
         self.resizeredrawing = 0 # holds timestamp of last resize triggered redraw
         
         self.logoimg = None # holds the background logo image
-        self.analysisresultsloc = [.5,.5]
+        self.analysisresultsloc_default = [.49,.5]
+        self.analysisresultsloc = self.analysisresultsloc_default
         self.analysispickflag = False
         self.analysisresultsstr = ""
         self.analysisstartchoice = 1
         self.analysisoffset = 180
         self.curvefitstartchoice = 0
         self.curvefitoffset = 180
-        self.segmentresultsloc = [.5,.5]
+        self.segmentresultsloc_default = [.5,.5]
+        self.segmentresultsloc = self.segmentresultsloc_default
         self.segmentpickflag = False
         self.segmentdeltathreshold = 0.6
         self.segmentsamplesthreshold = 3
@@ -16473,9 +16475,13 @@ class ApplicationWindow(QMainWindow):
             np_dbt = numpy.array(analysis_DeltaBT)
             np_dbtb = numpy.array(analysis_DeltaBTB)
 
+            #MSE
+            mse_BT = numpy.mean(numpy.square(np_bt - np_btb))
+            mse_deltaBT = numpy.mean(numpy.square(np_dbt - np_dbtb))
+            
             # RMSE
-            rmse_BT = numpy.sqrt(numpy.mean(numpy.square(np_bt - np_btb)))
-            rmse_deltaBT = numpy.sqrt(numpy.mean(numpy.square(np_dbt - np_dbtb)))
+            rmse_BT = numpy.sqrt(mse_BT)
+            rmse_deltaBT = numpy.sqrt(mse_deltaBT)
 
             # R squared - Coefficient of determination (1 is a good result, 0 is not good)
             # residual sum of squares
@@ -16608,13 +16614,20 @@ class ApplicationWindow(QMainWindow):
 
                 # general information
                 fitRoR = 60*(analysis_DeltaBTB[-1] - analysis_DeltaBTB[0]) / (aw.qmc.timex[timeindexs_all[-1]] - aw.qmc.timex[timeindexs_all[0]])
-                fitTypes = ["ln()", "", "x\u00b2", "x\u00b3", "Bkgnd", ""]
+                fitTypes = [QApplication.translate("Label","ln()",None), 
+                            "", 
+                            QApplication.translate("Label","x",None) + "\u00b2", 
+                            QApplication.translate("Label","x",None) + "\u00b3", 
+                            QApplication.translate("Label","Bkgnd",None), ""]
                 fitType = fitTypes[exp]
-                notabene = QApplication.translate("Label", "Note: All values calculated in Celsius",None)
 
                 # build a table of results
                 tbl = prettytable.PrettyTable()
-                tbl.field_names = ["Start", "Duration", "Max Delta", "Sign", "Swing", "MSE", "ABC", "ABC/secs"  ]
+                tbl.field_names = [QApplication.translate("Label","Start",None),
+                                   QApplication.translate("Label","Duration",None), 
+                                   QApplication.translate("Label","Max Delta",None),
+                                   QApplication.translate("Label","Swing",None),
+                                   QApplication.translate("Label","ABC/secs",None)  ]
                 tbl.float_format = "5.2"
                 for i in range(len(mask)):
                     thistime = self.eventtime2string(aw.qmc.timex[timeindexs_seg[i]] - aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -16624,15 +16637,16 @@ class ApplicationWindow(QMainWindow):
                     else:
                         swing = ""
                     if signs_seg[i] == 1:
-                        abovebelow = "Above"
+                        abovebelow = QApplication.translate("Label","Above",None)
                     else:
-                        abovebelow = "Below"
+                        abovebelow = QApplication.translate("Label","Below",None)
                     abcprime = segment_abc_deltas[i] / seconds_seg[i]
-                    tbl.add_row([thistime, duration, maxdeltas_seg[i], abovebelow, swing, segment_mse_deltas[i], segment_abc_deltas[i], abcprime ])
+                    tbl.add_row([thistime, duration, maxdeltas_seg[i], swing, abcprime ])
                 if len(mask) > 1:
-                    tbl.add_row(['~~~~~','~~~~~','~~~~~','~~~~~','~~~~~','~~~~~','~~~~~','~~~~~'])
-                    tbl.add_row([ioi_start, ioi_duration, ioi_maxdelta, '-', '-', ioi_mse_deltas, ioi_abc_deltas, ioi_abcprime ])
-                segmentresultstr = tbl.get_string(border=True)
+                    tbl.add_row(['~~~~~','~~~~~','~~~~~','~~~~~','~~~~~'])
+                    tbl.add_row([ioi_start, ioi_duration, ioi_maxdelta, '-', ioi_abcprime ])
+                segmentresultstr = QApplication.translate("Label","Segment Analysis (flick and crash)",None) + "\n"
+                segmentresultstr += tbl.get_string(border=True)
 
                 # build table of general information
                 tbl2 = prettytable.PrettyTable()
@@ -16641,15 +16655,15 @@ class ApplicationWindow(QMainWindow):
                 tbl2.align["A1"] = "r"
                 tbl2.align["B1"] = "r"
                 tbl2.float_format = "5.2"
-                tbl2.add_row(["Curve Fit", fitType, '', ''])
-                tbl2.add_row(["Samples Threshold", aw.qmc.segmentsamplesthreshold, "Delta Threshold", aw.qmc.segmentdeltathreshold])
-                tbl2.add_row(["Sample rate (secs)", self.qmc.profile_sampling_interval, "Smooth Curves", int((aw.qmc.curvefilter-1)/2) ])
-                tbl2.add_row(["Delta Span", aw.qmc.deltaBTspan, "Delta Smoothing", int((aw.qmc.deltaBTfilter-1)/2) ])
-                tbl2.add_row(["Fit RoRoR (C/min/min)", fitRoR, "Actual RoR at FCs", RoR_FCs_act])
-                segmentresultstr += "{}{}{}{}".format("\n", tbl2.get_string(border=False,header=False), "\n",notabene)
+                tbl2.add_row([QApplication.translate("Label","Curve Fit",None), fitType, '', ''])
+                tbl2.add_row([QApplication.translate("Label","Samples Threshold",None), aw.qmc.segmentsamplesthreshold, QApplication.translate("Label","Delta Threshold",None), aw.qmc.segmentdeltathreshold])
+                tbl2.add_row([QApplication.translate("Label","Sample rate (secs)",None), self.qmc.profile_sampling_interval, QApplication.translate("Label","Smooth Curves",None), int((aw.qmc.curvefilter-1)/2) ])
+                tbl2.add_row([QApplication.translate("Label","Delta Span",None), aw.qmc.deltaBTspan, QApplication.translate("Label","Delta Smoothing",None), int((aw.qmc.deltaBTfilter-1)/2) ])
+                tbl2.add_row([QApplication.translate("Label","Fit RoRoR (C/min/min)",None), fitRoR, QApplication.translate("Label","Actual RoR at FCs",None), RoR_FCs_act])
+                segmentresultstr += "{}{}".format("\n", tbl2.get_string(border=False,header=False))
 
                 # this table is here just to help with validation
-                if aw.superusermode: 
+                if aw.superusermode and False:  #disabled 
                     tbl3 = prettytable.PrettyTable()
                     tbl3.field_names = ["Start","Duration","Length", "Max Delta","Sign","Reduction","TimeIndex"  ]
                     tbl3.float_format = "5.2"
@@ -16668,6 +16682,8 @@ class ApplicationWindow(QMainWindow):
                 result['segmentresultstr'] = ""
 
             # build the dict to return
+            result['mse_BT'] = mse_BT
+            result['mse_deltaBT'] = mse_deltaBT
             result['rmse_BT'] = rmse_BT
             result['rmse_deltaBT'] = rmse_deltaBT
             result['r2_BT'] = r2_BT
@@ -30031,9 +30047,9 @@ class ApplicationWindow(QMainWindow):
 
             if exp == 4:
                 res = self.analysisGetResults(exp=4, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
-                self.cfr["equ_background"] = "Bkgd"
-                self.cfr["dbt_background"] = res["rmse_BT"]
-                self.cfr["dbdbt_background"] = res["rmse_deltaBT"]
+                self.cfr["equ_background"] = QApplication.translate("Label","Bkgd",None)
+                self.cfr["dbt_background"] = res["mse_BT"]
+                self.cfr["dbdbt_background"] = res["mse_deltaBT"]
                 self.cfr["r2_deltabt_background"] = res["r2_deltaBT"]
                 self.cfr['ror_fcs_delta_background'] = res['ror_fcs_delta']
                 self.cfr['ror_max_delta_background'] = res['ror_max_delta']
@@ -30044,8 +30060,8 @@ class ApplicationWindow(QMainWindow):
             if exp == 0 or exp == -1:
                 res = self.analysisGetResults(exp=0, curvefit_starttime=curvefit_starttime_ln, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_naturallog"] = res["equ"]
-                self.cfr["dbt_naturallog"] = res["rmse_BT"]
-                self.cfr["dbdbt_naturallog"] = res["rmse_deltaBT"]
+                self.cfr["dbt_naturallog"] = res["mse_BT"]
+                self.cfr["dbdbt_naturallog"] = res["mse_deltaBT"]
                 self.cfr["r2_deltabt_naturallog"] = res["r2_deltaBT"]
                 self.cfr['ror_fcs_delta_naturallog'] = res['ror_fcs_delta']
                 self.cfr['ror_max_delta_naturallog'] = res['ror_max_delta']
@@ -30056,8 +30072,8 @@ class ApplicationWindow(QMainWindow):
             if exp == 3 or exp == -1:
                 res = self.analysisGetResults(exp=3, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_cubic"] = res["equ"]
-                self.cfr["dbt_cubic"] = res["rmse_BT"]
-                self.cfr["dbdbt_cubic"] = res["rmse_deltaBT"]
+                self.cfr["dbt_cubic"] = res["mse_BT"]
+                self.cfr["dbdbt_cubic"] = res["mse_deltaBT"]
                 self.cfr["r2_deltabt_cubic"] = res["r2_deltaBT"]
                 self.cfr['ror_fcs_delta_cubic'] = res['ror_fcs_delta']
                 self.cfr['ror_max_delta_cubic'] = res['ror_max_delta']
@@ -30068,8 +30084,8 @@ class ApplicationWindow(QMainWindow):
             if exp == 2 or exp == -1:
                 res = self.analysisGetResults(exp=2, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_quadratic"] = res["equ"]
-                self.cfr["dbt_quadratic"] = res["rmse_BT"]
-                self.cfr["dbdbt_quadratic"] = res["rmse_deltaBT"]
+                self.cfr["dbt_quadratic"] = res["mse_BT"]
+                self.cfr["dbdbt_quadratic"] = res["mse_deltaBT"]
                 self.cfr["r2_deltabt_quadratic"] = res["r2_deltaBT"]
                 self.cfr['ror_fcs_delta_quadratic'] = res['ror_fcs_delta']
                 self.cfr['ror_max_delta_quadratic'] = res['ror_max_delta']
@@ -30079,21 +30095,22 @@ class ApplicationWindow(QMainWindow):
             
             # build the results table
             tbl = prettytable.PrettyTable()
-            tbl.field_names = [" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"] 
+            tbl.field_names = [" ", 
+                               QApplication.translate("Label","MSE BT",None), 
+                               QApplication.translate("Label","RoR",None) +  " \u0394 " + QApplication.translate("Label","@FCs",None),
+                               QApplication.translate("Label","Max+/Max- RoR",None) + " \u0394"] 
             tbl.float_format = "5.2"
             if "equ_background" in self.cfr:
-                tbl.add_row(["Bkgnd", self.cfr["dbt_background"], self.cfr["dbdbt_background"], self.cfr["r2_deltabt_background"], self.cfr['ror_fcs_delta_background'], self.cfr['ror_maxmin_delta_background']])
+                tbl.add_row([QApplication.translate("Label","Bkgnd",None), self.cfr["dbt_background"], self.cfr['ror_fcs_delta_background'], self.cfr['ror_maxmin_delta_background']])
             if "equ_quadratic" in self.cfr:
-                tbl.add_row(["x\u00b2", self.cfr["dbt_quadratic"], self.cfr["dbdbt_quadratic"], self.cfr["r2_deltabt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
+                tbl.add_row([QApplication.translate("Label","x",None) +"\u00b2", self.cfr["dbt_quadratic"], self.cfr['ror_fcs_delta_quadratic'], self.cfr['ror_maxmin_delta_quadratic']])
             if "equ_cubic" in self.cfr:
-                tbl.add_row(["x\u00b3", self.cfr["dbt_cubic"], self.cfr["dbdbt_cubic"], self.cfr["r2_deltabt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
+                tbl.add_row([QApplication.translate("Label","x",None) + "\u00b3", self.cfr["dbt_cubic"], self.cfr['ror_fcs_delta_cubic'], self.cfr['ror_maxmin_delta_cubic']])
             if "equ_naturallog" in self.cfr:
-                tbl.add_row(["ln()", self.cfr["dbt_naturallog"], self.cfr["dbdbt_naturallog"], self.cfr["r2_deltabt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
-            tbl.fields = [" ", "RMSE BT", "RMSE \u0394BT", "R\u00b2 \u0394BT", "\u0394RoR @FCs","Max/Min \u0394RoR"]
-            RMSEstr = tbl.get_string(sortby="RMSE BT")
+                tbl.add_row([QApplication.translate("Label","ln()",None), self.cfr["dbt_naturallog"], self.cfr['ror_fcs_delta_naturallog'], self.cfr['ror_maxmin_delta_naturallog']])
+            resultstr = "Curve Fit Analysis\n"
+            resultstr += tbl.get_string(sortby="MSE BT")
             
-            RMSEstr += "\n{0}   {1}{2:5.2f}".format(QApplication.translate("Label", "Note: All values calculated in Celsius",None), QApplication.translate("Label", "Actual RoR at FCs=",None), res['ror_fcs_act']) 
-
             self.cfr['segmentresultstr'] = res['segmentresultstr'] 
             
             # convert back to Fahrenheit if the profile was converted to Celsius
@@ -30102,7 +30119,7 @@ class ApplicationWindow(QMainWindow):
                 self.analysisRecomputeDeltas()
 
             # create the results annotation and update the graph 
-            self.analysisShowResults(RMSEstr, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+            self.analysisShowResults(resultstr, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -30182,12 +30199,12 @@ class ApplicationWindow(QMainWindow):
             #reset the annotation location if the origin is out of the screen
             for dim in self.qmc.analysisresultsloc:
                 if dim >= 1 or dim <=0:
-                    self.qmc.analysisresultsloc = [0.5,0.5]
+                    self.qmc.analysisresultsloc = self.qmc.analysisresultsloc_default
 
             #reset the annotation location if the origin is out of the screen
             for dim in self.qmc.segmentresultsloc:
                 if dim >= 1 or dim <=0:
-                    self.qmc.segmentresultsloc = [0.5,0.5]
+                    self.qmc.segmentresultsloc = self.qmc.segmentresultsloc_default
 
             # create the segement results annotation box
             a = aw.qmc.alpha["statsanalysisbkgnd"]
@@ -30199,7 +30216,7 @@ class ApplicationWindow(QMainWindow):
                        fontfamily='monospace',
                        fontsize='x-small',
                        color=tc,
-                       zorder=21,
+                       zorder=30,
                        picker=False,
                        bbox=dict(boxstyle="round", fc=fc, alpha=a))
             try:
@@ -30219,7 +30236,7 @@ class ApplicationWindow(QMainWindow):
                        fontfamily='monospace',
                        fontsize='x-small',
                        color=tc,
-                       zorder=121,
+                       zorder=31,
                        picker=False,
                        bbox=dict(boxstyle="round", fc=fc, alpha=a))
             try:
