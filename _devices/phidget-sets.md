@@ -16,9 +16,9 @@ Phidgets modules offer reliable measuring for roast logging with Artisan. In gen
 
 We describe here two basic setups that to our experience perform best. One setup is based on thermocouples (TCs) and a second, low-noise one, based on Resistive Thermal Devices (RTDs). For a technical discussion on the differences see *[On Idle Noise](https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html)*. An additional set of modules can be added to either of these two setups, providing ambient data (humidity, barometric pressure and room temperature).
 
-- [VINT TMP1101 2xTC Set](#vint-tmp1101-2xtc-set)
-- [VINT TMP1200 2xRTD Set](#vint-tmp1101-2xrtd-set) (low-noise)
-- [VINT Ambient Modules Extension](#vint-ambient-modules-extension)
+- [VINT TMP1101 2xTC Set](#2xtc-set)
+- [VINT TMP1200 2xRTD Set](#2xrtd-set) (low-noise)
+- [VINT Ambient Modules Extension](#ambient-modules-extension)
 
 All sets are based on the modern [VINT](https://www.phidgets.com/docs/What_is_VINT%3F Phidgets) as they provide additional flexibility, increased signal stability and generally consume less power from your USB port, in contrast to the direct-to-USB Phidgets (like the popular Phidget 1048 *databridge*)
 
@@ -55,6 +55,7 @@ Artisan for macOS is also available via the Homebrew Cask package manager. See t
 {: .notice--primary}
 
 
+<a id="2xtc-set"></a>
 ## 1. VINT TMP1101 2xTC Set
 
 This setup centers around the VINT Phidget TMP1101 that provides up to 4 temperature channels, only 2 of those are used here to measure bean temperature (BT) and environmental temperature (ET).
@@ -162,7 +163,7 @@ The [ambient modules](#vint-ambient-modules-extension) can be plugged additional
 
 You can easily plug additional [VINT modules supported by Artisan](/devices/phidgets/) into the free ports of the Phidget HUB0000 or add any other [device supported by Artisan](/devices/) like a USB Phidget.
 
-
+<a id="2xrtd-set"></a>
 ## 2. VINT TMP1200 2xRTD Set
 
 
@@ -246,7 +247,7 @@ The [ambient modules](#vint-ambient-modules-extension) can be plugged additional
 
 You can easily plug additional [VINT modules supported by Artisan](/devices/phidgets/) into the free ports of the Phidget HUB0000 or add any other [device supported by Artisan](/devices/) like a USB Phidget.
 
-
+<a id="ambient-modules-extension"></a>
 ## 3. VINT Ambient Modules Extension
 
 ### Parts
