@@ -73,6 +73,8 @@ devices:
         url: /devices/pid/
       - title: "Phidgets"
         url: /devices/phidgets/
+      - title: "Phidget SETS"
+        url: /devices/phidget-sets/
       - title: "S7"
         url: /devices/s7/
       - title: "Yoctopuce"

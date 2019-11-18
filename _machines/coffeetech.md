@@ -9,7 +9,7 @@ header:
   teaser: assets/images/FZ94-1.jpg
 ---
 * __Producer:__ [Coffee-Tech Engineering Ltd.](https://www.coffee-tech.com), Israel
-* __Machine:__ FZ-94 Lab Roaster, Ghibli 15/45/60/90, and Ghibli Firewood, Silon ZR7
+* __Machine:__ FZ-94 Lab Roaster, Ghibli 15/30/45/60/90, and Ghibli Firewood, Silon ZR7
 * __Connection:__ 
    * FZ-94/Ghibli: MODBUS RTU via USB-2-RS485 interface; requires the installation of a serial driver
    * Silon ZR7 (touch): MODBUS TCP via network connection

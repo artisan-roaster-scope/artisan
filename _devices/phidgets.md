@@ -24,34 +24,44 @@ Any number of Phidgets, of one type or mixed types, can be used in combination w
 
 For more information read the posts [Roasting with Phidgets](https://artisan-roasterscope.blogspot.it/2017/12/roasting-with-phidgets.html) and [More Phidgets!](https://artisan-roasterscope.blogspot.it/2017/12/more-phidgets.html) on the [Artisan blog](https://artisan-roasterscope.blogspot.it/)
 
-## Temperature Input
+**Watch out!** 
+Artisan v2.1 and newer features one-click configurations for the following popular Phidget sets
 
-### Thermocouples
+- [VINT TMP1101 2xTC Set](/devices/phidget-sets#vint-tmp1101-2xtc)
+- [VINT TMP1200 2xRTDs Set](/devices/phidget-sets#vint-tmp1200-2xrtd) (low [idle noise](https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html))
+- [VINT Ambient Modules Extension](/devices/phidget-sets#vint-ambient-modules)
+- USB 1048 Databridge
+
+For all these Phidget sets (but the last one), complete hardware packages are available from the [artisan.plus shop](https://shop.artisan.plus/).
+{: .notice--primary}
+
+
+## 1. Temperature Input
+
+### 1.1 Thermocouples (TCs)
 
 All of these devices support J, K, E and T type thermocouples. The type of thermocouples used has to be configured in the Phidgets tab on the Artisan side (menu `Config >> Device, Phidgets tab`).
 
-#### 1 Channel
+#### 1-Channel
 
 * [Phidget 1051](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=43) (USB)
 * [Phidget TMP1100](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=725) (VINT, isolated)
 
-#### 4 Channel
+#### 4-Channel
 
 * [Phidget 1048](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=38) (USB)
 * [Phidget TMP1101](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=726) (VINT)
 
-### RTDs
+### 1.2 Resistive Thermal Devices (RTDs)
 
-Resistive Thermal Devices
-
-#### 1 Channel
+#### 1-Channel
 
 * [Phidget TMP1200](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=968) (VINT)
  
 **Watch out!** The TMP1200 supports 2-, 3- and 4-wire PT100 and PT1000 RTDs to be connected directly. The type of RTD used has to be configured on the Artisan side (menu `Config >> Device, Phidgets tab`)
 {: .notice--primary}
 
-#### 4 Channel
+#### 4-Channel
 
 * [Phidget 1046](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=35) (USB)
 
@@ -59,14 +69,14 @@ Resistive Thermal Devices
 {: .notice--primary}
 
 
-### Infrared
+### 1.3 Infrared
 
 Single channel IR with integrated sensor
 
 * [Phidget IR 1045](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=34) (USB)
 
 
-## Analog/Digital Input & Output
+## 2. Analog/Digital Input & Output
 
 Artisan can attach to all Phidgets IO ports. The input ports are configured as (extra) devices and are handled as temperature curves. Phidgets output can be activated via `IO Command`, `PWM Command` or `VOUT Command` button or slider actions configured in the Events tab (menu `Config >> Events`). Note that buttons and sliders themself can be triggered autoamtically via alarm actions.
 
@@ -87,13 +97,13 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 
 Each output action supports a number of different commands specified in the `Documentation` field. See the post [More Phidgets!](https://artisan-roasterscope.blogspot.it/2017/12/more-phidgets.html) for details.
 
-## RC Servo Controllers
+## 3. RC Servo Controllers
 
 * [Phidget RCC 1000](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1015) (16x VINT, ext. powered)
 * [Phidget 1061](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1032) (8x USB, ext. powered)
 * [Phidget 1066](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1044) (1x USB powered) 
 
-## Ambient Sensors
+## 4. Ambient Sensors
 
 Artisan v1.4 adds support for the following ambient sensors that allow to automatically fill the room temperature, relative humidity and barometric pressure data of roast profiles.
 
