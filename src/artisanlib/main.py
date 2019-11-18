@@ -15628,8 +15628,8 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.etypes = aw.qmc.etypesdefault
                 aw.loadSettings(fn=action.data()[0],remember=False)
                 aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(label))
-                if action.data()[1] == "Phidget VINT":
-                    if action.text() == "Ambient":
+                if action.data()[1] == "Phidget":
+                    if action.text() == "VINT Ambient Modules":
                         elevation,res = QInputDialog.getInt(self,
                             QApplication.translate("Message", "Ambient",None),
                             QApplication.translate("Message", "Elevation (MASL)",None),value=aw.qmc.elevation)
