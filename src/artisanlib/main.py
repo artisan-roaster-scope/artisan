@@ -1676,14 +1676,14 @@ class tgraphcanvas(FigureCanvas):
         self.alarmflag = []    # 0 = OFF; 1 = ON flags
         self.alarmguard = []   # points to another alarm by index that has to be triggered before; -1 indicates no guard
         self.alarmnegguard = []   # points to another alarm by index that should not has been triggered before; -1 indicates no guard
-        self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
+        self.alarmtime = []    # time event after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
 #                              # -1 equals None
         self.alarmoffset = []  # for timed alarms, the seconds after alarmtime the alarm is triggered
         self.alarmtime2menuidx = [2,4,5,6,7,8,9,10,3,0,11,1] # maps self.alarmtime index to menu idx (to move TP in menu from index 9 to 3)
         self.menuidx2alarmtime = [9,-1,0,8,1,2,3,4,5,6,7,10] # inverse of above (note that those two are only inverse in one direction!)
         self.alarmcond = []    # 0 = falls below; 1 = rises above
         # alarmstate is set to 'not triggered' on reset(). This is needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
-        self.alarmstate = []   # <time>=triggered, 0=not triggered. 
+        self.alarmstate = []   # <idx>=triggered, -1=not triggered. 
         self.alarmsource = []   # -3=None, -2=DeltaET, -1=DeltaBT, 0=ET , 1=BT, 2=extratemp1[0], 3=extratemp2[0], 4=extratemp2[1],....
         self.alarmtemperature = []  # set temperature number (example 500)
         self.alarmaction = []       # -1 = no action; 0 = open a window;
@@ -3226,8 +3226,7 @@ class tgraphcanvas(FigureCanvas):
             self.delta_ax.lines = []
 
     def setalarm(self,alarmnumber):
-        if len(self.timex) > 1:
-            self.alarmstate[alarmnumber] = max(1,len(self.timex) - 1) # we have to ensure that alarmstate of triggered alarms is never 0
+        self.alarmstate[alarmnumber] = max(0,len(self.timex) - 1) # we have to ensure that alarmstate of triggered alarms is never negativ
         
         aw.sendmessage(QApplication.translate("Message","Alarm {0} triggered", None).format(alarmnumber + 1))
         if not self.silent_alarms:
@@ -5950,11 +5949,11 @@ class tgraphcanvas(FigureCanvas):
                                         elif self.eventsGraphflag == 4:
                                             anno = self.ax.annotate(firstletter + secondletter, xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
                                                          xytext=(self.timeB[int(self.backgroundEvents[i])],Btemp),
-                                                         alpha=min(aw.qmc.backgroundalpha + 0.1, 1.0),
+                                                         alpha=min(aw.qmc.backgroundalpha + 0.3, 1.0),
                                                          color=aw.qmc.palette["bgeventtext"],
                                                          va="center", ha="center",
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none',
-                                                            alpha=min(aw.qmc.backgroundalpha + 0.1, 1.0)),
+                                                            alpha=min(aw.qmc.backgroundalpha, 1.0)),
                                                          fontproperties=fontprop_small,
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          )
@@ -6538,9 +6537,11 @@ class tgraphcanvas(FigureCanvas):
                     self.legend = leg
                     self.legend_lines = leg.get_lines()
                     for h in leg.legendHandles:
-                        h.set_picker(5)
+                        h.set_picker(False) # we disable the click to hide on the handles feature
+                        #h.set_picker(aw.draggable_text_box_picker) # as setting this picker results in non-termination
                     for l in leg.texts:
-                        l.set_picker(5)
+                        #l.set_picker(5)
+                        l.set_picker(aw.draggable_text_box_picker)
                     try:
                         leg.set_draggable(state=True,use_blit=True)  #,update='bbox')
                         leg.set_picker(aw.draggable_text_box_picker)
@@ -7585,7 +7586,7 @@ class tgraphcanvas(FigureCanvas):
             
             #reset alarms
             self.temporaryalarmflag = -3
-            self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; any other value = triggered; value indicates the index in self.timex at which the alarm was triggered
+            self.alarmstate = [-1]*len(self.alarmflag)  #1- = not triggered; any other value = triggered; value indicates the index in self.timex at which the alarm was triggered
             #reset TPalarmtimeindex to trigger a new TP recognition during alarm processing
             aw.qmc.TPalarmtimeindex = None
             
@@ -12164,7 +12165,6 @@ class SampleThread(QThread):
                                 '{0:.1f}'.format(BTB)])
                         except:
                             pass
-                    
 
                     #check for each alarm that was not yet triggered
                     for i in range(len(aw.qmc.alarmflag)):
@@ -12190,14 +12190,14 @@ class SampleThread(QThread):
                         # 5) the alarm From is any other event but TP
                         # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
                         if aw.qmc.alarmflag[i] \
-                          and not aw.qmc.alarmstate[i] \
-                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
-                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmstate) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
+                          and aw.qmc.alarmstate[i] == -1 \
+                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]] != -1)) \
+                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]] == -1)) \
                           and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
-                          or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
-                          or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                          or (aw.qmc.alarmtime[i] == 10 and aw.qmc.alarmguard[i] != -1)  \
-                          or (aw.qmc.alarmtime[i] == 8 and aw.qmc.timeindex[0] > -1 \
+                            or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
+                            or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                            or (aw.qmc.alarmtime[i] == 10 and aw.qmc.alarmguard[i] != -1)  \
+                            or (aw.qmc.alarmtime[i] == 8 and aw.qmc.timeindex[0] > -1 \
                                 and aw.qmc.TPalarmtimeindex)):
                             #########
                             # check alarmoffset (time after From event):
@@ -12212,15 +12212,22 @@ class SampleThread(QThread):
                                 elif aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
                                     alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
                                 elif aw.qmc.alarmtime[i] == 10: # time or temp after the trigger of the alarmguard (if one is set)
+                                    # we know here that the alarmstate of the guard is valid as it has triggered
                                     alarm_time = alarm_time - aw.qmc.timex[aw.qmc.alarmstate[aw.qmc.alarmguard[i]]]
+                                
                                 if alarm_time >= aw.qmc.alarmoffset[i]:
                                     aw.qmc.temporaryalarmflag = i
                             #########
                             # check alarmtemp:
                             alarm_temp = None
-                            if aw.qmc.alarmtime[i] == 10: # IF ALARM
+                            if aw.qmc.alarmtime[i] == 10: # IF ALARM and only during recording as otherwise no data to refer to is available
                                 # and this is a conditional alarm with alarm_time set to IF ALARM
-                                alarm_idx = aw.qmc.alarmstate[aw.qmc.alarmguard[i]] # reading when the IF ALARM triggered
+                                if_alarm_state = aw.qmc.alarmstate[aw.qmc.alarmguard[i]] # reading when the IF ALARM triggered
+                                if if_alarm_state != -1:
+                                    if if_alarm_state < len(aw.qmc.timex):
+                                        alarm_idx = if_alarm_state
+                                    else:
+                                        alarm_idx = -1
                                 # we substract the reading at alarm_idx from the current reading of the channel determined by alarmsource
                             else:
                                 alarm_idx = None
@@ -12251,8 +12258,12 @@ class SampleThread(QThread):
                                         alarm_temp -= aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                                 
                             alarm_limit = aw.qmc.alarmtemperature[i]
-                            if alarm_temp is not None and alarm_temp != -1 and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                            if alarm_temp is not None and alarm_temp != -1 and (
+                                    (aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or 
+                                    (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit) or
+                                    (alarm_idx != None and alarm_temp == alarm_limit)): # for relative IF_ALARMS we include the equality
                                 aw.qmc.temporaryalarmflag = i
+
                 #############    if using DEVICE 18 (no device). Manual mode
                 # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
                 else:
@@ -19929,7 +19940,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
         else:
             self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
-        self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered    
+        self.qmc.alarmstate = [-1]*len(self.qmc.alarmflag)  #-1 = not triggered; otherwise idx = triggered
 
     def calcVirtualdevices(self):
         try:
@@ -20781,7 +20792,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtime.append(8)        #after TP
                                     aw.qmc.alarmoffset.append(0)
                                     aw.qmc.alarmcond.append(1)
-                                    aw.qmc.alarmstate.append(0)
+                                    aw.qmc.alarmstate.append(-1)
                                     aw.qmc.alarmsource.append(1)    #BT
                                     aw.qmc.alarmtemperature.append(float(fields_action[0]))
                                     aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
@@ -20795,7 +20806,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtime.append(8)        #after TP
                                     aw.qmc.alarmoffset.append(0)
                                     aw.qmc.alarmcond.append(1)
-                                    aw.qmc.alarmstate.append(0)
+                                    aw.qmc.alarmstate.append(-1)
                                     aw.qmc.alarmsource.append(1)    #BT
                                     aw.qmc.alarmtemperature.append(int(fields_action[0]))
                                     aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
@@ -20812,7 +20823,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtime.append(2)        #after FC
                                     aw.qmc.alarmoffset.append(int(fields_action[0]))
                                     aw.qmc.alarmcond.append(1)
-                                    aw.qmc.alarmstate.append(0)
+                                    aw.qmc.alarmstate.append(-1)
                                     aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
                                     aw.qmc.alarmtemperature.append(0)
                                     aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
@@ -20826,7 +20837,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtime.append(2)        #after FC
                                     aw.qmc.alarmoffset.append(int(fields_action[0]))
                                     aw.qmc.alarmcond.append(1)
-                                    aw.qmc.alarmstate.append(0)
+                                    aw.qmc.alarmstate.append(-1)
                                     aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
                                     aw.qmc.alarmtemperature.append(0)
                                     aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
@@ -20843,7 +20854,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtime.insert(0,9)        #after ON
                                     aw.qmc.alarmoffset.insert(0,0)
                                     aw.qmc.alarmcond.insert(0,1)
-                                    aw.qmc.alarmstate.insert(0,0)
+                                    aw.qmc.alarmstate.insert(0,-1)
                                     aw.qmc.alarmsource.insert(0,1)    #BT
                                     aw.qmc.alarmtemperature.insert(0,0)
                                     aw.qmc.alarmaction.insert(0,3+slider_power)    #SLIDER POWER
@@ -20857,7 +20868,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtime.insert(0,9)        #after ON
                                     aw.qmc.alarmoffset.insert(0,0)
                                     aw.qmc.alarmcond.insert(0,1)
-                                    aw.qmc.alarmstate.insert(0,0)
+                                    aw.qmc.alarmstate.insert(0,-1)
                                     aw.qmc.alarmsource.insert(0,1)    #BT
                                     aw.qmc.alarmtemperature.insert(0,0)
                                     aw.qmc.alarmaction.insert(0,3+slider_fan)    #SLIDER POWER
@@ -20874,7 +20885,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtime.insert(0,9)        #after ON
                                     aw.qmc.alarmoffset.insert(2,0)
                                     aw.qmc.alarmcond.insert(2,1)
-                                    aw.qmc.alarmstate.insert(2,0)
+                                    aw.qmc.alarmstate.insert(2,-1)
                                     aw.qmc.alarmsource.insert(2,1)    #BT
                                     aw.qmc.alarmtemperature.insert(2,float(fields_action[0])-10)
                                     aw.qmc.alarmaction.insert(2,7)    #inititate 7 (START)
@@ -20888,7 +20899,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtime.insert(3,-1)        #after START
                                     aw.qmc.alarmoffset.insert(3,0)
                                     aw.qmc.alarmcond.insert(3,1)
-                                    aw.qmc.alarmstate.insert(3,0)
+                                    aw.qmc.alarmstate.insert(3,-1)
                                     aw.qmc.alarmsource.insert(3,1)    #BT
                                     aw.qmc.alarmtemperature.insert(3,float(fields_action[0]))
                                     aw.qmc.alarmaction.insert(3,0)    #POPUP
@@ -23196,7 +23207,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmstrings = list(toStringList(settings.value("alarmstrings",self.qmc.alarmstrings)))
                 else:
                     self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
-                self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)
+                self.qmc.alarmstate = [-1]*len(self.qmc.alarmflag)
                 if settings.contains("loadAlarmsFromProfile"):
                     self.qmc.loadalarmsfromprofile = bool(toBool(settings.value("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)))
                 if settings.contains("loadAlarmsFromBackground"):
@@ -35885,7 +35896,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 aw.qmc.alarmoffset.append(tx) # seconds after TP
                 aw.qmc.alarmtime.append(ev)
                 aw.qmc.alarmcond.append(1) # rises above (we assume that BT always rises after TP)
-                aw.qmc.alarmstate.append(0) # not yet triggered
+                aw.qmc.alarmstate.append(-1) # not yet triggered
                 aw.qmc.alarmsource.append(1) # 1=BT
                 aw.qmc.alarmtemperature.append(float(round(aw.qmc.temp2[aw.qmc.specialevents[r]]))) # the BT trigger temperature
                 aw.qmc.alarmaction.append(aw.qmc.specialeventstype[r] + 3) # 3,4,5,6 for slider 0-3
@@ -48697,7 +48708,7 @@ class comportDlg(ArtisanResizeablDialog):
                             devname = devicename
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
-                        if not (devid in aw.qmc.nonSerialDevices) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(self.portComboBoxIndexChanged)
                             comportComboBox.setFixedWidth(200)
@@ -54180,7 +54191,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 obj = aw.deserialize(filename)
                 aw.loadAlarmsFromProfile(filename,obj)
                 self.alarmsfile.setText(aw.qmc.alarmsfile) 
-            aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag) 
+            aw.qmc.alarmstate = [-1]*len(aw.qmc.alarmflag) 
             aitems = self.buildAlarmSourceList()
             for i in range(len(aw.qmc.alarmsource)):
                 if aw.qmc.alarmsource[i] + 3 >= len(aitems):
@@ -54481,7 +54492,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         for i in range(self.alarmtable.rowCount()):
             for j in range(11):
                 try:
-                    if aw.qmc.alarmstate[i]:
+                    if aw.qmc.alarmstate[i] != -1:
                         #self.alarmtable.setItem(i,j,QTableWidgetItem())
                         self.alarmtable.item(i,j).setBackground(QColor(191, 191, 191))
                 except:
