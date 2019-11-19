@@ -25,7 +25,7 @@ We describe here two basic setups that to our experience perform best. One setup
 
 - [VINT TMP1101 2x TC Set](/phidgets/2x-tc-set/)
 - [VINT TMP1200 2x RTD Set](/phidgets/2x-rtd-set/) (low-noise)
-- [VINT Ambient Modules Extension](/phidgets/ambient-extension/)
+- Extension: [VINT Ambient Modules](/phidgets/ambient-extension/)
 
 All sets are based on modern [VINT](https://www.phidgets.com/docs/What_is_VINT%3F) modules as those provide additional flexibility, increased signal stability and generally consume less power from your USB port, in contrast to the direct-to-USB Phidgets (like the popular Phidget 1048 *databridge*)
 
