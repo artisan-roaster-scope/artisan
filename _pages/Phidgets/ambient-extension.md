@@ -66,7 +66,7 @@ Ambient data is also forwarded to the inventory service [artisan.plus](https://a
 
 <figure class="full">
     <a href="/assets/images/Phidgets/plus-ambient-data.png"><img src="/assets/images/Phidgets/plus-ambient-data.png"></a>
-    <figcaption>Ambient Data in [artisan.plus](https://artisan.plus/){:target="_blank"}</figcaption>
+    <figcaption>Ambient Data in artisan.plus</figcaption>
 </figure>
 
 **Watch out!** 
