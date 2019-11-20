@@ -117,8 +117,8 @@ docs:
         url: /docs/statistics/
       - title: "Axes"
         url: /docs/axes/
-      - title: "Colors"
-        url: /docs/colors/
+      - title: "Colors and Background Image"
+        url: /docs/colors and background image/
       - title: "Themes"
         url: /docs/themes/
       - title: "Autosave"
