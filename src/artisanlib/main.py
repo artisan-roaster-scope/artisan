@@ -6754,7 +6754,7 @@ class tgraphcanvas(FigureCanvas):
                         if screen:
                             screen = screen + "/"
                         screen = screen + str(int(round(aw.qmc.beansize_max)))
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Screen Size", None) + ': '+ screen # + '18/64\u2033' # the unit makes it hard to read
+                        statstr += '\n' + QApplication.translate("AddlInfo", "Screen Size", None) + ': '+ screen # + '18/64\u2033' # the unit makes it hard to read
                 if aw.qmc.density[0] and aw.qmc.density[2] != 0:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Density Green", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3]) 
                 if aw.qmc.moisture_greens:
@@ -41476,7 +41476,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def load(self,_):
-        self.filename = aw.ArtisanOpenFileDialog()
+        self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
         if len(u(self.filename)) == 0:
             return
         aw.sendmessage(QApplication.translate("Message","Reading background profile...",None))
@@ -45410,7 +45410,7 @@ class serialport(object):
              
 #--- Phidget Digital PWM Output (only one supported for now)
 #  only supporting 
-#           4 channel Phidget OUT1100
+#           4 channel Phidget OUT1100, REL1100
 #          16 channel Phidget REL1101
 #  commands: out(n,v) and toggle(n) with n channel number and value v from [0-100]
 #    toggle switches between last value != 0 and 0
@@ -45423,7 +45423,7 @@ class serialport(object):
                 # try to attach the 4 channels of the Phidget OUT1100 module
                 ser = None
                 port = None
-                for phidget_id in [DeviceID.PHIDID_OUT1100]:
+                for phidget_id in [DeviceID.PHIDID_OUT1100,DeviceID.PHIDID_REL1100]:
                     if ser is None:
                         ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,
                                 remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
