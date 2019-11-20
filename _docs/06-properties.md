@@ -2,6 +2,7 @@
 title: "Properties"
 permalink: /docs/properties/
 excerpt: "Roast properties dialog"
+last_modified_at: 2019-11-20T15:59:00-04:00
 toc: false
 ---
 ### Roast Properties Dialog
