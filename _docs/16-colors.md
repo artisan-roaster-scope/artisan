@@ -27,4 +27,4 @@ Artisan v2.1 allows you to show an image in the background of your profiles. Thi
 
 To set a background image follow the menu Config>Curves>UI. Click on the "Load" button to choose an image file.  Then set the opacity level from 0 to 10, where 0 it totally transparent and 10 is totally opaque.  The default setting is 2.0.  Choosing "Hide Image During Roasting" will hide the image whenever Artisan is recording.  Use this option if you want to reduce visual clutter in the graph while you are roasting.
 
-![background image example](/assets/images/gsg/Background Image example.png)
+![Background Image example](/assets/images/gsg/Background Image example.png)
