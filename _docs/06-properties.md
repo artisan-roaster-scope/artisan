@@ -22,6 +22,8 @@ Other useful information you might add includes which roaster was used and the d
 
 To reset the Properties you have to select the box “Delete roast properties on RESET” and then reset. You can also have the Properties box open on charge to remind you, mostly to at least, name your coffee.
 
+Note that you can now export your Roast Properties data and events tabs using the "Copy Table" button found on those tabs.
+
 *Density calculations*
 
 Two blog posts on the density calculations [here](

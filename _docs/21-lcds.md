@@ -10,7 +10,7 @@ toc: false
 
 
 
- Menu>View>Readings turns on the small LCD panels on the right side that read the ET, BT and Delta BT and Delta ET (rate of rise).  These are key readings you will use during the roast.  Keyboard shortcuts vary by operating system and can toggle on and off the LCDs as well as full screen mode. 
+ Menu>View>Readings turns on the small LCD panels on the right side that read the ET, BT and Delta BT and Delta ET (rate of rise).  These are key readings you will use during the roast.  Keyboard shortcuts vary by operating system and can toggle on and off the LCDs as well as full screen mode.
 
  ![view readings](/assets/images/gsg/view-readings.png)
 
@@ -18,7 +18,7 @@ toc: false
 
 ### Large LCDs
 
-An extra set of LCDs are available as an extra window (Menu View > LCDs) that respect the color settings of the time/BT/ET LCDs from the main window. This window can moved to a second screen attached to the computer running Artisan and enlarged as needed. Note that Delta BT is not included in this feature.  
+An extra set of LCDs are available as an extra window (Tools> LCDs) that respect the color settings of the time/BT/ET LCDs from the main window. This window can moved to a second screen attached to the computer running Artisan and enlarged as needed. New LCD's include Delta, PID and Extras.  
 
 ### Web LCDs
 

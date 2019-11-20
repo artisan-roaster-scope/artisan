@@ -15,7 +15,7 @@ Creating Events allows you to record data to be shown on your roast graph with e
 Artisan’s standard buttons are as follows:
 ![Artisan buttons](/assets/images/gsg/standard buttons.png)
 
-The buttons above contain key time points in your roast and after using the trier in the roaster, you would push the button when the event occurs.  Pushing these buttons during a roast will add data to your roast log.  You can find the data under Roast>Properties>Data tab.
+The buttons above contain key time points in your roast and after using the trier in the roaster, you would push the button when the event occurs. The buttons table can down be downloaded using the Copy Table button. Pushing these buttons during a roast will add data to your roast log.  You can find the data under Roast>Properties>Data tab.  The Data and Events tabs can be downloaded using the Copy Table button on those dialogs.  You can change the button sizes - tiny, small and large.  
 
 Sliders can be used to create Events as well.   The sliders appear on the left side and can be used to input a variable value between 0 and 999. Make sure you check Decimal Places under Curves>UI if you use them.  Your events will be rendered on your graphs (if you have the Events checked on the Sliders tab) with the first letter of the name of the event and two decimal places.  So Gas at a value of 35 would be G35.  Or if you don’t check decimal places G3.  
 
@@ -44,7 +44,9 @@ During a roast it is now possible to have Artisan draw a line at the current poi
 
 ### Rendering Events on Your Curves
 
-To see the values of the TP, DE, FCs etc, check the box for Annotations.  For Events that you have defined, you will see to the right of Events a dialog box with drop down options:
+To see the values of the TP, DE, FCs etc, check the box for Annotations.  You can now drag these Annotations if they are covering something else you want to see to move them on the graph.  
+
+For Events that you have defined, you will see to the right of Events a dialog box with drop down options:
 
 ![combo setting](/assets/images/gsg/combo example.png)
 
