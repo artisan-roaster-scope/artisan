@@ -19088,7 +19088,7 @@ class ApplicationWindow(QMainWindow):
                             aw.deleteBackground()
                             aw.qmc.redraw()
                         else:
-                            self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
+                            self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt="*.alog")
                             if len(u(self.filename)) != 0:
                                 try:
                                     aw.qmc.resetlinecountcaches()
@@ -19718,13 +19718,18 @@ class ApplicationWindow(QMainWindow):
                 
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
+    # if ext is given, the file selector allows only file with that extension to be selected for open
+    # if ext_alt is given (not None), all files can be selected, but if a file was selected not having the ext_alt the empty string is returned (used in the background profile dialog)
+    def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",ext_alt=None,path=None):
         if path is None:   
             path = self.getDefaultPath()
         res = u(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext)[0])
         f = u(res)
-        self.setDefaultPath(f)
-        return f
+        if ext_alt is not None and not f.endswith(ext_alt):
+            return ""
+        else:
+            self.setDefaultPath(f)
+            return f
  
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
@@ -32972,6 +32977,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     pyqtSlot()
     def ble_scan_failed(self):
         self.scale_weight = None
+        self.scale_battery = None
         self.scaleWeight.setText("")
 
     pyqtSlot(float)
@@ -33603,6 +33609,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         
         self.ble = None # the BLE interface
         self.scale_weight = None # weight received from a connected scale
+        self.scale_battery = None # battery level of the connected scale in %
         self.scale_set = None # set weight for accumulation
         
         self.disconnecting = False # this is set to True to terminate the scale connection
@@ -34433,8 +34440,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                             acaia.sendStop,
                             acaia.reset)
                     # start BLE loop
-                    self.ble.weightChanged.connect(self.ble_weight_changed)
                     self.ble.deviceDisconnected.connect(self.ble_scan_failed)
+                    self.ble.weightChanged.connect(self.ble_weight_changed)
+                    self.ble.batteryChanged.connect(self.ble_battery_changed)
                     self.ble.scanDevices()
                 except:
                     pass
@@ -34634,6 +34642,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.disconnecting:
             aw.scale.closeport()
             self.scale_weight = None
+            self.scale_battery = None
         else:
             if aw.scale.SP is None or not aw.scale.SP.isOpen():
                 self.connectScaleSignal.emit()
@@ -34684,6 +34693,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 #        print(st,"ble_scan_failed")
         self.scale_weight = None
+        self.scale_battery = None
         self.scaleWeight.setText("")
         if self.ble is not None:
             QTimer.singleShot(200,lambda : self.ble.scanDevices())
@@ -34691,6 +34701,11 @@ class editGraphDlg(ArtisanResizeablDialog):
     def ble_weight_changed(self,w):
         if w is not None:
             self.scale_weight = w
+            self.update_scale_weight()
+    
+    def ble_battery_changed(self,b):
+        if b is not None:
+            self.scale_battery = b
             self.update_scale_weight()
             
     def update_scale_weight(self):
@@ -35324,6 +35339,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.disconnecting = True
         if self.ble is not None:
             try:
+                self.ble.batteryChanged.disconnect()
                 self.ble.weightChanged.disconnect()
                 self.ble.deviceDisconnected.disconnect()
             except:
@@ -35342,6 +35358,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.disconnecting = True
         if self.ble is not None:
             try:
+                self.ble.batteryChanged.disconnect()
                 self.ble.weightChanged.disconnect()
                 self.ble.deviceDisconnected.disconnect()
             except:
@@ -41476,7 +41493,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def load(self,_):
-        self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
+        self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt="*.alog")
         if len(u(self.filename)) == 0:
             return
         aw.sendmessage(QApplication.translate("Message","Reading background profile...",None))

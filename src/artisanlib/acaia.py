@@ -53,12 +53,15 @@ class AcaiaBLE():
     TIMER_STATE_STARTED = 1
     TIMER_STATE_PAUSED = 2
     
+    
     def __init__(self):
         self.notificationConfSent = False
         # holds msgType on messages split in header and payload
         self.msgType = None
         self.weight = None
-        
+        self.battery = None
+        self.model = 0 # acaia models: 0: Pearl, 1: Lunar, 2: X
+    
     def reset(self):
         self.__init__()
 
@@ -103,13 +106,12 @@ class AcaiaBLE():
 
     # configure notifications
     def confNotifications(self,write):
-        # seems to be ignored / not needed by Pearl
         self.sendEvent(write,
             bytes([ # pairs of key/setting
                     0,  # weight
                     5,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec)
                        # 5 or 7 seems to be good values for this app in Artisan
-#                    1,  # battery
+#                    1,
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
 #                    2,  # timer
 #                    255, #5,  # timer argument
@@ -119,8 +121,12 @@ class AcaiaBLE():
                 )
 
     def parseInfo(self,data):
-        pass
-#        print("battery",data[4]) # most likely not the battery
+        if data.startswith(b'\x02\n\x02'):
+            self.model = 0 # Acaia Pearl
+        elif data.startswith(b'\x02\x14\x02'):
+            self.model = 1 # Acaia Lunar
+        elif data.startswith(b'\x02\x14\x03'):
+            self.model = 2
 
     # returns length of consumed data or -1 on error
     def parseWeightEvent(self,payload):
@@ -141,6 +147,9 @@ class AcaiaBLE():
 
             if (payload[5] & 0x02) == 0x02:
                 value *= -1
+                
+            if self.model == 2:
+                value = value * 1000
 
             if value != self.weight:
                 self.weight = value
@@ -151,7 +160,9 @@ class AcaiaBLE():
         if len(payload) < self.EVENT_BATTERY_LEN:
             return -1
         else:
-#            print("battery: ", payload[0])
+            b = payload[0]
+            if 0 <= b and b <= 100:
+                self.battery = payload[0]
             return self.EVENT_BATTERY_LEN
     
     def parseTimerEvent(self,payload):
@@ -215,14 +226,15 @@ class AcaiaBLE():
         elif msgType == self.MSG_EVENT:
             self.parseScaleEvents(data)
 
-    # returns None or new weight data
+    # returns None or new weight data as first result and
+    # None or new battery level as second result
     def processData(self,write,data):
         data = data.data() # convert QByteArray to Python byte array
         if len(data) == 3 and data[0] == self.HEADER1 and data[1] == self.HEADER2:
             # data package contains just the header (alternately send with payload)
             self.msgType = data[2]
             # we now expect a data package belonging to this header
-            return None
+            return None, None
         elif self.msgType is None and len(data)>3 and data[0] == self.HEADER1 and data[1] == self.HEADER2:
             # a complete package containing header and payload
             self.msgType = data[2]
@@ -231,12 +243,13 @@ class AcaiaBLE():
         # in any case data now contains the package without the first 3 bytes (magic1, magic2, msgType)
         
         old_weight = self.weight
+        old_battery = self.battery
 
         if self.msgType != None:
             msgCRC = data[-2:]
             if msgCRC != self.crc(data[:-2]):
 #                print("CRC check failed")
-                return None
+                return None, None
             else:
                 offset = 0
                 if self.msgType in [self.MSG_STATUS, self.MSG_EVENT, self.MSG_INFO]:
@@ -246,17 +259,22 @@ class AcaiaBLE():
                     offset = 1
                 elif self.msgType == self.MSG_SYSTEM:
                     l = 2
-                    return # we ignore system messages
+                    return None, None # we ignore system messages
                 else:
                     l = 2
                 if len(data) < (l + 2):
 #                    print("Invalid data length")
-                    return None
+                    return None, None
                 self.parseScaleData(write,self.msgType,data[offset:offset+l]);
             self.msgType = None # message consumed completely
             
         if old_weight == self.weight:
-            return None # weight did not change
+            w = None # weight did not change
         else:
-            return self.weight
+            w = self.weight
+        if old_battery == self.battery:
+            b = None # battery did not change
+        else:
+            b = self.battery
+        return w,b
 

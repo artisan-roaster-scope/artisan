@@ -23,6 +23,7 @@ from PyQt5 import QtBluetooth
 
 class BleInterface(QtCore.QObject):
     weightChanged=QtCore.pyqtSignal(float)
+    batteryChanged=QtCore.pyqtSignal(int)
     deviceDisconnected=QtCore.pyqtSignal()
     dataReceived = QtCore.pyqtSignal(QtCore.QByteArray)
 
@@ -91,9 +92,11 @@ class BleInterface(QtCore.QObject):
     QtCore.pyqtSlot("QByteArray")
     def printDataReceived(self,data=QtCore.QByteArray):
 #        print("received data:{data}".format(data =data))
-        res = self.processData(self.write, data)
-        if res is not None:
-            self.weightChanged.emit(res)
+        res_w, res_b = self.processData(self.write, data)
+        if res_w is not None:
+            self.weightChanged.emit(res_w)
+        if res_b is not None:
+            self.batteryChanged.emit(res_b)
 
     def read(self):
         if(self.m_service and self.m_readCharacteristic.isValid()):
