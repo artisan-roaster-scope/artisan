@@ -10,7 +10,7 @@ toc: false
 
 Menu>Config>Curves
 
-![cofig curves](/assets/images/gsg/config curves menu.png)
+![config curves](/assets/images/gsg/config curves menu.png)
 
 These are critical settings within Artisan and for most the first two tabs will be where your focus lies.  
 
