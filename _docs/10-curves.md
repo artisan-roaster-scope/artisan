@@ -58,5 +58,4 @@ IMPORTANT NOTE:  Except for the raw data filters, the filter settings can be cha
 
 *UI Tab*
 
-Make sure under the Curves dialog box, you do two things on the UI tab.  Check the box for Decimal Places and investigate the fonts.  Here is an example of the Comic font.
-![fonts example](/assets/images/gsg/font example - chemistry set.png)
+Make sure under the Curves dialog box, you do two things on the UI tab.  Check the box for Decimal Places and investigate the fonts you can use for your graph.  You can also set a background image.  See [Colors and Background Image](https://artisan-scope.org/docs/colors/).
