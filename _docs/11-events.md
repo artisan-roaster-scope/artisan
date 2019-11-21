@@ -17,7 +17,7 @@ Artisan’s standard buttons are as follows:
 
 The buttons above contain key time points in your roast and after using the trier in the roaster, you would push the button when the event occurs. The buttons table can down be downloaded using the Copy Table button. Pushing these buttons during a roast will add data to your roast log.  You can find the data under Roast>Properties>Data tab.  The Data and Events tabs can be downloaded using the Copy Table button on those dialogs.  You can change the button sizes - tiny, small and large.  
 
-![button sizes](assets/images/gsg/button sizes.png)
+![button sizes](assets/images/gsg/buttton sizes.png)
 
 Sliders can be used to create Events as well.   The sliders appear on the left side and can be used to input a variable value between 0 and 999. Make sure you check Decimal Places under Curves>UI if you use them.  Your events will be rendered on your graphs (if you have the Events checked on the Sliders tab) with the first letter of the name of the event and two decimal places.  So Gas at a value of 35 would be G35.  Or if you don’t check decimal places G3.  
 
