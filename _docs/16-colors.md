@@ -20,7 +20,9 @@ Also new are enhanced dialogs that display the chosen colors within the dialog. 
 
 ![colors dialog lcd](/assets/images/gsg/colors dialog lcd.png)
 
-You can adjust the Opacity of the graph colors, the statistic summary box, and mask when using the Analyze featture.  
+You can adjust the Opacity of the graph colors, the statistic summary box, and mask when using the Analyze featture.
+
+![opacity](/assets/images/gsg/color config opacity.png)
 
 ### Background Image on your Graph
 Artisan v2.1 allows you to show an image in the background of your profiles. This can be any image you choose.  It could be a logo, a picture of your roaster or anything you choose.
