@@ -45,7 +45,7 @@ Artisan’s standard event buttons are as follows:
 
 The buttons above with start and stop your roasts and indicate key time points in your roast that will be logged.  After using the roaster's trier, you push the button when the event occurs.  Pushing these buttons during a roast will add data to your roast log.  You can find the data under Roast>Properties>Data tab. Sliders can be used to create custom Events as well, but not the standard events.   
 
-When you are ready to charge the roaster, push the On Button. Then push the Start button, and give it about 15 seconds before you charge the roaster, and push the Charge button at the bottom of Artisan.  Using the trier, when you determine you are at Dry End, hit the Dry End Button, and do the same for First Crack Start, and Drop.  After the roast completes, hit the off button.  Congratulations on your first roast.  
+When you are ready to charge the roaster, push the On Button. Then push the Start button, and give it **about 15 seconds before you charge the roaster, and push the Charge button at the bottom of Artisan.**  Using the trier, when you determine you are at Dry End, hit the Dry End Button, and do the same for First Crack Start, and Drop.  After the roast completes, hit the off button.  Congratulations on your first roast.  
 
 **NOTE:
 *Unplug Your Laptop Before You Roast***
