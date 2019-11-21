@@ -44,6 +44,10 @@ You will need to configure the hardware device taking the readings from the roas
 The various devices supported can be found [here](https://artisan-roasterscope.blogspot.com/2013/06/device-selection.html). Information on PID control can be found [here](https://artisan-roasterscope.blogspot.com/2016/11/pid-control.html).  A discussion of virtual devices and symbolic assignments is [here](https://artisan-roasterscope.blogspot.com/2014/04/virtual-devices-and-symbolic-assignments.html). The most critical symbolic assignment is for your bean temp and that is explained below.
 Port settings are found under Config>Port IF they are needed.
 
+Artisan can now configure certain Phidgets much like a Machine.
+
+![Phidget Setup](/assets/images/gsg/phidget config.jpg)
+
 *Example* - Here is a quick discussion of connecting a Phidget.  Each device will differ. Connecting a Phidget is easy and you don't have to use the Port menu.  
 
 For a Phidget 1048, the connections were made as follows:
