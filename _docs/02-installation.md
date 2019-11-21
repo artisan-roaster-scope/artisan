@@ -33,7 +33,7 @@ Extract the downloaded zip archive and start the included installer.
 
 ### macOS
 
-Mount the installation `.dmg` archive with a double-click and drag the contained `Artisan.app` to your `Applications` folder
+Mount the installation `.dmg` archive with a double-click and drag the contained `Artisan.app` to your `Applications` folder.  Note that Phidgets released new drivers for macOS 10.15 Catalina which must be installed and authorized.  
 
 
 ### Linux
