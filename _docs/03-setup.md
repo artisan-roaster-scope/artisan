@@ -39,7 +39,7 @@ Under Config>Machine, Artisan 2.0 has direct support for:
 
 ### Configure for supported devices
 
-You will need to configure the hardware device taking the readings from the roaster if its not a listed roaster above.  
+You will need to configure the hardware device taking the readings from the roaster if its not a listed roaster above. 
 
 The various devices supported can be found [here](https://artisan-roasterscope.blogspot.com/2013/06/device-selection.html). Information on PID control can be found [here](https://artisan-roasterscope.blogspot.com/2016/11/pid-control.html).  A discussion of virtual devices and symbolic assignments is [here](https://artisan-roasterscope.blogspot.com/2014/04/virtual-devices-and-symbolic-assignments.html). The most critical symbolic assignment is for your bean temp and that is explained below.
 Port settings are found under Config>Port IF they are needed.
@@ -48,7 +48,7 @@ Artisan can now configure certain Phidgets much like a Machine.
 
 ![Phidget Setup](/assets/images/gsg/phidget config.jpg)
 
-*Example* - Here is a quick discussion of connecting a Phidget.  Each device will differ. Connecting a Phidget is easy and you don't have to use the Port menu.  
+*Example* - Here is one example of connecting a Phidget.  Each device will differ. Connecting a Phidget is easy and you don't have to use the Port menu.  
 
 For a Phidget 1048, the connections were made as follows:
 ![Phidget Connections](/assets/images/gsg/phidget wiring1.jpg) As thermocouples differ your wiring colors may vary.  And different devices will connect differently.
