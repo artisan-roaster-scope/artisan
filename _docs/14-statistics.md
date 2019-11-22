@@ -13,7 +13,7 @@ The statistics of a roast appear post roast on the right side of the screen.  Po
 
 ![save stats](/assets/images/gsg/save stats.png)
 
-![statistic dialog](/assets/images/gsg/statistics summary.png)
+![statistic dialog](/assets/images/gsg/statistics dialog.png)
 
 These selections allow you to see the three roast phases in the classic Artisan colors (green, yellow, brown) at the end of the roast, with the items you check: time, bar, average ROR, AUC, evaluation (descriptive words).  Phases example with the time, bar and F/min:
 
