@@ -76,6 +76,7 @@ class s7port(object):
         
         self.plc = None
         self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
+        self.libLoaded = False
 
 ################
 # conversion methods copied from s7:util.py
@@ -157,19 +158,26 @@ class s7port(object):
                 pass
         
     def connect(self):
-        from artisanlib.s7client import S7Client
-        from snap7.common import load_library as load_snap7_library
-        # first load shared lib if needed
-        platf = str(platform.system())
-        if platf in ['Windows','Linux'] and artisanlib.util.appFrozen():
-            libpath = os.path.dirname(sys.executable)
-            if platf == 'Linux':
-                snap7dll = os.path.join(libpath,"libsnap7.so")
-            else: # Windows:
-                snap7dll = os.path.join(libpath,"snap7.dll")                
-            load_snap7_library(snap7dll) # will ensure to load it only once
+        if not self.libLoaded:
+            from artisanlib.s7client import S7Client
+            from snap7.common import load_library as load_snap7_library
+            # first load shared lib if needed
+            platf = str(platform.system())
+            if platf in ['Windows','Linux'] and artisanlib.util.appFrozen():
+                libpath = os.path.dirname(sys.executable)
+                if platf == 'Linux':
+                    snap7dll = os.path.join(libpath,"libsnap7.so")
+                else: # Windows:
+                    snap7dll = os.path.join(libpath,"snap7.dll")                
+                load_snap7_library(snap7dll) # will ensure to load it only once
+            self.libLoaded = True
         # next reset client instance if not yet connected to ensure a fresh start
-        if self.plc and not self.plc.get_connected():
+        if self.plc is not None and not self.plc.get_connected():
+            if self.plc is not None:
+                try:
+                    self.plc.destroy()
+                except:
+                    pass
             self.plc = None
         # connect if not yet connected
         if self.plc is None:
