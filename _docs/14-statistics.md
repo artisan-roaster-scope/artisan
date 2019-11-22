@@ -21,7 +21,7 @@ These selections allow you to see the three roast phases in the classic Artisan 
 
 These Phases depend on your settings in Configuration>Phases.  The Characteristics, at the bottom of your graph post roast, show basic information on the roast, like date, time, beans, batch-size, roast-loss, on the x-axis label if you have entered some of this information in Roast>Properties.  You have to enter Charge and Drop in order to get statistics which can be either manually via an event button or automatically.  Summary shows roast information on the right, post roast such as what roast of the day it is, weight loss, and other data.  Time after First Crack is now shown as a Characteristic at the bottom of the chart.
 
-Sample post roast showing Characteristics at the bottom of the graph:
+Sample post roast showing Characteristics at the bottom of the graph and Summary Box on the right:
 ![post roast Characteristics](/assets/images/gsg/post roast charateristics.png)
 
 ![post roast statistics](/assets/images/gsg/stats in 14.png)
