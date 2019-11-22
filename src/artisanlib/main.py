@@ -17086,7 +17086,7 @@ class ApplicationWindow(QMainWindow):
                         dBT = self.qmc.temp2[-1]
                     dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[2]])
                     self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
-                    self.DRYlcd.display(u(dBT + self.qmc.mode))                      
+                    self.DRYlcd.display(u(dBT + self.qmc.mode))
                     #percentage
                     if totaltime:
                         finishphaseP = fmtstr%(ts*100./totaltime)
@@ -36912,11 +36912,11 @@ class batchDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Batch", None))
         self.prefixEdit = QLineEdit(aw.qmc.batchprefix)
-        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Batch prefix",None))        
+        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Batch prefix",None))
         self.counterSpinBox = QSpinBox()
         self.counterSpinBox.setRange(0,999999)
         self.counterSpinBox.setSingleStep(1)
-        self.counterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)                
+        self.counterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         batchchecklabel = QLabel(QApplication.translate("CheckBox","Batch Counter", None))
         self.batchcheckbox = QCheckBox()
         self.batchcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF batch counter",None))
@@ -57268,7 +57268,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.setONOFFrampsoak(0)
     
     def setONOFFrampsoak(self,flag):
-        #warning check how it ends at "rampsoakend":[0,41081] can let pid inop till value changed    UNFINISHED        
+        #warning check how it ends at "rampsoakend":[0,41081] can let pid inop till value changed    UNFINISHED
         # you can come out of this mode by putting the pid in standby (pid off) 
         #flag =0 OFF, flag = 1 ON, flag = 2 hold        
         #set rampsoak pattern ON
@@ -57482,7 +57482,6 @@ class PXG4pidDlgControl(PXpidDlgControl):
         aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         self.close()
-        
 
     def createsegmenttable(self):
         self.segmenttable.setRowCount(16)
@@ -57973,32 +57972,6 @@ class FujiPID(object):
     def activateONOFFsliderSV(self,flag):
         aw.pidcontrol.activateSVSlider(flag)
 
-# NOT CALLED ANYMORE!?
-#    #activates the PID SV buttons in the main window to adjust the SV value. Called from the PID control pannels/SV tab
-#    def activateONOFFeasySV(self,flag):
-#        #turn off
-#        if flag == 0:
-#            aw.button_12.setVisible(False)
-#            aw.button_13.setVisible(False)
-#            aw.button_14.setVisible(False)
-#            aw.button_15.setVisible(False)
-#            aw.button_16.setVisible(False)
-#            aw.button_17.setVisible(False)
-#        #turn on
-#        elif flag == 1:
-#            reply = QMessageBox.question(aw,QApplication.translate("Message","Activate PID front buttons",None),
-#                                         QApplication.translate("Message","Remember SV memory has a finite\nlife of ~10,000 writes.\n\nProceed?",None),
-#                                         QMessageBox.Yes|QMessageBox.Cancel)
-#            if reply == QMessageBox.Cancel:
-#                return 
-#            elif reply == QMessageBox.Yes:
-#                aw.button_12.setVisible(True)
-#                aw.button_13.setVisible(True)
-#                aw.button_14.setVisible(True)
-#                aw.button_15.setVisible(True)
-#                aw.button_16.setVisible(True)
-#                aw.button_17.setVisible(True)
-
     def readcurrentsv(self):
         if aw.ser.useModbusPort:
             reg = None
@@ -58455,7 +58428,7 @@ class FujiPID(object):
             elif  aw.ser.controlETpid[0] == 1:
                 reg1 = aw.modbus.address2register(self.PXR[svkey][1],6)
                 reg2 = aw.modbus.address2register(self.PXR[rampkey][1],6)
-                reg3 = aw.modbus.address2register(self.PXR[soakkey][1],6)                
+                reg3 = aw.modbus.address2register(self.PXR[soakkey][1],6)
             aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg1,int(sv*10))
             libtime.sleep(0.11) #important time between writings
             aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg2,ramp)
@@ -58756,7 +58729,6 @@ class PID_DlgControl(ArtisanDialog):
         pidSetSV.clicked.connect(self.setSV)
         pidSetSV.setFocusPolicy(Qt.NoFocus)
 
-        
         pidSVModeLabel = QLabel(QApplication.translate("Label","Mode",None))
         pidModeItems = [
             QApplication.translate("Label", "Manual",None),
@@ -58928,15 +58900,15 @@ class PID_DlgControl(ArtisanDialog):
         buttonLayout.addStretch()
         self.loadRampSoakFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load Ramp/Soak table from profile",None))
         self.loadRampSoakFromProfile.setChecked(aw.pidcontrol.loadRampSoakFromProfile)
-        
+
         tab2InnerLayout.addStretch()
         tab2InnerLayout.addLayout(rsGrid)
         tab2InnerLayout.addStretch()
         tab2Layout.addLayout(buttonLayout)
         tab2Layout.addStretch()
         tab2Layout.addWidget(self.loadRampSoakFromProfile)
-            
-            
+
+
         ############################
         okButton = QPushButton(QApplication.translate("Button","OK",None))
         okButton.clicked.connect(self.okAction)
@@ -59682,14 +59654,14 @@ class DtaPID(object):
                                                 # 15 = PT100 type3; 16 = L ; 17 = U; 18 = Txk
                   "controlmethod":[0,"4711"],   # 0 = pid; 1 = ON/OFF; 2 = manual
                   "units":[1,"4717"],           # units C = 1; F = 2
-                  "controlsetting":[1,"4719"],  # 1=Run; 0 = Stop  
+                  "controlsetting":[1,"4719"],  # 1=Run; 0 = Stop
                   "error":[0,"472B"]            # note: read only memory. Values:
                                                 # 0 = Normal,1 = Initial process; 2 = Initial status;
                                                 # 3 = sensor not connected; 4 = sensor input error
                                                 # 5 = Exceeds max temperature; 6 = Number Internal error
                                                 # 7 EEPROM error
                   }
-    #command  string = ID (ADR)+ FUNCTION (CMD) + ADDRESS + NDATA + LRC_CHK 
+    #command  string = ID (ADR)+ FUNCTION (CMD) + ADDRESS + NDATA + LRC_CHK
     def writeDTE(self,value,DTAaddress):
         newsv = hex(int(abs(float(str(value)))))[2:].upper()
         slaveID = aw.ser.controlETpid[1]
