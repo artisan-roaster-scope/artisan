@@ -15,9 +15,9 @@ This toggles on the top line of controls on the right:
 
 These controls need to be visible to operate Artisan.  
 
+Menu>View>Readings toggles the standard temperature readings on the right side, on and off.
 
-
-To toggle Buttons and Sliders on and off that you configured under [Events](https://artisan-scope.org/docs/events/) navigate to:
+To toggle the Buttons and Sliders on and off that you configured under [Events](https://artisan-scope.org/docs/events/) navigate to:
 
 Menu>View>Buttons
 
