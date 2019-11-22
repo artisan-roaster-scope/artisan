@@ -33,7 +33,7 @@ function 16
   - MACHINE SUPPORT: adds Drum Speed and Air Flow to Buhler Roastmaster setup
   - MACHINE SUPPORT: adds support for further [Coffed](https://coffed.pl/en) machines (SR3/5/15/25/60) automatic and manual variants
   - MACHINE SUPPORT: adds support for the [Atilla](https://www.atilla.com.br/) GOLD_plus_7'' II
-  - MACHINE SUPPORT: adds machine configurations for popular Phidget sets
+  - MACHINE SUPPORT: adds machine configurations for [popular Phidget sets](https://artisan-scope.org/devices/phidget-sets/)
   - MATH: adds x^2 to the exponent function as well as the possibility to define an offset from CHARGE
   - PHIDGETS: adds Phidget HUB0000 IO 0 and Phidget HUB0000 IO Digital 0 one channel device types that allocate only that single one channel/port to allow the use of all HUB0000 ports with an uneven number of analog or digital IO channels
   - PHIDGETS: attach IO Phidgets already in OFF mode on demand

@@ -3415,14 +3415,16 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.palette["canvas_alt"] = aw.qmc.palette["canvas"]
                         aw.qmc.palette["canvas"] = c
                         aw.updateCanvasColors()
+                        aw.qmc.redraw()
                         QApplication.processEvents() # needed to establish the change
                     except Exception:
                         pass
                 elif self.alarmaction[alarmnumber] == 25:
-                    # Set Canvas Color
+                    # Reset Canvas Color
                     if "canvas_alt" in aw.qmc.palette:
                         aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
                         aw.updateCanvasColors()
+                        aw.qmc.redraw()
                         QApplication.processEvents()
     
             except Exception as ex:
@@ -4194,7 +4196,8 @@ class tgraphcanvas(FigureCanvas):
                     # we exclude the main_events as they occur as substrings in others like CHARGE in dCHARGE
                     # the special case of a variable Y1 overlapping with a variable Y11,..,Y12 in this simple test has to be excluded to avoid
                     # that if mathexpression="Y11" and mathdictionary contains {"Y1":-1} -1 is returned instead of the correct value of Y11
-                    if any([((k in mathexpression) if k!="Y1" else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
+                    # "x" occurs in "max" and has also to be excluded, as "t" and "b"
+                    if any([((k in mathexpression) if k not in ["Y1","x","t","b"] else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
                         return -1
                     else:
@@ -4236,7 +4239,7 @@ class tgraphcanvas(FigureCanvas):
                         _, _, exc_tb = sys.exc_info()
                         mathexpression = mathexpression.replace("{","(").replace("}",")") # avoid {x} leading to key arrows
                         self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): %s {0} "%mathexpression).format(e),exc_tb.tb_lineno)
-                    return -1    
+                    return -1
         return -1
 
 
@@ -4700,6 +4703,13 @@ class tgraphcanvas(FigureCanvas):
                 aw.hideDefaultButtons()
                 aw.updateExtraButtonsVisibility()
                 aw.enableEditMenus()
+                
+                #reset alarms
+                self.temporaryalarmflag = -3
+                self.alarmstate = [-1]*len(self.alarmflag)  #1- = not triggered; any other value = triggered; value indicates the index in self.timex at which the alarm was triggered
+                #reset TPalarmtimeindex to trigger a new TP recognition during alarm processing
+                aw.qmc.TPalarmtimeindex = None
+
                 
                 aw.pidcontrol.pidActive = False
 
@@ -9026,7 +9036,7 @@ class tgraphcanvas(FigureCanvas):
                                     row = {0:self.phases[0]-10,1:self.phases[0]-20,2:self.phases[0]-30,3:self.phases[0]-40}
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 # plot events on BT when showeventsonbt is true
-                                if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
+                                if aw.qmc.ETcurve and not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
                                     anno = self.ax.annotate(firstletter + secondletter, 
                                         xy=(self.timex[index], 
                                         self.temp1[index]),
@@ -9038,7 +9048,7 @@ class tgraphcanvas(FigureCanvas):
                                         arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),
                                         fontsize=fontsize,
                                         fontproperties=fontprop_small)
-                                else:
+                                elif aw.qmc.BTcurve:
                                     anno = self.ax.annotate(firstletter + secondletter, 
                                             xy=(self.timex[index], 
                                             self.temp2[index]),
@@ -9071,10 +9081,12 @@ class tgraphcanvas(FigureCanvas):
                                     height = 20
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 # plot events on BT when showeventsonbt is true
-                                if not aw.qmc.showeventsonbt and self.temp1[index] > self.temp2[index]:
+                                if aw.qmc.ETcurve and not aw.qmc.showeventsonbt and self.temp1[index] > self.temp2[index]:
                                     temp = self.temp1[index]
-                                else:
+                                elif aw.qmc.BTcurve:
                                     temp = self.temp2[index]
+                                else:
+                                    temp = None
                                     
                                 if self.eventsGraphflag == 4:
                                     if self.specialeventstype[-1] == 0:
@@ -9213,7 +9225,7 @@ class tgraphcanvas(FigureCanvas):
                                 height = 20
                             #some times ET is not drawn (ET = 0) when using device NONE
                             # plot events on BT when showeventsonbt is true
-                            if not aw.qmc.showeventsonbt and self.temp1[index] > self.temp2[index]:
+                            if aw.qmc.ETcurve and not aw.qmc.showeventsonbt and self.temp1[index] > self.temp2[index]:
                                 temp = self.temp1[index]
                             else:
                                 temp = self.temp2[index]
@@ -9232,12 +9244,12 @@ class tgraphcanvas(FigureCanvas):
                                 row = {0:self.phases[0]-10,1:self.phases[0]-20,2:self.phases[0]-30,3:self.phases[0]-40}
                             #some times ET is not drawn (ET = 0) when using device NONE
                             # plot events on BT when showeventsonbt is true
-                            if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
+                            if aw.qmc.ETcurve and not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
                                 anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',
                                                  color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=fontsize,
                                                  fontproperties=fontprop_small,backgroundcolor=aw.qmc.palette["specialeventbox"])
-                            else:
+                            elif aw.qmc.BTcurve:
                                 anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',
                                                  color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=fontsize,
@@ -11689,7 +11701,7 @@ class SampleThread(QThread):
                 
                     #### first retrieve readings from the main device
                     timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
-                    #read time, ET (t1) and BT (t2) TEMPERATURE                    
+                    #read time, ET (t1) and BT (t2) TEMPERATURE
                     tx_org,t1,t2 = self.sample_main_device()
                     timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
                     etbt_time = timeAfterETBT - timeBeforeETBT
@@ -27444,7 +27456,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
         contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeye Coffee), Moshe Spinell")
         contributors += u(", Morris Beume (Morris.Coffee), Michael Herbert, Bill (San Franciscan Roaster), Chistopher Feran")
-        contributors += u(", Coffed, Bono Gargolov, Rodrigo Ramos (King Caf" + uchr(233) + "s), Nico Bigler, Saeed Abdinasab, Lewis Li<br>")
+        contributors += u(", Coffed, Bono Gargolov, Rodrigo Ramos (King Caf" + uchr(233) + "s), Nico Bigler, Saeed Abdinasab, Lewis Li, Fotis Lefas (Coffee Lovers, Editors & Trainers)<br>")
         box = QMessageBox(self)
         
         #create a html QString
