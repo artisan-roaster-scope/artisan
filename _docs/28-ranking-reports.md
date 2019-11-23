@@ -16,4 +16,4 @@ You can save these reports in a web page format, a CSV or an Excel format.
 This is the web version and it’s hard to screen shot, but you get Load, Charge Temp, FC start time, FC temp, Drop time, Drop Temp, Dry %, Mai%, Dev%, AUC, and Loss.
 
 *Roast Ranking Report*
-![roast ranking top](/assets/images/gsg/roast ranking report 1.jpg)![roast ranking middle](/assets/images/gsg/roast ranking report2.jpg)![roast ranking last](/assets/images/gsg/roast ranking report 3.jpg)
+![roast ranking top](/assets/images/gsg/roast ranking.jpg)
