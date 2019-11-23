@@ -8072,7 +8072,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[0] = -1
                             self.xaxistosm(redraw=False)
                             removed = True
-                    else:
+                    elif not aw.button_8.isFlat():
                         if self.device == 18: #manual mode
                             tx,et,bt = aw.ser.NONE()
                             if bt != 1 and et != -1:  #cancel
@@ -8159,6 +8159,7 @@ class tgraphcanvas(FigureCanvas):
                     pass
                 if aw.qmc.roastpropertiesAutoOpenFlag:
                     aw.openPropertiesSignal.emit()
+                aw.onMarkMoveToNext(aw.button_8)
 
     # called from sample() and marks the autodetected TP visually on the graph
     def markTP(self):
@@ -8216,7 +8217,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2] 
                             self.timeindex[1] = 0
                             removed = True
-                    else:
+                    elif not aw.button_19.isFlat():
                         if self.device != 18:
                             self.timeindex[1] = len(self.timex)-1
                         else:
@@ -8276,6 +8277,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.sendmessage(message)
                 except Exception:
                     pass
+                aw.onMarkMoveToNext(aw.button_19)
 
     #record 1C start markers of BT. called from push button_3 of application window
     @pyqtSlot(bool)
@@ -8304,7 +8306,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]  
                             self.timeindex[2] = 0
                             removed = True
-                    else:
+                    elif not aw.button_3.isFlat():
                         # record 1Cs only if Charge mark has been done
                         if self.device != 18:                
                             self.timeindex[2] = len(self.timex)-1
@@ -8367,6 +8369,7 @@ class tgraphcanvas(FigureCanvas):
                 st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
                 message = QApplication.translate("Message","[FC START] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
+                aw.onMarkMoveToNext(aw.button_3)
 
     #record 1C end markers of BT. called from button_4 of application window
     @pyqtSlot(bool)
@@ -8393,7 +8396,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]  
                             self.timeindex[3] = 0
                             removed = True
-                    else:
+                    elif not aw.button_4.isFlat():
                         if self.device != 18:
                             self.timeindex[3] = len(self.timex)-1
                         else:
@@ -8449,6 +8452,8 @@ class tgraphcanvas(FigureCanvas):
                 st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
                 message = QApplication.translate("Message","[FC END] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
+                aw.onMarkMoveToNext(aw.button_4)
+                
 
     #record 2C start markers of BT. Called from button_5 of application window
     @pyqtSlot(bool)
@@ -8475,7 +8480,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]  
                             self.timeindex[4] = 0
                             removed = True
-                    else:
+                    elif not aw.button_5.isFlat():
                         if self.device != 18:
                             self.timeindex[4] = len(self.timex)-1
                         else:
@@ -8536,6 +8541,7 @@ class tgraphcanvas(FigureCanvas):
                 st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
                 message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
+                aw.onMarkMoveToNext(aw.button_5)
 
     #record 2C end markers of BT. Called from button_6  of application window
     @pyqtSlot(bool)
@@ -8562,7 +8568,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]  
                             self.timeindex[5] = 0
                             removed = True
-                    else:
+                    elif not aw.button_6.isFlat():
                         if self.device != 18:
                             self.timeindex[5] = len(self.timex)-1
                         else:
@@ -8623,6 +8629,7 @@ class tgraphcanvas(FigureCanvas):
                 st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
                 message = QApplication.translate("Message","[SC END] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
+                aw.onMarkMoveToNext(aw.button_6)
 
     #record end of roast (drop of beans). Called from push button 'Drop'
     @pyqtSlot(bool)
@@ -8651,7 +8658,7 @@ class tgraphcanvas(FigureCanvas):
                             #decrease BatchCounter again
                             self.decBatchCounter()
                             removed = True
-                    else:
+                    elif aw.button_9.isFlat():
                         self.incBatchCounter()
                         # generate UUID
                         if self.roastUUID is None: # there might be already one assigned by undo and redo the markDROP!
@@ -8763,6 +8770,7 @@ class tgraphcanvas(FigureCanvas):
                                 aw.fujipid.sv = 0
                             except:
                                 pass
+                    aw.onMarkMoveToNext(aw.button_9)
             except Exception:
                 pass
 
@@ -14046,6 +14054,36 @@ class ApplicationWindow(QMainWindow):
                     min-width: """ + self.standard_button_min_width + """;
                     """ + border_modern + """
                     font-size: """ + self.button_font_size_small_selected + """;
+                    font-weight: bold;
+                    color: white;
+                    background:""" + self.createGradient('#c00b40') + """ ;
+                }
+                QPushButton:flat{
+                    color: darkgrey;
+                    background-color: #f0b7cb;
+                }
+                QPushButton:flat:hover:!pressed{
+                    color: #F5F5F5;
+                    background-color: #db5785;
+                }
+                QPushButton:flat:hover:pressed{
+                    color: #EEEEEE;
+                    background-color: #cc0f50;
+                }
+                QPushButton:pressed {
+                    color: white;
+                    background:""" + self.createGradient('#147bb3') + """ ;
+                }
+                QPushButton:hover:!pressed {
+                    color: white;
+                    background:""" + self.createGradient('#c70d49') + """ ;
+                }
+            """,
+            "SELECTED_MAIN_LARGE":     """
+                QPushButton {
+                    min-width: """ + self.main_button_min_width + """;
+                    """ + border_modern + """
+                    font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
                     background:""" + self.createGradient('#c00b40') + """ ;
@@ -19404,6 +19442,20 @@ class ApplicationWindow(QMainWindow):
                 return moveindex
         else:
             return moveindex
+    
+    # on manual 
+    def onMarkMoveToNext(self,button):
+        if aw.keyboardmoveflag: # keyboard navigation is active
+            try:
+                this_index = aw.keyboardButtonList.index(button)
+                if aw.keyboardmoveindex < this_index:
+                    for _ in range(this_index - aw.keyboardmoveindex):
+                        aw.moveKbutton("right")
+                        if aw.keyboardmoveindex == this_index:
+                            break
+                    aw.moveKbutton("right") # now to the next
+            except:
+                pass
             
     def moveKbutton(self,kcommand):
         #"Enter" toggles ON/OFF keyboard    
@@ -19445,6 +19497,8 @@ class ApplicationWindow(QMainWindow):
                 # activate the button at index nextcmd
                 if self.keyboardButtonStyles[nextcmd] in ["CHARGE","DROP"]:
                     self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED_MAIN"])
+                if self.keyboardButtonStyles[nextcmd] in ["ON"]:
+                    self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED_MAIN_LARGE"])
                 else:
                     self.keyboardButtonList[nextcmd].setStyleSheet(self.pushbuttonstyles["SELECTED"])
                 # deactivate the button at index self.keyboardmoveindex
