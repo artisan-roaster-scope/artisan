@@ -669,17 +669,6 @@ class tgraphcanvas(FigureCanvas):
     def __init__(self,parent,dpi):
 
         #default palette of colors
-        # Artisan 1.x
-#        self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
-#                        "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
-#                        "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
-#                        "deltabt":'blue',"markers":'#404040',"text":'#404040',"watermarks":'yellow',"timeguide":'blue',
-#                        "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
-#                        "specialeventbox":'yellow',"specialeventtext":'black',
-#                        "bgeventmarker":'black',"bgeventtext":'black',
-#                        "mettext":'white',"metbox":'red',
-#                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'}
-        # Artisan 2.x
         self.alpha = {"analysismask":0.4,"statsanalysisbkgnd":1.0,"legendbg":0.4}
         self.palette = {"background":'white',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
                         "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#bde0ee',"rect5":'lightgrey',
@@ -694,7 +683,6 @@ class tgraphcanvas(FigureCanvas):
         self.palette1 = self.palette.copy()
         self.EvalueColor_default = ['#43a7cf','#49B160','#800080','#ad0427']
         self.EvalueTextColor_default = ['white','white','white','white']
-#        self.legendbgalpha = 0.2
 
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Aftertaste",None),
