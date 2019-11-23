@@ -17,6 +17,10 @@ brew upgrade python
 #brew remove --ignore-dependencies python 1>/dev/null 2>&1
 #brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb 1>/dev/null 2>&1
 
+# to work around a wget open ssl issue: dyld: Library not loaded: /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
+# however for now we settled to use curl instead to download the upload script
+#brew uninstall wget
+#brew install wget
 
 
 brew install p7zip

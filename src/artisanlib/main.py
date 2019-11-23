@@ -4863,7 +4863,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             return b
 
-    def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):
+    def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.,draggable=True):
         fontprop_small = aw.mpl_fontproperties.copy()
         fontsize = "x-small"
         fontprop_small.set_size(fontsize)
@@ -4891,15 +4891,16 @@ class tgraphcanvas(FigureCanvas):
                              fontsize=fontsize,alpha=a,fontproperties=fontprop_small)
         try:
             time_anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-            time_anno.draggable(use_blit=True)
-            time_anno.set_picker(aw.draggable_text_box_picker)
+            if draggable:
+                time_anno.draggable(use_blit=True)
+                time_anno.set_picker(aw.draggable_text_box_picker)
         except: # mpl before v3.0 do not have this set_in_layout() function
             pass
         if aw.qmc.patheffects:
             rcParams['path.effects'] = []
         return [temp_anno, time_anno]
 
-    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,TP_time=-1,TP_time_loaded=-1):
+    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,TP_time=-1,TP_time_loaded=-1,draggable=True):
         ystep_down = ystep_up = 0
         anno_artists = []
         #Add markers for CHARGE
@@ -4925,7 +4926,7 @@ class tgraphcanvas(FigureCanvas):
                             st1 = toASCII(st1)
                         e = 0
                         a = 1.  
-                    anno_artists += self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable)
                 
                 #Add TP marker
                 if self.markTPflag and TP_index and TP_index > 0:
@@ -4933,7 +4934,7 @@ class tgraphcanvas(FigureCanvas):
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),u(self.stringfromseconds(timex[TP_index]-t0,False)))
                     a = 1.
                     e = 0
-                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,)
                 elif TP_time > -1:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                     if timeindex2:
@@ -4945,7 +4946,7 @@ class tgraphcanvas(FigureCanvas):
                     
                     TP_time = TP_time - t0
                     st1 = aw.arabicReshape("{0}",u(self.stringfromseconds(TP_time_loaded,False)))
-                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable)
                 #Add Dry End markers
                 if timeindex[1]:
                     tidx = timeindex[1]
@@ -4959,7 +4960,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
                 
                 #Add 1Cs markers
                 if timeindex[2]:
@@ -4977,7 +4978,7 @@ class tgraphcanvas(FigureCanvas):
                         e = 0
                     else:
                         e = -80
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
                 #Add 1Ce markers
                 if timeindex[3]:
                     tidx = timeindex[3]
@@ -4991,7 +4992,7 @@ class tgraphcanvas(FigureCanvas):
                         e = 0
                     else:
                         e = -80
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
                     #add a water mark if FCs
                     if timeindex[2] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -5011,7 +5012,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
                 #Add 2Ce markers
                 if timeindex[5]:
                     tidx = timeindex[5]
@@ -5025,7 +5026,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
                     #do water mark if SCs
                     if timeindex[4] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -5058,7 +5059,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         e = 0
                     
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
                     
                     #do water mark if FCs, but no FCe nor SCs nor SCe
                     if timeindex[2] and not timeindex[3] and not timeindex[4] and not timeindex[5] and not timeindex2 and self.watermarksflag:
@@ -5972,7 +5973,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 startB = 0
                         try:
-                            self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded)
+                            self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded, draggable=False) # not draggable
                         except Exception:
                             pass
 #                            import traceback
@@ -8102,10 +8103,11 @@ class tgraphcanvas(FigureCanvas):
                         tx = self.timex[self.timeindex[0]]
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                         self.l_annotations += self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
-                        try:
-                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-                        except: # mpl before v3.0 do not have this set_in_layout() function
-                            pass                        
+# in_layout all ready handled in self.annotate()
+#                        try:
+#                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
+#                        except: # mpl before v3.0 do not have this set_in_layout() function
+#                            pass                        
                         # mark active slider values that are not zero 
 
                         for slidernr in range(4):
@@ -19088,7 +19090,7 @@ class ApplicationWindow(QMainWindow):
                             aw.deleteBackground()
                             aw.qmc.redraw()
                         else:
-                            self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt="*.alog")
+                            self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
                             if len(u(self.filename)) != 0:
                                 try:
                                     aw.qmc.resetlinecountcaches()
@@ -19721,7 +19723,7 @@ class ApplicationWindow(QMainWindow):
     # if ext is given, the file selector allows only file with that extension to be selected for open
     # if ext_alt is given (not None), all files can be selected, but if a file was selected not having the ext_alt the empty string is returned (used in the background profile dialog)
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",ext_alt=None,path=None):
-        if path is None:   
+        if path is None:
             path = self.getDefaultPath()
         res = u(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext)[0])
         f = u(res)
@@ -19733,12 +19735,11 @@ class ApplicationWindow(QMainWindow):
  
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None,copy=False):
+    def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
         if path is None:
             path = self.getDefaultPath()
         f = u(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
-        if copy:
-            self.setDefaultPath(f)
+        self.setDefaultPath(f)
         return f
  
     #the central ExistingDirectoryDialog function that should always be called. Besides triggering the file dialog it
@@ -19983,7 +19984,7 @@ class ApplicationWindow(QMainWindow):
 
     # Loads background profile
     def loadbackground(self,filename):
-        try:        
+        try:
             f = QFile(u(filename))
             if not f.open(QIODevice.ReadOnly):
                 raise IOError(u(f.errorString()))
@@ -22262,7 +22263,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     prefix = ""
                 fname = path.absoluteFilePath(self.generateFilename(prefix=prefix))
-                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None), path=fname, copy=copy)
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None), path=fname)
             if filename:
                 #write
                 pf = self.getProfile()
@@ -41493,7 +41494,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def load(self,_):
-        self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt="*.alog")
+        self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
         if len(u(self.filename)) == 0:
             return
         aw.sendmessage(QApplication.translate("Message","Reading background profile...",None))
