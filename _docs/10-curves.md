@@ -12,7 +12,7 @@ Menu>Config>Curves
 
 ![config curves](/assets/images/gsg/config curves menu.png)
 
-These are critical settings within Artisan and for most the first two tabs will be where your focus lies.  
+These are critical settings within Artisan and for most the first two tabs will be where your focus lies.  After you understand Curves, there are advanced roast analysis tools using the Analyze feature which is explained in an Artisan Blog article - [Analyzer](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html)
 
 First you decide which ROR curves and LCD’s you want to display.
 ![curves ror](/assets/images/gsg/curves ror.png)
@@ -58,4 +58,4 @@ IMPORTANT NOTE:  Except for the raw data filters, the filter settings can be cha
 
 *UI Tab*
 
-Make sure under the Curves dialog box, you do two things on the UI tab.  Check the box for Decimal Places and investigate the fonts you can use for your graph.  You can also set a background image.  See [Colors and Background Image](https://artisan-scope.org/docs/colors/).
+Make sure under the Curves dialog box, you do two things on the UI tab.  Check the box for Decimal Places and investigate the fonts you can use for your graph.  You can also set a [background Image](https://artisan-scope.org/docs/colors/).
