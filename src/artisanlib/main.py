@@ -51847,6 +51847,7 @@ class graphColorDlg(ArtisanDialog):
         self.legendbgSpinBox.setValue(aw.qmc.alpha["legendbg"] * 10)
         self.legendbgSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)
         self.legendbgSpinBox.setFocusPolicy(Qt.StrongFocus)
+        self.legendbgButton.setSizePolicy(QSizePolicy.Expanding,self.legendbgButton.sizePolicy().verticalPolicy())
         self.legendbgLayout = QHBoxLayout()
         self.legendbgLayout.addWidget(self.legendbgButton)
         self.legendbgLayout.addWidget(self.legendbgSpinBox)
@@ -51917,6 +51918,7 @@ class graphColorDlg(ArtisanDialog):
         self.analysismaskSpinBox.setValue(aw.qmc.alpha["analysismask"] * 10)
         self.analysismaskSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)
         self.analysismaskLayout = QHBoxLayout()
+        self.analysismaskButton.setSizePolicy(QSizePolicy.Expanding,self.analysismaskButton.sizePolicy().verticalPolicy())
         self.analysismaskLayout.addWidget(self.analysismaskButton)
         self.analysismaskLayout.addWidget(self.analysismaskSpinBox)
         self.statsanalysisbkgndLabel = QLabel(QApplication.translate("Button","Stats&Analysis Bkgnd", None))
@@ -51933,6 +51935,7 @@ class graphColorDlg(ArtisanDialog):
         self.statsanalysisbkgndSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)
         self.statsanalysisbkgndSpinBox.setFocusPolicy(Qt.StrongFocus)
         self.statsanalysisbkgndLayout = QHBoxLayout()
+        self.statsanalysisbkgndButton.setSizePolicy(QSizePolicy.Expanding,self.statsanalysisbkgndButton.sizePolicy().verticalPolicy())
         self.statsanalysisbkgndLayout.addWidget(self.statsanalysisbkgndButton)
         self.statsanalysisbkgndLayout.addWidget(self.statsanalysisbkgndSpinBox)
 
