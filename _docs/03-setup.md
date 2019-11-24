@@ -76,7 +76,7 @@ Menu>Config>Temperature and Menu>Config>Language are where you go to choose your
 
 *Symbolic BT/ET*
 
-What BT and ET temperatures do you want as reference points?
+What BT and ET temperatures do you want as reference points?  
 
 Some roasters are just fine with the readings their machines put out from their thermocouples.  Each machine is different and each machine’s thermocouples are placed differently and read differently.  Learn your machine is something you will hear over and over.  That said are you happy with first crack being at 365° or do you want it to be at 390°?  In order to adjust your machine thermocouples to give you dry end or first crack at temps that people think they should be at, you can enter an adjustment under Config>Device on the Tab – Symb ET/BT.  ![symoblic bt](/assets/images/gsg/device assignment - symbolic bt.png)
 
@@ -84,6 +84,9 @@ Some roasters are just fine with the readings their machines put out from their 
 Also don’t expect these to match the PID in the roaster if the probes are in different places.
 
 Do you have to do this? NO.    You will know your roaster best and these data points aren’t absolutes, they are just reference point.  Sight and smell and will tell you best when dry end and first crack happen.  Make sure to use a lower case “x” and an upper case won’t work.  If you see a reading of -1 in the temp LCD’s your formula may be incorrect.
+
+Symbolic formulas are very important and provided advanced features.  They are covered in detail in a story on the Artisan Blog:
+[Symbolic Formulas: Basics, New Variables and Applications](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html)
 
 *Sampling and Oversampling*
 
