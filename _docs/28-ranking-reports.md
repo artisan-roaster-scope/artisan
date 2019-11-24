@@ -17,4 +17,4 @@ This is the web version and it’s hard to screen shot, but you get Load, Charge
 
 *Roast Ranking Report*
 
-![Roast Ranking](assets/images/gsg/Roast Ranking.png)
+![Roast Ranking](/assets/images/gsg/Roast Ranking.png)
