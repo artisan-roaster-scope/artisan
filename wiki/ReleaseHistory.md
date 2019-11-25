@@ -8,11 +8,11 @@ v2.1.0 (xx.11.2019)
 * New Features
   - ACTIONS: adds "Multiple Event" action to default buttons actions
   - ACTIONS: adds sleep(<n.m>) command to multiple button event action
-  - ACTIONS: adds Modbus Command action "writeWord" to write 32bit decimal numbers using MODBUS
+  - ACTIONS: adds Modbus Command action `writeWord(slaveId,register,value)` to write 32bit decimal numbers using MODBUS
   - ACTIONS: adds additional Artisan Commands
-     * PIDon, PIDoff, PIDtoggle to change the internal PID state
-     * pidmode(<n>) with 0: manual, 1: RS, 2: background follow
-     * playbackmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
+     * `PIDon`, `PIDoff`, `PIDtoggle` to change the internal PID state
+     * `pidmode(<n>)` with `<n>` 0: manual, 1: RS, 2: background follow
+     * `playbackmode(<n>)` with `<n>` 0: off, 1: time, 2: BT, 3: ET
 function 16
   - ALARMS: adds alarm actions to set and reset the canvas color
   - ALARMS: adds alarm actions to turn playback off and on

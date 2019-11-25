@@ -31,10 +31,11 @@ from PyQt5.QtWidgets import QApplication
 
 
 class s7port(object):
-    def __init__(self,sendmessage,adderror,addserial):
+    def __init__(self,sendmessage,adderror,addserial,aw):
         self.sendmessage = sendmessage # function to create an Artisan message to the user in the message line
         self.adderror = adderror # signal an error to the user
         self.addserial = addserial # add to serial log
+        self.aw = aw
         
         self.readRetries = 1
         self.channels = 8 # maximal number of S7 channels
@@ -146,20 +147,23 @@ class s7port(object):
             self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_SV_register,int(round(sv*multiplier)))
                     
     def isConnected(self):
-        return not (self.plc is None) and self.plc.get_connected()
+        # the check on the CPU state is needed as get_connected() still returns True if the connect got terminated from the peer due to a bug in snap7
+        return self.plc is not None and self.plc.get_connected() and str(self.plc.get_cpu_state()) == "S7CpuStatusRun"
         
     def disconnect(self):
-        if self.isConnected():
-            try:
-                self.plc.disconnect()
-                self.plc.destroy()
-                self.plc = None
-            except Exception:
-                pass
+        try:
+            self.plc.disconnect()
+        except Exception:
+            pass
+        try:
+            self.plc.destroy()
+        except:
+            pass
+        self.plc = None
         
     def connect(self):
         if not self.libLoaded:
-            from artisanlib.s7client import S7Client
+            #from artisanlib.s7client import S7Client
             from snap7.common import load_library as load_snap7_library
             # first load shared lib if needed
             platf = str(platform.system())
@@ -171,36 +175,36 @@ class s7port(object):
                     snap7dll = os.path.join(libpath,"snap7.dll")                
                 load_snap7_library(snap7dll) # will ensure to load it only once
             self.libLoaded = True
-        # next reset client instance if not yet connected to ensure a fresh start
-        if self.plc is not None and not self.plc.get_connected():
-            if self.plc is not None:
-                try:
-                    self.plc.destroy()
-                except:
-                    pass
-            self.plc = None
-        # connect if not yet connected
-        if self.plc is None:
+        
+        if self.libLoaded and self.plc is None:
+            # create a client instance
+            from artisanlib.s7client import S7Client
             self.plc = S7Client()
+            
+        # next reset client instance if not yet connected to ensure a fresh start
+        if self.plc is not None and not self.isConnected():
+            try:
+                self.plc.disconnect()
+            except:
+                pass
             with suppress_stdout_stderr():
-                time.sleep(0.4)
+                time.sleep(0.6)
                 try:
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
-                    time.sleep(0.4)
+                    time.sleep(0.6)
                 except Exception:
                     pass
-            if self.plc.get_connected():
+            if self.isConnected():
                 self.sendmessage(QApplication.translate("Message","S7 Connected", None))
                 time.sleep(0.7)
             else:
-                time.sleep(0.6)
-                self.plc = S7Client()
+                time.sleep(0.8)
                 # we try a second time
                 with suppress_stdout_stderr():
-                    time.sleep(0.4)
+                    time.sleep(0.6)
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
-                    time.sleep(0.4)
-                if self.plc.get_connected():
+                    time.sleep(0.8)
+                if self.isConnected():
                     self.sendmessage(QApplication.translate("Message","S7 Connected", None) + " (2)")
                     time.sleep(0.7)
 
@@ -209,7 +213,7 @@ class s7port(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.plc is not None and self.plc.get_connected():
+            if self.isConnected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
                     self.set_real(ba, 0, float(value))
@@ -221,14 +225,15 @@ class s7port(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
-            self.addserial("S7 writeFloat(" + str(area) + "," + str(dbnumber) + "," + str(start) + "," + str(value) + ")")
+            if self.aw.seriallogflag:
+                self.addserial("S7 writeFloat({},{},{},{})".format(area,dbnumber,start,value))
 
     def writeInt(self,area,dbnumber,start,value): 
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.plc is not None and self.plc.get_connected():
+            if self.isConnected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                     self.set_int(ba, 0, int(value))
@@ -240,14 +245,15 @@ class s7port(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
-            self.addserial("S7 writeInt(" + str(area) + "," + str(dbnumber) + "," + str(start) + "," + str(value) + ")")
+            if self.aw.seriallogflag:
+                self.addserial("S7 writeInt({},{},{},{})".format(area,dbnumber,start,value))
                     
     def readFloat(self,area,dbnumber,start):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.plc is not None and self.plc.get_connected():
+            if self.isConnected():
                 retry = self.readRetries   
                 res = None             
                 while True:
@@ -281,14 +287,15 @@ class s7port(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
-            self.addserial("S7 readFloat(" + str(area) + "," + str(dbnumber) + "," + str(start) + ")")
+            if self.aw.seriallogflag:
+                self.addserial("S7 readFloat({},{},{})".format(area,dbnumber,start))
                 
     def readInt(self,area,dbnumber,start):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.plc is not None and self.plc.get_connected():
+            if self.isConnected():
                 retry = self.readRetries   
                 res = None             
                 while True:
@@ -322,4 +329,5 @@ class s7port(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
-            self.addserial("S7 readInt(" + str(area) + "," + str(dbnumber) + "," + str(start) + ")")  
+            if self.aw.seriallogflag:
+                self.addserial("S7 readInt({},{},{})".format(area,dbnumber,start))

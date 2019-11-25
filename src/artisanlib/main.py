@@ -12585,13 +12585,17 @@ class ApplicationWindow(QMainWindow):
         #events config
         self.eventsbuttonflag = 0
         self.minieventsflag = 0   #minieditor flag
+        
+        #records serial comm (Help menu)
+        self.seriallogflag = False
+        self.seriallog = []
 
         #create a serial port object (main ET BT device)
         self.ser = serialport()
         #create a modbus port object (main modbus device)
-        self.modbus = modbusport(self.sendmessage,self.qmc.adderror,self.addserial)
+        self.modbus = modbusport(self.sendmessage,self.qmc.adderror,self.addserial,self)
         #create an s7 port object (main s7 device)        
-        self.s7 = s7port(self.sendmessage,self.qmc.adderror,self.addserial)
+        self.s7 = s7port(self.sendmessage,self.qmc.adderror,self.addserial,self)
         #create scale port object
         self.scale = scaleport()
         #create color port object
@@ -12717,9 +12721,6 @@ class ApplicationWindow(QMainWindow):
                     QAction(self, visible=False,
                             triggered=self.openRecentTheme))
 
-        #records serial comm (Help menu)
-        self.seriallogflag = False
-        self.seriallog = []
 
         #temp variable for text searches in Help menu artisan seetings
         self.searchtextartisansettings = ""
@@ -42682,7 +42683,7 @@ class serialport(object):
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)                
                 aw.addserial("Fuji: " + settings + " || Tx = " + cmd2str(binascii.hexlify(binstring)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
@@ -43526,7 +43527,7 @@ class serialport(object):
             return -1, -1
         finally:
             # note: logged chars should be unicode not binary
-            if aw.seriallogflag: #I seriously doubt this works!!!!! Not sure what its for
+            if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize) + "," + str(
                     self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial(
@@ -45473,8 +45474,7 @@ class serialport(object):
         if aw.ser.PhidgetBinaryOut is not None:
             for i in range(len(aw.ser.PhidgetBinaryOut)):
                 try:
-                    if aw.ser.PhidgetBinaryOut[i].getAttached():
-                        aw.ser.PhidgetBinaryOut[i].close()
+                    aw.ser.PhidgetBinaryOut[i].close()
                 except Exception:
                     pass
             aw.ser.PhidgetBinaryOut = None
@@ -45527,7 +45527,7 @@ class serialport(object):
                         aw.ser.PhidgetDigitalOut.append(do)
         try:
             if not aw.ser.PhidgetDigitalOut[channel].getAttached():
-                aw.ser.PhidgetDigitalOut[channel].openWaitForAttachment(1200) # we don't wait for the attach and might mis some data
+                aw.ser.PhidgetDigitalOut[channel].openWaitForAttachment(1200)
         except:
             pass
 
@@ -45572,8 +45572,7 @@ class serialport(object):
         if aw.ser.PhidgetDigitalOut is not None:
             for i in range(len(aw.ser.PhidgetDigitalOut)):
                 try:
-                    if aw.ser.PhidgetDigitalOut[i].getAttached():
-                        aw.ser.PhidgetDigitalOut[i].close()
+                    aw.ser.PhidgetDigitalOut[i].close()
                 except Exception:
                     pass
             aw.ser.PhidgetDigitalOut = None
@@ -45644,19 +45643,18 @@ class serialport(object):
     
     def phidgetOUTcloseHub(self):
         if aw.ser.PhidgetDigitalOutHub is not None and len(aw.ser.PhidgetDigitalOutHub)==6:
-            try:
-                for i in range(6):
-                    if aw.ser.PhidgetDigitalOutHub[i].getAttached():
-                        aw.ser.PhidgetDigitalOutHub[i].close()
-            except Exception:
-                pass
+            for i in range(6):
+                try:
+                    aw.ser.PhidgetDigitalOutHub[i].close()
+                except:
+                    pass
             aw.ser.PhidgetDigitalOutHub = None
 
 
 #--- Phidget Analog Voltage Output (only one supported for now)
 #  only supporting 
 #     1 channel Phidget OUT1000, OUT1001 and OUT1002
-#     4 channel USB Phdiget 1002
+#     4 channel USB Phidget 1002
 #  commands: out(n,v) with n channel number and value v voltage in V as a float
 
     def phidgetVOUTattach(self,channel):
@@ -45666,7 +45664,7 @@ class serialport(object):
             if aw.qmc.phidgetManager is not None:
                 # try to attach the Phidget OUT100x module
                 ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1000,
-                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)                
                 ports = 1
                 if ser is None:
                     ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1001,
@@ -45691,10 +45689,13 @@ class serialport(object):
                         if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
                             vo.setIsRemote(True)
                             vo.setIsLocal(False)
+                        elif not aw.qmc.phidgetRemoteFlag:
+                            vo.setIsRemote(False)
+                            vo.setIsLocal(True)
                         aw.ser.PhidgetAnalogOut.append(vo)
         try:
             if not aw.ser.PhidgetAnalogOut[channel].getAttached():
-                aw.ser.PhidgetAnalogOut[channel].openWaitForAttachment(1000)
+                aw.ser.PhidgetAnalogOut[channel].openWaitForAttachment(1200)
         except:
             pass
 
@@ -45706,7 +45707,7 @@ class serialport(object):
         if aw.ser.PhidgetAnalogOut is not None:
             # set voltage output
             try:
-                if len(aw.ser.PhidgetAnalogOut) > channel and aw.ser.PhidgetAnalogOut[channel] and aw.ser.PhidgetAnalogOut[channel].getAttached():
+                if len(aw.ser.PhidgetAnalogOut) > channel and aw.ser.PhidgetAnalogOut[channel].getAttached():
                     if value == 0:
                         aw.ser.PhidgetAnalogOut[channel].setVoltage(0)
                         aw.ser.PhidgetAnalogOut[channel].setEnabled(False)
@@ -45722,7 +45723,8 @@ class serialport(object):
         if aw.ser.PhidgetAnalogOut is not None:
             for i in range(len(aw.ser.PhidgetAnalogOut)):
                 try:
-                    aw.ser.PhidgetAnalogOut[i].setEnabled(False)
+                    if aw.ser.PhidgetAnalogOut[i].getAttached():
+                        aw.ser.PhidgetAnalogOut[i].setEnabled(False)
                     aw.ser.PhidgetAnalogOut[i].close()
                 except Exception:
                     pass
@@ -45840,7 +45842,8 @@ class serialport(object):
         if aw.ser.PhidgetRCServo is not None:
             for i in range(len(aw.ser.PhidgetRCServo)):
                 try:
-                    aw.ser.PhidgetRCServo[i].setEngaged(False)
+                    if aw.ser.PhidgetRCServo[i].getAttached():
+                        aw.ser.PhidgetRCServo[i].setEngaged(False)
                     aw.ser.PhidgetRCServo[i].close()
                 except Exception:
                     pass

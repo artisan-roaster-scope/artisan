@@ -100,10 +100,11 @@ def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorde
 # pymodbus version
 class modbusport(object):
     """ this class handles the communications with all the modbus devices"""
-    def __init__(self,sendmessage,adderror,addserial):
+    def __init__(self,sendmessage,adderror,addserial,aw):
         self.sendmessage = sendmessage # function to create an Artisan message to the user in the message line
         self.adderror = adderror # signal an error to the user
         self.addserial = addserial # add to serial log
+        self.aw = aw
         
         # retries
         self.readRetries = 1
@@ -478,11 +479,19 @@ class modbusport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
-            settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-            ser_str = "MODBUS readFloat :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code)
-            if r is not None:
-                ser_str = ser_str + " || Rx = " + str(r)
-            self.addserial(ser_str)
+            if self.aw.seriallogflag:
+                ser_str = "MODBUS readFloat :{},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    self.comport,
+                    self.baudrate,
+                    self.bytesize,
+                    self.parity,
+                    self.stopbits,
+                    self.timeout,
+                    slave,
+                    register,
+                    code,
+                    r)
+                self.addserial(ser_str)
             
             
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
@@ -524,11 +533,19 @@ class modbusport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
-            settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-            ser_str = "MODBUS readBCD :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code)
-            if r is not None:
-                ser_str = ser_str + " || Rx = " + str(r)
-            self.addserial(ser_str)
+            if self.aw.seriallogflag:
+                ser_str = "MODBUS readBCD : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    self.comport,
+                    self.baudrate,
+                    self.bytesize,
+                    self.parity,
+                    self.stopbits,
+                    self.timeout,
+                    slave,
+                    register,
+                    code,
+                    r)
+                self.addserial(ser_str)
 
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore!
@@ -617,11 +634,19 @@ class modbusport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
-            settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)            
-            ser_str = "MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code)
-            if r is not None:
-                ser_str = ser_str + " || Rx = " + str(r)
-            self.addserial(ser_str)
+            if self.aw.seriallogflag:
+                ser_str = "MODBUS readSingleRegister : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    self.comport,
+                    self.baudrate,
+                    self.bytesize,
+                    self.parity,
+                    self.stopbits,
+                    self.timeout,
+                    slave,
+                    register,
+                    code,
+                    r)
+                self.addserial(ser_str)
 
 
     def setTarget(self,sv):

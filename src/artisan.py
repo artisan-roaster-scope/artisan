@@ -47,7 +47,7 @@ elif system().startswith("Windows"):
         if ib:
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
         else:
-            import site
+            import site # @Reimport @UnusedImport
             #gives error in python 3.4: could not find or load the Qt platform plugin "windows"
             QApplication.addLibraryPath(site.getsitepackages()[1] + "\\PyQt5\\plugins")
 
@@ -66,7 +66,7 @@ else: # Linux
         pass
         
 from artisanlib import main
-import numpy # @UnusedImport
+#import numpy # @UnusedImport # what this for!?
 from multiprocessing import freeze_support
 
 if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
