@@ -73,7 +73,7 @@ RequestExecutionLevel admin
 ; HM NIS Edit Wizard helper defines
 !define pyinstallerOutputDir 'dist/artisan'
 !define PRODUCT_NAME "Artisan"
-!define PRODUCT_VERSION "2.0.1.0"
+!define PRODUCT_VERSION "2.1.0.0"
 !define PRODUCT_PUBLISHER "The Artisan Team"
 !define PRODUCT_WEB_SITE "https://github.com/artisan-roaster-scope/artisan/blob/master/README.md"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\artisan.exe"
@@ -269,7 +269,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\translations"
   RMDir /r "$INSTDIR\Wheels"
 
-  RMDir /r "$INSTDIR\gevent-1.4.0-py3.6.egg-info"
+  RMDir /r "$INSTDIR\gevent-1.4.0-py3.7.egg-info"
 
   RMDir /r "$INSTDIR\gevent"
   RMDir /r "$INSTDIR\matplotlib"

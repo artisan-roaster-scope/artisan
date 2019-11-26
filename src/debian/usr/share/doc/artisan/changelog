@@ -1,3 +1,13 @@
+artisan (2.1.0-0) precise; urgency=low
+  * new upstream release
+  * changes since 2.0.0:
+   - adds curve analyzer
+   - extended symbolic formulas
+   - forward looking alarms triggered by temperature differences
+   - support for Atilla GOLD plus 7" II, Besca Bee, more Coffed machines, Phidget sets
+   - bug fixes
+ --  <marko.luther@gmx.net>  Tue, 25 Nov 2019 19:32:14 +0200
+
 artisan (2.0.0-0) precise; urgency=low
   * new upstream release
   * changes since 1.6.2:
