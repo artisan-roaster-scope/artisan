@@ -44,13 +44,12 @@ You will need to configure the hardware device taking the readings from the roas
 The various devices supported can be found [here](https://artisan-roasterscope.blogspot.com/2013/06/device-selection.html). Information on PID control can be found [here](https://artisan-roasterscope.blogspot.com/2016/11/pid-control.html).  A discussion of virtual devices and symbolic assignments is [here](https://artisan-roasterscope.blogspot.com/2014/04/virtual-devices-and-symbolic-assignments.html). The most critical symbolic assignment is for your bean temp and that is explained below.
 Port settings are found under Config>Port IF they are needed.
 
-Artisan can now configure certain Phidgets much like a Machine.
+Artisan can now configure certain Phidgets much like a Machine. Machine setups for popular [VINT Phidget sets](https://artisan-scope.org/devices/phidget-sets/), available as ready-to-use packages from the Artisan shop, have been added that allow a one click configuration. There is a [2xTC setup based on the TMP1101](https://artisan-scope.org/phidgets/2x-tc-set/), a [2xRTD low-noise setup based on two TMP1200](https://artisan-scope.org/phidgets/2x-rtd-set/) as featured in [On Idle Noise](https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html) using a [one-in-two configuration](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html#one-in-two), and an [ambient extension based on the PRE1000 & HUM1000](https://artisan-scope.org/phidgets/ambient-extension/). There is also a setup for the older Phidget 1048 "databridge".
 
 ![Phidget Setup](/assets/images/gsg/phidget config.jpg)
 
-*Example* - Here is one example of connecting a Phidget.  Each device will differ. Connecting a Phidget is easy and you don't have to use the Port menu.  
+*Example* - Here is one example of physically connecting a Phidget 1048:
 
-For a Phidget 1048, the connections were made as follows:
 ![Phidget Connections](/assets/images/gsg/phidget wiring1.jpg) As thermocouples differ your wiring colors may vary.  And different devices will connect differently.
 The correct wiring colors for the thermocouples used were as follows:
 
@@ -79,7 +78,6 @@ Menu>Config>Temperature and Menu>Config>Language are where you go to choose your
 What BT and ET temperatures do you want as reference points?  
 
 Some roasters are just fine with the readings their machines put out from their thermocouples.  Each machine is different and each machine’s thermocouples are placed differently and read differently.  Learn your machine is something you will hear over and over.  That said are you happy with first crack being at 365° or do you want it to be at 390°?  In order to adjust your machine thermocouples to give you dry end or first crack at temps that people think they should be at, you can enter an adjustment under Config>Device on the Tab – Symb ET/BT.  ![symoblic bt](/assets/images/gsg/device assignment - symbolic bt.png)
-
 
 Also don’t expect these to match the PID in the roaster if the probes are in different places.
 
