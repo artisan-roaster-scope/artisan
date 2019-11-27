@@ -8047,6 +8047,7 @@ class tgraphcanvas(FigureCanvas):
     #Records charge (put beans in) marker. called from push button 'Charge'
     @pyqtSlot(bool)
     def markCharge(self,_=False):
+        print("markCharge")
         try:
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
@@ -8658,7 +8659,7 @@ class tgraphcanvas(FigureCanvas):
                             #decrease BatchCounter again
                             self.decBatchCounter()
                             removed = True
-                    elif aw.button_9.isFlat():
+                    elif not aw.button_9.isFlat():
                         self.incBatchCounter()
                         # generate UUID
                         if self.roastUUID is None: # there might be already one assigned by undo and redo the markDROP!
