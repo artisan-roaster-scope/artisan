@@ -25122,12 +25122,18 @@ class ApplicationWindow(QMainWindow):
         aw.quitAction.setEnabled(False)
         try:
             if aw.qmc.checkSaved(): # if not canceled
+                flagKeepON = aw.qmc.flagKeepON
+                aw.qmc.flagKeepON = False # temporarily turn keepOn off
                 self.stopActivities()
+                aw.qmc.flagKeepON = flagKeepON
                 self.closeEventSettings()
                 gc.collect()
                 QApplication.exit()
                 return True
-        finally:
+            else:
+                aw.quitAction.setEnabled(True)
+                return False
+        except:
             aw.quitAction.setEnabled(True)
             return False
 
