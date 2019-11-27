@@ -8047,7 +8047,6 @@ class tgraphcanvas(FigureCanvas):
     #Records charge (put beans in) marker. called from push button 'Charge'
     @pyqtSlot(bool)
     def markCharge(self,_=False):
-        print("markCharge")
         try:
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
