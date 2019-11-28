@@ -188,25 +188,31 @@ class s7port(object):
             except:
                 pass
             with suppress_stdout_stderr():
-                time.sleep(0.6)
+                time.sleep(0.4)
                 try:
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
-                    time.sleep(0.6)
+                    time.sleep(0.4)
                 except Exception:
                     pass
+            
             if self.isConnected():
                 self.sendmessage(QApplication.translate("Message","S7 Connected", None))
-                time.sleep(0.7)
+                time.sleep(0.4)
             else:
-                time.sleep(0.8)
+                time.sleep(0.6)
+                try:
+                    self.plc.disconnect()
+                except:
+                    pass
                 # we try a second time
                 with suppress_stdout_stderr():
-                    time.sleep(0.6)
+                    time.sleep(0.4)
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
-                    time.sleep(0.8)
-                if self.isConnected():
-                    self.sendmessage(QApplication.translate("Message","S7 Connected", None) + " (2)")
-                    time.sleep(0.7)
+                    time.sleep(0.4)
+                    
+                    if self.isConnected():
+                        self.sendmessage(QApplication.translate("Message","S7 Connected", None) + " (2)")
+                        time.sleep(0.4)
 
     def writeFloat(self,area,dbnumber,start,value):
         try:
@@ -214,10 +220,11 @@ class s7port(object):
             self.COMsemaphore.acquire(1)
             self.connect()
             if self.isConnected():
-                with suppress_stdout_stderr():
-                    ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                    self.set_real(ba, 0, float(value))
-                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+#                with suppress_stdout_stderr():
+                ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                self.set_real(ba, 0, float(value))
+                self.plc.write_area(self.areas[area],dbnumber,start,ba)
+
             else:
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
         except Exception as e:
@@ -233,11 +240,12 @@ class s7port(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.isConnected():
-                with suppress_stdout_stderr():
-                    ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    self.set_int(ba, 0, int(value))
-                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+            if self.isConnected():           
+#                with suppress_stdout_stderr():
+                ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                self.set_int(ba, 0, int(value))
+                self.plc.write_area(self.areas[area],dbnumber,start,ba)
+
             else:
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
         except Exception as e:
@@ -258,8 +266,9 @@ class s7port(object):
                 res = None             
                 while True:
                     try:
-                        with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,4)
+#                        with suppress_stdout_stderr():
+                        res = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                            
                     except:
                         res = None
                     if res is None:
@@ -300,8 +309,9 @@ class s7port(object):
                 res = None             
                 while True:
                     try:
-                        with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,2)
+#                        with suppress_stdout_stderr():
+                        res = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                        
                     except Exception:
                         res = None
                     if res is None:
