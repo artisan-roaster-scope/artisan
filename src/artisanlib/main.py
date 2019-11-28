@@ -21390,14 +21390,14 @@ class ApplicationWindow(QMainWindow):
                     self.addSerialPort()
                 # c) set extra temp curves and prepare empty extra smoothed temp curves
                 if "extratimex" in profile:
-                    self.qmc.extratimex = profile["extratimex"] + [profile["timex"]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
+                    self.qmc.extratimex = profile["extratimex"] + [[]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                 if "extratemp1" in profile and len(self.qmc.extratimex) > 0:
-                    self.qmc.extratemp1 = profile["extratemp1"] + [[-1]*len(self.qmc.extratimex[0])]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
+                    self.qmc.extratemp1 = profile["extratemp1"] + [[]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp1 = [[]]*len(self.qmc.extratemp1)
                     self.qmc.extractemp1 = [[]]*len(self.qmc.extratemp1)
                     self.qmc.extractimex1 = [[]]*len(self.qmc.extratemp1)
                 if "extratemp2" in profile and len(self.qmc.extratimex) > 0:
-                    self.qmc.extratemp2 = profile["extratemp2"] + [[-1]*len(self.qmc.extratimex[0])]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
+                    self.qmc.extratemp2 = profile["extratemp2"] + [[]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp2 = [[]]*len(self.qmc.extratemp2)
                     self.qmc.extractemp2 = [[]]*len(self.qmc.extratemp2)
                     self.qmc.extractimex2 = [[]]*len(self.qmc.extratemp2)
