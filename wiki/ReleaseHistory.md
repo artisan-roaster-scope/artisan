@@ -150,7 +150,7 @@ v2.0.0 (04.06.2019)
   - fixes regression that could lead to a potential hang caused by slow communicating devices
 
 ----
-v1.6.1 (20.03.2019)
+v1.6.2 (20.03.2019)
 ------------------
 
 * Changes
