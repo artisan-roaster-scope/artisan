@@ -2,6 +2,15 @@ Detailed Release History
 ========================
 
 ----
+v2.1.1 (29.11.2019)
+------------------
+
+* Fixes
+  - fixes DROP action, broken in v2.1
+  - fixes S7 communication, broken in v2.1
+  - fixes rare issue with the exit handler
+ 
+----
 v2.1.0 (26.11.2019)
 ------------------
 

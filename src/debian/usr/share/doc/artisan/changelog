@@ -1,6 +1,12 @@
 artisan (2.1.0-0) precise; urgency=low
   * new upstream release
   * changes since 2.0.0:
+   - bug fixes
+ --  <marko.luther@gmx.net>  Fri, 29 Nov 2019 19:32:14 +0200
+
+artisan (2.1.0-0) precise; urgency=low
+  * new upstream release
+  * changes since 2.0.0:
    - adds curve analyzer
    - extended symbolic formulas
    - forward looking alarms triggered by temperature differences
