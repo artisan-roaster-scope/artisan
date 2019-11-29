@@ -97,7 +97,7 @@ from PyQt5.QtGui import (QImageReader, QWindow, QFontMetrics,  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
                           qVersion,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
-                          QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
+                          QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
 try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
@@ -34487,6 +34487,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             propGrid.addWidget(self.tareComboBox,1,7)
             propGrid.addLayout(inButtonLayout,1,8)
             propGrid.addLayout(outButtonLayout,1,9)
+            
             if aw.scale.device == "acaia":
                 try:
                     with suppress_stdout_stderr():
@@ -34699,7 +34700,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
+        
     def readScale(self):
         if self.disconnecting:
             aw.scale.closeport()
@@ -59835,11 +59836,16 @@ if sys.platform.startswith("darwin"):
         def makeWindowControllers(self):
             pass
 
+def qt_message_handler(msg_type, msg_log_context, msg_string):
+    pass
+        
 def main():
     global aw
     global app
     global artisanviewerFirstStart
     
+    # supress all Qt messages        
+    qInstallMessageHandler(qt_message_handler)
     
     # suppress all warnings
     warnings.filterwarnings('ignore')
