@@ -666,6 +666,7 @@ class AmbientThread(QThread):
 #######################################################################################
 
 class tgraphcanvas(FigureCanvas):
+    
     def __init__(self,parent,dpi):
 
         #default palette of colors
@@ -1500,10 +1501,15 @@ class tgraphcanvas(FigureCanvas):
         # flags to control automatic DRY and FCs events based on phases limits
         self.autoDRYflag = False
         self.autoFCsFlag = False
+        
+        self.autoCHARGEenabled = True # get's disabled on undo of the CHARGE event and prevents further autoCHARGE marks
         self.autoDRYenabled = True # get's disabled on undo of the DRY event and prevents further autoDRY marks
         self.autoFCsenabled = True # get's disabled on undo of the FCs event and prevents further autoFCs marks
+        self.autoDROPsenabled = True # get's disabled on undo of the DROP event and prevents further autoDROP marks
+        
         self.autoDryIdx = 0 # set by sample() on recognition and cleared once DRY is marked
         self.autoFCsIdx = 0 # set by sample() on recognition and cleared once FCs is marked
+        
 
         # projection variables of change of rate
         self.projectionconstant = 1
@@ -2701,6 +2707,19 @@ class tgraphcanvas(FigureCanvas):
             return aw.s7.type[6+c] == 0 and aw.s7.mode[6+c] == 0 and aw.s7.div[6+c] == 0
         else:
             False
+            
+    def update_additional_artists(self):                            
+        if aw.qmc.flagstart and (aw.qmc.device == 18 or aw.qmc.showtimeguide) and aw.qmc.l_timeline is not None: # not NONE device
+            tx = aw.qmc.timex[-1]
+            aw.qmc.l_timeline.set_data([tx,tx], aw.qmc.ax.get_ylim())
+            aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
+        if aw.qmc.projectFlag:
+            if self.l_BTprojection is not None and aw.qmc.BTcurve:
+                aw.qmc.ax.draw_artist(self.l_BTprojection)
+            if self.l_ETprojection is not None and aw.qmc.ETcurve:
+                aw.qmc.ax.draw_artist(self.l_ETprojection)
+        if aw.qmc.AUCguideFlag and aw.qmc.AUCguideTime and aw.qmc.AUCguideTime > 0:
+            aw.qmc.ax.draw_artist(self.l_AUCguide)    
 
     # runs from GUI thread.
     # this function is called by a signal at the end of the thread sample()
@@ -2871,7 +2890,7 @@ class tgraphcanvas(FigureCanvas):
                             btd = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,bt))[1]))[1])
                             zlim_new = (btd - zlim_offset, btd + zlim_offset)
                             aw.qmc.delta_ax.set_ylim(zlim_new)
-            
+                
                         if ylim != ylim_new or xlim != xlim_new or (two_ax_mode and zlim != zlim_new):
                             self.ax_background = None
                     
@@ -2884,6 +2903,21 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoChargeIdx and aw.qmc.timeindex[0] < 0:
                         self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
                         self.autoChargeIdx = 0
+
+                    #auto mark TP/DRY/FCs/DROP
+                    # we set marks already here to have the canvas, incl. the projections, immediately redrawn
+                    if self.autoTPIdx != 0:
+                        self.markTP()
+                        self.autoTPIdx = 0
+                    if self.autoDryIdx != 0:
+                        self.markDryEnd()
+                        self.autoDryIdx = 0
+                    if self.autoFCsIdx != 0:
+                        self.mark1Cstart()
+                        self.autoFCsIdx = 0
+                    if self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
+                        self.markDrop() # we do not reset the autoDropIdx here to avoid another trigger
+                        self.autoDropIdx = -1 # we set the autoDropIdx to a negative value to prevent further triggers after undo markDROP
 
                     ##### updated canvas
                     try:
@@ -2903,6 +2937,7 @@ class tgraphcanvas(FigureCanvas):
 #                                        aw.qmc.ax.draw_artist(self.l_eventtype3dots)
 #                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
                                     # draw delta lines
+                                    
                                     if aw.qmc.swapdeltalcds:
                                         if self.DeltaBTflag and self.l_delta2 is not None:
                                             try:
@@ -2950,28 +2985,20 @@ class tgraphcanvas(FigureCanvas):
                                         # draw ET
                                         if aw.qmc.ETcurve:
                                             aw.qmc.ax.draw_artist(self.l_temp1)
-                                     
-                                    if aw.qmc.flagstart and (aw.qmc.device == 18 or aw.qmc.showtimeguide) and aw.qmc.l_timeline is not None: # not NONE device
-                                        aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
-                                        
+                                    
                                     if aw.qmc.BTcurve:
                                         for a in self.l_annotations:
                                             aw.qmc.ax.draw_artist(a)
                                     
-                                    if aw.qmc.projectFlag:
-                                        if self.l_BTprojection is not None and aw.qmc.BTcurve:
-                                            aw.qmc.ax.draw_artist(self.l_BTprojection)
-                                        if self.l_ETprojection is not None and aw.qmc.ETcurve:
-                                            aw.qmc.ax.draw_artist(self.l_ETprojection)
-                                            
-                                    if aw.qmc.AUCguideFlag and aw.qmc.AUCguideTime and aw.qmc.AUCguideTime > 0:
-                                        aw.qmc.ax.draw_artist(self.l_AUCguide)
+                                    self.update_additional_artists()
                                         
                                     self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
 
                                 else:
                                     # we do not have a background to bitblit, so do a full redraw
                                     self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
+                                    self.update_additional_artists()
+        
                             #-- end update display
                         
                         if aw.qmc.background and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
@@ -2998,20 +3025,6 @@ class tgraphcanvas(FigureCanvas):
                     #check if HUD is ON (done after self.fig.canvas.draw())
                     if self.HUDflag:
                         aw.showHUD[aw.HUDfunction]()
-                        
-                    #auto mark TP/DRY/FCs/DROP
-                    if self.autoTPIdx != 0:
-                        self.markTP()
-                        self.autoTPIdx = 0
-                    if self.autoDryIdx != 0:
-                        self.markDryEnd()
-                        self.autoDryIdx = 0
-                    if self.autoFCsIdx != 0:
-                        self.mark1Cstart()
-                        self.autoFCsIdx = 0
-                    if self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
-                        self.markDrop() # we do not reset the autoDropIdx here to avoid another trigger
-                        self.autoDropIdx = -1 # we set the autoDropIdx to a negative value to prevent further triggers after undo markDROP
                 
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
@@ -4615,10 +4628,12 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.scorching_flag = False
                 aw.qmc.divots_flag = False
                 
-                # renable autoDRY/autoFCs
+                # renable autoCHARGE/autoDRY/autoFCs/autoDROP
+                aw.qmc.autoCHARGEenabled = True
                 aw.qmc.autoDRYenabled = True
                 aw.qmc.autoFCsenabled = True
-                
+                aw.qmc.autoDROPenabled = True
+
                 #Designer variables
                 self.indexpoint = 0
                 self.workingline = 2            #selects ET or BT
@@ -8058,6 +8073,8 @@ class tgraphcanvas(FigureCanvas):
                     removed = False
                     if aw.button_8.isFlat() and self.timeindex[1] > -1:
                         # undo wrongly set CHARGE
+                        # deactivate autoCHARGE
+                        aw.qmc.autoCHARGEenabled = False
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
@@ -8124,7 +8141,7 @@ class tgraphcanvas(FigureCanvas):
                                 if slidervalue != 0:
                                     value = aw.float2float((slidervalue + 10.0) / 10.0)
                                     # note that EventRecordAction avoids to generate events were type and value matches to the previously recorded one
-                                    aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,takeLock=False)
+                                    aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,takeLock=False,doupdategraphics=False)
                                     # we don't take another lock in EventRecordAction as we already hold that lock!
                 except Exception:
                     pass
@@ -8140,7 +8157,7 @@ class tgraphcanvas(FigureCanvas):
         if self.flagstart:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+            aw.qmc.timealign(redraw=True,recompute=False,force=True) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             if aw.button_8.isFlat():
                 if removed:
                     aw.button_8.setFlat(False)
@@ -8160,6 +8177,9 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.roastpropertiesAutoOpenFlag:
                     aw.openPropertiesSignal.emit()
                 aw.onMarkMoveToNext(aw.button_8)
+            if not(self.autoChargeIdx and aw.qmc.timeindex[0] < 0):
+                self.updategraphics() # we need this to have the projections redrawn immediately
+
 
     # called from sample() and marks the autodetected TP visually on the graph
     def markTP(self):
@@ -8178,7 +8198,7 @@ class tgraphcanvas(FigureCanvas):
                     except: # mpl before v3.0 do not have this set_in_layout() function
                         pass
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.updateBackground() # but we need
+                    self.updateBackground() # but we need to update the background cache with the new annotation
                     st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
                     message = QApplication.translate("Message","[TP] recorded at {0} BT = {1}", None).format(st,st2)
                     #set message at bottom
@@ -8189,6 +8209,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
+        self.autoTPIdx = 0 # avoid a loop on auto marking
 
     @pyqtSlot(bool)
     def markDryEnd(self,_=False):
@@ -8278,6 +8299,9 @@ class tgraphcanvas(FigureCanvas):
                 except Exception:
                     pass
                 aw.onMarkMoveToNext(aw.button_19)
+            if self.autoDryIdx == 0:
+                # only if markDryEnd() is not anyhow triggered within updategraphics()
+                self.updategraphics()
 
     #record 1C start markers of BT. called from push button_3 of application window
     @pyqtSlot(bool)
@@ -8370,6 +8394,9 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[FC START] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
                 aw.onMarkMoveToNext(aw.button_3)
+            if self.autoFCsIdx == 0:
+                # only if mark1Cstart() is not triggered from within updategraphics() and the canvas is anyhow updated
+                self.updategraphics() # we need this to have the projections redrawn immediately
 
     #record 1C end markers of BT. called from button_4 of application window
     @pyqtSlot(bool)
@@ -8453,6 +8480,7 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[FC END] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
                 aw.onMarkMoveToNext(aw.button_4)
+            self.updategraphics() # we need this to have the projections redrawn immediately
                 
 
     #record 2C start markers of BT. Called from button_5 of application window
@@ -8542,6 +8570,7 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
                 aw.onMarkMoveToNext(aw.button_5)
+            self.updategraphics() # we need this to have the projections redrawn immediately
 
     #record 2C end markers of BT. Called from button_6  of application window
     @pyqtSlot(bool)
@@ -8630,6 +8659,7 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[SC END] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
                 aw.onMarkMoveToNext(aw.button_6)
+            self.updategraphics() # we need this to have the projections redrawn immediately
 
     #record end of roast (drop of beans). Called from push button 'Drop'
     @pyqtSlot(bool)
@@ -8649,6 +8679,8 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if aw.button_9.isFlat() and self.timeindex[6] > 0:
                         # undo wrongly set FCs
+                        # deactivate autoDROP
+                        aw.qmc.autoDROPenabled = False
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
@@ -8771,6 +8803,9 @@ class tgraphcanvas(FigureCanvas):
                             except:
                                 pass
                     aw.onMarkMoveToNext(aw.button_9)
+                if not (self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]):
+                    # only if not anyhow markDrop() is triggered from within updategraphic() which guarantees an immedate redraw
+                    self.updategraphics() # we need this to have the projections redrawn immediately
             except Exception:
                 pass
 
@@ -8863,7 +8898,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[7] = 0
                             removed = True
                         
-                    else:
+                    elif not aw.button_20.isFlat():
                         if self.device != 18:
                             self.timeindex[7] = len(self.timex)-1
                         else:
@@ -8929,6 +8964,7 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[COOL END] recorded at {0} BT = {1}", None).format(st1,st2)
                 #set message at bottom
                 aw.sendmessage(message)
+            self.updategraphics() # we need this to have the projections redrawn immediately
 
     @pyqtSlot(bool)
     def EventRecord_action(self,_=False):
@@ -8964,7 +9000,7 @@ class tgraphcanvas(FigureCanvas):
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
     # extraevent is given when called from aw.recordextraevent() from an extra Event Button
-    def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription="",takeLock=True):
+    def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription="",takeLock=True,doupdategraphics=True):
         try:
             if takeLock:
                 aw.qmc.samplingsemaphore.acquire(1)
@@ -9176,6 +9212,8 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if takeLock and aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
+        if self.flagstart and doupdategraphics:
+            self.updategraphics() # we need this to have the projections redrawn immediately
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
     def DeviceEventRecord(self,command):
@@ -12069,7 +12107,7 @@ class SampleThread(QThread):
                         
                         # autodetect CHARGE event
                         # only if BT > 77C/170F
-                        if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
+                        if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.autoCHARGEenabled and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
                             ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 77) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 170)):
                             if aw.qmc.mode == "C":
                                 o = 0.5
@@ -12098,7 +12136,7 @@ class SampleThread(QThread):
                                 pass
                         # autodetect DROP event
                         # only if 8min into roast and BT>160C/320F
-                        if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
+                        if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.autoDROPenabled and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
                             length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 160) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 320)) and\
                             ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 480):
                             if aw.qmc.mode == "C":
@@ -12290,9 +12328,9 @@ class SampleThread(QThread):
                         if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
-                #add to plot a vertical time line
-                if aw.qmc.flagstart and (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
-                    aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
+#                #add to plot a vertical time line
+#                if aw.qmc.flagstart and (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
+#                    aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
             except Exception as e:
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
