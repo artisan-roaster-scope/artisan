@@ -46,7 +46,7 @@ Port settings are found under Config>Port IF they are needed.
 
 Artisan can now configure certain Phidgets much like a Machine. Machine setups for popular [VINT Phidget sets](https://artisan-scope.org/devices/phidget-sets/), available as ready-to-use packages from the Artisan shop, have been added that allow a one click configuration. There is a [2xTC setup based on the TMP1101](https://artisan-scope.org/phidgets/2x-tc-set/), a [2xRTD low-noise setup based on two TMP1200](https://artisan-scope.org/phidgets/2x-rtd-set/) as featured in [On Idle Noise](https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html) using a [one-in-two configuration](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html#one-in-two), and an [ambient extension based on the PRE1000 & HUM1000](https://artisan-scope.org/phidgets/ambient-extension/). There is also a setup for the older Phidget 1048 "databridge".
 
-![Phidget Setup](/assets/images/gsg/phidget config.jpg)
+![Phidget Setup](/assets/images/gsg/phidget config.png)
 
 *Example* - Here is one example of physically connecting a Phidget 1048:
 
