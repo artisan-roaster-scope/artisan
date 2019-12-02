@@ -57,6 +57,8 @@ The correct wiring colors for the thermocouples used were as follows:
 2. BT 0 – Red
 3. ET G – white with blue stripe
 4. ET 0 – white with red stripe
+
+
 ![Phidget Wiring](/assets/images/gsg/ET0 white with red stripe.jpg)
 
 
