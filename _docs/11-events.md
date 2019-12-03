@@ -37,7 +37,9 @@ You can label up to 4 event types. You can edit how they work with the tabs Butt
 
 ![events editor](/assets/images/gsg/events editor.png)
 
-You have the option to render event descriptions instead of values.  Use the event button type "--" that creates an event adding labels to the graph rendering its button description.  For those using sliders the rendering will continue to be the first letter of the Event name and two digits of the value IF you check Decimal Places under Config>Curves>UI.  If you don’t it will render only one digit.  
+You have the option to render event values or descriptions instead of values.  A value would be for example a gas setting that your have set with a slider so if your event button is Gas and the value is 32 it would render G32.  In that that, case don't check the description box.  If you check the description box, it will describe the event.  For example A3(S0) would mean Alarm event 3, slider 0.  
+
+Use the event button type "--" that creates an event adding labels to the graph rendering its button description.  For those using sliders the rendering will continue to be the first letter of the Event name and two digits of the value IF you check Decimal Places under Config>Curves>UI.  If you don’t it will render only one digit.  
 
 During a roast it is now possible to have Artisan draw a line at the current point in time, which helps to compare the current roast state with that of the template (RoR, background event markers,..). You can activate this feature in the Events dialog (menu Config >> Events) by ticking the flag Show Time Guide.  This helps you see Events you have in your Background roast profile.
 
@@ -52,9 +54,9 @@ For Events that you have defined, you will see to the right of Events a dialog b
 
 ![combo setting](/assets/images/gsg/combo example.png)
 
-Flag will render an event either on your ET line or your BT line (check the box “show on BT”) and your event description if you check the box for Descr.  (number represents how many letters) or it will show the first letter of your event name and the event value if you do not.  
+Flag will render an event either on your ET line or your BT line (check the box “show on BT”) and your event value or description if you check the box for Descr. (number represents how many letters).  If you are using values, the first letter of your event name and the event value will be rendered.  
 
-Bar will show you a multicolored bar at the bottom of your graph with the first letter of your event name and the event value.  Description is not relevant.
+Bar will show you a multicolored bar at the bottom of your graph with the first letter of your event name and the event value. Description is not relevant.
 
 Step will show you a plot (step) graph with no values.  
 
