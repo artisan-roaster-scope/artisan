@@ -3643,11 +3643,14 @@ class tgraphcanvas(FigureCanvas):
         elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
             evalsign = "1"      #digit 1 = "+"
             shiftedindex = index + shiftval
-        if shiftedindex < 0:
-            shiftedindex = 0
-        if shiftedindex >= len(readings):
-            shiftedindex = len(readings)- 1
-        return readings[shiftedindex], evalsign
+        if len(readings) > 0:
+            if shiftedindex >= len(readings):
+                shiftedindex = len(readings)- 1
+            if shiftedindex < 0:
+                shiftedindex = 0
+            return readings[shiftedindex], evalsign
+        else:
+            return 0, evalsign
 
     # mathexpression = formula; t = a number to evaluate(usually time);
     # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTsval = RealTime var val
