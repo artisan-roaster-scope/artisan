@@ -3640,13 +3640,13 @@ class tgraphcanvas(FigureCanvas):
         if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
             evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
             shiftedindex = index - shiftval
-            if shiftedindex < 0:
-                shiftedindex = 0
         elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
             evalsign = "1"      #digit 1 = "+"
             shiftedindex = index + shiftval
-            if shiftedindex >= len(self.timex):
-                shiftedindex = len(self.timex)- 1
+        if shiftedindex < 0:
+            shiftedindex = 0
+        if shiftedindex >= len(readings):
+            shiftedindex = len(readings)- 1
         return readings[shiftedindex], evalsign
 
     # mathexpression = formula; t = a number to evaluate(usually time);
@@ -12509,6 +12509,7 @@ class ApplicationWindow(QMainWindow):
         self.recentSettingActs = []
         self.recentThemeActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
+        
         super(ApplicationWindow, self).__init__(parent)
         
         # a timer that is triggered by resizing the main window

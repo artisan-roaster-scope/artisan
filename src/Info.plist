@@ -120,7 +120,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0.1</string>
+	<string>2.1.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -133,7 +133,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>Artisan 2.0.1</string>
+	<string>Artisan 2.1.2</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSArchitecturePriority</key>
@@ -158,6 +158,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+<!-- setting NSRequiresAquaSystemAppearance enables dark mode (on PyQt 5.13.1), but breaks builds based on PyQt 5.13.2 -->
 	<key>NSRequiresAquaSystemAppearance</key>
 	<string>false</string>
 </dict>
