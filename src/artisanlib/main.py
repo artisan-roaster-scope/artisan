@@ -60007,7 +60007,7 @@ def main():
             mxOpenKey.setValue(".", cmdLine)
         except:
             pass
-            
+
     # write gc debug messages to stdout
 #    gc.set_debug(gc.DEBUG_STATS)
 
