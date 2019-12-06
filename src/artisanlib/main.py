@@ -19607,7 +19607,7 @@ class ApplicationWindow(QMainWindow):
                     #restore dirs
                     QDir.setCurrent(oldDir)
                     self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
-                    #self.setCurrentFile(filename) # we do not add autosaved files any longer to the recent file menu
+                    self.setCurrentFile(filename,False) # we do not add autosaved files any longer to the recent file menu
                     self.qmc.fileClean()
                     
                     if self.qmc.autosaveimage and not aw.qmc.flagon:
@@ -19753,22 +19753,23 @@ class ApplicationWindow(QMainWindow):
     def strippedDir(self, fullFileName):
         return u(QFileInfo(fullFileName).dir().dirName())
 
-    def setCurrentFile(self, fileName):
+    def setCurrentFile(self, fileName,addToRecent=True):
         self.curFile = fileName
         if self.curFile:
             self.setWindowTitle(("%s - " + self.windowTitle) % self.strippedName(self.curFile))
-            settings = QSettings()
-            files = toStringList(settings.value('recentFileList'))
-            try:
-                removeAll(files,fileName)
-            except ValueError:
-                pass
-            files.insert(0, fileName)
-            del files[self.MaxRecentFiles:]
-            settings.setValue('recentFileList', files)
-            for widget in QApplication.topLevelWidgets():
-                if isinstance(widget, ApplicationWindow):
-                    widget.updateRecentFileActions()
+            if addToRecent:
+                settings = QSettings()
+                files = toStringList(settings.value('recentFileList'))
+                try:
+                    removeAll(files,fileName)
+                except ValueError:
+                    pass
+                files.insert(0, fileName)
+                del files[self.MaxRecentFiles:]
+                settings.setValue('recentFileList', files)
+                for widget in QApplication.topLevelWidgets():
+                    if isinstance(widget, ApplicationWindow):
+                        widget.updateRecentFileActions()
         else:
             self.setWindowTitle(self.windowTitle)
  
