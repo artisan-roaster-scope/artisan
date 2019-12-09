@@ -26582,7 +26582,7 @@ class ApplicationWindow(QMainWindow):
                                 ws['E{0}'.format(c)].number_format = ("0.0" if aw.qmc.LCDdecimalplaces else "0")
                             if "FCs_time" in rd:
                                 h,m = divmod(rd["FCs_time"],60)
-                                dt = datetime.time(int(round(h)),int(round(m)),0)
+                                dt = datetime.time(int(h),int(m),0)
                                 ws['F{0}'.format(c)] = dt
                                 ws['F{0}'.format(c)].number_format = 'H:MM'
                             if "FCs_temp" in rd and "temp_unit" in rd:
@@ -26590,7 +26590,7 @@ class ApplicationWindow(QMainWindow):
                                 ws['G{0}'.format(c)].number_format = ("0.0" if aw.qmc.LCDdecimalplaces else "0")
                             if "DROP_time" in rd:
                                 h,m = divmod(rd["DROP_time"],60)
-                                dt = datetime.time(int(round(h)),int(round(m)),0)
+                                dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
                                 ws['H{0}'.format(c)] = dt
                                 ws['H{0}'.format(c)].number_format = 'H:MM'
                             if "DROP_temp" in rd and "temp_unit" in rd:
