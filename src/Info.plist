@@ -158,7 +158,6 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-<!-- setting NSRequiresAquaSystemAppearance enables dark mode (on PyQt 5.13.1), but breaks builds based on PyQt 5.13.2 -->
 	<key>NSRequiresAquaSystemAppearance</key>
 	<string>false</string>
 </dict>

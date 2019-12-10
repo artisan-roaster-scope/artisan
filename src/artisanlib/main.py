@@ -1219,6 +1219,8 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         self.fig.canvas.mpl_connect('pick_event', self.onpick)
         self.fig.canvas.mpl_connect('draw_event', self._draw_event)
+        
+        self.fig.canvas.mpl_connect('button_release_event', self.onrelease_after_pick)
 
         # set the parent widget
         self.setParent(parent)
@@ -2437,7 +2439,7 @@ class tgraphcanvas(FigureCanvas):
                     try:
                         label = event.artist.get_text()
                         idx = self.labels.index(label)
-                    except Exception as e:
+                    except:
                         pass
                     try:
                         # toggle also the visibility of the legend handle
@@ -2447,22 +2449,18 @@ class tgraphcanvas(FigureCanvas):
                             artist.set_visible(not artist.get_visible())
                     except:
                         pass
-                elif isinstance(event.artist, matplotlib.lines.Line2D):
-                    try:
-                        label = event.artist.get_label().replace(deltaLabelUTF8,deltaLabelMathPrefix)
-                        idx = self.labels.index(label)
-                    except:
-                        pass
-                    # toggle also the visibility of the legend handle
-                    event.artist.set_visible(not event.artist.get_visible())
+#                elif isinstance(event.artist, matplotlib.lines.Line2D):
+#                    try:
+#                        label = event.artist.get_label().replace(deltaLabelUTF8,deltaLabelMathPrefix)
+#                        idx = self.labels.index(label)
+#                    except:
+#                        pass
+#                    # toggle also the visibility of the legend handle
+#                    event.artist.set_visible(not event.artist.get_visible())
                 # toggle the visibility of the corresponding line
                 if idx is not None:
                     artist = self.handles[idx]
                     artist.set_visible(not artist.get_visible())
-                QApplication.processEvents() # this is needed to avoid redraw problems if legend uses "use_blit" option!
-    #            self.fig.canvas.draw()
-                self.updateBackground()
-                QApplication.processEvents() # this is needed to avoid redraw problems if legend uses "use_blit" option!
             
             # show event information by clicking on event lines in step, step+ and combo modes
             elif isinstance(event.artist, matplotlib.lines.Line2D):
@@ -2509,10 +2507,14 @@ class tgraphcanvas(FigureCanvas):
                             self.starteventmessagetimer()
                             break
         except Exception as e:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onpick() {0}").format(str(e)),exc_tb.tb_lineno)
+            
+    def onrelease_after_pick(self,_):
+        if self.legend is not None:
+            QTimer.singleShot(1,self.updateBackground)
 
     def onrelease(self,event):     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
         try:
@@ -2797,7 +2799,9 @@ class tgraphcanvas(FigureCanvas):
                                         aw.extraLCD1[i].display(extra1_value)
                                         extra1_values.append(extra1_value)
                                 except:
-                                    pass
+                                    extra1_value = "--"
+                                    extra1_values.append(extra1_value)
+                                    aw.extraLCD1[i].display(extra1_value)
                                 try:
                                     if self.extratemp2[i]:
                                         fmt = lcdformat
@@ -2814,7 +2818,9 @@ class tgraphcanvas(FigureCanvas):
                                         aw.extraLCD2[i].display(extra2_value)
                                         extra2_values.append(extra2_value)
                                 except:
-                                    pass
+                                    extra2_value = "--"
+                                    extra2_values.append(extra2_value)
+                                    aw.extraLCD2[i].display(extra2_value)
                                         
                         # update large LCDs (incl. Web LCDs)
                         timestr = None
@@ -2960,37 +2966,65 @@ class tgraphcanvas(FigureCanvas):
                                                 aw.qmc.ax.draw_artist(self.l_delta2)
                                             except:
                                                 pass
+                                    
                                     # draw extra curves
                                     xtra_dev_lines1 = 0
                                     xtra_dev_lines2 = 0
 
-                                    for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                                        if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
-                                            aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
-                                            xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                        if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
-                                            aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
-                                            xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                    try:
+                                        for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                                            if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
+                                                except:
+                                                    pass
+                                                xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                            if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
+                                                except:
+                                                    pass
+                                                xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                    except:
+                                        pass
                                     if aw.qmc.swaplcds:
                                         # draw ET
                                         if aw.qmc.ETcurve:
-                                            aw.qmc.ax.draw_artist(self.l_temp1)
+                                            try:
+                                                aw.qmc.ax.draw_artist(self.l_temp1)
+                                            except:
+                                                pass
                                         # draw BT
                                         if aw.qmc.BTcurve:
-                                            aw.qmc.ax.draw_artist(self.l_temp2)
+                                            try:
+                                                aw.qmc.ax.draw_artist(self.l_temp2)
+                                            except:
+                                                pass
                                     else:
                                         # draw BT
                                         if aw.qmc.BTcurve:
-                                            aw.qmc.ax.draw_artist(self.l_temp2)
+                                            try:
+                                                aw.qmc.ax.draw_artist(self.l_temp2)
+                                            except:
+                                                pass
                                         # draw ET
                                         if aw.qmc.ETcurve:
-                                            aw.qmc.ax.draw_artist(self.l_temp1)
+                                            try:
+                                                aw.qmc.ax.draw_artist(self.l_temp1)
+                                            except:
+                                                pass
                                     
-                                    if aw.qmc.BTcurve:
-                                        for a in self.l_annotations:
-                                            aw.qmc.ax.draw_artist(a)
+                                    try:
+                                        if aw.qmc.BTcurve:
+                                            for a in self.l_annotations:
+                                                aw.qmc.ax.draw_artist(a)
+                                    except:
+                                        pass
                                     
-                                    self.update_additional_artists()
+                                    try:
+                                        self.update_additional_artists()
+                                    except:
+                                        pass
                                         
                                     self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
 
@@ -3024,7 +3058,10 @@ class tgraphcanvas(FigureCanvas):
 
                     #check if HUD is ON (done after self.fig.canvas.draw())
                     if self.HUDflag:
-                        aw.showHUD[aw.HUDfunction]()
+                        try:
+                            aw.showHUD[aw.HUDfunction]()
+                        except:
+                            pass
                 
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
@@ -3050,30 +3087,30 @@ class tgraphcanvas(FigureCanvas):
     def updateLCDtime(self):
         if self.flagstart and self.flagon:
             tx = self.timeclock.elapsed()/1000.
-            
-            if type(self.timeindex) is list and len(self.timeindex) == 8: # ensure we have a valid self.timeindex array
-            
-                if self.timeindex[0] != -1 and type(self.timex) is list and len(self.timex) > self.timeindex[0]:
-                    ts = tx - self.timex[self.timeindex[0]]
-                else:
-                    ts = tx
-                nextreading = 1000. - 1000.*(tx%1.)
-    
-                # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
-                if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6] and \
-                    type(aw.qmc.statisticsconditions) is list and len(aw.qmc.statisticsconditions) > 7 and (tx - aw.qmc.timex[aw.qmc.timeindex[6]]) > aw.qmc.statisticsconditions[7]:
-                    aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
-    
-                timestr = self.stringfromseconds(int(round(ts)))
-                aw.lcd1.display(u(timestr))
+            nextreading = 1000. - 1000.*(tx%1.)
+            try:
+                if type(self.timeindex) is list and len(self.timeindex) == 8: # ensure we have a valid self.timeindex array
                 
-                # update connected WebLCDs
-                if aw.WebLCDs:
-                    self.updateWebLCDs(time=timestr)
-                if aw.largeLCDs_dialog:
-                    self.updateLargeLCDs(time=timestr)
-            
-            QTimer.singleShot(nextreading,self.updateLCDtime)
+                    if self.timeindex[0] != -1 and type(self.timex) is list and len(self.timex) > self.timeindex[0]:
+                        ts = tx - self.timex[self.timeindex[0]]
+                    else:
+                        ts = tx
+        
+                    # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
+                    if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6] and \
+                        type(aw.qmc.statisticsconditions) is list and len(aw.qmc.statisticsconditions) > 7 and (tx - aw.qmc.timex[aw.qmc.timeindex[6]]) > aw.qmc.statisticsconditions[7]:
+                        aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
+        
+                    timestr = self.stringfromseconds(int(round(ts)))
+                    aw.lcd1.display(u(timestr))
+                    
+                    # update connected WebLCDs
+                    if aw.WebLCDs:
+                        self.updateWebLCDs(time=timestr)
+                    if aw.largeLCDs_dialog:
+                        self.updateLargeLCDs(time=timestr)
+            finally:            
+                QTimer.singleShot(nextreading,self.updateLCDtime)
     
     @pyqtSlot(bool)
     def toggleHUD(self,_=False):
@@ -11767,11 +11804,17 @@ class SampleThread(QThread):
                                 extrat1 = aw.qmc.RTextratemp1[i]
                                 extrat2 = aw.qmc.RTextratemp2[i]
                                 if len(aw.qmc.extramathexpression1) > i and aw.qmc.extramathexpression1[i] is not None and len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
-                                    aw.qmc.RTextratemp1[i] = extrat1
+                                    try:
+                                        extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
+                                        aw.qmc.RTextratemp1[i] = extrat1
+                                    except:
+                                        pass
                                 if len(aw.qmc.extramathexpression2) > i and aw.qmc.extramathexpression2[i] is not None and len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
-                                    aw.qmc.RTextratemp2[i] = extrat2
+                                    try:
+                                        extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
+                                        aw.qmc.RTextratemp2[i] = extrat2
+                                    except:
+                                        pass
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
                                     extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
                                     extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
@@ -11865,11 +11908,17 @@ class SampleThread(QThread):
                     ####### all values retrieved
 
                     if aw.qmc.ETfunction is not None and len(aw.qmc.ETfunction):
-                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,tx,RTsname="Y1",RTsval=t1)
-                        aw.qmc.RTtemp1 = t1
+                        try:
+                            t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,tx,RTsname="Y1",RTsval=t1)
+                            aw.qmc.RTtemp1 = t1
+                        except:
+                            pass
                     if aw.qmc.BTfunction is not None and len(aw.qmc.BTfunction):
-                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,tx,RTsname="Y2",RTsval=t2)
-                        aw.qmc.RTtemp2 = t2
+                        try:
+                            t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,tx,RTsname="Y2",RTsval=t2)
+                            aw.qmc.RTtemp2 = t2
+                        except:
+                            pass
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
                     t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
@@ -12008,7 +12057,10 @@ class SampleThread(QThread):
                             timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
                             aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
-                                aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
+                                try:
+                                    aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
+                                except:
+                                    pass
                         # compute T2 RoR
                         if t2_final == -1:  # we repeat the last RoR if underlying temperature dropped
                             if aw.qmc.unfiltereddelta2:
@@ -12021,7 +12073,10 @@ class SampleThread(QThread):
                             timed = aw.qmc.ctimex2[-1] - aw.qmc.ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
                             aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
                             if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
-                                aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
+                                try:
+                                    aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
+                                except:
+                                    pass
 
                         aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                         aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
@@ -17072,51 +17127,56 @@ class ApplicationWindow(QMainWindow):
         return frame
 
     def updateAUCLCD(self):
-        if ((aw.qmc.AUCbegin == 0 and aw.qmc.timeindex[0] > -1) or
-            (aw.qmc.AUCbegin == 1 and aw.qmc.TPalarmtimeindex) or
-            (aw.qmc.AUCbegin == 2 and self.qmc.timeindex[1] > 0) or
-            (aw.qmc.AUCbegin == 3 and self.qmc.timeindex[2] > 0)):
-            if aw.qmc.AUCLCDmode == 0:
-                v = int(round(aw.qmc.AUCvalue))
-                if v > 999:
-                    self.AUClcd.display("---")
+        try:
+            if ((aw.qmc.AUCbegin == 0 and aw.qmc.timeindex[0] > -1) or
+                (aw.qmc.AUCbegin == 1 and aw.qmc.TPalarmtimeindex) or
+                (aw.qmc.AUCbegin == 2 and self.qmc.timeindex[1] > 0) or
+                (aw.qmc.AUCbegin == 3 and self.qmc.timeindex[2] > 0)):
+                if aw.qmc.AUCLCDmode == 0:
+                    v = int(round(aw.qmc.AUCvalue))
+                    if v > 999:
+                        self.AUClcd.display("---")
+                    else:
+                        self.AUClcd.display(u(v))
+                    self.AUClcd.setStyleSheet("QLCDNumber { color: black; }") 
+                elif aw.qmc.AUCLCDmode == 1:
+                    if aw.qmc.AUCtargetFlag and aw.qmc.background and aw.qmc.AUCbackground > 0:
+                        # background AUC as target
+                        target = aw.qmc.AUCbackground
+                    else:
+                        # use target AUC as specified by the user
+                        target = aw.qmc.AUCtarget
+                    d = aw.qmc.AUCvalue-target
+                    if d < 0:
+                        # too low => blue
+                        self.AUClcd.setStyleSheet("QLCDNumber { color: blue; }")
+                    else:
+                        # too high => red
+                        self.AUClcd.setStyleSheet("QLCDNumber { color: red; }")
+                        self.AUClabel.setText("<small><b>" + u(QApplication.translate("Label", "AUC",None)) + "&laquo;</b></small>")
+                    v = abs(int(round(d)))
+                    if v > 999:
+                        self.AUClcd.display("---")
+                        self.AUClcd.setStyleSheet("QLCDNumber { color: black; }")
+                    else:
+                        self.AUClcd.display(u(v))
+                elif aw.qmc.timeindex[2] > 0:
+                    v = int(round(aw.qmc.AUCsinceFCs))
+                    if v > 999:
+                        self.AUClcd.display("---")
+                    else:
+                        self.AUClcd.display(u(v))
+                    self.AUClcd.setStyleSheet("QLCDNumber { color: black; }") 
                 else:
-                    self.AUClcd.display(u(v))
-                self.AUClcd.setStyleSheet("QLCDNumber { color: black; }") 
-            elif aw.qmc.AUCLCDmode == 1:
-                if aw.qmc.AUCtargetFlag and aw.qmc.background and aw.qmc.AUCbackground > 0:
-                    # background AUC as target
-                    target = aw.qmc.AUCbackground
-                else:
-                    # use target AUC as specified by the user
-                    target = aw.qmc.AUCtarget
-                d = aw.qmc.AUCvalue-target
-                if d < 0:
-                    # too low => blue
-                    self.AUClcd.setStyleSheet("QLCDNumber { color: blue; }")
-                else:
-                    # too high => red
-                    self.AUClcd.setStyleSheet("QLCDNumber { color: red; }")
-                    self.AUClabel.setText("<small><b>" + u(QApplication.translate("Label", "AUC",None)) + "&laquo;</b></small>")
-                v = abs(int(round(d)))
-                if v > 999:
                     self.AUClcd.display("---")
                     self.AUClcd.setStyleSheet("QLCDNumber { color: black; }")
-                else:
-                    self.AUClcd.display(u(v))
-            elif aw.qmc.timeindex[2] > 0:
-                v = int(round(aw.qmc.AUCsinceFCs))
-                if v > 999:
-                    self.AUClcd.display("---")
-                else:
-                    self.AUClcd.display(u(v))
-                self.AUClcd.setStyleSheet("QLCDNumber { color: black; }") 
             else:
                 self.AUClcd.display("---")
                 self.AUClcd.setStyleSheet("QLCDNumber { color: black; }")
-        else:
-            self.AUClcd.display("---")
-            self.AUClcd.setStyleSheet("QLCDNumber { color: black; }") 
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updateAUCLCD(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            
         
     def updatePhasesLCDs(self):
         try:
