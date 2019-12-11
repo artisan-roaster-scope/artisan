@@ -1852,6 +1852,8 @@ class tgraphcanvas(FigureCanvas):
         
         self.l_annotations = []
         self.l_background_annotations = []
+        
+        self.ai = None # holds background logo image
 
         ###########################  TIME  CLOCK     ##########################
         # create an object time to measure and record time (in miliseconds)
@@ -8107,13 +8109,13 @@ class tgraphcanvas(FigureCanvas):
         try:
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
+                removed = False
                 try:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.fileDirty()
                     
-                    removed = False
-                    if aw.button_8.isFlat() and self.timeindex[1] > -1:
+                    if aw.button_8.isFlat() and self.timeindex[0] > -1:
                         # undo wrongly set CHARGE
                         # deactivate autoCHARGE
                         aw.qmc.autoCHARGEenabled = False
@@ -8127,7 +8129,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_annotations[-2].remove()
                             except:
                                 pass
-                            self.l_annotations = self.l_annotations[:-2]                            
+                            self.l_annotations = self.l_annotations[:-2]
                             self.timeindex[0] = -1
                             self.xaxistosm(redraw=False)
                             removed = True
@@ -8414,7 +8416,7 @@ class tgraphcanvas(FigureCanvas):
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.qmc.alignEvent in [2,7]:
                 aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            # NOTE: the following aw.eventaction might do serial communication that acquires a lock, so release it here
             if aw.button_3.isFlat():
                 if removed:
                     self.updateBackground()
@@ -8424,11 +8426,8 @@ class tgraphcanvas(FigureCanvas):
                         if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                             aw.button_8.setFlat(False)
             else:
-                #aw.button_3.setDisabled(True) # deactivate FCs button
                 aw.button_3.setFlat(True)
-                #aw.button_8.setDisabled(True) # also deactivate CHARGE button
                 aw.button_8.setFlat(True)
-                #aw.button_19.setDisabled(True) # also deactivate DRY button
                 aw.button_19.setFlat(True)
                 aw.eventactionx(aw.qmc.buttonactions[2],aw.qmc.buttonactionstrings[2])
                 st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
@@ -11465,6 +11464,8 @@ class VMToolbar(NavigationToolbar):
         
         # if true, we render Artisan-specific white versions of the icons
         self.white_icons = white_icons
+        
+        self.axis_ranges = [] # holds the ranges of all axis to detect if it is zoomed in
 
         NavigationToolbar.__init__(self, plotCanvas, parent)
         
@@ -11523,8 +11524,50 @@ class VMToolbar(NavigationToolbar):
         self.update_view_org()
         aw.qmc.updateBackground()
 
+    def getAxisRanges(self):
+        res = []
+        for ax in self.canvas.figure.axes:
+            xlim = ax.get_xlim()
+            ylim = ax.get_ylim()
+            res.append(xlim[1]-xlim[0])
+            res.append(ylim[1]-ylim[0])
+        return res
+        
+    def press_pan(self, event):
+        if aw.qmc.ai is not None:
+            # we remember the axis ranges before the pan-zoom to detect if it was zoomed
+            self.axis_ranges = self.getAxisRanges()
+        super(VMToolbar, self).press_pan(event)
+    
+    def release_pan(self, event):
+        if aw.qmc.ai is not None and [round(r) for r in self.axis_ranges] != [round(r) for r in self.getAxisRanges()]:
+            # only hide the background image if the axis ratio changed
+            aw.qmc.ai.set_visible(False)
+        super(VMToolbar, self).release_pan(event)
+
+    def release_zoom(self, event):
+        if aw.qmc.ai is not None:
+            aw.qmc.ai.set_visible(False)
+        super(VMToolbar, self).release_zoom(event)
+
+    def forward(self, *args):
+        if aw.qmc.ai is not None:
+            aw.qmc.ai.set_visible(False)
+        super(VMToolbar, self).forward(*args) 
+        
+    def back(self, *args):
+        if aw.qmc.ai is not None:
+            if self._nav_stack._pos > 1:
+                aw.qmc.ai.set_visible(False)
+            else:
+                aw.qmc.ai.set_visible(True)
+        super(VMToolbar, self).back(*args) 
+        
     def home(self, *args):
         """Restore the original view"""
+        # show the background image again that was hidden on zoom-in
+        if aw.qmc.ai is not None:
+            aw.qmc.ai.set_visible(True)
         super(VMToolbar, self).home(*args) 
                 
         # toggle zoom_follow if recording
@@ -14943,7 +14986,6 @@ class ApplicationWindow(QMainWindow):
         sliderGrp1.setContentsMargins(0,7,0,0)
         sliderGrp1.setSpacing(0)
         self.sliderGrpBox1 = QGroupBox()
-        self.sliderGrpBox1.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBox1.setLayout(sliderGrp1)
         self.sliderGrpBox1.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox1.setMinimumWidth(55) 
@@ -14970,7 +15012,6 @@ class ApplicationWindow(QMainWindow):
         sliderGrp2.setContentsMargins(0,7,0,0)
         sliderGrp2.setSpacing(0)
         self.sliderGrpBox2 = QGroupBox()
-        self.sliderGrpBox2.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBox2.setLayout(sliderGrp2)
         self.sliderGrpBox2.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox2.setMinimumWidth(55) 
@@ -14996,7 +15037,6 @@ class ApplicationWindow(QMainWindow):
         sliderGrp3.setContentsMargins(0,7,0,0)
         sliderGrp3.setSpacing(0)
         self.sliderGrpBox3 = QGroupBox()
-        self.sliderGrpBox3.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBox3.setLayout(sliderGrp3)
         self.sliderGrpBox3.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox3.setMinimumWidth(55) 
@@ -15022,7 +15062,6 @@ class ApplicationWindow(QMainWindow):
         sliderGrp4.setContentsMargins(0,7,0,0)
         sliderGrp4.setSpacing(0)
         self.sliderGrpBox4 = QGroupBox()
-        self.sliderGrpBox4.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBox4.setLayout(sliderGrp4)
         self.sliderGrpBox4.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox4.setMinimumWidth(55) 
@@ -15039,7 +15078,7 @@ class ApplicationWindow(QMainWindow):
 
         self.sliderSV = self.slider()
         self.sliderLCDSV = self.sliderLCD()
-        self.sliderLCDSV.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.palette["text"])
+#        self.sliderLCDSV.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.palette["text"])
         self.sliderLCDSV.setNumDigits(3)
         self.sliderLCDSV.setStyleSheet("font-weight: bold;")
         self.sliderLCDSV.display(self.pidcontrol.svValue)
@@ -15050,7 +15089,6 @@ class ApplicationWindow(QMainWindow):
         sliderGrpSV.setContentsMargins(0,7,0,0)
         sliderGrpSV.setSpacing(0)
         self.sliderGrpBoxSV = QGroupBox()
-        self.sliderGrpBoxSV.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.sliderGrpBoxSV.setLayout(sliderGrpSV)
         self.sliderGrpBoxSV.setAlignment(Qt.AlignCenter)
         self.sliderGrpBoxSV.setMinimumWidth(55) 
@@ -15146,8 +15184,18 @@ class ApplicationWindow(QMainWindow):
         self.sendmessageSignal.connect(self.sendmessage)
         self.openPropertiesSignal.connect(self.editgraph)
         
+        if sys.platform.startswith("darwin"):
+            # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
+            self.installEventFilter(self)
+        
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.ApplicationPaletteChange:  # called if the palette changed (switch between dark and light mode on macOS)
+            self.updateCanvasColors()
+            return True
+        return super(ApplicationWindow, self).eventFilter(obj, event)
     
     # search the given QTable table for a row with the given widget in column col
     # returns the row number if the widget was found or None
@@ -16051,7 +16099,20 @@ class ApplicationWindow(QMainWindow):
         val = -1
         try:
             for c in colorPairsToCheck:
-                val = self.colorDifference(c[1],c[3]) 
+                c1 = c[1]
+                c3 = c[3]
+                # if one color is the canvas color set to None (transparent), we try to avoid a false warning
+                if str(c1) == "None" and c[0] == "Canvas":
+                    if sys.platform.startswith("darwin") and darkdetect.isDark():
+                        c1 = "black"
+                    else:
+                        c1 = "white"
+                if str(c3) == "None" and c[2] == "Canvas":
+                    if sys.platform.startswith("darwin") and darkdetect.isDark():
+                        c3 = "black"
+                    else:
+                        c3 = "white"
+                val = self.colorDifference(c1,c3) 
                 if val < aw.qmc.colorDifferenceThreshold :
                     val = aw.float2float(val,1)
                     if showMsg:
@@ -16121,6 +16182,37 @@ class ApplicationWindow(QMainWindow):
 
         
     def updateCanvasColors(self):
+        canvas_color = aw.qmc.palette["canvas"]
+        try:
+            if str(canvas_color) == 'None' and sys.platform.startswith("darwin"):
+                if darkdetect.isDark():
+                    # in dark mode on macOS, the transparent canvas of the classic Artisan theme leeds to unreadable text, thus we switch to standard gray
+                    canvas_color = "#333333" # for light: "#F8F8F8"
+                    aw.qmc.palette["title"] = "#e6e6e6"
+                    aw.qmc.palette["xlabel"] = "#cccccc"
+                    aw.qmc.palette["ylabel"] = "#cccccc"
+                else:
+                    if aw.qmc.palette["title"] == "#e6e6e6":
+                        aw.qmc.palette["title"] = "#000000"
+                    if aw.qmc.palette["xlabel"] == "#cccccc":
+                        aw.qmc.palette["xlabel"] = "#000000"
+                    if aw.qmc.palette["ylabel"] == "#cccccc":
+                        aw.qmc.palette["ylabel"] = "#000000"
+                for label in aw.qmc.ax.xaxis.get_ticklabels():
+                    label.set_color(aw.qmc.palette["xlabel"])
+                for label in aw.qmc.ax.yaxis.get_ticklabels():
+                    label.set_color(aw.qmc.palette["ylabel"])
+                if aw.qmc.delta_ax:
+                    for label in aw.qmc.delta_ax.yaxis.get_ticklabels():
+                        label.set_color(aw.qmc.palette["ylabel"])
+                    aw.qmc.delta_ax.yaxis.get_label().set_color(aw.qmc.palette["ylabel"])
+                aw.qmc.ax.xaxis.get_label().set_color(aw.qmc.palette["xlabel"])
+                aw.qmc.ax.yaxis.get_label().set_color(aw.qmc.palette["ylabel"])
+        except:
+            pass
+        
+        title_color = aw.qmc.palette["title"]
+
         current_background_color = None
         try:
             s = aw.styleSheet()[12+len("background-color:"):]
@@ -16128,14 +16220,20 @@ class ApplicationWindow(QMainWindow):
         except:
             pass
 
-        whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
+        if str(canvas_color) == 'None':
+            if sys.platform.startswith("darwin"):
+                whitep = darkdetect.isDark()
+            else:
+                whitep = False
+        else:
+            whitep = aw.colorDifference("white",canvas_color) > aw.colorDifference("black",canvas_color)
 
-        aw.qmc.fig.patch.set_facecolor(str(aw.qmc.palette["canvas"]))
-        aw.setStyleSheet("QMainWindow{background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+        aw.qmc.fig.patch.set_facecolor(str(canvas_color))
+        aw.setStyleSheet("QMainWindow{background-color:" + str(canvas_color) + ";"
                                    + "border: 0px solid black;"
                                    + "}" )
 
-        if current_background_color is None or current_background_color != str(aw.qmc.palette["canvas"]) or (whitep and aw.qmc.palette["messages"] != 'white'): # canvas color did not change, we do not need to redo the navigation bar        
+        if current_background_color is None or current_background_color != str(canvas_color) or (whitep and aw.qmc.palette["messages"] != 'white'): # canvas color did not change, we do not need to redo the navigation bar        
             # update navigationbar
             aw.level1layout.removeWidget(aw.ntb) # remove current bar
             if aw.ntb._active == 'PAN':
@@ -16151,34 +16249,38 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.palette["messages"] = 'white'
         else:
             aw.qmc.palette["messages"] = 'black'
+        aw.sendmessage("")
         aw.ntb.setMinimumHeight(50)
-        aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+        aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(canvas_color) + ";"
+                                    + "color: " + str(title_color) + ";"
                                     + "border: 0px solid gray;"
                                     + "border-width: 0px;"
                                     + "padding-top: 12px;"
                                     + "padding-bottom: 5px;"
                                     + "padding-left: 0px;"
                                     + "padding-right: 0px;"
-                                    + "}"
-                                    + "QGroupBox::title {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                    + "}"                                   
+                                    + "QGroupBox::title {background-color:" + str(canvas_color) + ";"
                                     + "subcontrol-origin: margin;" # or border or margin
                                     + "subcontrol-position: top center;" #/* position at the top center */
-                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
-                                    + "}" ) 
+                                    + "color: " + aw.qmc.palette["messages"] + ";"
+                                    + "}")
+        
         # ensure x/y coordinates are readable
-        aw.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+        aw.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(canvas_color) + ";"
+                                    + "color: " + str(title_color) + ";"
                                     + "}" )
         # make QToolBar background transparent
-        aw.ntb.setStyleSheet("QToolBar {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                    + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
-                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+        aw.ntb.setStyleSheet("QToolBar {background-color:" + str(canvas_color) + ";"
+                                    + "border: 5px solid " + str(canvas_color) + ";"
+                                    + "color: " + str(title_color) + ";"
                                     + "}" )
+        
+        self.qmc.setProfileTitle(aw.qmc.title,updatebackground=True)
             
         aw.level1layout.insertWidget(0,aw.ntb)
         
-        if str(aw.qmc.palette["canvas"]) == 'None':
+        if str(canvas_color) == 'None':
             aw.qmc.fig.canvas.setStyleSheet("background-color:transparent;") 
             aw.ntb.setStyleSheet("QToolBar {background-color:transparent;}")
 
@@ -16229,11 +16331,6 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCD3.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[2])
         self.sliderLCD4.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[3])
         self.sliderLCDSV.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.palette['title'])
-        self.sliderGrpBox1.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
-        self.sliderGrpBox2.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
-        self.sliderGrpBox3.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
-        self.sliderGrpBox4.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
-        self.sliderGrpBoxSV.setStyleSheet("QGroupBox::title {color:  %s;}"%self.qmc.palette["text"])
         self.slider1.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[0]))
         self.slider2.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[1]))
         self.slider3.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[2]))
@@ -33670,13 +33767,14 @@ class RoastsComboBox(QComboBox):
             except Exception:
                 pass
 
-    def eventFilter(self, _, event):
+    def eventFilter(self, obj, event):
 # the next prevents correct setSelection on Windows
 #        if event.type() == QEvent.FocusIn:
 #            self.setSelection(self.currentIndex())
         if event.type() == QEvent.MouseButtonPress:
             self.updateMenu()
-        return False
+            return True
+        return super(RoastsComboBox, self).eventFilter(obj, event)
 
     # the first entry is always just the current text edit line
     def updateMenu(self):
@@ -47774,13 +47872,14 @@ class PortComboBox(QComboBox):
             except Exception:
                 pass
 
-    def eventFilter(self, _, event):
+    def eventFilter(self, obj, event):
 # the next prevents correct setSelection on Windows
 #        if event.type() == QEvent.FocusIn:
 #            self.setSelection(self.currentIndex())
         if event.type() == QEvent.MouseButtonPress:
             self.updateMenu()
-        return False
+            return True
+        return super(PortComboBox, self).eventFilter(obj, event)
 
     def updateMenu(self):
         self.blockSignals(True)
