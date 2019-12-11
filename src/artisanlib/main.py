@@ -7077,14 +7077,15 @@ class tgraphcanvas(FigureCanvas):
             self.mode_tempsliders = self.mode    
             
     #sets the graph display in Fahrenheit mode
-    def fahrenheitMode(self):
-        # just set it to the defaults to avoid strange conversion issues
-        self.ylimit = self.ylimit_F_default
-        self.ylimit_min = self.ylimit_min_F_default
-        self.ygrid = self.ygrid_F_default
-        self.zlimit = self.zlimit_F_default
-        self.zlimit_min = self.zlimit_min_F_default
-        self.zgrid = self.zgrid_F_default
+    def fahrenheitMode(self,setdefaultaxes=True):
+        if setdefaultaxes:
+            # just set it to the defaults to avoid strange conversion issues
+            self.ylimit = self.ylimit_F_default
+            self.ylimit_min = self.ylimit_min_F_default
+            self.ygrid = self.ygrid_F_default
+            self.zlimit = self.zlimit_F_default
+            self.zlimit_min = self.zlimit_min_F_default
+            self.zgrid = self.zgrid_F_default
         if self.mode == "C":
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
@@ -7115,13 +7116,14 @@ class tgraphcanvas(FigureCanvas):
             self.adjustTempSliders()
 
     #sets the graph display in Celsius mode
-    def celsiusMode(self):
-        self.ylimit = self.ylimit_C_default
-        self.ylimit_min = self.ylimit_min_C_default
-        self.ygrid = self.ygrid_C_default
-        self.zlimit = self.zlimit_C_default
-        self.zlimit_min = self.zlimit_min_C_default
-        self.zgrid = self.zgrid_C_default
+    def celsiusMode(self,setdefaultaxes=True):
+        if setdefaultaxes:
+            self.ylimit = self.ylimit_C_default
+            self.ylimit_min = self.ylimit_min_C_default
+            self.ygrid = self.ygrid_C_default
+            self.zlimit = self.zlimit_C_default
+            self.zlimit_min = self.zlimit_min_C_default
+            self.zgrid = self.zgrid_C_default
         if self.mode == "F":
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
@@ -7174,7 +7176,7 @@ class tgraphcanvas(FigureCanvas):
         self.convertTemperature("C")
 
     #converts a loaded profile to a different temperature scale. t input is the requested mode (F or C).
-    def convertTemperature(self,t,silent=False):
+    def convertTemperature(self,t,silent=False,setdefaultaxes=True):
         #verify there is a loaded profile
         profilelength = len(self.timex)
         if profilelength > 0 or self.background:
@@ -7224,7 +7226,7 @@ class tgraphcanvas(FigureCanvas):
                             self.stemp1B[i] = self.fromCtoF(self.stemp1B[i])
                             self.stemp2B[i] = self.fromCtoF(self.stemp2B[i])
 
-                        self.fahrenheitMode()
+                        self.fahrenheitMode(setdefaultaxes=setdefaultaxes)
                         if not silent:
                             aw.sendmessage(QApplication.translate("Message","Profile changed to Fahrenheit", None))
 
@@ -7282,7 +7284,7 @@ class tgraphcanvas(FigureCanvas):
                             self.stemp1B[i] = self.fromFtoC(self.stemp1B[i])
                             self.stemp2B[i] = self.fromFtoC(self.stemp2B[i])
 
-                        self.celsiusMode()
+                        self.celsiusMode(setdefaultaxes=setdefaultaxes)
                         if not silent:
                             aw.sendmessage(QApplication.translate("Message","Profile changed to Celsius", None))
 
@@ -30152,7 +30154,7 @@ class ApplicationWindow(QMainWindow):
             #run all analysis in celsius
             if aw.qmc.mode == "F":
                 restoreF = True
-                self.qmc.convertTemperature("C", silent=True)
+                self.qmc.convertTemperature("C", silent=True, setdefaultaxes=False)
                 self.analysisRecomputeDeltas()
             else:
                 restoreF = False
@@ -30296,7 +30298,7 @@ class ApplicationWindow(QMainWindow):
             
             # convert back to Fahrenheit if the profile was converted to Celsius
             if restoreF:
-                self.qmc.convertTemperature("F", silent=True)
+                self.qmc.convertTemperature("F", silent=True, setdefaultaxes=False)
                 self.analysisRecomputeDeltas()
 
             # create the results annotation and update the graph 
