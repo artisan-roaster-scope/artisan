@@ -2615,10 +2615,30 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot("QAction*")
     def event_popup_action(self,action):
         if action.key[0] >= 0:
+            # we check if this is the first DROP mark on this roast
+            firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)
             self.timeindex[action.key[0]] = action.key[1]
             if action.key[0] == 0: # CHARGE
                 # realign to background
                 aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+            elif action.key[0] == 6: # DROP
+                try:
+                    # update ambient temperature if a ambient temperature source is configured and no value yet established
+                    aw.qmc.updateAmbientTempFromPhidgetModulesOrCurve()
+                except Exception:
+                    pass                        
+#PLUS
+                # only on first setting the DROP event (not set yet and no previous DROP undone), we upload to PLUS
+                if firstDROP and aw.qmc.autoDROPenabled and aw.plus_account is not None:
+                    try:
+                        aw.updatePlusStatus()
+                    except:
+                        pass
+                        # add to out-queue
+                    try:
+                        plus.queue.addRoast()
+                    except:
+                        pass
         else:
             # add a special event at the current timepoint
             self.specialevents.append(action.key[1]) # absolut time index
@@ -2927,6 +2947,17 @@ class tgraphcanvas(FigureCanvas):
                         self.markDrop() # we do not reset the autoDropIdx here to avoid another trigger
                         self.autoDropIdx = -1 # we set the autoDropIdx to a negative value to prevent further triggers after undo markDROP
 
+                    #check quantified events; do this before the canvas is redraw as additional annotations might be added here, but do not recursively call updategraphics
+                    for el in self.quantifiedEvent:
+                        try:
+                            aw.moveslider(el[0],el[1])
+                            if aw.qmc.flagstart:
+                                value = aw.float2float((el[1] + 10.0) / 10.0)
+                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription=u("Q")+aw.qmc.eventsvalues(value),doupdategraphics=False)
+                        except:
+                            pass
+                    self.quantifiedEvent = []
+                
                     ##### updated canvas
                     try:
                         if not self.block_update:
@@ -3070,14 +3101,6 @@ class tgraphcanvas(FigureCanvas):
                     i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
                     self.temporaryalarmflag = -3 # self.setalarm(i) can take longer to run than the sampling interval 
                     self.setalarm(i)
-                    
-                #check quantified events
-                for el in self.quantifiedEvent:
-                    aw.moveslider(el[0],el[1])
-                    if aw.qmc.flagstart:
-                        value = aw.float2float((el[1] + 10.0) / 10.0)
-                        aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription=u("Q")+aw.qmc.eventsvalues(value))
-                self.quantifiedEvent = []
 
         except Exception as e:
 #            import traceback
@@ -4670,7 +4693,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.scorching_flag = False
                 aw.qmc.divots_flag = False
                 
-                # renable autoCHARGE/autoDRY/autoFCs/autoDROP
+                # renable autoCHARGE/autoDRY/autoFCs/autoDROP; all of those get set to False on UNDO of the event for the current roast
                 aw.qmc.autoCHARGEenabled = True
                 aw.qmc.autoDRYenabled = True
                 aw.qmc.autoFCsenabled = True
@@ -8718,6 +8741,8 @@ class tgraphcanvas(FigureCanvas):
                         start = self.timex[self.timeindex[0]]
                     else:
                         start = 0
+                    # we check if this is the first DROP mark on this roast
+                    firstDROP = self.timeindex[6] == 0                 
                     if aw.button_9.isFlat() and self.timeindex[6] > 0:
                         # undo wrongly set FCs
                         # deactivate autoDROP
@@ -8775,7 +8800,8 @@ class tgraphcanvas(FigureCanvas):
                             pass                        
 
 #PLUS
-                        if aw.plus_account is not None:
+                        # only on first setting the DROP event (not set yet and no previous DROP undone), we upload to PLUS
+                        if firstDROP and aw.qmc.autoDROPenabled and aw.plus_account is not None:
                             try:
                                 aw.updatePlusStatus()
                             except:
