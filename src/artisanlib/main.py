@@ -667,6 +667,9 @@ class AmbientThread(QThread):
 
 class tgraphcanvas(FigureCanvas):
     updategraphicsSignal = pyqtSignal()
+    updateLargeLCDsTimeSignal = pyqtSignal(str)
+    updateLargeLCDsReadingsSignal = pyqtSignal(str,str)
+    updateLargeLCDsSignal = pyqtSignal(str,str,str)
     
     def __init__(self,parent,dpi):
 
@@ -2115,6 +2118,9 @@ class tgraphcanvas(FigureCanvas):
         self.stats_summary_rect = None
         
         self.updategraphicsSignal.connect(self.updategraphics)
+        self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
+        self.updateLargeLCDsReadingsSignal.connect(self.updateLargeLCDsReadings)
+        self.updateLargeLCDsTimeSignal.connect(self.updateLargeLCDsTime)
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -2676,12 +2682,29 @@ class tgraphcanvas(FigureCanvas):
             pass
     
     # note that partial values might be given here (time might update, but not the values)
-    def updateLargeLCDs(self,bt=None,et=None,time=None):
+    @pyqtSlot(str,str,str)
+    def updateLargeLCDs(self,bt,et,time):
         try:
             if aw.largeLCDs_dialog is not None:
                 aw.largeLCDs_dialog.updateValues([et],[bt],time=time)
         except:
             pass
+
+    @pyqtSlot(str,str)
+    def updateLargeLCDsReadings(self,bt,et):
+        try:
+            if aw.largeLCDs_dialog is not None:
+                aw.largeLCDs_dialog.updateValues([et],[bt])
+        except:
+            pass
+
+    @pyqtSlot(str)
+    def updateLargeLCDsTime(self,time):
+        try:
+            if aw.largeLCDs_dialog is not None:
+                aw.largeLCDs_dialog.updateValues([],[],time=time)
+        except:
+            pass            
             
     # note that partial values might be given here
     def updateLargeDeltaLCDs(self,deltabt=None,deltaet=None):
@@ -2853,7 +2876,10 @@ class tgraphcanvas(FigureCanvas):
                             timestr = "00:00"
                         if aw.WebLCDs:
                             self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
-                        self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
+                        if timestr is None:
+                            self.updateLargeLCDsReadingsSignal.emit(btstr,etstr)
+                        else:
+                            self.updateLargeLCDsSignal.emit(btstr,etstr,timestr)
                         self.updateLargeExtraLCDs(extra1=extra1_values,extra2=extra2_values)
                 finally:
                     if aw.qmc.samplingsemaphore.available() < 1:
@@ -3141,7 +3167,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.WebLCDs:
                         self.updateWebLCDs(time=timestr)
                     if aw.largeLCDs_dialog:
-                        self.updateLargeLCDs(time=timestr)
+                        self.updateLargeLCDsTimeSignal.emit(timestr)
             finally:            
                 QTimer.singleShot(nextreading,self.updateLCDtime)
     
@@ -4518,7 +4544,7 @@ class tgraphcanvas(FigureCanvas):
             if aw.WebLCDs:
                 self.updateWebLCDs(time="00:00")
             if aw.largeLCDs_dialog:
-                self.updateLargeLCDs(time="00:00")
+                self.updateLargeLCDsTimeSignal.emit("00:00")
             if andLCDs:
                 self.clearLCDs()
 
