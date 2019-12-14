@@ -666,6 +666,7 @@ class AmbientThread(QThread):
 #######################################################################################
 
 class tgraphcanvas(FigureCanvas):
+    updategraphicsSignal = pyqtSignal()
     
     def __init__(self,parent,dpi):
 
@@ -2112,6 +2113,8 @@ class tgraphcanvas(FigureCanvas):
         self.segmentsamplesthreshold = 3
         
         self.stats_summary_rect = None
+        
+        self.updategraphicsSignal.connect(self.updategraphics)
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -2895,7 +2898,18 @@ class tgraphcanvas(FigureCanvas):
                 #update message_dlg
                 if aw.message_dlg:
                     aw.message_dlg.update()
-
+                    
+                #check quantified events; do this before the canvas is redraw as additional annotations might be added here, but do not recursively call updategraphics
+                for el in self.quantifiedEvent:
+                    try:
+                        aw.moveslider(el[0],el[1])
+                        if aw.qmc.flagstart:
+                            value = aw.float2float((el[1] + 10.0) / 10.0)
+                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription=u("Q")+aw.qmc.eventsvalues(value),doupdategraphics=False)
+                    except:
+                        pass
+                self.quantifiedEvent = []
+                    
                 if self.flagstart:
                     if  aw.qmc.zoom_follow and aw.qmc.temp2 and len(aw.qmc.temp2)>0 and aw.qmc.temp1 and len(aw.qmc.temp1)>0: # aw.ntb._active == 'ZOOM'
                         # center current BT reading on canvas
@@ -2946,17 +2960,6 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx here to avoid another trigger
                         self.autoDropIdx = -1 # we set the autoDropIdx to a negative value to prevent further triggers after undo markDROP
-
-                    #check quantified events; do this before the canvas is redraw as additional annotations might be added here, but do not recursively call updategraphics
-                    for el in self.quantifiedEvent:
-                        try:
-                            aw.moveslider(el[0],el[1])
-                            if aw.qmc.flagstart:
-                                value = aw.float2float((el[1] + 10.0) / 10.0)
-                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription=u("Q")+aw.qmc.eventsvalues(value),doupdategraphics=False)
-                        except:
-                            pass
-                    self.quantifiedEvent = []
                 
                     ##### updated canvas
                     try:
@@ -2966,106 +2969,111 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.redraw()
                             else:
                             #-- start update display
-                                if self.ax_background:
-                                    self.fig.canvas.restore_region(self.ax_background)
-                                    # draw eventtypes
-# this seems not to be needed and hides partially event by value "Combo-type" annotations
-#                                    if self.eventsshowflag and self.eventsGraphflag in [2,3,4]:
-#                                        aw.qmc.ax.draw_artist(self.l_eventtype1dots)
-#                                        aw.qmc.ax.draw_artist(self.l_eventtype2dots)
-#                                        aw.qmc.ax.draw_artist(self.l_eventtype3dots)
-#                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
-                                    # draw delta lines
-                                    
-                                    if aw.qmc.swapdeltalcds:
-                                        if self.DeltaBTflag and self.l_delta2 is not None:
-                                            try:
-                                                aw.qmc.ax.draw_artist(self.l_delta2)
-                                            except:
-                                                pass
-                                        if self.DeltaETflag and self.l_delta1 is not None:
-                                            try:
-                                                aw.qmc.ax.draw_artist(self.l_delta1)
-                                            except:
-                                                pass
-                                    else:
-                                        if self.DeltaETflag and self.l_delta1 is not None:
-                                            try:
-                                                aw.qmc.ax.draw_artist(self.l_delta1)
-                                            except:
-                                                pass
-                                        if self.DeltaBTflag and self.l_delta2 is not None:
-                                            try:
-                                                aw.qmc.ax.draw_artist(self.l_delta2)
-                                            except:
-                                                pass
-                                    
-                                    # draw extra curves
-                                    xtra_dev_lines1 = 0
-                                    xtra_dev_lines2 = 0
-
-                                    try:
-                                        for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                                            if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
-                                                try:
-                                                    aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
-                                                except:
-                                                    pass
-                                                xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                            if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
-                                                try:
-                                                    aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
-                                                except:
-                                                    pass
-                                                xtra_dev_lines2 = xtra_dev_lines2 + 1
-                                    except:
-                                        pass
-                                    if aw.qmc.swaplcds:
-                                        # draw ET
-                                        if aw.qmc.ETcurve:
-                                            try:
-                                                aw.qmc.ax.draw_artist(self.l_temp1)
-                                            except:
-                                                pass
-                                        # draw BT
-                                        if aw.qmc.BTcurve:
-                                            try:
-                                                aw.qmc.ax.draw_artist(self.l_temp2)
-                                            except:
-                                                pass
-                                    else:
-                                        # draw BT
-                                        if aw.qmc.BTcurve:
-                                            try:
-                                                aw.qmc.ax.draw_artist(self.l_temp2)
-                                            except:
-                                                pass
-                                        # draw ET
-                                        if aw.qmc.ETcurve:
-                                            try:
-                                                aw.qmc.ax.draw_artist(self.l_temp1)
-                                            except:
-                                                pass
-                                    
-                                    try:
-                                        if aw.qmc.BTcurve:
-                                            for a in self.l_annotations:
-                                                aw.qmc.ax.draw_artist(a)
-                                    except:
-                                        pass
-                                    
-                                    try:
-                                        self.update_additional_artists()
-                                    except:
-                                        pass
+                                #### lock shared resources to ensure that no other redraw is interfering with this one here #####
+                                aw.qmc.samplingsemaphore.acquire(1)
+                                try:
+                                    if self.ax_background:
+                                        self.fig.canvas.restore_region(self.ax_background)
+                                        # draw eventtypes
+    # this seems not to be needed and hides partially event by value "Combo-type" annotations
+    #                                    if self.eventsshowflag and self.eventsGraphflag in [2,3,4]:
+    #                                        aw.qmc.ax.draw_artist(self.l_eventtype1dots)
+    #                                        aw.qmc.ax.draw_artist(self.l_eventtype2dots)
+    #                                        aw.qmc.ax.draw_artist(self.l_eventtype3dots)
+    #                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
+                                        # draw delta lines
                                         
-                                    self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
-
-                                else:
-                                    # we do not have a background to bitblit, so do a full redraw
-                                    self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
-                                    self.update_additional_artists()
-        
+                                        if aw.qmc.swapdeltalcds:
+                                            if self.DeltaBTflag and self.l_delta2 is not None:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.l_delta2)
+                                                except:
+                                                    pass
+                                            if self.DeltaETflag and self.l_delta1 is not None:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.l_delta1)
+                                                except:
+                                                    pass
+                                        else:
+                                            if self.DeltaETflag and self.l_delta1 is not None:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.l_delta1)
+                                                except:
+                                                    pass
+                                            if self.DeltaBTflag and self.l_delta2 is not None:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.l_delta2)
+                                                except:
+                                                    pass
+                                        
+                                        # draw extra curves
+                                        xtra_dev_lines1 = 0
+                                        xtra_dev_lines2 = 0
+    
+                                        try:
+                                            for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                                                if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
+                                                    try:
+                                                        aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
+                                                    except:
+                                                        pass
+                                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                                if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
+                                                    try:
+                                                        aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
+                                                    except:
+                                                        pass
+                                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                        except:
+                                            pass
+                                        if aw.qmc.swaplcds:
+                                            # draw ET
+                                            if aw.qmc.ETcurve:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.l_temp1)
+                                                except:
+                                                    pass
+                                            # draw BT
+                                            if aw.qmc.BTcurve:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.l_temp2)
+                                                except:
+                                                    pass
+                                        else:
+                                            # draw BT
+                                            if aw.qmc.BTcurve:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.l_temp2)
+                                                except:
+                                                    pass
+                                            # draw ET
+                                            if aw.qmc.ETcurve:
+                                                try:
+                                                    aw.qmc.ax.draw_artist(self.l_temp1)
+                                                except:
+                                                    pass
+                                        
+                                        try:
+                                            if aw.qmc.BTcurve:
+                                                for a in self.l_annotations:
+                                                    aw.qmc.ax.draw_artist(a)
+                                        except:
+                                            pass
+                                        
+                                        try:
+                                            self.update_additional_artists()
+                                        except:
+                                            pass
+                                            
+                                        self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
+    
+                                    else:
+                                        # we do not have a background to bitblit, so do a full redraw
+                                        self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
+                                        self.update_additional_artists()
+                                finally:
+                                    if aw.qmc.samplingsemaphore.available() < 1:
+                                        aw.qmc.samplingsemaphore.release(1)
                             #-- end update display
                         
                         if aw.qmc.background and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
@@ -8137,7 +8145,6 @@ class tgraphcanvas(FigureCanvas):
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.fileDirty()
-                    
                     if aw.button_8.isFlat() and self.timeindex[0] > -1:
                         # undo wrongly set CHARGE
                         # deactivate autoCHARGE
@@ -8154,8 +8161,8 @@ class tgraphcanvas(FigureCanvas):
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
                             self.timeindex[0] = -1
-                            self.xaxistosm(redraw=False)
                             removed = True
+                            self.xaxistosm(redraw=False)
                     elif not aw.button_8.isFlat():
                         if self.device == 18: #manual mode
                             tx,et,bt = aw.ser.NONE()
@@ -8228,6 +8235,7 @@ class tgraphcanvas(FigureCanvas):
             if aw.button_8.isFlat():
                 if removed:
                     aw.button_8.setFlat(False)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
             else:
                 aw.eventactionx(aw.qmc.buttonactions[0],aw.qmc.buttonactionstrings[0])
                 aw.button_8.setFlat(True)
@@ -8244,8 +8252,8 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.roastpropertiesAutoOpenFlag:
                     aw.openPropertiesSignal.emit()
                 aw.onMarkMoveToNext(aw.button_8)
-            if not(self.autoChargeIdx and aw.qmc.timeindex[0] < 0):
-                self.updategraphics() # we need this to have the projections redrawn immediately
+                if not(self.autoChargeIdx and aw.qmc.timeindex[0] < 0):
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
 
     # called from sample() and marks the autodetected TP visually on the graph
@@ -8353,6 +8361,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.button_19.setFlat(False)
                     if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                         aw.button_8.setFlat(False)
+                    self.updategraphicsSignal.emit()
             else:
                 aw.button_19.setFlat(True) # deactivate DRY button
                 aw.button_8.setFlat(True) # also deactivate CHARGE button
@@ -8366,9 +8375,9 @@ class tgraphcanvas(FigureCanvas):
                 except Exception:
                     pass
                 aw.onMarkMoveToNext(aw.button_19)
-            if self.autoDryIdx == 0:
-                # only if markDryEnd() is not anyhow triggered within updategraphics()
-                self.updategraphics()
+                if self.autoDryIdx == 0:
+                    # only if markDryEnd() is not anyhow triggered within updategraphics()
+                    self.updategraphicsSignal.emit()
 
     #record 1C start markers of BT. called from push button_3 of application window
     @pyqtSlot(bool)
@@ -8448,6 +8457,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.button_19.setFlat(False)
                         if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                             aw.button_8.setFlat(False)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
             else:
                 aw.button_3.setFlat(True)
                 aw.button_8.setFlat(True)
@@ -8458,9 +8468,9 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[FC START] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
                 aw.onMarkMoveToNext(aw.button_3)
-            if self.autoFCsIdx == 0:
-                # only if mark1Cstart() is not triggered from within updategraphics() and the canvas is anyhow updated
-                self.updategraphics() # we need this to have the projections redrawn immediately
+                if self.autoFCsIdx == 0:
+                    # only if mark1Cstart() is not triggered from within updategraphics() and the canvas is anyhow updated
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     #record 1C end markers of BT. called from button_4 of application window
     @pyqtSlot(bool)
@@ -8533,6 +8543,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.button_19.setFlat(False)                        
                             if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                                 aw.button_8.setFlat(False)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
             else:
                 aw.button_4.setFlat(True)
                 aw.button_8.setFlat(True)
@@ -8544,7 +8555,7 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[FC END] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
                 aw.onMarkMoveToNext(aw.button_4)
-            self.updategraphics() # we need this to have the projections redrawn immediately
+                self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
                 
 
     #record 2C start markers of BT. Called from button_5 of application window
@@ -8622,6 +8633,7 @@ class tgraphcanvas(FigureCanvas):
                                 aw.button_19.setFlat(False)
                                 if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                                     aw.button_8.setFlat(False)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
             else:
                 aw.button_5.setFlat(True)
                 aw.button_8.setFlat(True)
@@ -8634,7 +8646,7 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
                 aw.onMarkMoveToNext(aw.button_5)
-            self.updategraphics() # we need this to have the projections redrawn immediately
+                self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     #record 2C end markers of BT. Called from button_6  of application window
     @pyqtSlot(bool)
@@ -8710,6 +8722,7 @@ class tgraphcanvas(FigureCanvas):
                                     aw.button_19.setFlat(False)                        
                                     if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                                         aw.button_8.setFlat(False)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
             else:
                 aw.button_6.setFlat(True)
                 aw.button_8.setFlat(True)
@@ -8723,7 +8736,7 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[SC END] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
                 aw.onMarkMoveToNext(aw.button_6)
-            self.updategraphics() # we need this to have the projections redrawn immediately
+                self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     #record end of roast (drop of beans). Called from push button 'Drop'
     @pyqtSlot(bool)
@@ -8844,6 +8857,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.button_19.setFlat(False)
                                             if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                                                 aw.button_8.setFlat(False)
+                        self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
                 else:            
                     aw.button_9.setFlat(True)
                     aw.button_8.setFlat(True)
@@ -8870,9 +8884,9 @@ class tgraphcanvas(FigureCanvas):
                             except:
                                 pass
                     aw.onMarkMoveToNext(aw.button_9)
-                if not (self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]):
-                    # only if not anyhow markDrop() is triggered from within updategraphic() which guarantees an immedate redraw
-                    self.updategraphics() # we need this to have the projections redrawn immediately
+                    if not (self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]):
+                        # only if not anyhow markDrop() is triggered from within updategraphic() which guarantees an immedate redraw
+                        self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
             except Exception:
                 pass
 
@@ -9016,6 +9030,7 @@ class tgraphcanvas(FigureCanvas):
                                             aw.button_19.setFlat(False)
                                             if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                                                 aw.button_8.setFlat(False)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
             else:
                 aw.button_20.setFlat(True)
                 aw.button_8.setFlat(True)
@@ -9031,7 +9046,7 @@ class tgraphcanvas(FigureCanvas):
                 message = QApplication.translate("Message","[COOL END] recorded at {0} BT = {1}", None).format(st1,st2)
                 #set message at bottom
                 aw.sendmessage(message)
-            self.updategraphics() # we need this to have the projections redrawn immediately
+                self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     @pyqtSlot(bool)
     def EventRecord_action(self,_=False):
@@ -9280,7 +9295,7 @@ class tgraphcanvas(FigureCanvas):
             if takeLock and aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
         if self.flagstart and doupdategraphics:
-            self.updategraphics() # we need this to have the projections redrawn immediately
+            self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
     def DeviceEventRecord(self,command):
