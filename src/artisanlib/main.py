@@ -11620,14 +11620,12 @@ class VMToolbar(NavigationToolbar):
 
     def forward(self, *args):
         if aw.qmc.ai is not None:
-            aw.qmc.ai.set_visible(False)
+            aw.qmc.ai.set_visible(False)  # whenever forward is pressed the image will be hidden
         super(VMToolbar, self).forward(*args) 
         
     def back(self, *args):
         if aw.qmc.ai is not None:
-            if self._nav_stack._pos > 1:
-                aw.qmc.ai.set_visible(False)
-            else:
+            if self._nav_stack._pos = 1:
                 aw.qmc.ai.set_visible(True)
         super(VMToolbar, self).back(*args) 
         
@@ -16924,7 +16922,7 @@ class ApplicationWindow(QMainWindow):
                 ioi_duration = self.eventtime2string(ioi_seconds)
                 ioi_abs_deltas = numpy.absolute(deltas_all)
                 ioi_maxdelta = deltas_all[numpy.where(ioi_abs_deltas == numpy.amax(ioi_abs_deltas))[0][0]]
-                ioi_mse_deltas = numpy.mean(numpy.square(deltas_all))
+#                ioi_mse_deltas = numpy.mean(numpy.square(deltas_all))
                 ioi_abc_deltas = numpy.sum((ioi_abs_deltas[1:] + ioi_abs_deltas[:-1]) * self.qmc.profile_sampling_interval /2)  #trapazoidal area height*(base1+base2)/2
                 ioi_abcprime = ioi_abc_deltas / ioi_seconds
 
@@ -16952,10 +16950,10 @@ class ApplicationWindow(QMainWindow):
                         swing = maxdeltas_seg[i] - maxdeltas_seg[i-1]
                     else:
                         swing = ""
-                    if signs_seg[i] == 1:
-                        abovebelow = QApplication.translate("Label","Above",None)
-                    else:
-                        abovebelow = QApplication.translate("Label","Below",None)
+#                    if signs_seg[i] == 1:
+#                        abovebelow = QApplication.translate("Label","Above",None)
+#                    else:
+#                        abovebelow = QApplication.translate("Label","Below",None)
                     abcprime = segment_abc_deltas[i] / seconds_seg[i]
                     tbl.add_row([thistime, duration, maxdeltas_seg[i], swing, abcprime ])
                 if len(mask) > 1:
@@ -30472,7 +30470,6 @@ class ApplicationWindow(QMainWindow):
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
-            RMSEstr = QApplication.translate("Error Message", "There was an error",None)
 
         progress.cancel()
         progress = None
