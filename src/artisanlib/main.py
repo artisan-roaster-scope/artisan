@@ -11625,7 +11625,7 @@ class VMToolbar(NavigationToolbar):
         
     def back(self, *args):
         if aw.qmc.ai is not None:
-            if self._nav_stack._pos = 1:
+            if self._nav_stack._pos == 1:
                 aw.qmc.ai.set_visible(True)
         super(VMToolbar, self).back(*args) 
         
