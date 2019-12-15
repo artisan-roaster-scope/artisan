@@ -144,7 +144,7 @@ def getRoast():
         if "computed" in p:
             cp = p["computed"]
             util.addTemp2dict(cp,"det",d,"CM_ETD")
-            util.addTemp2dict(cp,"dbt",d,"CM_BTD")                             
+            util.addTemp2dict(cp,"dbt",d,"CM_BTD")
 
         if aw.qmc.plus_store:
             d["location"] = aw.qmc.plus_store
@@ -210,7 +210,7 @@ def getSyncRecord(r = None):
             "ground_color",
             "moisture",
             "machine",
-            "notes",                           
+            "notes",
         ]
         # we take only the value of attributes to be synced back
         for a in attributes:

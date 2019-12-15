@@ -2518,8 +2518,8 @@ class tgraphcanvas(FigureCanvas):
                             self.starteventmessagetimer()
                             break
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onpick() {0}").format(str(e)),exc_tb.tb_lineno)
             
@@ -17051,7 +17051,7 @@ class ApplicationWindow(QMainWindow):
                         totalQuadraticDeltaET += det * det
                         dbt = (bt - btb)
                         totalQuadraticDeltaBT += dbt * dbt
-                        count += 1                        
+                        count += 1
                     else:
                         break
                 return math.sqrt(totalQuadraticDeltaET/float(count)), math.sqrt(totalQuadraticDeltaBT/float(count))
@@ -17060,7 +17060,7 @@ class ApplicationWindow(QMainWindow):
                 return None, None
         except Exception:
 #            import traceback
-#            traceback.print_exc(file=sys.stdout)        
+#            traceback.print_exc(file=sys.stdout)
             return None, None
             
     def setLCDsDigitCount(self,n):
