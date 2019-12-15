@@ -406,7 +406,7 @@ class Artisan(QtSingleApplication):
         if event.type() == QEvent.FileOpen:
             try:
                 url = event.url()
-                if url.isValid():
+                if url.isValid() and url.scheme() != "file" and (event.file() is None or event.file() == ""):
                     self.open_url(event.url())
                 else:
                     if not aw.qmc.flagstart:
@@ -422,12 +422,11 @@ class Artisan(QtSingleApplication):
                         elif file_suffix == "apal":
                             # load Artisan palettes on double-click on *.apal file
                             QTimer.singleShot(20,lambda : aw.getPalettes(filename,aw.buttonpalette))
-            except Exception:
+            except:
                 pass
             return 1
         else:
             return super(Artisan, self).event(event)
-
 
 args = sys.argv
 if sys.platform.startswith("linux"):
@@ -60126,11 +60125,6 @@ def main():
         if not viewersettings.contains("Mode"):
             artisanviewerFirstStart = True
         del viewersettings
-    
-    #QDesktopServices.setUrlHandler('artisan', open_desktopservices_url)
-    # Set URL handler to warn before opening url
-    # handler = URLHandler()
-    # QDesktopServices.setUrlHandler("artisan", handler.handleURL) 
     
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
