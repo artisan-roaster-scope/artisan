@@ -2758,9 +2758,10 @@ class tgraphcanvas(FigureCanvas):
         else:
             False
             
-    def update_additional_artists(self):                            
+    def update_additional_artists(self): 
         if aw.qmc.flagstart and (aw.qmc.device == 18 or aw.qmc.showtimeguide) and aw.qmc.l_timeline is not None: # not NONE device
-            tx = aw.qmc.timex[-1]
+            tx = int(aw.qmc.timeclock.elapsed()/1000.)
+            #aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
             aw.qmc.l_timeline.set_data([tx,tx], aw.qmc.ax.get_ylim())
             aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
         if aw.qmc.projectFlag:
@@ -2769,7 +2770,7 @@ class tgraphcanvas(FigureCanvas):
             if self.l_ETprojection is not None and aw.qmc.ETcurve:
                 aw.qmc.ax.draw_artist(self.l_ETprojection)
         if aw.qmc.AUCguideFlag and aw.qmc.AUCguideTime and aw.qmc.AUCguideTime > 0:
-            aw.qmc.ax.draw_artist(self.l_AUCguide)    
+            aw.qmc.ax.draw_artist(self.l_AUCguide)
 
     # runs from GUI thread.
     # this function is called by a signal at the end of the thread sample()
