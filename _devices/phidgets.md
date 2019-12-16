@@ -24,8 +24,8 @@ Any number of Phidgets, of one type or mixed types, can be used in combination w
 
 For more information read the posts [Roasting with Phidgets](https://artisan-roasterscope.blogspot.it/2017/12/roasting-with-phidgets.html){:target="_blank"} and [More Phidgets!](https://artisan-roasterscope.blogspot.it/2017/12/more-phidgets.html){:target="_blank"} on the [Artisan blog](https://artisan-roasterscope.blogspot.it/){:target="_blank"}.
 
-**Watch out!** 
-Artisan v2.1 and newer features one-click configurations for the following popular Phidget sets
+> **Watch out!** 
+> Artisan v2.1 and newer features one-click configurations for the following popular Phidget sets
 >
 > - [VINT TMP1101 2x TC Set](/phidgets/2x-tc-set/)
 > - [VINT TMP1200 2x RTDs Set](/phidgets/2x-rtd-set/) (low [Idle Noise](https://artisan-> roasterscope.blogspot.com/2019/03/on-idle-noise.html){:target="_blank"})
