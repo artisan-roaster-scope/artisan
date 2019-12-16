@@ -26,11 +26,13 @@ For more information read the posts [Roasting with Phidgets](https://artisan-roa
 
 **Watch out!** 
 Artisan v2.1 and newer features one-click configurations for the following popular Phidget sets
+{: .notice--primary}
 
 - [VINT TMP1101 2x TC Set](/phidgets/2x-tc-set/)
-- [VINT TMP1200 2x RTDs Set](/phidgets/2x-rtd-set/) (low [idle noise](https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html){:target="_blank"})
+- [VINT TMP1200 2x RTDs Set](/phidgets/2x-rtd-set/) (low [Idle Noise](https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html){:target="_blank"})
 - [VINT Ambient Modules Extension](/phidgets/ambient-extension/)
 - USB 1048 Databridge
+{: .notice--primary}
 
 For all these Phidget sets (but the last one), ready-to-use hardware packages are available from the [artisan.plus shop](https://shop.artisan.plus/){:target="_blank"}.
 {: .notice--primary}
