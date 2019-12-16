@@ -32,7 +32,7 @@ For more information read the posts [Roasting with Phidgets](https://artisan-roa
 > - [VINT Ambient Modules Extension](/phidgets/ambient-extension/)
 > - USB 1048 Databridge
 > 
-For all these Phidget sets (but the last one), ready-to-use hardware packages are available from the [artisan.plus shop](https://shop.artisan.plus/){:target="_blank"}.
+> For all these Phidget sets (but the last one), ready-to-use hardware packages are available from the > [artisan.plus shop](https://shop.artisan.plus/){:target="_blank"}.
 {: .notice--primary}
 
 
