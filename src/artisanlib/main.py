@@ -40088,11 +40088,13 @@ class EventsDlg(ArtisanResizeablDialog):
         if modifiers == Qt.AltModifier:  #alt click
             tbl = prettytable.PrettyTable()
             fields = []
+            fields.append(u(" "))  # this column shows the row number
             for c in range(ncols):
                 fields.append(u(self.eventbuttontable.horizontalHeaderItem(c).text()))
             tbl.field_names = fields
             for r in range(nrows):
                 rows = []
+                rows.append(u(r+1))
                 rows.append(u(self.eventbuttontable.cellWidget(r,0).text()))
                 rows.append(u(self.eventbuttontable.cellWidget(r,1).text()))
                 rows.append(u(self.eventbuttontable.cellWidget(r,2).currentText()))
@@ -40105,21 +40107,23 @@ class EventsDlg(ArtisanResizeablDialog):
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
         else:
+            clipboard += u(" ") + '\t'  # this column shows the row number
             for c in range(ncols):
                 clipboard += u(self.eventbuttontable.horizontalHeaderItem(c).text())
                 if c != (ncols-1):
                     clipboard += '\t'
             clipboard += '\n'
             for r in range(nrows):
-                clipboard += u(self.eventbuttontable.cellWidget(r,0).text()) + "\t"
+                clipboard += u(r+1) + '\t'
+                clipboard += u(self.eventbuttontable.cellWidget(r,0).text()) + '\t'
                 clipboard += u(self.eventbuttontable.cellWidget(r,1).text()) + '\t'
                 clipboard += u(self.eventbuttontable.cellWidget(r,2).currentText()) + '\t'
                 clipboard += u(self.eventbuttontable.cellWidget(r,3).text()) + '\t'
                 clipboard += u(self.eventbuttontable.cellWidget(r,4).currentText()) + '\t'
                 clipboard += u(self.eventbuttontable.cellWidget(r,5).text()) + '\t'
                 clipboard += u(self.eventbuttontable.cellWidget(r,6).currentText()) + '\t'
-                clipboard += u(self.eventbuttontable.cellWidget(r,7).palette().button().color().name()) + "\t"
-                clipboard += u(self.eventbuttontable.cellWidget(r,8).palette().button().color().name()) + "\n"
+                clipboard += u(self.eventbuttontable.cellWidget(r,7).palette().button().color().name()) + '\t'
+                clipboard += u(self.eventbuttontable.cellWidget(r,8).palette().button().color().name()) + '\n'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         sys_clip.setText(clipboard)
