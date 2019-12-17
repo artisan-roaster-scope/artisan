@@ -510,12 +510,12 @@ deltaLabelMathPrefix = u("$\Delta\/$")  # prefix for labels in matplibgraphs to 
 # platform dependent imports:
 if sys.platform.startswith("darwin"):
     # control app napping on OS X >= 10.9
-    import appnope
+    import appnope  # @UnresolvedImport
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport
     # to establish a thread pool on OS X
-    import objc  # @UnusedImport # pyobjc seems not to be needed anylonger
-    import Foundation
+    import objc  # @UnresolvedImport @UnusedImport # pyobjc seems not to be needed anylonger 
+    import Foundation  # @UnresolvedImport
 #   list_ports module patched for P3k from new pyserial GitHub repository
 
 # to make py2exe happy with scipy >0.11
@@ -30610,7 +30610,7 @@ class ApplicationWindow(QMainWindow):
         retval = {**result, **res}
         return retval
 
-#dave
+
     def analysisRecomputeDeltas(self):
         try:
             smooth=True
@@ -50653,6 +50653,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 rows.append(u(self.devicetable.cellWidget(r,10).isChecked()))
                 rows.append(u(self.devicetable.cellWidget(r,11).isChecked()))
                 rows.append(u(self.devicetable.cellWidget(r,12).isChecked()))
+                rows.append(u(self.devicetable.cellWidget(r,13).value()))
+                rows.append(u(self.devicetable.cellWidget(r,14).value()))
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
         else:
@@ -50662,19 +50664,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     clipboard += '\t'
             clipboard += '\n'
             for r in range(nrows):
-                clipboard += u(self.devicetable.cellWidget(r,0).currentText()) + "\t"
+                clipboard += u(self.devicetable.cellWidget(r,0).currentText()) + '\t'
                 clipboard += u(self.devicetable.cellWidget(r,1).palette().button().color().name()) + '\t'
                 clipboard += u(self.devicetable.cellWidget(r,2).palette().button().color().name()) + '\t'
                 clipboard += u(self.devicetable.cellWidget(r,3).text()) + '\t'
                 clipboard += u(self.devicetable.cellWidget(r,4).text()) + '\t'
                 clipboard += u(self.devicetable.cellWidget(r,5).text()) + '\t'
                 clipboard += u(self.devicetable.cellWidget(r,6).text()) + '\t'
-                clipboard += u(self.devicetable.cellWidget(r,7).isChecked()) + "\t"
-                clipboard += u(self.devicetable.cellWidget(r,8).isChecked()) + "\t"
-                clipboard += u(self.devicetable.cellWidget(r,9).isChecked()) + "\t"
-                clipboard += u(self.devicetable.cellWidget(r,10).isChecked()) + "\t"
+                clipboard += u(self.devicetable.cellWidget(r,7).isChecked()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,8).isChecked()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,9).isChecked()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,10).isChecked()) + '\t'
                 clipboard += u(self.devicetable.cellWidget(r,11).isChecked()) + '\t'
-                clipboard += u(self.devicetable.cellWidget(r,12).isChecked()) + '\n'
+                clipboard += u(self.devicetable.cellWidget(r,12).isChecked()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,13).value()) + '\t'
+                clipboard += u(self.devicetable.cellWidget(r,14).value()) + '\n'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         sys_clip.setText(clipboard)
@@ -54142,6 +54146,12 @@ class AlarmDlg(ArtisanResizeablDialog):
         deleteButton.clicked.connect(self.deletealarm)
         deleteButton.setMinimumWidth(80)
         deleteButton.setFocusPolicy(Qt.NoFocus)
+
+        self.copyalarmTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
+        self.copyalarmTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
+        self.copyalarmTableButton.setFocusPolicy(Qt.NoFocus)
+        self.copyalarmTableButton.clicked.connect(self.copyAlarmTabletoClipboard)
+
         importButton = QPushButton(QApplication.translate("Button","Load",None))
         importButton.clicked.connect(self.importalarms)
         importButton.setMinimumWidth(80)
@@ -54190,6 +54200,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         buttonlayout.addWidget(addButton)
         buttonlayout.addWidget(self.insertButton)
         buttonlayout.addWidget(deleteButton)
+        buttonlayout.addWidget(self.copyalarmTableButton)
         buttonlayout.addStretch()
         buttonlayout.addSpacing(10)
         buttonlayout.addWidget(allonButton)
@@ -54902,6 +54913,57 @@ class AlarmDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createalarmtable() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    @pyqtSlot(bool)
+    def copyAlarmTabletoClipboard(self,_=False):
+        nrows = self.alarmtable.rowCount() 
+        ncols = self.alarmtable.columnCount()
+        clipboard = ""
+        modifiers = QApplication.keyboardModifiers()
+        if modifiers == Qt.AltModifier:  #alt click
+            tbl = prettytable.PrettyTable()
+            fields = []
+            for c in range(ncols):
+                fields.append(u(self.alarmtable.horizontalHeaderItem(c).text()))
+            tbl.field_names = fields
+            for r in range(nrows):
+                rows = []
+                rows.append(u(self.alarmtable.item(r,0).text()))
+                rows.append(u(self.alarmtable.cellWidget(r,1).isChecked()))
+                rows.append(u(self.alarmtable.cellWidget(r,2).text()))
+                rows.append(u(self.alarmtable.cellWidget(r,3).text()))
+                rows.append(u(self.alarmtable.cellWidget(r,4).currentText()))
+                rows.append(u(self.alarmtable.cellWidget(r,5).text()))
+                rows.append(u(self.alarmtable.cellWidget(r,6).currentText()))
+                rows.append(u(self.alarmtable.cellWidget(r,7).currentText()))
+                rows.append(u(self.alarmtable.cellWidget(r,8).text()))
+                rows.append(u(self.alarmtable.cellWidget(r,9).currentText()))
+                rows.append(u(self.alarmtable.cellWidget(r,10).layout().itemAt(1).widget().isChecked()))
+                rows.append(u(self.alarmtable.cellWidget(r,11).text()))
+                tbl.add_row(rows)
+            clipboard = tbl.get_string()
+        else:
+            for c in range(ncols):
+                clipboard += u(self.alarmtable.horizontalHeaderItem(c).text())
+                if c != (ncols-1):
+                    clipboard += '\t'
+            clipboard += '\n'
+            for r in range(nrows):
+                clipboard += u(self.alarmtable.item(r,0).text()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,1).isChecked()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,2).text()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,3).text()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,4).currentText()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,5).text()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,6).currentText()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,7).currentText()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,8).text()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,9).currentText()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,10).layout().itemAt(1).widget().isChecked()) + '\t'
+                clipboard += u(self.alarmtable.cellWidget(r,11).text()) + '\n'
+        # copy to the system clipboard
+        sys_clip = QApplication.clipboard()
+        sys_clip.setText(clipboard)
+        aw.sendmessage(QApplication.translate("Message","Alarm table copied to clipboard",None))
 
 ############################################################################
 ######################## FUJI PX PID CONTROL DIALOG ########################
