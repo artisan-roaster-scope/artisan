@@ -49,6 +49,7 @@ Version History
 
 | Version | Date  | Comment |
 |---------|------:|---------|
+| v2.1.2  | 24.12.2019 | Bug fixes |
 | v2.1.1  | 29.11.2019 | Bug fixes |
 | v2.1.0  | 26.11.2019 | Adds curve analyzer, extended symbolic formulas, forward looking alarms and alarms triggered by temperature differences, support for the [Atilla](https://www.atilla.com.br/) GOLD plus 7" II, the [Besca Bee sample roaster](https://www.bescaroasters.com/roaster-detail/14/Sample-Roasters/Besca-Bee-Coffee-Roaster), additional [Coffed](https://coffed.pl/en) machines (SR3/5/15/25/60), [Coffeetool Rxx](https://coffeetool.gr/product-category/coffeeroasters/) machines with control, and popular [popular Phidget sets](https://artisan-scope.org/devices/phidget-sets/) (incl. the one feature in [On Idle Noise](https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html)) |
 | v2.0.0  | 04.06.2019 | New icon and new look! Adds support for the [artisan.plus](https://artisan.plus/) inventory management service, [Coffee-Tech Engineering Silon ZR7](https://www.coffee-tech.com/products/shop-roasters/silon-zr-7-shop-roaster/), [Has Garanti HGS and HSR series](http://www.hasgaranti.com.tr/en/products/shop-type-products/shop-type-roasting-coffee-machine.html), [Kaldi Fortis](https://eng.homecaffe.net/product/kaldi-fortis-grande-coffee-roaster/126/category/223/display/1/), and the forthcoming [Behmor 1kg](https://behmor.com/jake-kilo-roaster/) |
