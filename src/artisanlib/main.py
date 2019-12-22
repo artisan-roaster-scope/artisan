@@ -3332,7 +3332,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 if self.alarmaction[alarmnumber] == 0:
                     # alarm popup message with 10sec timeout
-                    amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=aw.qmc.alarm_popup_timout)
+                    amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=aw.qmc.alarm_popup_timout,modal=False)
                     amb.show()
                     #send alarm also to connected WebLCDs clients
                     if aw.WebLCDs and aw.WebLCDsAlerts:
@@ -30826,10 +30826,11 @@ class ArtisanResizeablDialog(ArtisanDialog):
 
 
 class ArtisanMessageBox(QMessageBox):
-    def __init__(self, parent = None, title=None, text=None, timeout=0): 
+    def __init__(self, parent = None, title=None, text=None, timeout=0, modal=True):
         super(ArtisanMessageBox, self).__init__(parent)
         self.setWindowTitle(title)
         self.setText(text)
+        self.setModal(modal)
         self.setIcon(QMessageBox.Information)
         self.setStandardButtons(QMessageBox.Ok)
         self.setDefaultButton(QMessageBox.Ok)
