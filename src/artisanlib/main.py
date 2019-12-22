@@ -22970,6 +22970,8 @@ class ApplicationWindow(QMainWindow):
                     settings.beginGroup("Batch")
                     if settings.contains("batchcounter"):
                         self.settingspath = filename
+                    else:
+                        self.settingspath = ""
                     settings.endGroup()
                 else:
                     self.settingspath = ""
@@ -28284,6 +28286,7 @@ class ApplicationWindow(QMainWindow):
         fname = path.absoluteFilePath(QApplication.translate("Message","artisan-settings", None))
         filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Settings",None), path=fname, ext="*.aset")
         if filename:
+            aw.settingspath = filename
             aw.closeEventSettings(filename)
             self.sendmessage(QApplication.translate("Message","Settings saved", None))
             # update recentSettings menu
