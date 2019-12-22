@@ -4,12 +4,12 @@ pyobjc-framework-Cocoa==6.1
 py2app==0.19
 gevent==1.4.0
 gevent-websocket==0.10.1
-numpy==1.17.4 #1.16.4 #1.15.4 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
+numpy==1.18.0 # 1.17.4 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
 colorspacious==1.1.2
-scipy==1.3.2
+scipy==1.4.1 # 1.3.2
 matplotlib==3.1.2
 PyQt5==5.13.1 # py2app 0.18 builds made with PyQt5.13.2 fail to show window content
-openpyxl==3.0.0
-keyring==19.2.0
+openpyxl==3.0.2
+keyring==19.2.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
 darkdetect==0.1.1 # detect if dark mode is active
 

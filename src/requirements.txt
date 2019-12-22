@@ -1,18 +1,18 @@
 pyserial==3.4
-pymodbus==2.3.0 #2.2.0
+pymodbus==2.3.0
 unidecode==1.1.1
-bottle==0.12.17
+bottle==0.12.18
 qrcode==6.1
 requests==2.22.0
-yoctopuce==1.10.37304
+yoctopuce==1.10.38545
 pefile==2019.4.18
 altgraph==0.16.1
 macholib==1.11
 python-snap7==0.10
 pyusb==1.0.2
-setuptools==41.4.0
+setuptools==42.0.2
 persist-queue==0.5.0
 portalocker==1.5.2
 prettytable==0.7.2
-Phidget22==1.5.20191106
+Phidget22==1.5.20191113
 natsort==6.2.0

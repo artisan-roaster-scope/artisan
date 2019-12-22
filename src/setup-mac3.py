@@ -273,6 +273,11 @@ for lang in ['ar', 'de','el','en','es','fa','fi','fr','he','hu','id','it','ja','
     # cannot be run brew as root thus the folllowing does not work
     # subprocess.check_call(r'cp $(brew list libusb | grep libusb-1.0.0.dylib) Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
 
+# you need to do a 
+#
+#  # brew install libusb
+#
+# to get libusb installed
 try:
     subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.23/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
 except Exception as e:
