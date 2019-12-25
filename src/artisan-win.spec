@@ -21,7 +21,12 @@ PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 SNAP7_BIN = r'C:\Windows'
 LIBUSB_BIN = r'C:\Windows\SysWOW64'
-SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\extra-dll'
+
+from PyInstaller.utils.hooks import is_module_satisfies
+if is_module_satisfies('scipy >= 1.3.2'):
+  SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\.libs'
+else:
+  SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\extra-dll'
 
 #os.system(PYTHON + r'\Scripts\pylupdate5 artisan.pro')
 
