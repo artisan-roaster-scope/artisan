@@ -2297,7 +2297,10 @@ class tgraphcanvas(FigureCanvas):
                             ambient.setHubPort(aw.ser.PhidgetTemperatureSensor[0].getHubPort())
                         ambient.setChannel(4)
                         ambient.openWaitForAttachment(1000) # timeout in ms
-                        libtime.sleep(.5)
+                        if aw.qmc.phidgetRemoteOnlyFlag:
+                            libtime.sleep(.8)
+                        else:
+                            libtime.sleep(.5)
                         t = ambient.getTemperature()
                         if aw.qmc.mode == "F":
                             aw.qmc.ambientTemp = aw.float2float(aw.qmc.fromCtoF(t))
@@ -5406,6 +5409,7 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             pass
 
+    # if updatebackground is True, the samplingsemaphore is catched and updatebackground() is called
     @pyqtSlot(str,bool)
     def setProfileTitle(self,title,updatebackground=False):
         if self.flagon and self.batchcounter != -1:
@@ -5434,7 +5438,13 @@ class tgraphcanvas(FigureCanvas):
         except: # set_in_layout not available in mpl<3.x
             pass
         if updatebackground:
-            self.updateBackground()
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
+            try:
+                self.updateBackground()
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
 
     # resize the given list to the length ln by cutting away elements or padding with trailing -1 items
     # used to resize temperature data to the length of the corresponding timex times
@@ -12523,14 +12533,14 @@ class SampleThread(QThread):
         return self.afterTP
 
     def run(self):
-        aw.qmc.flagsamplingthreadrunning = True
-        if sys.platform.startswith("darwin"):
-            pool = Foundation.NSAutoreleasePool.alloc().init()  # @UndefinedVariable
-        self.afterTP = False
-        if not aw.qmc.flagon:
-            return
-            
         try:
+            aw.qmc.flagsamplingthreadrunning = True
+            if sys.platform.startswith("darwin"):
+                pool = Foundation.NSAutoreleasePool.alloc().init()  # @UndefinedVariable
+            self.afterTP = False
+            if not aw.qmc.flagon:
+                return
+            
             # initialize digitizer
             aw.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
@@ -12546,8 +12556,8 @@ class SampleThread(QThread):
 #                        print(datetime.datetime.now()) # use this to check for drifts
                         
                         #collect information
-                        aw.qmc.flagsampling = True # we signal that we are sampling
                         try:
+                            aw.qmc.flagsampling = True # we signal that we are sampling
                             self.sample()
                         finally:
                             aw.qmc.flagsampling = False # we signal that we are done with sampling
@@ -12568,8 +12578,6 @@ class SampleThread(QThread):
                         pass
                     self.quit()
                     break  #thread ends
-        except Exception:
-            aw.qmc.flagsampling = False # we signal that we are done with sampling
         finally:
             aw.qmc.flagsampling = False # we signal that we are done with sampling
             aw.qmc.flagsamplingthreadrunning = False
@@ -27806,6 +27814,7 @@ class ApplicationWindow(QMainWindow):
                 <p>
                 <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}, pymodbus {13}{17}</small>
                 </p>
+                <p>{18}</p>
                 <p><b>{9}</b><small>{10}</small></p>
                 <p><b>{11}</b><small>{12}</small></p>
                 <p><b>{14}</b><br><small>{15}</small></p>
@@ -27827,7 +27836,8 @@ class ApplicationWindow(QMainWindow):
                 QApplication.translate("About", "License",None),
                 '<a href="http://www.gnu.org/copyleft/gpl.html">GNU Public Licence (GPLv3.0)</a>',
                 build,
-                otherlibs))
+                otherlibs,
+                '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
