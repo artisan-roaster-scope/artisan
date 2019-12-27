@@ -33,7 +33,7 @@ And here is what a slider looks like. NOTE if you have sliders checked on the co
 In order to set up custom events, you need to create Event types, under Config>Events:
 ![config events](/assets/images/gsg/events config dialog 14.png)
 
-You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these events on your roasting graph.  You may need to set your temperature axis to a low of 0° in order to see these the best.  Config>Axes.  If you check Mini Editor you will be able to add or edit existing events during the roast.  It will appeal below your Buttons.  
+You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these events on your roasting graph.  You may need to set your temperature axis to a low of 0° in order to see these the best.  Config>Axes.  If you check Mini Editor you will be able to add or edit existing events during the roast.  The Mini-Editor will appear below your Buttons.  
 
 ![events editor](/assets/images/gsg/events editor.png)
 
