@@ -23138,7 +23138,7 @@ class ApplicationWindow(QMainWindow):
             # Done this way with two variables to maintain forward and backward compatibility with settings since adding LCD mode by phase.
             if settings.contains("phasesLCDmode_l"):
                 self.qmc.phasesLCDmode_l = [toInt(x) for x in toList(settings.value("phasesLCDmode_l",self.qmc.phasesLCDmode_l))]
-            else:
+            elif settings.contains("phasesLCDmode"):
                 self.qmc.phasesLCDmode_l = [toInt(self.qmc.phasesLCDmode)]*3
             if settings.contains("phasesLCDmode_all"):
                 self.qmc.phasesLCDmode_all = [bool(toBool(x)) for x in toList(settings.value("phasesLCDmode_all",self.qmc.phasesLCDmode_all))]               
