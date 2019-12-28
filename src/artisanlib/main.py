@@ -13667,6 +13667,13 @@ class ApplicationWindow(QMainWindow):
                 
         self.helpMenu.addSeparator()
 
+        checkUpdateAction = QAction(UIconst.HELP_MENU_CHECKUPDATE,self)
+        checkUpdateAction.setMenuRole(QAction.NoRole)
+        checkUpdateAction.triggered.connect(self.checkUpdate)
+        self.helpMenu.addAction(checkUpdateAction)
+
+        self.helpMenu.addSeparator()
+
         errorAction = QAction(UIconst.HELP_MENU_ERRORS,self)
         errorAction.triggered.connect(self.viewErrorLog)
         self.helpMenu.addAction(errorAction)
@@ -27848,6 +27855,38 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def helpHelp(self,_=False):
         QDesktopServices.openUrl(QUrl("https://artisan-scope.org/docs/quick-start-guide/", QUrl.TolerantMode))
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def checkUpdate(self,_=False):
+        try:
+            update_url = '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'
+            from requests import get as request_get
+            r = request_get('https://api.github.com/repos/artisan-roaster-scope/artisan/releases/latest', timeout=(2,4))
+            tag_name = r.json()['tag_name']
+            latest = re.search(r"[\d\.]+",tag_name).group(0)
+            if latest > __version__:
+                update_str = QApplication.translate("About", "A new release is available.",None)
+                update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md">'
+                update_str +=  QApplication.translate("About", "Show Change list",None)
+                update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/releases/tag/' + str(tag_name) + '">'
+                update_str +=  QApplication.translate("About", "Download Release",None) + str(' ') + str(tag_name)
+            elif latest == __version__ :
+                update_str = QApplication.translate("About", "You are using the latest release.",None)
+            elif latest < __version__:
+                update_str = QApplication.translate("About", "You are using a beta continuous build.",None)
+                update_str += str('<br/>') + QApplication.translate("About", "You will see a notice here once a new official release is available.",None)
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkUpdate() {0}").format(str(ex)),exc_tb.tb_lineno)
+            update_str = QApplication.translate("About", "There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.",None)
+
+        box = QMessageBox(self)
+        box.about(self,
+                QApplication.translate("About", "Update status",None),
+                u("""<p>{0}</p>{1}""").format(update_str, update_url))
 
     def applicationscreenshot(self):
         imag = self.grab()
