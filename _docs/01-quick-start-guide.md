@@ -8,7 +8,7 @@ toc: false
 
 ## Quick-Start Guide
 
-**If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.**  Artisan Quick-Start Guide is maintained by *Michael Herbert of  CarefreeBuzzBuzz.*  If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the community mailing list on the [Community](https://artisan-scope.org/docs/community/) page.  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  You can also find a great deal of information at the [Artisan Blog](https://artisan-roasterscope.blogspot.com/)
+**If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.**  Artisan Quick-Start Guide is maintained by *Michael Herbert of  CarefreeBuzzBuzz.*  If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the community mailing list on the [Artisan Community](https://artisan-scope.org/docs/community/) page.  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  You can also find a great deal of information at the [Artisan Blog](https://artisan-roasterscope.blogspot.com/)
 
 
 Version 2.0 is a major milestone in the development of the artisan roast logger. It comes not only in a new look and with a new application icon, but also with support for the new Artisan.Plus inventory service described below.
