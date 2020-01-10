@@ -15584,7 +15584,7 @@ class ApplicationWindow(QMainWindow):
                                 tblrows.append(entry)
                     tbl.add_row(tblrows)
                 clipboard = tbl.get_string()
-            elif recurse:
+            else:
                 if adjustment & 1:
                     clipboard += "" + '\t'
                 for c in range(ncols):
@@ -15609,7 +15609,7 @@ class ApplicationWindow(QMainWindow):
             sys_clip = QApplication.clipboard()
             sys_clip.setText(clipboard)
         # if nothing is selected, temporary select all and try to copy
-        else:
+        elif recurse:
             table_widget.selectAll()
             self.copy_cells_to_clipboard(table_widget, adjustment, False)
             table_widget.clearSelection()
