@@ -89,7 +89,7 @@ class BleInterface(QtCore.QObject):
 
 #--------
 
-    QtCore.pyqtSlot("QByteArray")
+    @QtCore.pyqtSlot("QByteArray")
     def printDataReceived(self,data=QtCore.QByteArray):
 #        print("received data:{data}".format(data =data))
         res_w, res_b = self.processData(self.write, data)

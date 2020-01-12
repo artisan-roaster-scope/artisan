@@ -61,6 +61,7 @@ class AcaiaBLE():
         self.weight = None
         self.battery = None
         self.model = 0 # acaia models: 0: Pearl, 1: Lunar, 2: X
+        self.firmware = None # on connect this is set to a tripel of ints, (major, minor, patch)-version
     
     def reset(self):
         self.__init__()
@@ -111,7 +112,7 @@ class AcaiaBLE():
                     0,  # weight
                     5,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec)
                        # 5 or 7 seems to be good values for this app in Artisan
-#                    1,
+#                    1,   # battery
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
 #                    2,  # timer
 #                    255, #5,  # timer argument
@@ -121,20 +122,27 @@ class AcaiaBLE():
                 )
 
     def parseInfo(self,data):
+        # TODO: the model is only indicated by the second byte of data, thus this here is wrong!!
         if data.startswith(b'\x02\n\x02'):
             self.model = 0 # Acaia Pearl
         elif data.startswith(b'\x02\x14\x02'):
             self.model = 1 # Acaia Lunar
         elif data.startswith(b'\x02\x14\x03'):
             self.model = 2
-
+        if len(data)>4:
+            self.firmware = (data[2],data[3],data[4])
+            #print("{}.{}.{}".format(self.firmware[0],self.firmware[1],self.firmware[2]))
+   
     # returns length of consumed data or -1 on error
     def parseWeightEvent(self,payload):
         if len(payload) < self.EVENT_WEIGHT_LEN:
             return -1
         else:
-            value = ((payload[1] & 0xff) << 8) + (payload[0] & 0xff)
-            unit = payload[4] & 0xFF
+            # first 4 bytes encode the weight as unsigned long
+            value = ((payload[3] & 0xff) << 24) + \
+                ((payload[2] & 0xff) << 16) + ((payload[1] & 0xff) << 8) + (payload[0] & 0xff)
+            
+            unit = payload[4]
 
             if unit == 1:
                 value /= 10
@@ -144,16 +152,21 @@ class AcaiaBLE():
                 value /= 1000
             elif unit == 4:
                 value /= 10000
-
-            if (payload[5] & 0x02) == 0x02:
-                value *= -1
-                
+            
+            # TODO: this factor should not be based on the module, but on the unit extracted from the scale status message!
             if self.model == 2:
                 value = value * 1000
+            
+            stable = (payload[5] & 0x01) != 0x01
+            
+            # if 2nd bit of payload[5] is set, the reading is negative
+            if (payload[5] & 0x02) == 0x02:
+                value *= -1
 
-            if value != self.weight:
+            # if value is fresh and reading is stable
+            if value != self.weight: # and stable:
                 self.weight = value
-
+            
             return self.EVENT_WEIGHT_LEN
     
     def parseBatteryEvent(self,payload):
@@ -162,7 +175,8 @@ class AcaiaBLE():
         else:
             b = payload[0]
             if 0 <= b and b <= 100:
-                self.battery = payload[0]
+                self.battery = int(payload[0])
+                #print("bat","{}%".format(self.battery))
             return self.EVENT_BATTERY_LEN
     
     def parseTimerEvent(self,payload):
@@ -215,12 +229,18 @@ class AcaiaBLE():
             pos = self.parseScaleEvent(payload)
             if pos > -1:
                 self.parseScaleEvents(payload[pos+1:])
+                
+    def parseStatus(self,payload):
+        if payload and len(payload) > 1:
+            self.battery = int(payload[0] & ~(1 << 7))
+            #print("bat","{}%".format(self.battery))
 
     def parseScaleData(self,write,msgType,data):
         if msgType == self.MSG_INFO:
             self.parseInfo(data)
             self.sendId(write)
         elif msgType == self.MSG_STATUS:
+            self.parseStatus(data)
             if not self.notificationConfSent:
                 self.confNotifications(write)
         elif msgType == self.MSG_EVENT:
@@ -265,7 +285,7 @@ class AcaiaBLE():
                 if len(data) < (l + 2):
 #                    print("Invalid data length")
                     return None, None
-                self.parseScaleData(write,self.msgType,data[offset:offset+l]);
+                self.parseScaleData(write,self.msgType,data[offset:offset+l-1]);
             self.msgType = None # message consumed completely
             
         if old_weight == self.weight:
