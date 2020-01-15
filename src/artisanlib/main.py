@@ -1787,7 +1787,7 @@ class tgraphcanvas(FigureCanvas):
         self.autosavepath = ""
         
         self.autosaveimage = False # if true save an image along alog files
-        self.autosaveimageformat = "PDF" # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP
+        self.autosaveimageformat = "PDF" # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP, CSV, JSON
 
         #used to place correct height of text to avoid placing text over text (annotations)
         self.ystep_down = 0
@@ -7999,6 +7999,7 @@ class tgraphcanvas(FigureCanvas):
             except Exception:
                 pass
 
+    # close Phidget and and Yocto outputs
     def closePhidgetOUTPUTs(self):
         # close Phidget Digital Outputs
         aw.ser.phidgetOUTclose()
@@ -8010,6 +8011,10 @@ class tgraphcanvas(FigureCanvas):
         aw.ser.phidgetVOUTclose()
         # close Phidget RC Servos
         aw.ser.phidgetRCclose()
+        # close Yocto Voltage Outputs
+        aw.ser.yoctoVOUTclose()
+        # close Yocto Current Outputs
+        aw.ser.yoctoCOUTclose()
         
         
     def disconnectProbes(self):
@@ -18445,10 +18450,25 @@ class ApplicationWindow(QMainWindow):
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
+                            # for Phidgets OUT modules
                             if cs.startswith('out(') and len(cs)>7:
                                 try:
                                     c,v = cs[4:-1].split(',')
                                     aw.ser.phidgetVOUTsetVOUT(int(c),float(v))
+                                except Exception:
+                                    pass
+                            # for YOCTOPUCE VOLTAGE OUT modules "vout(c,v)" with c the channel (1 or 2) and v the voltage as float [0.0-10.0]
+                            elif cs.startswith('vout(') and len(cs)>8:
+                                try:
+                                    c,v = cs[5:-1].split(',')
+                                    aw.ser.yoctoVOUTsetVOUT(int(c),float(v))
+                                except Exception:
+                                    pass
+                            # for YOCTOPUCE CURRENT OUT modules "cout(c)" with c the current as float [3.0-21.0]
+                            elif cs.startswith('cout(') and len(cs)>6:
+                                try:
+                                    c = cs[5:-1]
+                                    aw.ser.yoctoCOUTsetCOUT(float(c))
                                 except Exception:
                                     pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
@@ -19856,6 +19876,10 @@ class ApplicationWindow(QMainWindow):
                             self.saveVectorGraph(extension=".pdf",fname=filename) 
                         elif self.qmc.autosaveimageformat == "SVG":
                             self.saveVectorGraph(extension=".svg",fname=filename)
+                        elif self.qmc.autosaveimageformat == "CSV":
+                            self.exportCSV(filename + ".csv")
+                        elif self.qmc.autosaveimageformat == "JSON":
+                            self.exportJSON(filename + ".json")
                         else:
                             self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename)
                     return filename
@@ -22629,6 +22653,10 @@ class ApplicationWindow(QMainWindow):
                             self.saveVectorGraph(extension=".pdf",fname=filename)
                         elif self.qmc.autosaveimageformat == "SVG":
                             self.saveVectorGraph(extension=".svg",fname=filename)
+                        elif self.qmc.autosaveimageformat == "CSV":
+                            self.exportCSV(filename + ".csv")
+                        elif self.qmc.autosaveimageformat == "JSON":
+                            self.exportJSON(filename + ".json")
                         else:
                             self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename)
                     return True
@@ -34827,6 +34855,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                             acaia.sendHeartbeat,
                             acaia.sendStop,
                             acaia.reset)
+                            
                     # start BLE loop
                     self.ble.deviceDisconnected.connect(self.ble_scan_failed)
                     self.ble.weightChanged.connect(self.ble_weight_changed)
@@ -37218,7 +37247,7 @@ class autosaveDlg(ArtisanDialog):
         self.autopdfcheckbox = QCheckBox()
         self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save image alongside .alog profiles",None))
         self.autopdfcheckbox.setChecked(aw.qmc.autosaveimage)
-        imageTypes = ["PDF", "SVG", "PNG", "JPEG", "BMP"]
+        imageTypes = ["PDF", "SVG", "PNG", "JPEG", "BMP", "CSV", "JSON"]
         self.imageTypesComboBox = QComboBox()
         self.imageTypesComboBox.addItems(imageTypes)
         self.imageTypesComboBox.setCurrentIndex(imageTypes.index(aw.qmc.autosaveimageformat))
@@ -42747,7 +42776,7 @@ class serialport(object):
         'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
         'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetAnalogOutHub','PhidgetRCServo','PhidgetBinaryOut',\
         'YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
-        'YOCTOthread','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
+        'YOCTOthread','YOCTOvoltageOutput1','YOCTOvoltageOutput2','YOCTOcurrentOutput','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
         'externaloutprogram','externaloutprogramFlag']
@@ -42792,7 +42821,7 @@ class serialport(object):
         self.PhidgetIOvalues = [[],[],[],[],[],[],[],[]] # the values gathered by registered change triggers
         self.PhidgetIOlastvalues = [-1]*8 # the values gathered by registered change triggers
         self.PhidgetIOsemaphores = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
-        #stores the Phidget Digital Output PMW objects (None if not initialized)      
+        #stores the Phidget Digital Output PMW objects (None if not initialized)
         self.PhidgetDigitalOut = None
         self.PhidgetDigitalOutLastPWM = [0]*4 # 0-100
         self.PhidgetDigitalOutLastToggle = [None]*4 # if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
@@ -42814,6 +42843,10 @@ class serialport(object):
         self.YOCTOlastvalues = [-1]*2 # the last async values returned
         self.YOCTOsemaphores = [QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to YOCTO per channel
         self.YOCTOthread = None
+        
+        self.YOCTOvoltageOutput1 = None
+        self.YOCTOvoltageOutput2 = None
+        self.YOCTOcurrentOutput = None
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid = "X"
@@ -43897,10 +43930,10 @@ class serialport(object):
     # connects to a Yocto Meteo, returns current humidity value
     def YoctoMeteoHUM(self):
         try:
-            self.YOCTOimportLIB() # first via import the lib
+            self.YOCTOimportLIB() # first import the lib
             from yoctopuce.yocto_humidity import YHumidity
             HUMsensor = YHumidity.FirstHumidity()
-            if HUMsensor.isOnline():
+            if HUMsensor is not None and HUMsensor.isOnline():
                 return HUMsensor.get_currentValue()
             else:
                 return None
@@ -43931,7 +43964,7 @@ class serialport(object):
             self.YOCTOimportLIB() # first via import the lib
             from yoctopuce.yocto_pressure import YPressure
             PRESSsensor = YPressure.FirstPressure()
-            if PRESSsensor.isOnline():
+            if PRESSsensor is not None and PRESSsensor.isOnline():
                 return PRESSsensor.get_currentValue()
             else:
                 return None
@@ -44621,7 +44654,7 @@ class serialport(object):
                     #we convert the hex strings to integers. Divide by 10.0 (decimal position)
                     r = r.replace(str2cmd(' '),str2cmd('0'))
                     return int(r[1:5],16)/10., int(r[7:11],16)/10.
-                else:                     
+                else:
                     if retry:
                         return self.HH506RAtemperature(retry=retry-1)
                     else:
@@ -46067,6 +46100,71 @@ class serialport(object):
             aw.ser.PhidgetAnalogOut = None
 
 
+#--- Yoctopuce Voltage Output (only one supported for now)
+#  only supporting 
+#     1 channel Yocto-0-10V-Tx
+#  commands: vout(c,v) with c the channel (1 or 2) v voltage in V as a float [0.0-10.0]
+
+    def yoctoVOUTattach(self):
+        if aw.ser.YOCTOvoltageOutput1 is None or aw.ser.YOCTOvoltageOutput2 is None:
+            self.YOCTOimportLIB() # first import the lib
+            from yoctopuce.yocto_voltageoutput import YVoltageOutput
+            vout = YVoltageOutput.FirstVoltageOutput()
+            if vout is not None:
+                m = vout.get_module()
+                target = m.get_serialNumber()
+                aw.ser.YOCTOvoltageOutput1 = YVoltageOutput.FindVoltageOutput(target + '.voltageOutput1')
+                aw.ser.YOCTOvoltageOutput2 = YVoltageOutput.FindVoltageOutput(target + '.voltageOutput2')
+            
+    def yoctoVOUTsetVOUT(self,c,v):
+        try:
+            self.yoctoVOUTattach()
+            if c == 1 and aw.ser.YOCTOvoltageOutput1 is not None and aw.ser.YOCTOvoltageOutput1.isOnline():
+                aw.ser.YOCTOvoltageOutput1.set_currentVoltage(v) # with v a voltage in V [0.0-10.0]
+            elif c == 2 and aw.ser.YOCTOvoltageOutput2 is not None and aw.ser.YOCTOvoltageOutput2.isOnline():
+                aw.ser.YOCTOvoltageOutput2.set_currentVoltage(v) # with v a voltage in V [0-10]
+        except:
+            pass
+            
+    def yoctoVOUTclose(self):
+        if aw.ser.YOCTOvoltageOutput1 is not None or aw.ser.YOCTOvoltageOutput2 is not None:
+            aw.ser.YOCTOvoltageOutput1 = None
+            aw.ser.YOCTOvoltageOutput2 = None
+            try:
+                from yoctopuce.yocto_api import YAPI
+                YAPI.FreeAPI()
+            except Exception:
+                pass
+
+
+#--- Yoctopuce Current Output (only one supported for now)
+#  only supporting 
+#     1 channel Yocto-4-20mA-Tx
+#  commands: cout(c) with c current in mA as a float [3.0-21.0]
+
+    def yoctoCOUTattach(self):
+        if aw.ser.YOCTOcurrentOutput is None:
+            self.YOCTOimportLIB() # first import the lib
+            from yoctopuce.yocto_currentloopoutput import YCurrentLoopOutput
+            aw.ser.YOCTOcurrentOutput = YCurrentLoopOutput.FirstCurrentLoopOutput()
+            
+    def yoctoCOUTsetCOUT(self,c):
+        try:
+            self.yoctoCOUTattach()
+            if aw.ser.YOCTOcurrentOutput is not None and aw.ser.YOCTOcurrentOutput.isOnline():
+                aw.ser.YOCTOcurrentOutput.set_current(c) # with c a current in mA [3.0-21.0]
+        except:
+            pass
+            
+    def yoctoCOUTclose(self):
+        if aw.ser.YOCTOcurrentOutput is not None:
+            aw.ser.YOCTOcurrentOutput = None
+            try:
+                from yoctopuce.yocto_api import YAPI
+                YAPI.FreeAPI()
+            except Exception:
+                pass
+            
 #--- Phidget RC (only one supported for now)
 #  supporting up to 16 channels like those of the RCC1000
 #  commands: 

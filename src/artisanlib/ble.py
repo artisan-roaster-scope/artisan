@@ -30,6 +30,12 @@ class BleInterface(QtCore.QObject):
     def __init__(self,service_uuid, char_uuid, processData, sendHeartbeat, sendStop, reset):
         super().__init__()
         
+#        cp = QtBluetooth.QLowEnergyConnectionParameters()
+#        print("max interval",cp.maximumInterval())
+#        print("min interval",cp.minimumInterval())
+#        print("supervisionTimeout",cp.supervisionTimeout())
+#        print("latency()",cp.latency())
+        
         self.SERVICE_UUID = QtBluetooth.QBluetoothUuid(service_uuid)
         self.CHAR_UUID = QtBluetooth.QBluetoothUuid(char_uuid)
         self.processData = processData

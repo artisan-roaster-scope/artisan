@@ -62,6 +62,7 @@ class AcaiaBLE():
         self.battery = None
         self.model = 0 # acaia models: 0: Pearl, 1: Lunar, 2: X
         self.firmware = None # on connect this is set to a tripel of ints, (major, minor, patch)-version
+        self.unit = 2 # 1: kg, 2: g, 5: ounce
     
     def reset(self):
         self.__init__()
@@ -154,7 +155,8 @@ class AcaiaBLE():
                 value /= 10000
             
             # TODO: this factor should not be based on the module, but on the unit extracted from the scale status message!
-            if self.model == 2:
+            # convert received weight data to g
+            if self.model == 2: # if self.unit == 1 (kg) => value*1000, if self.unit == 5 => value*28.3495
                 value = value * 1000
             
             stable = (payload[5] & 0x01) != 0x01
@@ -234,6 +236,8 @@ class AcaiaBLE():
         if payload and len(payload) > 1:
             self.battery = int(payload[0] & ~(1 << 7))
             #print("bat","{}%".format(self.battery))
+        if payload and len(payload) > 2:
+            self.unit = int(payload[1] & ~(1 << 7))
 
     def parseScaleData(self,write,msgType,data):
         if msgType == self.MSG_INFO:
