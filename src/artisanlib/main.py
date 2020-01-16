@@ -18445,30 +18445,37 @@ class ApplicationWindow(QMainWindow):
                                         libtime.sleep(cmds)
                             except Exception:
                                 pass
-                elif action == 14: # VOUT Command (currently only "out(<channel>,<value>)" with <value> a float
+                elif action == 14: # VOUT Command to drive Phidget/Yocto Output Modules
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
-                            # for Phidgets OUT modules
+                            # for Phidgets OUT modules "out(<channel>,<value>)" with <value> a float
                             if cs.startswith('out(') and len(cs)>7:
                                 try:
                                     c,v = cs[4:-1].split(',')
                                     aw.ser.phidgetVOUTsetVOUT(int(c),float(v))
                                 except Exception:
                                     pass
-                            # for YOCTOPUCE VOLTAGE OUT modules "vout(c,v)" with c the channel (1 or 2) and v the voltage as float [0.0-10.0]
+                            # for YOCTOPUCE VOLTAGE OUT modules "vout(c,v[,sn])" with c the channel (1 or 2),v the voltage as float [0.0-10.0] and the optional sn either the modules serial number or its name
                             elif cs.startswith('vout(') and len(cs)>8:
                                 try:
-                                    c,v = cs[5:-1].split(',')
-                                    aw.ser.yoctoVOUTsetVOUT(int(c),float(v))
+                                    cs_split = cs[5:-1].split(',')
+                                    if len(cs_split) > 2:
+                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(cs_split[1]),cs_split[2])
+                                    else:
+                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(cs_split[1]))
                                 except Exception:
                                     pass
-                            # for YOCTOPUCE CURRENT OUT modules "cout(c)" with c the current as float [3.0-21.0]
+                            # for YOCTOPUCE CURRENT OUT modules "cout(c[,sn])" with c the current as float [3.0-21.0] and the optional sn either the modules serial number or its name
                             elif cs.startswith('cout(') and len(cs)>6:
                                 try:
-                                    c = cs[5:-1]
-                                    aw.ser.yoctoCOUTsetCOUT(float(c))
+                                    #c = cs[5:-1]
+                                    cs_split = cs[5:-1].split(',')
+                                    if len(cs_split) > 1:
+                                        aw.ser.yoctoCOUTsetCOUT(float(cs_split[0]),cs_split[1])
+                                    else:
+                                        aw.ser.yoctoCOUTsetCOUT(float(cs_split[0]))
                                 except Exception:
                                     pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
@@ -42776,7 +42783,7 @@ class serialport(object):
         'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
         'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetAnalogOutHub','PhidgetRCServo','PhidgetBinaryOut',\
         'YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
-        'YOCTOthread','YOCTOvoltageOutput1','YOCTOvoltageOutput2','YOCTOcurrentOutput','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
+        'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
         'externaloutprogram','externaloutprogramFlag']
@@ -42844,9 +42851,8 @@ class serialport(object):
         self.YOCTOsemaphores = [QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to YOCTO per channel
         self.YOCTOthread = None
         
-        self.YOCTOvoltageOutput1 = None
-        self.YOCTOvoltageOutput2 = None
-        self.YOCTOcurrentOutput = None
+        self.YOCTOvoltageOutputs = []
+        self.YOCTOcurrentOutputs = []
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid = "X"
@@ -46103,68 +46109,109 @@ class serialport(object):
 #--- Yoctopuce Voltage Output (only one supported for now)
 #  only supporting 
 #     1 channel Yocto-0-10V-Tx
-#  commands: vout(c,v) with c the channel (1 or 2) v voltage in V as a float [0.0-10.0]
+#  commands: vout(c,v[,sn]) with c the channel (1 or 2), v voltage in V as a float [0.0-10.0], and the optional sn either the modules serial number or its name as stringthe optional sn either the modules serial number or its name
 
-    def yoctoVOUTattach(self):
-        if aw.ser.YOCTOvoltageOutput1 is None or aw.ser.YOCTOvoltageOutput2 is None:
-            self.YOCTOimportLIB() # first import the lib
-            from yoctopuce.yocto_voltageoutput import YVoltageOutput
+    # module_id is a string that is either None, a module serial number or a module logical name
+    # it is assumed that the modules two channels do not have custom function names different from
+    # voltageOutput1 and voltageOutput2
+    def yoctoVOUTattach(self,c,module_id):
+        # check if VoltageOutput object for channel c and module_id is already attached
+        voltageOutputs = aw.ser.YOCTOvoltageOutputs
+        m = next((x for x in voltageOutputs if 
+                x.get_functionId() == "voltageOutput"+str(c) and 
+                (module_id is None or module_id == x.get_serialNumber() or module_id == x.get_logicalName())),
+                None)
+        if m is not None:
+            return m
+        # the module/channel is not yet attached search for it
+        self.YOCTOimportLIB() # first import the lib
+        from yoctopuce.yocto_voltageoutput import YVoltageOutput
+        if module_id is None:
             vout = YVoltageOutput.FirstVoltageOutput()
-            if vout is not None:
-                m = vout.get_module()
-                target = m.get_serialNumber()
-                aw.ser.YOCTOvoltageOutput1 = YVoltageOutput.FindVoltageOutput(target + '.voltageOutput1')
-                aw.ser.YOCTOvoltageOutput2 = YVoltageOutput.FindVoltageOutput(target + '.voltageOutput2')
-            
-    def yoctoVOUTsetVOUT(self,c,v):
+            if vout is None:
+                return None
+            m = vout.get_module()
+            target = m.get_serialNumber()
+        else:
+            target = module_id
+        YOCTOvoltageOutput = YVoltageOutput.FindVoltageOutput(target + '.voltageOutput' + str(c))
+        if YOCTOvoltageOutput.isOnline():
+            aw.ser.YOCTOvoltageOutputs.append(YOCTOvoltageOutput)
+            return YOCTOvoltageOutput
+        else:
+            return None
+    
+    def yoctoVOUTsetVOUT(self,c,v,module_id=None):
         try:
-            self.yoctoVOUTattach()
-            if c == 1 and aw.ser.YOCTOvoltageOutput1 is not None and aw.ser.YOCTOvoltageOutput1.isOnline():
-                aw.ser.YOCTOvoltageOutput1.set_currentVoltage(v) # with v a voltage in V [0.0-10.0]
-            elif c == 2 and aw.ser.YOCTOvoltageOutput2 is not None and aw.ser.YOCTOvoltageOutput2.isOnline():
-                aw.ser.YOCTOvoltageOutput2.set_currentVoltage(v) # with v a voltage in V [0-10]
+            m = self.yoctoVOUTattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.set_currentVoltage(v) # with v a voltage in V [0.0-10.0]
         except:
             pass
-            
+    
     def yoctoVOUTclose(self):
-        if aw.ser.YOCTOvoltageOutput1 is not None or aw.ser.YOCTOvoltageOutput2 is not None:
-            aw.ser.YOCTOvoltageOutput1 = None
-            aw.ser.YOCTOvoltageOutput2 = None
-            try:
-                from yoctopuce.yocto_api import YAPI
-                YAPI.FreeAPI()
-            except Exception:
-                pass
+        aw.ser.YOCTOvoltageOutputs = []
+# this crashs on macOS with "Illegal instruction: 4" once modules were attached:
+#        try:
+#            from yoctopuce.yocto_api import YAPI
+#            YAPI.FreeAPI() 
+#        except:
+#            pass
 
 
 #--- Yoctopuce Current Output (only one supported for now)
 #  only supporting 
 #     1 channel Yocto-4-20mA-Tx
-#  commands: cout(c) with c current in mA as a float [3.0-21.0]
+#  commands: cout(c[,sn]) with c current in mA as a float [3.0-21.0], and the optional sn either the modules serial number or its name as stringthe optional sn either the modules serial number or its name
 
-    def yoctoCOUTattach(self):
-        if aw.ser.YOCTOcurrentOutput is None:
-            self.YOCTOimportLIB() # first import the lib
-            from yoctopuce.yocto_currentloopoutput import YCurrentLoopOutput
-            aw.ser.YOCTOcurrentOutput = YCurrentLoopOutput.FirstCurrentLoopOutput()
-            
-    def yoctoCOUTsetCOUT(self,c):
+    # module_id is a string that is either None, a module serial number or a module logical name
+    # it is assumed that the modules two channels do not have custom function names different from
+    # voltageOutput1 and voltageOutput2
+    def yoctoCOUTattach(self,module_id):
+        # check if YOCTOcurrentOutput object for module_id is already attached
+        currentOutputs = aw.ser.YOCTOcurrentOutputs
+        m = next((x for x in currentOutputs if 
+                x.get_functionId() == "currentLoopOutput" and 
+                (module_id is None or module_id == x.get_serialNumber() or module_id == x.get_logicalName())),
+                None)
+        if m is not None:
+            return m
+        # the module/channel is not yet attached search for it
+        self.YOCTOimportLIB() # first import the lib
+        from yoctopuce.yocto_currentloopoutput import YCurrentLoopOutput
+        if module_id is None:
+            cout = YCurrentLoopOutput.FirstCurrentLoopOutput()
+            if cout is None:
+                return None
+            m = cout.get_module()
+            target = m.get_serialNumber()
+        else:
+            target = module_id
+        YOCTOcurrentOutput = YCurrentLoopOutput.FindCurrentLoopOutput(target + '.currentLoopOutput')
+        if YOCTOcurrentOutput.isOnline():
+            aw.ser.YOCTOcurrentOutputs.append(YOCTOcurrentOutput)
+            return YOCTOcurrentOutput
+        else:
+            return None
+
+    def yoctoCOUTsetCOUT(self,c,module_id=None):
         try:
-            self.yoctoCOUTattach()
-            if aw.ser.YOCTOcurrentOutput is not None and aw.ser.YOCTOcurrentOutput.isOnline():
-                aw.ser.YOCTOcurrentOutput.set_current(c) # with c a current in mA [3.0-21.0]
+            m = self.yoctoCOUTattach(module_id)
+            if m is not None and m.isOnline():
+                m.set_current(c) # with c a current in mA [3.0-21.0]
         except:
             pass
-            
+
     def yoctoCOUTclose(self):
-        if aw.ser.YOCTOcurrentOutput is not None:
-            aw.ser.YOCTOcurrentOutput = None
-            try:
-                from yoctopuce.yocto_api import YAPI
-                YAPI.FreeAPI()
-            except Exception:
-                pass
-            
+        aw.ser.YOCTOcurrentOutputs = []
+# this crashs on macOS with "Illegal instruction: 4" once modules were attached:
+#        try:
+#            from yoctopuce.yocto_api import YAPI
+#            YAPI.FreeAPI()
+#        except Exception:
+#            pass
+
+
 #--- Phidget RC (only one supported for now)
 #  supporting up to 16 channels like those of the RCC1000
 #  commands: 
