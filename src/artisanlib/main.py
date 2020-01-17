@@ -189,6 +189,8 @@ from artisanlib.qtsingleapplication import QtSingleApplication
 from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
 
+from yoctopuce.yocto_api import YAPI, YRefParam
+
 
 # maps Artisan thermocouple types (order as listed in the menu; see phidget1048_types) to Phidget thermocouple types
 # 1 => k-type (default)
@@ -7994,7 +7996,6 @@ class tgraphcanvas(FigureCanvas):
                     ser.YOCTOthread = None
                 ser.YOCTOvalues = [[],[]]
                 ser.YOCTOlastvalues = [-1]*2
-                from yoctopuce.yocto_api import YAPI
                 YAPI.FreeAPI()
             except Exception:
                 pass
@@ -8015,6 +8016,8 @@ class tgraphcanvas(FigureCanvas):
         aw.ser.yoctoVOUTclose()
         # close Yocto Current Outputs
         aw.ser.yoctoCOUTclose()
+        # close Yocto Relay Outputs
+        aw.ser.yoctoRELclose()
         
         
     def disconnectProbes(self):
@@ -18237,7 +18240,7 @@ class ApplicationWindow(QMainWindow):
                                 #block resetting style of last button
                                 self.lastbuttonpressed = -1
 
-                            elif cs_a[0] == "pulse" and cs_len == 3: #len(cs)>9 and len(cs)<14:
+                            elif cs_a[0] == "pulse" and cs_len == 3:
                                 c = toInt(cs_a[1])
                                 t = toInt(cs_a[2])
                                 #print("pulse(%d, %d)" % (c, t))
@@ -18278,6 +18281,27 @@ class ApplicationWindow(QMainWindow):
                                         libtime.sleep(t)
                                 except Exception:
                                     pass
+                            # Yoctopuce Relay Command Actions
+                            # on(c[,sn])
+                            elif cs_a[0] == "on" and cs_len == 2:
+                                aw.ser.yoctoRELon(int(cs_a[1]),None)
+                            elif cs_a[0] == "on" and cs_len == 3:
+                                aw.ser.yoctoRELon(int(cs_a[1]),cs_a[2])
+                            # off(c[,sn])
+                            elif cs_a[0] == "off" and cs_len == 2:
+                                aw.ser.yoctoRELoff(int(cs_a[1]),None)
+                            elif cs_a[0] == "off" and cs_len == 3:
+                                aw.ser.yoctoRELoff(int(cs_a[1]),cs_a[2])
+                            # flip(c[,sn])
+                            elif cs_a[0] == "flip" and cs_len == 2:
+                                aw.ser.yoctoRELflip(int(cs_a[1]),None)
+                            elif cs_a[0] == "flip" and cs_len == 3:
+                                aw.ser.yoctoRELflip(int(cs_a[1]),cs_a[2])
+                            # pulse(c,delay,duration[,sn])
+                            elif cs_a[0] == "pulse" and cs_len == 4:
+                                aw.ser.yoctoRELpulse(int(cs_a[1]),int(cs_a[2]),int(cs_a[3]),None)
+                            elif cs_a[0] == "pulse" and cs_len == 5:
+                                aw.ser.yoctoRELpulse(int(cs_a[1]),int(cs_a[2]),int(cs_a[3]),cs_a[4])
                             else:
                                 #print("no match for command [%s], continue" % (cs_a[0]))
                                 aw.sendmessage(QApplication.translate("Message","No match for command [%s], continuing" % (cs_a[0]), None))
@@ -27845,7 +27869,6 @@ class ApplicationWindow(QMainWindow):
         except:
             pass
         try:
-            from yoctopuce.yocto_api import YAPI
             yocto_version = YAPI.GetAPIVersion()
             otherlibs += ", Yoctopuce " + yocto_version
         except:
@@ -40329,7 +40352,7 @@ class EventsDlg(ArtisanResizeablDialog):
         i = aw.findWidgetsRow(self.eventbuttontable,self.sender(),4)
         if i is not None:
             actioncombobox = self.eventbuttontable.cellWidget(i,4)
-            if i < len(aw.extraeventsactions):
+            if i < len(self.extraeventsactions):
                 self.extraeventsactions[i] = actioncombobox.currentIndex()
                 if self.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
                     self.extraeventsactions[i] = self.extraeventsactions[i] + 1
@@ -42758,7 +42781,6 @@ class YoctoThread(threading.Thread):
         threading.Thread.__init__(self)
     
     def run(self):
-        from yoctopuce.yocto_api import YAPI, YRefParam
         errmsg = YRefParam()
         while not self._stopevent.isSet():
             YAPI.UpdateDeviceList(errmsg)  # traps plug/unplug events
@@ -42782,8 +42804,8 @@ class serialport(object):
         'PhidgetIO','PhidgetIOvalues','PhidgetIOlastvalues','PhidgetIOsemaphores','PhidgetDigitalOut',\
         'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
         'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetAnalogOutHub','PhidgetRCServo','PhidgetBinaryOut',\
-        'YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
-        'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
+        'YOCTOlibImported','YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
+        'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
         'externaloutprogram','externaloutprogramFlag']
@@ -42841,6 +42863,7 @@ class serialport(object):
         #store the Phidget IO Binary Output objects
         self.PhidgetBinaryOut = None # if attached, it contains a list of th 8 attached output channel objects
         #Yoctopuce channels
+        self.YOCTOlibImported = False # ensure that the YOCTOlib is only imported once
         self.YOCTOsensor = None
         self.YOCTOchan1 = None
         self.YOCTOchan2 = None
@@ -42853,6 +42876,7 @@ class serialport(object):
         
         self.YOCTOvoltageOutputs = []
         self.YOCTOcurrentOutputs = []
+        self.YOCTOrelays = []
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid = "X"
@@ -46109,7 +46133,7 @@ class serialport(object):
 #--- Yoctopuce Voltage Output (only one supported for now)
 #  only supporting 
 #     1 channel Yocto-0-10V-Tx
-#  commands: vout(c,v[,sn]) with c the channel (1 or 2), v voltage in V as a float [0.0-10.0], and the optional sn either the modules serial number or its name as stringthe optional sn either the modules serial number or its name
+#  commands: vout(c,v[,sn]) with c the channel (1 or 2), v voltage in V as a float [0.0-10.0], and sn the modules serial number or its logical name
 
     # module_id is a string that is either None, a module serial number or a module logical name
     # it is assumed that the modules two channels do not have custom function names different from
@@ -46153,7 +46177,6 @@ class serialport(object):
         aw.ser.YOCTOvoltageOutputs = []
 # this crashs on macOS with "Illegal instruction: 4" once modules were attached:
 #        try:
-#            from yoctopuce.yocto_api import YAPI
 #            YAPI.FreeAPI() 
 #        except:
 #            pass
@@ -46162,7 +46185,7 @@ class serialport(object):
 #--- Yoctopuce Current Output (only one supported for now)
 #  only supporting 
 #     1 channel Yocto-4-20mA-Tx
-#  commands: cout(c[,sn]) with c current in mA as a float [3.0-21.0], and the optional sn either the modules serial number or its name as stringthe optional sn either the modules serial number or its name
+#  commands: cout(c[,sn]) with c current in mA as a float [3.0-21.0], and sn the modules serial number or its logical name
 
     # module_id is a string that is either None, a module serial number or a module logical name
     # it is assumed that the modules two channels do not have custom function names different from
@@ -46206,7 +46229,105 @@ class serialport(object):
         aw.ser.YOCTOcurrentOutputs = []
 # this crashs on macOS with "Illegal instruction: 4" once modules were attached:
 #        try:
-#            from yoctopuce.yocto_api import YAPI
+#            YAPI.FreeAPI()
+#        except Exception:
+#            pass
+
+
+#--- Yoctopuce Relay Output
+#  supporting
+#     2 channel Yocto-Relay
+#     1 channel Yocto-LatchedRelay
+#     8 channel Yocto-MaxiCoupler-V2
+#     1 channel Yocto-PowerRelay-V2
+#     1 channel Yocto-PowerRelay-V3
+#     5 channel Yocto-MaxiPowerRelay
+#  commands: 
+#      on(c[,sn])
+#      off(c[,sn])
+#      flip(c[,sn])
+#      pulse(c,delay,duration[,sn])
+#    with c the channel, delay and duration in milliseconds, sn the option module serial number or its logical name as string
+
+    # module_id is a string that is either None, a module serial number or a module logical name
+    # it is assumed that the modules two channels do not have custom function names different from
+    # relay1, relay2,...
+    def yoctoRELattach(self,c,module_id):
+        print("yoctoRELattach",c,module_id)
+        # check if Relay object for channel c and module_id is already attached
+        relays = aw.ser.YOCTOrelays
+        m = next((x for x in relays if 
+                x.get_functionId() == "relay"+str(c) and 
+                (module_id is None or module_id == x.get_serialNumber() or module_id == x.get_logicalName())),
+                None)
+        if m is not None:
+            return m
+        # the module/channel is not yet attached search for it
+        self.YOCTOimportLIB() # first import the lib
+        from yoctopuce.yocto_relay import YRelay
+        if module_id is None:
+            rel = YRelay.FirstRelay()
+            if rel is None:
+                return None
+            m = rel.get_module()
+            target = m.get_serialNumber()
+        else:
+            target = module_id
+        YOCTOrelay = YRelay.FindRelay(target + '.relay' + str(c))
+        module = YOCTOrelay.get_module()
+        print("module",module)
+        print("before module")
+        module.isOnline()
+        print("after module")
+        if YOCTOrelay.isOnline():
+            aw.ser.YOCTOrelays.append(YOCTOrelay)
+            return YOCTOrelay
+        else:
+            return None
+
+    def yoctoRELon(self,c,module_id=None):
+        print("yoctoRELon",c,module_id)
+        try:
+            m = self.yoctoRELattach(c,module_id)
+            print("m",m)
+            if m is not None and m.isOnline():
+                print("online")
+                from yoctopuce.yocto_relay import YRelay
+                m.set_state(YRelay.STATE_B)
+                #m.set_output(YRelay.OUTPUT_ON)
+        except:
+            pass
+    
+    def yoctoRELoff(self,c,module_id=None):
+        try:
+            m = self.yoctoRELattach(c,module_id)
+            if m is not None and m.isOnline():
+                from yoctopuce.yocto_relay import YRelay
+                m.set_state(YRelay.STATE_A)
+                #m.set_output(YRelay.OUTPUT_OFF)
+        except:
+            pass
+    
+    def yoctoRELflip(self,c,module_id=None):
+        try:
+            m = self.yoctoRELattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.toggle()
+        except:
+            pass
+    
+    def yoctoRELpulse(self,c,delay,duration,module_id=None):
+        try:
+            m = self.yoctoRELattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.delayedPulse(delay,duration)
+        except:
+            pass
+
+    def yoctoRELclose(self):
+        aw.ser.YOCTOrelayOutputs = []
+# this crashs on macOS with "Illegal instruction: 4" once modules were attached:
+#        try:
 #            YAPI.FreeAPI()
 #        except Exception:
 #            pass
@@ -46686,42 +46807,43 @@ class serialport(object):
             return None
             
     def YOCTOimportLIB(self):
-        # import Yoctopuce Python library (installed form PyPI)
-        from yoctopuce.yocto_api import YAPI, YRefParam
-        errmsg=YRefParam()
-        #aw.sendmessage(str(errmsg))
-        YAPI.DisableExceptions
-        ## WINDOWS/Linux DLL HACK BEGIN
-        arch = platform.architecture()[0]
-        machine = platform.machine()
-        libpath = os.path.dirname(sys.executable)
-        if platf == 'Windows' and appFrozen():
-            if arch == '32bit':
-                YAPI._yApiCLibFile = libpath + "\\lib\\yapi.dll"
-            else:
-                YAPI._yApiCLibFile = libpath + "\\lib\\yapi64.dll"
-            YAPI._yApiCLibFileFallback = libpath + "\\lib\\yapi.dll"
-        elif platf == "Linux" and appFrozen():
-            if machine.find("arm") >= 0: # Raspberry
-                YAPI._yApiCLibFile = libpath + "/libyapi-armhf.so"
-                YAPI._yApiCLibFileFallback = libpath + "/libyapi-armel.so"
-            elif machine.find("mips") >= 0:
-                YAPI._yApiCLibFile = libpath + "/libyapi-mips.so"
-                YAPI._yApiCLibFileFallback = ""
-            elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
-                YAPI._yApiCLibFile = libpath + "/libyapi-i386.so"
-                YAPI._yApiCLibFileFallback = libpath + "/libyapi-amd64.so"  # just in case
-            elif machine == 'x86_64':
-                YAPI._yApiCLibFile = libpath + "/libyapi-amd64.so"
-                YAPI._yApiCLibFileFallback = libpath + "/libyapi-i386.so"  # just in case
-        ## WINDOWS/Linux DLL HACK END
-        try:
-            if aw.qmc.yoctoRemoteFlag:
-                YAPI.RegisterHub(aw.qmc.yoctoServerID)
-            else:
-                YAPI.RegisterHub("usb", errmsg)
-        except Exception as e:
-            aw.sendmessage(str(e))
+        if not self.YOCTOlibImported:
+            # import Yoctopuce Python library (installed form PyPI)
+            errmsg=YRefParam()
+            #aw.sendmessage(str(errmsg))
+            YAPI.DisableExceptions
+            ## WINDOWS/Linux DLL HACK BEGIN
+            arch = platform.architecture()[0]
+            machine = platform.machine()
+            libpath = os.path.dirname(sys.executable)
+            if platf == 'Windows' and appFrozen():
+                if arch == '32bit':
+                    YAPI._yApiCLibFile = libpath + "\\lib\\yapi.dll"
+                else:
+                    YAPI._yApiCLibFile = libpath + "\\lib\\yapi64.dll"
+                YAPI._yApiCLibFileFallback = libpath + "\\lib\\yapi.dll"
+            elif platf == "Linux" and appFrozen():
+                if machine.find("arm") >= 0: # Raspberry
+                    YAPI._yApiCLibFile = libpath + "/libyapi-armhf.so"
+                    YAPI._yApiCLibFileFallback = libpath + "/libyapi-armel.so"
+                elif machine.find("mips") >= 0:
+                    YAPI._yApiCLibFile = libpath + "/libyapi-mips.so"
+                    YAPI._yApiCLibFileFallback = ""
+                elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
+                    YAPI._yApiCLibFile = libpath + "/libyapi-i386.so"
+                    YAPI._yApiCLibFileFallback = libpath + "/libyapi-amd64.so"  # just in case
+                elif machine == 'x86_64':
+                    YAPI._yApiCLibFile = libpath + "/libyapi-amd64.so"
+                    YAPI._yApiCLibFileFallback = libpath + "/libyapi-i386.so"  # just in case
+            ## WINDOWS/Linux DLL HACK END
+            try:
+                if aw.qmc.yoctoRemoteFlag:
+                    YAPI.RegisterHub(aw.qmc.yoctoServerID,errmsg)
+                else:
+                    YAPI.RegisterHub("usb", errmsg)
+                self.YOCTOlibImported = True
+            except Exception as e:
+                aw.sendmessage(str(e))
 
     def yoctoTimedCallback(self,_, measure,channel):
         try:
@@ -46738,7 +46860,6 @@ class serialport(object):
             if not self.YOCTOsensor:
                 self.YOCTOimportLIB()
                 try:
-                    from yoctopuce.yocto_api import YAPI
                     from yoctopuce.yocto_temperature import YTemperature
                     YAPI.DisableExceptions
                     # already connected YOCTOsensors?
