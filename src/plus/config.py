@@ -65,7 +65,7 @@ post_compression_threshold = 500 # in bytes (data smaller than this are always s
 
 # Cache and queue parameters
 
-stock_cache_expiration = 1*60 # expiration period in seconds
+stock_cache_expiration = 30 # expiration period in seconds
 
 queue_start_delay = 5 # startup time of queue in seconds
 queue_task_delay = 0.7 # delay between tasks in seconds (cycling interval of the queue)

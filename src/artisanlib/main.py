@@ -8018,6 +8018,8 @@ class tgraphcanvas(FigureCanvas):
         aw.ser.yoctoCOUTclose()
         # close Yocto Relay Outputs
         aw.ser.yoctoRELclose()
+        # close Yocto Servo Outputs
+        aw.ser.yoctoSRERVOclose()
         
         
     def disconnectProbes(self):
@@ -18722,18 +18724,77 @@ class ApplicationWindow(QMainWindow):
                                     aw.ser.phidgetRCveloc(int(channel),float(veloc))
                                 except Exception:
                                     pass
-                            elif cs.startswith('sleep'): # in seconds
+                            elif cs.startswith('sleep('): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):])
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
-                                except Exception:
+                                except:
+                                    pass
+                            
+                            # functions supporting the Yoctopuce RC module
+                            # enabled(c,b[,sn]) with c:int the channel, b a bool (eg. enabled(0,1) or enabled(0,True)), sn the optional modules serial number or logical name
+                            elif cs.startswith('enabled(') and len(cs) > 11:
+                                try:
+                                    cs_split = cs[8:-1].split(',')
+                                    c = int(cs_split[0])
+                                    b = bool(eval(cs_split[1]))
+                                    if len(cs_split) > 2:
+                                        sn = cs_split[2]
+                                        aw.ser.yoctoSERVOenabled(c,b,sn)
+                                    else:
+                                        aw.ser.yoctoSERVOenabled(c,b)
+                                except:
+                                    pass
+                            # move(c,p[,t][,sn]) with p:int the target position, the optional t the duration in ms, sn the optional modules serial number or logical name
+                            elif cs.startswith('move(') and len(cs) > 8:
+                                try:
+                                    cs_split = cs[5:-1].split(',')
+                                    c = int(cs_split[0])
+                                    p = int(cs_split[1])
+                                    if len(cs_split) > 2:
+                                        try:
+                                            t = int(cs_split[2])
+                                            if len(cs_split) > 3:
+                                                aw.ser.yoctoSERVOmove(c,p,t,cs_split[3])
+                                            else:
+                                                aw.ser.yoctoSERVOmove(c,p,t)
+                                        except:
+                                            aw.ser.yoctoSERVOposition(c,p,cs_split[2])
+                                    else:
+                                        aw.ser.yoctoSERVOposition(c,p)
+                                except:
+                                    pass
+                            # neutral(c,n[,sn]) with n an int [0..65000] in us, sn the modules serial number or logical name
+                            elif cs.startswith('neutral(') and len(cs) > 11:
+                                try:
+                                    cs_split = cs[8:-1].split(',')
+                                    c = int(cs_split[0])
+                                    n = int(cs_split[1])
+                                    if len(cs_split) > 2:
+                                        sn = cs_split[1]
+                                        aw.ser.yoctoSERVOneutral(c,n,sn)
+                                    else:
+                                        aw.ser.yoctoSERVOneutral(c,n)
+                                except:
+                                    pass
+                            # range(c,r[,sn]) with r an int in %, sn the modules serial number or logical name
+                            elif cs.startswith('range(') and len(cs) > 8:
+                                try:
+                                    cs_split = cs[6:-1].split(',')
+                                    c = int(cs_split[0])
+                                    r = int(cs_split[1])
+                                    if len(cs_split) > 2:
+                                        sn = cs_split[1]
+                                        aw.ser.yoctoSERVOrange(c,r,sn)
+                                    else:
+                                        aw.ser.yoctoSERVOrange(c,r)
+                                except:
                                     pass
             except Exception:
                 pass
-                
-                
+    
     def calc_env(self):
         # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
         my_env = os.environ.copy()
@@ -42805,7 +42866,7 @@ class serialport(object):
         'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
         'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetAnalogOutHub','PhidgetRCServo','PhidgetBinaryOut',\
         'YOCTOlibImported','YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
-        'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
+        'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
         'externaloutprogram','externaloutprogramFlag']
@@ -42877,6 +42938,7 @@ class serialport(object):
         self.YOCTOvoltageOutputs = []
         self.YOCTOcurrentOutputs = []
         self.YOCTOrelays = []
+        self.YOCTOservos = []
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid = "X"
@@ -46253,7 +46315,6 @@ class serialport(object):
     # it is assumed that the modules two channels do not have custom function names different from
     # relay1, relay2,...
     def yoctoRELattach(self,c,module_id):
-        print("yoctoRELattach",c,module_id)
         # check if Relay object for channel c and module_id is already attached
         relays = aw.ser.YOCTOrelays
         m = next((x for x in relays if 
@@ -46275,10 +46336,7 @@ class serialport(object):
             target = module_id
         YOCTOrelay = YRelay.FindRelay(target + '.relay' + str(c))
         module = YOCTOrelay.get_module()
-        print("module",module)
-        print("before module")
         module.isOnline()
-        print("after module")
         if YOCTOrelay.isOnline():
             aw.ser.YOCTOrelays.append(YOCTOrelay)
             return YOCTOrelay
@@ -46286,12 +46344,9 @@ class serialport(object):
             return None
 
     def yoctoRELon(self,c,module_id=None):
-        print("yoctoRELon",c,module_id)
         try:
             m = self.yoctoRELattach(c,module_id)
-            print("m",m)
             if m is not None and m.isOnline():
-                print("online")
                 from yoctopuce.yocto_relay import YRelay
                 m.set_state(YRelay.STATE_B)
                 #m.set_output(YRelay.OUTPUT_ON)
@@ -46325,12 +46380,105 @@ class serialport(object):
             pass
 
     def yoctoRELclose(self):
-        aw.ser.YOCTOrelayOutputs = []
+        aw.ser.YOCTOrelays = []
 # this crashs on macOS with "Illegal instruction: 4" once modules were attached:
 #        try:
 #            YAPI.FreeAPI()
 #        except Exception:
 #            pass
+
+
+
+#--- Yoctopuce Servo Output
+#  supporting
+#     5 channel Yocto-Servo
+#  commands: 
+#      enabled(c,b[,sn])
+#      move(c,p[,t][,sn])
+#      neutral(c,n[,sn])
+#      range(c,r[,sn])
+#    with c the channel, delay and duration in milliseconds, sn the option module serial number or its logical name as string
+
+    # module_id is a string that is either None, a module serial number or a module logical name
+    # it is assumed that the modules two channels do not have custom function names different from
+    # relay1, relay2,...
+    def yoctoSERVOattach(self,c,module_id):
+        # check if Servo object for channel c and module_id is already attached
+        servos = aw.ser.YOCTOservos
+        m = next((x for x in servos if 
+                x.get_functionId() == "servo"+str(c) and 
+                (module_id is None or module_id == x.get_serialNumber() or module_id == x.get_logicalName())),
+                None)
+        if m is not None:
+            return m
+        # the module/channel is not yet attached search for it
+        self.YOCTOimportLIB() # first import the lib
+        from yoctopuce.yocto_servo import YServo
+        if module_id is None:
+            srv = YServo.FirstServo()
+            if srv is None:
+                return None
+            m = srv.get_module()
+            target = m.get_serialNumber()
+        else:
+            target = module_id
+        YOCTOservo = YServo.FindServo(target + '.servo' + str(c))
+        module = YOCTOservo.get_module()
+        module.isOnline()
+        if YOCTOservo.isOnline():
+            aw.ser.YOCTOservos.append(YOCTOservo)
+            return YOCTOservo
+        else:
+            return None
+
+    def yoctoSERVOenabled(self,c,b,module_id=None):
+        try:
+            m = self.yoctoSERVOattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.enabled(b)
+        except:
+            pass
+
+    def yoctoSERVOposition(self,c,p,module_id=None):
+        try:
+            m = self.yoctoSERVOattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.set_position(p)
+        except:
+            pass
+
+    def yoctoSERVOmove(self,c,p,t,module_id=None):
+        try:
+            m = self.yoctoSERVOattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.move(p,t)
+        except:
+            pass
+
+    def yoctoSERVOneutral(self,c,n,module_id=None):
+        try:
+            m = self.yoctoSERVOattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.neutral(n)
+        except:
+            pass
+
+    def yoctoSERVOrange(self,c,r,module_id=None):
+        try:
+            m = self.yoctoSERVOattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.range(r)
+        except:
+            pass
+
+    def yoctoSERVOclose(self):
+        aw.ser.YOCTOservos = []
+# this crashs on macOS with "Illegal instruction: 4" once modules were attached:
+#        try:
+#            YAPI.FreeAPI()
+#        except Exception:
+#            pass
+
 
 
 #--- Phidget RC (only one supported for now)
