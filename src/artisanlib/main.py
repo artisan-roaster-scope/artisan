@@ -46237,11 +46237,10 @@ class serialport(object):
     
     def yoctoVOUTclose(self):
         aw.ser.YOCTOvoltageOutputs = []
-# this crashs on macOS with "Illegal instruction: 4" once modules were attached:
-#        try:
-#            YAPI.FreeAPI() 
-#        except:
-#            pass
+        try:
+            YAPI.FreeAPI() 
+        except:
+            pass
 
 
 #--- Yoctopuce Current Output (only one supported for now)
@@ -46289,11 +46288,10 @@ class serialport(object):
 
     def yoctoCOUTclose(self):
         aw.ser.YOCTOcurrentOutputs = []
-# this crashs on macOS with "Illegal instruction: 4" once modules were attached:
-#        try:
-#            YAPI.FreeAPI()
-#        except Exception:
-#            pass
+        try:
+            YAPI.FreeAPI() 
+        except:
+            pass
 
 
 #--- Yoctopuce Relay Output
@@ -46381,11 +46379,10 @@ class serialport(object):
 
     def yoctoRELclose(self):
         aw.ser.YOCTOrelays = []
-# this crashs on macOS with "Illegal instruction: 4" once modules were attached:
-#        try:
-#            YAPI.FreeAPI()
-#        except Exception:
-#            pass
+        try:
+            YAPI.FreeAPI() 
+        except:
+            pass
 
 
 
@@ -46473,12 +46470,10 @@ class serialport(object):
 
     def yoctoSERVOclose(self):
         aw.ser.YOCTOservos = []
-# this crashs on macOS with "Illegal instruction: 4" once modules were attached:
-#        try:
-#            YAPI.FreeAPI()
-#        except Exception:
-#            pass
-
+        try:
+            YAPI.FreeAPI() 
+        except:
+            pass
 
 
 #--- Phidget RC (only one supported for now)

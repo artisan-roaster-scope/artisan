@@ -4,7 +4,7 @@ unidecode==1.1.1
 bottle==0.12.18
 qrcode==6.1
 requests==2.22.0
-yoctopuce==1.10.38545
+yoctopuce==1.10.39263
 pefile==2019.4.18
 altgraph==0.16.1
 macholib==1.11
