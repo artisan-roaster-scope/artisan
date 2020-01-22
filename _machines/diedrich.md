@@ -20,3 +20,7 @@ header:
   - all of the 4 Sensor Data Logging Package
   - logging of fuel percentage (Power 0-100%)
   - logging of air dampener (Roast Air)
+
+**Watch out!**
+The datalogging on Diedrich maschines is build around [Phidgets](https://www.phidgets.com/). Ensure you have the latest Phidgets driver v22 for your platform (e.g. [Windows](https://www.phidgets.com/docs/OS_-_Windows), [macOS](https://www.phidgets.com/docs/OS_-_macOS) or [Linux](https://www.phidgets.com/docs/OS_-_Linux)) installed.
+{: .notice--primary}
