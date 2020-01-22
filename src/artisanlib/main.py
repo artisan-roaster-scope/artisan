@@ -1686,7 +1686,7 @@ class tgraphcanvas(FigureCanvas):
         # alarmstate is set to 'not triggered' on reset(). This is needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
         self.alarmstate = []   # <idx>=triggered, -1=not triggered. 
         self.alarmsource = []   # -3=None, -2=DeltaET, -1=DeltaBT, 0=ET , 1=BT, 2=extratemp1[0], 3=extratemp2[0], 4=extratemp2[1],....
-        self.alarmtemperature = []  # set temperature number (example 500)
+        self.alarmtemperature = []  # set temperature number (example 500; can be negative)
         self.alarmaction = []       # -1 = no action; 0 = open a window;
                                     # 1 = call program with a filepath equal to alarmstring; 
                                     # 2 = activate button with number given in description; 
@@ -55246,7 +55246,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         tempedit.setAlignment(Qt.AlignRight)
         tempedit.setMaximumWidth(130)
 #        tempedit.setValidator(QIntValidator(0, 999,tempedit))
-        tempedit.setValidator(aw.createCLocaleDoubleValidator(0., 999.9,1,tempedit))
+        tempedit.setValidator(aw.createCLocaleDoubleValidator(-999.9, 999.9,1,tempedit))
         #action
         actionComboBox = MyQComboBox()
         actionComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
