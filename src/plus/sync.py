@@ -315,14 +315,21 @@ def fetchServerUpdate(uuid,file=None):
 #   don't update the sync cache timestamp here as the changes might not have been submitted to the server yet
         else:
             file_last_modified = None
+        
         if file_last_modified is not None:
             last_modified = "?modified_at=" + str(int(round(file_last_modified*1000)))
         res = connection.getData(config.roast_url + "/" + uuid + last_modified)
         status = res.status_code
+        
         if status == 204: # NO CONTENT: data on server is older then ours
             config.logger.debug("sync:fetchServerUpdate() -> 204 data on server is older")
             #no newer data found on server, do nothing; controller.is_synced() might report an unsynced status
             # if file modification date is newer than what is known on the version from the server via the sync cache
+            
+            if file is not None and getSync(uuid) is None:
+                config.logger.debug("sync: -> file not in sync cache yet, we recuires to fetch the servers modification date and add the profile to the sync cache")
+                # we recurse to get a 200 with the last_modification date from the server for this record to add it to the sync cache automatically
+                fetchServerUpdate(uuid)
             pass
         elif status == 404:
             try:
@@ -340,11 +347,16 @@ def fetchServerUpdate(uuid,file=None):
             config.logger.debug("sync:fetchServerUpdate() -> 200 data on server is newer")
             data = res.json()
             if "result" in data:
-                r = data["result"]                
+                r = data["result"]
                 config.logger.debug("sync: -> fetch: %s",r)
+                
+                if getSync(uuid) is None and "modified_at" in r :
+                    addSync(uuid,util.ISO86012epoch(r["modified_at"]))
+                    config.logger.debug("sync: -> added profile automatically to sync cache")
+                
                 if file_last_modified is not None:
                     config.logger.debug("sync: -> file last_modified date: %s",util.epoch2ISO8601(file_last_modified))
-                if "modified_at" in r and file_last_modified is not None and util.ISO86012epoch(r["modified_at"])>file_last_modified:                    
+                if "modified_at" in r and file_last_modified is not None and util.ISO86012epoch(r["modified_at"])>file_last_modified:
                     applyServerUpdates(r)
                 else:
                     config.logger.debug("sync: -> data received from server was older!?")
@@ -372,11 +384,9 @@ def getUpdate(uuid,file=None):
         aw = config.app_window
         if aw.editgraphdialog is None and controller.is_connected():
             try:
-                sync_cache_timestamp = getSync(uuid)
-                if sync_cache_timestamp is not None:
-                    aw.editgraphdialog = False # block opening the Roast Properties dialog while syncing from the server
-                    aw.updatePlusStatusSignal.emit() # show syncing icon
-                    QTimer.singleShot(2,lambda : fetchServerUpdate(uuid,file))
+                aw.editgraphdialog = False # block opening the Roast Properties dialog while syncing from the server
+                aw.updatePlusStatusSignal.emit() # show syncing icon
+                QTimer.singleShot(2,lambda : fetchServerUpdate(uuid,file))
             except Exception as e:
                 config.logger.error("sync: Exception in getUpdate() %s",e)
 
