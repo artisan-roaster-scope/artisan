@@ -35,7 +35,13 @@ The Yocto IR module features an infrared sensor and communicates as all other Yo
 
 The Yocto Meteo board adds ambient data (temperature, pressure and humidity) automatically to each roast profile. Set the correct MASL for your location under menu Config >> Device, Ambient tab and select this sensor from the popups.
 
-## [Yoctopuce Yocto-0-10V-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-tx)
+
+## [Yoctopuce 4-20mA-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-4-20ma-rx)
+
+The two channel Yocto-4-20mA-Rx device lets you read values returned by any industrial sensor following the 4-20mA standard.
+
+
+## [Yoctopuce 0-10V-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-tx)
 
 *(support for this module is available in Artisan v2.1.3 and later)*
 
@@ -49,7 +55,7 @@ This Yoctopuce output can be activated via `VOUT Command` actions triggered by b
 `sn` which specifies either the modules serial number or its logical name (if `sn` is not given, the first module/channel found is addressed).
 
 
-## [Yoctopuce Yocto-4-20mA-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-4-20ma-tx)
+## [Yoctopuce 4-20mA-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-4-20ma-tx)
 
 *(support for this module is available in Artisan v2.1.3 and later)*
 
@@ -60,6 +66,29 @@ This Yoctopuce output can be activated via `VOUT Command` actions triggered by b
 * `cout(c[,sn])` : with  
 `c` the current [3.0-21.0] in mA, and the optional argument  
 `sn` which specifies either the modules serial number or its logical name (if `sn` is not given, the first module found is addressed).
+
+## [Yoctopuce PWM-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-pwm-tx)
+
+*(support for this module is available in Artisan v2.1.3 and later)*
+
+The Yoctopuce PWM module can be controlled via `PWM Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`).
+
+The supported commands are:
+
+- `enabled(c,b[,sn])` : PWM running state
+- `freq(c,f[,sn])` : PWM frequency
+- `duty(c,d[,sn])` : PWM period
+- `move(c,d,t[,sn])` : changes progressively the PWM to the specified value over the given time interval
+
+with 
+
+- `c` : the channel (1 or 2)
+- `b` : a bool given as 0, 1, False or True
+- `f` : the frequency in Hz as an integer [0-1000000]
+- `d` : the duty cycle in % as a float [0.0-100.0]
+- `t` : the time as an integer in milliseconds
+- `sn` : the modules serial number or its logical name
+
 
 ## Yoctopuce Relays
 
