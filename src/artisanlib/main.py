@@ -1072,6 +1072,7 @@ class tgraphcanvas(FigureCanvas):
                        "+Behmor 78",                #105
                        "Phidget HUB IO 0",          #106
                        "Phidget HUB IO Digital 0",  #107
+                       "Yocto 4-20mA Rx",           #108
                        ]
 
         # ADD DEVICE:
@@ -1104,7 +1105,8 @@ class tgraphcanvas(FigureCanvas):
             99, # Aillio Bullet R1 IBTS/BT
             100, # Yocto IR
             106, # Phidget HUB IO 0
-            107  # Phidget HUB IO Digital 0
+            107, # Phidget HUB IO Digital 0
+            108  # Yocto 4-20mA Rx
         ]
         
         # ADD DEVICE:
@@ -1166,7 +1168,8 @@ class tgraphcanvas(FigureCanvas):
             97, # Phidget DAQ1400 Digital
             98, # Phidget DAQ1400 Voltage
             106, # Phidget HUB IO 0
-            107  # Phidget HUB IO Digital 0
+            107, # Phidget HUB IO Digital 0
+            108  # Yocto 4-20mA Rx
         ]
 
         #extra devices
@@ -7997,7 +8000,7 @@ class tgraphcanvas(FigureCanvas):
                 ser.YOCTOvalues = [[],[]]
                 ser.YOCTOlastvalues = [-1]*2
                 YAPI.FreeAPI()
-            except Exception:
+            except:
                 pass
 
     # close Phidget and and Yocto outputs
@@ -8020,6 +8023,8 @@ class tgraphcanvas(FigureCanvas):
         aw.ser.yoctoRELclose()
         # close Yocto Servo Outputs
         aw.ser.yoctoSRERVOclose()
+        # close Yocto PWM Outputs
+        aw.ser.yoctoPWMclose()
         
         
     def disconnectProbes(self):
@@ -18464,11 +18469,57 @@ class ApplicationWindow(QMainWindow):
                                 elif cs.startswith('pulsehub(') and len(cs)>12 and len(cs)<17:
                                     c,t = cs[9:-1].split(',')
                                     aw.ser.phidgetOUTpulsePWMhub(int(c),int(t))
+                                
                                 elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                     cmds = eval(cs[len('sleep'):])
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
+                                
+                                
+                                # Commands for the YoctoPWM module
+                                
+                                # enabled(c,b[,sn])
+                                elif cs.startswith('enabled') and cs.endswith(")") and len(cs)>11:
+                                    try:
+                                        cs_split = cs[len('enabled('):-1].split(',')
+                                        if len(cs_split) > 2:
+                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),bool(eval(cs_split[1])),cs_split[2])
+                                        else:
+                                            aw.ser.yoctoPWMenabled(int(cs_split[0]),bool(eval(cs_split[1])))
+                                    except Exception:
+                                        pass
+                                # freq(c,f[,sn])
+                                elif cs.startswith('freq') and cs.endswith(")") and len(cs)>8:
+                                    try:
+                                        cs_split = cs[len('freq('):-1].split(',')
+                                        if len(cs_split) > 2:
+                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(cs_split[1]),cs_split[2])
+                                        else:
+                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(cs_split[1]))
+                                    except Exception:
+                                        pass
+                                # duty(c,d[,sn])
+                                elif cs.startswith('duty') and cs.endswith(")") and len(cs)>8:
+                                    try:
+                                        cs_split = cs[len('duty('):-1].split(',')
+                                        if len(cs_split) > 2:
+                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(cs_split[1]),cs_split[2])
+                                        else:
+                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(cs_split[1]))
+                                    except Exception:
+                                        pass
+                                # move(c,d,t[,sn])
+                                elif cs.startswith('move') and cs.endswith(")") and len(cs)>10:
+                                    try:
+                                        cs_split = cs[len('move('):-1].split(',')
+                                        if len(cs_split) > 3:
+                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(cs_split[1]),int(cs_split[2]),cs_split[3])
+                                        else:
+                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(cs_split[1]),int(cs_split[2]))
+                                    except Exception:
+                                        pass
+                            
                             except Exception:
                                 pass
                 elif action == 14: # VOUT Command to drive Phidget/Yocto Output Modules
@@ -18683,7 +18734,7 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                             elif cs.startswith("engaged(") and len(cs) > 11:
-                                # enable(ch,state) # engage channel
+                                # engaged(ch,state) # engage channel
                                 try:
                                     channel,state = cs[len("engaged("):-1].split(',')
                                     aw.ser.phidgetRCengaged(int(channel),bool(int(state)))
@@ -18704,7 +18755,7 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                             elif cs.startswith("volt(") and len(cs) > 8:
-                                # volt(ch,pos) # sets voltage
+                                # volt(ch,v) # sets voltage
                                 try:
                                     channel,volt = cs[len("volt("):-1].split(',')
                                     aw.ser.phidgetRCvoltage(int(channel),float(volt))
@@ -42866,7 +42917,7 @@ class serialport(object):
         'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
         'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetAnalogOutHub','PhidgetRCServo','PhidgetBinaryOut',\
         'YOCTOlibImported','YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
-        'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
+        'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
         'externaloutprogram','externaloutprogramFlag']
@@ -42939,6 +42990,7 @@ class serialport(object):
         self.YOCTOcurrentOutputs = []
         self.YOCTOrelays = []
         self.YOCTOservos = []
+        self.YOCTOpwmOutputs = []
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid = "X"
@@ -43082,6 +43134,7 @@ class serialport(object):
                                    self.BEHMOR_78,            #105
                                    self.PHIDGET_HUB0000_0,    #106
                                    self.PHIDGET_HUB0000_D_0,  #107
+                                   self.YOCTO_generic         #108
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -43909,6 +43962,11 @@ class serialport(object):
     def YOCTO_thermo(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         v2,v1 = self.YOCTOtemperatures(0)
+        return tx,v1,v2
+        
+    def YOCTO_generic(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.YOCTOtemperatures(4)
         return tx,v1,v2
 
     def YOCTO_pt100(self):
@@ -46192,9 +46250,9 @@ class serialport(object):
             aw.ser.PhidgetAnalogOut = None
 
 
-#--- Yoctopuce Voltage Output (only one supported for now)
+#--- Yoctopuce Voltage Output
 #  only supporting 
-#     1 channel Yocto-0-10V-Tx
+#     2 channel Yocto-0-10V-Tx
 #  commands: vout(c,v[,sn]) with c the channel (1 or 2), v voltage in V as a float [0.0-10.0], and sn the modules serial number or its logical name
 
     # module_id is a string that is either None, a module serial number or a module logical name
@@ -46243,7 +46301,7 @@ class serialport(object):
             pass
 
 
-#--- Yoctopuce Current Output (only one supported for now)
+#--- Yoctopuce Current Output
 #  only supporting 
 #     1 channel Yocto-4-20mA-Tx
 #  commands: cout(c[,sn]) with c current in mA as a float [3.0-21.0], and sn the modules serial number or its logical name
@@ -46288,6 +46346,96 @@ class serialport(object):
 
     def yoctoCOUTclose(self):
         aw.ser.YOCTOcurrentOutputs = []
+        try:
+            YAPI.FreeAPI() 
+        except:
+            pass
+
+
+#--- Yoctopuce PWM Output
+#  only supporting 
+#     2 channel Yocto-PWM-Tx
+#  commands:
+#     enabled(c,b[,sn])
+#     freq(c,f[,sn])
+#     duty(c,d[,sn])
+#     move(c,d,t[,sn]) 
+#    with 
+#     c the channel (1 or 2)
+#     b a bool given as 0, 1, False or True
+#     f the frequency in Hz as an integer [0-1000000]
+#     d the duty cycle in % as a float [0.0-100.0]
+#     t the time as an integer in milliseconds
+#     sn the modules serial number or its logical name
+
+    # module_id is a string that is either None, a module serial number or a module logical name
+    # it is assumed that the modules two channels do not have custom function names different from
+    # pwmOutput1 and pwmOutput2
+    def yoctoPWMattach(self,c,module_id):
+        # check if YPwmOutput object for channel c and module_id is already attached
+        pwmOutputs = aw.ser.YOCTOpwmOutputs
+        m = next((x for x in pwmOutputs if 
+                x.get_functionId() == "pwmOutput"+str(c) and 
+                (module_id is None or module_id == x.get_serialNumber() or module_id == x.get_logicalName())),
+                None)
+        if m is not None:
+            return m
+        # the module/channel is not yet attached search for it
+        self.YOCTOimportLIB() # first import the lib
+        from yoctopuce.yocto_pwmoutput import YPwmOutput
+        if module_id is None:
+            vout = YPwmOutput.FirstPwmOutput()
+            if vout is None:
+                return None
+            m = vout.get_module()
+            target = m.get_serialNumber()
+        else:
+            target = module_id
+        YOCTOpwmOutput = YPwmOutput.FindPwmOutput(target + '.pwmOutput' + str(c))
+        if YOCTOpwmOutput.isOnline():
+            aw.ser.YOCTOpwmOutputs.append(YOCTOpwmOutput)
+            return YOCTOpwmOutput
+        else:
+            return None
+    
+    def yoctoPWMenabled(self,c,b,module_id=None):
+        try:
+            m = self.yoctoPWMattach(c,module_id)
+            if m is not None and m.isOnline():
+                from yoctopuce.yocto_pwmoutput import YPwmOutput
+                if b:
+                    m.set_enabled(YPwmOutput.ENABLED_TRUE)
+                else:
+                    m.set_enabled(YPwmOutput.ENABLED_FALSE)
+        except:
+            pass
+    
+    def yoctoPWMsetFrequency(self,c,f,module_id=None):
+        try:
+            m = self.yoctoPWMattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.set_frequency(f) # with f the frequency in Hz as an integer [0-1000000]
+        except:
+            pass
+    
+    def yoctoPWMsetDuty(self,c,d,module_id=None):
+        try:
+            m = self.yoctoPWMattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.set_dutyCycle(d) # d the duty cycle in % as a float [0.0-100.0]
+        except:
+            pass
+    
+    def yoctoPWMmove(self,c,d,t,module_id=None):
+        try:
+            m = self.yoctoPWMattach(c,module_id)
+            if m is not None and m.isOnline():
+                m.dutyCycleMove(d,t) # d the duty cycle in % as a float [0.0-100.0] and t the time as an integer in milliseconds
+        except:
+            pass
+    
+    def yoctoPWMclose(self):
+        aw.ser.YOCTOpwmOutputs = []
         try:
             YAPI.FreeAPI() 
         except:
@@ -46385,7 +46533,6 @@ class serialport(object):
             pass
 
 
-
 #--- Yoctopuce Servo Output
 #  supporting
 #     5 channel Yocto-Servo
@@ -46480,10 +46627,13 @@ class serialport(object):
 #  supporting up to 16 channels like those of the RCC1000
 #  commands: 
 #     pulse(ch,min,max) # sets min/max pulse width
-#     pos(ch,min,max) # sets min/max position
-#     enable(ch,state) # enables channel
-#     set(ch,pos) # sets position
-#     move(ch,pos) # sets position, enables servo, disables servo once target position is reached
+#     pos(ch,min,max)   # sets min/max position
+#     engaged(ch,state) # engage channel
+#     set(ch,pos)       # sets position
+#     ramp(ch,b)        # activates or deactivates the speed ramping state
+#     volt(ch,v)        # set the voltage to one of 5, 6 or 7.4 in Volt
+#     accel(ch,accel)   # set the acceleration 
+#     veloc(ch,v)       # set the velocity
 
     def phidgetRCattach(self,channel):
         if aw.ser.PhidgetRCServo is None:
@@ -46933,26 +47083,34 @@ class serialport(object):
     #   mode=0 => Yocto-Thermocouple
     #   mode=1 => Yocto-Pt100
     #   mode=2 => Yocto-IR
-    #   mode=3 => Yocto-METEO
+    #   mode=3 => Yocto-Meteo
+    #   mode=4 => Yocto-4-20mA-Rx
     # that is not in the list of already connected ones
     def getNextYOCTOsensorOfType(self,mode,connected_yoctos,YOCTOsensor):
-        from yoctopuce.yocto_temperature import YTemperature
+        if mode == 4:
+            from yoctopuce.yocto_genericsensor import YGenericSensor
+        else:
+            from yoctopuce.yocto_temperature import YTemperature
         if YOCTOsensor:
             productName = YOCTOsensor.get_module().get_productName()
             if not (YOCTOsensor.get_module().get_serialNumber() in connected_yoctos) and  \
                 ((mode == 0 and productName == "Yocto-Thermocouple") or (mode == 1 and productName == "Yocto-PT100") or \
                  (mode == 2 and productName == "Yocto-Temperature-IR") or \
-                 (mode == 3 and productName.startswith("Yocto-Meteo"))):
+                 (mode == 3 and productName.startswith("Yocto-Meteo")) or \
+                 (mode == 4 and productName.startswith("Yocto-4-20mA-Rx"))):
                 return YOCTOsensor
             else:
-                return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.nextTemperature(YOCTOsensor))
+                if mode == 4:
+                    return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YGenericSensor.nextGenericSensor(YOCTOsensor))
+                else:
+                    return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.nextTemperature(YOCTOsensor))
         else:
             return None
             
     def YOCTOimportLIB(self):
+        errmsg=YRefParam()
         if not self.YOCTOlibImported:
             # import Yoctopuce Python library (installed form PyPI)
-            errmsg=YRefParam()
             #aw.sendmessage(str(errmsg))
             YAPI.DisableExceptions
             ## WINDOWS/Linux DLL HACK BEGIN
@@ -46979,14 +47137,14 @@ class serialport(object):
                     YAPI._yApiCLibFile = libpath + "/libyapi-amd64.so"
                     YAPI._yApiCLibFileFallback = libpath + "/libyapi-i386.so"  # just in case
             ## WINDOWS/Linux DLL HACK END
-            try:
-                if aw.qmc.yoctoRemoteFlag:
-                    YAPI.RegisterHub(aw.qmc.yoctoServerID,errmsg)
-                else:
-                    YAPI.RegisterHub("usb", errmsg)
-                self.YOCTOlibImported = True
-            except Exception as e:
-                aw.sendmessage(str(e))
+        try:
+            if aw.qmc.yoctoRemoteFlag:
+                YAPI.RegisterHub(aw.qmc.yoctoServerID,errmsg)
+            else:
+                YAPI.RegisterHub("usb", errmsg)
+            self.YOCTOlibImported = True
+        except Exception as e:
+            aw.sendmessage(str(e))
 
     def yoctoTimedCallback(self,_, measure,channel):
         try:
@@ -46997,13 +47155,16 @@ class serialport(object):
             if self.YOCTOsemaphores[channel].available() < 1:
                 self.YOCTOsemaphores[channel].release(1)
     
-    # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe; mode = 2 for IR sensor
+    # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe; mode = 2 for IR sensor; mode = 4 for the Yocto-4-20mA-Rx
     def YOCTOtemperatures(self,mode=0):
         try: 
             if not self.YOCTOsensor:
                 self.YOCTOimportLIB()
                 try:
-                    from yoctopuce.yocto_temperature import YTemperature
+                    if mode == 4:
+                        from yoctopuce.yocto_genericsensor import YGenericSensor
+                    else:
+                        from yoctopuce.yocto_temperature import YTemperature
                     YAPI.DisableExceptions
                     # already connected YOCTOsensors?
                     if not aw.ser.YOCTOsensor:
@@ -47015,7 +47176,10 @@ class serialport(object):
                             connected_yoctos.append(s.YOCTOsensor.get_module().get_serialNumber())
                     
                     # search for the next one of the required type, but not yet connected
-                    self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.FirstTemperature())
+                    if mode == 4:
+                        self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YGenericSensor.FirstGenericSensor())
+                    else:
+                        self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.FirstTemperature())
                     
                     yocto_res = 0.0001 # while 0.001 seems to be the maximum accepted, but just returning mostly 2 decimals!?
                     if mode in [0,2] and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
@@ -47023,9 +47187,9 @@ class serialport(object):
                         self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
                         self.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
                         if mode == 0:
-                            aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None))  
+                            aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None))
                         elif mode == 2:
-                            aw.sendmessage(QApplication.translate("Message","Yocto IR attached",None))  
+                            aw.sendmessage(QApplication.translate("Message","Yocto IR attached",None))
                         # increase the resolution
                         try:
                             self.YOCTOchan1.set_resolution(yocto_res)
@@ -47096,6 +47260,11 @@ class serialport(object):
                             if self.YOCTOthread is None:
                                 self.YOCTOthread = YoctoThread()
                             self.YOCTOthread.start()
+                    elif mode == 4 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
+                        serial=self.YOCTOsensor.get_module().get_serialNumber()
+                        self.YOCTOchan1 = YGenericSensor.FindGenericSensor(serial + '.genericSensor1')
+                        self.YOCTOchan2 = YGenericSensor.FindGenericSensor(serial + '.genericSensor2')
+                        aw.sendmessage(QApplication.translate("Message","Yocto 4-20mA-Rx attached",None))
                 except:
                     if self.YOCTOthread is not None:
                         self.YOCTOthread.join()
@@ -47191,6 +47360,17 @@ class serialport(object):
                         elif aw.qmc.YOCTOchanUnit == "F" and aw.qmc.mode == "C":
                             probe1 = aw.qmc.fromFtoC(probe1)
                 except Exception:
+                    pass
+            elif mode == 4:
+                try:
+                    if self.YOCTOchan1 and self.YOCTOchan1.isOnline():
+                        probe1 = self.YOCTOchan1.get_currentValue()
+                except:
+                    pass
+                try:
+                    if self.YOCTOchan2 and self.YOCTOchan2.isOnline():
+                        probe2 = self.YOCTOchan2.get_currentValue()
+                except:
                     pass
             # apply the emissivity to the IR value
             if mode == 2 and probe1 != -1 and probe2 != -1:
@@ -52149,6 +52329,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 elif meter == "Phidget HUB IO Digital 0":
                     aw.qmc.device = 107
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                elif meter == "Yocto 4-20ma Rx":
+                    aw.qmc.device = 108
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
 
 
                 # ADD DEVICE:
@@ -52273,6 +52457,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 9, # 105
                 1, # 106
                 1, # 107
+                1, # 108
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
