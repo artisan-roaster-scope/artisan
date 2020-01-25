@@ -660,8 +660,7 @@ class AmbientThread(QThread):
             aw.qmc.getAmbientData()
         except:
             pass
-        
-        
+
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
 #######################################################################################
@@ -928,6 +927,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidgetPassword = ""
         self.phidgetPort = 5661
         self.phidgetServerAdded = False # this should be set on PhidgetNetwork.addServer and cleared on PhidgetNetwork.removeServer
+        self.phidgetServiceDiscoveryStarted = False # this should be set on PhidgetNetwork.addServer and cleared on PhidgetNetwork.removeServer
         self.phidgetManager = None
         
         self.probatManager = None
@@ -7640,19 +7640,40 @@ class tgraphcanvas(FigureCanvas):
                 self.extraNoneTempHint2.append(not bool(aw.s7.mode[7]))
             else:
                 self.extraNoneTempHint1.append(False)
-                self.extraNoneTempHint2.append(False)          
+                self.extraNoneTempHint2.append(False)
+
 
     def addPhidgetServer(self):
         if not self.phidgetServerAdded:
             from Phidget22.Net import Net as PhidgetNetwork
-            PhidgetNetwork.addServer("PhidgetServer",self.phidgetServerID,self.phidgetPort,self.phidgetPassword,0)
-            self.phidgetServerAdded = True
+            if self.phidgetServerID == "" and not self.phidgetServiceDiscoveryStarted:
+                try:
+                    # we enable the automatic service discovery if no server host is given
+                    from Phidget22.PhidgetServerType import PhidgetServerType
+                    PhidgetNetwork.enableServerDiscovery(PhidgetServerType.PHIDGETSERVER_DEVICEREMOTE)
+                    self.phidgetServiceDiscoveryStarted = True
+                    aw.sendmessage(QApplication.translate("Message","Phidget service discovery started...", None))
+                except Exception:
+                    pass
+            else:
+                PhidgetNetwork.addServer("PhidgetServer",self.phidgetServerID,self.phidgetPort,self.phidgetPassword,0)
+                self.phidgetServerAdded = True
 
     def removePhidgetServer(self):
         if self.phidgetServerAdded:
             from Phidget22.Net import Net as PhidgetNetwork
-            PhidgetNetwork.removeServer("PhidgetServer")
+            try:
+                PhidgetNetwork.removeServer("PhidgetServer")
+            except:
+                pass
             self.phidgetServerAdded = False
+            if self.phidgetServiceDiscoveryStarted:
+                try:
+                    from Phidget22.PhidgetServerType import PhidgetServerType
+                    PhidgetNetwork.disableServerDiscovery(PhidgetServerType.PHIDGETSERVER_DEVICEREMOTE)
+                    self.phidgetServiceDiscoveryStarted = False
+                except:
+                    pass
             
     def startPhidgetManager(self):
         # this is needed to surpress the message on the ignored Exception
@@ -7690,6 +7711,10 @@ class tgraphcanvas(FigureCanvas):
             self.phidgetManager.close()
             self.phidgetManager = None
         self.removePhidgetServer()
+        
+    def restartPhidgetManager(self):
+        self.stopPhidgetManager()
+        self.startPhidgetManager()
             
     def OnMonitor(self):
         try:
@@ -52578,6 +52603,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 aw.largePIDLCDs_dialog.updateVisiblitiesPID()
             if aw.largeExtraLCDs_dialog:
                 aw.largeExtraLCDs_dialog.reLayout() # names, styles and visibilties might have changed
+            
+            # restart PhidgetManager
+            try:
+                aw.qmc.restartPhidgetManager()
+            except:
+                pass
+            
             aw.qmc.redraw(recomputeAllDeltas=False)
             aw.sendmessage(message)
             #open serial conf Dialog
