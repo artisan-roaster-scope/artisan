@@ -17888,7 +17888,7 @@ class ApplicationWindow(QMainWindow):
                     cmd = value
                 else:
                     cmd = self.eventslidercommands[n]
-                    cmd = cmd.format(value)
+                    cmd = cmd.format(*(tuple([value]*cmd.count("{}"))))
                 self.eventaction(action,cmd)
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
