@@ -842,11 +842,6 @@ class tgraphcanvas(FigureCanvas):
         # NOTE: stat. flavors not used anymore. The code has been removed.
         self.statisticsflags = [1,1,0,1,0,0]
         self.statisticsmode = 1 # one of 0: standard computed values, 1: roast properties
-        #conditions to estimate bad flavor:dry[min,max],mid[min,max],finish[min,max] in seconds
-        self.defaultstatisticsconditions = [180,360,180,600,180,360,180,300]
-        self.statisticsconditions = self.defaultstatisticsconditions
-        #records length in seconds of total time [0], dry phase [1],mid phase[2],finish phase[3], cool phase[4]
-        self.statisticstimes = [0,0,0,0,0]
         
         # Area Under Curve (AUC)
         self.AUCbegin = 1 # counting begins after 0: CHARGE, 1: TP (default), 2: DE, 3: FCs
@@ -3164,8 +3159,7 @@ class tgraphcanvas(FigureCanvas):
                         ts = tx
         
                     # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
-                    if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6] and \
-                        type(aw.qmc.statisticsconditions) is list and len(aw.qmc.statisticsconditions) > 7 and (tx - aw.qmc.timex[aw.qmc.timeindex[6]]) > aw.qmc.statisticsconditions[7]:
+                    if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6]:
                         aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
         
                     timestr = self.stringfromseconds(int(round(ts)))
@@ -23397,11 +23391,6 @@ class ApplicationWindow(QMainWindow):
                 # extend statisticsflag len to the full size (for backward compatibility)
                 for i in range(6 - len(self.qmc.statisticsflags)):
                     self.qmc.statisticsflags.append(0)
-            if settings.contains("StatisticsConds"):
-                tmpconds = [toInt(x) for x in toList(settings.value("StatisticsConds",self.qmc.statisticsconditions))]
-                for i in range(len(tmpconds),len(self.qmc.statisticsconditions)):
-                    tmpconds.append(self.qmc.statisticsconditions[i])
-                self.qmc.statisticsconditions = tmpconds
             if settings.contains("AnalysisResultsLoc"):
                 self.qmc.analysisresultsloc = [toFloat(x) for x in toList(settings.value("AnalysisResultsLoc",self.qmc.analysisresultsloc))]
             if settings.contains("SegmentResultsLoc"):
@@ -24900,7 +24889,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("autoFCs",self.qmc.autoFCsFlag)
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
-            settings.setValue("StatisticsConds",self.qmc.statisticsconditions)
             settings.setValue("AnalysisResultsLoc",aw.qmc.analysisresultsloc)
             settings.setValue("SegmentResultsLoc",aw.qmc.segmentresultsloc)
             settings.setValue("analysisstartchoice",aw.qmc.analysisstartchoice)
@@ -25532,7 +25520,12 @@ class ApplicationWindow(QMainWindow):
                 if self.extraLCDvisibility1[i]:
                     if i < len(self.qmc.extraname1):
                         l1 = "<b>" + self.qmc.extraname1[i] + "</b>"
-                        self.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                        try:
+                            l1 = l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
+                        except:
+                            # substitution might fail if the label contains brackets like in "t{FCS}"
+                            pass
+                        self.extraLCDlabel1[i].setText(l1)
                         self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
                     self.extraLCDframe1[i].setVisible(True)
                     self.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -25541,7 +25534,12 @@ class ApplicationWindow(QMainWindow):
                 if self.extraLCDvisibility2[i]:
                     if i < len(self.qmc.extraname2):
                         l2 = "<b>" + self.qmc.extraname2[i] + "</b>"
-                        self.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                        try:
+                            l2 = l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
+                        except:
+                            # substitution might fail if the label contains brackets like in "t{FCS}"
+                            pass
+                        self.extraLCDlabel2[i].setText(l2)
                         self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
                     self.extraLCDframe2[i].setVisible(True)
                     self.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -42317,7 +42315,6 @@ class StatisticsDlg(ArtisanDialog):
         super(StatisticsDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Statistics",None))
         self.setModal(True)
-        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
         self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None))
         self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None))
         self.ror = QCheckBox(aw.qmc.mode + QApplication.translate("CheckBox","/min",None))
@@ -42326,52 +42323,6 @@ class StatisticsDlg(ArtisanDialog):
         self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Summary",None))
         self.ShowStatsSummary.setChecked(aw.qmc.statssummary)
         self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle
-        self.mindryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))
-        self.mindryedit.setAlignment(Qt.AlignRight)
-        self.mindryedit.setMinimumWidth(60)
-        self.mindryedit.setMaximumWidth(60)
-        self.maxdryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[1]))
-        self.maxdryedit.setAlignment(Qt.AlignRight)
-        self.maxdryedit.setMinimumWidth(60)
-        self.maxdryedit.setMaximumWidth(60)
-        self.minmidedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[2]))
-        self.minmidedit.setAlignment(Qt.AlignRight)
-        self.minmidedit.setMinimumWidth(60)
-        self.minmidedit.setMaximumWidth(60)
-        self.maxmidedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[3]))
-        self.maxmidedit.setAlignment(Qt.AlignRight)
-        self.maxmidedit.setMinimumWidth(60)
-        self.maxmidedit.setMaximumWidth(60)
-        self.minfinishedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[4]))
-        self.minfinishedit.setAlignment(Qt.AlignRight)
-        self.minfinishedit.setMinimumWidth(60)
-        self.minfinishedit.setMaximumWidth(60)
-        self.maxfinishedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[5]))
-        self.maxfinishedit.setAlignment(Qt.AlignRight)
-        self.maxfinishedit.setMinimumWidth(60)
-        self.maxfinishedit.setMaximumWidth(60)
-        self.mincooledit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[6]))
-        self.mincooledit.setAlignment(Qt.AlignRight)
-        self.mincooledit.setMinimumWidth(60)
-        self.mincooledit.setMaximumWidth(60)
-        self.maxcooledit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[7]))
-        self.maxcooledit.setAlignment(Qt.AlignRight)
-        self.maxcooledit.setMinimumWidth(60)
-        self.maxcooledit.setMaximumWidth(60)
-        self.mindryedit.setValidator(QRegExpValidator(regextime,self))
-        self.maxdryedit.setValidator(QRegExpValidator(regextime,self))
-        self.minmidedit.setValidator(QRegExpValidator(regextime,self))
-        self.maxmidedit.setValidator(QRegExpValidator(regextime,self))
-        self.minfinishedit.setValidator(QRegExpValidator(regextime,self))
-        self.maxfinishedit.setValidator(QRegExpValidator(regextime,self))
-        self.mincooledit.setValidator(QRegExpValidator(regextime,self))
-        self.maxcooledit.setValidator(QRegExpValidator(regextime,self))
-        drylabel =QLabel(QApplication.translate("Label", "Drying",None))
-        midlabel =QLabel(QApplication.translate("Label", "Maillard",None))
-        finishlabel =QLabel(QApplication.translate("Label", "Finishing",None))
-        coollabel =QLabel(QApplication.translate("Label", "Cooling",None))
-        minf = QLabel(QApplication.translate("Label", "min",None))
-        maxf = QLabel(QApplication.translate("Label", "max",None))
         #temp fix for possible bug aw.qmc.statisticsflags=[] > empty list out of range
         if aw.qmc.statisticsflags:
             if aw.qmc.statisticsflags[0]:
@@ -42401,10 +42352,6 @@ class StatisticsDlg(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.accept)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        resetButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
-        if aw.locale not in aw.qtbase_locales:
-            resetButton.setText(QApplication.translate("Button","Reset", None))
-        resetButton.clicked.connect(self.initialsettings)
         flagsLayout = QGridLayout()
         flagsLayout.addWidget(self.timez,0,0)
         flagsLayout.addWidget(self.bar,0,1)
@@ -42412,24 +42359,6 @@ class StatisticsDlg(ArtisanDialog):
         flagsLayout.addWidget(self.ts,0,3)
         flagsLayout.addWidget(self.area,0,4)
         flagsLayout.addWidget(self.ShowStatsSummary,0,5)
-        layout = QGridLayout()
-        layout.setAlignment(Qt.AlignTop)
-        layout.addWidget(minf,0,1,Qt.AlignCenter)
-        layout.addWidget(maxf,0,2,Qt.AlignCenter)
-        layout.addWidget(drylabel,1,0,Qt.AlignRight)
-        layout.addWidget(self.mindryedit,1,1)
-        layout.addWidget(self.maxdryedit,1,2)
-        layout.addWidget(midlabel,2,0,Qt.AlignRight)
-        layout.addWidget(self.minmidedit,2,1)
-        layout.addWidget(self.maxmidedit,2,2)
-        layout.addWidget(finishlabel,3,0,Qt.AlignRight)
-        layout.addWidget(self.minfinishedit,3,1)
-        layout.addWidget(self.maxfinishedit,3,2)
-        layout.addWidget(coollabel,4,0,Qt.AlignRight)
-        layout.addWidget(self.mincooledit,4,1)
-        layout.addWidget(self.maxcooledit,4,2)
-        eventsGroupLayout = QGroupBox(QApplication.translate("GroupBox","Evaluation",None))
-        eventsGroupLayout.setLayout(layout)
         
         beginlabel =QLabel(QApplication.translate("Label", "From",None))
         beginitems = [
@@ -42487,12 +42416,12 @@ class StatisticsDlg(ArtisanDialog):
         statsmaxchrperlineGroupLayout.setLayout(statsmaxchrperlineHorizontal)
 
         AUCgrid = QGridLayout()
-        AUCgrid.addWidget(beginlabel,0,0)
+        AUCgrid.addWidget(beginlabel,0,0,Qt.AlignRight)
         AUCgrid.addWidget(self.beginComboBox,0,1,1,2)
-        AUCgrid.addWidget(baselabel,1,0)
+        AUCgrid.addWidget(baselabel,1,0,Qt.AlignRight)
         AUCgrid.addWidget(self.baseedit,1,1)
         AUCgrid.addWidget(self.baseFlag,1,2)
-        AUCgrid.addWidget(targetlabel,2,0)
+        AUCgrid.addWidget(targetlabel,2,0,Qt.AlignRight)
         AUCgrid.addWidget(self.targetedit,2,1)
         AUCgrid.addWidget(self.targetFlag,2,2)
         AUCgrid.addWidget(self.AUClcdFlag,4,1)
@@ -42511,13 +42440,9 @@ class StatisticsDlg(ArtisanDialog):
         vgroupLayout = QVBoxLayout()
         vgroupLayout.addWidget(AUCgroupLayout)
         vgroupLayout.addWidget(statsmaxchrperlineGroupLayout)
-        hgroupLayout = QHBoxLayout()
-        hgroupLayout.addWidget(eventsGroupLayout)
-        hgroupLayout.addLayout(vgroupLayout)
-#        hgroupLayout.addWidget(AUCgroupLayout)
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(displayGroupLayout)
-        mainLayout.addLayout(hgroupLayout)
+        mainLayout.addLayout(vgroupLayout)
         mainLayout.addStretch()
         mainLayout.addLayout(buttonsLayout)
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
@@ -42581,79 +42506,50 @@ class StatisticsDlg(ArtisanDialog):
         aw.qmc.statisticsflags[i] = value
         aw.qmc.redraw(recomputeAllDeltas=False)
 
-    @pyqtSlot(bool)
-    def initialsettings(self,_):
-        aw.qmc.statisticsconditions = aw.qmc.defaultstatisticsconditions
-        self.mindryedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))
-        self.maxdryedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[1]))
-        self.minmidedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[2]))
-        self.maxmidedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[3]))
-        self.minfinishedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[4]))
-        self.maxfinishedit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[5]))
-        self.mincooledit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[6]))
-        self.maxcooledit.setText(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[7]))
-
     @pyqtSlot()
     def accept(self):
-        mindry = aw.qmc.stringtoseconds(str(self.mindryedit.text()))
-        maxdry = aw.qmc.stringtoseconds(str(self.maxdryedit.text()))
-        minmid = aw.qmc.stringtoseconds(str(self.minmidedit.text()))
-        maxmid = aw.qmc.stringtoseconds(str(self.maxmidedit.text()))
-        minfinish = aw.qmc.stringtoseconds(str(self.minfinishedit.text()))
-        maxfinish = aw.qmc.stringtoseconds(str(self.maxfinishedit.text()))
-        mincool = aw.qmc.stringtoseconds(str(self.mincooledit.text()))
-        maxcool = aw.qmc.stringtoseconds(str(self.maxcooledit.text()))
-        if mindry != -1 and maxdry != -1 and minmid != -1 and maxmid != -1 and minfinish != -1 and maxfinish != -1 and mincool != -1 and maxcool != -1:
-            aw.qmc.statsmaxchrperline = self.statsmaxchrperlineedit.value()
-            aw.qmc.AUCbegin = self.beginComboBox.currentIndex()
-            aw.qmc.AUCbase = self.baseedit.value()
-            aw.qmc.AUCbaseFlag = self.baseFlag.isChecked()
-            aw.qmc.AUCtarget = self.targetedit.value()
-            aw.qmc.AUCtargetFlag = self.targetFlag.isChecked()
-            aw.qmc.AUCguideFlag = self.guideFlag.isChecked()
-            aw.qmc.AUClcdFlag = self.AUClcdFlag.isChecked()
-            try:
-                if aw.qmc.TP_time_B:
-                    _,_,auc,_ = aw.ts(tp=aw.qmc.backgroundtime2index(aw.qmc.TP_time_B),background=True)
-                else:
-                    _,_,auc,_ = aw.ts(tp=0,background=True)
-                aw.qmc.AUCbackground = auc
-            except:
-                pass
-            aw.qmc.statisticsconditions[0] = mindry
-            aw.qmc.statisticsconditions[1] = maxdry
-            aw.qmc.statisticsconditions[2] = minmid
-            aw.qmc.statisticsconditions[3] = maxmid
-            aw.qmc.statisticsconditions[4] = minfinish
-            aw.qmc.statisticsconditions[5] = maxfinish
-            aw.qmc.statisticsconditions[6] = mincool
-            aw.qmc.statisticsconditions[7] = maxcool
-            if self.timez.isChecked(): 
-                aw.qmc.statisticsflags[0] = 1
+        aw.qmc.statsmaxchrperline = self.statsmaxchrperlineedit.value()
+        aw.qmc.AUCbegin = self.beginComboBox.currentIndex()
+        aw.qmc.AUCbase = self.baseedit.value()
+        aw.qmc.AUCbaseFlag = self.baseFlag.isChecked()
+        aw.qmc.AUCtarget = self.targetedit.value()
+        aw.qmc.AUCtargetFlag = self.targetFlag.isChecked()
+        aw.qmc.AUCguideFlag = self.guideFlag.isChecked()
+        aw.qmc.AUClcdFlag = self.AUClcdFlag.isChecked()
+        try:
+            if aw.qmc.TP_time_B:
+                _,_,auc,_ = aw.ts(tp=aw.qmc.backgroundtime2index(aw.qmc.TP_time_B),background=True)
             else:
-                aw.qmc.statisticsflags[0] = 0
-                
-            if self.bar.isChecked(): 
-                aw.qmc.statisticsflags[1] = 1
-            else:
-                aw.qmc.statisticsflags[1] = 0
-                
-            if self.area.isChecked(): 
-                aw.qmc.statisticsflags[3] = 1
-            else:
-                aw.qmc.statisticsflags[3] = 0
-                
-            if self.ror.isChecked(): 
-                aw.qmc.statisticsflags[4] = 1
-            else:
-                aw.qmc.statisticsflags[4] = 0
-                
-            if self.ts.isChecked(): 
-                aw.qmc.statisticsflags[5] = 1
-            else:
-                aw.qmc.statisticsflags[5] = 0
-            aw.qmc.redraw(recomputeAllDeltas=False)
-            self.close()
+                _,_,auc,_ = aw.ts(tp=0,background=True)
+            aw.qmc.AUCbackground = auc
+        except:
+            pass
+        if self.timez.isChecked(): 
+            aw.qmc.statisticsflags[0] = 1
+        else:
+            aw.qmc.statisticsflags[0] = 0
+            
+        if self.bar.isChecked(): 
+            aw.qmc.statisticsflags[1] = 1
+        else:
+            aw.qmc.statisticsflags[1] = 0
+            
+        if self.area.isChecked(): 
+            aw.qmc.statisticsflags[3] = 1
+        else:
+            aw.qmc.statisticsflags[3] = 0
+            
+        if self.ror.isChecked(): 
+            aw.qmc.statisticsflags[4] = 1
+        else:
+            aw.qmc.statisticsflags[4] = 0
+            
+        if self.ts.isChecked(): 
+            aw.qmc.statisticsflags[5] = 1
+        else:
+            aw.qmc.statisticsflags[5] = 0
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        self.close()
 
 class extraserialport(object):
     def __init__(self):
