@@ -9501,6 +9501,7 @@ class tgraphcanvas(FigureCanvas):
                                  fontproperties=fontprop_small,
                                  path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                  picker=True,
+                                 zorder=2,
                                  )
                     try:
                         self.met_annotate.set_in_layout(False) # remove suptitle from tight_layout calculation
@@ -30907,11 +30908,6 @@ class ApplicationWindow(QMainWindow):
                 if dim >= 1 or dim <=0:
                     self.qmc.analysisresultsloc = self.qmc.analysisresultsloc_default
 
-            #reset the annotation location if the origin is out of the screen
-            for dim in self.qmc.segmentresultsloc:
-                if dim >= 1 or dim <=0:
-                    self.qmc.segmentresultsloc = self.qmc.segmentresultsloc_default
-
             # create the segement results annotation box
             a = aw.qmc.alpha["statsanalysisbkgnd"]
             fc = aw.qmc.palette["statsanalysisbkgnd"]
@@ -51372,12 +51368,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                             typeComboBox.setCurrentIndex(devices.index(dev_name))
                         except Exception:
                             pass
-                        color1Button = QPushButton(QApplication.translate("Button","Select",None))
+                        color1Button = QPushButton(QApplication.translate("Button",u(aw.qmc.extradevicecolor1[i]),None))
                         color1Button.setFocusPolicy(Qt.NoFocus)
                         color1Button.clicked.connect(self.setextracolor1)
                         textcolor = aw.labelBorW(aw.qmc.extradevicecolor1[i])
                         color1Button.setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor1[i], textcolor))
-                        color2Button = QPushButton(QApplication.translate("Button","Select",None))
+                        color2Button = QPushButton(QApplication.translate("Button",u(aw.qmc.extradevicecolor2[i]),None))
                         color2Button.setFocusPolicy(Qt.NoFocus)
                         color2Button.clicked.connect(self.setextracolor2)
                         textcolor = aw.labelBorW(aw.qmc.extradevicecolor2[i])
