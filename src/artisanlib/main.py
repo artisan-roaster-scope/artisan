@@ -19999,26 +19999,96 @@ class ApplicationWindow(QMainWindow):
         return ''.join(c for c in d(cleanedFilename) if c in validFilenameChars)
     
     
-    def generateFilename(self,prefix=""):
+    def generateFilename(self,prefix="",fakeon=False):
         filename = ""
         try:
-            title = None
-            if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None):
-                title = aw.qmc.title
-            if prefix == "" and title:
-                filename = title
+            if prefix == "":
+                title = None
+                if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None):
+                    title = aw.qmc.title
+                if prefix == "" and title:
+                    filename = title
+                else:
+                    filename = prefix
+                if filename != "":                
+                    filename += "_" + str(aw.qmc.roastdate.toString(u("yy-MM-dd_hhmm")))
+                else:
+                    filename += str(aw.qmc.roastdate.toString(u("yy-MM-dd_hhmm")))
             else:
-                filename = prefix
-            if filename != "":                
-                filename += "_" + str(aw.qmc.roastdate.toString(u("yy-MM-dd_hhmm")))
-            else:
-                filename += str(aw.qmc.roastdate.toString(u("yy-MM-dd_hhmm")))
+                filename = self.parseAutosaveprefix(prefix, fakeon=fakeon)
             filename += ".alog"
             #clean name
             filename = self.removeDisallowedFilenameChars(u(filename))
+            filename = filename.strip()
         except Exception:
             pass
         return filename
+
+    #replace fields delimited as %field% with the corresponding value
+    def parseAutosaveprefix(self,fn,fakeon=False):
+        try:
+            #it's text only when there are no disallowed characters, so add the date for backward compatibility and return.
+            if fn == self.removeDisallowedFilenameChars(u(fn)):
+                fn += '_' + u(self.qmc.roastdate.toString(u("yy-MM-dd_hhmm")))
+                return fn
+
+            #single, leading delimiter for the fields
+            self.fieldDelim = '~'  #note this value is hard coded in autosavefieldsHelpDlg(). 
+            #delimiter for ON only
+            onDelim = "'"
+            #delimiter for OFF only
+            offDelim = '"'
+
+            #newlines can sneak in from cut and paste from help page 
+            fn = fn.replace('\n', '')  
+
+            #if flagon then the batchcounter has not yet been incremented so we do that here
+            if (self.qmc.flagon or fakeon) and self.qmc.batchcounter != -1:
+                bnr = self.qmc.batchcounter + 1
+            else:
+                bnr = self.qmc.roastbatchnr
+
+            #note: since fields are delimited only at the start, to avoid ambiguity requires the shortest field string to be last in the list.  Example, "date_time" must come before "date" in the list.
+            fields = [
+                (QApplication.translate("AutosaveField", "batch_long",None), u(self.qmc.roastbatchprefix) + u(bnr) + ' (' + u(self.qmc.roastbatchpos) + ')'),
+                (QApplication.translate("AutosaveField", "batchprefix",None),u(self.qmc.roastbatchprefix)),
+                (QApplication.translate("AutosaveField", "batchcounter",None),u(bnr) if bnr!='' else '**'),
+                (QApplication.translate("AutosaveField", "batchposition",None),u(self.qmc.roastbatchpos)),
+                (QApplication.translate("AutosaveField", "batch",None), u(self.qmc.roastbatchprefix) + u(bnr)),
+                (QApplication.translate("AutosaveField", "title",None),self.qmc.title),
+                (QApplication.translate("AutosaveField", "datetime_long",None),u(self.qmc.roastdate.toString(u("yyyy-MM-dd_hhmm")))),
+                (QApplication.translate("AutosaveField", "datetime",None),u(self.qmc.roastdate.toString(u("yy-MM-dd_hhmm")))),
+                (QApplication.translate("AutosaveField", "date_long",None),u(self.qmc.roastdate.toString(u("yyyy-MM-dd")))),
+                (QApplication.translate("AutosaveField", "date",None),u(self.qmc.roastdate.toString(u("yy-MM-dd")))),
+                (QApplication.translate("AutosaveField", "time",None),u(self.qmc.roastdate.toString(u("hhmm")))),
+                (QApplication.translate("AutosaveField", "operator",None),u(self.qmc.operator)),
+                (QApplication.translate("AutosaveField", "machine",None),u(self.qmc.roastertype)),
+                (QApplication.translate("AutosaveField", "drumspeed",None),u(self.qmc.drumspeed)),
+                (QApplication.translate("AutosaveField", "weightunits",None),u(self.qmc.weight[2])),
+                (QApplication.translate("AutosaveField", "weight",None),u(self.qmc.weight[0])),
+                (QApplication.translate("AutosaveField", "volumeunits",None),u(self.qmc.volume[2])),
+                (QApplication.translate("AutosaveField", "volume",None),u(self.qmc.volume[0])),
+                (QApplication.translate("AutosaveField", "densityunits",None),u(self.qmc.density[1]) + '_' + u(self.qmc.density[3])),
+                (QApplication.translate("AutosaveField", "density",None),u(self.qmc.density[0])),
+                (QApplication.translate("AutosaveField", "moistureunits",None),QApplication.translate("AutosaveField","pct",None)),
+                (QApplication.translate("AutosaveField", "moisture",None),u(self.qmc.moisture_greens)),
+                ]
+
+            #text between single quotes ' will show only when flagon is True
+            fn = re.sub(rf"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (self.qmc.flagon or fakeon) else re.sub(rf"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
+            #text between double quotes " will show only when flagon is False
+            fn = re.sub(rf'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if not (self.qmc.flagon or fakeon) else re.sub(rf'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
+            #replace the fields with content
+            for i in range(len(fields)):
+                fn = fn.replace(self.fieldDelim + fields[i][0], u(fields[i][1]))
+
+            #cleaning is performed in generateFilename()
+            #fn = self.removeDisallowedFilenameChars(u(fn))
+            #fn = fn.strip()
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " parseAutosaveprefix() {0}").format(str(e)),exc_tb.tb_lineno)
+        return fn
         
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting.
     def automaticsave(self,interactive=True):
@@ -20027,7 +20097,7 @@ class ApplicationWindow(QMainWindow):
                 prefix = ""
                 if self.qmc.autosaveprefix != "":
                     prefix = self.qmc.autosaveprefix
-                if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
+                elif aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
                     prefix += u(aw.qmc.batchprefix) + u(aw.qmc.roastbatchnr)
                 filename = self.generateFilename(prefix=prefix)
                 filename_path = os.path.join(self.qmc.autosavepath,filename)
@@ -22792,10 +22862,10 @@ class ApplicationWindow(QMainWindow):
             if not filename:
                 path = QDir()
                 path.setPath(self.getDefaultPath())
-                if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
+                if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0 and self.qmc.autosaveprefix == "":
                     prefix = u(aw.qmc.batchprefix) + u(aw.qmc.roastbatchnr)
                 else:
-                    prefix = ""
+                    prefix = self.qmc.autosaveprefix
                 fname = path.absoluteFilePath(self.generateFilename(prefix=prefix))
                 filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None), path=fname)
             if filename:
@@ -28408,7 +28478,7 @@ class ApplicationWindow(QMainWindow):
     def autosaveconf(self,_=False):
         dialog = autosaveDlg(self)
         dialog.show()
-        dialog.setFixedSize(dialog.size())
+#        dialog.setFixedSize(dialog.size())
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -37450,7 +37520,18 @@ class autosaveDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Autosave", None))
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
-        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None))
+        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name",None))
+
+        self.prefixEdit.textChanged.connect(self.prefixChanged)
+        prefixpreviewLabel = QLabel()
+        prefixpreviewLabel.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
+        prefixpreviewLabel.setText(u(QApplication.translate("Label", "Preview",None)))
+        prefixpreviewLabel.setToolTip(QApplication.translate("Tooltip","Prefix while recording: ", None) + aw.generateFilename(self.prefixEdit.text(),fakeon=True))
+        prefixpreviewLabel.setToolTipDuration(60000)
+        self.prefixPreview = QLabel(aw.generateFilename(self.prefixEdit.text()))
+        self.prefixPreview.setToolTip(QApplication.translate("Tooltip","Prefix while recording: ", None) + aw.generateFilename(self.prefixEdit.text(),fakeon=True))
+        self.prefixPreview.setToolTipDuration(60000)
+ 
         autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]", None))
         self.autocheckbox = QCheckBox()
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None))
@@ -37465,7 +37546,7 @@ class autosaveDlg(ArtisanDialog):
         self.imageTypesComboBox.setCurrentIndex(imageTypes.index(aw.qmc.autosaveimageformat))
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None)))
+        prefixlabel.setText(u(QApplication.translate("Label", "File Name Prefix",None)))
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.autoChanged)
@@ -37475,9 +37556,13 @@ class autosaveDlg(ArtisanDialog):
         pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(u(aw.qmc.autosavepath))
         self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None))
-
         pathButton.clicked.connect(self.getpath)
+
+        helpButton = QPushButton(QApplication.translate("Button","Help", None))
+        helpButton.clicked.connect(self.autosavehelp)
+
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(helpButton)
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         autolayout = QGridLayout()
@@ -37485,11 +37570,16 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(autochecklabel,0,1)
         autolayout.addWidget(prefixlabel,1,0)
         autolayout.addWidget(self.prefixEdit,1,1,1,2)
-        autolayout.addWidget(pathButton,2,0)
-        autolayout.addWidget(self.pathEdit,2,1,1,2)
-        autolayout.addWidget(self.autopdfcheckbox,3,0,Qt.AlignRight)
-        autolayout.addWidget(autopdflabel,3,1)
-        autolayout.addWidget(self.imageTypesComboBox,3,2)
+        autolayout.addWidget(prefixpreviewLabel,2,0)
+        autolayout.addWidget(self.prefixPreview,2,1)
+        autolayout.addWidget(pathButton,3,0)
+        autolayout.addWidget(self.pathEdit,3,1,1,2)
+        autolayout.addWidget(self.autopdfcheckbox,4,0,Qt.AlignRight)
+        autolayout.addWidget(autopdflabel,4,1)
+        autolayout.addWidget(self.imageTypesComboBox,4,2)
+        autolayout.setColumnStretch(0,0)
+        autolayout.setColumnStretch(1,10)
+        autolayout.setColumnStretch(2,0)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(autolayout)
         mainLayout.addStretch()
@@ -37497,6 +37587,21 @@ class autosaveDlg(ArtisanDialog):
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def autosavehelp(self,_=False):
+        dialog = autosavefieldsHelpDlg(self)
+        #the following line causes the help dialog to obscure the autosave dialog.  the small help window is not desireable, but is better than hiding the autosave dialog.
+        #dialog.resize(600, 500)
+        dialog.show()
+        dialog.activateWindow()
+
+    @pyqtSlot()
+    def prefixChanged(self):
+        preview = aw.generateFilename(self.prefixEdit.text())
+        self.prefixPreview.setText(preview)
+        self.prefixPreview.setToolTip(aw.generateFilename(self.prefixEdit.text(),fakeon=True))
 
     @pyqtSlot(bool)
     def getpath(self,_):
@@ -37513,11 +37618,132 @@ class autosaveDlg(ArtisanDialog):
             aw.sendmessage(message)
         else:
             aw.qmc.autosaveflag = 0
-            message = QApplication.translate("Message","Autosave OFF", None)
+#            message = QApplication.translate("Message","Autosave OFF", None)
+            aw.qmc.autosaveprefix = u(self.prefixEdit.text())
+            message = QApplication.translate("Message","Autosave OFF. Prefix: {0}").format(self.prefixEdit.text())
             aw.sendmessage(message)
         aw.qmc.autosaveimage = self.autopdfcheckbox.isChecked()
         aw.qmc.autosaveimageformat = self.imageTypesComboBox.currentText()
         self.close()
+
+########################################################################################
+#####################  AUTOSAVE FIELDS HELP DLG ########################################
+########################################################################################
+class autosavefieldsHelpDlg(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(autosavefieldsHelpDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Form Caption","Autosave Filename Fields Help",None)) 
+        self.setModal(False)
+        
+        delim = '~'
+
+        tbl = prettytable.PrettyTable()
+        tbl.field_names = [QApplication.translate("Label","Prefix Field",None),
+                           QApplication.translate("Label","Source",None), 
+                           QApplication.translate("Label","Example",None), ]
+
+        tbl.add_row([delim + QApplication.translate("AutosaveField","batchprefix",None),
+                     QApplication.translate("AutosaveField","The batch prefix set in Config>Batch>Prefix",None),
+                     u('Prod-')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","batchcounter",None),
+                     QApplication.translate("AutosaveField","The current batch number",None),
+                     u('653')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","batch",None),
+                     QApplication.translate("AutosaveField","Same as '~batchprefix~batchnum'",None),
+                     u('Prod-653')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","batchposition",None),
+                     QApplication.translate("AutosaveField","The current batch position, or 'Roast of the Day'",None),
+                     u('9')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","batch_long",None),
+                     QApplication.translate("AutosaveField","Same as Batch field in Roast Properties\n'~batchprefix~batchnum (~batchposition)'",None),
+                     u('Prod-653 (9)')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","title",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Title",None),
+                     u('Ethiopia Guji')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","date",None),
+                     QApplication.translate("AutosaveField","Roast date in format yy-MM-dd",None),
+                     u('20-02-05')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","date_long",None),
+                     QApplication.translate("AutosaveField","Roast date in format yyyy-MM-dd",None),
+                     u('2020-02-05')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","time",None),
+                     QApplication.translate("AutosaveField","Roast time in format hhmm",None),
+                     u('1742')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","datetime",None),
+                     QApplication.translate("AutosaveField","Roast date and time in format yy-MM-dd_hhmm",None),
+                     u('20-02-05_1742')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","datetime_long",None),
+                     QApplication.translate("AutosaveField","Roast date and time in format yyyy-MM-dd_hhmm",None),
+                     u('2020-02-05_1742')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","operator",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Operator",None),
+                     u('Dave')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","weight",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Weight Green",None),
+                     u('3.0')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","weightunits",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Weight",None),
+                     u('Kg')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","volume",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Volume Green",None),
+                     u('4.1')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","volumeunits",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Volume",None),
+                     u('l')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","density",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Density Green",None),
+                     u('756.4')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","densityunits",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Density",None),
+                     u('g_l')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","moisture",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Moisture Green",None),
+                     u('11.7')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","moisturetunits",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Moisture",None),
+                     QApplication.translate("AutosaveField",'pct',None)]),
+        tbl.add_row([delim + QApplication.translate("AutosaveField","machine",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Machine",None),
+                     u('SF-6')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","drumspeed",None),
+                     QApplication.translate("AutosaveField","From Roast>Properties>Drum Speed",None),
+                     u('64')])
+
+        helpstr = ""
+        helpstr += "<head><style>"
+        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
+        helpstr += "tr:nth-child(even){background-color: #f2f2f2;}"
+        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #4CAF50;color: white;}"
+        helpstr += "</style></head>"
+        helpstr += "<body>"
+        helpstr += tbl.get_html_string(attributes={"border":"1","padding":"1","border-collapse":"collapse"})
+            
+        helpstr += "<UL>"
+        helpstr += QApplication.translate("AutosaveField","NOTES:",None)
+        helpstr += "<LI>" + QApplication.translate("AutosaveField","Anything between single quotes ' will show in the file name <b>only</b> when ON. \
+Example: 'REC ~batch'",None)
+        helpstr += "<LI>" + QApplication.translate("AutosaveField",'Anything between double quotes " will show in the file name <b>only</b> when OFF. \
+Example: "~operator"',None)
+        helpstr += "<LI>" + QApplication.translate("AutosaveField","Hover the mouse over the Preview field to see a preview of the prefix while the roaster scope is ON.",None)
+        helpstr += "<LI>" + QApplication.translate("AutosaveField","For backward compatibility, when the Prefix field is text only \
+the date and time is appended to the file name.\
+<BR/>Example: 'Autosave' will result in file name 'Autosave_20-01-13_1705'. \
+<BR/>To prevent this place a single '!' at the start of the Prefix field.\
+<BR/> Example: '!Autosave' will result in file name 'Autosave'.",None)
+        helpstr += "<LI>" + QApplication.translate("AutosaveField","To maintain cross platform compatibility, file names may contain only letters, numbers, spaces, \
+and the following special characters:<br/>_-.()",None)
+        helpstr += "</UL>"
+        helpstr += "<br/>"
+        helpstr += "</body>"
+
+        phelp = QTextEdit()
+        phelp.setHtml(helpstr)
+        phelp.setReadOnly(True)
+
+        hLayout = QVBoxLayout()
+        hLayout.addWidget(phelp)        
+        self.setLayout(hLayout)
+
 
 ##########################################################################
 #####################  BATCH DLG  ########################################
