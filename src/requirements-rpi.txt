@@ -5,7 +5,7 @@
 # websocket has to be requested after the pywheel version of gevent)
 gevent==1.4.0
 gevent-websocket==0.10.1
-numpy==1.18.0 #1.17.4
+numpy==1.18.1
 colorspacious==1.1.2 # depends on numpy thus needs to be put after
 scipy==1.3.3 # 1.3.2
 matplotlib==3.0.3 # 3.1.x requires Python 3.7, stretch comes with Python 3.5.3 only
@@ -14,4 +14,4 @@ openpyxl==2.6.4 # openpyxl >=3.0.0 requires Python >=3.6 while TravisCI RPi runs
 pyinstaller==3.3.1 # 3.5 seems to hang!?
 cffi==1.12.3 # 1.13.2 fails, 1.12.3 is needed by crypto v2.5
 cryptography==2.5 # 2.8 fails with libcrypto.so.1.1: version `OPENSSL_1_1_0j' not found, required by cryptography.hazmat.bindings._openssl.so
-keyring==19.2.0  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
+keyring==19.2.0  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller; Python 3.5 support was dropped

@@ -188,6 +188,7 @@ from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
 from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
+from artisanlib.cropster import extractProfileCropsterXLS
 
 from yoctopuce.yocto_api import YAPI, YRefParam
 
@@ -827,7 +828,7 @@ class tgraphcanvas(FigureCanvas):
         self.phases_celsius_defaults = [150,150,200,230]
         self.phases = list(self.phases_fahrenheit_defaults) # contains either the phases_filter or phases_espresso, depending on the mode
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
-        self.phasesbuttonflag = False #False no change; True make the DRY and FC buttons change the phases during roast automatically
+        self.phasesbuttonflag = True #False no change; True make the DRY and FC buttons change the phases during roast automatically
         self.phasesfromBackgroundflag = False # False: no change; True: set phases from background profile on load
         self.watermarksflag = True
 
@@ -3685,7 +3686,7 @@ class tgraphcanvas(FigureCanvas):
                     # 1 Damper or fan. Heating by convection is _faster_ than heat by conduction,
                     # 2 Mass of beans. The heavier the mass, the _slower_ the heating of BT
                     # 3 Gas or electric power: gas heats BT _faster_ because of hoter air.
-                    # Every roaster will have a different constantN.
+                    # Every roaster will have a different constantN (self.projectionconstant).
 
                     den = self.ctemp1[-1] - self.ctemp2[-1]  #denominator ETn - BTn 
                     if den > 0 and len(aw.qmc.delta2)>0 and aw.qmc.delta2[-1]: # if ETn > BTn
@@ -5040,7 +5041,7 @@ class tgraphcanvas(FigureCanvas):
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
                         if aw.qmc.graphfont == 1:
                             st1 = toASCII(st1)
-                        e = 0
+                        e = 15
                         a = 1.  
                     anno_artists += self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable)
                 
@@ -5049,7 +5050,7 @@ class tgraphcanvas(FigureCanvas):
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),u(self.stringfromseconds(timex[TP_index]-t0,False)))
                     a = 1.
-                    e = 0
+                    e = -50
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,)
                 elif TP_time > -1:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
@@ -5057,7 +5058,7 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-                    e = -60
+                    e = -70
                     TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
                     
                     TP_time = TP_time - t0
@@ -13006,37 +13007,41 @@ class ApplicationWindow(QMainWindow):
 
         self.importMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_IMPORT)
 
-        fileImportCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
+        fileImportCSVAction = QAction("Artisan CSV...",self)
         fileImportCSVAction.triggered.connect(self.fileImportCSV)
         self.importMenu.addAction(fileImportCSVAction)
 
-        fileImportJSONAction = QAction(QApplication.translate("Menu", "Artisan JSON...",None),self)
+        fileImportJSONAction = QAction("Artisan JSON...",self)
         fileImportJSONAction.triggered.connect(self.fileImportJSON)
         self.importMenu.addAction(fileImportJSONAction)
         
         self.importMenu.addSeparator()
 
-        importBulletAction = QAction(QApplication.translate("Menu", "Aillio Roastime...",None),self)
+        importBulletAction = QAction("Aillio Roastime...",self)
         importBulletAction.triggered.connect(self.importBullet)
         self.importMenu.addAction(importBulletAction)
 
-        importHH506RAAction = QAction(QApplication.translate("Menu", "HH506RA...",None),self)
+        importCropsterAction = QAction("Cropster XLS...",self)
+        importCropsterAction.triggered.connect(self.importCropster)
+        self.importMenu.addAction(importCropsterAction)
+
+        importHH506RAAction = QAction("HH506RA...",self)
         importHH506RAAction.triggered.connect(self.importHH506RA)
         self.importMenu.addAction(importHH506RAAction)
 
-        importK202Action = QAction(QApplication.translate("Menu", "K202...",None),self)
+        importK202Action = QAction("K202...",self)
         importK202Action.triggered.connect(self.importK202)
         self.importMenu.addAction(importK202Action)
 
-        importK204Action = QAction(QApplication.translate("Menu", "K204...",None),self)
+        importK204Action = QAction("K204...",self)
         importK204Action.triggered.connect(self.importK204)
         self.importMenu.addAction(importK204Action)
 
-        importPilotAction = QAction(QApplication.translate("Menu", "Probat Pilot...",None),self)
+        importPilotAction = QAction("Probat Pilot...",self)
         importPilotAction.triggered.connect(self.importPilot)
         self.importMenu.addAction(importPilotAction)
 
-        fileImportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
+        fileImportRoastLoggerAction = QAction("RoastLogger...",self)
         fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
         self.importMenu.addAction(fileImportRoastLoggerAction)
 
@@ -16462,31 +16467,37 @@ class ApplicationWindow(QMainWindow):
 
 
     def autoAdjustAxis(self,background=False):
-        if aw.qmc.autotimex:
-            # auto adjust
-            if background:
-                t_min,t_max = aw.calcAutoAxisBackground()
-            else:
-                t_min,t_max = aw.calcAutoAxis()
-                
-            if aw.qmc.background:
-                _,t_max_b = aw.calcAutoAxisBackground()
-                if aw.qmc.timeindexB[0] != -1:
-                    t_max = max(t_max,t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]])
+        try:
+            if aw.qmc.autotimex:
+                # auto adjust
+                if background:
+                    t_min,t_max = aw.calcAutoAxisBackground()
                 else:
-                    t_max = max(t_max,t_max_b)
-            
-            if background and aw.qmc.timeindexB[0] != -1:
-                aw.qmc.startofx = t_min - aw.qmc.timeB[aw.qmc.timeindexB[0]]
-            else:
-                aw.qmc.startofx = t_min
-            
-            if not background and aw.qmc.timeindex[0] != -1:
-                aw.qmc.endofx = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
-            elif background and aw.qmc.timeindexB[0] != -1:
-                aw.qmc.endofx = t_max - aw.qmc.timeB[aw.qmc.timeindexB[0]]
-            else:
-                aw.qmc.endofx = t_max
+                    t_min,t_max = aw.calcAutoAxis()
+                    
+                if aw.qmc.background:
+                    _,t_max_b = aw.calcAutoAxisBackground()
+                    if aw.qmc.timeindexB[0] != -1:
+                        t_max = max(t_max,t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]])
+                    else:
+                        t_max = max(t_max,t_max_b)
+                
+                if background and aw.qmc.timeindexB[0] != -1:
+                    aw.qmc.startofx = t_min - aw.qmc.timeB[aw.qmc.timeindexB[0]]
+                else:
+                    aw.qmc.startofx = t_min
+                
+                if not background and aw.qmc.timeindex[0] != -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
+                    aw.qmc.endofx = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
+                elif background and aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
+                    aw.qmc.endofx = t_max - aw.qmc.timeB[aw.qmc.timeindexB[0]]
+                else:
+                    aw.qmc.endofx = t_max
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " autoAdjustAxis() {0}").format(str(e)),exc_tb.tb_lineno)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -21891,7 +21902,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]] + self.qmc.extradevicecolor2[len(profile["extradevicecolor2"]):]
                     
                 # ensure that extra list length are of the size of the extradevices:
-                self.ensureCorrectExtraDeviceListLenght()                 
+                self.ensureCorrectExtraDeviceListLenght()
                                         
                 if "extramarkersizes1" in profile:
                     self.qmc.extramarkersizes1 = profile["extramarkersizes1"] + self.qmc.extramarkersizes1[len(profile["extramarkersizes1"]):]
@@ -22273,7 +22284,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.startofx = self.qmc.timex[aw.qmc.timeindex[0]] + self.qmc.locktimex_start
                     else:
                         self.qmc.startofx = self.qmc.locktimex_start
-            elif len(profile) > 0:
+            elif len(profile) > 0 and ("startend" in profile or "dryend" in profile or "cracks" in profile):
                 ###########      OLD PROFILE FORMAT
                 if "startend" in profile:
                     startend = [float(fl) for fl in profile["startend"]]
@@ -27272,7 +27283,7 @@ class ApplicationWindow(QMainWindow):
                     datetime_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(aw.qmc.roastUUID),datetime_html)
             if aw.qmc.background and aw.qmc.titleB is not None and aw.qmc.titleB != "" and aw.qmc.backgroundUUID is not None and plus.register.getPath(aw.qmc.backgroundUUID):
                 background_html = '<a href="artisan://roast/' + aw.qmc.backgroundUUID + '">' + background_html + "</a>"
-            if beans_html is not None and beans_html is not "" and aw.qmc.plus_coffee is not None:
+            if beans_html is not None and beans_html != "" and aw.qmc.plus_coffee is not None:
                 beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(aw.qmc.plus_coffee),beans_html)
                 # note that blends are hard to link back as it requires to link component by component
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -29644,7 +29655,43 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " self.importBullet() {0}").format(str(ex)),exc_tb.tb_lineno)
-        
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importCropster(self,_=False):
+        try:
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import Cropster XLS", None),ext="*.xls")
+            if len(filename) == 0:
+                return
+            res = aw.qmc.reset(redraw=False,soundOn=False)
+            if res:
+                obj = extractProfileCropsterXLS(filename)
+                res = self.setProfile(filename,obj)
+
+            if res:
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                #update etypes combo box
+                self.etypeComboBox.clear()
+                self.etypeComboBox.addItems(self.qmc.etypes)
+                # profiles was adjusted, ensure that it does not overwrite the original file on saving
+                self.qmc.fileDirty()
+                self.curFile = None
+                #Plot everything
+                self.qmc.redraw()
+                message = u(QApplication.translate("Message","{0}  imported ", None).format(u(filename)))
+                self.sendmessage(message)
+
+        except IOError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importCropster(): {0}").format(str(ex)))
+        except ValueError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importCropster(): {0}").format(str(ex)))
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCropster() {0}").format(str(ex)),exc_tb.tb_lineno)
+
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def importHH506RA(self,_=False):

@@ -6,8 +6,8 @@ qrcode==6.1
 requests==2.22.0
 yoctopuce==1.10.39263
 pefile==2019.4.18
-altgraph==0.16.1
-macholib==1.11
+altgraph==0.17
+macholib==1.14
 python-snap7==0.10
 pyusb==1.0.2
 setuptools==42.0.2
@@ -16,3 +16,4 @@ portalocker==1.5.2
 prettytable==0.7.2
 Phidget22==1.5.20191113
 natsort==6.2.0
+xlrd==1.2.0

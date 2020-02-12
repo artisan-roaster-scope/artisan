@@ -1,11 +1,11 @@
 gevent==1.4.0
 gevent-websocket==0.10.1
-numpy==1.18.0 # 1.17.4
+numpy==1.18.1
 colorspacious==1.1.2
 scipy==1.4.1 # 1.3.1
 matplotlib==3.1.3
 PyQt5==5.13.2
-openpyxl==3.0.2
+openpyxl==3.0.3
 pyinstaller==3.6
 #jeepney==0.4
 #cryptography==2.6.1
