@@ -17069,7 +17069,7 @@ class ApplicationWindow(QMainWindow):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curvesimilatrity(): {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " curveSimilatrity2(): {0}").format(str(e)),exc_tb.tb_lineno)
         return result
 
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
@@ -20049,6 +20049,13 @@ class ApplicationWindow(QMainWindow):
             else:
                 bnr = self.qmc.roastbatchnr
 
+            #grab the first line of the beens field
+            firstline = re.match(r'([^\n]*)',self.qmc.beans)
+            if firstline:
+                beansline = firstline.group(0)
+            else:
+                beansline = ""
+
             #note: since fields are delimited only at the start, to avoid ambiguity requires the shortest field string to be last in the list.  Example, "date_time" must come before "date" in the list.
             fields = [
                 (QApplication.translate("AutosaveField", "batch_long",None), u(self.qmc.roastbatchprefix) + u(bnr) + ' (' + u(self.qmc.roastbatchpos) + ')'),
@@ -20073,6 +20080,8 @@ class ApplicationWindow(QMainWindow):
                 (QApplication.translate("AutosaveField", "density",None),u(self.qmc.density[0])),
                 (QApplication.translate("AutosaveField", "moistureunits",None),QApplication.translate("AutosaveField","pct",None)),
                 (QApplication.translate("AutosaveField", "moisture",None),u(self.qmc.moisture_greens)),
+                (QApplication.translate("AutosaveField", "beans_line",None),u(beansline)),
+                (QApplication.translate("AutosaveField", "beans",None),u(beansline[:30])),
                 ]
 
             #text between single quotes ' will show only when flagon is True
@@ -37656,6 +37665,12 @@ class autosavefieldsHelpDlg(ArtisanDialog):
         tbl.add_row([delim + QApplication.translate("AutosaveField","title",None),
                      QApplication.translate("AutosaveField","From Roast>Properties>Title",None),
                      u('Ethiopia Guji')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","beans",None),
+                     QApplication.translate("AutosaveField","The first 30 characters of the first line\nFrom Roast>Properties>Beans",None),
+                     u('Ethiopia Guji purchased from R')])
+        tbl.add_row([delim + QApplication.translate("AutosaveField","beans_line",None),
+                     QApplication.translate("AutosaveField","The entire first line\nFrom Roast>Properties>Beans",None),
+                     u('Ethiopia Guji purchased from Royal')])
         tbl.add_row([delim + QApplication.translate("AutosaveField","date",None),
                      QApplication.translate("AutosaveField","Roast date in format yy-MM-dd",None),
                      u('20-02-05')])
