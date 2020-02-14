@@ -37724,7 +37724,7 @@ class autosavefieldsHelpDlg(ArtisanDialog):
         helpstr += "<head><style>"
         helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
         helpstr += "tr:nth-child(even){background-color: #f2f2f2;}"
-        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #4CAF50;color: white;}"
+        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
         helpstr += "</style></head>"
         helpstr += "<body>"
         helpstr += tbl.get_html_string(attributes={"border":"1","padding":"1","border-collapse":"collapse"})
