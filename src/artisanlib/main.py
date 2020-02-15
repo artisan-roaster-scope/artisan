@@ -44,7 +44,7 @@ import time as libtime
 import datetime
 import warnings
 import string as libstring
-import cgi
+import html as htmllib
 import numpy
 import subprocess
 import shlex
@@ -27213,7 +27213,7 @@ class ApplicationWindow(QMainWindow):
             rcParams['path.effects'] = []
             with open(u(self.getResourcePath() + 'roast-template.htm'), 'r') as myfile:
                 HTML_REPORT_TEMPLATE=myfile.read()
-            beans_html = u(cgi.escape(self.qmc.beans))
+            beans_html = u(htmllib.escape(self.qmc.beans))
             if len(beans_html) > 43:
                 beans_html = u(beans_html[:41] + "&hellip;")
                 
@@ -27355,7 +27355,7 @@ class ApplicationWindow(QMainWindow):
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + u(" ")
             datetime_html=u(self.qmc.roastdate.date().toString()) + ", " + u(self.qmc.roastdate.time().toString()[:-3])
             # add artisan or artisan.plus links to title, background and beans if possible
-            title_html = u(cgi.escape(batch)) + u(cgi.escape(self.qmc.title))
+            title_html = u(htmllib.escape(batch)) + u(htmllib.escape(self.qmc.title))
             if aw.qmc.roastUUID is not None and aw.qmc.roastUUID != "":
                 if plus.register.getPath(aw.qmc.roastUUID):
                     title_html = '<a href="artisan://roast/' + aw.qmc.roastUUID + '">' + title_html + "</a>"
@@ -27381,9 +27381,9 @@ class ApplicationWindow(QMainWindow):
                 volume_label=u(QApplication.translate("HTML Report Template", "Volume:", None)),
                 volume=volume,
                 roaster_label=u(QApplication.translate("HTML Report Template", "Roaster:", None)),
-                roaster=u(cgi.escape(self.qmc.roastertype)),
+                roaster=u(htmllib.escape(self.qmc.roastertype)),
                 operator_label=u(QApplication.translate("HTML Report Template", "Operator:", None)),
-                operator=u(cgi.escape(self.qmc.operator)),
+                operator=u(htmllib.escape(self.qmc.operator)),
                 cup_label=u(QApplication.translate("HTML Report Template", "Cupping:", None)),
                 cup=u(str(aw.float2float(self.cuppingSum(self.qmc.flavors)))),
                 color_label=u(QApplication.translate("HTML Report Template", "Color:", None)),
@@ -34312,7 +34312,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.ble = None # the BLE interface
         self.scale_weight = None # weight received from a connected scale
         self.scale_battery = None # battery level of the connected scale in %
-        self.scale_set = None # set weight for accumulation
+        self.scale_set = None # set weight for accumulation in g
         
         self.disconnecting = False # this is set to True to terminate the scale connection
         self.volumedialog = None # link forward to the the Volume Calculator
@@ -35389,7 +35389,17 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.scale_set is None or weight is None:
             self.scaleWeightAccumulated.setText("")
         else:
-            self.scaleWeightAccumulated.setText("{0:.1f}g".format(weight + self.scale_set))
+            v = weight + self.scale_set
+            if aw.qmc.weight_units.index(aw.qmc.weight[2]) in [0,1]:
+                if v > 1000:
+                    v_formatted = "{0:.2f}kg".format(v/1000)
+                else:
+                    v_formatted = "{0:.1f}g".format(v)
+            # non-metric
+            else:
+                v = aw.convertWeight(v,0,aw.qmc.weight_units.index(aw.qmc.weight[2]))
+                v_formatted = "{0:.2f}{1}".format(v,aw.qmc.weight[2])
+            self.scaleWeightAccumulated.setText(v_formatted)
 
     def ble_scan_failed(self):
 #        import datetime
@@ -35421,7 +35431,18 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception:
             pass
         if self.scale_weight is not None and tare is not None:
-            self.scaleWeight.setText("{0:.1f}g".format(self.scale_weight - tare))
+            v = self.scale_weight - tare # weight in g
+            if aw.qmc.weight_units.index(aw.qmc.weight[2]) in [0,1]:
+                # metric
+                if v > 1000:
+                    v_formatted = "{0:.2f}kg".format(v/1000)
+                else:
+                    v_formatted = "{0:.1f}g".format(v)
+            # non-metric
+            else:
+                v = aw.convertWeight(v,0,aw.qmc.weight_units.index(aw.qmc.weight[2]))
+                v_formatted = "{0:.2f}{1}".format(v,aw.qmc.weight[2])
+            self.scaleWeight.setText(v_formatted)
             self.updateScaleWeightAccumulated(self.scale_weight - tare)
         else:
             self.scaleWeight.setText("")
@@ -36314,7 +36335,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 new_w = w
             else:
                 new_w = current_w + w # we add the new weight to the already existing one!
-                self.scale_set = new_w
+                self.scale_set = aw.convertWeight(new_w,aw.qmc.weight_units.index(aw.qmc.weight[2]),0) # convert to weight units
 #            weight_edit.setText("%g" % aw.float2float(new_w))
             # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problems
             # a QApplication.processEvents() or an weight_edit.update() seems not to help
