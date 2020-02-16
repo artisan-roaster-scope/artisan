@@ -1427,7 +1427,7 @@ class tgraphcanvas(FigureCanvas):
         self.roastbatchnr = 0 # batch number of the roast; if roastbatchnr=0, prefix/counter is hidden/inactiv (initialized to 0 on roast START)
         self.roastbatchprefix = self.batchprefix # batch prefix of the roast
         self.roastbatchpos = 1 # position of the roast in the roast session (first batch, second batch,..)
-        self.roasttzoffset = libtime.timezone # timezone offset to be added to roastepoch to get time in local timezone
+        self.roasttzoffset = libtime.timezone # timezone offset to be added to roastepoch to get time in local timezone; NOTE: this is not set/updated on loading a .alog profile!
         # profile UUID
         self.roastUUID = None
         
@@ -8881,7 +8881,7 @@ class tgraphcanvas(FigureCanvas):
                             # update ambient temperature if a ambient temperature source is configured and no value yet established
                             aw.qmc.updateAmbientTempFromPhidgetModulesOrCurve()
                         except Exception:
-                            pass                        
+                            pass
 
 #PLUS
                         # only on first setting the DROP event (not set yet and no previous DROP undone), we upload to PLUS
@@ -22203,6 +22203,11 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.roastdate = QDateTime(date)
                     else:
                         self.qmc.roastdate = QDateTime(date)
+                except Exception:
+                    pass
+            if "roastepoch" in profile:
+                try:
+                   self.qmc.roastdate = QDateTime.fromTime_t(profile["roastepoch"])
                 except Exception:
                     pass
             if "roastUUID" in profile:
