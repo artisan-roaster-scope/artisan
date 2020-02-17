@@ -16883,7 +16883,7 @@ class ApplicationWindow(QMainWindow):
                 maxdelta = numpy.max(np_dbt - np_dbtb)
                 mindelta = numpy.min(np_dbt - np_dbtb)
 
-                # calculate the flicks and crashes
+                # calculate the rise, crash and flick
                 #create array of differences between actual curve and the fit curve
                 deltas_all = numpy.array(np_dbt - np_dbtb)
                 #array indicating actual curve is greater than fit curve (+1) or is less than (-1)
@@ -17019,7 +17019,7 @@ class ApplicationWindow(QMainWindow):
                 if len(mask) > 1:
                     tbl.add_row(['~~~~~','~~~~~','~~~~~','~~~~~','~~~~~'])
                     tbl.add_row([ioi_start, ioi_duration, ioi_maxdelta, '-', ioi_abcprime ])
-                segmentresultstr = QApplication.translate("Label","Segment Analysis (flick and crash)",None) + "\n"
+                segmentresultstr = QApplication.translate("Label","Segment Analysis (rise, crash and flick)",None) + "\n"
                 segmentresultstr += tbl.get_string(border=True)
 
                 # build table of general information
@@ -30674,7 +30674,8 @@ class ApplicationWindow(QMainWindow):
             self.sendmessage(QApplication.translate("Error Message", "Analyze: no profile data available", None))
             return
 
-        #Turn off background annotations
+        #Save the background annotations setting and then disable
+        orig_backgroundDetails = self.qmc.backgroundDetails
         self.qmc.backgroundDetails = False
         
         #prevent accidental overwrite of the original file 
@@ -30849,6 +30850,8 @@ class ApplicationWindow(QMainWindow):
 
         progress.cancel()
         progress = None
+        #restore the background annotations setting
+        self.qmc.backgroundDetails = orig_backgroundDetails
     
     # returns True as first result if draggable text box artist is contained in the given events region and
     # and it is the one in the region with the highest z-order, otherwise False
