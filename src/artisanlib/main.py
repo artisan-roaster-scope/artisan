@@ -19457,6 +19457,7 @@ class ApplicationWindow(QMainWindow):
         self.importMenu.setEnabled(True) # import
         self.fileSaveAction.setEnabled(True)
         self.fileSaveAsAction.setEnabled(True)
+        self.fileSaveCopyAsAction.setEnabled(True)
         self.exportMenu.setEnabled(True)
         self.saveGraphMenu.setEnabled(True)
         self.importMenu.setEnabled(True) # roast
@@ -19503,6 +19504,7 @@ class ApplicationWindow(QMainWindow):
         self.importMenu.setEnabled(False) # import
         self.fileSaveAction.setEnabled(False)
         self.fileSaveAsAction.setEnabled(False)
+        self.fileSaveCopyAsAction.setEnabled(False)
         self.exportMenu.setEnabled(False)
         if not wheel:
             self.saveGraphMenu.setEnabled(False)
@@ -22207,7 +22209,7 @@ class ApplicationWindow(QMainWindow):
                     pass
             if "roastepoch" in profile:
                 try:
-                   self.qmc.roastdate = QDateTime.fromTime_t(profile["roastepoch"])
+                    self.qmc.roastdate = QDateTime.fromTime_t(profile["roastepoch"])
                 except Exception:
                     pass
             if "roastUUID" in profile:
@@ -34591,7 +34593,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             dateedit.setStyleSheet("background-color: #eeeeee;")
         #Batch
         batchlabel = QLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
-        if aw.superusermode and aw.qmc.batchcounter > -1:
+        if aw.superusermode: # and aw.qmc.batchcounter > -1:
             self.batchprefixedit = QLineEdit(u(aw.qmc.roastbatchprefix))
             self.batchcounterSpinBox = QSpinBox()
             self.batchcounterSpinBox.setRange(0,999999)
