@@ -26,6 +26,7 @@
 import requests
 import gzip
 import json
+import datetime
 
 #import keyring.backends.file
 #import keyring.backends.Gnome
@@ -190,17 +191,25 @@ def authentify():
                                 config.app_window.plus_paidUntil = util.ISO86012datetime(paidUntil)
                         except Exception:
                             pass
-                    if "readonly" in res["result"]["user"] and isinstance(res["result"]["user"]["readonly"], bool):
-                        config.app_window.plus_readonly = res["result"]["user"]["readonly"]
+                    if config.app_window.plus_paidUntil is not None and \
+                            (config.app_window.plus_paidUntil.date() - datetime.datetime.now().date()).days < (- config.expired_subscription_max_days):
+                        config.logger.debug("connection: -> authentication failed due to long expired subscription")
+                        if "error" in res:
+                            config.app_window.sendmessage(res["error"]) # @UndefinedVariable
+                        clearCredentials()
+                        return False
                     else:
-                        config.app_window.plus_readonly = False
-                    #
-                    setToken(res["result"]["user"]["token"],nickname)
-                    if "account_id" in res["result"]["user"] and "_id" in res["result"]["user"]["account_id"]:
-                        account_nr = account.setAccount(res["result"]["user"]["account_id"]["_id"])
-                        config.account_nr = account_nr
-                        config.logger.debug("connection: -> account: %s",account_nr)
-                    return True
+                        if "readonly" in res["result"]["user"] and isinstance(res["result"]["user"]["readonly"], bool):
+                            config.app_window.plus_readonly = res["result"]["user"]["readonly"]
+                        else:
+                            config.app_window.plus_readonly = False
+                        #
+                        setToken(res["result"]["user"]["token"],nickname)
+                        if "account_id" in res["result"]["user"] and "_id" in res["result"]["user"]["account_id"]:
+                            account_nr = account.setAccount(res["result"]["user"]["account_id"]["_id"])
+                            config.account_nr = account_nr
+                            config.logger.debug("connection: -> account: %s",account_nr)
+                        return True
                 else:
                     config.logger.debug("connection: -> authentication failed")
                     if "error" in res:

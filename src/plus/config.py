@@ -63,6 +63,11 @@ min_login_len    = 6
 compress_posts   = True
 post_compression_threshold = 500 # in bytes (data smaller than this are always send uncompressed via POST)
 
+# Authentication configuration
+
+# do not authentify successfully after max_days after the subscription expired
+expired_subscription_max_days = 90
+
 # Cache and queue parameters
 
 stock_cache_expiration = 30 # expiration period in seconds
