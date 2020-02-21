@@ -134,7 +134,7 @@ import matplotlib.backends.backend_svg # @UnusedImport
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
 from matplotlib.backend_bases import LocationEvent as mplLocationevent
-    
+
 import matplotlib.backends.qt_editor.figureoptions as figureoptions
 
 
