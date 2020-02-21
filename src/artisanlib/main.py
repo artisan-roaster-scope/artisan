@@ -1872,7 +1872,7 @@ class tgraphcanvas(FigureCanvas):
         
         ##########################     Designer variables       #################################
         self.designerflag = False
-        self.designerconnections = [0,0,0,0]   #mouse event ids
+        self.designerconnections = [None,None,None,None]   #mouse event ids
         self.mousepress = None
         self.indexpoint = 0
         self.workingline = 2  #selects ET or BT
@@ -5512,12 +5512,26 @@ class tgraphcanvas(FigureCanvas):
                 rcParams['xtick.color'] = self.palette["xlabel"]
                 rcParams['ytick.color'] = self.palette["ylabel"]
 
-                self.fig.clf()   #wipe out figure. keep_observers=False
+#                self.fig.clf()   #wipe out figure (remove all artists and axis). keep_observers=False
+#                # first remove previous figure axis
+#                if self.ax is not None:
+#                    try:
+#                        self.fig.delaxes(self.ax)
+#                    except:
+#                        pass
+#                self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
+#                # reset crosslines to force redrawing on new axis object
+#                self.l_horizontalcrossline = None
+#                self.l_verticalcrossline = None
 
-                self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
+                # instead to remove and regenerate the axis object (as in the commented section above) we just clear and reuse it
+                self.ax.clear()
+                self.delta_ax.clear()
+
 
                 self.ax.set_ylim(self.ylimit_min, self.ylimit)
                 self.ax.set_autoscale_on(False)
+                
 
                 fontprop_small = aw.mpl_fontproperties.copy()
                 fontprop_small.set_size("xx-small")
@@ -5634,7 +5648,7 @@ class tgraphcanvas(FigureCanvas):
 
                 if two_ax_mode:
                     #create a second set of axes in the same position as self.ax
-                    self.delta_ax = self.ax.twinx()
+                    #self.delta_ax = self.ax.twinx()
                     self.delta_ax.tick_params(\
                         axis='y',           # changes apply to the x-axis
                         which='both',       # both major and minor ticks are affected
@@ -7480,6 +7494,11 @@ class tgraphcanvas(FigureCanvas):
             self.fig.clf()
             #create a new name ax1 instead of ax (ax is used when plotting profiles)
             
+            if self.ax1 is not None:
+                try:
+                    self.fig.delaxes(self.ax1)
+                except:
+                    pass
             self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor='None') #) radar green facecolor='#d5de9c'
             self.ax1.set_aspect(self.flavoraspect)
             
@@ -11022,7 +11041,7 @@ class tgraphcanvas(FigureCanvas):
             self.setCursor(Qt.OpenHandCursor)
             self.mousepress = None
             #create mouse events. Note: keeping the ids inside a list helps protect against extrange python behaviour.
-            self.designerconnections = [0,0,0,0]
+            self.designerconnections = [None,None,None,None]
             self.designerconnections[0] = self.fig.canvas.mpl_connect('pick_event', self.on_pick) 
             self.designerconnections[1] = self.fig.canvas.mpl_connect('button_release_event', self.on_release)
             self.designerconnections[2] = self.fig.canvas.mpl_connect('motion_notify_event', self.on_motion)
@@ -11035,7 +11054,7 @@ class tgraphcanvas(FigureCanvas):
         self.designerflag = False
         aw.designerAction.setChecked(False)
         for i in range(len(self.designerconnections)):
-            if self.designerconnections[i]:
+            if self.designerconnections[i] is not None:
                 self.fig.canvas.mpl_disconnect(self.designerconnections[i])
         self.setCursor(Qt.ArrowCursor)
         warnings.simplefilter('default', UserWarning)
@@ -11261,6 +11280,11 @@ class tgraphcanvas(FigureCanvas):
 
     def exitviewmode(self):
         self.disconnectWheel()
+        if self.ax2 is not None:
+            try:
+                self.fig.delaxes(self.ax2)
+            except:
+                pass
         self.redraw(recomputeAllDeltas=False)
 
     def connectWheel(self):
@@ -11288,6 +11312,11 @@ class tgraphcanvas(FigureCanvas):
             # same as redraw but using different axes
             self.fig.clf()
             #create a new name ax1 instead of ax
+            if self.ax2 is not None:
+                try:
+                    self.fig.delaxes(self.ax2)
+                except:
+                    pass
             self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor='None')
             self.ax2.set_rmax(1.)
             self.ax2.set_aspect(self.wheelaspect)
@@ -11493,57 +11522,64 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.mpl_disconnect(self.onreleaseid)  #mouse cross lines measurement
 
     def drawcross(self,event):
-        if event.inaxes == self.ax:
-            x = event.xdata 
-            y = event.ydata
-            if self.baseX and self.baseY:
-                deltaX = aw.qmc.stringfromseconds(event.xdata - self.baseX)
-                deltaY = str(aw.float2float(event.ydata - self.baseY,1))
-                RoR = str(aw.float2float(60 * (event.ydata - self.baseY) / (event.xdata - self.baseX),1))
-                message = "delta Time= {},    delta Temp= {} {},    RoR= {} {}/min".format(deltaX,deltaY,aw.qmc.mode,RoR,aw.qmc.mode)
-                aw.sendmessage(message)
-                self.base_messagevisible = True
-            elif self.base_messagevisible:
-                aw.clearMessageLine()
-                self.base_messagevisible = False
-            if x and y:
-                if self.l_horizontalcrossline is None:
-                    self.l_horizontalcrossline, = self.ax.plot([self.startofx,self.endofx*2], [y,y],color = self.palette["text"], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
-                else:
-                    self.l_horizontalcrossline.set_data([self.startofx,self.endofx*2], [y,y])
-                if self.l_verticalcrossline is None:
-                    self.l_verticalcrossline, = self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color = self.palette["text"], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
-                else:
-                    self.l_verticalcrossline.set_data([x,x], [self.ylimit_min,self.ylimit])
-                if self.ax_background:
-                    self.fig.canvas.restore_region(self.ax_background)
-                    aw.qmc.ax.draw_artist(self.l_horizontalcrossline)
-                    aw.qmc.ax.draw_artist(self.l_verticalcrossline)
-                    if self.base_horizontalcrossline and self.base_verticalcrossline:
-                        aw.qmc.ax.draw_artist(self.base_horizontalcrossline)
-                        aw.qmc.ax.draw_artist(self.base_verticalcrossline)
-                    self.fig.canvas.blit(aw.qmc.ax.get_tightbbox(self.fig.canvas.get_renderer()))
-                else:
-                    self.updateBackground()
-        elif event.inaxes == self.delta_ax:
-            x = event.xdata 
-            y = event.ydata
-            if x and y and self.delta_ax:
-                if self.l_horizontalcrossline is None:
-                    self.l_horizontalcrossline, = self.delta_ax.plot([self.startofx,self.endofx*2], [y,y], color = self.palette["text"], linestyle = '-', linewidth = .5, alpha = 1.0,sketch_params=None,path_effects=[])
-                else:
-                    self.l_horizontalcrossline.set_data([self.startofx,self.endofx*2], [y,y])
-                if self.l_verticalcrossline is None:
-                    self.l_verticalcrossline, = self.delta_ax.plot([x,x], [self.zlimit_min,self.zlimit], color = self.palette["text"], linestyle = '-', linewidth = .5, alpha = 1.0,sketch_params=None,path_effects=[])
-                else:
-                    self.l_verticalcrossline.set_data([x,x], [self.zlimit_min,self.zlimit])
-                if self.ax_background:
-                    self.fig.canvas.restore_region(self.ax_background)
-                    aw.qmc.delta_ax.draw_artist(self.l_horizontalcrossline)
-                    aw.qmc.delta_ax.draw_artist(self.l_verticalcrossline)
-                    self.fig.canvas.blit(aw.qmc.delta_ax.bbox)
-                else:
-                    self.updateBackground()
+        # do not interleave with redraw()
+        gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,0)
+        if gotlock:
+            try:
+                if event.inaxes == self.ax:
+                    x = event.xdata 
+                    y = event.ydata
+                    if self.baseX and self.baseY:
+                        deltaX = aw.qmc.stringfromseconds(event.xdata - self.baseX)
+                        deltaY = str(aw.float2float(event.ydata - self.baseY,1))
+                        RoR = str(aw.float2float(60 * (event.ydata - self.baseY) / (event.xdata - self.baseX),1))
+                        message = "delta Time= {},    delta Temp= {} {},    RoR= {} {}/min".format(deltaX,deltaY,aw.qmc.mode,RoR,aw.qmc.mode)
+                        aw.sendmessage(message)
+                        self.base_messagevisible = True
+                    elif self.base_messagevisible:
+                        aw.clearMessageLine()
+                        self.base_messagevisible = False
+                    if x and y:
+                        if self.l_horizontalcrossline is None:
+                            self.l_horizontalcrossline, = self.ax.plot([self.startofx,self.endofx*2], [y,y],color = self.palette["text"], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
+                        else:
+                            self.l_horizontalcrossline.set_data([self.startofx,self.endofx*2], [y,y])
+                        if self.l_verticalcrossline is None:
+                            self.l_verticalcrossline, = self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color = self.palette["text"], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
+                        else:
+                            self.l_verticalcrossline.set_data([x,x], [self.ylimit_min,self.ylimit])
+                        if self.ax_background:
+                            self.fig.canvas.restore_region(self.ax_background)
+                            aw.qmc.ax.draw_artist(self.l_horizontalcrossline)
+                            aw.qmc.ax.draw_artist(self.l_verticalcrossline)
+                            if self.base_horizontalcrossline and self.base_verticalcrossline:
+                                aw.qmc.ax.draw_artist(self.base_horizontalcrossline)
+                                aw.qmc.ax.draw_artist(self.base_verticalcrossline)
+                            self.fig.canvas.blit(aw.qmc.ax.get_tightbbox(self.fig.canvas.get_renderer()))
+                        else:
+                            self.updateBackground()
+                elif event.inaxes == self.delta_ax:
+                    x = event.xdata 
+                    y = event.ydata
+                    if x and y and self.delta_ax:
+                        if self.l_horizontalcrossline is None:
+                            self.l_horizontalcrossline, = self.delta_ax.plot([self.startofx,self.endofx*2], [y,y], color = self.palette["text"], linestyle = '-', linewidth = .5, alpha = 1.0,sketch_params=None,path_effects=[])
+                        else:
+                            self.l_horizontalcrossline.set_data([self.startofx,self.endofx*2], [y,y])
+                        if self.l_verticalcrossline is None:
+                            self.l_verticalcrossline, = self.delta_ax.plot([x,x], [self.zlimit_min,self.zlimit], color = self.palette["text"], linestyle = '-', linewidth = .5, alpha = 1.0,sketch_params=None,path_effects=[])
+                        else:
+                            self.l_verticalcrossline.set_data([x,x], [self.zlimit_min,self.zlimit])
+                        if self.ax_background:
+                            self.fig.canvas.restore_region(self.ax_background)
+                            aw.qmc.delta_ax.draw_artist(self.l_horizontalcrossline)
+                            aw.qmc.delta_ax.draw_artist(self.l_verticalcrossline)
+                            self.fig.canvas.blit(aw.qmc.delta_ax.bbox)
+                        else:
+                            self.updateBackground()
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
 
 #######################################################################################
 #######################  END OF MAIN APPLICATION   ####################################
@@ -20087,9 +20123,9 @@ class ApplicationWindow(QMainWindow):
                 ]
 
             #text between single quotes ' will show only when flagon is True
-            fn = re.sub(rf"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (self.qmc.flagon or fakeon) else re.sub(rf"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
+            fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}',r'\1",fn) if (self.qmc.flagon or fakeon) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
             #text between double quotes " will show only when flagon is False
-            fn = re.sub(rf'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if not (self.qmc.flagon or fakeon) else re.sub(rf'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
+            fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if not (self.qmc.flagon or fakeon) else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
             #replace the fields with content
             for i in range(len(fields)):
                 fn = fn.replace(self.fieldDelim + fields[i][0], u(fields[i][1]))
@@ -41934,6 +41970,11 @@ class flavorDlg(ArtisanResizeablDialog):
         settings.setValue("FlavorProperties",self.saveGeometry())  
         self.savetable()
         aw.qmc.fileDirty()
+        if aw.qmc.ax1 is not None:
+            try:
+                aw.qmc.fig.delaxes(self.aw.qmc.ax1)
+            except:
+                pass
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.showControls()
         self.accept()
