@@ -2651,12 +2651,19 @@ class tgraphcanvas(FigureCanvas):
                         plus.queue.addRoast()
                     except:
                         pass
+            
+            # update phases
+            elif action.key[0] == 1 and self.phasesbuttonflag: # DRY
+                self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
+            elif action.key[0] == 2 and self.phasesbuttonflag: # FCs
+                self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
         else:
             # add a special event at the current timepoint
             self.specialevents.append(action.key[1]) # absolut time index
             self.specialeventstype.append(4) # "--"
             self.specialeventsStrings.append("")
             self.specialeventsvalue.append(0)
+                            
         aw.qmc.fileDirty()
         self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
         
@@ -6699,23 +6706,12 @@ class tgraphcanvas(FigureCanvas):
 
                 # we create here the project line plots to have the accurate time axis after CHARGE
                 dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0  
-                    
-            except Exception as ex:
-#                import traceback
-#                traceback.print_exc(file=sys.stdout)
-                _, _, exc_tb = sys.exc_info()    
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
-            finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
 
-            #watermark image
-            self.placelogoimage()
+                #watermark image
+                self.placelogoimage()
 
-            # we can run the actual redraw outside of the sampling semaphore
-            try:  
                 ############  ready to plot ############
-                self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
+#                self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
                 self.updateBackground() # update bitlblit backgrounds
                 #######################################
                     
@@ -6760,12 +6756,15 @@ class tgraphcanvas(FigureCanvas):
                         QApplication.processEvents()
                 except:
                     pass
-                    
+
             except Exception as ex:
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()    
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
 
 
     #watermark image
@@ -19774,10 +19773,12 @@ class ApplicationWindow(QMainWindow):
                         self.automaticsave()
                 elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
                     self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
-                    try:
-                        aw.ntb.mouse_move(mplLocationevent.lastevent)
-                    except:
-                        pass
+                    # force redraw crosslines if active
+                    if aw.qmc.crossmarker:
+                        try:
+                            aw.ntb.mouse_move(mplLocationevent.lastevent)
+                        except:
+                            pass
                 elif key == 67:                     #letter C (controls)
                     self.toggleControls()
                 elif key == 88:                     #letter X (readings)
