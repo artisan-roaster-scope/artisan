@@ -35036,7 +35036,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         datebatch.addSpacing(15)
         datebatch.addWidget(batchlabel)
         datebatch.addSpacing(7)
-        if aw.superusermode and aw.qmc.batchcounter > -1:
+        if aw.superusermode: # and aw.qmc.batchcounter > -1:
             datebatch.addLayout(batchLayout)
         else:
             datebatch.addWidget(batchedit)
