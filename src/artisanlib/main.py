@@ -2615,6 +2615,25 @@ class tgraphcanvas(FigureCanvas):
                         ac.setText(u(" ") + u(QApplication.translate("Label", "EVENT")))
                         ac.key = (-1,timex)
                         menu.addAction(ac)
+                        
+                        # we deactivate all active motion_notify_event_handlers of draggable annotations that might have been connected by this click to
+                        # avoid redraw conficts between Artisan canvas bitblit caching and the matplotlib internal bitblit caches.
+                        cids = []
+                        try:
+                            if 'motion_notify_event' in aw.qmc.fig.canvas.callbacks.callbacks:
+                                motion_notify_event_handlers = aw.qmc.fig.canvas.callbacks.callbacks['motion_notify_event']
+                                for cid, func_ref in motion_notify_event_handlers.items():
+                                    func = func_ref()
+                                    if func.__self__ is not None: # a bound method
+                                        c = func.__self__.__class__
+                                        if c == matplotlib.offsetbox.DraggableAnnotation:
+                                            cids.append(cid)
+                            # disconnecting all established motion_notify_event_handlers of DraggableAnnotations
+                            for cid in cids:
+                                aw.qmc.fig.canvas.mpl_disconnect(cid)
+                        except:
+                            pass
+                        
                         # show menu
                         menu.triggered.connect(self.event_popup_action)
                         menu.popup(QCursor.pos())
@@ -5058,7 +5077,7 @@ class tgraphcanvas(FigureCanvas):
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),u(self.stringfromseconds(timex[TP_index]-t0,False)))
                     a = 1.
                     e = -50
-                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,)
+                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable)
                 elif TP_time > -1:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                     if timeindex2:
@@ -5069,7 +5088,7 @@ class tgraphcanvas(FigureCanvas):
                     TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
                     
                     TP_time = TP_time - t0
-                    st1 = aw.arabicReshape("{0}",u(self.stringfromseconds(TP_time_loaded,False)))
+                    st1 = aw.arabicReshape("TP {0}",u(self.stringfromseconds(TP_time_loaded,False)))
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable)
                 #Add Dry End markers
                 if timeindex[1]:
@@ -8356,7 +8375,7 @@ class tgraphcanvas(FigureCanvas):
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
-                    self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down)
+                    self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down,-50,1.)
                     try:
                         self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
                     except: # mpl before v3.0 do not have this set_in_layout() function
