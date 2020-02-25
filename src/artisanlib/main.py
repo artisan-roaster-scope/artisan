@@ -2615,6 +2615,25 @@ class tgraphcanvas(FigureCanvas):
                         ac.setText(u(" ") + u(QApplication.translate("Label", "EVENT")))
                         ac.key = (-1,timex)
                         menu.addAction(ac)
+                        
+                        # we deactivate all active motion_notify_event_handlers of draggable annotations that might have been connected by this click to
+                        # avoid redraw conficts between Artisan canvas bitblit caching and the matplotlib internal bitblit caches.
+                        cids = []
+                        try:
+                            if 'motion_notify_event' in aw.qmc.fig.canvas.callbacks.callbacks:
+                                motion_notify_event_handlers = aw.qmc.fig.canvas.callbacks.callbacks['motion_notify_event']
+                                for cid, func_ref in motion_notify_event_handlers.items():
+                                    func = func_ref()
+                                    if func.__self__ is not None: # a bound method
+                                        c = func.__self__.__class__
+                                        if c == matplotlib.offsetbox.DraggableAnnotation:
+                                            cids.append(cid)
+                            # disconnecting all established motion_notify_event_handlers of DraggableAnnotations
+                            for cid in cids:
+                                aw.qmc.fig.canvas.mpl_disconnect(cid)
+                        except:
+                            pass
+                        
                         # show menu
                         menu.triggered.connect(self.event_popup_action)
                         menu.popup(QCursor.pos())
@@ -2651,12 +2670,19 @@ class tgraphcanvas(FigureCanvas):
                         plus.queue.addRoast()
                     except:
                         pass
+            
+            # update phases
+            elif action.key[0] == 1 and self.phasesbuttonflag: # DRY
+                self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
+            elif action.key[0] == 2 and self.phasesbuttonflag: # FCs
+                self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
         else:
             # add a special event at the current timepoint
             self.specialevents.append(action.key[1]) # absolut time index
             self.specialeventstype.append(4) # "--"
             self.specialeventsStrings.append("")
             self.specialeventsvalue.append(0)
+                            
         aw.qmc.fileDirty()
         self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
         
@@ -3163,7 +3189,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6]:
                         aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
         
-                    timestr = self.stringfromseconds(int(round(ts)))
+                    timestr = self.stringfromseconds(ts)
                     aw.lcd1.display(u(timestr))
                     
                     # update connected WebLCDs
@@ -4300,7 +4326,7 @@ class tgraphcanvas(FigureCanvas):
                     # the special case of a variable Y1 overlapping with a variable Y11,..,Y12 in this simple test has to be excluded to avoid
                     # that if mathexpression="Y11" and mathdictionary contains {"Y1":-1} -1 is returned instead of the correct value of Y11
                     # "x" occurs in "max" and has also to be excluded, as "t" and "b"
-                    if any([((k in mathexpression) if k not in ["Y1","x","t","b"] else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
+                    if any([((k in mathexpression) if k not in (["Y1","x","t","b"] if ("max" in mathexpression) else ["Y1","t","b"]) else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
                         return -1
                     else:
@@ -5051,7 +5077,7 @@ class tgraphcanvas(FigureCanvas):
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),u(self.stringfromseconds(timex[TP_index]-t0,False)))
                     a = 1.
                     e = -50
-                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,)
+                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable)
                 elif TP_time > -1:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                     if timeindex2:
@@ -5062,11 +5088,11 @@ class tgraphcanvas(FigureCanvas):
                     TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
                     
                     TP_time = TP_time - t0
-                    st1 = aw.arabicReshape("{0}",u(self.stringfromseconds(TP_time_loaded,False)))
+                    st1 = aw.arabicReshape("TP {0}",u(self.stringfromseconds(TP_time_loaded,False)))
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable)
                 #Add Dry End markers
                 if timeindex[1]:
-                    tidx = timeindex[1]
+                    tidx = timeindex[1]                    
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE {0}", None),u(self.stringfromseconds(timex[tidx]-t0,False)))
                     if timeindex2:
@@ -6699,23 +6725,12 @@ class tgraphcanvas(FigureCanvas):
 
                 # we create here the project line plots to have the accurate time axis after CHARGE
                 dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0  
-                    
-            except Exception as ex:
-#                import traceback
-#                traceback.print_exc(file=sys.stdout)
-                _, _, exc_tb = sys.exc_info()    
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
-            finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
 
-            #watermark image
-            self.placelogoimage()
+                #watermark image
+                self.placelogoimage()
 
-            # we can run the actual redraw outside of the sampling semaphore
-            try:  
                 ############  ready to plot ############
-                self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
+#                self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
                 self.updateBackground() # update bitlblit backgrounds
                 #######################################
                     
@@ -6760,12 +6775,15 @@ class tgraphcanvas(FigureCanvas):
                         QApplication.processEvents()
                 except:
                     pass
-                    
+
             except Exception as ex:
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()    
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
 
 
     #watermark image
@@ -7064,7 +7082,8 @@ class tgraphcanvas(FigureCanvas):
         return j,i  #return height of arm
 
     # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
-    def stringfromseconds(self, seconds, leadingzero=True):
+    def stringfromseconds(self, seconds_raw, leadingzero=True):
+        seconds = int(round(seconds_raw))
         if seconds >= 0:
             if leadingzero:
                 return "%02d:%02d"% divmod(seconds, 60)
@@ -8357,7 +8376,7 @@ class tgraphcanvas(FigureCanvas):
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
-                    self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down)
+                    self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down,-50,1.)
                     try:
                         self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
                     except: # mpl before v3.0 do not have this set_in_layout() function
@@ -19774,10 +19793,12 @@ class ApplicationWindow(QMainWindow):
                         self.automaticsave()
                 elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
                     self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
-                    try:
-                        aw.ntb.mouse_move(mplLocationevent.lastevent)
-                    except:
-                        pass
+                    # force redraw crosslines if active
+                    if aw.qmc.crossmarker:
+                        try:
+                            aw.ntb.mouse_move(mplLocationevent.lastevent)
+                        except:
+                            pass
                 elif key == 67:                     #letter C (controls)
                     self.toggleControls()
                 elif key == 88:                     #letter X (readings)
@@ -20606,10 +20627,13 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.extradevices[j] == 25:  #virtual device
                     if len(aw.qmc.extratimex[j]) > 0:  # move on if the virtual device already has data 
                         continue
-                    if self.qmc.timeindex[0] > -1:
-                        toff = aw.qmc.timex[self.qmc.timeindex[0]]
-                    else:
-                        toff = 0
+                        
+                    # supplying eval_math_expression with the t_offset changes the semantic of the symbolic variable t and b to eval to relative times after CHARGE
+                    # instead of absolute recording time as it is interpreted while recording
+#                    if self.qmc.timeindex[0] > -1:
+#                        toff = aw.qmc.timex[self.qmc.timeindex[0]]
+#                    else:
+#                        toff = 0
                         
                     self.qmc.extratimex[j] = aw.qmc.timex[:]
                     self.qmc.extratemp1[j] = [-1]*len((self.qmc.timex))
@@ -20619,11 +20643,11 @@ class ApplicationWindow(QMainWindow):
 
                     # need two seperate loops. without y2(x) cannot calculate a dependency on y1(x).
                     for i in range(len(self.qmc.timex)):
-                        y_range1.append(self.qmc.eval_math_expression(self.qmc.extramathexpression1[j],self.qmc.timex[i],t_offset=toff))
+                        y_range1.append(self.qmc.eval_math_expression(self.qmc.extramathexpression1[j],self.qmc.timex[i])) #,t_offset=toff))
                     self.qmc.extratemp1[j] = y_range1[:]
 
                     for i in range(len(self.qmc.timex)):
-                        y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.timex[i],t_offset=toff))
+                        y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.timex[i])) #,t_offset=toff))
                     self.qmc.extratemp2[j] = y_range2[:]
 
             self.qmc.fileDirty()
@@ -34102,7 +34126,7 @@ class equDataDlg(ArtisanDialog):
                 t = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.timex[i])
                 t.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                 
-                time = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
+                time = QTableWidgetItem(aw.qmc.stringfromseconds(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))
                 time.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
     
                 if len(aw.qmc.plotterequationresults[0]) and len(aw.qmc.plotterequationresults[0]) > i:
@@ -36442,8 +36466,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         offset = 0
         if aw.qmc.timeindex[0] > -1:
             offset = aw.qmc.timex[aw.qmc.timeindex[0]]
+        
         for i in range(ndata):
-            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-offset))))
+            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(aw.qmc.timex[i]-offset))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             if aw.qmc.LCDdecimalplaces:
                 fmtstr = "%.1f"
@@ -42563,7 +42588,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.datatable.setShowGrid(True)
         self.datatable.verticalHeader().setSectionResizeMode(2)
         for i in range(ndata):
-            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
+            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(aw.qmc.timeB[i]-start))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             if aw.qmc.LCDdecimalplaces:
                 fmtstr = "%.1f"
@@ -51455,12 +51480,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                             typeComboBox.setCurrentIndex(devices.index(dev_name))
                         except Exception:
                             pass
-                        color1Button = QPushButton(QApplication.translate("Button",u(aw.qmc.extradevicecolor1[i]),None))
+                        color1Button = QPushButton(u(aw.qmc.extradevicecolor1[i]))
                         color1Button.setFocusPolicy(Qt.NoFocus)
                         color1Button.clicked.connect(self.setextracolor1)
                         textcolor = aw.labelBorW(aw.qmc.extradevicecolor1[i])
                         color1Button.setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor1[i], textcolor))
-                        color2Button = QPushButton(QApplication.translate("Button",u(aw.qmc.extradevicecolor2[i]),None))
+                        color2Button = QPushButton(u(aw.qmc.extradevicecolor2[i]))
                         color2Button.setFocusPolicy(Qt.NoFocus)
                         color2Button.clicked.connect(self.setextracolor2)
                         textcolor = aw.labelBorW(aw.qmc.extradevicecolor2[i])
@@ -51928,8 +51953,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor1[i] = colorname
                     # set LCD label color
-                    aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))
+                    aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))                    
                     self.devicetable.cellWidget(i,1).setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor1[i], aw.labelBorW(aw.qmc.extradevicecolor1[i])))
+                    self.devicetable.cellWidget(i,1).setText(u(colorname))
                     aw.checkColors([(aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background'])])
                     aw.checkColors([(aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette['background'])])
             #line 2
@@ -51942,6 +51968,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     # set LCD label color
                     aw.setLabelColor(aw.extraLCDlabel2[i],QColor(colorname))
                     self.devicetable.cellWidget(i,2).setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor2[i], aw.labelBorW(aw.qmc.extradevicecolor2[i])))
+                    self.devicetable.cellWidget(i,2).setText(u(colorname))
                     aw.checkColors([(aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background'])])
                     aw.checkColors([(aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Legend bkgnd",None),aw.qmc.palette['background'])])
         except Exception as e:

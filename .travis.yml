@@ -6,6 +6,11 @@ branches:
   - gh-pages
   - master
 
+addons:
+  apt:
+    packages:
+    - fakeroot
+
 matrix:
   allow_failures:
     - env: ARTISAN_OS=rpi
