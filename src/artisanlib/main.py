@@ -20643,11 +20643,11 @@ class ApplicationWindow(QMainWindow):
 
                     # need two seperate loops. without y2(x) cannot calculate a dependency on y1(x).
                     for i in range(len(self.qmc.timex)):
-                        y_range1.append(self.qmc.eval_math_expression(self.qmc.extramathexpression1[j],self.qmc.timex[i]) #,t_offset=toff))
+                        y_range1.append(self.qmc.eval_math_expression(self.qmc.extramathexpression1[j],self.qmc.timex[i])) #,t_offset=toff))
                     self.qmc.extratemp1[j] = y_range1[:]
 
                     for i in range(len(self.qmc.timex)):
-                        y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.timex[i]) #,t_offset=toff))
+                        y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.timex[i])) #,t_offset=toff))
                     self.qmc.extratemp2[j] = y_range2[:]
 
             self.qmc.fileDirty()
