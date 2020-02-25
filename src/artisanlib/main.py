@@ -20627,10 +20627,13 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.extradevices[j] == 25:  #virtual device
                     if len(aw.qmc.extratimex[j]) > 0:  # move on if the virtual device already has data 
                         continue
-                    if self.qmc.timeindex[0] > -1:
-                        toff = aw.qmc.timex[self.qmc.timeindex[0]]
-                    else:
-                        toff = 0
+                        
+                    # supplying eval_math_expression with the t_offset changes the semantic of the symbolic variable t and b to eval to relative times after CHARGE
+                    # instead of absolute recording time as it is interpreted while recording
+#                    if self.qmc.timeindex[0] > -1:
+#                        toff = aw.qmc.timex[self.qmc.timeindex[0]]
+#                    else:
+#                        toff = 0
                         
                     self.qmc.extratimex[j] = aw.qmc.timex[:]
                     self.qmc.extratemp1[j] = [-1]*len((self.qmc.timex))
@@ -20640,11 +20643,11 @@ class ApplicationWindow(QMainWindow):
 
                     # need two seperate loops. without y2(x) cannot calculate a dependency on y1(x).
                     for i in range(len(self.qmc.timex)):
-                        y_range1.append(self.qmc.eval_math_expression(self.qmc.extramathexpression1[j],self.qmc.timex[i],t_offset=toff))
+                        y_range1.append(self.qmc.eval_math_expression(self.qmc.extramathexpression1[j],self.qmc.timex[i]) #,t_offset=toff))
                     self.qmc.extratemp1[j] = y_range1[:]
 
                     for i in range(len(self.qmc.timex)):
-                        y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.timex[i],t_offset=toff))
+                        y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.timex[i]) #,t_offset=toff))
                     self.qmc.extratemp2[j] = y_range2[:]
 
             self.qmc.fileDirty()
