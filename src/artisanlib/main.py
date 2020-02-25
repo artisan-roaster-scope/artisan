@@ -1855,6 +1855,8 @@ class tgraphcanvas(FigureCanvas):
         self.l_eventtype4dots = None
         
         self.l_annotations = []
+        self.l_annotations_dict = {} # associating event ids (-1:TP, 0:CHARGE, 1:DRY,...) to its pair of draggable temp and time annotations
+        self.l_event_flags_dict = {} # assocating event flag annotations id (event number) to its draggable text annotation
         self.l_background_annotations = []
         
         self.ai = None # holds background logo image
@@ -4829,6 +4831,7 @@ class tgraphcanvas(FigureCanvas):
                 self.autoFCsIdx = 0
                 
                 self.l_annotations = [] # initiate the event annotations
+                self.l_annotations_dict = {} # initiate the event id to temp/time annotation dict
                 self.l_background_annotations = [] # initiate the event annotations
 
                 aw.hideDefaultButtons()
@@ -5006,7 +5009,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             return b
 
-    def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.,draggable=True):
+    def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.,draggable=True,draggable_anno_key=None):
         fontprop_small = aw.mpl_fontproperties.copy()
         fontsize = "x-small"
         fontprop_small.set_size(fontsize)
@@ -5019,7 +5022,11 @@ class tgraphcanvas(FigureCanvas):
             fmtstr = "%.1f"
         else:
             fmtstr = "%.0f"
-        temp_anno = self.ax.annotate(fmtstr%(temp), xy=(x,y),xytext=(x+e,y + yup),
+        if draggable and draggable_anno_key is not None and draggable_anno_key in aw.qmc.l_annotations_dict:
+            xytext = aw.qmc.l_annotations_dict[draggable_anno_key][0].xyann
+        else:
+            xytext = (x+e,y + yup)
+        temp_anno = self.ax.annotate(fmtstr%(temp), xy=(x,y),xytext=xytext,
                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),
                             fontsize=fontsize,alpha=a,fontproperties=fontprop_small)
         try:
@@ -5029,7 +5036,11 @@ class tgraphcanvas(FigureCanvas):
         except: # mpl before v3.0 do not have this set_in_layout() function
             pass
         #anotate time
-        time_anno = self.ax.annotate(time_str,xy=(x,y),xytext=(x+e,y - ydown),
+        if draggable and draggable_anno_key is not None and draggable_anno_key in aw.qmc.l_annotations_dict:
+            xytext = aw.qmc.l_annotations_dict[draggable_anno_key][1].xyann
+        else:
+            xytext = (x+e,y - ydown)
+        time_anno = self.ax.annotate(time_str,xy=(x,y),xytext=xytext,
                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),
                              fontsize=fontsize,alpha=a,fontproperties=fontprop_small)
         try:
@@ -5041,7 +5052,10 @@ class tgraphcanvas(FigureCanvas):
             pass
         if aw.qmc.patheffects:
             rcParams['path.effects'] = []
-        return [temp_anno, time_anno]
+        res = [temp_anno, time_anno]
+        if draggable and draggable_anno_key is not None:
+            aw.qmc.l_annotations_dict[draggable_anno_key] = [temp_anno, time_anno]
+        return res
 
     def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,TP_time=-1,TP_time_loaded=-1,draggable=True):
         ystep_down = ystep_up = 0
@@ -5068,8 +5082,9 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.graphfont == 1:
                             st1 = toASCII(st1)
                         e = 15
-                        a = 1.  
-                    anno_artists += self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable)
+                        a = 1.
+                    time_temp_annos = self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable,0)
+                    anno_artists += time_temp_annos
                 
                 #Add TP marker
                 if self.markTPflag and TP_index and TP_index > 0:
@@ -5077,7 +5092,7 @@ class tgraphcanvas(FigureCanvas):
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),u(self.stringfromseconds(timex[TP_index]-t0,False)))
                     a = 1.
                     e = -50
-                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable)
+                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
                 elif TP_time > -1:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                     if timeindex2:
@@ -5089,7 +5104,7 @@ class tgraphcanvas(FigureCanvas):
                     
                     TP_time = TP_time - t0
                     st1 = aw.arabicReshape("TP {0}",u(self.stringfromseconds(TP_time_loaded,False)))
-                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable)
+                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
                 #Add Dry End markers
                 if timeindex[1]:
                     tidx = timeindex[1]                    
@@ -5103,7 +5118,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,1)
                 
                 #Add 1Cs markers
                 if timeindex[2]:
@@ -5121,7 +5136,7 @@ class tgraphcanvas(FigureCanvas):
                         e = 0
                     else:
                         e = -80
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,2)
                 #Add 1Ce markers
                 if timeindex[3]:
                     tidx = timeindex[3]
@@ -5135,7 +5150,7 @@ class tgraphcanvas(FigureCanvas):
                         e = 0
                     else:
                         e = -80
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,3)
                     #add a water mark if FCs
                     if timeindex[2] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -5155,7 +5170,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,4)
                 #Add 2Ce markers
                 if timeindex[5]:
                     tidx = timeindex[5]
@@ -5169,7 +5184,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,5)
                     #do water mark if SCs
                     if timeindex[4] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -5202,7 +5217,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         e = 0
                     
-                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,6)
                     
                     #do water mark if FCs, but no FCe nor SCs nor SCe
                     if timeindex[2] and not timeindex[3] and not timeindex[4] and not timeindex[5] and not timeindex2 and self.watermarksflag:
@@ -5217,7 +5232,7 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             sc_artist.set_in_layout(False) # remove title from tight_layout calculation
                         except: # set_in_layout not available in mpl<3.x
-                            pass                        
+                            pass
                 # add COOL mark
                 if timeindex[7] and not timeindex2:
                     tidx = timeindex[7]
@@ -5230,12 +5245,12 @@ class tgraphcanvas(FigureCanvas):
                             cool_mark.set_in_layout(False) # remove title from tight_layout calculation
                         except: # set_in_layout not available in mpl<3.x
                             pass
-                aw.qmc.l_annotations = anno_artists
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),exc_tb.tb_lineno)
+        return anno_artists
     
     def apply_symbolic_delta_formula(self,fct,deltas,timex,RTsname):
         try:
@@ -6137,7 +6152,8 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 startB = 0
                         try:
-                            self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded, draggable=False) # not draggable
+                            # background annotations are not draggable
+                            aw.qmc.l_background_annotations.extend(self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded, draggable=False))
                         except Exception:
                             pass
 #                            import traceback
@@ -6265,8 +6281,6 @@ class tgraphcanvas(FigureCanvas):
                                                      fontproperties=fontprop_small)
                                     try:
                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                        # we do not allow to drag labels in bar graph!
-                                        #anno.draggable(use_blit=True)
                                     except: # mpl before v3.0 do not have this set_in_layout() function
                                         pass
 
@@ -6429,7 +6443,7 @@ class tgraphcanvas(FigureCanvas):
                                     if aw.qmc.flagon:
                                         temp = self.temp2[int(self.specialevents[i])]
                                     else:
-                                        temp = self.stemp2[int(self.specialevents[i])]  
+                                        temp = self.stemp2[int(self.specialevents[i])]
                                     
                                 if self.eventsGraphflag == 4 and self.specialeventstype[i] < 4 and aw.qmc.showEtypes[self.specialeventstype[i]]:
                                     temp = evalues[self.specialeventstype[i]][0]
@@ -6457,8 +6471,12 @@ class tgraphcanvas(FigureCanvas):
                                         boxcolor = self.palette["specialeventbox"]
                                         textcolor = self.palette["specialeventtext"]
                                     if self.eventsGraphflag in [0,3] or self.specialeventstype[i] > 3:
+                                        if i in self.l_event_flags_dict:
+                                            xytext = self.l_event_flags_dict[i].xyann
+                                        else:
+                                            xytext = (self.timex[int(self.specialevents[i])],temp+height)
                                         anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                                     xytext=(self.timex[int(self.specialevents[i])],temp+height),
+                                                     xytext=xytext,
                                                      alpha=0.9,
                                                      color=textcolor,
                                                      va="center", ha="center",
@@ -6473,6 +6491,8 @@ class tgraphcanvas(FigureCanvas):
                                             anno.set_picker(aw.draggable_text_box_picker)
                                         except: # mpl before v3.0 do not have this set_in_layout() function
                                             pass
+                                        # register draggable flag annotation to be re-created after re-positioning on redraw
+                                        self.l_event_flags_dict[i] = anno
                                     elif self.eventsGraphflag == 4:
                                         anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
                                                      xytext=(self.timex[int(self.specialevents[i])],temp),
@@ -6485,8 +6505,6 @@ class tgraphcanvas(FigureCanvas):
                                                      )
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                            # we do not allow to drag labels in bar graph!
-                                            #anno.draggable(use_blit=True)
                                         except: # mpl before v3.0 do not have this set_in_layout() function
                                             pass
                             
@@ -6641,11 +6659,11 @@ class tgraphcanvas(FigureCanvas):
                             
                 if not self.designerflag and aw.qmc.BTcurve:
                     if self.flagon: # no smoothed lines in this case, pass normal BT
-                        self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
+                        aw.qmc.l_annotations = self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
                     else:
                         TP_index = aw.findTP()
                         if aw.qmc.annotationsflag:
-                            self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
+                            aw.qmc.l_annotations = self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
                         if self.timeindex[6]:
                             self.writestatistics(TP_index)
                 
@@ -6692,7 +6710,11 @@ class tgraphcanvas(FigureCanvas):
                         ncol = int(math.ceil(len(self.handles)))
                     if aw.qmc.graphfont == 1:
                         self.labels = [toASCII(l) for l in self.labels]
-                    leg = self.ax.legend(self.handles,self.labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                    if self.legend is None:
+                        loc = self.legendloc
+                    else:
+                        loc = self.legend._loc
+                    leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
                     try:
                         leg.set_in_layout(False) # remove legend from tight_layout calculation
                     except: # set_in_layout not available in mpl<3.x
@@ -8269,6 +8291,7 @@ class tgraphcanvas(FigureCanvas):
                             except:
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
+                            del self.l_annotations_dict[0]
                             self.timeindex[0] = -1
                             removed = True
                             self.xaxistosm(redraw=False)
@@ -8302,12 +8325,7 @@ class tgraphcanvas(FigureCanvas):
                         t2 = self.temp2[self.timeindex[0]]
                         tx = self.timex[self.timeindex[0]]
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
-                        self.l_annotations += self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
-# in_layout all ready handled in self.annotate()
-#                        try:
-#                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-#                        except: # mpl before v3.0 do not have this set_in_layout() function
-#                            pass                        
+                        self.l_annotations += self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down,draggable_anno_key=0)
                         # mark active slider values that are not zero 
 
                         for slidernr in range(4):
@@ -8376,11 +8394,7 @@ class tgraphcanvas(FigureCanvas):
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
-                    self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down,-50,1.)
-                    try:
-                        self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-                    except: # mpl before v3.0 do not have this set_in_layout() function
-                        pass
+                    self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down,-50,1.,draggable_anno_key=-1)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need to update the background cache with the new annotation
                     st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
@@ -8419,7 +8433,8 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == DE_str:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
-                            self.l_annotations = self.l_annotations[:-2] 
+                            self.l_annotations = self.l_annotations[:-2]
+                            del self.l_annotations_dict[1]
                             self.timeindex[1] = 0
                             removed = True
                     elif not aw.button_19.isFlat():
@@ -8440,11 +8455,7 @@ class tgraphcanvas(FigureCanvas):
                         #anotate temperature
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
-                        self.l_annotations += self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
-                        try:
-                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-                        except: # mpl before v3.0 do not have this set_in_layout() function
-                            pass
+                        self.l_annotations += self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down,draggable_anno_key=1)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[1]
@@ -8512,7 +8523,8 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
-                            self.l_annotations = self.l_annotations[:-2]  
+                            self.l_annotations = self.l_annotations[:-2]
+                            del self.l_annotations_dict[2]
                             self.timeindex[2] = 0
                             removed = True
                     elif not aw.button_3.isFlat():
@@ -8535,11 +8547,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
                         else:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
-                        self.l_annotations += self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
-                        try:
-                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-                        except: # mpl before v3.0 do not have this set_in_layout() function
-                            pass  
+                        self.l_annotations += self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down,draggable_anno_key=2)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[2]
@@ -8603,7 +8611,8 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
-                            self.l_annotations = self.l_annotations[:-2]  
+                            self.l_annotations = self.l_annotations[:-2]
+                            del self.l_annotations_dict[3]
                             self.timeindex[3] = 0
                             removed = True
                     elif not aw.button_4.isFlat():
@@ -8620,11 +8629,7 @@ class tgraphcanvas(FigureCanvas):
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[3]]-start,False)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
-                        self.l_annotations += self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
-                        try:
-                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-                        except: # mpl before v3.0 do not have this set_in_layout() function
-                            pass  
+                        self.l_annotations += self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down,draggable_anno_key=3)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -8689,7 +8694,8 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
-                            self.l_annotations = self.l_annotations[:-2]  
+                            self.l_annotations = self.l_annotations[:-2]
+                            del self.l_annotations_dict[4]
                             self.timeindex[4] = 0
                             removed = True
                     elif not aw.button_5.isFlat():
@@ -8708,11 +8714,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
                         else:
                             self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
-                        self.l_annotations += self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
-                        try:
-                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-                        except: # mpl before v3.0 do not have this set_in_layout() function
-                            pass  
+                        self.l_annotations += self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down,draggable_anno_key=4)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -8779,7 +8781,8 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
-                            self.l_annotations = self.l_annotations[:-2]  
+                            self.l_annotations = self.l_annotations[:-2]
+                            del self.l_annotations_dict[5]
                             self.timeindex[5] = 0
                             removed = True
                     elif not aw.button_6.isFlat():
@@ -8795,11 +8798,7 @@ class tgraphcanvas(FigureCanvas):
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
-                        self.l_annotations += self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
-                        try:
-                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-                        except: # mpl before v3.0 do not have this set_in_layout() function
-                            pass
+                        self.l_annotations += self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down,draggable_anno_key=5)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -8864,7 +8863,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     # we check if this is the first DROP mark on this roast
-                    firstDROP = self.timeindex[6] == 0                 
+                    firstDROP = self.timeindex[6] == 0
                     if aw.button_9.isFlat() and self.timeindex[6] > 0:
                         # undo wrongly set FCs
                         # deactivate autoDROP
@@ -8873,7 +8872,8 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
-                            self.l_annotations = self.l_annotations[:-2]  
+                            self.l_annotations = self.l_annotations[:-2]
+                            del self.l_annotations_dict[6]
                             self.timeindex[6] = 0
                             #decrease BatchCounter again
                             self.decBatchCounter()
@@ -8907,11 +8907,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
                         elif self.timeindex[1]:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
-                        self.l_annotations += self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
-                        try:
-                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-                        except: # mpl before v3.0 do not have this set_in_layout() function
-                            pass
+                        self.l_annotations += self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down,draggable_anno_key=6)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         
@@ -9084,7 +9080,8 @@ class tgraphcanvas(FigureCanvas):
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
-                            self.l_annotations = self.l_annotations[:-2]  
+                            self.l_annotations = self.l_annotations[:-2]
+                            del self.l_annotations_dict[7]
                             self.timeindex[7] = 0
                             removed = True
                         
@@ -9103,11 +9100,7 @@ class tgraphcanvas(FigureCanvas):
                         #anotate temperature
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
-                        self.l_annotations += self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
-                        try:
-                            self.l_annotations[-1].set_in_layout(False)  # remove text annotations from tight_layout calculation
-                        except: # mpl before v3.0 do not have this set_in_layout() function
-                            pass
+                        self.l_annotations += self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down,draggable_anno_key=7)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
             else:
@@ -11430,7 +11423,7 @@ class tgraphcanvas(FigureCanvas):
                     try:
                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                     except: # mpl before v3.0 do not have this set_in_layout() function
-                        pass                          
+                        pass
                     count += 1
             self.fig.canvas.draw()
 
@@ -35411,7 +35404,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-        
+    
     def readScale(self):
         if self.disconnecting:
             aw.scale.closeport()
