@@ -3189,7 +3189,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6]:
                         aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
         
-                    timestr = self.stringfromseconds(int(round(ts)))
+                    timestr = self.stringfromseconds(ts)
                     aw.lcd1.display(u(timestr))
                     
                     # update connected WebLCDs
@@ -5092,7 +5092,7 @@ class tgraphcanvas(FigureCanvas):
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable)
                 #Add Dry End markers
                 if timeindex[1]:
-                    tidx = timeindex[1]
+                    tidx = timeindex[1]                    
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE {0}", None),u(self.stringfromseconds(timex[tidx]-t0,False)))
                     if timeindex2:
@@ -7082,7 +7082,8 @@ class tgraphcanvas(FigureCanvas):
         return j,i  #return height of arm
 
     # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
-    def stringfromseconds(self, seconds, leadingzero=True):
+    def stringfromseconds(self, seconds_raw, leadingzero=True):
+        seconds = int(round(seconds_raw))
         if seconds >= 0:
             if leadingzero:
                 return "%02d:%02d"% divmod(seconds, 60)
@@ -34122,7 +34123,7 @@ class equDataDlg(ArtisanDialog):
                 t = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.timex[i])
                 t.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                 
-                time = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
+                time = QTableWidgetItem(aw.qmc.stringfromseconds(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))
                 time.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
     
                 if len(aw.qmc.plotterequationresults[0]) and len(aw.qmc.plotterequationresults[0]) > i:
@@ -36462,8 +36463,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         offset = 0
         if aw.qmc.timeindex[0] > -1:
             offset = aw.qmc.timex[aw.qmc.timeindex[0]]
+        
         for i in range(ndata):
-            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-offset))))
+            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(aw.qmc.timex[i]-offset))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             if aw.qmc.LCDdecimalplaces:
                 fmtstr = "%.1f"
@@ -42583,7 +42585,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.datatable.setShowGrid(True)
         self.datatable.verticalHeader().setSectionResizeMode(2)
         for i in range(ndata):
-            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
+            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(aw.qmc.timeB[i]-start))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             if aw.qmc.LCDdecimalplaces:
                 fmtstr = "%.1f"
