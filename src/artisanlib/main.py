@@ -51480,12 +51480,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                             typeComboBox.setCurrentIndex(devices.index(dev_name))
                         except Exception:
                             pass
-                        color1Button = QPushButton(QApplication.translate("Button",u(aw.qmc.extradevicecolor1[i]),None))
+                        color1Button = QPushButton(u(aw.qmc.extradevicecolor1[i]))
                         color1Button.setFocusPolicy(Qt.NoFocus)
                         color1Button.clicked.connect(self.setextracolor1)
                         textcolor = aw.labelBorW(aw.qmc.extradevicecolor1[i])
                         color1Button.setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor1[i], textcolor))
-                        color2Button = QPushButton(QApplication.translate("Button",u(aw.qmc.extradevicecolor2[i]),None))
+                        color2Button = QPushButton(u(aw.qmc.extradevicecolor2[i]))
                         color2Button.setFocusPolicy(Qt.NoFocus)
                         color2Button.clicked.connect(self.setextracolor2)
                         textcolor = aw.labelBorW(aw.qmc.extradevicecolor2[i])
@@ -51953,8 +51953,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor1[i] = colorname
                     # set LCD label color
-                    aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))
+                    aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))                    
                     self.devicetable.cellWidget(i,1).setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor1[i], aw.labelBorW(aw.qmc.extradevicecolor1[i])))
+                    self.devicetable.cellWidget(i,1).setText(u(colorname))
                     aw.checkColors([(aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background'])])
                     aw.checkColors([(aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette['background'])])
             #line 2
@@ -51967,6 +51968,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     # set LCD label color
                     aw.setLabelColor(aw.extraLCDlabel2[i],QColor(colorname))
                     self.devicetable.cellWidget(i,2).setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor2[i], aw.labelBorW(aw.qmc.extradevicecolor2[i])))
+                    self.devicetable.cellWidget(i,2).setText(u(colorname))
                     aw.checkColors([(aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background'])])
                     aw.checkColors([(aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Legend bkgnd",None),aw.qmc.palette['background'])])
         except Exception as e:
