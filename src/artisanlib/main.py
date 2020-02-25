@@ -4326,7 +4326,7 @@ class tgraphcanvas(FigureCanvas):
                     # the special case of a variable Y1 overlapping with a variable Y11,..,Y12 in this simple test has to be excluded to avoid
                     # that if mathexpression="Y11" and mathdictionary contains {"Y1":-1} -1 is returned instead of the correct value of Y11
                     # "x" occurs in "max" and has also to be excluded, as "t" and "b"
-                    if any([((k in mathexpression) if k not in ["Y1","x","t","b"] else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
+                    if any([((k in mathexpression) if k not in (["Y1","x","t","b"] if ("max" in mathexpression) else ["Y1","t","b"]) else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
                         return -1
                     else:
