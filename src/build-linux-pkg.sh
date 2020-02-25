@@ -22,8 +22,8 @@ tar -xf dist-centos64.tar -C debian/usr/share
 mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 fakeroot chown -R root:root debian
-sudo chmod -R go-w debian
-sudo chmod 0644 debian/usr/share/artisan/*.so*
+fakeroot chmod -R go-w debian
+fakeroot chmod 0644 debian/usr/share/artisan/*.so*
 rm -f ${NAME}*.rpm
 
 cd debian
@@ -52,7 +52,7 @@ flavor." \
 -v ${VERSION} --prefix / usr etc
 
 # Allow FPM to write some temporary files
-sudo chmod o+w .
+fakeroot chmod o+w .
 fpm --deb-no-default-config-files -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" -p .. \
 --vendor "Artisan GitHub" \
 --no-auto-depends \
