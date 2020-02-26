@@ -5534,7 +5534,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.graphstyle == 1:
                     scale = 1
                 else:
-                    scale = 0            
+                    scale = 0
                 length = 700 # 100 (128 the default)
                 randomness = 12 # 2 (16 default)
                 rcParams['path.sketch'] = (scale, length, randomness)
@@ -5552,6 +5552,11 @@ class tgraphcanvas(FigureCanvas):
                 
                 rcParams['xtick.color'] = self.palette["xlabel"]
                 rcParams['ytick.color'] = self.palette["ylabel"]
+                
+                if self.ax is None:
+                    self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
+                if self.delta_ax is None:
+                    self.delta_ax = self.ax.twinx()
 
 #                self.fig.clf()   #wipe out figure (remove all artists and axis). keep_observers=False
 #                # first remove previous figure axis
@@ -7532,7 +7537,13 @@ class tgraphcanvas(FigureCanvas):
         try:
     
             pi = math.pi
+            
+            # to trigger a recreation of the standard axis in redraw() we remove them completely
+            self.ax = None
+            self.delta_ax = None
+
             self.fig.clf()
+            
             #create a new name ax1 instead of ax (ax is used when plotting profiles)
             
             if self.ax1 is not None:
@@ -7606,7 +7617,7 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                 except: # mpl before v3.0 do not have this set_in_layout() function
-                    pass                                    
+                    pass
     
             score = 0.
             for i in range(nflavors):
@@ -10448,7 +10459,7 @@ class tgraphcanvas(FigureCanvas):
             lptemp2 = self.temp2[lpindex]
             # we only consider TP if its BT is at least 20 degrees lower than the CHARGE temperature
             if self.temp2[self.timeindex[0]] < (lptemp2 + 20):
-                lpindex = -1                
+                lpindex = -1
         else:
             lpindex = -1
 
@@ -24135,7 +24146,7 @@ class ApplicationWindow(QMainWindow):
             self.userprofilepath = toString(settings.value("profilepath",self.userprofilepath))
             if settings.contains("settingspath") and not filename:
                 self.settingspath = toString(settings.value("settingspath",self.settingspath))
-            if settings.contains("wheelpath"):            
+            if settings.contains("wheelpath"):
                 self.wheelpath = toString(settings.value("wheelpath",self.wheelpath))
             if settings.contains("autosavepath"):
                 self.qmc.autosavepath = toString(settings.value("autosavepath",self.qmc.autosavepath))
@@ -26677,22 +26688,20 @@ class ApplicationWindow(QMainWindow):
                                 tx = numpy.array(timex)
                                 cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                                 t1 = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=cf,decay_smoothing=not aw.qmc.optimalSmoothing)
-                                # we start RoR computation 10 readings after CHARGE to avoid this initial peak
-                                RoR_start = min(rd["charge_idx"]+10,len(tx)-1)
-                                delta,_ = self.qmc.recomputeDeltas(tx,RoR_start,drop,t1,None,optimalSmoothing=aw.qmc.optimalSmoothing)
-                                if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
-                                    dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
-                                    dlinestyle = self.qmc.BTdeltalinestyle
-                                else:
-                                    dlinewidth = self.qmc.BTdeltalinewidth
-                                    dlinestyle = self.qmc.BTdeltalinestyle
-    #                                if self.qmc.BTdeltalinestyle == "-" and self.qmc.BTlinestyle == "-":
-    #                                    dlinestyle = ':' # dotted
-                                trans = self.qmc.delta_ax.transData
-                                self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
-#                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=path_effects_color)],
-                                sketch_params=None,path_effects=[],
-                                linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
+                                if len(t1)>10 and len(tx) > 10:
+                                    # we start RoR computation 10 readings after CHARGE to avoid this initial peak
+                                    RoR_start = min(rd["charge_idx"]+10,len(tx)-1)
+                                    delta,_ = self.qmc.recomputeDeltas(tx,RoR_start,drop,t1,None,optimalSmoothing=aw.qmc.optimalSmoothing)
+                                    if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
+                                        dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
+                                        dlinestyle = self.qmc.BTdeltalinestyle
+                                    else:
+                                        dlinewidth = self.qmc.BTdeltalinewidth
+                                        dlinestyle = self.qmc.BTdeltalinestyle
+                                    trans = self.qmc.delta_ax.transData
+                                    self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
+                                        sketch_params=None,path_effects=[],
+                                        linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
                                     
                             first_profile = False
 
@@ -27312,6 +27321,7 @@ class ApplicationWindow(QMainWindow):
             #add some random number to force HTML reloading
             graph_image = path2url(graph_image)
             graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
+            
             #obtain flavor chart image
             self.qmc.flavorchart()
             flavor_image = "roastlog-flavor"
@@ -27326,6 +27336,8 @@ class ApplicationWindow(QMainWindow):
             #return screen to GRAPH profile mode
             if sys.platform.startswith("darwin") and darkdetect.isDark():
                 aw.qmc.patheffects = org_patheffects
+            
+            self.qmc.fig.clf() # remove the flavorchart artists
             self.qmc.redraw(recomputeAllDeltas=False)
             met = u("--")
             if "MET" in cp:
@@ -28901,6 +28913,9 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.designerflag:
             self.stopdesigner()
         if self.wheeldialog == None:
+            # remove the standard fig axis to trigger their recreation
+            self.qmc.ax = None
+            self.qmc.delta_ax = None
             self.wheeldialog = WheelDlg(self)
         if self.qmc.wheelflag:
             self.qmc.exitviewmode()
@@ -41993,6 +42008,7 @@ class flavorDlg(ArtisanResizeablDialog):
                 aw.qmc.fig.delaxes(self.aw.qmc.ax1)
             except:
                 pass
+        aw.qmc.fig.clf()
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.showControls()
         self.accept()
