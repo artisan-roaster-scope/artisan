@@ -2422,7 +2422,7 @@ class tgraphcanvas(FigureCanvas):
         self.eventmessagetimer.timeout.connect(self.sendeventmessage)
         self.eventmessagetimer.setSingleShot(True)
         self.eventmessagetimer.start(time)
-                
+    
     def onpick(self,event):
         try:
             # display MET information by clicking on the MET marker
@@ -2658,7 +2658,8 @@ class tgraphcanvas(FigureCanvas):
             firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)
             self.timeindex[action.key[0]] = action.key[1]
             # clear custom label positions cache entry
-            del aw.qmc.l_annotations_dict[action.key[0]]
+            if action.key[0] in aw.qmc.l_annotations_dict:
+                del aw.qmc.l_annotations_dict[action.key[0]]
             if action.key[0] == 0: # CHARGE
                 # realign to background
                 aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
@@ -2667,7 +2668,7 @@ class tgraphcanvas(FigureCanvas):
                     # update ambient temperature if a ambient temperature source is configured and no value yet established
                     aw.qmc.updateAmbientTempFromPhidgetModulesOrCurve()
                 except Exception:
-                    pass                        
+                    pass
 #PLUS
                 # only on first setting the DROP event (not set yet and no previous DROP undone), we upload to PLUS
                 if firstDROP and aw.qmc.autoDROPenabled and aw.plus_account is not None:
@@ -2686,15 +2687,43 @@ class tgraphcanvas(FigureCanvas):
                 self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
             elif action.key[0] == 2 and self.phasesbuttonflag: # FCs
                 self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
+            
+            aw.qmc.fileDirty()
+            self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
         else:
             # add a special event at the current timepoint
-            self.specialevents.append(action.key[1]) # absolut time index
-            self.specialeventstype.append(4) # "--"
-            self.specialeventsStrings.append("")
-            self.specialeventsvalue.append(0)
-                            
-        aw.qmc.fileDirty()
-        self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
+            dlg = customEventDlg(aw,action.key[1])
+            if dlg.exec_():
+                self.specialevents.append(action.key[1]) # absolut time index
+                self.specialeventstype.append(dlg.type) # default: "--"
+                self.specialeventsStrings.append(dlg.description)
+                self.specialeventsvalue.append(dlg.value)
+                
+                try:
+                    dlg.dialogbuttons.accepted.disconnect()
+                    dlg.dialogbuttons.rejected.disconnect()
+                    QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+                    try: # sip not supported on older PyQt versions (RPi!)
+                        sip.delete(dlg)
+                        #print(sip.isdeleted(dlg))
+                    except:
+                        pass
+                except:
+                    pass
+                aw.qmc.fileDirty()
+                self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
+            else:
+                try:
+                    dlg.dialogbuttons.accepted.disconnect()
+                    dlg.dialogbuttons.rejected.disconnect()
+                    QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+                    try: # sip not supported on older PyQt versions (RPi!)
+                        sip.delete(dlg)
+                        #print(sip.isdeleted(dlg))
+                    except:
+                        pass
+                except:
+                    pass
         
     def updateWebLCDs(self,bt=None,et=None,time=None,alertTitle=None,alertText=None,alertTimeout=None):
         try:
@@ -8366,7 +8395,8 @@ class tgraphcanvas(FigureCanvas):
                             except:
                                 pass
                             self.l_annotations = self.l_annotations[:-2]
-                            del self.l_annotations_dict[0]
+                            if 0 in self.l_annotations_dict:
+                                del self.l_annotations_dict[0]
                             self.timeindex[0] = -1
                             removed = True
                             self.xaxistosm(redraw=False)
@@ -8509,7 +8539,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
                             self.l_annotations = self.l_annotations[:-2]
-                            del self.l_annotations_dict[1]
+                            if 1 in self.l_annotations_dict:
+                                del self.l_annotations_dict[1]
                             self.timeindex[1] = 0
                             removed = True
                     elif not aw.button_19.isFlat():
@@ -8599,7 +8630,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
                             self.l_annotations = self.l_annotations[:-2]
-                            del self.l_annotations_dict[2]
+                            if 2 in self.l_annotations_dict:
+                                del self.l_annotations_dict[2]
                             self.timeindex[2] = 0
                             removed = True
                     elif not aw.button_3.isFlat():
@@ -8687,7 +8719,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
                             self.l_annotations = self.l_annotations[:-2]
-                            del self.l_annotations_dict[3]
+                            if 3 in self.l_annotations_dict:
+                                del self.l_annotations_dict[3]
                             self.timeindex[3] = 0
                             removed = True
                     elif not aw.button_4.isFlat():
@@ -8770,7 +8803,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
                             self.l_annotations = self.l_annotations[:-2]
-                            del self.l_annotations_dict[4]
+                            if 4 in self.l_annotations_dict:
+                                del self.l_annotations_dict[4]
                             self.timeindex[4] = 0
                             removed = True
                     elif not aw.button_5.isFlat():
@@ -8857,7 +8891,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
                             self.l_annotations = self.l_annotations[:-2]
-                            del self.l_annotations_dict[5]
+                            if 5 in self.l_annotations_dict:
+                                del self.l_annotations_dict[5]
                             self.timeindex[5] = 0
                             removed = True
                     elif not aw.button_6.isFlat():
@@ -8948,7 +8983,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
                             self.l_annotations = self.l_annotations[:-2]
-                            del self.l_annotations_dict[6]
+                            if 6 in self.l_annotations_dict:
+                                del self.l_annotations_dict[6]
                             self.timeindex[6] = 0
                             #decrease BatchCounter again
                             self.decBatchCounter()
@@ -9156,7 +9192,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
                             self.l_annotations = self.l_annotations[:-2]
-                            del self.l_annotations_dict[7]
+                            if 7 in self.l_annotations_dict:
+                                del self.l_annotations_dict[7]
                             self.timeindex[7] = 0
                             removed = True
                         
@@ -19721,10 +19758,10 @@ class ApplicationWindow(QMainWindow):
                 self.processingKeyEvent = True
                 key = int(event.key())
                 modifiers = event.modifiers()
-                control_modifier = modifiers == Qt.ControlModifier
+                control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS
                 alt_modifier = modifiers == Qt.AltModifier
                 control_alt_modifier = modifiers == (Qt.ControlModifier | Qt.AltModifier)
-                #meta_modifier = modifiers == Qt.MetaModifier
+                #meta_modifier = modifiers == Qt.MetaModifier # right-click (Control-click on macOS)
                 #uncomment next line to find the integer value of a key
                 #print(key)
                 
@@ -20377,9 +20414,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventsStrings[lenevents-1] = u(self.lineEvent.text())
             if aw.qmc.timeindex[0] > -1:
                 newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ self.qmc.stringtoseconds(str(self.etimeline.text())))
-                if self.qmc.specialevents[lenevents-1] != newtime:
+                if self.qmc.specialevents[lenevents-1] != newtime and lenevents-1 in self.qmc.l_event_flags_dict:
                     # remove the cached label position of this entry as its time changed
-                    del aw.qmc.l_event_flags_dict[lenevents-1]
+                    del self.qmc.l_event_flags_dict[lenevents-1]
                 self.qmc.specialevents[lenevents-1] = newtime
 
             self.lineEvent.clearFocus()
@@ -34492,6 +34529,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.org_weight = aw.qmc.weight[:]
         self.org_volume = aw.qmc.volume[:]
         
+        self.batcheditmode = False # a click to the batch label enables the batcheditmode
+        
         self.ble = None # the BLE interface
         self.scale_weight = None # weight received from a connected scale
         self.scale_battery = None # battery level of the connected scale in %
@@ -34765,23 +34804,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         else:
             dateedit.setStyleSheet("background-color: #eeeeee;")
         #Batch
-        batchlabel = QLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
+        batchlabel = ClickableQLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
+        batchlabel.clicked.connect(self.enableBatchEdit)
+        self.batchLayout = QHBoxLayout()
         if aw.superusermode: # and aw.qmc.batchcounter > -1:
-            self.batchprefixedit = QLineEdit(u(aw.qmc.roastbatchprefix))
-            self.batchcounterSpinBox = QSpinBox()
-            self.batchcounterSpinBox.setRange(0,999999)
-            self.batchcounterSpinBox.setSingleStep(1)
-            self.batchcounterSpinBox.setValue(aw.qmc.roastbatchnr)
-            self.batchcounterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter) 
-            self.batchposSpinBox = QSpinBox()
-            self.batchposSpinBox.setRange(1,99)
-            self.batchposSpinBox.setSingleStep(1)
-            self.batchposSpinBox.setValue(aw.qmc.roastbatchpos)
-            self.batchposSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter) 
-            batchLayout = QHBoxLayout()
-            batchLayout.addWidget(self.batchprefixedit)
-            batchLayout.addWidget(self.batchcounterSpinBox)
-            batchLayout.addWidget(self.batchposSpinBox)
+            self.defineBatchEditor()
         else:
             batch = ""
             if aw.qmc.roastbatchnr != 0:
@@ -34792,13 +34819,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                 batch = ""
             else:
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + roastpos + u(" ")
-            batchedit = QLineEdit(batch)
-            batchedit.setReadOnly(True)
+            self.batchedit = QLineEdit(batch)
+            self.batchedit.setReadOnly(True)
             if sys.platform.startswith("darwin") and darkdetect.isDark():
-                batchedit.setStyleSheet("background-color: #757575; color : white;")
+                self.batchedit.setStyleSheet("background-color: #757575; color : white;")
             else:
-                batchedit.setStyleSheet("background-color: #eeeeee;")
-            batchedit.setFocusPolicy(Qt.NoFocus)
+                self.batchedit.setStyleSheet("background-color: #eeeeee;")
+            self.batchedit.setFocusPolicy(Qt.NoFocus)
             
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
@@ -35173,10 +35200,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         datebatch.addSpacing(15)
         datebatch.addWidget(batchlabel)
         datebatch.addSpacing(7)
-        if aw.superusermode: # and aw.qmc.batchcounter > -1:
-            datebatch.addLayout(batchLayout)
-        else:
-            datebatch.addWidget(batchedit)
+        datebatch.addLayout(self.batchLayout)
+        if not aw.superusermode: # and aw.qmc.batchcounter > -1:
+            self.batchLayout.addWidget(self.batchedit)
         textLayout.addLayout(datebatch,0,1)
         
         titleLine = QHBoxLayout()
@@ -35525,6 +35551,30 @@ class editGraphDlg(ArtisanResizeablDialog):
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
     
+    def enableBatchEdit(self):
+        modifiers = QApplication.keyboardModifiers()
+        meta_modifier = modifiers == Qt.MetaModifier # right-click (Control-click on macOS)
+        if not aw.superusermode and not self.batcheditmode and meta_modifier:
+            self.batcheditmode = True
+            self.batchLayout.removeWidget(self.batchedit)
+            self.defineBatchEditor()
+    
+    def defineBatchEditor(self):
+        self.batchprefixedit = QLineEdit(u(aw.qmc.roastbatchprefix))
+        self.batchcounterSpinBox = QSpinBox()
+        self.batchcounterSpinBox.setRange(0,999999)
+        self.batchcounterSpinBox.setSingleStep(1)
+        self.batchcounterSpinBox.setValue(aw.qmc.roastbatchnr)
+        self.batchcounterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter) 
+        self.batchposSpinBox = QSpinBox()
+        self.batchposSpinBox.setRange(1,99)
+        self.batchposSpinBox.setSingleStep(1)
+        self.batchposSpinBox.setValue(aw.qmc.roastbatchpos)
+        self.batchposSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.batchLayout.addWidget(self.batchprefixedit)
+        self.batchLayout.addWidget(self.batchcounterSpinBox)
+        self.batchLayout.addWidget(self.batchposSpinBox)
+        
     def readScale(self):
         if self.disconnecting:
             aw.scale.closeport()
@@ -36299,7 +36349,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         aw.qmc.ambient_humidity = self.org_ambient_humidity
         aw.qmc.ambient_pressure = self.org_ambient_pressure
         
-        self.reject()   
+        self.reject()
 
     # calcs volume (in ml) from density (in g/l) and weight (in g)
     def calc_volume(self,density,weight):
@@ -37384,7 +37434,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         aw.qmc.drumspeed = u(self.drumspeed.text())
         aw.qmc.roastingnotes = u(self.roastingeditor.toPlainText())
         aw.qmc.cuppingnotes = u(self.cuppingeditor.toPlainText())
-        if aw.superusermode and aw.qmc.batchcounter > -1:
+        if aw.superusermode or self.batcheditmode:
             aw.qmc.roastbatchprefix = u(self.batchprefixedit.text())
             aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
             aw.qmc.roastbatchpos = self.batchposSpinBox.value()
@@ -38445,6 +38495,7 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot(int)
     def changelegendloc(self,_):
         aw.qmc.legendloc = self.legendComboBox.currentIndex()
+        aw.qmc.legend = None
         aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(int)
@@ -45170,15 +45221,26 @@ class serialport(object):
             try:
                 dialogx.okButton.disconnect()
                 dialogx.cancelButton.disconnect()
+                QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+                try: # sip not supported on older PyQt versions (RPi!)
+                    sip.delete(dialogx)
+                    #print(sip.isdeleted(dialogx))
+                except:
+                    pass
                 del dialogx
             except:
                 pass
             return ET, BT
         else:
             try:
-                
                 dialogx.okButton.disconnect()
                 dialogx.cancelButton.disconnect()
+                QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+                try: # sip not supported on older PyQt versions (RPi!)
+                    sip.delete(dialogx)
+                    #print(sip.isdeleted(dialogx))
+                except:
+                    pass
                 del dialogx
             except:
                 pass
@@ -48925,6 +48987,64 @@ class pointDlg(ArtisanDialog):
         self.values[1] = float(self.tempEdit.text())
         self.accept()
 
+#########################################################################
+#############  CUSTOM EVENT DIALOG ######################################
+#########################################################################
+
+class customEventDlg(ArtisanDialog):
+    def __init__(self, parent = None,time_idx=0,description="",event_type=4,value=0):
+        super(customEventDlg,self).__init__(parent)
+        if time_idx != 0:
+            event_time = aw.qmc.timex[time_idx]
+            if aw.qmc.timeindex[0] > -1:
+                event_time -= aw.qmc.timex[aw.qmc.timeindex[0]]
+            event_time_str = " @ " + aw.eventtime2string(event_time)
+        else:
+            event_time_str = ""
+        self.setWindowTitle(QApplication.translate("Form Caption","Event",None) + event_time_str)
+        self.description = description
+        self.type = event_type
+        self.value = aw.qmc.eventsvalues(value)
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(self.accept)
+        self.dialogbuttons.rejected.connect(self.reject)
+        
+        descriptionLabel = QLabel(QApplication.translate("Table", "Description", None))
+        self.descriptionEdit = QLineEdit(self.description)
+        typeLabel = QLabel(QApplication.translate("Table", "Type", None))
+        etypes = aw.qmc.getetypes()
+        self.typeCombo = MyQComboBox()
+        self.typeCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.typeCombo.addItems(etypes)
+        self.typeCombo.setCurrentIndex(self.type)
+        valueLabel = QLabel(QApplication.translate("Table", "Value", None))
+        self.valueEdit = QLineEdit(str(self.value))
+        
+        grid = QGridLayout()
+        grid.addWidget(descriptionLabel,0,0)
+        grid.addWidget(self.descriptionEdit,0,1)
+        grid.addWidget(typeLabel,1,0)
+        grid.addWidget(self.typeCombo,1,1)
+        grid.addWidget(valueLabel,2,0)
+        grid.addWidget(self.valueEdit,2,1)
+
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(self.dialogbuttons)
+        
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(grid)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonsLayout)
+        self.setLayout(mainLayout)
+        
+    def accept(self):
+        self.description = self.descriptionEdit.text()
+        evalue = self.valueEdit.text()
+        self.value = aw.qmc.str2eventsvalue(str(evalue))
+        self.type = self.typeCombo.currentIndex()
+        super(customEventDlg,self).accept()
 
 #########################################################################
 #############  NONE DEVICE DIALOG #######################################
