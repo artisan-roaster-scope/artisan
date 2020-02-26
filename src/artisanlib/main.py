@@ -1209,6 +1209,8 @@ class tgraphcanvas(FigureCanvas):
 
         #legend location
         self.legendloc = 7
+        self.legendloc_pos = None # holds the custom position of the legend set on profile load and reset after first redraw
+        
         self.fig.subplots_adjust(
             # all values in percent
             top=0.93, # the top of the subplots of the figure (default: 0.9)
@@ -1855,9 +1857,13 @@ class tgraphcanvas(FigureCanvas):
         self.l_eventtype4dots = None
         
         self.l_annotations = []
-        self.l_annotations_dict = {} # associating event ids (-1:TP, 0:CHARGE, 1:DRY,...) to its pair of draggable temp and time annotations
-        self.l_event_flags_dict = {} # assocating event flag annotations id (event number) to its draggable text annotation
         self.l_background_annotations = []
+
+        # NOTE: the l_annotations_pos_dict is set on profile load and its positions are prefered over those in l_annotations_dict, but deleted at the end of the first redraw()
+        self.l_annotations_dict = {} # associating event ids (-1:TP, 0:CHARGE, 1:DRY,...) to its pair of draggable temp and time annotations
+        self.l_annotations_pos_dict = {} # associating event ids (-1:TP, 0:CHARGE, 1:DRY,...) to its pair of draggable temp and time xyann coordinate pairs
+        self.l_event_flags_dict = {} # assocating event flag annotations id (event number) to its draggable text annotation
+        self.l_event_flags_pos_dict = {} # assocating event flag annotations id (event number) to its draggable text xyann coordinates
         
         self.ai = None # holds background logo image
 
@@ -2651,6 +2657,8 @@ class tgraphcanvas(FigureCanvas):
             # we check if this is the first DROP mark on this roast
             firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)
             self.timeindex[action.key[0]] = action.key[1]
+            # clear custom label positions cache entry
+            del aw.qmc.l_annotations_dict[action.key[0]]
             if action.key[0] == 0: # CHARGE
                 # realign to background
                 aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
@@ -5008,6 +5016,45 @@ class tgraphcanvas(FigureCanvas):
             return numpy.concatenate(([None]*(fromIndex),res.tolist(),[None]*(len(a)-toIndex))).tolist()
         else:
             return b
+    
+    # returns the position of the main event annotations as list of lists of the form
+    #   [[id,temp_x,temp_y,time_x,time_y],...]
+    # with id the main event id like -1 for TP, 0 for CHARGE, 1 for DRY,..
+    def getAnnoPositions(self):
+        res = []
+        for k,v in self.l_annotations_dict.items():
+            temp_anno = v[0].xyann
+            time_anno = v[1].xyann
+            res.append([k,temp_anno[0],temp_anno[1],time_anno[0],time_anno[1]])
+        return res
+        
+    def setAnnoPositions(self,anno_positions):
+        for ap in anno_positions:
+            if len(ap) == 5:
+                i = ap[0]
+                temp_x = ap[1]
+                temp_y = ap[2]
+                time_x = ap[3]
+                time_y = ap[4]
+                self.l_annotations_pos_dict[i] = ((temp_x,temp_y),(time_x,time_y))
+    
+    # returns the position of the custom event flag annotations as list of lists of the form
+    #   [[id,x,y],...]
+    # with id the event id
+    def getFlagPositions(self):
+        res = []
+        for k,v in self.l_event_flags_dict.items():
+            flag_anno = v.xyann
+            res.append([k,flag_anno[0],flag_anno[1]])
+        return res
+    
+    def setFlagPositions(self,flag_positions):
+        for fp in flag_positions:
+            if len(fp) == 3:
+                i = fp[0]
+                x = fp[1]
+                y = fp[2]
+                self.l_event_flags_pos_dict[i] = (x,y)
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.,draggable=True,draggable_anno_key=None):
         fontprop_small = aw.mpl_fontproperties.copy()
@@ -5022,8 +5069,12 @@ class tgraphcanvas(FigureCanvas):
             fmtstr = "%.1f"
         else:
             fmtstr = "%.0f"
-        if draggable and draggable_anno_key is not None and draggable_anno_key in aw.qmc.l_annotations_dict:
-            xytext = aw.qmc.l_annotations_dict[draggable_anno_key][0].xyann
+        if draggable and draggable_anno_key is not None and draggable_anno_key in self.l_annotations_pos_dict:
+            # we first look into the position dictionary loaded from file
+            xytext = self.l_annotations_pos_dict[draggable_anno_key][0]
+        elif draggable and draggable_anno_key is not None and draggable_anno_key in self.l_annotations_dict:
+            # next we check the "live" dictionary
+            xytext = self.l_annotations_dict[draggable_anno_key][0].xyann
         else:
             xytext = (x+e,y + yup)
         temp_anno = self.ax.annotate(fmtstr%(temp), xy=(x,y),xytext=xytext,
@@ -5036,8 +5087,11 @@ class tgraphcanvas(FigureCanvas):
         except: # mpl before v3.0 do not have this set_in_layout() function
             pass
         #anotate time
-        if draggable and draggable_anno_key is not None and draggable_anno_key in aw.qmc.l_annotations_dict:
-            xytext = aw.qmc.l_annotations_dict[draggable_anno_key][1].xyann
+        if draggable and draggable_anno_key is not None and draggable_anno_key in self.l_annotations_pos_dict:
+            # we first look into the position dictionary loaded from file
+            xytext = self.l_annotations_pos_dict[draggable_anno_key][1]
+        elif draggable and draggable_anno_key is not None and draggable_anno_key in self.l_annotations_dict:
+            xytext = self.l_annotations_dict[draggable_anno_key][1].xyann
         else:
             xytext = (x+e,y - ydown)
         time_anno = self.ax.annotate(time_str,xy=(x,y),xytext=xytext,
@@ -6476,7 +6530,9 @@ class tgraphcanvas(FigureCanvas):
                                         boxcolor = self.palette["specialeventbox"]
                                         textcolor = self.palette["specialeventtext"]
                                     if self.eventsGraphflag in [0,3] or self.specialeventstype[i] > 3:
-                                        if i in self.l_event_flags_dict:
+                                        if i in self.l_event_flags_pos_dict:
+                                            xytext = self.l_event_flags_pos_dict[i]
+                                        elif i in self.l_event_flags_dict:
                                             xytext = self.l_event_flags_dict[i].xyann
                                         else:
                                             xytext = (self.timex[int(self.specialevents[i])],temp+height)
@@ -6716,10 +6772,14 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.graphfont == 1:
                         self.labels = [toASCII(l) for l in self.labels]
                     if self.legend is None:
-                        loc = self.legendloc
+                        if self.legendloc_pos is None:
+                            loc = self.legendloc
+                        else:
+                            loc = self.legendloc_pos
                     else:
                         loc = self.legend._loc
                     leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                    
                     try:
                         leg.set_in_layout(False) # remove legend from tight_layout calculation
                     except: # set_in_layout not available in mpl<3.x
@@ -6809,6 +6869,10 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()    
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
             finally:
+                # we initialize at the end of the redraw the event and flag annotation custom position loaded from a profile as it should have been consumed
+                self.l_annotations_pos_dict = {}
+                self.l_event_flags_pos_dict = {}
+                self.legendloc_pos = None
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
 
@@ -9161,6 +9225,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
                 self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
+    # action of the EVENT button
     @pyqtSlot(bool)
     def EventRecord_action(self,_=False):
         self.EventRecord()
@@ -16621,24 +16686,30 @@ class ApplicationWindow(QMainWindow):
 
     # order event table by time
     def orderEvents(self):
-        nevents = len(aw.qmc.specialevents)
-        packed_events = []
-        # pack
-        for i in range(nevents):
-            packed_events.append(
-                (aw.qmc.specialevents[i],
-                 aw.qmc.specialeventstype[i],
-                 aw.qmc.specialeventsStrings[i],
-                 aw.qmc.specialeventsvalue[i]))
-        # sort
-        packed_events.sort(key=lambda tup: tup[0])
-        # unpack
-        for i in range(nevents):
-            aw.qmc.specialevents[i] = packed_events[i][0]
-            aw.qmc.specialeventstype[i] = packed_events[i][1]
-            aw.qmc.specialeventsStrings[i] = packed_events[i][2]
-            aw.qmc.specialeventsvalue[i] = packed_events[i][3]
-            
+        try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
+            nevents = len(aw.qmc.specialevents)
+            packed_events = []
+            # pack
+            for i in range(nevents):
+                packed_events.append(
+                    (aw.qmc.specialevents[i],
+                     aw.qmc.specialeventstype[i],
+                     aw.qmc.specialeventsStrings[i],
+                     aw.qmc.specialeventsvalue[i]))
+            # sort
+            packed_events.sort(key=lambda tup: tup[0])
+            # unpack
+            for i in range(nevents):
+                aw.qmc.specialevents[i] = packed_events[i][0]
+                aw.qmc.specialeventstype[i] = packed_events[i][1]
+                aw.qmc.specialeventsStrings[i] = packed_events[i][2]
+                aw.qmc.specialeventsvalue[i] = packed_events[i][3]
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
+
 
     # if only_active then only the event types with quantifiers activated are grouped
     def clusterEvents(self,only_active=False):
@@ -16648,56 +16719,61 @@ class ApplicationWindow(QMainWindow):
             
     # cluster of events of the given type (0-3)
     def clusterEventsType(self,tp):
-        nevents = len(aw.qmc.specialevents)
-        if nevents:
-            # first order the events table
-            self.orderEvents()
-            # second detect the minimum time span between two events (could be equal to the sampling rate)
-            min_span = None
-            last_event_idx = None # index of last event analyzed
-            for i in range(len(aw.qmc.specialevents)):
-                if aw.qmc.specialeventstype[i] == tp and last_event_idx is not None:
-                    time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
-                    if min_span is None or time_diff < min_span:
-                        min_span = time_diff
-                last_event_idx = i
-            if min_span is not None:
-                min_span = min(1,min_span,aw.qmc.delay/1000 * 3)
-                indexes_to_be_removed = []
+        try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
+            nevents = len(aw.qmc.specialevents)
+            if nevents:
+                # first order the events table
+                self.orderEvents()
+                # second detect the minimum time span between two events (could be equal to the sampling rate)
+                min_span = None
                 last_event_idx = None # index of last event analyzed
-                last_index_not_removed = None
-                # group those with minimally 2x min_span time delta by keeping the first with the value of the last
                 for i in range(len(aw.qmc.specialevents)):
                     if aw.qmc.specialeventstype[i] == tp and last_event_idx is not None:
-                        if aw.qmc.specialeventsvalue[last_event_idx] == aw.qmc.specialeventsvalue[i]:
-                            # if the value of the event is the same as the previous, we remove it
-                            indexes_to_be_removed.append(i)
-                        else:
-                            time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
-                            if time_diff < 2*min_span:
+                        time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
+                        if min_span is None or time_diff < min_span:
+                            min_span = time_diff
+                    last_event_idx = i
+                if min_span is not None:
+                    min_span = min(1,min_span,aw.qmc.delay/1000 * 3)
+                    indexes_to_be_removed = []
+                    last_event_idx = None # index of last event analyzed
+                    last_index_not_removed = None
+                    # group those with minimally 2x min_span time delta by keeping the first with the value of the last
+                    for i in range(len(aw.qmc.specialevents)):
+                        if aw.qmc.specialeventstype[i] == tp and last_event_idx is not None:
+                            if aw.qmc.specialeventsvalue[last_event_idx] == aw.qmc.specialeventsvalue[i]:
+                                # if the value of the event is the same as the previous, we remove it
                                 indexes_to_be_removed.append(i)
-                                if last_index_not_removed is not None:
-                                    aw.qmc.specialeventsvalue[last_index_not_removed] = aw.qmc.specialeventsvalue[i]
                             else:
-                                last_index_not_removed = i
-                    if aw.qmc.specialeventstype[i] == tp:
-                        last_event_idx = i
-                # remove marked events
-                specialevents = []
-                specialeventstype = []
-                specialeventsStrings = []
-                specialeventsvalue = []   
-                for i in range(len(aw.qmc.specialevents)):
-                    if not (i in indexes_to_be_removed):
-                        specialevents.append(aw.qmc.specialevents[i])
-                        specialeventstype.append(aw.qmc.specialeventstype[i])
-                        specialeventsStrings.append(aw.qmc.specialeventsStrings[i])
-                        specialeventsvalue.append(aw.qmc.specialeventsvalue[i])
-                aw.qmc.specialevents = specialevents
-                aw.qmc.specialeventstype = specialeventstype
-                aw.qmc.specialeventsStrings = specialeventsStrings
-                aw.qmc.specialeventsvalue = specialeventsvalue
-                
+                                time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
+                                if time_diff < 2*min_span:
+                                    indexes_to_be_removed.append(i)
+                                    if last_index_not_removed is not None:
+                                        aw.qmc.specialeventsvalue[last_index_not_removed] = aw.qmc.specialeventsvalue[i]
+                                else:
+                                    last_index_not_removed = i
+                        if aw.qmc.specialeventstype[i] == tp:
+                            last_event_idx = i
+                    # remove marked events
+                    specialevents = []
+                    specialeventstype = []
+                    specialeventsStrings = []
+                    specialeventsvalue = []   
+                    for i in range(len(aw.qmc.specialevents)):
+                        if not (i in indexes_to_be_removed):
+                            specialevents.append(aw.qmc.specialevents[i])
+                            specialeventstype.append(aw.qmc.specialeventstype[i])
+                            specialeventsStrings.append(aw.qmc.specialeventsStrings[i])
+                            specialeventsvalue.append(aw.qmc.specialeventsvalue[i])
+                    aw.qmc.specialevents = specialevents
+                    aw.qmc.specialeventstype = specialeventstype
+                    aw.qmc.specialeventsStrings = specialeventsStrings
+                    aw.qmc.specialeventsvalue = specialeventsvalue
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
 
     # decides on visibility of the Control button based on the selected devices and configuration
@@ -20300,7 +20376,11 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventsvalue[lenevents-1] = aw.qmc.str2eventsvalue(str(self.valueEdit.text()))
             self.qmc.specialeventsStrings[lenevents-1] = u(self.lineEvent.text())
             if aw.qmc.timeindex[0] > -1:
-                self.qmc.specialevents[lenevents-1] = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ self.qmc.stringtoseconds(str(self.etimeline.text())))
+                newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ self.qmc.stringtoseconds(str(self.etimeline.text())))
+                if self.qmc.specialevents[lenevents-1] != newtime:
+                    # remove the cached label position of this entry as its time changed
+                    del aw.qmc.l_event_flags_dict[lenevents-1]
+                self.qmc.specialevents[lenevents-1] = newtime
 
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
@@ -22411,6 +22491,21 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.moisture_roasted = profile["moisture_roasted"]
             else:
                 self.qmc.moisture_roasted = 0.
+            if "anno_positions" in profile:
+                self.qmc.setAnnoPositions(profile["anno_positions"])
+            if "flag_positions" in profile:
+                self.qmc.setFlagPositions(profile["flag_positions"])
+            if "legendloc_pos" in profile:
+                try:
+                    # if available we transform the custom legend position back from data into axis coordinates
+                    legendloc_pos_data = numpy.array(profile["legendloc_pos"])
+                    axis_to_data = self.qmc.ax.transAxes + self.qmc.ax.transData.inverted()
+                    data_to_axis = axis_to_data.inverted()
+                    pos = data_to_axis.transform(legendloc_pos_data)
+                    self.qmc.legendloc_pos = (pos[0],pos[1])
+                except:
+                    pass
+            
 # we load external programs only from app settings
 #            if "externalprogram" in profile:
 #                self.ser.externalprogram = d(profile["externalprogram"])
@@ -22913,6 +23008,16 @@ class ApplicationWindow(QMainWindow):
                 pass
             profile["elevation"] = self.qmc.elevation
             profile["computed"] = self.computedProfileInformation()
+            # add positions of main event annotations and custom event flags
+            profile["anno_positions"] = self.qmc.getAnnoPositions()
+            profile["flag_positions"] = self.qmc.getFlagPositions()
+            if self.qmc.legend is not None and not isinstance(self.qmc.legend._loc, int):
+                # if a legend is currently drawn and has a custom position we save its position in data coordinates
+                try:
+                    axis_to_data = self.qmc.ax.transAxes + self.qmc.ax.transData.inverted()
+                    profile["legendloc_pos"] = axis_to_data.transform(self.qmc.legend._loc).tolist()
+                except:
+                    pass
             return profile
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -34395,7 +34500,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.disconnecting = False # this is set to True to terminate the scale connection
         self.volumedialog = None # link forward to the the Volume Calculator
         
-        # other parameters remembered for Cancel operation        
+        # other parameters remembered for Cancel operation
         self.org_specialevents = aw.qmc.specialevents[:]
         self.org_specialeventstype = aw.qmc.specialeventstype[:]
         self.org_specialeventsStrings = aw.qmc.specialeventsStrings[:]
@@ -36256,26 +36361,15 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def tabSwitched(self,i):
-        if i == 3:
-            try:
-                #### lock shared resources #####
-                aw.qmc.samplingsemaphore.acquire(1)
-                self.createDataTable()
-            finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+        if i == 0:
+            self.saveEventTable()
+        elif i == 1:
+            self.saveEventTable()
         elif i == 2:
-            try:
-                #### lock shared resources #####
-                aw.qmc.samplingsemaphore.acquire(1)
-            finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
-                self.createEventTable()
-# to clear the selection on entering the event table tab one first has to clear the focus
-# if the event table is freshly created by the call above this is not needed            
-#            QApplication.focusWidget().clearFocus()
-#            self.eventtable.clearSelection()
+            self.createEventTable()
+        elif i == 3:
+            self.saveEventTable()
+            self.createDataTable()
 
     @pyqtSlot(int)
     def roastflagHeavyFCChanged(self,i):
@@ -36554,108 +36648,121 @@ class editGraphDlg(ArtisanResizeablDialog):
                     j = j + 1
 
     def createEventTable(self):
-        nevents = len(aw.qmc.specialevents)
-        
-        #self.eventtable.clear() # this crashes Ubuntu 16.04
-#        if nevents != 0:
-#            self.eventtable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
-        self.eventtable.clearSelection() # this seems to work also for Ubuntu 16.04
-        
-        self.eventtable.setRowCount(nevents)
-        self.eventtable.setColumnCount(6)
-        self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table", "Time", None),
-                                                   QApplication.translate("Table", "ET", None),
-                                                   QApplication.translate("Table", "BT", None),
-                                                   QApplication.translate("Table", "Description", None),
-                                                   QApplication.translate("Table", "Type", None),
-                                                   QApplication.translate("Table", "Value", None)])
-        self.eventtable.setAlternatingRowColors(True)
-        self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.eventtable.setSelectionMode(QTableWidget.ExtendedSelection)
+        try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
+            
+            nevents = len(aw.qmc.specialevents)
+            
+            #self.eventtable.clear() # this crashes Ubuntu 16.04
+    #        if nevents != 0:
+    #            self.eventtable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
+            self.eventtable.clearSelection() # this seems to work also for Ubuntu 16.04
+            
+            self.eventtable.setRowCount(nevents)
+            self.eventtable.setColumnCount(6)
+            self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table", "Time", None),
+                                                       QApplication.translate("Table", "ET", None),
+                                                       QApplication.translate("Table", "BT", None),
+                                                       QApplication.translate("Table", "Description", None),
+                                                       QApplication.translate("Table", "Type", None),
+                                                       QApplication.translate("Table", "Value", None)])
+            self.eventtable.setAlternatingRowColors(True)
+            self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.eventtable.setSelectionMode(QTableWidget.ExtendedSelection)
 
-        self.eventtable.setShowGrid(True)
-        
-        self.eventtable.verticalHeader().setSectionResizeMode(2)
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        etypes = aw.qmc.getetypes()
-        #populate table
-        for i in range(nevents):
-            #create widgets
-            typeComboBox = MyQComboBox()
-            typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-            typeComboBox.addItems(etypes)
-            typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
-
-            if aw.qmc.LCDdecimalplaces:
-                fmtstr = "%.1f"
-            else:
-                fmtstr = "%.0f"
-
-            etline = QLineEdit()
-            etline.setReadOnly(True)
-            etline.setAlignment(Qt.AlignRight)
-            ettemp = fmtstr%(aw.qmc.temp1[aw.qmc.specialevents[i]]) + aw.qmc.mode
-            etline.setText(ettemp)
+            self.eventtable.setShowGrid(True)
+            
+            self.eventtable.verticalHeader().setSectionResizeMode(2)
+            regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+            etypes = aw.qmc.getetypes()
+            #populate table
+            for i in range(nevents):
+                #create widgets
+                typeComboBox = MyQComboBox()
+                typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+                typeComboBox.addItems(etypes)
+                typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
+    
+                if aw.qmc.LCDdecimalplaces:
+                    fmtstr = "%.1f"
+                else:
+                    fmtstr = "%.0f"
+    
+                etline = QLineEdit()
+                etline.setReadOnly(True)
+                etline.setAlignment(Qt.AlignRight)
+                ettemp = fmtstr%(aw.qmc.temp1[aw.qmc.specialevents[i]]) + aw.qmc.mode
+                etline.setText(ettemp)
+                    
+                btline = QLineEdit()
+                btline.setReadOnly(True)
+                btline.setAlignment(Qt.AlignRight)
+                bttemp = fmtstr%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
+                btline.setText(bttemp)
                 
-            btline = QLineEdit()
-            btline.setReadOnly(True)
-            btline.setAlignment(Qt.AlignRight)
-            bttemp = fmtstr%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
-            btline.setText(bttemp)
-            
-            valueEdit = QLineEdit()
-            valueEdit.setAlignment(Qt.AlignRight)
-            valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[i]))
-            
-            timeline = QLineEdit()
-            timeline.setAlignment(Qt.AlignRight)
-            if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
-                timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
-            else:
-                timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]))                
-            timeline.setText(timez)
-            timeline.setValidator(QRegExpValidator(regextime,self))
-            
-            stringline = QLineEdit(aw.qmc.specialeventsStrings[i])
-            #add widgets to the table
-            self.eventtable.setCellWidget(i,0,timeline)
-            self.eventtable.setCellWidget(i,1,etline)
-            self.eventtable.setCellWidget(i,2,btline)
-            self.eventtable.setCellWidget(i,3,stringline)
-            self.eventtable.setCellWidget(i,4,typeComboBox)
-            self.eventtable.setCellWidget(i,5,valueEdit)
-            valueEdit.setValidator(QIntValidator(0,aw.eventsMaxValue,self.eventtable.cellWidget(i,5)))
-        header = self.eventtable.horizontalHeader()
-        #header.setStretchLastSection(True)
-        header.setSectionResizeMode(0, QHeaderView.Fixed)
-        header.setSectionResizeMode(1, QHeaderView.Fixed)
-        header.setSectionResizeMode(2, QHeaderView.Fixed)
-        header.setSectionResizeMode(3, QHeaderView.Stretch)
-        header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(5, QHeaderView.Fixed)
-        # improve width of Time column
-        self.eventtable.setColumnWidth(0,60)
-        self.eventtable.setColumnWidth(1,65)
-        self.eventtable.setColumnWidth(2,65)
-        self.eventtable.setColumnWidth(5,55)
-        # header.setSectionResizeMode(QHeaderView.Stretch)
+                valueEdit = QLineEdit()
+                valueEdit.setAlignment(Qt.AlignRight)
+                valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[i]))
+                
+                timeline = QLineEdit()
+                timeline.setAlignment(Qt.AlignRight)
+                if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
+                    timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+                else:
+                    timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]))
+                timeline.setText(timez)
+                timeline.setValidator(QRegExpValidator(regextime,self))
+                
+                stringline = QLineEdit(aw.qmc.specialeventsStrings[i])
+                #add widgets to the table
+                self.eventtable.setCellWidget(i,0,timeline)
+                self.eventtable.setCellWidget(i,1,etline)
+                self.eventtable.setCellWidget(i,2,btline)
+                self.eventtable.setCellWidget(i,3,stringline)
+                self.eventtable.setCellWidget(i,4,typeComboBox)
+                self.eventtable.setCellWidget(i,5,valueEdit)
+                valueEdit.setValidator(QIntValidator(0,aw.eventsMaxValue,self.eventtable.cellWidget(i,5)))
+            header = self.eventtable.horizontalHeader()
+            #header.setStretchLastSection(True)
+            header.setSectionResizeMode(0, QHeaderView.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.Fixed)
+            header.setSectionResizeMode(2, QHeaderView.Fixed)
+            header.setSectionResizeMode(3, QHeaderView.Stretch)
+            header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(5, QHeaderView.Fixed)
+            # improve width of Time column
+            self.eventtable.setColumnWidth(0,60)
+            self.eventtable.setColumnWidth(1,65)
+            self.eventtable.setColumnWidth(2,65)
+            self.eventtable.setColumnWidth(5,55)
+            # header.setSectionResizeMode(QHeaderView.Stretch)
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
 
     def saveEventTable(self):
-        nevents = self.eventtable.rowCount()
-        for i in range(nevents):
-            timez = self.eventtable.cellWidget(i,0)
-            if aw.qmc.timeindex[0] > -1:
-                aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(str(timez.text())))
-            else:
-                aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.stringtoseconds(str(timez.text())))
-            description = self.eventtable.cellWidget(i,3)
-            aw.qmc.specialeventsStrings[i] = u(description.text())
-            etype = self.eventtable.cellWidget(i,4)
-            aw.qmc.specialeventstype[i] = etype.currentIndex()
-            evalue = self.eventtable.cellWidget(i,5).text()
-            aw.qmc.specialeventsvalue[i] = aw.qmc.str2eventsvalue(str(evalue))
+        try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
+            nevents = self.eventtable.rowCount()
+            for i in range(nevents):
+                timez = self.eventtable.cellWidget(i,0)
+                if aw.qmc.timeindex[0] > -1:
+                    aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(str(timez.text())))
+                else:
+                    aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.stringtoseconds(str(timez.text())))
+                description = self.eventtable.cellWidget(i,3)
+                aw.qmc.specialeventsStrings[i] = u(description.text())
+                etype = self.eventtable.cellWidget(i,4)
+                aw.qmc.specialeventstype[i] = etype.currentIndex()
+                evalue = self.eventtable.cellWidget(i,5).text()
+                aw.qmc.specialeventsvalue[i] = aw.qmc.str2eventsvalue(str(evalue))
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
     @pyqtSlot(bool)
     def copyDataTabletoClipboard(self,_=False):
@@ -36735,15 +36842,21 @@ class editGraphDlg(ArtisanResizeablDialog):
             
     @pyqtSlot(bool)
     def clearEvents(self,_=False):
-        nevents = len(aw.qmc.specialevents)
-        if nevents:
-            aw.qmc.specialevents = []
-            aw.qmc.specialeventstype = []
-            aw.qmc.specialeventsStrings = []
-            aw.qmc.specialeventsvalue = []
-            self.createEventTable()
-            aw.qmc.redraw(recomputeAllDeltas=False)
-            aw.qmc.fileDirty()
+        try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
+            nevents = len(aw.qmc.specialevents)
+            if nevents:
+                aw.qmc.specialevents = []
+                aw.qmc.specialeventstype = []
+                aw.qmc.specialeventsStrings = []
+                aw.qmc.specialeventsvalue = []
+                self.createEventTable()
+                aw.qmc.redraw(recomputeAllDeltas=False)
+                aw.qmc.fileDirty()
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
     
     @pyqtSlot(bool)
     def createAlarmEventTable(self,_=False):
@@ -37145,12 +37258,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     aw.qmc.phases[1] = int(round(aw.qmc.temp2[aw.qmc.timeindex[1]]))
                 if aw.qmc.timeindex[2]:
                     aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
-            try:
-                #### lock shared resources #####
-                self.saveEventTable()
-            finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+            
+            self.saveEventTable()
         # Update Title
         aw.qmc.title = ' '.join(u(self.titleedit.currentText()).split())
         aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
@@ -37274,11 +37383,18 @@ class editGraphDlg(ArtisanResizeablDialog):
         aw.qmc.operator = u(self.operator.text())
         aw.qmc.drumspeed = u(self.drumspeed.text())
         aw.qmc.roastingnotes = u(self.roastingeditor.toPlainText())
-        aw.qmc.cuppingnotes = u(self.cuppingeditor.toPlainText())        
+        aw.qmc.cuppingnotes = u(self.cuppingeditor.toPlainText())
         if aw.superusermode and aw.qmc.batchcounter > -1:
             aw.qmc.roastbatchprefix = u(self.batchprefixedit.text())
             aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
             aw.qmc.roastbatchpos = self.batchposSpinBox.value()
+            
+        # if custom events were changed we clear the event flag position cache 
+        if aw.qmc.specialevents != self.org_specialevents:
+            aw.qmc.l_event_flags_dict = {}
+        # if events were changed we clear the event flag position cache 
+        if aw.qmc.timeindex != self.org_timeindex:
+            aw.qmc.l_annotations_dict = {}
         
         # load selected recent roast template in the background
         if self.template_file:
@@ -41054,6 +41170,7 @@ class EventsDlg(ArtisanResizeablDialog):
             aw.qmc.showeventsonbt = True
         else:
             aw.qmc.showeventsonbt = False
+        aw.qmc.l_event_flags_dict = {} # clear the custom event flag position cache
         aw.qmc.redraw(recomputeAllDeltas=False)
     
     @pyqtSlot(int)
@@ -42118,7 +42235,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         #table for showing events
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
-        self.createEventTable()
+        #self.createEventTable()
         self.copyeventTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
         self.copyeventTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copyeventTableButton.setFocusPolicy(Qt.NoFocus)
@@ -42560,128 +42677,135 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.eventtable.setColumnWidth(2,65)
 
     def createDataTable(self):
-        ndata = len(aw.qmc.timeB)
-        
-        # self.datatable.clear() # this crashes Ubuntu 16.04
-#        if ndata != 0:
-#            self.datatable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
-        self.datatable.clearSelection() # this seems to work also for Ubuntu 16.04
-
-        if aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
-            start = aw.qmc.timeB[aw.qmc.timeindexB[0]]
-        else:
-            start = 0
-        self.datatable.setRowCount(ndata)
-        headers = [QApplication.translate("Table","Time",None),
-                                                  QApplication.translate("Table","ET",None),
-                                                  QApplication.translate("Table","BT",None),
-                                                  deltaLabelUTF8 + QApplication.translate("Table","ET",None),
-                                                  deltaLabelUTF8 + QApplication.translate("Table","BT",None)]
-        xtcurve = False # no XT curve
-        if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
-            idx3 = aw.qmc.xtcurveidx - 1
-            n3 = idx3 // 2
-            if len(aw.qmc.temp1BX) > n3 and len(aw.qmc.extratimexB) > n3:
-                xtcurve = True
-                if aw.qmc.xtcurveidx % 2:
-                    headers.append(aw.qmc.extraname1B[n3])
-                else:
-                    headers.append(aw.qmc.extraname2B[n3])
-        headers.append("") # dummy column that stretches
-        self.datatable.setColumnCount(len(headers))
-        self.datatable.setHorizontalHeaderLabels(headers)
-        self.datatable.setAlternatingRowColors(True)
-        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.datatable.setSelectionMode(QTableWidget.ExtendedSelection) # QTableWidget.SingleSelection, ContiguousSelection, MultiSelection
-        self.datatable.setShowGrid(True)
-        self.datatable.verticalHeader().setSectionResizeMode(2)
-        for i in range(ndata):
-            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(aw.qmc.timeB[i]-start))
-            Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            if aw.qmc.LCDdecimalplaces:
-                fmtstr = "%.1f"
-            else:
-                fmtstr = "%.0f"
-            ET = QTableWidgetItem(fmtstr%aw.qmc.temp1B[i])
-            BT = QTableWidgetItem(fmtstr%aw.qmc.temp2B[i])
-            ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            if i:
-                d = (aw.qmc.timeB[i]-aw.qmc.timeB[i-1])
-                if d == 0:
-                    dET = 0.
-                    dBT = 0.
-                else:
-                    dET = (60*(aw.qmc.temp1B[i]-aw.qmc.temp1B[i-1])/d)
-                    dBT = (60*(aw.qmc.temp2B[i]-aw.qmc.temp2B[i-1])/d)
-                deltaET = QTableWidgetItem("%.1f"%dET)
-                deltaBT = QTableWidgetItem("%.1f"%dBT)
-            else:
-                deltaET = QTableWidgetItem("--")
-                deltaBT = QTableWidgetItem("--")
-            deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            self.datatable.setItem(i,0,Rtime)
-                    
-            if i:
-                #identify by color and add notation
-                if i == aw.qmc.timeindexB[0] != -1:
-                    self.datatable.item(i,0).setBackground(QColor('#f07800'))
-                    text = QApplication.translate("Table", "CHARGE",None)
-                elif i == aw.qmc.timeindexB[1]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate("Table", "DRY END",None)
-                elif i == aw.qmc.timeindexB[2]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate("Table", "FC START",None)
-                elif i == aw.qmc.timeindexB[3]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate("Table", "FC END",None)
-                elif i == aw.qmc.timeindexB[4]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate("Table", "SC START",None)
-                elif i == aw.qmc.timeindexB[5]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate("Table", "SC END",None)
-                elif i == aw.qmc.timeindexB[6]:
-                    self.datatable.item(i,0).setBackground(QColor('#f07800'))
-                    text = QApplication.translate("Table", "DROP",None)
-                elif i == aw.qmc.timeindexB[7]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate("Table", "COOL",None)
-                elif i in aw.qmc.backgroundEvents:
-                    self.datatable.item(i,0).setBackground(QColor('yellow'))
-                    index = aw.qmc.backgroundEvents.index(i)
-                    text = QApplication.translate("Table", "#{0} {1}{2}",None).format(str(index+1),aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0],aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[index]))
-                else:
-                    text = ""
-                Rtime.setText(text + u(" " + Rtime.text()))
-            self.datatable.setItem(i,1,ET)
-            self.datatable.setItem(i,2,BT)
-            self.datatable.setItem(i,3,deltaET)
-            self.datatable.setItem(i,4,deltaBT)
+        try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
             
-            if xtcurve and len(aw.qmc.temp1BX[n3]) > i: # an XT column is availble, fill it with data
-                if aw.qmc.xtcurveidx % 2:
-                    XT = QTableWidgetItem("%.0f"%aw.qmc.temp1BX[n3][i])
+            ndata = len(aw.qmc.timeB)
+            
+            # self.datatable.clear() # this crashes Ubuntu 16.04
+    #        if ndata != 0:
+    #            self.datatable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
+            self.datatable.clearSelection() # this seems to work also for Ubuntu 16.04
+    
+            if aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
+                start = aw.qmc.timeB[aw.qmc.timeindexB[0]]
+            else:
+                start = 0
+            self.datatable.setRowCount(ndata)
+            headers = [QApplication.translate("Table","Time",None),
+                                                      QApplication.translate("Table","ET",None),
+                                                      QApplication.translate("Table","BT",None),
+                                                      deltaLabelUTF8 + QApplication.translate("Table","ET",None),
+                                                      deltaLabelUTF8 + QApplication.translate("Table","BT",None)]
+            xtcurve = False # no XT curve
+            if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
+                idx3 = aw.qmc.xtcurveidx - 1
+                n3 = idx3 // 2
+                if len(aw.qmc.temp1BX) > n3 and len(aw.qmc.extratimexB) > n3:
+                    xtcurve = True
+                    if aw.qmc.xtcurveidx % 2:
+                        headers.append(aw.qmc.extraname1B[n3])
+                    else:
+                        headers.append(aw.qmc.extraname2B[n3])
+            headers.append("") # dummy column that stretches
+            self.datatable.setColumnCount(len(headers))
+            self.datatable.setHorizontalHeaderLabels(headers)
+            self.datatable.setAlternatingRowColors(True)
+            self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.datatable.setSelectionMode(QTableWidget.ExtendedSelection) # QTableWidget.SingleSelection, ContiguousSelection, MultiSelection
+            self.datatable.setShowGrid(True)
+            self.datatable.verticalHeader().setSectionResizeMode(2)
+            for i in range(ndata):
+                Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(aw.qmc.timeB[i]-start))
+                Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                if aw.qmc.LCDdecimalplaces:
+                    fmtstr = "%.1f"
                 else:
-                    XT = QTableWidgetItem("%.0f"%aw.qmc.temp2BX[n3][i])
-                XT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                self.datatable.setItem(i,5,XT)
+                    fmtstr = "%.0f"
+                ET = QTableWidgetItem(fmtstr%aw.qmc.temp1B[i])
+                BT = QTableWidgetItem(fmtstr%aw.qmc.temp2B[i])
+                ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                if i:
+                    d = (aw.qmc.timeB[i]-aw.qmc.timeB[i-1])
+                    if d == 0:
+                        dET = 0.
+                        dBT = 0.
+                    else:
+                        dET = (60*(aw.qmc.temp1B[i]-aw.qmc.temp1B[i-1])/d)
+                        dBT = (60*(aw.qmc.temp2B[i]-aw.qmc.temp2B[i-1])/d)
+                    deltaET = QTableWidgetItem("%.1f"%dET)
+                    deltaBT = QTableWidgetItem("%.1f"%dBT)
+                else:
+                    deltaET = QTableWidgetItem("--")
+                    deltaBT = QTableWidgetItem("--")
+                deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                self.datatable.setItem(i,0,Rtime)
+                        
+                if i:
+                    #identify by color and add notation
+                    if i == aw.qmc.timeindexB[0] != -1:
+                        self.datatable.item(i,0).setBackground(QColor('#f07800'))
+                        text = QApplication.translate("Table", "CHARGE",None)
+                    elif i == aw.qmc.timeindexB[1]:
+                        self.datatable.item(i,0).setBackground(QColor('orange'))
+                        text = QApplication.translate("Table", "DRY END",None)
+                    elif i == aw.qmc.timeindexB[2]:
+                        self.datatable.item(i,0).setBackground(QColor('orange'))
+                        text = QApplication.translate("Table", "FC START",None)
+                    elif i == aw.qmc.timeindexB[3]:
+                        self.datatable.item(i,0).setBackground(QColor('orange'))
+                        text = QApplication.translate("Table", "FC END",None)
+                    elif i == aw.qmc.timeindexB[4]:
+                        self.datatable.item(i,0).setBackground(QColor('orange'))
+                        text = QApplication.translate("Table", "SC START",None)
+                    elif i == aw.qmc.timeindexB[5]:
+                        self.datatable.item(i,0).setBackground(QColor('orange'))
+                        text = QApplication.translate("Table", "SC END",None)
+                    elif i == aw.qmc.timeindexB[6]:
+                        self.datatable.item(i,0).setBackground(QColor('#f07800'))
+                        text = QApplication.translate("Table", "DROP",None)
+                    elif i == aw.qmc.timeindexB[7]:
+                        self.datatable.item(i,0).setBackground(QColor('orange'))
+                        text = QApplication.translate("Table", "COOL",None)
+                    elif i in aw.qmc.backgroundEvents:
+                        self.datatable.item(i,0).setBackground(QColor('yellow'))
+                        index = aw.qmc.backgroundEvents.index(i)
+                        text = QApplication.translate("Table", "#{0} {1}{2}",None).format(str(index+1),aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0],aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[index]))
+                    else:
+                        text = ""
+                    Rtime.setText(text + u(" " + Rtime.text()))
+                self.datatable.setItem(i,1,ET)
+                self.datatable.setItem(i,2,BT)
+                self.datatable.setItem(i,3,deltaET)
+                self.datatable.setItem(i,4,deltaBT)
                 
-        header = self.datatable.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Fixed)
-        header.setSectionResizeMode(1, QHeaderView.Fixed)
-        header.setSectionResizeMode(2, QHeaderView.Fixed)
-        header.setSectionResizeMode(3, QHeaderView.Fixed)
-        header.setSectionResizeMode(4, QHeaderView.Fixed)
-        if xtcurve:
-            header.setSectionResizeMode(5, QHeaderView.Fixed)
-            header.setSectionResizeMode(6, QHeaderView.Stretch)
-        else:
-            header.setSectionResizeMode(5, QHeaderView.Stretch)
-        self.datatable.resizeColumnsToContents()
+                if xtcurve and len(aw.qmc.temp1BX[n3]) > i: # an XT column is availble, fill it with data
+                    if aw.qmc.xtcurveidx % 2:
+                        XT = QTableWidgetItem("%.0f"%aw.qmc.temp1BX[n3][i])
+                    else:
+                        XT = QTableWidgetItem("%.0f"%aw.qmc.temp2BX[n3][i])
+                    XT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                    self.datatable.setItem(i,5,XT)
+                    
+            header = self.datatable.horizontalHeader()
+            header.setSectionResizeMode(0, QHeaderView.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.Fixed)
+            header.setSectionResizeMode(2, QHeaderView.Fixed)
+            header.setSectionResizeMode(3, QHeaderView.Fixed)
+            header.setSectionResizeMode(4, QHeaderView.Fixed)
+            if xtcurve:
+                header.setSectionResizeMode(5, QHeaderView.Fixed)
+                header.setSectionResizeMode(6, QHeaderView.Stretch)
+            else:
+                header.setSectionResizeMode(5, QHeaderView.Stretch)
+            self.datatable.resizeColumnsToContents()
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
     @pyqtSlot(bool)
     def copyDataTabletoClipboard(self,_=False):
