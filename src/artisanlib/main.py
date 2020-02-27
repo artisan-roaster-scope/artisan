@@ -19761,7 +19761,7 @@ class ApplicationWindow(QMainWindow):
                 control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS
                 alt_modifier = modifiers == Qt.AltModifier
                 control_alt_modifier = modifiers == (Qt.ControlModifier | Qt.AltModifier)
-                #meta_modifier = modifiers == Qt.MetaModifier # right-click (Control-click on macOS)
+                #meta_modifier = modifiers == Qt.MetaModifier # Control on macOS, Meta on Windows
                 #uncomment next line to find the integer value of a key
                 #print(key)
                 
@@ -34451,12 +34451,18 @@ class RoastsComboBox(QComboBox):
 
 class ClickableQLabel(QLabel):
     clicked = pyqtSignal()
+    left_clicked = pyqtSignal()
+    right_clicked = pyqtSignal()
     
     def __init__(self, *args, **kwargs):
         super(ClickableQLabel, self).__init__(*args, **kwargs)
 
-    def mousePressEvent(self, _):
+    def mousePressEvent(self, event):
         self.clicked.emit()
+        if event.button() == Qt.LeftButton:
+            self.left_clicked.emit()
+        elif event.button() == Qt.RightButton:
+            self.right_clicked.emit()
 
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
@@ -34805,7 +34811,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             dateedit.setStyleSheet("background-color: #eeeeee;")
         #Batch
         batchlabel = ClickableQLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
-        batchlabel.clicked.connect(self.enableBatchEdit)
+        batchlabel.right_clicked.connect(self.enableBatchEdit)
         self.batchLayout = QHBoxLayout()
         if aw.superusermode: # and aw.qmc.batchcounter > -1:
             self.defineBatchEditor()
@@ -35552,9 +35558,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
     
     def enableBatchEdit(self):
-        modifiers = QApplication.keyboardModifiers()
-        meta_modifier = modifiers == Qt.MetaModifier # right-click (Control-click on macOS)
-        if not aw.superusermode and not self.batcheditmode and meta_modifier:
+        if not aw.superusermode and not self.batcheditmode:
             self.batcheditmode = True
             self.batchLayout.removeWidget(self.batchedit)
             self.defineBatchEditor()
