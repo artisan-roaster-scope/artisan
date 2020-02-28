@@ -1222,9 +1222,9 @@ class tgraphcanvas(FigureCanvas):
         # important to make the Qt canvas transparent (note that this changes stylesheets of childs like popups too!):
         self.fig.canvas.setStyleSheet("background-color:transparent;") # default is white
 
-        self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-        self.fig.canvas.mpl_connect('pick_event', self.onpick)
-        self.fig.canvas.mpl_connect('draw_event', self._draw_event)
+        self.onclick_cid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        self.oncpick_cid = self.fig.canvas.mpl_connect('pick_event', self.onpick)
+        self.ondraw_cid = self.fig.canvas.mpl_connect('draw_event', self._draw_event)
         
         self.fig.canvas.mpl_connect('button_release_event', self.onrelease_after_pick)
 
@@ -2540,7 +2540,7 @@ class tgraphcanvas(FigureCanvas):
 
     def onrelease(self,event):     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
         try:
-            if event.button==1: 
+            if event.button == 1: 
                 self.baseX,self.baseY = None, None
                 self.base_horizontalcrossline, self.base_verticalcrossline = None, None
             # save the location of analysis results after dragging
@@ -2559,25 +2559,44 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),exc_tb.tb_lineno)
 
+
+    def disconnect_draggableannotations_motion_notifiers(self):
+        cids = []
+        try:
+            if 'motion_notify_event' in aw.qmc.fig.canvas.callbacks.callbacks:
+                motion_notify_event_handlers = aw.qmc.fig.canvas.callbacks.callbacks['motion_notify_event']
+                for cid, func_ref in motion_notify_event_handlers.items():
+                    func = func_ref()
+                    if func.__self__ is not None: # a bound method
+                        c = func.__self__.__class__
+                        if c == matplotlib.offsetbox.DraggableAnnotation:
+                            cids.append(cid)
+            # disconnecting all established motion_notify_event_handlers of DraggableAnnotations
+            for cid in cids:
+                aw.qmc.fig.canvas.mpl_disconnect(cid)
+        except:
+            pass
+
+
     def onclick(self,event):
         try:
-            if not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==3:
+            if not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == Qt.RightButton:
                 aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
 
 #PLUS
-            elif not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==1 and event.dblclick==True and \
+            elif not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == Qt.LeftButton and event.dblclick==True and \
                     event.x < event.y and aw.plus_account is not None and aw.qmc.roastUUID is not None:
                 QDesktopServices.openUrl(QUrl(plus.util.roastLink(aw.qmc.roastUUID), QUrl.TolerantMode))
-                                                        
-            elif event.button==1 and event.inaxes and aw.qmc.crossmarker and not self.designerflag and not self.wheelflag and not aw.qmc.flagon:
+            
+            elif event.button == 1 and event.inaxes and aw.qmc.crossmarker and not self.designerflag and not self.wheelflag and not aw.qmc.flagon:
                 self.baseX,self.baseY = event.xdata, event.ydata
                 if self.base_horizontalcrossline is None and self.base_verticalcrossline is None:
                     # Mark starting point of click-and-drag with a marker
                     self.base_horizontalcrossline, = self.ax.plot(self.baseX,self.baseY,'r+', markersize=20)
                     self.base_verticalcrossline, = self.ax.plot(self.baseX,self.baseY,'wo', markersize = 2)
-            elif event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag:# and not self.flagon:
+            elif event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag:# and not self.flagon:
                 timex = self.time2index(event.xdata)
                 if timex > 0:
                     menu = QMenu(aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
@@ -2626,21 +2645,7 @@ class tgraphcanvas(FigureCanvas):
                         
                         # we deactivate all active motion_notify_event_handlers of draggable annotations that might have been connected by this click to
                         # avoid redraw conficts between Artisan canvas bitblit caching and the matplotlib internal bitblit caches.
-                        cids = []
-                        try:
-                            if 'motion_notify_event' in aw.qmc.fig.canvas.callbacks.callbacks:
-                                motion_notify_event_handlers = aw.qmc.fig.canvas.callbacks.callbacks['motion_notify_event']
-                                for cid, func_ref in motion_notify_event_handlers.items():
-                                    func = func_ref()
-                                    if func.__self__ is not None: # a bound method
-                                        c = func.__self__.__class__
-                                        if c == matplotlib.offsetbox.DraggableAnnotation:
-                                            cids.append(cid)
-                            # disconnecting all established motion_notify_event_handlers of DraggableAnnotations
-                            for cid in cids:
-                                aw.qmc.fig.canvas.mpl_disconnect(cid)
-                        except:
-                            pass
+                        self.disconnect_draggableannotations_motion_notifiers()
                         
                         # show menu
                         menu.triggered.connect(self.event_popup_action)
@@ -11375,11 +11380,11 @@ class tgraphcanvas(FigureCanvas):
 
     def wheel_menu(self,event):
         if str(event.inaxes) != str(self.ax2): return
-        if event.button == 1:                    #if left click
+        if event.button == 1:
             self.wheellocationx = event.xdata
             self.wheellocationz = event.ydata
 
-        elif event.button == 3:                  #if right click
+        elif event.button == 3:
             designermenu = QMenu(aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
             cuppingAction = QAction(QApplication.translate("Contextual Menu", "Add to Cupping Notes",None),self)
             cuppingAction.triggered.connect(self.addTocuppingnotes)
@@ -12826,6 +12831,7 @@ class ApplicationWindow(QMainWindow):
     global locale
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
+    singleShotPhidgetsPulseOFFSerial = pyqtSignal(int,int,str,str)
 #PLUS
     updatePlusStatusSignal = pyqtSignal() # can be called from another thread or a QTimer to trigger to update the plus icon status
     setTitleSignal = pyqtSignal(str,bool) # can be called from another thread or a QTimer to set the profile title in the main GUI thread
@@ -15461,6 +15467,7 @@ class ApplicationWindow(QMainWindow):
 
         # we connect the signals
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
+        self.singleShotPhidgetsPulseOFFSerial.connect(self.processSingleShotPhidgetsPulse)
         self.setTitleSignal.connect(self.qmc.setProfileTitle)
         self.sendmessageSignal.connect(self.sendmessage)
         self.openPropertiesSignal.connect(self.editgraph)
@@ -15723,13 +15730,13 @@ class ApplicationWindow(QMainWindow):
 
     
     # turns channel off after millis
-    def processSingleShotPhidgetsPulse(self,channel,millis,fct):
+    def processSingleShotPhidgetsPulse(self,channel,millis,fct,serial=None):
         if fct == "OUTsetPWM":
-            QTimer.singleShot(millis,lambda : self.ser.phidgetOUTsetPWM(channel,0))
+            QTimer.singleShot(millis,lambda : self.ser.phidgetOUTsetPWM(channel,0,serial))
         elif fct == "OUTsetPWMhub":
-            QTimer.singleShot(millis,lambda : self.ser.phidgetOUTsetPWMhub(channel,0))
+            QTimer.singleShot(millis,lambda : self.ser.phidgetOUTsetPWMhub(channel,0,serial))
         elif fct == "BinaryOUTset":
-            QTimer.singleShot(millis,lambda : self.ser.phidgetBinaryOUTset(channel,0))
+            QTimer.singleShot(millis,lambda : self.ser.phidgetBinaryOUTset(channel,0,serial))
         
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ##################################### 
@@ -18194,7 +18201,7 @@ class ApplicationWindow(QMainWindow):
         except Exception:
             pass                    
 
-    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
+    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets/Yocto IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Command; 11= p-i-d; 12= Fuji Command;
     #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command;
     #         20= Artisan Command; 21= RC Command
@@ -18416,29 +18423,55 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.03
                                 except Exception:
                                     pass
-                elif action == 5:
+                elif action == 5: # DTA Command
                     try:
                         DTAvalue=cmd_str.split(':')[1]
                         DTAaddress=cmd_str.split(':')[0]
                         aw.dtapid.writeDTE(DTAvalue,DTAaddress)
                     except Exception:
                         pass
-                elif action == 6:
+                elif action == 6:  # IO Command
+                    # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
+                    ##  set(c,b[,sn])   : switches channel c off (b=0) and on (b=1)
+                    ##  toggle(c[,sn])  : toggles channel c
+                    ##  pulse(c,t[,sn]) : sets the output of channel c to on for time t in milliseconds
+                    #
+                    # YOCTOPUCE
+                    ##  on(c[,sn])   : turn channel c of the relay module on
+                    ##  off(c[,sn])  : turn channel c of the relay module off
+                    ##  flip(c[,sn]) : toggle the state of channel c
+                    ##  pip(c,delay,duration[,sn]) : pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds
+                    #
+                    # OTHERS
+                    ##  out(c,v[,sn]) : sets voltage output of channel c to v (float)
+                    ##  slider(c,v)   : move slider c to value v
+                    ##  button(i,c,b[,sn]) : switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b
+                    ##  sleep(s) : sleep for s seconds, s a float
+                    #
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
-                            cs_a = re.findall("[0-9a-zA-Z-\.]+", c)
+                            cs_a = re.findall("[0-9a-zA-Z-\.:]+", c)
                             cs_len = len(cs_a)
 
-                            if cs_a[0] == "set" and cs_len == 3:
-                                if not aw.ser.phidgetBinaryOUTset(toInt(cs_a[1]), bool(toInt(cs_a[2]))):
-                                    aw.sendmessage(QApplication.translate("Message", "Failed to set(%s, %s)" % (cs_a[1], cs_a[2] ), None))
+                            if cs_a[0] == "set":
+                                if cs_len == 3:
+                                    if not aw.ser.phidgetBinaryOUTset(toInt(cs_a[1]), bool(toInt(cs_a[2]))):
+                                        aw.sendmessage(QApplication.translate("Message", "Failed to set(%s, %s)" % (cs_a[1], cs_a[2]), None))
+                                elif cs_len == 4:
+                                    if not aw.ser.phidgetBinaryOUTset(toInt(cs_a[1]), bool(toInt(cs_a[2])), cs_a[3]):
+                                        aw.sendmessage(QApplication.translate("Message", "Failed to set(%s, %s, %s)" % (cs_a[1], cs_a[2], cs_a[3]), None))
 
-                            elif cs_a[0] == "toggle" and cs_len == 2:
+                            elif cs_a[0] == "toggle" and cs_len > 1:
                                 c = toInt(cs_a[1])
+                                if cs_len > 2:
+                                    sn = cs_a[2]
+                                else:
+                                    sn = None
                                 #keep state of this gpio, rather than rely on phidget and use non-zero value to set button color
+                                # NOTE: with this strategy the modules state might be different to this one if also a set command is used
                                 newValue = (self.buttonStates[self.lastbuttonpressed] + 1) & 0x1
-                                if aw.ser.phidgetBinaryOUTset(c, bool(newValue)):
+                                if aw.ser.phidgetBinaryOUTset(c, bool(newValue),sn):
                                     self.buttonStates[self.lastbuttonpressed] = newValue
                                 else:
                                     aw.sendmessage(QApplication.translate("Message", "Failed to toggle(%s)" % (cs_a[1]), None))
@@ -18450,17 +18483,24 @@ class ApplicationWindow(QMainWindow):
                                 #block resetting style of last button
                                 self.lastbuttonpressed = -1
 
-                            elif cs_a[0] == "pulse" and cs_len == 3:
+                            elif cs_a[0] == "pulse" and cs_len > 2:
                                 c = toInt(cs_a[1])
                                 t = toInt(cs_a[2])
-                                #print("pulse(%d, %d)" % (c, t))
+                                if cs_len > 3:
+                                    sn = cs_a[3]
+                                else:
+                                    sn = None
                                 if t>= 0.0 and t <= 999999:
-                                    aw.ser.phidgetBinaryOUTpulse(c, t)
+                                    aw.ser.phidgetBinaryOUTpulse(c, t, sn)
                                 else:
                                     aw.sendmessage(QApplication.translate("Message", "Pulse out of range (%d)" % (t), None))
 
-                            elif cs_a[0] == "out" and cs_len == 3:
-                                if not aw.ser.phidgetVOUTsetVOUT(toInt(cs_a[1]), toFloat(cs_a[2])):
+                            elif cs_a[0] == "out" and cs_len > 2:
+                                if cs_len > 3:
+                                    sn = cs_a[3]
+                                else:
+                                    sn = None
+                                if not aw.ser.phidgetVOUTsetVOUT(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn):
                                     aw.sendmessage(QApplication.translate("Message", "Failed to set VOUT(%s, %s)" % (cs_a[1], cs_a[2] ), None))
 
                             elif cs_a[0] == "slider" and cs_len == 3:
@@ -18469,12 +18509,15 @@ class ApplicationWindow(QMainWindow):
                                     aw.moveslider(toInt(cs_a[1]), v)
                                 else:
                                     aw.sendmessage(QApplication.translate("Message", "Slider out of range (%f)" % (v), None))
-
-                            elif cs_a[0] == "button" and cs_len == 4:
+                            elif cs_a[0] == "button" and cs_len > 3:
                                 b = toInt(cs_a[1]) - 1 # gui button list is indexed from 1
                                 c = toInt(cs_a[2])
                                 v = toInt(cs_a[3])
-                                if aw.ser.phidgetBinaryOUTset(c, bool(v & 0x1)):
+                                if cs_len > 3:
+                                    sn = cs_a[4]
+                                else:
+                                    sn = None
+                                if aw.ser.phidgetBinaryOUTset(c, bool(v & 0x1), sn):
                                     self.buttonStates[b] = v & 0x1
                                 else:
                                     aw.sendmessage(QApplication.translate("Message", "Failed to set button(%s, %s, %s)" % (cs_a[1], cs_a[2], cs_a[3] ), None))
@@ -18491,6 +18534,7 @@ class ApplicationWindow(QMainWindow):
                                         libtime.sleep(t)
                                 except Exception:
                                     pass
+                            
                             # Yoctopuce Relay Command Actions
                             # on(c[,sn])
                             elif cs_a[0] == "on" and cs_len == 2:
@@ -18508,9 +18552,9 @@ class ApplicationWindow(QMainWindow):
                             elif cs_a[0] == "flip" and cs_len == 3:
                                 aw.ser.yoctoRELflip(int(cs_a[1]),cs_a[2])
                             # pulse(c,delay,duration[,sn])
-                            elif cs_a[0] == "pulse" and cs_len == 4:
+                            elif cs_a[0] == "pip" and cs_len == 4:
                                 aw.ser.yoctoRELpulse(int(cs_a[1]),int(cs_a[2]),int(cs_a[3]),None)
-                            elif cs_a[0] == "pulse" and cs_len == 5:
+                            elif cs_a[0] == "pip" and cs_len == 5:
                                 aw.ser.yoctoRELpulse(int(cs_a[1]),int(cs_a[2]),int(cs_a[3]),cs_a[4])
                             else:
                                 #print("no match for command [%s], continue" % (cs_a[0]))
@@ -18643,36 +18687,55 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                 elif action == 13: # PWM Command 
-                    ## out(<channel>,<value>)  with <value> in [0-100]
-                    ## toggle(<channel>)
-                    ## outhub(<channel>,<value>)
-                    ## togglehub(<channel>)
-                    ## pulse(<channel>,<millis>)
-                    ## pulsehub(<channel>,<millis>)
+                    # PHIDGET  <sn> : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
+                    # 
+                    ## out(<channel>,<value>[,<sn>])  with <value> in [0-100]
+                    ## toggle(<channel>[,<sn>])
+                    ## outhub(<channel>,<value>[,<sn>])
+                    ## togglehub(<channel>[,<sn>])
+                    ## pulse(<channel>,<millis>[,<sn>])
+                    ## pulsehub(<channel>,<millis>[,<sn>])
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
                             try:
-                                if cs.startswith('out(') and len(cs)>7 and len(cs)<11:
-                                    c,v = cs[4:-1].split(',')
-                                    aw.ser.phidgetOUTsetPWM(int(c),int(v))
-                                elif cs.startswith('toggle(') and len(cs)==9:
-                                    c = cs[7:8]
-                                    aw.ser.phidgetOUTtogglePWM(int(c))
-                                elif cs.startswith('outhub(') and len(cs)>10 and len(cs)<14:
-                                    c,v = cs[7:-1].split(',')
-                                    aw.ser.phidgetOUTsetPWMhub(int(c),int(v))
-                                elif cs.startswith('togglehub(') and len(cs)==12:
-                                    c = cs[10:11]
-                                    aw.ser.phidgetOUTtogglePWMhub(int(c))
-                                elif cs.startswith('pulse(') and len(cs)>9 and len(cs)<14:
-                                    c,t = cs[6:-1].split(',')
-                                    aw.ser.phidgetOUTpulsePWM(int(c),int(t))
-                                elif cs.startswith('pulsehub(') and len(cs)>12 and len(cs)<17:
-                                    c,t = cs[9:-1].split(',')
-                                    aw.ser.phidgetOUTpulsePWMhub(int(c),int(t))
-                                
+                                if cs.startswith('out(') and len(cs)>7:
+                                    cs_split = cs[4:-1].split(',')
+                                    if len(cs_split) == 2:
+                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(eval(cs_split[1])))
+                                    elif len(cs_split) == 3:
+                                        aw.ser.phidgetOUTsetPWM(int(cs_split[0]),int(eval(cs_split[1])),cs_split[2])
+                                elif cs.startswith('toggle(') and len(cs)>8:
+                                    cs_split = cs[7:-1].split(',')
+                                    if len(cs_split) == 1:
+                                        aw.ser.phidgetOUTtogglePWM(int(cs_split[0]))
+                                    elif len(cs_split) == 2:
+                                        aw.ser.phidgetOUTtogglePWM(int(cs_split[0]),cs_split[1])
+                                elif cs.startswith('outhub(') and len(cs)>10:
+                                    cs_split = cs[7:-1].split(',')
+                                    if len(cs_split) == 2:
+                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(eval(cs_split[1])))
+                                    elif len(cs_split) == 3:
+                                        aw.ser.phidgetOUTsetPWMhub(int(cs_split[0]),int(eval(cs_split[1])),cs_split[2])
+                                elif cs.startswith('togglehub(') and len(cs)>11:
+                                    cs_split = cs[10:-1].split(',')
+                                    if len(cs_split) == 1:
+                                        aw.ser.phidgetOUTtogglePWMhub(int(cs_split[0]))
+                                    elif len(cs_split) == 2:
+                                        aw.ser.phidgetOUTtogglePWMhub(int(cs_split[0]),cs_split[1])
+                                elif cs.startswith('pulsehub(') and len(cs)>12:
+                                    cs_split = cs[9:-1].split(',')
+                                    if len(cs_split) == 2:
+                                        aw.ser.phidgetOUTpulsePWMhub(int(cs_split[0]),int(cs_split[1]))
+                                    elif len(cs_split) == 3:
+                                        aw.ser.phidgetOUTpulsePWMhub(int(cs_split[0]),int(cs_split[1]),cs_split[2])
+                                elif cs.startswith('pulse(') and len(cs)>9:
+                                    cs_split = cs[6:-1].split(',')
+                                    if len(cs_split) == 2:
+                                        aw.ser.phidgetOUTpulsePWM(int(cs_split[0]),int(cs_split[1]))
+                                    elif len(cs_split) == 3:
+                                        aw.ser.phidgetOUTpulsePWM(int(cs_split[0]),int(cs_split[1]),cs_split[2])
                                 elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                     cmds = eval(cs[len('sleep'):])
                                     if isinstance(cmds,float) or isinstance(cmds,int):
@@ -18697,9 +18760,9 @@ class ApplicationWindow(QMainWindow):
                                     try:
                                         cs_split = cs[len('freq('):-1].split(',')
                                         if len(cs_split) > 2:
-                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(cs_split[1]),cs_split[2])
+                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(eval(cs_split[1])),cs_split[2])
                                         else:
-                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(cs_split[1]))
+                                            aw.ser.yoctoPWMsetFrequency(int(cs_split[0]),int(eval(cs_split[1])))
                                     except Exception:
                                         pass
                                 # duty(c,d[,sn])
@@ -18707,9 +18770,9 @@ class ApplicationWindow(QMainWindow):
                                     try:
                                         cs_split = cs[len('duty('):-1].split(',')
                                         if len(cs_split) > 2:
-                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(cs_split[1]),cs_split[2])
+                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2])
                                         else:
-                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(cs_split[1]))
+                                            aw.ser.yoctoPWMsetDuty(int(cs_split[0]),float(eval(cs_split[1])))
                                     except Exception:
                                         pass
                                 # move(c,d,t[,sn])
@@ -18717,24 +18780,27 @@ class ApplicationWindow(QMainWindow):
                                     try:
                                         cs_split = cs[len('move('):-1].split(',')
                                         if len(cs_split) > 3:
-                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(cs_split[1]),int(cs_split[2]),cs_split[3])
+                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(eval(cs_split[1])),int(cs_split[2]),cs_split[3])
                                         else:
-                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(cs_split[1]),int(cs_split[2]))
+                                            aw.ser.yoctoPWMmove(int(cs_split[0]),float(eval(cs_split[1])),int(cs_split[2]))
                                     except Exception:
                                         pass
                             
-                            except Exception:
+                            except:
                                 pass
                 elif action == 14: # VOUT Command to drive Phidget/Yocto Output Modules
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
-                            # for Phidgets OUT modules "out(<channel>,<value>)" with <value> a float
+                            # for Phidgets OUT modules "out(<channel>,<value>[,<serial>])" with <value> a float
                             if cs.startswith('out(') and len(cs)>7:
                                 try:
-                                    c,v = cs[4:-1].split(',')
-                                    aw.ser.phidgetVOUTsetVOUT(int(c),float(v))
+                                    cs_split = cs[4:-1].split(',')
+                                    if len(cs_split) == 2:
+                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])))
+                                    elif len(cs_split) == 3:
+                                        aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2])
                                 except Exception:
                                     pass
                             # for YOCTOPUCE VOLTAGE OUT modules "vout(c,v[,sn])" with c the channel (1 or 2),v the voltage as float [0.0-10.0] and the optional sn either the modules serial number or its name
@@ -18742,9 +18808,9 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cs_split = cs[5:-1].split(',')
                                     if len(cs_split) > 2:
-                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(cs_split[1]),cs_split[2])
+                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2])
                                     else:
-                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(cs_split[1]))
+                                        aw.ser.yoctoVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])))
                                 except Exception:
                                     pass
                             # for YOCTOPUCE CURRENT OUT modules "cout(c[,sn])" with c the current as float [3.0-21.0] and the optional sn either the modules serial number or its name
@@ -18753,9 +18819,9 @@ class ApplicationWindow(QMainWindow):
                                     #c = cs[5:-1]
                                     cs_split = cs[5:-1].split(',')
                                     if len(cs_split) > 1:
-                                        aw.ser.yoctoCOUTsetCOUT(float(cs_split[0]),cs_split[1])
+                                        aw.ser.yoctoCOUTsetCOUT(float(eval(cs_split[0])),cs_split[1])
                                     else:
-                                        aw.ser.yoctoCOUTsetCOUT(float(cs_split[0]))
+                                        aw.ser.yoctoCOUTsetCOUT(float(eval(cs_split[0])))
                                 except Exception:
                                     pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
@@ -18778,7 +18844,7 @@ class ApplicationWindow(QMainWindow):
                             if cs.startswith("setDBint(") and len(cs) > 14:
                                 try:
                                     dbnr,s,v = cs[len("setDBint("):-1].split(',')
-                                    aw.s7.writeInt(5,int(dbnr),int(s),v)
+                                    aw.s7.writeInt(5,int(dbnr),int(s),eval(v))
                                 except Exception:
                                     pass
                             elif cs.startswith("getDBint(") and len(cs) > 14:
@@ -18790,13 +18856,13 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith("setDBfloat(") and len(cs) > 16:
                                 try:
                                     dbnr,s,v = cs[len("setDBfloat("):-1].split(',')
-                                    aw.s7.writeInt(5,int(dbnr),int(s),v)
+                                    aw.s7.writeFloat(5,int(dbnr),int(s),eval(v))
                                 except Exception:
                                     pass
                             elif cs.startswith("getDBfloat(") and len(cs) > 16:
                                 try:
                                     dbnr,s,v = cs[len("getDBfloat("):-1].split(',')
-                                    aw.s7.lastReadResult = aw.s7.writeFloat(5,int(dbnr),int(s))
+                                    aw.s7.lastReadResult = aw.s7.readFloat(5,int(dbnr),int(s))
                                 except Exception:
                                     pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
@@ -18807,12 +18873,12 @@ class ApplicationWindow(QMainWindow):
                                         libtime.sleep(cmds)
                                 except Exception:
                                     pass
-                elif action == 16:
-                    self.ser.R1.set_heater(int(cmd)/10)
-                elif action == 17:
-                    self.ser.R1.set_fan(int(cmd)/10)
-                elif action == 18:
-                    self.ser.R1.set_drum(int(cmd)/10)
+                elif action == 16: # Aillio Heater
+                    self.ser.R1.set_heater(int(eval(cmd))/10)
+                elif action == 17: # Aillio Fan
+                    self.ser.R1.set_fan(int(eval(cmd))/10)
+                elif action == 18: # Aillio Drum
+                    self.ser.R1.set_drum(int(eval(cmd))/10)
                 elif action == 19:
                     if cmd_str == "PRS":
                         self.ser.R1.prs()
@@ -18918,64 +18984,124 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                 elif action == 21: # RC Command
+                    # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
+                    ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds
+                    ##  pos(ch,min,max[,sn]) : sets the min/max position
+                    ##  engaged(ch,b[,sn]) : engage (b=1) or disengage (b = 0)
+                    ##  ramp(ch,b[,sn]) : activates or deactivates the speed ramping state
+                    ##  volt(ch,v[,sn]) : set the voltage to one of 5, 6 or 7.4 in Volt
+                    ##  accel(ch,a[,sn]) : set the acceleration
+                    ##  veloc(ch,v[,sn]) : set the velocity
+                    ##  set(ch,pos[,sn]) : set the target position
+                    #
+                    # YOCTOPUCE
+                    #
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
-                            # pulse(ch,min,max) # sets min/max pulse width
+                            # pulse(ch,min,max[,sn]) # sets min/max pulse width
                             if cs.startswith("pulse(") and len(cs) > 11:
                                 try:
-                                    channel,min_pulse,max_pulse = cs[len("pulse("):-1].split(',')
-                                    aw.ser.phidgetRCpulse(int(channel),int(min_pulse),int(max_pulse))
+                                    n = 3
+                                    cs_split = cs[len("pulse("):-1].split(',')
+                                    channel,min_pulse,max_pulse = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    aw.ser.phidgetRCpulse(int(channel),int(min_pulse),int(max_pulse),sn)
                                 except Exception:
                                     pass
                             elif cs.startswith("pos(") and len(cs) > 9:
-                                # pos(ch,min,max) # sets min/max position
+                                # pos(ch,min,max[,sn]) # sets min/max position
                                 try:
-                                    channel,min_pos,max_pos = cs[len("pos("):-1].split(',')
-                                    aw.ser.phidgetRCpos(int(channel),float(min_pos),float(max_pos))
+                                    n = 3
+                                    cs_split = cs[len("pos("):-1].split(',')
+                                    channel,min_pos,max_pos = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    aw.ser.phidgetRCpos(int(channel),float(min_pos),float(max_pos),sn)
                                 except Exception:
                                     pass
                             elif cs.startswith("engaged(") and len(cs) > 11:
-                                # engaged(ch,state) # engage channel
+                                # engaged(ch,state[,sn]) # engage channel
                                 try:
-                                    channel,state = cs[len("engaged("):-1].split(',')
-                                    aw.ser.phidgetRCengaged(int(channel),bool(int(state)))
+                                    n = 2
+                                    cs_split = cs[len("engaged("):-1].split(',')
+                                    channel,state = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    aw.ser.phidgetRCengaged(int(channel),bool(int(state)),sn)
                                 except Exception:
                                     pass
                             elif cs.startswith("set(") and len(cs) > 7:
-                                # set(ch,pos) # set position
+                                # set(ch,pos[,sn]) # set position
                                 try:
-                                    channel,pos = cs[len("set("):-1].split(',')
-                                    aw.ser.phidgetRCset(int(channel),float(pos))
+                                    n = 2
+                                    cs_split = cs[len("set("):-1].split(',')
+                                    channel,pos = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    aw.ser.phidgetRCset(int(channel),float(eval(pos)),sn)
                                 except Exception:
                                     pass
                             elif cs.startswith("ramp(") and len(cs) > 8:
                                 # ramp(ch,state) # set speed ramping state per channel
                                 try:
-                                    channel,state = cs[len("ramp("):-1].split(',')
-                                    aw.ser.phidgetRCspeedRamping(int(channel),bool(int(state)))
+                                    n = 2
+                                    cs_split = s[len("ramp("):-1].split(',')
+                                    channel,state = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    aw.ser.phidgetRCspeedRamping(int(channel),bool(int(state)),sn)
                                 except Exception:
                                     pass
                             elif cs.startswith("volt(") and len(cs) > 8:
                                 # volt(ch,v) # sets voltage
                                 try:
-                                    channel,volt = cs[len("volt("):-1].split(',')
-                                    aw.ser.phidgetRCvoltage(int(channel),float(volt))
+                                    n = 2
+                                    cs_split = cs[len("volt("):-1].split(',')
+                                    channel,volt = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    aw.ser.phidgetRCvoltage(int(channel),float(volt),n)
                                 except Exception:
                                     pass
                             elif cs.startswith("accel(") and len(cs) > 9:
                                 # accel(ch,accel) # sets acceleration
                                 try:
-                                    channel,accel = cs[len("accel("):-1].split(',')
-                                    aw.ser.phidgetRCaccel(int(channel),float(accel))
+                                    n = 2
+                                    cs_split = cs[len("accel("):-1].split(',')
+                                    channel,accel = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    aw.ser.phidgetRCaccel(int(channel),float(accel),sn)
                                 except Exception:
                                     pass
                             elif cs.startswith("veloc(") and len(cs) > 9:
                                 # veloc(ch,veloc) # sets velocity
                                 try:
-                                    channel,veloc = cs[len("veloc("):-1].split(',')
-                                    aw.ser.phidgetRCveloc(int(channel),float(veloc))
+                                    n = 2
+                                    cs_split = cs[len("veloc("):-1].split(',')
+                                    channel,veloc = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    aw.ser.phidgetRCveloc(int(channel),float(veloc),sn)
                                 except Exception:
                                     pass
                             elif cs.startswith('sleep('): # in seconds
@@ -19001,12 +19127,12 @@ class ApplicationWindow(QMainWindow):
                                         aw.ser.yoctoSERVOenabled(c,b)
                                 except:
                                     pass
-                            # move(c,p[,t][,sn]) with p:int the target position, the optional t the duration in ms, sn the optional modules serial number or logical name
+                            # move(c,p[,t][,sn]) with c:int the channel, p:int the target position, the optional t the duration in ms, sn the optional modules serial number or logical name
                             elif cs.startswith('move(') and len(cs) > 8:
                                 try:
                                     cs_split = cs[5:-1].split(',')
                                     c = int(cs_split[0])
-                                    p = int(cs_split[1])
+                                    p = int(eval(cs_split[1]))
                                     if len(cs_split) > 2:
                                         try:
                                             t = int(cs_split[2])
@@ -19232,7 +19358,9 @@ class ApplicationWindow(QMainWindow):
         if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type " " that does not add an event; if eventtype == 9 ("-") we have an untyped event
             if eventtype == 9: # an untyped event
                 # we just fire the action
-                self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue),parallel=parallel)
+                cmd = u(self.extraeventsactionstrings[ee])
+                cmd = cmd.format(*(tuple([cmdvalue]*cmd.count("{}"))))
+                self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
                 if self.qmc.flagstart:
                     self.qmc.EventRecord(extraevent = ee)
@@ -19258,7 +19386,9 @@ class ApplicationWindow(QMainWindow):
                 if self.extraeventsactions[ee] in [8,9,16,17,18]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
                     self.eventaction(self.extraeventsactions[ee],u(int(new_value)),parallel=parallel)
                 else:
-                    self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(actionvalue),parallel=parallel)
+                    cmd = u(self.extraeventsactionstrings[ee])
+                    cmd = cmd.format(*(tuple([actionvalue]*cmd.count("{}"))))
+                    self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # remember the new value as the last value set for this event
                 self.block_quantification_sampling_ticks[etype] = self.sampling_ticks_to_block_quantifiction
                 self.extraeventsactionslastvalue[etype] = new_value
@@ -19268,7 +19398,9 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.EventRecord(extraevent = ee)
         else:
             # just issue the eventaction (no cmd substitution here)
-            self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue),parallel=parallel)
+            cmd = u(self.extraeventsactionstrings[ee])
+            cmd = cmd.format(*(tuple([cmdvalue]*cmd.count("{}"))))
+            self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -20414,9 +20546,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventsStrings[lenevents-1] = u(self.lineEvent.text())
             if aw.qmc.timeindex[0] > -1:
                 newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ self.qmc.stringtoseconds(str(self.etimeline.text())))
-                if self.qmc.specialevents[lenevents-1] != newtime and lenevents-1 in self.qmc.l_event_flags_dict:
-                    # remove the cached label position of this entry as its time changed
-                    del self.qmc.l_event_flags_dict[lenevents-1]
                 self.qmc.specialevents[lenevents-1] = newtime
 
             self.lineEvent.clearFocus()
@@ -43405,7 +43534,7 @@ class serialport(object):
         'Phidget1045semaphore','PhidgetBridgeSensor','Phidget1046values','Phidget1046lastvalues','Phidget1046semaphores',\
         'PhidgetIO','PhidgetIOvalues','PhidgetIOlastvalues','PhidgetIOsemaphores','PhidgetDigitalOut',\
         'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
-        'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetAnalogOutHub','PhidgetRCServo','PhidgetBinaryOut',\
+        'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetRCServo','PhidgetBinaryOut',\
         'YOCTOlibImported','YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
@@ -43453,17 +43582,18 @@ class serialport(object):
         self.PhidgetIOlastvalues = [-1]*8 # the values gathered by registered change triggers
         self.PhidgetIOsemaphores = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
         #stores the Phidget Digital Output PMW objects (None if not initialized)
-        self.PhidgetDigitalOut = None
-        self.PhidgetDigitalOutLastPWM = [0]*4 # 0-100
-        self.PhidgetDigitalOutLastToggle = [None]*4 # if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
-        self.PhidgetDigitalOutHub = None
-        self.PhidgetDigitalOutLastPWMhub = [0]*6 # 0-100
-        self.PhidgetDigitalOutLastToggleHub = [None]*6 # if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
-        self.PhidgetAnalogOut = None
-        self.PhidgetAnalogOutHub = None
-        self.PhidgetRCServo = None
+        self.PhidgetDigitalOut = {} # a dict associating out serials with lists of channels
+        self.PhidgetDigitalOutLastPWM = {} # a dict assocating out serials with the list of last PWMs per channel
+        self.PhidgetDigitalOutLastToggle = {} # a dict associating out serials with the list of last toggles per channel; if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
+        self.PhidgetDigitalOutHub = {} # a dict associating hub serials with lists of channels
+        self.PhidgetDigitalOutLastPWMhub = {} # a dict assocating hub serials with the list of last PWMs per port of the hub
+        self.PhidgetDigitalOutLastToggleHub = {} # a dict associating hub serials with the list of last toggles per port of the hub; if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
+        #store the Phidget Analog Output objects
+        self.PhidgetAnalogOut = {} # a dict associating serials with lists of channels
+        #store the servo objects
+        self.PhidgetRCServo = {} # a dict associating serials with lists of channels
         #store the Phidget IO Binary Output objects
-        self.PhidgetBinaryOut = None # if attached, it contains a list of th 8 attached output channel objects
+        self.PhidgetBinaryOut = {} # a dict associating binary out serials with lists of channels
         #Yoctopuce channels
         self.YOCTOlibImported = False # ensure that the YOCTOlib is only imported once
         self.YOCTOsensor = None
@@ -46398,6 +46528,53 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1046temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
+    # takes a string of the form "<serial>[:<hubport>]" or None and returns serial and hubport numbers
+    def serialString2serialPort(self,serial):
+        if serial is None:
+            return None, None
+        else:
+            serial_split = serial.split(":")
+            s = None
+            p = None
+            try:
+                s = int(serial_split[0])
+            except:
+                pass
+            try:
+                p = int(serial_split[1])
+            except:
+                pass
+            return s,p
+            
+    # takes serial and hubport as integers and returns the composed serial string
+    def serialPort2serialString(self,serial,port):
+        if serial is None and port is None:
+            return None
+        elif port is None:
+            return str(serial)
+        else:
+            return str(serial) + ":" + str(port)
+    
+    def phidgetOUTattached(self,ch):
+        aw.qmc.phidgetManager.reserveSerialPort(
+            ch.getDeviceSerialNumber(), # serial
+            ch.getHubPort(), # port
+            ch.getChannel(), # channel
+            ch.getChannelClassName(), # phidget_class_name
+            ch.getDeviceID(), # device_id
+            remote=aw.qmc.phidgetRemoteFlag,
+            remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+    
+    def phidgetOUTdetached(self,ch):
+        aw.qmc.phidgetManager.releaseSerialPort(
+            ch.getDeviceSerialNumber(), # serial
+            ch.getHubPort(), # port
+            ch.getChannel(), # channel
+            ch.getChannelClassName(), # phidget_class_name
+            ch.getDeviceID(), # device_id
+            remote=aw.qmc.phidgetRemoteFlag,
+            remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+
 #--- Phidget IO Binay Output (only one device supported for now)
 #  only supporting (trying to attach in this order)
 #      4 channel Phidget 1014, OUT1100, REL1000, REL1100, REL1101
@@ -46405,33 +46582,35 @@ class serialport(object):
 #      8 channel Phidget 1010, 1013, 1018, 1019 modules
 #  commands: set(n,0), set(n,1), toggle(n) with n channel number
 
-    def phidgetBinaryOUTattach(self,channel):
-        if aw.ser.PhidgetBinaryOut is None:
+    # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
+    def phidgetBinaryOUTattach(self,channel,serial=None):
+        if not serial in aw.ser.PhidgetBinaryOut:
             if aw.qmc.phidgetManager is None:
                 aw.qmc.startPhidgetManager()
             if aw.qmc.phidgetManager is not None:
                 ser = None
+                s,p = self.serialString2serialPort(serial)
                 for phidget_id in [DeviceID.PHIDID_1014,DeviceID.PHIDID_OUT1100,DeviceID.PHIDID_REL1000,DeviceID.PHIDID_REL1100]:
                     if ser is None:
                         ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,channel,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                 ports = 4
                 if ser is None:
                     ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1017,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 8
                 # try to attach up to 8 IO channels of the first Phidget 1010, 1013, 1018, 1019 module
                 if ser is None:
                     ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 8
                 # try to attach up to 16 IO channels of the first Phidget REL1101 module
                 if ser is None:
                     ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_REL1100,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 16
-                if ser is not None and ports > 0:
-                    aw.ser.PhidgetBinaryOut = []
+                if ser is not None:
+                    aw.ser.PhidgetBinaryOut[serial] = []
                     for i in range(ports):
                         do = DigitalOutput()
                         do.setChannel(i)
@@ -46442,64 +46621,85 @@ class serialport(object):
                         elif not aw.qmc.phidgetRemoteFlag:
                             do.setIsRemote(False)
                             do.setIsLocal(True)
-                        aw.ser.PhidgetBinaryOut.append(do)
-                        
+                        aw.ser.PhidgetBinaryOut[serial].append(do)
+                    if serial is None:
+                        # we make this also accessible via its serial number
+                        aw.ser.PhidgetBinaryOut[str(ser)] = aw.ser.PhidgetBinaryOut[None]
         try:
-            if not aw.ser.PhidgetBinaryOut[channel].getAttached():
-                aw.ser.PhidgetBinaryOut[channel].openWaitForAttachment(1000)
+            ch = aw.ser.PhidgetBinaryOut[serial][channel]
+            ch.setOnAttachHandler(self.phidgetOUTattached)
+            ch.setOnDetachHandler(self.phidgetOUTdetached)
+            if not ch.getAttached():
+                if aw.qmc.phidgetRemoteFlag:
+                    ch.openWaitForAttachment(3000)
+                else:
+                    ch.openWaitForAttachment(1000)
+                if serial is None and ch.getAttached():
+                    # we make this also accessible via its serial number + port
+                    s = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort()) # NOTE: ch.getHubPort() returns -1 if not yet attached
+                    aw.ser.PhidgetBinaryOut[s] = aw.ser.PhidgetBinaryOut[None]
         except:
             pass
 
-    def phidgetBinaryOUTpulse(self,channel,millis):
-        self.phidgetBinaryOUTset(channel,1)
+    def phidgetBinaryOUTpulse(self,channel,millis,serial=None):
+        self.phidgetBinaryOUTset(channel,1,serial)
 #        QTimer.singleShot(millis,lambda : self.phidgetBinaryOUTset(channel,0))
         # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
         # the following solution has the drawback to block the eventaction thread
 #        libtime.sleep(millis/1000.)
 #        self.phidgetBinaryOUTset(channel,0)
         # so we use a QTimer.singleShot running in the main thread
-        aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"BinaryOUTset")
+        if serial is None:
+            aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"BinaryOUTset")
+        else:
+            aw.singleShotPhidgetsPulseOFFSerial.emit(channel,millis,"BinaryOUTset",serial)
 
     # value: True or False
-    def phidgetBinaryOUTset(self,channel,value):
+    def phidgetBinaryOUTset(self,channel,value,serial=None):
         res = False
-        self.phidgetBinaryOUTattach(channel)
-        if aw.ser.PhidgetBinaryOut is not None:
+        self.phidgetBinaryOUTattach(channel,serial)
+        if serial in aw.ser.PhidgetBinaryOut:
             # set state of the given channel
+            out = aw.ser.PhidgetBinaryOut[serial]
             try:
-                if len(aw.ser.PhidgetBinaryOut) > channel and aw.ser.PhidgetBinaryOut[channel] and aw.ser.PhidgetBinaryOut[channel].getAttached():
-                    aw.ser.PhidgetBinaryOut[channel].setState(value)
+                if len(out) > channel and out[channel] and out[channel].getAttached():
+                    out[channel].setState(value)
                     res = True
             except:
                 res = False
         return res
 
     # returns: True or False (default)
-    def phidgetBinaryOUTget(self,channel):
-        self.phidgetBinaryOUTattach(channel)
+    def phidgetBinaryOUTget(self,channel,serial=None):
+        self.phidgetBinaryOUTattach(channel,serial)
         res = False
-        if aw.ser.PhidgetBinaryOut is not None:
-            # set PWM of the given channel
+        if serial in aw.ser.PhidgetBinaryOut:
+            # get state of the given channel
+            out = aw.ser.PhidgetBinaryOut[serial]
             try:
-                if len(aw.ser.PhidgetBinaryOut) > channel and aw.ser.PhidgetBinaryOut[channel] and aw.ser.PhidgetBinaryOut[channel].getAttached():
-                    res = aw.ser.PhidgetBinaryOut[channel].getState()
+                if len(out) > channel and out[channel] and out[channel].getAttached():
+                    res = out[channel].getState()
             except:
                 pass
         return res
     
-    def phidgetBinaryOUTtoggle(self,channel):
-        self.phidgetBinaryOUTset(channel,not self.phidgetBinaryOUTget(channel))
+    def phidgetBinaryOUTtoggle(self,channel,serial=None):
+        self.phidgetBinaryOUTset(channel,not self.phidgetBinaryOUTget(channel,serial),serial)
         
     def phidgetBinaryOUTclose(self):
-        if aw.ser.PhidgetBinaryOut is not None:
-            for i in range(len(aw.ser.PhidgetBinaryOut)):
-                try:
-                    aw.ser.PhidgetBinaryOut[i].close()
-                except Exception:
-                    pass
-            aw.ser.PhidgetBinaryOut = None
+        for o in aw.ser.PhidgetBinaryOut:
+            out = aw.ser.PhidgetBinaryOut[o]
+            if out is not None:
+                for i in range(len(out)):
+                    try:
+                        if out[i].getAttached():
+                            self.phidgetOUTdetached(out[i])
+                        out[i].close()
+                    except Exception:
+                        pass
+        aw.ser.PhidgetBinaryOut = {}
     
-             
+    
 #--- Phidget Digital PWM Output (only one supported for now)
 #  only supporting 
 #           4 channel Phidget OUT1100, REL1100
@@ -46507,18 +46707,20 @@ class serialport(object):
 #  commands: out(n,v) and toggle(n) with n channel number and value v from [0-100]
 #    toggle switches between last value != 0 and 0
 
-    def phidgetOUTattach(self,channel):
-        if aw.ser.PhidgetDigitalOut is None:
+    # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
+    def phidgetOUTattach(self,channel,serial=None):
+        if not serial in aw.ser.PhidgetDigitalOut:
             if aw.qmc.phidgetManager is None:
                 aw.qmc.startPhidgetManager()
             if aw.qmc.phidgetManager is not None:
                 # try to attach the 4 channels of the Phidget OUT1100 module
                 ser = None
+                s,p = self.serialString2serialPort(serial)
                 port = None
                 for phidget_id in [DeviceID.PHIDID_OUT1100,DeviceID.PHIDID_REL1100]:
                     if ser is None:
-                        ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                        ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,channel,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     else:
                         break
                 ports = 4
@@ -46526,12 +46728,14 @@ class serialport(object):
                     ports = 16
                     for phidget_id in [DeviceID.PHIDID_REL1101]:
                         if ser is None:
-                            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,
-                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,channel,
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                         else:
                             break
                 if ser is not None:
-                    aw.ser.PhidgetDigitalOut = []
+                    aw.ser.PhidgetDigitalOut[serial] = []
+                    aw.ser.PhidgetDigitalOutLastPWM[serial] = [0]*ports # 0-100
+                    aw.ser.PhidgetDigitalOutLastToggle[serial] = [None]*ports
                     for i in range(ports):
                         do = DigitalOutput()
                         if port is not None:
@@ -46544,162 +46748,243 @@ class serialport(object):
                         elif not aw.qmc.phidgetRemoteFlag:
                             do.setIsRemote(False)
                             do.setIsLocal(True)
-                        aw.ser.PhidgetDigitalOut.append(do)
+                        aw.ser.PhidgetDigitalOut[serial].append(do)
+                    if serial is None:
+                        # we make this also accessible via its serial number
+                        aw.ser.PhidgetDigitalOut[str(ser)] = aw.ser.PhidgetDigitalOut[None]
         try:
-            if not aw.ser.PhidgetDigitalOut[channel].getAttached():
-                aw.ser.PhidgetDigitalOut[channel].openWaitForAttachment(1200)
+            ch = aw.ser.PhidgetDigitalOut[serial][channel]
+            if not ch.getAttached():
+                ch.setOnAttachHandler(self.phidgetOUTattached)
+                ch.setOnDetachHandler(self.phidgetOUTdetached)
+                if aw.qmc.phidgetRemoteFlag:
+                    ch.openWaitForAttachment(3000)
+                else:
+                    ch.openWaitForAttachment(1200)
+                if serial is None and ch.getAttached():
+                    # we make this also accessible via its serial number + port
+                    s = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
+                    aw.ser.PhidgetDigitalOut[s] = aw.ser.PhidgetDigitalOut[None]
         except:
             pass
 
-    def phidgetOUTtogglePWM(self,channel):
-        lastPWM = aw.ser.PhidgetDigitalOutLastPWM[channel]
-        lastToggle = aw.ser.PhidgetDigitalOutLastToggle[channel]
-        if lastPWM == 0:
-            # we switch on
-            if lastToggle is None:
-                self.phidgetOUTsetPWM(channel,100)
+    def phidgetOUTtogglePWM(self,channel,serial=None):
+        self.phidgetOUTattach(channel,serial) # this is to ensure that the lastToggle/lastPWM structures are allocated
+        if serial in aw.ser.PhidgetDigitalOut:
+            lastPWM = aw.ser.PhidgetDigitalOutLastPWM[serial][channel]
+            lastToggle = aw.ser.PhidgetDigitalOutLastToggle[serial][channel]
+            if lastPWM == 0:
+                # we switch on
+                if lastToggle is None:
+                    self.phidgetOUTsetPWM(channel,100,serial)
+                else:
+                    # we have a lastPWM from before toggling off
+                    self.phidgetOUTsetPWM(channel,lastToggle,serial)
             else:
-                # we have a lastPWM from before toggling off
-                self.phidgetOUTsetPWM(channel,lastToggle)
-        else:
-            # we switch off
-            self.phidgetOUTsetPWM(channel,0)
-            aw.ser.PhidgetDigitalOutLastToggle[channel] = lastPWM # remember lastPWM to be able to switch on again
-            
-    def phidgetOUTpulsePWM(self,channel,millis):
-        self.phidgetOUTsetPWM(channel,100)
+                # we switch off
+                self.phidgetOUTsetPWM(channel,0,serial)
+                aw.ser.PhidgetDigitalOutLastToggle[serial][channel] = lastPWM # remember lastPWM to be able to switch on again
+                if serial is None:
+                    # also establish for the entry with serial number
+                    s = aw.ser.PhidgetDigitalOut[serial][channel].getDeviceSerialNumber()
+                    ser = self.serialPort2serialString(s,aw.ser.PhidgetDigitalOut[serial][channel].getHubPort())
+                    aw.ser.PhidgetDigitalOutLastToggle[ser][channel] = lastPWM # remember lastPWM to be able to switch on again
+                    aw.ser.PhidgetDigitalOutLastToggle[str(s)][channel] = lastPWM # remember lastPWM to be able to switch on again
+    
+    def phidgetOUTpulsePWM(self,channel,millis,serial=None):
+        self.phidgetOUTsetPWM(channel,100,serial)
 #        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWM(channel,0))
 #        # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
         # the following solution has the drawback to block the eventaction thread
 #        libtime.sleep(millis/1000.)
 #        self.phidgetOUTsetPWM(channel,0)
-        aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"OUTsetPWM")
+        if serial is None:
+            aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"OUTsetPWM")
+        else:
+            aw.singleShotPhidgetsPulseOFFSerial.emit(channel,millis,"OUTsetPWM",serial)
 
     # value: 0-100
-    def phidgetOUTsetPWM(self,channel,value):
-        self.phidgetOUTattach(channel)
-        if aw.ser.PhidgetDigitalOut is not None:
+    def phidgetOUTsetPWM(self,channel,value,serial=None):
+        self.phidgetOUTattach(channel,serial)
+        if serial in aw.ser.PhidgetDigitalOut:
+            out = aw.ser.PhidgetDigitalOut[serial]
             # set PWM of the given channel
             try:
-                if len(aw.ser.PhidgetDigitalOut) > channel and aw.ser.PhidgetDigitalOut[channel].getAttached():
-                    aw.ser.PhidgetDigitalOut[channel].setDutyCycle(value/100.)
-                    aw.ser.PhidgetDigitalOutLastPWM[channel] = value
-                    aw.ser.PhidgetDigitalOutLastToggle[channel] = None # clears the lastToggle value
+                if len(out) > channel and out[channel].getAttached():
+                    out[channel].setDutyCycle(value/100.)
+                    aw.ser.PhidgetDigitalOutLastPWM[serial][channel] = value
+                    aw.ser.PhidgetDigitalOutLastToggle[serial][channel] = None # clears the lastToggle value
+                    if serial is None:
+                        # also establish for the entry with serial number
+                        s = out[channel].getDeviceSerialNumber()
+                        sr = self.serialPort2serialString(s,out[channel].getHubPort())
+                        aw.ser.PhidgetDigitalOutLastPWM[sr][channel] = value
+                        aw.ser.PhidgetDigitalOutLastToggle[sr][channel] = None # clears the lastToggle value
+                        aw.ser.PhidgetDigitalOutLastPWM[str(s)][channel] = value
+                        aw.ser.PhidgetDigitalOutLastToggle[str(s)][channel] = None # clears the lastToggle value
             except Exception:
                 pass
     
     def phidgetOUTclose(self):
-        if aw.ser.PhidgetDigitalOut is not None:
-            for i in range(len(aw.ser.PhidgetDigitalOut)):
-                try:
-                    aw.ser.PhidgetDigitalOut[i].close()
-                except Exception:
-                    pass
-            aw.ser.PhidgetDigitalOut = None
+        for m in aw.ser.PhidgetDigitalOut:
+            out = aw.ser.PhidgetDigitalOut[m]
+            if out is not None:
+                for i in range(len(out)):
+                    try:
+                        if out[i].getAttached():
+                            self.phidgetOUTdetached(out[i])
+                        out[i].close()
+                    except Exception:
+                        pass
+        aw.ser.PhidgetDigitalOut = {}
+        aw.ser.PhidgetDigitalOutLastPWM = {}
+        aw.ser.PhidgetDigitalOutLastToggle = {}
 
-#--- Phidget Digital PWMhub Output (only one supported for now)
+
+#--- Phidget Digital PWMhub Output
 #  only supporting 6 channel Phidget HUB module
 
-    def phidgetOUTattachHub(self,channel):
-        if aw.ser.PhidgetDigitalOutHub is not None:
+    # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
+    def phidgetOUTattachHub(self,channel,serial=None):
+        if not serial in aw.ser.PhidgetDigitalOutHub:
             if aw.qmc.phidgetManager is None:
                 aw.qmc.startPhidgetManager()
             if aw.qmc.phidgetManager is not None:
                 # try to attach the 6 channels of the Phidget HUB module
+                s,p = self.serialString2serialPort(serial)
                 ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_DIGITALOUTPUT_PORT,channel,
-                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                 if ser is not None:
-                    aw.ser.PhidgetDigitalOutHub = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
+                    aw.ser.PhidgetDigitalOutHub[serial] = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
+                    aw.ser.PhidgetDigitalOutLastPWMhub[serial] = [0]*6 # 0-100
+                    aw.ser.PhidgetDigitalOutLastToggleHub[serial] = [None]*6
                     for i in range(6):
-                        aw.ser.PhidgetDigitalOutHub[i].setChannel(0)
-                        aw.ser.PhidgetDigitalOutHub[i].setHubPort(i)
-                        aw.ser.PhidgetDigitalOutHub[i].setDeviceSerialNumber(ser)
-                        aw.ser.PhidgetDigitalOutHub[i].setIsHubPortDevice(True)
+                        aw.ser.PhidgetDigitalOutHub[serial][i].setChannel(0)
+                        aw.ser.PhidgetDigitalOutHub[serial][i].setHubPort(i)
+                        aw.ser.PhidgetDigitalOutHub[serial][i].setDeviceSerialNumber(ser)
+                        aw.ser.PhidgetDigitalOutHub[serial][i].setIsHubPortDevice(True)
                         if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
-                            aw.ser.PhidgetDigitalOutHub[i].setIsRemote(True)
-                            aw.ser.PhidgetDigitalOutHub[i].setIsLocal(False)
+                            aw.ser.PhidgetDigitalOutHub[serial][i].setIsRemote(True)
+                            aw.ser.PhidgetDigitalOutHub[serial][i].setIsLocal(False)
+                    if serial is None:
+                        # we make this also accessible via its serial number
+                        aw.ser.PhidgetDigitalOutHub[str(ser)] = aw.ser.PhidgetDigitalOutHub[None]
+                        aw.ser.PhidgetDigitalOutLastPWMhub[str(ser)] = aw.ser.PhidgetDigitalOutLastPWMhub[None]
+                        aw.ser.PhidgetDigitalOutLastToggleHub[str(ser)] = aw.ser.PhidgetDigitalOutLastToggleHub[None]
         try:
-            if not aw.ser.PhidgetDigitalOutHub[channel].getAttached():
-                aw.ser.PhidgetDigitalOutHub[channel].openWaitForAttachment(1000) # we don't wait for the attach and might mis some data
+            ch = aw.ser.PhidgetDigitalOutHub[serial][channel]
+            ch.setOnAttachHandler(self.phidgetOUTattached)
+            ch.setOnDetachHandler(self.phidgetOUTdetached)
+            if not ch.getAttached():
+                if aw.qmc.phidgetRemoteFlag:
+                    ch.openWaitForAttachment(3000)
+                else:
+                    ch.openWaitForAttachment(1000)
         except:
-            pass                        
+            pass
     
-    def phidgetOUTtogglePWMhub(self,channel):
-        lastToggle = aw.ser.PhidgetDigitalOutLastToggleHub[channel]
-        lastPWM = aw.ser.PhidgetDigitalOutLastPWMhub[channel]
-        if lastPWM == 0:
-            # we switch on
-            if lastToggle is None:
-                self.phidgetOUTsetPWMhub(channel,100)
+    def phidgetOUTtogglePWMhub(self,channel,serial=None):
+        self.phidgetOUTattachHub(channel,serial) # this is to ensure that the lastToggle/lastPWM structures are allocated
+        if serial in aw.ser.PhidgetDigitalOutHub:
+            lastToggle = aw.ser.PhidgetDigitalOutLastToggleHub[serial][channel]
+            lastPWM = aw.ser.PhidgetDigitalOutLastPWMhub[serial][channel]
+            if lastPWM == 0:
+                # we switch on
+                if lastToggle is None:
+                    self.phidgetOUTsetPWMhub(channel,100,serial)
+                else:
+                    # we have a lastPWM from before toggling off
+                    self.phidgetOUTsetPWMhub(channel,lastToggle,serial)
             else:
-                # we have a lastPWM from before toggling off
-                self.phidgetOUTsetPWMhub(channel,lastToggle)
-        else:
-            # we switch off
-            self.phidgetOUTsetPWMhub(channel,0)
-            aw.ser.PhidgetDigitalOutLastToggleHub[channel] = lastPWM # remember lastPWM to be able to switch on again
+                # we switch off
+                self.phidgetOUTsetPWMhub(channel,0,serial)
+                aw.ser.PhidgetDigitalOutLastToggleHub[serial][channel] = lastPWM # remember lastPWM to be able to switch on again
+                if serial is None:
+                    # also establish for the entry with serial number
+                    ser = aw.ser.PhidgetDigitalOutHub[serial][channel].getDeviceSerialNumber()
+                    aw.ser.PhidgetDigitalOutLastToggleHub[str(ser)][channel] = lastPWM # remember lastPWM to be able to switch on again
+    
 
-    def phidgetOUTpulsePWMhub(self,channel,millis):
-        self.phidgetOUTsetPWMhub(channel,100)
+    def phidgetOUTpulsePWMhub(self,channel,millis,serial=None):
+        self.phidgetOUTsetPWMhub(channel,100,serial)
 #        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWMhub(channel,0))
         # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
         # the following solution has the drawback to block the eventaction thread
 #        libtime.sleep(millis/1000.)
 #        self.phidgetOUTsetPWMhub(channel,0)
-        aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"OUTsetPWMhub")
-        
+        if serial is None:
+            aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"OUTsetPWMhub")
+        else:
+            aw.singleShotPhidgetsPulseOFFSerial.emit(channel,millis,"OUTsetPWMhub",serial)
+    
     # channel: 0-5
     # value: 0-100
-    def phidgetOUTsetPWMhub(self,channel,value):
-        self.phidgetOUTattachHub(channel)
-        if aw.ser.PhidgetDigitalOutHub is not None:
+    # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
+    def phidgetOUTsetPWMhub(self,channel,value,serial=None):
+        self.phidgetOUTattachHub(channel,serial)
+        if serial in aw.ser.PhidgetDigitalOutHub:
+            outHub = aw.ser.PhidgetDigitalOutHub[serial]
             # set PWM of the given channel
             try:
-                if len(aw.ser.PhidgetDigitalOutHub) > channel and aw.ser.PhidgetDigitalOutHub[channel].getAttached():
-                    aw.ser.PhidgetDigitalOutHub[channel].setDutyCycle(value/100.)
-                    aw.ser.PhidgetDigitalOutLastPWMhub[channel] = value
+                if len(outHub) > channel and outHub[channel] and outHub[channel].getAttached():
+                    outHub[channel].setDutyCycle(value/100.)
+                    aw.ser.PhidgetDigitalOutLastPWMhub[serial][channel] = value
+                    aw.ser.PhidgetDigitalOutLastToggleHub[serial][channel] = None # clears the lastToggle value
+                    if serial is None:
+                        # also establish for the entry with serial number
+                        sr = outHub[channel].getDeviceSerialNumber()
+                        aw.ser.PhidgetDigitalOutLastPWMhub[str(sr)][channel] = value
+                        aw.ser.PhidgetDigitalOutLastToggleHub[str(sr)][channel] = None # clears the lastToggle value
             except:
                 pass
     
     def phidgetOUTcloseHub(self):
-        if aw.ser.PhidgetDigitalOutHub is not None and len(aw.ser.PhidgetDigitalOutHub)==6:
-            for i in range(6):
-                try:
-                    aw.ser.PhidgetDigitalOutHub[i].close()
-                except:
-                    pass
-            aw.ser.PhidgetDigitalOutHub = None
+        for h in aw.ser.PhidgetDigitalOutHub:
+            outHub = aw.ser.PhidgetDigitalOutHub[h]
+            if outHub is not None:
+                for i in range(len(outHub)):
+                    try:
+                        if outHub[i].getAttached():
+                            self.phidgetOUTdetached(outHub[i])
+                        outHub[i].close()
+                    except:
+                        pass
+        aw.ser.PhidgetDigitalOutHub = {}
+        aw.ser.PhidgetDigitalOutLastPWMhub = {}
+        aw.ser.PhidgetDigitalOutLastToggleHub = {}
 
 
 #--- Phidget Analog Voltage Output (only one supported for now)
 #  only supporting 
 #     1 channel Phidget OUT1000, OUT1001 and OUT1002
 #     4 channel USB Phidget 1002
-#  commands: out(n,v) with n channel number and value v voltage in V as a float
+#  commands: out(n,v[,serial]) with n channel number and value v voltage in V as a float, and serial the optional serial/port number of the addressed module
 
-    def phidgetVOUTattach(self,channel):
-        if aw.ser.PhidgetAnalogOut is None:
+    # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
+    def phidgetVOUTattach(self,channel,serial):
+        if not serial in aw.ser.PhidgetAnalogOut:
             if aw.qmc.phidgetManager is None:
                 aw.qmc.startPhidgetManager()
             if aw.qmc.phidgetManager is not None:
                 # try to attach the Phidget OUT100x module
+                s,p = self.serialString2serialPort(serial)
                 ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1000,
-                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)                
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                 ports = 1
                 if ser is None:
                     ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1001,
-                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 1
                 if ser is None:
                     ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1002,
-                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 1
                 if ser is None:
                     ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_1002,
-                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 4
                 if ser is not None:
-                    aw.ser.PhidgetAnalogOut = []
+                    aw.ser.PhidgetAnalogOut[serial] = []
                     for i in range(ports):
                         vo = VoltageOutput()
                         if port is not None:
@@ -46712,43 +46997,59 @@ class serialport(object):
                         elif not aw.qmc.phidgetRemoteFlag:
                             vo.setIsRemote(False)
                             vo.setIsLocal(True)
-                        aw.ser.PhidgetAnalogOut.append(vo)
+                        aw.ser.PhidgetAnalogOut[serial].append(vo)
+                    if serial is None:
+                        # we make this also accessible via its serial number
+                        aw.ser.PhidgetAnalogOut[str(ser)] = aw.ser.PhidgetAnalogOut[None]
         try:
-            if not aw.ser.PhidgetAnalogOut[channel].getAttached():
-                aw.ser.PhidgetAnalogOut[channel].openWaitForAttachment(1200)
+            ch = aw.ser.PhidgetAnalogOut[serial][channel]
+            ch.setOnAttachHandler(self.phidgetOUTattached)
+            ch.setOnDetachHandler(self.phidgetOUTdetached)
+            if not ch.getAttached():
+                if aw.qmc.phidgetRemoteFlag:
+                    ch.openWaitForAttachment(3000)
+                else:
+                    ch.openWaitForAttachment(1200)
+                if serial is None and ch.getAttached():
+                    # we make this also accessible via its serial number + port
+                    s = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
+                    aw.ser.PhidgetAnalogOut[s] = aw.ser.PhidgetAnalogOut[None]
         except:
             pass
 
     # value: float
     # returns True or False indicating set status
-    def phidgetVOUTsetVOUT(self,channel,value):
+    def phidgetVOUTsetVOUT(self,channel,value,serial=None):
         res = False
-        self.phidgetVOUTattach(channel)
-        if aw.ser.PhidgetAnalogOut is not None:
+        self.phidgetVOUTattach(channel,serial)
+        if serial in aw.ser.PhidgetAnalogOut:
+            out = aw.ser.PhidgetAnalogOut[serial]
             # set voltage output
             try:
-                if len(aw.ser.PhidgetAnalogOut) > channel and aw.ser.PhidgetAnalogOut[channel].getAttached():
+                if len(out) > channel and out[channel].getAttached():
                     if value == 0:
-                        aw.ser.PhidgetAnalogOut[channel].setVoltage(0)
-                        aw.ser.PhidgetAnalogOut[channel].setEnabled(False)
+                        out[channel].setVoltage(0)
+                        out[channel].setEnabled(False)
                     else:
-                        aw.ser.PhidgetAnalogOut[channel].setVoltage(value)
-                        aw.ser.PhidgetAnalogOut[channel].setEnabled(True)
+                        out[channel].setVoltage(value)
+                        out[channel].setEnabled(True)
                     res = True
             except Exception:
                 res = False
         return res
 
     def phidgetVOUTclose(self):
-        if aw.ser.PhidgetAnalogOut is not None:
-            for i in range(len(aw.ser.PhidgetAnalogOut)):
+        for c in aw.ser.PhidgetAnalogOut:
+            out = aw.ser.PhidgetAnalogOut[c]
+            for i in range(len(out)):
                 try:
-                    if aw.ser.PhidgetAnalogOut[i].getAttached():
-                        aw.ser.PhidgetAnalogOut[i].setEnabled(False)
-                    aw.ser.PhidgetAnalogOut[i].close()
+                    if out[i].getAttached():
+                        out[i].setEnabled(False)
+                        self.phidgetOUTdetached(out[i])
+                    out[i].close()
                 except Exception:
                     pass
-            aw.ser.PhidgetAnalogOut = None
+        aw.ser.PhidgetAnalogOut = {}
 
 
 #--- Yoctopuce Voltage Output
@@ -47127,89 +47428,103 @@ class serialport(object):
 #--- Phidget RC (only one supported for now)
 #  supporting up to 16 channels like those of the RCC1000
 #  commands: 
-#     pulse(ch,min,max) # sets min/max pulse width
-#     pos(ch,min,max)   # sets min/max position
-#     engaged(ch,state) # engage channel
-#     set(ch,pos)       # sets position
-#     ramp(ch,b)        # activates or deactivates the speed ramping state
-#     volt(ch,v)        # set the voltage to one of 5, 6 or 7.4 in Volt
-#     accel(ch,accel)   # set the acceleration 
-#     veloc(ch,v)       # set the velocity
+#     pulse(ch,min,max[,sn]) # sets min/max pulse width
+#     pos(ch,min,max[,sn])   # sets min/max position
+#     engaged(ch,state[,sn]) # engage channel
+#     set(ch,pos[,sn])       # sets position
+#     ramp(ch,b[,sn])        # activates or deactivates the speed ramping state
+#     volt(ch,v[,sn])        # set the voltage to one of 5, 6 or 7.4 in Volt
+#     accel(ch,accel[,sn])   # set the acceleration 
+#     veloc(ch,v[,sn])       # set the velocity
 
-    def phidgetRCattach(self,channel):
-        if aw.ser.PhidgetRCServo is None:
-            aw.qmc.startPhidgetManager()
-            # try to attach an Phidget RCC1000 module
-            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_RCC1000,
-                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-            ports = 16
-            # try to attach an Phidget RC 1061 module
-            if ser is None:
-                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1061,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-                ports = 8
-            # try to attach an Phidget RC 1066 module
-            if ser is None:
-                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1066,
-                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
-                ports = 1
-            if ser is not None:
-                aw.ser.PhidgetRCServo = []
-                for i in range(ports):
-                    rcservo = RCServo()
-                    aw.ser.PhidgetRCServo.append(rcservo)
-                    if port is not None:
-                        rcservo.setHubPort(port)
-                    rcservo.setDeviceSerialNumber(ser)
-                    rcservo.setChannel(i)
-                    if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
-                        rcservo.setIsRemote(True)
-                        rcservo.setIsLocal(False)
+    # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
+    def phidgetRCattach(self,channel,serial=None):
+        if not serial in aw.ser.PhidgetRCServo:
+            if aw.qmc.phidgetManager is None:
+                aw.qmc.startPhidgetManager()
+            if aw.qmc.phidgetManager is not None:
+                # try to attach an Phidget RCC1000 module
+                s,p = self.serialString2serialPort(serial)
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_RCC1000,
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                ports = 16
+                # try to attach an Phidget RC 1061 module
+                if ser is None:
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1061,
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                    ports = 8
+                # try to attach an Phidget RC 1066 module
+                if ser is None:
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1066,
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                    ports = 1
+                if ser is not None:
+                    aw.ser.PhidgetRCServo[serial] = []
+                    for i in range(ports):
+                        rcservo = RCServo()
+                        if port is not None:
+                            rcservo.setHubPort(port)
+                        rcservo.setDeviceSerialNumber(ser)
+                        rcservo.setChannel(i)
+                        if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
+                            rcservo.setIsRemote(True)
+                            rcservo.setIsLocal(False)
+                        aw.ser.PhidgetRCServo[serial].append(rcservo)
+                    if serial is None:
+                        # we make this also accessible via its serial number
+                        aw.ser.PhidgetRCServo[str(ser)] = aw.ser.PhidgetRCServo[None]
         try:
-            if not aw.ser.PhidgetRCServo[channel].getAttached():
+            ch = aw.ser.PhidgetRCServo[serial][channel]
+            ch.setOnAttachHandler(self.phidgetOUTattached)
+            ch.setOnDetachHandler(self.phidgetOUTdetached)
+            if not ch.getAttached():
                 if aw.qmc.phidgetRemoteFlag:
-                    aw.ser.PhidgetRCServo[channel].openWaitForAttachment(3000)
+                    ch.openWaitForAttachment(3000)
                 else:
-                    aw.ser.PhidgetRCServo[channel].openWaitForAttachment(1500)
+                    ch.openWaitForAttachment(1500)
+                if serial is None and ch.getAttached():
+                    # we make this also accessible via its serial number + port
+                    s = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
+                    aw.ser.PhidgetRCServo[s] = aw.ser.PhidgetRCServo[None]
         except:
             pass
 
     # sets min/max pulse width
-    def phidgetRCpulse(self,channel,min_pulse,max_pulse):
-        self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
-            aw.ser.PhidgetRCServo[channel].setMinPulseWidth(min_pulse)
-            aw.ser.PhidgetRCServo[channel].setMaxPulseWidth(max_pulse)
+    def phidgetRCpulse(self,channel,min_pulse,max_pulse,serial=None):
+        self.phidgetRCattach(channel,serial)
+        if serial in aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo[serial])>channel:
+            aw.ser.PhidgetRCServo[serial][channel].setMinPulseWidth(min_pulse)
+            aw.ser.PhidgetRCServo[serial][channel].setMaxPulseWidth(max_pulse)
 
     # sets min/max position
-    def phidgetRCpos(self,channel,min_pos,max_pos):
-        self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
-            aw.ser.PhidgetRCServo[channel].setMinPosition(min_pos)
-            aw.ser.PhidgetRCServo[channel].setMaxPosition(max_pos)
+    def phidgetRCpos(self,channel,min_pos,max_pos,serial=None):
+        self.phidgetRCattach(channel,serial)
+        if serial in aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo[serial])>channel:
+            aw.ser.PhidgetRCServo[serial][channel].setMinPosition(min_pos)
+            aw.ser.PhidgetRCServo[serial][channel].setMaxPosition(max_pos)
 
     # engage channel
-    def phidgetRCengaged(self,channel,state):
-        self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
-            aw.ser.PhidgetRCServo[channel].setEngaged(state)
+    def phidgetRCengaged(self,channel,state,serial=None):
+        self.phidgetRCattach(channel,serial)
+        if serial in aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo[serial])>channel:
+            aw.ser.PhidgetRCServo[serial][channel].setEngaged(state)
 
     # sets position
-    def phidgetRCset(self,channel,position):
-        self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
-            aw.ser.PhidgetRCServo[channel].setTargetPosition(position)
+    def phidgetRCset(self,channel,position,serial=None):
+        self.phidgetRCattach(channel,serial)
+        if serial in aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo[serial])>channel:
+            aw.ser.PhidgetRCServo[serial][channel].setTargetPosition(position)
 
     # set speed rampling state per channel
-    def phidgetRCspeedRamping(self,channel,state):
-        self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
-            aw.ser.PhidgetRCServo[channel].setSpeedRampingState(state)
+    def phidgetRCspeedRamping(self,channel,state,serial=None):
+        self.phidgetRCattach(channel,serial)
+        if serial in aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo[serial])>channel:
+            aw.ser.PhidgetRCServo[serial][channel].setSpeedRampingState(state)
 
     # set voltage per channel
-    def phidgetRCvoltage(self,channel,volt):
-        self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
+    def phidgetRCvoltage(self,channel,volt,serial=None):
+        self.phidgetRCattach(channel,serial)
+        if serial in aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo[serial])>channel:
             from Phidget22.RCServoVoltage import RCServoVoltage
             if volt>6:
                 # set to 7.4V
@@ -47220,30 +47535,32 @@ class serialport(object):
             else:
                 # set to 6V
                 v = RCServoVoltage.RCSERVO_VOLTAGE_6V
-            aw.ser.PhidgetRCServo[channel].setVoltage(v)
+            aw.ser.PhidgetRCServo[serial][channel].setVoltage(v)
             
     # sets acceleration
-    def phidgetRCaccel(self,channel,accel):
-        self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
-            aw.ser.PhidgetRCServo[channel].setAcceleration(accel)
+    def phidgetRCaccel(self,channel,accel,serial=None):
+        self.phidgetRCattach(channel,serial)
+        if serial in aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo[serial])>channel:
+            aw.ser.PhidgetRCServo[serial][channel].setAcceleration(accel)
             
     # sets velocity
-    def phidgetRCveloc(self,channel,veloc):
-        self.phidgetRCattach(channel)
-        if aw.ser.PhidgetRCServo is not None and len(aw.ser.PhidgetRCServo)>channel:
-            aw.ser.PhidgetRCServo[channel].setVelocityLimit(veloc)
+    def phidgetRCveloc(self,channel,veloc,serial=None):
+        self.phidgetRCattach(channel,serial)
+        if serial in aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo[serial])>channel:
+            aw.ser.PhidgetRCServo[serial][channel].setVelocityLimit(veloc)
 
-    def phidgetRCclose(self):
-        if aw.ser.PhidgetRCServo is not None:
-            for i in range(len(aw.ser.PhidgetRCServo)):
+    def phidgetRCclose(self,serial=None):
+        for c in aw.ser.PhidgetRCServo:
+            rc = aw.ser.PhidgetRCServo[c]
+            for i in range(len(rc)):
                 try:
-                    if aw.ser.PhidgetRCServo[i].getAttached():
-                        aw.ser.PhidgetRCServo[i].setEngaged(False)
-                    aw.ser.PhidgetRCServo[i].close()
+                    if rc[i].getAttached():
+                        rc[i].setEngaged(False)
+                        self.phidgetOUTdetached(rc[i])
+                    rc[i].close()
                 except Exception:
                     pass
-            aw.ser.PhidgetRCServo = None
+            aw.ser.PhidgetRCServo = {}
         
 #---
 

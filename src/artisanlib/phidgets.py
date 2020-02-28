@@ -172,7 +172,7 @@ class PhidgetManager():
                             pass
                 #else:
                 #  not a HUB port
-        except Exception:
+        except:
             pass
         finally:
             if self.managersemaphore.available() < 1:
@@ -209,8 +209,8 @@ class PhidgetManager():
 #            print(k.getDeviceSerialNumber(),k.getChannelClassName(),k.getDeviceID(),k.getIsHubPortDevice(),"port: ", k.getHubPort(),"ch: ",k.getChannel(), "local: ", k.getIsLocal())
 
     # returns the first matching Phidget channel and reserves it
-    def getFirstMatchingPhidget(self,phidget_class_name,device_id,channel=None,remote=False,remoteOnly=False):
-#        print("getFirstMatchingPhidget",phidget_class_name,device_id,channel,remote,remoteOnly)
+    def getFirstMatchingPhidget(self,phidget_class_name,device_id,channel=None,remote=False,remoteOnly=False,serial=None,hubport=None):
+#        print("getFirstMatchingPhidget",phidget_class_name,device_id,channel,remote,remoteOnly,serial,hubport)
         try:
             self.managersemaphore.acquire(1)
             if device_id in [
@@ -229,6 +229,8 @@ class PhidgetManager():
             # get list of all matching phidget channels
             matching_channels = [k for k, v in self.attachedPhidgetChannels.items() if v and \
                 (hub or (k.getDeviceID() == device_id)) and \
+                (serial is None or serial == k.getDeviceSerialNumber()) and \
+                (hubport is None or hubport == k.getHubPort()) and \
                 ((remote and not remoteOnly) or (not remote and k.getIsLocal()) or (remote and remoteOnly and not k.getIsLocal())) and \
                 k.getChannelClassName() == phidget_class_name and \
                 (channel is None or (not hub and channel == k.getChannel()) or (hub and k.getIsHubPortDevice() and k.getHubPort() == channel))]
@@ -236,7 +238,7 @@ class PhidgetManager():
 #            self.print_list2(matching_channels)
 
             # sort by serial number (local first)
-            matching_channels.sort(key=lambda x:(x.getDeviceSerialNumber(),(x.getHubPort() if x.getIsHubPortDevice() else 0)))
+            matching_channels.sort(key=lambda x:(x.getDeviceSerialNumber(),x.getHubPort()))
             # return smallest / first item
             if len(matching_channels) > 0:
                 p = matching_channels[0]
