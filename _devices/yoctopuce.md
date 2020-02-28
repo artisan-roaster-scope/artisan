@@ -108,7 +108,7 @@ The supported commands are:
 * `on(c[,sn])` : turn channel c of the relay module on  
 * `off(c[,sn])` : turn channel c of the relay module off
 * `flip(c[,sn])` : toggle the state of channel c
-* `pulse(c,delay,duration[,sn])` : pulse the channel c on after a delay of `delay` milliseconds for the duration of `duration` milliseconds
+* `pip(c,delay,duration[,sn])` : pulse the channel c on after a delay of `delay` milliseconds for the duration of `duration` milliseconds
 
 The optional `sn` parameter specifies either the modules serial number or its logical name (if `sn` is not given, the first module found is addressed).
 
