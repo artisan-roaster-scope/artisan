@@ -1791,6 +1791,8 @@ class tgraphcanvas(FigureCanvas):
         
         self.autosaveimage = False # if true save an image along alog files
         self.autosaveimageformat = "PDF" # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP, CSV, JSON
+        
+        self.autosavehelpisOpen = False
 
         #used to place correct height of text to avoid placing text over text (annotations)
         self.ystep_down = 0
@@ -20393,7 +20395,7 @@ class ApplicationWindow(QMainWindow):
                 ]
 
             #text between single quotes ' will show only when flagon is True
-            fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}',r'\1",fn) if (self.qmc.flagon or fakeon) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
+            fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (self.qmc.flagon or fakeon) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
             #text between double quotes " will show only when flagon is False
             fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if not (self.qmc.flagon or fakeon) else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
             #replace the fields with content
@@ -37923,18 +37925,22 @@ class autosaveDlg(ArtisanDialog):
         super(autosaveDlg,self).__init__(parent)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Autosave", None))
+
+        settings = QSettings()
+        if settings.contains("autosaveGeometry"):
+            self.restoreGeometry(settings.value("autosaveGeometry"))
+
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name",None))
-
         self.prefixEdit.textChanged.connect(self.prefixChanged)
         prefixpreviewLabel = QLabel()
         prefixpreviewLabel.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
-        prefixpreviewLabel.setText(u(QApplication.translate("Label", "Preview",None)))
-        prefixpreviewLabel.setToolTip(QApplication.translate("Tooltip","Prefix while recording: ", None) + aw.generateFilename(self.prefixEdit.text(),fakeon=True))
-        prefixpreviewLabel.setToolTipDuration(60000)
-        self.prefixPreview = QLabel(aw.generateFilename(self.prefixEdit.text()))
-        self.prefixPreview.setToolTip(QApplication.translate("Tooltip","Prefix while recording: ", None) + aw.generateFilename(self.prefixEdit.text(),fakeon=True))
-        self.prefixPreview.setToolTipDuration(60000)
+        prefixpreviewLabel.setText(u(QApplication.translate("Label", "Preview:",None)))
+        self.prefixPreview = QLabel()
+        self.prefixpreviewrecordingLabel = QLabel()
+        self.prefixpreviewrecordingLabel.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
+        self.prefixPreviewrecording = QLabel()
+        self.prefixChanged()
  
         autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]", None))
         self.autocheckbox = QCheckBox()
@@ -37976,11 +37982,13 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(self.prefixEdit,1,1,1,2)
         autolayout.addWidget(prefixpreviewLabel,2,0)
         autolayout.addWidget(self.prefixPreview,2,1)
-        autolayout.addWidget(pathButton,3,0)
-        autolayout.addWidget(self.pathEdit,3,1,1,2)
-        autolayout.addWidget(self.autopdfcheckbox,4,0,Qt.AlignRight)
-        autolayout.addWidget(autopdflabel,4,1)
-        autolayout.addWidget(self.imageTypesComboBox,4,2)
+        autolayout.addWidget(self.prefixpreviewrecordingLabel,3,0)
+        autolayout.addWidget(self.prefixPreviewrecording,3,1)
+        autolayout.addWidget(pathButton,4,0)
+        autolayout.addWidget(self.pathEdit,4,1,1,2)
+        autolayout.addWidget(self.autopdfcheckbox,5,0,Qt.AlignRight)
+        autolayout.addWidget(autopdflabel,5,1)
+        autolayout.addWidget(self.imageTypesComboBox,5,2)
         autolayout.setColumnStretch(0,0)
         autolayout.setColumnStretch(1,10)
         autolayout.setColumnStretch(2,0)
@@ -37993,19 +38001,24 @@ class autosaveDlg(ArtisanDialog):
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     @pyqtSlot()
-    @pyqtSlot(bool)
-    def autosavehelp(self,_=False):
-        dialog = autosavefieldsHelpDlg(self)
-        #the following line causes the help dialog to obscure the autosave dialog.  the small help window is not desireable, but is better than hiding the autosave dialog.
-        #dialog.resize(600, 500)
-        dialog.show()
-        dialog.activateWindow()
+    def autosavehelp(self):
+        if not aw.qmc.autosavehelpisOpen:
+            self.helpdialog = autosavefieldsHelpDlg(self)
+            self.helpdialog.show()
+            aw.qmc.autosavehelpisOpen = True
+        self.helpdialog.activateWindow()
 
     @pyqtSlot()
     def prefixChanged(self):
         preview = aw.generateFilename(self.prefixEdit.text())
         self.prefixPreview.setText(preview)
-        self.prefixPreview.setToolTip(aw.generateFilename(self.prefixEdit.text(),fakeon=True))
+        previewrecording = aw.generateFilename(self.prefixEdit.text(),fakeon=True)
+        if previewrecording == preview:
+            self.prefixpreviewrecordingLabel.setText("")
+            self.prefixPreviewrecording.setText("")
+        else:
+            self.prefixpreviewrecordingLabel.setText(u(QApplication.translate("Label", "While recording:",None)))
+            self.prefixPreviewrecording.setText(previewrecording)
 
     @pyqtSlot(bool)
     def getpath(self,_):
@@ -38022,13 +38035,20 @@ class autosaveDlg(ArtisanDialog):
             aw.sendmessage(message)
         else:
             aw.qmc.autosaveflag = 0
-#            message = QApplication.translate("Message","Autosave OFF", None)
             aw.qmc.autosaveprefix = u(self.prefixEdit.text())
             message = QApplication.translate("Message","Autosave OFF. Prefix: {0}").format(self.prefixEdit.text())
             aw.sendmessage(message)
         aw.qmc.autosaveimage = self.autopdfcheckbox.isChecked()
         aw.qmc.autosaveimageformat = self.imageTypesComboBox.currentText()
         self.close()
+
+    @pyqtSlot()
+    def closeEvent(self, _):
+        if aw.qmc.autosavehelpisOpen:
+            self.helpdialog.close()
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("autosaveGeometry",self.saveGeometry())              
 
 ########################################################################################
 #####################  AUTOSAVE FIELDS HELP DLG ########################################
@@ -38039,6 +38059,10 @@ class autosavefieldsHelpDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Autosave Filename Fields Help",None)) 
         self.setModal(False)
         
+        settings = QSettings()
+        if settings.contains("autosavefieldsHelpGeometry"):
+            self.restoreGeometry(settings.value("autosavefieldsHelpGeometry"))
+
         delim = '~'
 
         tbl = prettytable.PrettyTable()
@@ -38141,7 +38165,9 @@ the date and time is appended to the file name.\
 <BR/>To prevent this place a single '!' at the start of the Prefix field.\
 <BR/> Example: '!Autosave' will result in file name 'Autosave'.",None)
         helpstr += "<LI>" + QApplication.translate("AutosaveField","To maintain cross platform compatibility, file names may contain only letters, numbers, spaces, \
-and the following special characters:<br/>_-.()",None)
+and the following special characters:<br/>_-.( )<br/>All other characters will be filtered out.",None)
+        helpstr += "<LI>" + QApplication.translate("AutosaveField","The 'While recording' preview shows only when the file name will be different when saved during a recording. \
+Pressing the 'a' key will save during a recording when 'Autosave [a]' is checked.",None)
         helpstr += "</UL>"
         helpstr += "<br/>"
         helpstr += "</body>"
@@ -38153,6 +38179,13 @@ and the following special characters:<br/>_-.()",None)
         hLayout = QVBoxLayout()
         hLayout.addWidget(phelp)        
         self.setLayout(hLayout)
+
+    @pyqtSlot()
+    def closeEvent(self, _):
+        aw.qmc.autosavehelpisOpen = False
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("autosavefieldsHelpGeometry",self.saveGeometry())              
 
 
 ##########################################################################
