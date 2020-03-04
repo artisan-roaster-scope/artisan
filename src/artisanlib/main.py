@@ -13080,7 +13080,7 @@ class ApplicationWindow(QMainWindow):
         self.block_quantification_sampling_ticks = [0,0,0,0]
         # by default we block quantification for sampling_ticks_to_block_quantifiction sampling intervals after
         # a button/slider event
-        self.sampling_ticks_to_block_quantifiction = 10
+        self.sampling_ticks_to_block_quantifiction = 15
                         
         self.extraeventsactionslastvalue = [None,None,None,None]
 
@@ -16734,10 +16734,11 @@ class ApplicationWindow(QMainWindow):
         return res_last
 
     # order event table by time
-    def orderEvents(self):
+    def orderEvents(self,lock=True):
         try:
             #### lock shared resources #####
-            aw.qmc.samplingsemaphore.acquire(1)
+            if lock:
+                aw.qmc.samplingsemaphore.acquire(1)
             nevents = len(aw.qmc.specialevents)
             packed_events = []
             # pack
@@ -16756,7 +16757,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.specialeventsStrings[i] = packed_events[i][2]
                 aw.qmc.specialeventsvalue[i] = packed_events[i][3]
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
+            if lock and aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
 
 
@@ -16774,7 +16775,7 @@ class ApplicationWindow(QMainWindow):
             nevents = len(aw.qmc.specialevents)
             if nevents:
                 # first order the events table
-                self.orderEvents()
+                self.orderEvents(lock=False)
                 # second detect the minimum time span between two events (could be equal to the sampling rate)
                 min_span = None
                 last_event_idx = None # index of last event analyzed
@@ -37933,6 +37934,8 @@ class autosaveDlg(ArtisanDialog):
         settings = QSettings()
         if settings.contains("autosaveGeometry"):
             self.restoreGeometry(settings.value("autosaveGeometry"))
+        
+        self.helpdialog = None
 
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name",None))
@@ -38184,12 +38187,11 @@ Pressing the 'a' key will save during a recording when 'Autosave [a]' is checked
         hLayout.addWidget(phelp)        
         self.setLayout(hLayout)
 
-    @pyqtSlot()
     def closeEvent(self, _):
         aw.qmc.autosavehelpisOpen = False
         settings = QSettings()
         #save window geometry
-        settings.setValue("autosavefieldsHelpGeometry",self.saveGeometry())              
+        settings.setValue("autosavefieldsHelpGeometry",self.saveGeometry())
 
 
 ##########################################################################
@@ -39130,7 +39132,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event",None))
         self.minieventsflag.setChecked(bool(aw.minieventsflag))
         self.minieventsflag.stateChanged.connect(self.minieventsflagChanged)
-        barstylelabel = QLabel(QApplication.translate("Label","Events",None))
+        barstylelabel = QLabel(QApplication.translate("Label","Markers",None))
         barstyles = ["",
                     QApplication.translate("ComboBox","Flag",None),
                     QApplication.translate("ComboBox","Bar",None),
@@ -40359,7 +40361,7 @@ class EventsDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def applyQuantifiers(self,_):
         self.saveQuantifierSettings()
-        # recompute the 4 event quantifier linsapces
+        # recompute the 4 event quantifier linspaces
         aw.computeLinespaces()
         # remove previous quantifier events
         # recompute quantifier events
@@ -47586,7 +47588,7 @@ class serialport(object):
         if serial in aw.ser.PhidgetRCServo and len(aw.ser.PhidgetRCServo[serial])>channel:
             aw.ser.PhidgetRCServo[serial][channel].setVelocityLimit(veloc)
 
-    def phidgetRCclose(self,serial=None):
+    def phidgetRCclose(self):
         for c in aw.ser.PhidgetRCServo:
             rc = aw.ser.PhidgetRCServo[c]
             for i in range(len(rc)):
@@ -61188,6 +61190,7 @@ class PIDcontrol(object):
                     vp = min(100,max(0,int(vp)))
                     # we need to map the duty [0%,100%] to the [slidermin,slidermax] range
                     heat = int(round(numpy.interp(vp,[0,100],[aw.eventslidermin[slidernr],aw.eventslidermax[slidernr]])))
+                    aw.block_quantification_sampling_ticks[slidernr] = aw.sampling_ticks_to_block_quantifiction
                     aw.qmc.temporarymovepositiveslider = (slidernr,heat)
                 if aw.pidcontrol.pidNegativeTarget:
                     slidernr = aw.pidcontrol.pidNegativeTarget - 1
@@ -61197,6 +61200,7 @@ class PIDcontrol(object):
                         vn = v
                     vn = min(0,max(-100,int(vn)))
                     # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range
+                    aw.block_quantification_sampling_ticks[slidernr] = aw.sampling_ticks_to_block_quantifiction
                     cool = int(round(numpy.interp(vn,[-100,0],[aw.eventslidermax[slidernr],aw.eventslidermin[slidernr]])))
                     aw.qmc.temporarymovenegativeslider = (slidernr,cool)
             except:
