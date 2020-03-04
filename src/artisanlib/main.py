@@ -3963,16 +3963,21 @@ class tgraphcanvas(FigureCanvas):
                         if i+1 < mlen:                          #check for out of range
                             if mathexpression[i+1].isdigit():
                                 seconddigitstr = ""
-                                nint = int(mathexpression[i+1])              #Ynumber int
+                                if i+2 < mlen and mathexpression[i+2].isdigit():
+                                    offset = 1
+                                    nint = int(mathexpression[i+1]+mathexpression[i+2])  # two digits Ynumber int
+                                else:
+                                    offset = 0
+                                    nint = int(mathexpression[i+1])                      # one digit Ynumber int
                                 #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" 
-                                if i+5 < len(mathexpression) and mathexpression[i+2] == "[":
-                                    Yshiftval = int(mathexpression[i+4])
-                                    sign = mathexpression[i+3]
+                                if i+5+offset < mlen and mathexpression[i+2+offset] == "[":
+                                    Yshiftval = int(mathexpression[i+offset+4])
+                                    sign = mathexpression[i+offset+3]
 
                                     #timeshift with two digits
-                                    if mathexpression[i+5].isdigit():
-                                        seconddigitstr = mathexpression[i+5]
-                                        mathexpression = mathexpression[:i+5]+mathexpression[i+6:]
+                                    if mathexpression[i+offset+5].isdigit():
+                                        seconddigitstr = mathexpression[i+offset+5]
+                                        mathexpression = mathexpression[:i+offset+5]+mathexpression[i+offset+6:]
                                         Yshiftval = 10*Yshiftval + int(seconddigitstr)
                                     
                                     if nint == 1: #ET
@@ -3981,8 +3986,7 @@ class tgraphcanvas(FigureCanvas):
                                         readings = self.temp2
                                     elif nint > 2: 
                                         #map the extra device
-                                        b = [0,0,1,1,2,2,3]
-                                        edindex = b[nint-3]
+                                        edindex = (nint-1)//2 - 1
                                         if nint%2:
                                             readings = self.extratemp1[edindex]
                                         else:
@@ -3990,16 +3994,16 @@ class tgraphcanvas(FigureCanvas):
                                     val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
 
                                     #add expression and values found
-                                    evaltimeexpression = "Y{}{}{}{}{}".format(mathexpression[i+1],evalsign*2,mathexpression[i+4],seconddigitstr,evalsign)
+                                    evaltimeexpression = "Y{}{}{}{}{}".format(mathexpression[i+1:i+2+offset],evalsign*2,mathexpression[i+offset+4],seconddigitstr,evalsign)
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     #convert "Y2[+9]" to Ynumber compatible for python eval() to add to dictionary
                                     #METHOD USED: replace all non digits chars with sign value.
                                     #Example1 "Y2[-7]" = "Y20070"   Example2 "Y2[+9]" = "Y21191"
-                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+offset+6:]))
                                 #direct index access: e.g. "Y2{CHARGE}" or "Y2{12}"
-                                elif i+5 < len(mathexpression) and mathexpression[i+2] == "{" and mathexpression.find("}",i+3) > -1:
-                                    end_idx = mathexpression.index("}",i+3)
+                                elif i+5+offset < len(mathexpression) and mathexpression[i+offset+2] == "{" and mathexpression.find("}",i+offset+3) > -1:
+                                    end_idx = mathexpression.index("}",i+offset+3)
                                     body = mathexpression[i+3:end_idx]
                                     val = -1
                                     try:
@@ -4011,8 +4015,7 @@ class tgraphcanvas(FigureCanvas):
                                                 val = self.temp2[absolute_index]
                                             elif nint > 2: 
                                                 #map the extra device
-                                                b = [0,0,1,1,2,2,3]
-                                                edindex = b[nint-3]
+                                                edindex = (nint-1)//2 - 1
                                                 if nint%2:
                                                     val = self.extratemp1[edindex][absolute_index]
                                                 else:
@@ -23329,6 +23332,7 @@ class ApplicationWindow(QMainWindow):
                         if not os.path.exists(fconv):
                             aw.qmc.reset(redraw=False,soundOn=False)
                             self.setProfile(f,self.deserialize(f),quiet=True)
+                            aw.qmc.redraw() # we need to redraw to ensure populated delta lines
                             dumper(fconv)
                         else:
                             aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(ext)))
