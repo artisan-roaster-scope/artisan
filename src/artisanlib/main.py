@@ -3825,6 +3825,7 @@ class tgraphcanvas(FigureCanvas):
 
     # mathexpression = formula; t = a number to evaluate(usually time);
     # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTsval = RealTime var val
+    # The given mathexpression has to be a non-empty string!
     def eval_math_expression(self,mathexpression,t,equeditnumber=None, RTsname=None,RTsval=None,t_offset=0):
         if len(mathexpression):
             mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
@@ -20877,36 +20878,44 @@ class ApplicationWindow(QMainWindow):
             self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
         self.qmc.alarmstate = [-1]*len(self.qmc.alarmflag)  #-1 = not triggered; otherwise idx = triggered
 
+    # returns True if data got updated, False otherwise
     def calcVirtualdevices(self):
         try:
+            dirty = False
             for j in range(len(self.qmc.extradevices)):
                 if aw.qmc.extradevices[j] == 25:  #virtual device
-                    if len(aw.qmc.extratimex[j]) > 0:  # move on if the virtual device already has data 
+                    if len(aw.qmc.extratimex[j]) > 0:  # move on if the virtual device already has data
                         continue
                         
-                    # supplying eval_math_expression with the t_offset changes the semantic of the symbolic variable t and b to eval to relative times after CHARGE
-                    # instead of absolute recording time as it is interpreted while recording
-#                    if self.qmc.timeindex[0] > -1:
-#                        toff = aw.qmc.timex[self.qmc.timeindex[0]]
-#                    else:
-#                        toff = 0
+                    nonempty_mathexpression1 = bool(self.qmc.extramathexpression1[j] is not None and len(self.qmc.extramathexpression1[j].strip()))
+                    nonempty_mathexpression2 = bool(self.qmc.extramathexpression2[j] is not None and len(self.qmc.extramathexpression2[j].strip()))
+                    
+                    if nonempty_mathexpression1 or nonempty_mathexpression2:
+                        self.qmc.extratimex[j] = aw.qmc.timex[:]
                         
-                    self.qmc.extratimex[j] = aw.qmc.timex[:]
-                    self.qmc.extratemp1[j] = [-1]*len((self.qmc.timex))
-                    self.qmc.extratemp2[j] = [-1]*len((self.qmc.timex))
-                    y_range1 = []
-                    y_range2 = []
+                        # need two seperate loops. without y2(x) cannot calculate a dependency on y1(x).
+                        
+                        if nonempty_mathexpression1:
+                            dirty = True
+                            self.qmc.extratemp1[j] = [-1]*len((self.qmc.extratimex[j]))
+                            y_range1 = []
+                            for i in range(len(self.qmc.extratimex[j])):
+                                y_range1.append(self.qmc.eval_math_expression(self.qmc.extramathexpression1[j],self.qmc.extratimex[j][i]))
+                            self.qmc.extratemp1[j] = y_range1[:]
 
-                    # need two seperate loops. without y2(x) cannot calculate a dependency on y1(x).
-                    for i in range(len(self.qmc.timex)):
-                        y_range1.append(self.qmc.eval_math_expression(self.qmc.extramathexpression1[j],self.qmc.timex[i])) #,t_offset=toff))
-                    self.qmc.extratemp1[j] = y_range1[:]
+                        if nonempty_mathexpression2:
+                            dirty = True
+                            self.qmc.extratemp2[j] = [-1]*len((self.qmc.extratimex[j]))
+                            y_range2 = []
+                            for i in range(len(self.qmc.extratimex[j])):
+                                y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.extratimex[j][i]))
+                            self.qmc.extratemp2[j] = y_range2[:]
 
-                    for i in range(len(self.qmc.timex)):
-                        y_range2.append(self.qmc.eval_math_expression(self.qmc.extramathexpression2[j],self.qmc.timex[i])) #,t_offset=toff))
-                    self.qmc.extratemp2[j] = y_range2[:]
-
-            self.qmc.fileDirty()
+            if dirty:
+                self.qmc.fileDirty()
+                return True
+            else:
+                return False
        
         except Exception as ex:
             #import traceback
@@ -52426,7 +52435,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "delextradevice(): {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    def savedevicetable(self,redraw=True):
+    def savedevicetable(self,redraw=True,calcVirtualdevices=True):
         try:
             for i in range(len(aw.qmc.extradevices)):
                 typecombobox = self.devicetable.cellWidget(i,0)
@@ -52469,7 +52478,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     aw.qmc.extramathexpression2[i] = u(mexpr2edit.text())
                 else:
                     aw.qmc.extramathexpression2[i] = ""
-            aw.calcVirtualdevices()
+            if calcVirtualdevices:
+                aw.calcVirtualdevices()
             #update legend with new curves
             if redraw:
                 aw.qmc.redraw(recomputeAllDeltas=False)
@@ -52480,14 +52490,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def updateVirtualdevicesinprofile(self,_):
         try:
-            self.savedevicetable()
-            for j in range(len(aw.qmc.extradevices)):
-                if aw.qmc.extradevices[j] == 25:  #virtual device
-                    aw.qmc.extratemp1[j] = []
-                    aw.qmc.extratemp2[j] = []
-                    aw.qmc.extratimex[j] = []
-            aw.calcVirtualdevices()
-            aw.qmc.redraw(recomputeAllDeltas=False)
+            self.savedevicetable(redraw=False,calcVirtualdevices=False)
+            if aw.calcVirtualdevices():
+                aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateVirtualdevicesinprofile(): {0}").format(str(ex)),exc_tb.tb_lineno)
