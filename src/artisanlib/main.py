@@ -6171,7 +6171,7 @@ class tgraphcanvas(FigureCanvas):
                                         firstletter = u(Betype[0])
                                         secondletter = self.eventsvaluesShort(self.backgroundEvalues[i])
                                     else:
-                                        firstletter = self.backgroundEStrings[i].strip()[:4]
+                                        firstletter = self.backgroundEStrings[i].strip()[:aw.qmc.eventslabelschars]
                                         if firstletter == "":
                                             firstletter = "E"
                                         secondletter = ""
