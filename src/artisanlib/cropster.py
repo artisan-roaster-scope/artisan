@@ -23,6 +23,8 @@ def extractProfileCropsterXLS(file):
     if general_sh.nrows >= 1:
         general_data = dict(zip([x.value for x in general_sh.row(0)],general_sh.row(1)))
         
+        res["samplinginterval"] = 1.0
+        
         if 'Id-Tag' in general_data:
             try:
                 id_tag = general_data['Id-Tag'].value
