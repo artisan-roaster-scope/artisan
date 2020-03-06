@@ -52478,8 +52478,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     aw.qmc.extramathexpression2[i] = u(mexpr2edit.text())
                 else:
                     aw.qmc.extramathexpression2[i] = ""
-            if calcVirtualdevices:
-                aw.calcVirtualdevices()
+# don't automatically update virtual devices, but only on explicit click on "Update"
+#            if calcVirtualdevices:
+#                aw.calcVirtualdevices()
             #update legend with new curves
             if redraw:
                 aw.qmc.redraw(recomputeAllDeltas=False)
