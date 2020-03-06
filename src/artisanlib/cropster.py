@@ -6,11 +6,12 @@
 
 import time as libtime
 import xlrd
-from PyQt5.QtCore import QDateTime, QDate, Qt# returns a dict containing all profile information contained in the given Cropster XLS file
+from PyQt5.QtCore import QDateTime, QDate, Qt
 from PyQt5.QtWidgets import QApplication
 
 from artisanlib.util import encodeLocal
 
+# returns a dict containing all profile information contained in the given Cropster XLS file
 def extractProfileCropsterXLS(file):
     res = {} # the interpreted data set
     

@@ -189,6 +189,7 @@ from artisanlib.qtsingleapplication import QtSingleApplication
 from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
 from artisanlib.cropster import extractProfileCropsterXLS
+from artisanlib.ikawa import extractProfileIkawaCSV
 
 from yoctopuce.yocto_api import YAPI, YRefParam
 
@@ -1453,7 +1454,7 @@ class tgraphcanvas(FigureCanvas):
         self.BTcurve = True
         self.ETlcd = True
         self.BTlcd = True
-        self.swaplcds = False
+        self.swaplcds = False # draw ET curver on top of BT curve and show ET LCD above BT LCD by default
         self.LCDdecimalplaces = 1
         self.DeltaETflag = False
         self.DeltaBTflag = True
@@ -13202,6 +13203,10 @@ class ApplicationWindow(QMainWindow):
         importHH506RAAction = QAction("HH506RA...",self)
         importHH506RAAction.triggered.connect(self.importHH506RA)
         self.importMenu.addAction(importHH506RAAction)
+
+        importIkawaAction = QAction("IKAWA CSV...",self)
+        importIkawaAction.triggered.connect(self.importIkawa)
+        self.importMenu.addAction(importIkawaAction)
 
         importK202Action = QAction("K202...",self)
         importK202Action.triggered.connect(self.importK202)
@@ -30133,6 +30138,40 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCropster() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importIkawa(self,_=False):
+        try:
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import IKAWA CSV", None),ext="*.csv")
+            if len(filename) == 0:
+                return
+            res = aw.qmc.reset(redraw=False,soundOn=False)
+            if res:
+                obj = extractProfileIkawaCSV(filename)
+                res = self.setProfile(filename,obj)
+
+            if res:
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                #update etypes combo box
+                self.etypeComboBox.clear()
+                self.etypeComboBox.addItems(self.qmc.etypes)
+                # profiles was adjusted, ensure that it does not overwrite the original file on saving
+                self.qmc.fileDirty()
+                self.curFile = None
+                #Plot everything
+                self.qmc.redraw()
+                message = u(QApplication.translate("Message","{0}  imported ", None).format(u(filename)))
+                self.sendmessage(message)
+
+        except IOError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importIkawa(): {0}").format(str(ex)))
+        except ValueError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importIkawa(): {0}").format(str(ex)))
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importIkawa() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     @pyqtSlot()
     @pyqtSlot(bool)
