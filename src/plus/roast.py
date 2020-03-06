@@ -211,6 +211,10 @@ def getSyncRecord(r = None):
             "moisture",
             "machine",
             "notes",
+            
+            "temperature",
+            "pressure",
+            "humidity",
         ]
         # we take only the value of attributes to be synced back
         for a in attributes:

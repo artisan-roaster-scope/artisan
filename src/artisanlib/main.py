@@ -52435,7 +52435,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "delextradevice(): {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    def savedevicetable(self,redraw=True,calcVirtualdevices=True):
+    def savedevicetable(self,redraw=True):
         try:
             for i in range(len(aw.qmc.extradevices)):
                 typecombobox = self.devicetable.cellWidget(i,0)
@@ -52478,9 +52478,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     aw.qmc.extramathexpression2[i] = u(mexpr2edit.text())
                 else:
                     aw.qmc.extramathexpression2[i] = ""
-# don't automatically update virtual devices, but only on explicit click on "Update"
-#            if calcVirtualdevices:
-#                aw.calcVirtualdevices()
             #update legend with new curves
             if redraw:
                 aw.qmc.redraw(recomputeAllDeltas=False)
@@ -52491,7 +52488,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def updateVirtualdevicesinprofile(self,_):
         try:
-            self.savedevicetable(redraw=False,calcVirtualdevices=False)
+            self.savedevicetable(redraw=False)
             if aw.calcVirtualdevices():
                 aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
