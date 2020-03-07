@@ -12525,7 +12525,7 @@ class SampleThread(QThread):
                         # only if 8min into roast and BT>160C/320F
                         if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.autoDROPenabled and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
                             length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 160) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 320)) and\
-                            ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 480):
+                            ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 420):
                             if aw.qmc.mode == "C":
                                 o = 0.2
                             else:
@@ -20773,7 +20773,10 @@ class ApplicationWindow(QMainWindow):
                 f.close()
                 res = aw.qmc.reset(redraw=False,soundOn=False)
                 obj = self.deserialize(filename)
-                org_obj_extra_devs = obj["extradevices"][:]
+                if "extradevices" in obj:
+                    org_obj_extra_devs = obj["extradevices"][:]
+                else:
+                    org_obj_extra_devs = []
                 if res:
                     res = self.setProfile(filename,obj)
             else:
