@@ -1800,8 +1800,6 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveimage = False # if true save an image along alog files
         self.autosaveimageformat = "PDF" # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP, CSV, JSON
         
-        self.autosavehelpisOpen = False
-
         #used to place correct height of text to avoid placing text over text (annotations)
         self.ystep_down = 0
         self.ystep_up = 0
@@ -38124,10 +38122,12 @@ class autosaveDlg(ArtisanDialog):
 
     @pyqtSlot()
     def autosavehelp(self):
-        if not aw.qmc.autosavehelpisOpen:
+        try: # sip not supported on older PyQt versions (RPi!)
+            if self.helpdialog is None or sip.isdeleted(self.helpdialog):
+                self.helpdialog = autosavefieldsHelpDlg(self)
+        except:
             self.helpdialog = autosavefieldsHelpDlg(self)
-            self.helpdialog.show()
-            aw.qmc.autosavehelpisOpen = True
+        self.helpdialog.show()
         self.helpdialog.activateWindow()
 
     @pyqtSlot()
@@ -38166,7 +38166,10 @@ class autosaveDlg(ArtisanDialog):
 
     @pyqtSlot()
     def closeEvent(self, _):
-        if aw.qmc.autosavehelpisOpen:
+        try: # sip not supported on older PyQt versions (RPi!)
+            if not (self.helpdialog is None or sip.isdeleted(self.helpdialog)):
+                self.helpdialog.close()
+        except:
             self.helpdialog.close()
         settings = QSettings()
         #save window geometry
@@ -38298,12 +38301,20 @@ Pressing the 'a' key will save during a recording when 'Autosave [a]' is checked
         phelp.setHtml(helpstr)
         phelp.setReadOnly(True)
 
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        self.dialogbuttons.accepted.connect(self.close)
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(self.dialogbuttons)
         hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)        
+        hLayout.addWidget(phelp)
+        hLayout.addLayout(buttonLayout)
         self.setLayout(hLayout)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
     def closeEvent(self, _):
-        aw.qmc.autosavehelpisOpen = False
         settings = QSettings()
         #save window geometry
         settings.setValue("autosavefieldsHelpGeometry",self.saveGeometry())
