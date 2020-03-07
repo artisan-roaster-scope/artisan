@@ -797,6 +797,13 @@ class tgraphcanvas(FigureCanvas):
         self.flavors = [5., 5., 5., 5., 5., 5., 5., 5., 5.]
         self.flavorstartangle = 90
         self.flavoraspect = 1.0  #aspect ratio
+        # flavor chart graph plots and annotations
+        self.flavorchart_plotf = None
+        self.flavorchart_angles = None
+        self.flavorchart_plot = None
+        self.flavorchart_fill = None
+        self.flavorchart_labels = None
+        self.flavorchart_total = None
 
         #F = Fahrenheit; C = Celsius        
         self.mode = "F"
@@ -2583,13 +2590,13 @@ class tgraphcanvas(FigureCanvas):
 
     def onclick(self,event):
         try:
-            if not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == Qt.RightButton:
+            if not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 3:
                 aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
 
 #PLUS
-            elif not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == Qt.LeftButton and event.dblclick==True and \
+            elif not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 1 and event.dblclick==True and \
                     event.x < event.y and aw.plus_account is not None and aw.qmc.roastUUID is not None:
                 QDesktopServices.openUrl(QUrl(plus.util.roastLink(aw.qmc.roastUUID), QUrl.TolerantMode))
             
@@ -7637,10 +7644,17 @@ class tgraphcanvas(FigureCanvas):
         aw.update_extraeventbuttons_visibility()
         self.fig.canvas.redraw()
 
+    def clearFlavorChart(self):
+        self.flavorchart_plotf = None
+        self.flavorchart_angles = None
+        self.flavorchart_plot = None
+        self.flavorchart_fill = None
+        self.flavorchart_labels = None
+        self.flavorchart_total = None
+        
     #draws a polar star graph to score cupping. It does not delete any profile data.
     def flavorchart(self):
         try:
-    
             pi = math.pi
             
             # to trigger a recreation of the standard axis in redraw() we remove them completely
@@ -7694,67 +7708,117 @@ class tgraphcanvas(FigureCanvas):
                 stringlabel = str(int(locs[i]*10))
                 labels.append(stringlabel)
             self.ax1.set_yticklabels(labels,color=self.palette["xlabel"],fontproperties=fontprop_small)
-    
-            step = 2.*pi/nflavors
-            startradian = math.radians(self.flavorstartangle)
-            angles = [startradian]   #angles in radians
-            for i in range(nflavors-1): angles.append(angles[-1] + step)
-    
-            #To close circle we need one more element. angle and values need same dimension in order to plot.
-            plotf = self.flavors[:]
-            plotf.append(self.flavors[0])
-            #normalize flavor values to 0-1 range
-            for i in range(len(plotf)):
-                plotf[i] /= 10.
-            angles.append(angles[-1]+step)
+
+            self.updateFlavorChartData()
             
             #anotate labels
+            self.flavorchart_labels = []
             for i in range(len(self.flavorlabels)):
-                if angles[i] > 2.*pi or angles[i] < 0.:
-                    _,angles[i] = divmod(angles[i],(2.*pi))
-                if angles[i] <= (pi/2.) or angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degress
+                if self.flavorchart_angles[i] > 2.*pi or self.flavorchart_angles[i] < 0.:
+                    _,self.flavorchart_angles[i] = divmod(self.flavorchart_angles[i],(2.*pi))
+                if self.flavorchart_angles[i] <= (pi/2.) or self.flavorchart_angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degress
                     ha = "left"
                 else:
                     ha = "right"
-                anno = self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
+                anno = self.ax1.annotate(self.flavorChartLabelText(i),xy =(self.flavorchart_angles[i],.9),
                                     fontproperties=fontprop_small,
-                                    xytext=(angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
+                                    xytext=(self.flavorchart_angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
                 try:
                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                 except: # mpl before v3.0 do not have this set_in_layout() function
                     pass
+                self.flavorchart_labels.append(anno)
     
-            score = 0.
-            for i in range(nflavors):
-                score += self.flavors[i]
-            score /= (nflavors)
-            score *= 10.
-    
+            # total score
+            score = self.calcFlavorChartScore()
             txt = "%.2f" %score
-            self.ax1.text(0.,0.,txt,fontsize="x-large",fontproperties=aw.mpl_fontproperties,color="#FFFFFF",horizontalalignment="center",bbox={"facecolor":"#212121", "alpha":0.5, "pad":10})
+            self.flavorchart_total = self.ax1.text(0.,0.,txt,fontsize="x-large",fontproperties=aw.mpl_fontproperties,color="#FFFFFF",horizontalalignment="center",bbox={"facecolor":"#212121", "alpha":0.5, "pad":10})
     
             #add background to plot if found
             if self.background:
                 if self.flavorbackgroundflag:
-                    backgroundplotf = self.backgroundFlavors[:]
-                    backgroundplotf.append(self.backgroundFlavors[0])
-                    #normalize flavor values to 0-1 range
-                    for i in range(len(backgroundplotf)):
-                        backgroundplotf[i] /= 10.
-    
-                    self.ax1.plot(angles,backgroundplotf,color="#cc0f50",marker="o",alpha=.5)
-                    #needs matplotlib 1.0.0+
-                    self.ax1.fill_between(angles,0,backgroundplotf, facecolor="#ff5871", alpha=0.1, interpolate=True)
+                    if len(aw.qmc.backgroundFlavors) != len(aw.qmc.flavors):
+                        message = QApplication.translate("Message","Background does not match number of labels", None)
+                        aw.sendmessage(message)
+                        self.flavorbackgroundflag = False
+                    else:
+                        backgroundplotf = self.backgroundFlavors[:]
+                        backgroundplotf.append(self.backgroundFlavors[0])
+                        #normalize flavor values to 0-1 range
+                        for i in range(len(backgroundplotf)):
+                            backgroundplotf[i] /= 10.
+        
+                        self.ax1.plot(self.flavorchart_angles,backgroundplotf,color="#cc0f50",marker="o",alpha=.5)
+                        #needs matplotlib 1.0.0+
+                        self.ax1.fill_between(self.flavorchart_angles,0,backgroundplotf, facecolor="#ff5871", alpha=0.1, interpolate=True)
     
             #add to plot
-            self.ax1.plot(angles,plotf,color="#0c6aa6",marker="o")
+            self.flavorchart_plot, = self.ax1.plot(self.flavorchart_angles,self.flavorchart_plotf,color="#0c6aa6",marker="o")
             
-            self.ax1.fill_between(angles,0,plotf, facecolor='#1985ba', alpha=0.1, interpolate=True)
+            self.flavorchart_fill = self.ax1.fill_between(self.flavorchart_angles,0,self.flavorchart_plotf, facecolor='#1985ba', alpha=0.1, interpolate=True)
     
             #self.fig.canvas.draw()
             self.fig.canvas.draw_idle()
         except Exception:
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             pass
+            
+    def flavorChartLabelText(self,i):
+        return aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i])
+            
+    #To close circle we need one more element. angle and values need same dimension in order to plot.
+    def updateFlavorChartData(self):
+        # update angles
+        nflavors = len(self.flavors)      #last value of nflavors is used to close circle (same as flavors[0])
+        step = 2.*math.pi/nflavors
+        startradian = math.radians(self.flavorstartangle)
+        self.flavorchart_angles = [startradian]   #angles in radians
+        for i in range(nflavors-1): self.flavorchart_angles.append(self.flavorchart_angles[-1] + step)
+        self.flavorchart_angles.append(self.flavorchart_angles[-1]+step)
+        # update values
+        self.flavorchart_plotf = self.flavors[:]
+        self.flavorchart_plotf.append(self.flavors[0])
+        #normalize flavor values to 0-1 range
+        for i in range(len(self.flavorchart_plotf)):
+            self.flavorchart_plotf[i] /= 10.
+    
+    def calcFlavorChartScore(self):
+        score = 0.
+        nflavors = len(self.flavors)
+        for i in range(nflavors):
+            score += self.flavors[i]
+        score /= (nflavors)
+        score *= 10.    
+        return score
+    
+    # an incremental redraw of the existing flavorchart
+    def updateFlavorchartValues(self):
+        # update data
+        self.updateFlavorChartData()
+        self.flavorchart_plot.set_xdata(self.flavorchart_angles)
+        self.flavorchart_plot.set_ydata(self.flavorchart_plotf)
+        
+        # collections need to be redrawn completely
+        self.flavorchart_fill.remove()
+        self.flavorchart_fill = self.ax1.fill_between(self.flavorchart_angles,0,self.flavorchart_plotf, facecolor='#1985ba', alpha=0.1, interpolate=True)
+        
+        # total score
+        score = self.calcFlavorChartScore()
+        txt = "%.2f" %score
+        self.flavorchart_total.set_text(txt)
+        
+        # update canvas
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+        
+    def updateFlavorchartLabel(self,i):
+        label_anno = self.flavorchart_labels[i]
+        label_anno.set_text(self.flavorChartLabelText(i))
+        
+        # update canvas
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
         
     def samplingAction(self):
         try:
@@ -42283,6 +42347,7 @@ class flavorDlg(ArtisanResizeablDialog):
                 if len(aw.qmc.backgroundFlavors) != len(aw.qmc.flavors):
                     message = QApplication.translate("Message","Background does not match number of labels", None)
                     aw.sendmessage(message)
+                    aw.qmc.flavorbackgroundflag = False
                     self.backgroundCheck.setChecked(False)
                 else:
                     aw.qmc.flavorbackgroundflag = True
@@ -42321,7 +42386,8 @@ class flavorDlg(ArtisanResizeablDialog):
         if x is not None:
             labeledit = self.flavortable.cellWidget(x,0)
             aw.qmc.flavorlabels[x] = labeledit.text()
-            aw.qmc.flavorchart()
+#            aw.qmc.flavorchart() # slow full redraw
+            aw.qmc.updateFlavorchartLabel(x) # fast incremental redraw
 
     @pyqtSlot(float)
     def setvalue(self,_):
@@ -42329,7 +42395,8 @@ class flavorDlg(ArtisanResizeablDialog):
         if x is not None:
             valueSpinBox = self.flavortable.cellWidget(x,1)
             aw.qmc.flavors[x] = valueSpinBox.value()
-            aw.qmc.flavorchart()
+#            aw.qmc.flavorchart() # slow full redraw
+            aw.qmc.updateFlavorchartValues() # fast incremental redraw
 
     @pyqtSlot(int)
     def setdefault(self,_):
@@ -42400,6 +42467,7 @@ class flavorDlg(ArtisanResizeablDialog):
             except:
                 pass
         aw.qmc.fig.clf()
+        aw.qmc.clearFlavorChart()
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.showControls()
         self.accept()
