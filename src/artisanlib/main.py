@@ -2815,19 +2815,19 @@ class tgraphcanvas(FigureCanvas):
     def intChannel(self,n,c):
         if aw.qmc.extradevices[n] == 29: # MODBUS
             if c == 0:
-                return not aw.modbus.input1float and aw.modbus.input1div == 0 and aw.modbus.input1mode == ""
+                return not aw.modbus.inputFloats[0] and aw.modbus.inputDivs[0] == 0 and aw.modbus.inputModes[0] == ""
             else:
-                return not aw.modbus.input2float and aw.modbus.input2div == 0 and aw.modbus.input2mode == "" 
+                return not aw.modbus.inputFloats[1] and aw.modbus.inputDivs[1] == 0 and aw.modbus.inputModes[1] == "" 
         elif aw.qmc.extradevices[n] == 33: # MODBUS_34
             if c == 0:
-                return not aw.modbus.input3float and aw.modbus.input3div == 0 and aw.modbus.input3mode == ""
+                return not aw.modbus.inputFloats[2] and aw.modbus.inputDivs[2] == 0 and aw.modbus.inputModes[2] == ""
             else:
-                return not aw.modbus.input4float and aw.modbus.input4div == 0 and aw.modbus.input4mode == ""
+                return not aw.modbus.inputFloats[3] and aw.modbus.inputDivs[3] == 0 and aw.modbus.inputModes[3] == ""
         elif aw.qmc.extradevices[n] == 55: # MODBUS_56
             if c == 0:
-                return not aw.modbus.input5float and aw.modbus.input5div == 0 and aw.modbus.input5mode == ""
+                return not aw.modbus.inputFloats[4] and aw.modbus.inputDivs[4] == 0 and aw.modbus.inputModes[4] == ""
             else:
-                return not aw.modbus.input6float and aw.modbus.input6div == 0 and aw.modbus.input6mode == ""
+                return not aw.modbus.inputFloats[5] and aw.modbus.inputDivs[5] == 0 and aw.modbus.inputModes[5] == ""
         elif aw.qmc.extradevices[n] == 70: # S7
             return aw.s7.type[0+c] == 0 and aw.s7.mode[0+c] == 0 and aw.s7.div[0+c] == 0
         elif aw.qmc.extradevices[n] == 80: # S7_34
@@ -5672,6 +5672,7 @@ class tgraphcanvas(FigureCanvas):
 
                 # instead to remove and regenerate the axis object (as in the commented section above) we just clear and reuse it
                 self.ax.clear()
+                self.ax.set_facecolor(self.palette["background"])
                 self.delta_ax.clear()
 
 
@@ -7851,14 +7852,14 @@ class tgraphcanvas(FigureCanvas):
                 self.extraNoneTempHint1.append(True)
                 self.extraNoneTempHint2.append(True)
             elif d == 29: # MODBUS
-                self.extraNoneTempHint1.append(aw.modbus.input1mode == "")
-                self.extraNoneTempHint2.append(aw.modbus.input2mode == "")
+                self.extraNoneTempHint1.append(aw.modbus.inputModes[0] == "")
+                self.extraNoneTempHint2.append(aw.modbus.inputModes[1] == "")
             elif d == 33: # +MODBUS 34
-                self.extraNoneTempHint1.append(aw.modbus.input3mode == "")
-                self.extraNoneTempHint2.append(aw.modbus.input4mode == "")  
+                self.extraNoneTempHint1.append(aw.modbus.inputModes[2] == "")
+                self.extraNoneTempHint2.append(aw.modbus.inputModes[3] == "")  
             elif d == 55: # +MODBUS 56
-                self.extraNoneTempHint1.append(aw.modbus.input5mode == "")
-                self.extraNoneTempHint2.append(aw.modbus.input6mode == "") 
+                self.extraNoneTempHint1.append(aw.modbus.inputModes[4] == "")
+                self.extraNoneTempHint2.append(aw.modbus.inputModes[5] == "") 
             elif d == 79: # S7
                 self.extraNoneTempHint1.append(not bool(aw.s7.mode[0]))
                 self.extraNoneTempHint2.append(not bool(aw.s7.mode[1]))
@@ -9800,7 +9801,10 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.beans and aw.qmc.beans != "":
                         msg += sep + aw.qmc.abbrevString(u(aw.qmc.beans),25)
                     if aw.qmc.weight[0]:
-                        msg += sep + str(aw.float2float(aw.qmc.weight[0],2)) + aw.qmc.weight[2]
+                        if aw.qmc.weight[2] in ["g","oz"]:
+                            msg += sep + str(aw.float2float(aw.qmc.weight[0],0)) + aw.qmc.weight[2]
+                        else:
+                            msg += sep + str(aw.float2float(aw.qmc.weight[0],1)) + aw.qmc.weight[2]
                         if aw.qmc.weight[1]:
                             msg += sep + str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
                     if aw.qmc.volume[0] and aw.qmc.volume[1]:
@@ -24096,83 +24100,83 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("timeout"):
                 self.modbus.timeout = aw.float2float(toFloat(settings.value("timeout",self.modbus.timeout)))
             if settings.contains("input1slave"):
-                self.modbus.input1slave = toInt(settings.value("input1slave",self.modbus.input1slave))
+                self.modbus.inputSlaves[0] = toInt(settings.value("input1slave",self.modbus.inputSlaves[0]))
             if settings.contains("input1register"):
-                self.modbus.input1register = toInt(settings.value("input1register",self.modbus.input1register))
+                self.modbus.inputRegisters[0] = toInt(settings.value("input1register",self.modbus.inputRegisters[0]))
             if settings.contains("input2slave"):
-                self.modbus.input2slave = toInt(settings.value("input2slave",self.modbus.input2slave))
+                self.modbus.inputSlaves[1] = toInt(settings.value("input2slave",self.modbus.inputSlaves[1]))
             if settings.contains("input2register"):
-                self.modbus.input2register = toInt(settings.value("input2register",self.modbus.input2register))
+                self.modbus.inputRegisters[1] = toInt(settings.value("input2register",self.modbus.inputRegisters[1]))
             if settings.contains("input3slave"):
-                self.modbus.input3slave = toInt(settings.value("input3slave",self.modbus.input3slave))
+                self.modbus.inputSlaves[2] = toInt(settings.value("input3slave",self.modbus.inputSlaves[2]))
             if settings.contains("input3register"):
-                self.modbus.input3register = toInt(settings.value("input3register",self.modbus.input3register))
+                self.modbus.inputRegisters[2] = toInt(settings.value("input3register",self.modbus.inputRegisters[2]))
             if settings.contains("input4slave"):
-                self.modbus.input4slave = toInt(settings.value("input4slave",self.modbus.input4slave))
+                self.modbus.inputSlaves[3] = toInt(settings.value("input4slave",self.modbus.inputSlaves[3]))
             if settings.contains("input4register"):
-                self.modbus.input4register = toInt(settings.value("input4register",self.modbus.input4register))
+                self.modbus.inputRegisters[3] = toInt(settings.value("input4register",self.modbus.inputRegisters[3]))
             if settings.contains("input5slave"):
-                self.modbus.input5slave = toInt(settings.value("input5slave",self.modbus.input5slave))
+                self.modbus.inputSlaves[4] = toInt(settings.value("input5slave",self.modbus.inputSlaves[4]))
             if settings.contains("input5register"):
-                self.modbus.input5register = toInt(settings.value("input5register",self.modbus.input5register))
+                self.modbus.inputRegisters[4] = toInt(settings.value("input5register",self.modbus.inputRegisters[4]))
             if settings.contains("input6slave"):
-                self.modbus.input6slave = toInt(settings.value("input6slave",self.modbus.input6slave))
+                self.modbus.inputSlaves[5] = toInt(settings.value("input6slave",self.modbus.inputSlaves[5]))
             if settings.contains("input6register"):
-                self.modbus.input6register = toInt(settings.value("input6register",self.modbus.input6register))
+                self.modbus.inputRegisters[5] = toInt(settings.value("input6register",self.modbus.inputRegisters[5]))
             if settings.contains("input1float"):
-                self.modbus.input1float = bool(toBool(settings.value("input1float",self.modbus.input1float)))
+                self.modbus.inputFloats[0] = bool(toBool(settings.value("input1float",self.modbus.inputFloats[0])))
             if settings.contains("input1bcd"):
-                self.modbus.input1bcd = bool(toBool(settings.value("input1bcd",self.modbus.input1bcd)))
+                self.modbus.inputBCDs[0] = bool(toBool(settings.value("input1bcd",self.modbus.inputBCDs[0])))
             if settings.contains("input1code"):
-                self.modbus.input1code = toInt(settings.value("input1code",self.modbus.input1code))
+                self.modbus.inputCodes[0] = toInt(settings.value("input1code",self.modbus.inputCodes[0]))
             if settings.contains("input2float"):
-                self.modbus.input2float = bool(toBool(settings.value("input2float",self.modbus.input2float)))
+                self.modbus.inputFloats[1] = bool(toBool(settings.value("input2float",self.modbus.inputFloats[1])))
             if settings.contains("input2bcd"):
-                self.modbus.input2bcd = bool(toBool(settings.value("input2bcd",self.modbus.input2bcd)))
+                self.modbus.inputBCDs[1] = bool(toBool(settings.value("input2bcd",self.modbus.inputBCDs[1])))
             if settings.contains("input2code"):
-                self.modbus.input2code = toInt(settings.value("input2code",self.modbus.input2code))
+                self.modbus.inputCodes[1] = toInt(settings.value("input2code",self.modbus.inputCodes[1]))
             if settings.contains("input3float"):
-                self.modbus.input3float = bool(toBool(settings.value("input3float",self.modbus.input3float)))
+                self.modbus.inputFloats[2] = bool(toBool(settings.value("input3float",self.modbus.inputFloats[2])))
             if settings.contains("input3bcd"):
-                self.modbus.input3bcd = bool(toBool(settings.value("input3bcd",self.modbus.input3bcd)))
+                self.modbus.inputBCDs[2] = bool(toBool(settings.value("input3bcd",self.modbus.inputBCDs[2])))
             if settings.contains("input3code"):
-                self.modbus.input3code = toInt(settings.value("input3code",self.modbus.input3code))
+                self.modbus.inputCodes[2] = toInt(settings.value("input3code",self.modbus.inputCodes[2]))
             if settings.contains("input4float"):
-                self.modbus.input4float = bool(toBool(settings.value("input4float",self.modbus.input4float)))
+                self.modbus.inputFloats[3] = bool(toBool(settings.value("input4float",self.modbus.inputFloats[3])))
             if settings.contains("input4bcd"):
-                self.modbus.input4bcd = bool(toBool(settings.value("input4bcd",self.modbus.input4bcd)))
+                self.modbus.inputBCDs[3] = bool(toBool(settings.value("input4bcd",self.modbus.inputBCDs[3])))
             if settings.contains("input4code"):
-                self.modbus.input4code = toInt(settings.value("input4code",self.modbus.input4code))
+                self.modbus.inputCodes[3] = toInt(settings.value("input4code",self.modbus.inputCodes[3]))
             if settings.contains("input5float"):
-                self.modbus.input5float = bool(toBool(settings.value("input5float",self.modbus.input5float)))
+                self.modbus.inputFloats[4] = bool(toBool(settings.value("input5float",self.modbus.inputFloats[4])))
             if settings.contains("input5bcd"):
-                self.modbus.input5bcd = bool(toBool(settings.value("input5bcd",self.modbus.input5bcd)))
+                self.modbus.inputBCDs[4] = bool(toBool(settings.value("input5bcd",self.modbus.inputBCDs[4])))
             if settings.contains("input5code"):
-                self.modbus.input5code = toInt(settings.value("input5code",self.modbus.input5code))
+                self.modbus.inputCodes[4] = toInt(settings.value("input5code",self.modbus.inputCodes[4]))
             if settings.contains("input6float"):
-                self.modbus.input6float = bool(toBool(settings.value("input6float",self.modbus.input6float)))
+                self.modbus.inputFloats[5] = bool(toBool(settings.value("input6float",self.modbus.inputFloats[5])))
             if settings.contains("input6bcd"):
-                self.modbus.input6bcd = bool(toBool(settings.value("input1bcd",self.modbus.input6bcd)))
+                self.modbus.inputBCDs[5] = bool(toBool(settings.value("input1bcd",self.modbus.inputBCDs[5])))
             if settings.contains("input6code"):
-                self.modbus.input6code = toInt(settings.value("input6code",self.modbus.input6code))
+                self.modbus.inputCodes[5] = toInt(settings.value("input6code",self.modbus.inputCodes[5]))
             if settings.contains("littleEndianFloats"):
                 self.modbus.byteorderLittle = bool(toBool(settings.value("littleEndianFloats",self.modbus.byteorderLittle)))
             if settings.contains("wordorderLittle"):
                 self.modbus.wordorderLittle = bool(toBool(settings.value("wordorderLittle",self.modbus.wordorderLittle)))
             if settings.contains("input1mode"):
-                self.modbus.input1mode = s2a(toString(settings.value("input1mode",self.modbus.input1mode)))
-                self.modbus.input2mode = s2a(toString(settings.value("input2mode",self.modbus.input2mode)))
-                self.modbus.input3mode = s2a(toString(settings.value("input3mode",self.modbus.input3mode)))
-                self.modbus.input4mode = s2a(toString(settings.value("input4mode",self.modbus.input4mode)))
-                self.modbus.input5mode = s2a(toString(settings.value("input5mode",self.modbus.input5mode)))
-                self.modbus.input6mode = s2a(toString(settings.value("input6mode",self.modbus.input6mode)))
+                self.modbus.inputModes[0] = s2a(toString(settings.value("input1mode",self.modbus.inputModes[0])))
+                self.modbus.inputModes[1] = s2a(toString(settings.value("input2mode",self.modbus.inputModes[1])))
+                self.modbus.inputModes[2] = s2a(toString(settings.value("input3mode",self.modbus.inputModes[2])))
+                self.modbus.inputModes[3] = s2a(toString(settings.value("input4mode",self.modbus.inputModes[3])))
+                self.modbus.inputModes[4] = s2a(toString(settings.value("input5mode",self.modbus.inputModes[4])))
+                self.modbus.inputModes[5] = s2a(toString(settings.value("input6mode",self.modbus.inputModes[5])))
             if settings.contains("input1div"):
-                self.modbus.input1div = toInt(settings.value("input1div",self.modbus.input1div))
-                self.modbus.input2div = toInt(settings.value("input2div",self.modbus.input2div))
-                self.modbus.input3div = toInt(settings.value("input3div",self.modbus.input3div))
-                self.modbus.input4div = toInt(settings.value("input4div",self.modbus.input4div))
-                self.modbus.input5div = toInt(settings.value("input5div",self.modbus.input5div))
-                self.modbus.input6div = toInt(settings.value("input6div",self.modbus.input6div))
+                self.modbus.inputDivs[0] = toInt(settings.value("input1div",self.modbus.inputDivs[0]))
+                self.modbus.inputDivs[1] = toInt(settings.value("input2div",self.modbus.inputDivs[1]))
+                self.modbus.inputDivs[2] = toInt(settings.value("input3div",self.modbus.inputDivs[2]))
+                self.modbus.inputDivs[3] = toInt(settings.value("input4div",self.modbus.inputDivs[3]))
+                self.modbus.inputDivs[4] = toInt(settings.value("input5div",self.modbus.inputDivs[4]))
+                self.modbus.inputDivs[5] = toInt(settings.value("input6div",self.modbus.inputDivs[5]))
             if settings.contains("PIDmultiplier"):
                 self.modbus.PIDmultiplier = toInt(settings.value("PIDmultiplier",self.modbus.PIDmultiplier))
                 self.modbus.SVmultiplier = toInt(settings.value("SVmultiplier",self.modbus.SVmultiplier))
@@ -25541,48 +25545,48 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("PID_d_register",self.modbus.PID_d_register)
             settings.setValue("PID_OFF_action",self.modbus.PID_OFF_action)
             settings.setValue("PID_ON_action",self.modbus.PID_ON_action)
-            settings.setValue("input1slave",self.modbus.input1slave)
-            settings.setValue("input1register",self.modbus.input1register)
-            settings.setValue("input1float",self.modbus.input1float)
-            settings.setValue("input1bcd",self.modbus.input1bcd)
-            settings.setValue("input1code",self.modbus.input1code)
-            settings.setValue("input1div",self.modbus.input1div)
-            settings.setValue("input1mode",self.modbus.input1mode)
-            settings.setValue("input2slave",self.modbus.input2slave)
-            settings.setValue("input2register",self.modbus.input2register)
-            settings.setValue("input2float",self.modbus.input2float)
-            settings.setValue("input2bcd",self.modbus.input2bcd)
-            settings.setValue("input2code",self.modbus.input2code)
-            settings.setValue("input2div",self.modbus.input2div)
-            settings.setValue("input2mode",self.modbus.input2mode)
-            settings.setValue("input3slave",self.modbus.input3slave)
-            settings.setValue("input3register",self.modbus.input3register)
-            settings.setValue("input3float",self.modbus.input3float)
-            settings.setValue("input3bcd",self.modbus.input3bcd)
-            settings.setValue("input3code",self.modbus.input3code)
-            settings.setValue("input3div",self.modbus.input3div)
-            settings.setValue("input3mode",self.modbus.input3mode)
-            settings.setValue("input4slave",self.modbus.input4slave)
-            settings.setValue("input4register",self.modbus.input4register)
-            settings.setValue("input4float",self.modbus.input4float)
-            settings.setValue("input4bcd",self.modbus.input4bcd)
-            settings.setValue("input4code",self.modbus.input4code)
-            settings.setValue("input4div",self.modbus.input4div)
-            settings.setValue("input4mode",self.modbus.input4mode)
-            settings.setValue("input5slave",self.modbus.input5slave)
-            settings.setValue("input5register",self.modbus.input5register)
-            settings.setValue("input5float",self.modbus.input5float)
-            settings.setValue("input5bcd",self.modbus.input5bcd)
-            settings.setValue("input5code",self.modbus.input5code)
-            settings.setValue("input5div",self.modbus.input5div)
-            settings.setValue("input5mode",self.modbus.input5mode)
-            settings.setValue("input6slave",self.modbus.input6slave)
-            settings.setValue("input6register",self.modbus.input6register)
-            settings.setValue("input6float",self.modbus.input6float)
-            settings.setValue("input6bcd",self.modbus.input6bcd)
-            settings.setValue("input6code",self.modbus.input6code)
-            settings.setValue("input6div",self.modbus.input6div)
-            settings.setValue("input6mode",self.modbus.input6mode)
+            settings.setValue("input1slave",self.modbus.inputSlaves[0])
+            settings.setValue("input1register",self.modbus.inputRegisters[0])
+            settings.setValue("input1float",self.modbus.inputFloats[0])
+            settings.setValue("input1bcd",self.modbus.inputBCDs[0])
+            settings.setValue("input1code",self.modbus.inputCodes[0])
+            settings.setValue("input1div",self.modbus.inputDivs[0])
+            settings.setValue("input1mode",self.modbus.inputModes[0])
+            settings.setValue("input2slave",self.modbus.inputSlaves[1])
+            settings.setValue("input2register",self.modbus.inputRegisters[1])
+            settings.setValue("input2float",self.modbus.inputFloats[1])
+            settings.setValue("input2bcd",self.modbus.inputBCDs[1])
+            settings.setValue("input2code",self.modbus.inputCodes[1])
+            settings.setValue("input2div",self.modbus.inputDivs[1])
+            settings.setValue("input2mode",self.modbus.inputModes[1])
+            settings.setValue("input3slave",self.modbus.inputSlaves[2])
+            settings.setValue("input3register",self.modbus.inputRegisters[2])
+            settings.setValue("input3float",self.modbus.inputFloats[2])
+            settings.setValue("input3bcd",self.modbus.inputBCDs[2])
+            settings.setValue("input3code",self.modbus.inputCodes[2])
+            settings.setValue("input3div",self.modbus.inputDivs[2])
+            settings.setValue("input3mode",self.modbus.inputModes[2])
+            settings.setValue("input4slave",self.modbus.inputSlaves[3])
+            settings.setValue("input4register",self.modbus.inputRegisters[3])
+            settings.setValue("input4float",self.modbus.inputFloats[3])
+            settings.setValue("input4bcd",self.modbus.inputBCDs[3])
+            settings.setValue("input4code",self.modbus.inputCodes[3])
+            settings.setValue("input4div",self.modbus.inputDivs[3])
+            settings.setValue("input4mode",self.modbus.inputModes[3])
+            settings.setValue("input5slave",self.modbus.inputSlaves[4])
+            settings.setValue("input5register",self.modbus.inputRegisters[4])
+            settings.setValue("input5float",self.modbus.inputFloats[4])
+            settings.setValue("input5bcd",self.modbus.inputBCDs[4])
+            settings.setValue("input5code",self.modbus.inputCodes[4])
+            settings.setValue("input5div",self.modbus.inputDivs[4])
+            settings.setValue("input5mode",self.modbus.inputModes[4])
+            settings.setValue("input6slave",self.modbus.inputSlaves[5])
+            settings.setValue("input6register",self.modbus.inputRegisters[5])
+            settings.setValue("input6float",self.modbus.inputFloats[5])
+            settings.setValue("input6bcd",self.modbus.inputBCDs[5])
+            settings.setValue("input6code",self.modbus.inputCodes[5])
+            settings.setValue("input6div",self.modbus.inputDivs[5])
+            settings.setValue("input6mode",self.modbus.inputModes[5])
             settings.setValue("PIDmultiplier",self.modbus.PIDmultiplier)
             settings.setValue("SVmultiplier",self.modbus.SVmultiplier)
             settings.setValue("littleEndianFloats",self.modbus.byteorderLittle)
@@ -28664,90 +28668,90 @@ class ApplicationWindow(QMainWindow):
             self.modbus.PID_d_register = int(str(dialog.modbus_Dregister_Edit.text()))
             self.modbus.PID_OFF_action = s2a(toString(dialog.modbus_pid_off.text()))
             self.modbus.PID_ON_action = s2a(toString(dialog.modbus_pid_on.text()))
-            self.modbus.input1slave = int(str(dialog.modbus_input1slaveEdit.text()))
-            self.modbus.input1register = int(str(dialog.modbus_input1registerEdit.text()))
-            self.modbus.input1code = int(str(dialog.modbus_input1code.currentText()))
-            self.modbus.input1div = dialog.modbus_input1div.currentIndex()
-            self.modbus.input1mode = str(dialog.modbus_input1mode.currentText())
+            self.modbus.inputSlaves[0] = int(str(dialog.modbus_input1slaveEdit.text()))
+            self.modbus.inputRegisters[0] = int(str(dialog.modbus_input1registerEdit.text()))
+            self.modbus.inputCodes[0] = int(str(dialog.modbus_input1code.currentText()))
+            self.modbus.inputDivs[0] = dialog.modbus_input1div.currentIndex()
+            self.modbus.inputModes[0] = str(dialog.modbus_input1mode.currentText())
             if dialog.modbus_input1decode.currentIndex() == 1:
-                self.modbus.input1float = True
-                self.modbus.input1bcd = False
+                self.modbus.inputFloats[0] = True
+                self.modbus.inputBCDs[0] = False
             elif dialog.modbus_input1decode.currentIndex() == 2:
-                self.modbus.input1float = False
-                self.modbus.input1bcd = True
+                self.modbus.inputFloats[0] = False
+                self.modbus.inputBCDs[0] = True
             else:
-                self.modbus.input1float = False
-                self.modbus.input1bcd = False
-            self.modbus.input2slave = int(str(dialog.modbus_input2slaveEdit.text()))
-            self.modbus.input2register = int(str(dialog.modbus_input2registerEdit.text()))
-            self.modbus.input2code = int(str(dialog.modbus_input2code.currentText()))
-            self.modbus.input2div = dialog.modbus_input2div.currentIndex()
-            self.modbus.input2mode = str(dialog.modbus_input2mode.currentText())
+                self.modbus.inputFloats[0] = False
+                self.modbus.inputBCDs[0] = False
+            self.modbus.inputSlaves[1] = int(str(dialog.modbus_input2slaveEdit.text()))
+            self.modbus.inputRegisters[1] = int(str(dialog.modbus_input2registerEdit.text()))
+            self.modbus.inputCodes[1] = int(str(dialog.modbus_input2code.currentText()))
+            self.modbus.inputDivs[1] = dialog.modbus_input2div.currentIndex()
+            self.modbus.inputModes[1] = str(dialog.modbus_input2mode.currentText())
             if dialog.modbus_input2decode.currentIndex() == 1:
-                self.modbus.input2float = True
-                self.modbus.input2bcd = False
+                self.modbus.inputFloats[1] = True
+                self.modbus.inputBCDs[1] = False
             elif dialog.modbus_input2decode.currentIndex() == 2:
-                self.modbus.input2float = False
-                self.modbus.input2bcd = True
+                self.modbus.inputFloats[1] = False
+                self.modbus.inputBCDs[1] = True
             else:
-                self.modbus.input2float = False
-                self.modbus.input2bcd = False
-            self.modbus.input3slave = int(str(dialog.modbus_input3slaveEdit.text()))
-            self.modbus.input3register = int(str(dialog.modbus_input3registerEdit.text()))
-            self.modbus.input3code = int(str(dialog.modbus_input3code.currentText()))
-            self.modbus.input3div = dialog.modbus_input3div.currentIndex()
-            self.modbus.input3mode = str(dialog.modbus_input3mode.currentText())
+                self.modbus.inputFloats[1] = False
+                self.modbus.inputBCDs[1] = False
+            self.modbus.inputSlaves[2] = int(str(dialog.modbus_input3slaveEdit.text()))
+            self.modbus.inputRegisters[2] = int(str(dialog.modbus_input3registerEdit.text()))
+            self.modbus.inputCodes[2] = int(str(dialog.modbus_input3code.currentText()))
+            self.modbus.inputDivs[2] = dialog.modbus_input3div.currentIndex()
+            self.modbus.inputModes[2] = str(dialog.modbus_input3mode.currentText())
             if dialog.modbus_input3decode.currentIndex() == 1:
-                self.modbus.input3float = True
-                self.modbus.input3bcd = False
+                self.modbus.inputFloats[2] = True
+                self.modbus.inputBCDs[2] = False
             elif dialog.modbus_input3decode.currentIndex() == 2:
-                self.modbus.input3float = False
-                self.modbus.input3bcd = True
+                self.modbus.inputFloats[2] = False
+                self.modbus.inputBCDs[2] = True
             else:
-                self.modbus.input3float = False
-                self.modbus.input3bcd = False   
-            self.modbus.input4slave = int(str(dialog.modbus_input4slaveEdit.text()))
-            self.modbus.input4register = int(str(dialog.modbus_input4registerEdit.text()))
-            self.modbus.input4code = int(str(dialog.modbus_input4code.currentText()))
-            self.modbus.input4div = dialog.modbus_input4div.currentIndex()
-            self.modbus.input4mode = str(dialog.modbus_input4mode.currentText())
+                self.modbus.inputFloats[2] = False
+                self.modbus.inputBCDs[2] = False   
+            self.modbus.inputSlaves[3] = int(str(dialog.modbus_input4slaveEdit.text()))
+            self.modbus.inputRegisters[3] = int(str(dialog.modbus_input4registerEdit.text()))
+            self.modbus.inputCodes[3] = int(str(dialog.modbus_input4code.currentText()))
+            self.modbus.inputDivs[3] = dialog.modbus_input4div.currentIndex()
+            self.modbus.inputModes[3] = str(dialog.modbus_input4mode.currentText())
             if dialog.modbus_input4decode.currentIndex() == 1:
-                self.modbus.input4float = True
-                self.modbus.input4bcd = False
+                self.modbus.inputFloats[3] = True
+                self.modbus.inputBCDs[3] = False
             elif dialog.modbus_input4decode.currentIndex() == 2:
-                self.modbus.input4float = False
-                self.modbus.input4bcd = True
+                self.modbus.inputFloats[3] = False
+                self.modbus.inputBCDs[3] = True
             else:
-                self.modbus.input4float = False
-                self.modbus.input4bcd = False
-            self.modbus.input5slave = int(str(dialog.modbus_input5slaveEdit.text()))
-            self.modbus.input5register = int(str(dialog.modbus_input5registerEdit.text()))
-            self.modbus.input5code = int(str(dialog.modbus_input5code.currentText()))
-            self.modbus.input5div = dialog.modbus_input5div.currentIndex()
-            self.modbus.input5mode = str(dialog.modbus_input5mode.currentText())
+                self.modbus.inputFloats[3] = False
+                self.modbus.inputBCDs[3] = False
+            self.modbus.inputSlaves[4] = int(str(dialog.modbus_input5slaveEdit.text()))
+            self.modbus.inputRegisters[4] = int(str(dialog.modbus_input5registerEdit.text()))
+            self.modbus.inputCodes[4] = int(str(dialog.modbus_input5code.currentText()))
+            self.modbus.inputDivs[4] = dialog.modbus_input5div.currentIndex()
+            self.modbus.inputModes[4] = str(dialog.modbus_input5mode.currentText())
             if dialog.modbus_input5decode.currentIndex() == 1:
-                self.modbus.input5float = True
-                self.modbus.input5bcd = False
+                self.modbus.inputFloats[4] = True
+                self.modbus.inputBCDs[4] = False
             elif dialog.modbus_input5decode.currentIndex() == 2:
-                self.modbus.input5float = False
-                self.modbus.input5bcd = True
+                self.modbus.inputFloats[4] = False
+                self.modbus.inputBCDs[4] = True
             else:
-                self.modbus.input5float = False
-                self.modbus.input5bcd = False
-            self.modbus.input6slave = int(str(dialog.modbus_input6slaveEdit.text()))
-            self.modbus.input6register = int(str(dialog.modbus_input6registerEdit.text()))
-            self.modbus.input6code = int(str(dialog.modbus_input6code.currentText()))
-            self.modbus.input6div = dialog.modbus_input6div.currentIndex()
-            self.modbus.input6mode = str(dialog.modbus_input6mode.currentText())
+                self.modbus.inputFloats[4] = False
+                self.modbus.inputBCDs[4] = False
+            self.modbus.inputSlaves[5] = int(str(dialog.modbus_input6slaveEdit.text()))
+            self.modbus.inputRegisters[5] = int(str(dialog.modbus_input6registerEdit.text()))
+            self.modbus.inputCodes[5] = int(str(dialog.modbus_input6code.currentText()))
+            self.modbus.inputDivs[5] = dialog.modbus_input6div.currentIndex()
+            self.modbus.inputModes[5] = str(dialog.modbus_input6mode.currentText())
             if dialog.modbus_input6decode.currentIndex() == 1:
-                self.modbus.input6float = True
-                self.modbus.input6bcd = False
+                self.modbus.inputFloats[5] = True
+                self.modbus.inputBCDs[5] = False
             elif dialog.modbus_input6decode.currentIndex() == 2:
-                self.modbus.input6float = False
-                self.modbus.input6bcd = True
+                self.modbus.inputFloats[5] = False
+                self.modbus.inputBCDs[5] = True
             else:
-                self.modbus.input6float = False
-                self.modbus.input6bcd = False
+                self.modbus.inputFloats[5] = False
+                self.modbus.inputBCDs[5] = False
             self.modbus.SVmultiplier = dialog.modbus_SVmultiplier.currentIndex()
             self.modbus.PIDmultiplier = dialog.modbus_PIDmultiplier.currentIndex()
             self.modbus.byteorderLittle = bool(dialog.modbus_littleEndianBytes.isChecked())
@@ -45416,82 +45420,86 @@ class serialport(object):
 
     #returns v1,v2 from a connected MODBUS device
     def MODBUSread(self):
+        # fill the MODBUS optimizer (if active) with data for all read requests specified in the device MODBUS tab using block reads
+        aw.modbus.readActiveRegisters()
+        
         # slave, register
         just_send = False
-        if aw.modbus.input1slave:
-            aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
-            if aw.modbus.input1float:
-                res1 = aw.modbus.readFloat(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
-            elif aw.modbus.input1bcd:
-                res1 = aw.modbus.readBCD(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
+        if aw.modbus.inputSlaves[0]:
+            if not aw.modbus.optimizer:
+                aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
+            if aw.modbus.inputFloats[0]:
+                res1 = aw.modbus.readFloat(aw.modbus.inputSlaves[0],aw.modbus.inputRegisters[0],aw.modbus.inputCodes[0])
+            elif aw.modbus.inputBCDs[0]:
+                res1 = aw.modbus.readBCD(aw.modbus.inputSlaves[0],aw.modbus.inputRegisters[0],aw.modbus.inputCodes[0])
             else:
-                res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
-            res1 = self.processChannelData(res1,aw.modbus.input1div,aw.modbus.input1mode)
+                res1 = aw.modbus.readSingleRegister(aw.modbus.inputSlaves[0],aw.modbus.inputRegisters[0],aw.modbus.inputCodes[0])
+            res1 = self.processChannelData(res1,aw.modbus.inputDivs[0],aw.modbus.inputModes[0])
             just_send = True
         else:
             res1 = -1
-        if aw.modbus.input2slave:
-            if just_send:
+        if aw.modbus.inputSlaves[1]:
+            if just_send and not aw.modbus.optimizer:
                 aw.modbus.sleepBetween()
-            if aw.modbus.input2float:
-                res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
-            elif aw.modbus.input2bcd:
-                res2 = aw.modbus.readBCD(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
+            if aw.modbus.inputFloats[1]:
+                res2 = aw.modbus.readFloat(aw.modbus.inputSlaves[1],aw.modbus.inputRegisters[1],aw.modbus.inputCodes[1])
+            elif aw.modbus.inputBCDs[1]:
+                res2 = aw.modbus.readBCD(aw.modbus.inputSlaves[1],aw.modbus.inputRegisters[1],aw.modbus.inputCodes[1])
             else:
-                res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
-            res2 = self.processChannelData(res2,aw.modbus.input2div,aw.modbus.input2mode)
+                res2 = aw.modbus.readSingleRegister(aw.modbus.inputSlaves[1],aw.modbus.inputRegisters[1],aw.modbus.inputCodes[1])
+            res2 = self.processChannelData(res2,aw.modbus.inputDivs[1],aw.modbus.inputModes[1])
             just_send = True
         else:
             res2 = -1
-        if aw.modbus.input3slave:
-            if just_send:
+        if aw.modbus.inputSlaves[2]:
+            if just_send and not aw.modbus.optimizer:
                 aw.modbus.sleepBetween()
-            if aw.modbus.input3float:
-                res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
-            elif aw.modbus.input3bcd:
-                res3 = aw.modbus.readBCD(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
+            if aw.modbus.inputFloats[2]:
+                res3 = aw.modbus.readFloat(aw.modbus.inputSlaves[2],aw.modbus.inputRegisters[2],aw.modbus.inputCodes[2])
+            elif aw.modbus.inputBCDs[2]:
+                res3 = aw.modbus.readBCD(aw.modbus.inputSlaves[2],aw.modbus.inputRegisters[2],aw.modbus.inputCodes[2])
             else:
-                res3 = aw.modbus.readSingleRegister(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
-            res3 = self.processChannelData(res3,aw.modbus.input3div,aw.modbus.input3mode)
+                res3 = aw.modbus.readSingleRegister(aw.modbus.inputSlaves[2],aw.modbus.inputRegisters[2],aw.modbus.inputCodes[2])
+            res3 = self.processChannelData(res3,aw.modbus.inputDivs[2],aw.modbus.inputModes[2])
             just_send = True
         else:
             res3 = -1
-        if aw.modbus.input4slave:
-            if just_send:
+        if aw.modbus.inputSlaves[3]:
+            if just_send and not aw.modbus.optimizer:
                 aw.modbus.sleepBetween()
-            if aw.modbus.input4float:
-                res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
-            elif aw.modbus.input4bcd:
-                res4 = aw.modbus.readBCD(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
+            if aw.modbus.inputFloats[3]:
+                res4 = aw.modbus.readFloat(aw.modbus.inputSlaves[3],aw.modbus.inputRegisters[3],aw.modbus.inputCodes[3])
+            elif aw.modbus.inputBCDs[3]:
+                res4 = aw.modbus.readBCD(aw.modbus.inputSlaves[3],aw.modbus.inputRegisters[3],aw.modbus.inputCodes[3])
             else:
-                res4 = aw.modbus.readSingleRegister(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
-            res4 = self.processChannelData(res4,aw.modbus.input4div,aw.modbus.input4mode)
+                res4 = aw.modbus.readSingleRegister(aw.modbus.inputSlaves[3],aw.modbus.inputRegisters[3],aw.modbus.inputCodes[3])
+            res4 = self.processChannelData(res4,aw.modbus.inputDivs[3],aw.modbus.inputModes[3])
             just_send = True
         else:
             res4 = -1
-        if aw.modbus.input5slave:
-            if just_send:
+        if aw.modbus.inputSlaves[4]:
+            if just_send and not aw.modbus.optimizer:
                 aw.modbus.sleepBetween()
-            if aw.modbus.input5float:
-                res5 = aw.modbus.readFloat(aw.modbus.input5slave,aw.modbus.input5register,aw.modbus.input5code)
-            elif aw.modbus.input5bcd:
-                res5 = aw.modbus.readBCD(aw.modbus.input5slave,aw.modbus.input5register,aw.modbus.input5code)
+            if aw.modbus.inputFloats[4]:
+                res5 = aw.modbus.readFloat(aw.modbus.inputSlaves[4],aw.modbus.inputRegisters[4],aw.modbus.inputCodes[4])
+            elif aw.modbus.inputBCDs[4]:
+                res5 = aw.modbus.readBCD(aw.modbus.inputSlaves[4],aw.modbus.inputRegisters[4],aw.modbus.inputCodes[4])
             else:
-                res5 = aw.modbus.readSingleRegister(aw.modbus.input5slave,aw.modbus.input5register,aw.modbus.input5code)
-            res5 = self.processChannelData(res5,aw.modbus.input5div,aw.modbus.input5mode)
+                res5 = aw.modbus.readSingleRegister(aw.modbus.inputSlaves[4],aw.modbus.inputRegisters[4],aw.modbus.inputCodes[4])
+            res5 = self.processChannelData(res5,aw.modbus.inputDivs[4],aw.modbus.inputModes[4])
             just_send = True
         else:
             res5 = -1
-        if aw.modbus.input6slave:
-            if just_send:
+        if aw.modbus.inputSlaves[5]:
+            if just_send and not aw.modbus.optimizer:
                 aw.modbus.sleepBetween()
-            if aw.modbus.input6float:
-                res6 = aw.modbus.readFloat(aw.modbus.input6slave,aw.modbus.input6register,aw.modbus.input6code)
-            elif aw.modbus.input6bcd:
-                res6 = aw.modbus.readBCD(aw.modbus.input6slave,aw.modbus.input6register,aw.modbus.input6code)
+            if aw.modbus.inputFloats[5]:
+                res6 = aw.modbus.readFloat(aw.modbus.inputSlaves[5],aw.modbus.inputRegisters[5],aw.modbus.inputCodes[5])
+            elif aw.modbus.inputBCDs[5]:
+                res6 = aw.modbus.readBCD(aw.modbus.inputSlaves[5],aw.modbus.inputRegisters[5],aw.modbus.inputCodes[5])
             else:
-                res6 = aw.modbus.readSingleRegister(aw.modbus.input6slave,aw.modbus.input6register,aw.modbus.input6code)
-            res6 = self.processChannelData(res6,aw.modbus.input6div,aw.modbus.input6mode)
+                res6 = aw.modbus.readSingleRegister(aw.modbus.inputSlaves[5],aw.modbus.inputRegisters[5],aw.modbus.inputCodes[5])
+            res6 = self.processChannelData(res6,aw.modbus.inputDivs[5],aw.modbus.inputModes[5])
             just_send = True
         else:
             res6 = -1
@@ -49756,43 +49764,43 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_input1divlabel = QLabel(QApplication.translate("Label", "Divider",None))
         modbus_input1modelabel = QLabel(QApplication.translate("Label", "Mode",None))
         
-        self.modbus_input1slaveEdit = QLineEdit(str(aw.modbus.input1slave))
+        self.modbus_input1slaveEdit = QLineEdit(str(aw.modbus.inputSlaves[0]))
         self.modbus_input1slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input1slaveEdit))
         self.modbus_input1slaveEdit.setFixedWidth(65)
         self.modbus_input1slaveEdit.setAlignment(Qt.AlignRight)
-        self.modbus_input1registerEdit = QLineEdit(str(aw.modbus.input1register))
+        self.modbus_input1registerEdit = QLineEdit(str(aw.modbus.inputRegisters[0]))
         self.modbus_input1registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input1registerEdit))
         self.modbus_input1registerEdit.setFixedWidth(65)
         self.modbus_input1registerEdit.setAlignment(Qt.AlignRight)
         self.modbus_input1decode = QComboBox()
         self.modbus_input1decode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input1decode.addItems(modbus_decode)
-        if aw.modbus.input1float:
+        if aw.modbus.inputFloats[0]:
             self.modbus_input1decode.setCurrentIndex(1)
-        elif aw.modbus.input1bcd:
+        elif aw.modbus.inputBCDs[0]:
             self.modbus_input1decode.setCurrentIndex(2)
         self.modbus_input1decode.setFixedWidth(70)        
         self.modbus_input1code = QComboBox()
         self.modbus_input1code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input1code.addItems(modbus_function_codes)
-        self.modbus_input1code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input1code)))
+        self.modbus_input1code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.inputCodes[0])))
         self.modbus_input1code.setFixedWidth(70)
         self.modbus_input1div = QComboBox()
         self.modbus_input1div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input1div.addItems(modbus_divs)
-        self.modbus_input1div.setCurrentIndex(aw.modbus.input1div)
+        self.modbus_input1div.setCurrentIndex(aw.modbus.inputDivs[0])
         self.modbus_input1div.setFixedWidth(70)
         self.modbus_input1mode = QComboBox()
         self.modbus_input1mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input1mode.addItems(modbus_modes)
-        self.modbus_input1mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input1mode)))
+        self.modbus_input1mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.inputModes[0])))
         self.modbus_input1mode.setFixedWidth(70)
         
-        self.modbus_input2slaveEdit = QLineEdit(str(aw.modbus.input2slave))
+        self.modbus_input2slaveEdit = QLineEdit(str(aw.modbus.inputSlaves[1]))
         self.modbus_input2slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input2slaveEdit))
         self.modbus_input2slaveEdit.setFixedWidth(65)
         self.modbus_input2slaveEdit.setAlignment(Qt.AlignRight)
-        self.modbus_input2registerEdit = QLineEdit(str(aw.modbus.input2register))
+        self.modbus_input2registerEdit = QLineEdit(str(aw.modbus.inputRegisters[1]))
         self.modbus_input2registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input2registerEdit))
         self.modbus_input2registerEdit.setFixedWidth(65)
         self.modbus_input2registerEdit.setAlignment(Qt.AlignRight)
@@ -49800,31 +49808,31 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_input2decode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input2decode.addItems(modbus_decode)
         self.modbus_input2decode.setFixedWidth(70)
-        if aw.modbus.input2float:
+        if aw.modbus.inputFloats[1]:
             self.modbus_input2decode.setCurrentIndex(1)
-        elif aw.modbus.input2bcd:
+        elif aw.modbus.inputBCDs[1]:
             self.modbus_input2decode.setCurrentIndex(2)
         self.modbus_input2code = QComboBox()
         self.modbus_input2code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input2code.addItems(modbus_function_codes)
-        self.modbus_input2code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input2code)))
+        self.modbus_input2code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.inputCodes[1])))
         self.modbus_input2code.setFixedWidth(70)  
         self.modbus_input2div = QComboBox()
         self.modbus_input2div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input2div.addItems(modbus_divs)
-        self.modbus_input2div.setCurrentIndex(aw.modbus.input2div)
+        self.modbus_input2div.setCurrentIndex(aw.modbus.inputDivs[1])
         self.modbus_input2div.setFixedWidth(70)
         self.modbus_input2mode = QComboBox()
         self.modbus_input2mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input2mode.addItems(modbus_modes)
-        self.modbus_input2mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input2mode)))
+        self.modbus_input2mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.inputModes[1])))
         self.modbus_input2mode.setFixedWidth(70)
         
-        self.modbus_input3slaveEdit = QLineEdit(str(aw.modbus.input3slave))
+        self.modbus_input3slaveEdit = QLineEdit(str(aw.modbus.inputSlaves[2]))
         self.modbus_input3slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input3slaveEdit))
         self.modbus_input3slaveEdit.setFixedWidth(65)
         self.modbus_input3slaveEdit.setAlignment(Qt.AlignRight)
-        self.modbus_input3registerEdit = QLineEdit(str(aw.modbus.input3register))
+        self.modbus_input3registerEdit = QLineEdit(str(aw.modbus.inputRegisters[2]))
         self.modbus_input3registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input3registerEdit))
         self.modbus_input3registerEdit.setFixedWidth(65)
         self.modbus_input3registerEdit.setAlignment(Qt.AlignRight)
@@ -49832,34 +49840,34 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_input3decode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input3decode.addItems(modbus_decode)
         self.modbus_input3decode.setFixedWidth(70)
-        if aw.modbus.input3float:
+        if aw.modbus.inputFloats[2]:
             self.modbus_input3decode.setCurrentIndex(1)
-        elif aw.modbus.input3bcd:
+        elif aw.modbus.inputBCDs[2]:
             self.modbus_input3decode.setCurrentIndex(2)
         self.modbus_input3float = QCheckBox()
-        self.modbus_input3float.setChecked(aw.modbus.input3float)
+        self.modbus_input3float.setChecked(aw.modbus.inputFloats[2])
         self.modbus_input3float.setFocusPolicy(Qt.NoFocus) 
         self.modbus_input3code = QComboBox()
         self.modbus_input3code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input3code.addItems(modbus_function_codes)
-        self.modbus_input3code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input3code)))
+        self.modbus_input3code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.inputCodes[2])))
         self.modbus_input3code.setFixedWidth(70)
         self.modbus_input3div = QComboBox()
         self.modbus_input3div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input3div.addItems(modbus_divs)
-        self.modbus_input3div.setCurrentIndex(aw.modbus.input3div)
+        self.modbus_input3div.setCurrentIndex(aw.modbus.inputDivs[2])
         self.modbus_input3div.setFixedWidth(70)
         self.modbus_input3mode = QComboBox()
         self.modbus_input3mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input3mode.addItems(modbus_modes)
-        self.modbus_input3mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input3mode)))
+        self.modbus_input3mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.inputModes[2])))
         self.modbus_input3mode.setFixedWidth(70)
         
-        self.modbus_input4slaveEdit = QLineEdit(str(aw.modbus.input4slave))
+        self.modbus_input4slaveEdit = QLineEdit(str(aw.modbus.inputSlaves[3]))
         self.modbus_input4slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input4slaveEdit))
         self.modbus_input4slaveEdit.setFixedWidth(65)
         self.modbus_input4slaveEdit.setAlignment(Qt.AlignRight)
-        self.modbus_input4registerEdit = QLineEdit(str(aw.modbus.input4register))
+        self.modbus_input4registerEdit = QLineEdit(str(aw.modbus.inputRegisters[3]))
         self.modbus_input4registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input4registerEdit))
         self.modbus_input4registerEdit.setFixedWidth(65)
         self.modbus_input4registerEdit.setAlignment(Qt.AlignRight)
@@ -49867,33 +49875,33 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_input4decode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input4decode.addItems(modbus_decode)
         self.modbus_input4decode.setFixedWidth(70)
-        if aw.modbus.input4float:
+        if aw.modbus.inputFloats[3]:
             self.modbus_input4decode.setCurrentIndex(1)
-        elif aw.modbus.input4bcd:
+        elif aw.modbus.inputBCDs[3]:
             self.modbus_input4decode.setCurrentIndex(2)
         self.modbus_input4float = QCheckBox()
-        self.modbus_input4float.setChecked(aw.modbus.input4float)
+        self.modbus_input4float.setChecked(aw.modbus.inputFloats[3])
         self.modbus_input4float.setFocusPolicy(Qt.NoFocus)
         self.modbus_input4code = QComboBox()
         self.modbus_input4code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input4code.addItems(modbus_function_codes)
-        self.modbus_input4code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input4code)))
+        self.modbus_input4code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.inputCodes[3])))
         self.modbus_input4code.setFixedWidth(70)
         self.modbus_input4div = QComboBox()
         self.modbus_input4div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input4div.addItems(modbus_divs)
-        self.modbus_input4div.setCurrentIndex(aw.modbus.input4div)
+        self.modbus_input4div.setCurrentIndex(aw.modbus.inputDivs[3])
         self.modbus_input4div.setFixedWidth(70)
         self.modbus_input4mode = QComboBox()
         self.modbus_input4mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input4mode.addItems(modbus_modes)
-        self.modbus_input4mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input4mode)))
+        self.modbus_input4mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.inputModes[3])))
         self.modbus_input4mode.setFixedWidth(70)
-        self.modbus_input5slaveEdit = QLineEdit(str(aw.modbus.input5slave))
+        self.modbus_input5slaveEdit = QLineEdit(str(aw.modbus.inputSlaves[4]))
         self.modbus_input5slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input5slaveEdit))
         self.modbus_input5slaveEdit.setFixedWidth(65)
         self.modbus_input5slaveEdit.setAlignment(Qt.AlignRight)
-        self.modbus_input5registerEdit = QLineEdit(str(aw.modbus.input5register))
+        self.modbus_input5registerEdit = QLineEdit(str(aw.modbus.inputRegisters[4]))
         self.modbus_input5registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input5registerEdit))
         self.modbus_input5registerEdit.setFixedWidth(65)
         self.modbus_input5registerEdit.setAlignment(Qt.AlignRight)
@@ -49901,34 +49909,34 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_input5decode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input5decode.addItems(modbus_decode)
         self.modbus_input5decode.setFixedWidth(70)
-        if aw.modbus.input5float:
+        if aw.modbus.inputFloats[4]:
             self.modbus_input5decode.setCurrentIndex(1)
-        elif aw.modbus.input5bcd:
+        elif aw.modbus.inputBCDs[4]:
             self.modbus_input5decode.setCurrentIndex(2)
         self.modbus_input5float = QCheckBox()
-        self.modbus_input5float.setChecked(aw.modbus.input5float)
+        self.modbus_input5float.setChecked(aw.modbus.inputFloats[4])
         self.modbus_input5float.setFocusPolicy(Qt.NoFocus)
         self.modbus_input5code = QComboBox()
         self.modbus_input5code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input5code.addItems(modbus_function_codes)
-        self.modbus_input5code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input5code)))
+        self.modbus_input5code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.inputCodes[4])))
         self.modbus_input5code.setFixedWidth(70)
         self.modbus_input5div = QComboBox()
         self.modbus_input5div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input5div.addItems(modbus_divs)
-        self.modbus_input5div.setCurrentIndex(aw.modbus.input5div)
+        self.modbus_input5div.setCurrentIndex(aw.modbus.inputDivs[4])
         self.modbus_input5div.setFixedWidth(70)
         self.modbus_input5mode = QComboBox()
         self.modbus_input5mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input5mode.addItems(modbus_modes)
-        self.modbus_input5mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input5mode)))
+        self.modbus_input5mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.inputModes[4])))
         self.modbus_input5mode.setFixedWidth(70)
         
-        self.modbus_input6slaveEdit = QLineEdit(str(aw.modbus.input6slave))
+        self.modbus_input6slaveEdit = QLineEdit(str(aw.modbus.inputSlaves[5]))
         self.modbus_input6slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input6slaveEdit))
         self.modbus_input6slaveEdit.setFixedWidth(65)
         self.modbus_input6slaveEdit.setAlignment(Qt.AlignRight)
-        self.modbus_input6registerEdit = QLineEdit(str(aw.modbus.input6register))
+        self.modbus_input6registerEdit = QLineEdit(str(aw.modbus.inputRegisters[5]))
         self.modbus_input6registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input6registerEdit))
         self.modbus_input6registerEdit.setFixedWidth(65)
         self.modbus_input6registerEdit.setAlignment(Qt.AlignRight)
@@ -49936,27 +49944,27 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_input6decode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input6decode.addItems(modbus_decode)
         self.modbus_input6decode.setFixedWidth(70)
-        if aw.modbus.input6float:
+        if aw.modbus.inputFloats[5]:
             self.modbus_input6decode.setCurrentIndex(1)
-        elif aw.modbus.input6bcd:
+        elif aw.modbus.inputBCDs[5]:
             self.modbus_input6decode.setCurrentIndex(2)
         self.modbus_input6float = QCheckBox()
-        self.modbus_input6float.setChecked(aw.modbus.input6float)
+        self.modbus_input6float.setChecked(aw.modbus.inputFloats[5])
         self.modbus_input6float.setFocusPolicy(Qt.NoFocus)
         self.modbus_input6code = QComboBox()
         self.modbus_input6code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input6code.addItems(modbus_function_codes)
-        self.modbus_input6code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input6code)))
+        self.modbus_input6code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.inputCodes[5])))
         self.modbus_input6code.setFixedWidth(70)
         self.modbus_input6div = QComboBox()
         self.modbus_input6div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input6div.addItems(modbus_divs)
-        self.modbus_input6div.setCurrentIndex(aw.modbus.input6div)
+        self.modbus_input6div.setCurrentIndex(aw.modbus.inputDivs[5])
         self.modbus_input6div.setFixedWidth(70)
         self.modbus_input6mode = QComboBox()
         self.modbus_input6mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input6mode.addItems(modbus_modes)
-        self.modbus_input6mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input6mode)))
+        self.modbus_input6mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.inputModes[5])))
         self.modbus_input6mode.setFixedWidth(70)
 
         modbus_endianlabel = QLabel(QApplication.translate("Label", "little-endian",None))
