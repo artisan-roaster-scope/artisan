@@ -123,7 +123,7 @@ class modbusport(object):
         self.PID_ON_action = ""
         self.PID_OFF_action = ""
         
-        self.channels = 6
+        self.channels = 8
         self.inputSlaves = [0]*self.channels
         self.inputRegisters = [0]*self.channels
         self.inputFloats = [False]*self.channels
@@ -132,7 +132,7 @@ class modbusport(object):
         self.inputDivs = [0]*self.channels # 0: none, 1: 1/10, 2:1/100
         self.inputModes = ["C"]*self.channels
         
-        self.optimizer = False # if set, values of consecutive register addresses are requested in single requests
+        self.optimizer = True # if set, values of consecutive register addresses are requested in single requests
         # MODBUS functions associated to dicts associating MODBUS slave ids to registers in use 
         # for optimized read of full register segments with single request
         # this dict is re-computed on each connect() by a call to updateActiveRegisters()
@@ -442,6 +442,8 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
 
     # function 22 (Mask Write Register)
+    # bits to be modified are "masked" with a 0 in the and_mask (not and_mask)
+    # new bit values to be written are taken from the or_mask
     def maskWriteRegister(self,slave,register,and_mask,or_mask):
         try:
             #### lock shared resources #####
@@ -458,7 +460,14 @@ class modbusport(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
-                
+
+    # a local variant of function 22 (Mask Write Register)
+    # the masks are evaluated locally on the given integer value and the result is send via
+    # using function 6
+    def localMaskWriteRegister(self,slave,register,and_mask,or_mask,value):
+        new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
+        self.writeSingleRegister(slave,register,int(new_val))
+            
     # function 16 (Write Multiple Holding Registers)
     # values is a list of integers or one integer
     def writeRegisters(self,slave,register,values):
