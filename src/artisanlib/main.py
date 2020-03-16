@@ -1726,6 +1726,8 @@ class tgraphcanvas(FigureCanvas):
         
         self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>,<recordEvent>]
 
+        self.loadaxisfromprofile = False # if set, axis are loaded from profile
+        
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.startofx_default = -30
         self.endofx_default = 600 # 10min*60
@@ -22736,8 +22738,8 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.greens_temp != 0.:
                     self.qmc.greens_temp = self.qmc.fromCtoF(self.qmc.greens_temp)
                 self.qmc.fileDirty()
-            else:
-                # only if the temperature mode of the profile equals to our current mode, we respect the temp/RoR axis limits
+            elif self.qmc.loadaxisfromprofile:
+                # only if the temperature mode of the profile equals to our current mode, and loadfromprofile is ticked, we respect the temp/RoR axis limits
                 if "zmax" in profile:
                     self.qmc.zlimit = min(int(profile["zmax"]),self.qmc.zlimit_max)
                 if "zmin" in profile:
@@ -22746,7 +22748,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ylimit = min(int(profile["ymax"]),self.qmc.ylimit_max)
                 if "ymin" in profile:
                     self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),self.qmc.ylimit_min_max)
-            if  not self.qmc.locktimex:
+            if not self.qmc.locktimex and self.qmc.loadaxisfromprofile:
                 # otherwise don't let the users y/z min/max axis limits be overwritten by loading a profile
                 if "xmin" in profile:
                     self.qmc.startofx = float(profile["xmin"])
@@ -22755,7 +22757,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     #Set the xlimits
                     if self.qmc.timex:
-                        self.qmc.endofx = self.qmc.timex[-1] + 40  
+                        self.qmc.endofx = self.qmc.timex[-1] + 40
             if "ambient_humidity" in profile:
                 self.qmc.ambient_humidity = profile["ambient_humidity"]
             if "ambient_pressure" in profile:
@@ -24500,6 +24502,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #loads max-min temp limits of graph
             settings.beginGroup("Axis")
+            if settings.contains("loadAxisFromProfile"):
+                self.qmc.loadaxisfromprofile = bool(toBool(settings.value("loadAxisFromProfile",self.qmc.loadaxisfromprofile)))
             try: # prevents some random exceptions in Windows!?
                 self.qmc.startofx = toFloat(settings.value("xmin",self.qmc.startofx))
                 self.qmc.endofx = toFloat(settings.value("xmax",self.qmc.endofx))
@@ -25776,6 +25780,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Beep",self.soundflag)
             settings.endGroup()
             settings.beginGroup("Axis")
+            settings.setValue("loadAxisFromProfile",self.qmc.loadaxisfromprofile)
             settings.setValue("xmin",self.qmc.startofx)
             settings.setValue("xmax",self.qmc.endofx)
             settings.setValue("ymax",self.qmc.ylimit)
@@ -38604,6 +38609,9 @@ class WindowsDlg(ArtisanDialog):
         resetButton.clicked.connect(self.reset)
         if aw.locale not in aw.qtbase_locales:
             resetButton.setText(QApplication.translate("Button","Defaults", None))
+            
+        self.loadAxisFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile",None))
+        self.loadAxisFromProfile.setChecked(aw.qmc.loadaxisfromprofile)
         
         hline = QFrame()
         hline.setFrameShape(QFrame.HLine)
@@ -38688,6 +38696,8 @@ class WindowsDlg(ArtisanDialog):
         GridGroupLayout = QGroupBox(QApplication.translate("GroupBox","Grid",None))
         GridGroupLayout.setLayout(graphgridlayout)
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.loadAxisFromProfile)
+        buttonLayout.addSpacing(10)
         buttonLayout.addWidget(self.dialogbuttons)
         mainLayout1 = QVBoxLayout()
         mainLayout1.addWidget(xGroupLayout)
@@ -38822,6 +38832,7 @@ class WindowsDlg(ArtisanDialog):
         limits_changed = False
         aw.qmc.time_grid = self.timeGridCheckBox.isChecked()
         aw.qmc.temp_grid = self.tempGridCheckBox.isChecked()
+        aw.qmc.loadaxisfromprofile = self.loadAxisFromProfile.isChecked()
         try:
             yl = int(str(self.ylimitEdit.text()))
             yl_min = int(str(self.ylimitEdit_min.text()))
