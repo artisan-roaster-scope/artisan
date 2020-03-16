@@ -49,9 +49,18 @@ class s7port(object):
         self.area = [0]*self.channels
         self.db_nr = [1]*self.channels
         self.start = [0]*self.channels
-        self.type = [0]*self.channels
+        self.type = [0]*self.channels # type 0 => int, type 1 => float
         self.mode = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F (this is different than other places)
         self.div = [0]*self.channels
+        
+        self.optimizer = True # if set, values of consecutive register addresses are requested in single requests
+        # S7 areas associated to dicts associating S7 DB numbers to start registers in use 
+        # for optimized read of full register segments with single requests
+        # this dict is re-computed on each connect() by a call to updateActiveRegisters()
+        # NOTE: for registers of type float (32bit = 2x16bit) also the succeeding register is registered here
+        self.activeRegisters = {}        
+        # the readings cache that is filled by requesting sequences of values in blocks
+        self.readingsCache = {}
         
         self.PID_area = 0
         self.PID_db_nr = 0
@@ -213,6 +222,100 @@ class s7port(object):
                     if self.isConnected():
                         self.sendmessage(QApplication.translate("Message","S7 Connected", None) + " (2)")
                         time.sleep(0.4)
+            self.updateActiveRegisters()
+
+
+########## S7 optimizer for fetching register data in batches
+
+    # S7 area => db_nr => [start registers]
+    def updateActiveRegisters(self):
+        self.activeRegisters = {}
+        for c in range(self.channels):
+            area = self.area[c]-1
+            if area != -1:
+                db_nr = self.db_nr[c]
+                register = self.start[c]
+                registers = [register,register+1]
+                if self.type[c]:
+                    registers.append(register+2)
+                    registers.append(register+3)
+                if not (area in self.activeRegisters):
+                    self.activeRegisters[area] = {}
+                if db_nr in self.activeRegisters[area]:
+                    self.activeRegisters[area][db_nr].extend(registers)
+                else:
+                    self.activeRegisters[area][db_nr] = registers
+    
+    def clearReadingsCache(self):
+        self.readingsCache = {}
+
+    def cacheReadings(self,area,db_nr,register,results):
+        if not (area in self.readingsCache):
+            self.readingsCache[area] = {}
+        if not db_nr in self.readingsCache[area]:
+            self.readingsCache[area][db_nr] = {}
+        try:
+            for i,v in enumerate(results):
+                self.readingsCache[area][db_nr][register+i] = v
+        except:
+            pass
+
+    def readActiveRegisters(self):
+        if not self.optimizer:
+            return
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            self.clearReadingsCache()
+            for area in self.activeRegisters:
+                for db_nr in self.activeRegisters[area]:
+                    registers = sorted(self.activeRegisters[area][db_nr])
+                    # split in successive sequences
+                    gaps = [[s, e] for s, e in zip(registers, registers[1:]) if s+1 < e]
+                    edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
+                    sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
+                    for seq in sequences:
+                        retry = self.readRetries
+                        register = seq[0]
+                        count = seq[1]-seq[0] + 1
+                        res = None
+                        while True:
+                            try:
+                                res = self.plc.read_area(self.areas[area],db_nr,register,count)
+                            except:
+                                res = None
+                            if res is None:
+                                if retry > 0:
+                                    retry = retry - 1
+                                else:
+                                    raise Exception("Exception response")
+                            else:
+                                break
+                        if res is not None:
+                            if self.commError: # we clear the previous error and send a message
+                                self.commError = False
+                                self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
+                            self.cacheReadings(area,db_nr,register,res)
+
+                        #note: logged chars should be unicode not binary
+                        if self.aw.seriallogflag:
+                            self.addserial("S7 read_area({},{},{},{})".format(area,db_nr,register,count))
+
+        except Exception: # as ex:
+#            self.disconnect()
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+#            _, _, exc_tb = sys.exc_info()
+#            self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
+            self.commError = True
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+                
+##########
+
 
     def writeFloat(self,area,dbnumber,start,value):
         try:
@@ -261,34 +364,45 @@ class s7port(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.isConnected():
-                retry = self.readRetries   
-                res = None             
-                while True:
-                    try:
-#                        with suppress_stdout_stderr():
-                        res = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                            
-                    except:
-                        res = None
-                    if res is None:
-                        if retry > 0:
-                            retry = retry - 1
-                        else:
-                            raise Exception("Communication error")
-                    else:
-                        break
-                if res is None:
-                    return -1
-                else:
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                    return self.get_real(res,0)
+            if area in self.readingsCache and dbnumber in self.readingsCache[area] and start in self.readingsCache[area][dbnumber] \
+                and start+1 in self.readingsCache[area][dbnumber] and start+2 in self.readingsCache[area][dbnumber] \
+                and start+3 in self.readingsCache[area][dbnumber]:
+                # cache hit
+                res = bytearray([
+                    self.readingsCache[area][dbnumber][start],
+                    self.readingsCache[area][dbnumber][start+1],
+                    self.readingsCache[area][dbnumber][start+2],
+                    self.readingsCache[area][dbnumber][start+3]])
+                return self.get_real(res,0)
             else:
-                self.commError = True  
-                self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))                                 
-                return -1
+                if self.isConnected():
+                    retry = self.readRetries   
+                    res = None             
+                    while True:
+                        try:
+#                            with suppress_stdout_stderr():
+                            res = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                                
+                        except:
+                            res = None
+                        if res is None:
+                            if retry > 0:
+                                retry = retry - 1
+                            else:
+                                raise Exception("Communication error")
+                        else:
+                            break
+                    if res is None:
+                        return -1
+                    else:
+                        if self.commError: # we clear the previous error and send a message
+                            self.commError = False
+                            self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
+                        return self.get_real(res,0)
+                else:
+                    self.commError = True  
+                    self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))                                 
+                    return -1
         except Exception as e:
             self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readFloat: " + str(e))
             self.commError = True
@@ -304,34 +418,42 @@ class s7port(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.isConnected():
-                retry = self.readRetries   
-                res = None             
-                while True:
-                    try:
-#                        with suppress_stdout_stderr():
-                        res = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                        
-                    except Exception:
-                        res = None
-                    if res is None:
-                        if retry > 0:
-                            retry = retry - 1
+            if area in self.readingsCache and dbnumber in self.readingsCache[area] and start in self.readingsCache[area][dbnumber] \
+                and start+1 in self.readingsCache[area][dbnumber]:
+                # cache hit
+                res = bytearray([
+                    self.readingsCache[area][dbnumber][start],
+                    self.readingsCache[area][dbnumber][start+1]])
+                return self.get_int(res,0)
+            else:            
+                if self.isConnected():
+                    retry = self.readRetries   
+                    res = None             
+                    while True:
+                        try:
+#                            with suppress_stdout_stderr():
+                            res = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                            
+                        except Exception:
+                            res = None
+                        if res is None:
+                            if retry > 0:
+                                retry = retry - 1
+                            else:
+                                raise Exception("Communication error")
                         else:
-                            raise Exception("Communication error")
+                            break
+                    if res is None:
+                        return -1
                     else:
-                        break
-                if res is None:
-                    return -1
+                        if self.commError: # we clear the previous error and send a message
+                            self.commError = False
+                            self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
+                        return self.get_int(res,0)
                 else:
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                    return self.get_int(res,0)
-            else:
-                self.commError = True  
-                self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
-                return -1
+                    self.commError = True  
+                    self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
+                    return -1
         except Exception as e:
             self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt: " + str(e))
             self.commError = True

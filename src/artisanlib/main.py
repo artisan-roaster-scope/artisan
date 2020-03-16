@@ -45414,6 +45414,8 @@ class serialport(object):
     # mode=2 to read ch5+6
     # mode=3 to read ch7+8
     def S7read(self,mode):
+        # fill the S7 optimizer (if active) with data for all read requests specified in the device S7 tab using block reads
+        aw.s7.readActiveRegisters()
         res = []
         for i in range(mode*2,mode*2+2):
             if aw.s7.area[i]:
