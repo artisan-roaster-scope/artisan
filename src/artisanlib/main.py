@@ -150,6 +150,7 @@ from Phidget22.Devices.VoltageOutput import VoltageOutput # @UnusedWildImport
 from Phidget22.Devices.RCServo import RCServo # @UnusedWildImport
 from Phidget22.Devices.CurrentInput import CurrentInput # @UnusedWildImport
 from Phidget22.Devices.FrequencyCounter import FrequencyCounter # @UnusedWildImport
+from Phidget22.Devices.DCMotor import DCMotor # @UnusedWildImport
 from Phidget22.Phidget import Phidget as PhidgetDriver
 
 
@@ -8275,6 +8276,8 @@ class tgraphcanvas(FigureCanvas):
         aw.ser.phidgetBinaryOUTclose()
         # close Phidget Analog Outputs
         aw.ser.phidgetVOUTclose()
+        # close Phidget DCMotors
+        aw.ser.phidgetDCMotorClose()
         # close Phidget RC Servos
         aw.ser.phidgetRCclose()
         # close Yocto Voltage Outputs
@@ -18537,6 +18540,9 @@ class ApplicationWindow(QMainWindow):
                     ##  set(c,b[,sn])   : switches channel c off (b=0) and on (b=1)
                     ##  toggle(c[,sn])  : toggles channel c
                     ##  pulse(c,t[,sn]) : sets the output of channel c to on for time t in milliseconds
+                    ##  out(c,v[,sn])   : sets voltage output of channel c to v (float)
+                    ##  accel(c,v[,sn]) : sets acceleration of channel c to v (float) on a DCMotor phidget
+                    ##  vel(c,v[,sn])   : sets target velocity of channel c to v (float) on a DCMotor phidget
                     #
                     # YOCTOPUCE
                     ##  on(c[,sn])   : turn channel c of the relay module on
@@ -18545,7 +18551,6 @@ class ApplicationWindow(QMainWindow):
                     ##  pip(c,delay,duration[,sn]) : pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds
                     #
                     # OTHERS
-                    ##  out(c,v[,sn]) : sets voltage output of channel c to v (float)
                     ##  slider(c,v)   : move slider c to value v
                     ##  button(i,c,b[,sn]) : switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b
                     ##  sleep(s) : sleep for s seconds, s a float
@@ -18604,6 +18609,20 @@ class ApplicationWindow(QMainWindow):
                                     sn = None
                                 if not aw.ser.phidgetVOUTsetVOUT(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn):
                                     aw.sendmessage(QApplication.translate("Message", "Failed to set VOUT(%s, %s)" % (cs_a[1], cs_a[2] ), None))
+
+                            elif cs_a[0] == "accel" and cs_len > 2:
+                                if cs_len > 3:
+                                    sn = cs_a[3]
+                                else:
+                                    sn = None
+                                aw.ser.phidgetDCMotorSetAcceleration(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn)
+
+                            elif cs_a[0] == "vel" and cs_len > 2:
+                                if cs_len > 3:
+                                    sn = cs_a[3]
+                                else:
+                                    sn = None
+                                aw.ser.phidgetDCMotorSetVelocity(toInt(cs_a[1]), toFloat(eval(cs_a[2])),sn)
 
                             elif cs_a[0] == "slider" and cs_len == 3:
                                 v = toFloat(cs_a[2])
@@ -18797,6 +18816,7 @@ class ApplicationWindow(QMainWindow):
                     ## togglehub(<channel>[,<sn>])
                     ## pulse(<channel>,<millis>[,<sn>])
                     ## pulsehub(<channel>,<millis>[,<sn>])
+                    #
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
@@ -43712,7 +43732,7 @@ class serialport(object):
         'Phidget1045semaphore','PhidgetBridgeSensor','Phidget1046values','Phidget1046lastvalues','Phidget1046semaphores',\
         'PhidgetIO','PhidgetIOvalues','PhidgetIOlastvalues','PhidgetIOsemaphores','PhidgetDigitalOut',\
         'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
-        'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetRCServo','PhidgetBinaryOut',\
+        'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetDCMotor','PhidgetRCServo','PhidgetBinaryOut',\
         'YOCTOlibImported','YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
@@ -43772,6 +43792,8 @@ class serialport(object):
         self.PhidgetRCServo = {} # a dict associating serials with lists of channels
         #store the Phidget IO Binary Output objects
         self.PhidgetBinaryOut = {} # a dict associating binary out serials with lists of channels
+        #store the Phidget DCMotor objects
+        self.PhidgetDCMotor = {} # a dict associating serials with lists of channels
         #Yoctopuce channels
         self.YOCTOlibImported = False # ensure that the YOCTOlib is only imported once
         self.YOCTOsensor = None
@@ -46698,7 +46720,7 @@ class serialport(object):
             remote=aw.qmc.phidgetRemoteFlag,
             remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
 
-#--- Phidget IO Binay Output (only one device supported for now)
+#--- Phidget IO Binay Output
 #  only supporting (trying to attach in this order)
 #      4 channel Phidget 1014, OUT1100, REL1000, REL1100, REL1101
 #      8 channel Phidget 1017
@@ -46823,7 +46845,7 @@ class serialport(object):
         aw.ser.PhidgetBinaryOut = {}
     
     
-#--- Phidget Digital PWM Output (only one supported for now)
+#--- Phidget Digital PWM Output
 #  only supporting 
 #           4 channel Phidget OUT1100, REL1100
 #          16 channel Phidget REL1101
@@ -47077,7 +47099,7 @@ class serialport(object):
         aw.ser.PhidgetDigitalOutLastToggleHub = {}
 
 
-#--- Phidget Analog Voltage Output (only one supported for now)
+#--- Phidget Analog Voltage Output
 #  only supporting 
 #     1 channel Phidget OUT1000, OUT1001 and OUT1002
 #     4 channel USB Phidget 1002
@@ -47173,6 +47195,109 @@ class serialport(object):
                 except Exception:
                     pass
         aw.ser.PhidgetAnalogOut = {}
+
+
+
+
+#--- Phidget DCMotor
+#  only supporting
+#     1 channel VINT DCC1000 and DCC1002
+#     2 channel VINT DCC1003
+#  commands: 
+#     accel(c,v[,sn]) with c channel number and v acceleration as a float, and sn erial the optional serial/port number of the addressed module
+#     vel(c,v[,sn])   with c channel number and v target velocity as a float, and sn erial the optional serial/port number of the addressed module
+
+    # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
+    def phidgetDCMotorAttach(self,channel,serial):
+        if not serial in aw.ser.PhidgetDCMotor:
+            if aw.qmc.phidgetManager is None:
+                aw.qmc.startPhidgetManager()
+            if aw.qmc.phidgetManager is not None:
+                # try to attach the DCMotor modules
+                s,p = self.serialString2serialPort(serial)
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDCMotor',DeviceID.PHIDID_DCC1000,
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                ports = 1
+                if ser is None:
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDCMotor',DeviceID.PHIDID_DCC1002,
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                    ports = 1
+                if ser is None:
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDCMotor',DeviceID.PHIDID_DCC1003,
+                                    remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                    ports = 2
+                if ser is not None:
+                    aw.ser.PhidgetDCMotor[serial] = []
+                    for i in range(ports):
+                        dcm = DCMotor()
+                        if port is not None:
+                            dcm.setHubPort(port)
+                        dcm.setDeviceSerialNumber(ser)
+                        dcm.setChannel(i)
+                        if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
+                            dcm.setIsRemote(True)
+                            dcm.setIsLocal(False)
+                        elif not aw.qmc.phidgetRemoteFlag:
+                            dcm.setIsRemote(False)
+                            dcm.setIsLocal(True)
+                        aw.ser.PhidgetDCMotor[serial].append(dcm)
+                    if serial is None:
+                        # we make this also accessible via its serial number
+                        aw.ser.PhidgetDCMotor[str(ser)] = aw.ser.PhidgetDCMotor[None]
+        try:
+            ch = aw.ser.PhidgetDCMotor[serial][channel]
+            ch.setOnAttachHandler(self.phidgetOUTattached)
+            ch.setOnDetachHandler(self.phidgetOUTdetached)
+            if not ch.getAttached():
+                if aw.qmc.phidgetRemoteFlag:
+                    ch.openWaitForAttachment(3000)
+                else:
+                    ch.openWaitForAttachment(1200)
+                if serial is None and ch.getAttached():
+                    # we make this also accessible via its serial number + port
+                    s = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
+                    aw.ser.PhidgetDCMotor[s] = aw.ser.PhidgetDCMotor[None]
+        except:
+            pass
+
+    # value: float
+    def phidgetDCMotorSetAcceleration(self,channel,value,serial=None):
+        self.phidgetDCMotorAttach(channel,serial)
+        if serial in aw.ser.PhidgetDCMotor:
+            dcm = aw.ser.PhidgetDCMotor[serial]
+            # set velocity
+            try:
+                if len(dcm) > channel and dcm[channel].getAttached():
+                    dcm.setAcceleration(value)
+            except Exception:
+                pass
+
+    # value: float
+    def phidgetDCMotorSetVelocity(self,channel,value,serial=None):
+        self.phidgetDCMotorAttach(channel,serial)
+        if serial in aw.ser.PhidgetDCMotor:
+            dcm = aw.ser.PhidgetDCMotor[serial]
+            # set velocity
+            try:
+                if len(dcm) > channel and dcm[channel].getAttached():
+                    dcm.setTargetVelocity(value)
+            except Exception:
+                pass
+    
+    def phidgetDCMotorClose(self):
+        for c in aw.ser.PhidgetDCMotor:
+            dcm = aw.ser.PhidgetDCMotor[c]
+            for i in range(len(dcm)):
+                try:
+                    if dcm[i].getAttached():
+                        dcm[i].setEnabled(False)
+                        self.phidgetOUTdetached(dcm[i])
+                    dcm[i].close()
+                except Exception:
+                    pass
+        aw.ser.PhidgetDCMotor = {}
+
+
 
 
 #--- Yoctopuce Voltage Output
