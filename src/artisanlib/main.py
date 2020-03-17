@@ -10291,6 +10291,14 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " lnRegression() " + str(e),exc_tb.tb_lineno)
+            if power == 2:
+                fit = QApplication.translate("Label","x",None) +"\u00b2"
+            elif power == 3:
+                fit = QApplication.translate("Label","x",None) +"\u00b3"
+            else:
+                fit = QApplication.translate("Label","ln()",None)
+            QMessageBox.warning(aw,QApplication.translate("Message","Curve fit problem", None),
+                    QApplication.translate("Message","Cannot fit this curve to " + fit, None))
         return res
 
     #interpolation type
@@ -17141,8 +17149,12 @@ class ApplicationWindow(QMainWindow):
                 RoR_FCs_act = aw.qmc.delta2[aw.qmc.timeindex[2]]
                 try:
                     fcs_idx = numpy.where(np_dbt==aw.qmc.delta2[aw.qmc.timeindex[2]])
-                    RoR_FCs_templ = np_dbtb[fcs_idx[0]].item()
+                    RoR_FCs_templ = np_dbtb[fcs_idx[0][0]].item()  #it is possible for fcs_idx[0] to be a tuple so we take the first element
                     RoR_FCs_delta = RoR_FCs_act - RoR_FCs_templ
+                    if (fcs_idx[0][-1] - fcs_idx[0][0]) != (len(fcs_idx[0]) - 1) or len(fcs_idx[0]) > 3:  #if there are multiple and discontiguous elements in fcs_idx
+                        #we don't have an accurate value
+                        #print(fcs_idx[0])
+                        RoR_FCs_delta = float('nan')
                 except:
                     RoR_FCs_delta = float('nan')
 
@@ -17261,6 +17273,10 @@ class ApplicationWindow(QMainWindow):
                             QApplication.translate("Label","x",None) + "\u00b3", 
                             QApplication.translate("Label","Bkgnd",None), ""]
                 fitType = fitTypes[exp]
+                if aw.qmc.filterDropOuts:
+                    smoothspikes = "On"
+                else:
+                    smoothspikes = "Off"
 
                 # build a table of results
                 tbl = prettytable.PrettyTable()
@@ -17298,7 +17314,7 @@ class ApplicationWindow(QMainWindow):
                 tbl2.float_format = "5.2"
                 tbl2.add_row([QApplication.translate("Label","Curve Fit",None), fitType, '', ''])
                 tbl2.add_row([QApplication.translate("Label","Samples Threshold",None), aw.qmc.segmentsamplesthreshold, QApplication.translate("Label","Delta Threshold",None), aw.qmc.segmentdeltathreshold])
-                tbl2.add_row([QApplication.translate("Label","Sample rate (secs)",None), self.qmc.profile_sampling_interval, QApplication.translate("Label","Smooth Curves",None), int((aw.qmc.curvefilter-1)/2) ])
+                tbl2.add_row([QApplication.translate("Label","Sample rate (secs)",None), self.qmc.profile_sampling_interval, QApplication.translate("Label","Smooth Curves/Spikes",None), str(int((aw.qmc.curvefilter-1)/2)) + "/" + str(smoothspikes) ])
                 tbl2.add_row([QApplication.translate("Label","Delta Span",None), aw.qmc.deltaBTspan, QApplication.translate("Label","Delta Smoothing",None), int((aw.qmc.deltaBTfilter-1)/2) ])
                 tbl2.add_row([QApplication.translate("Label","Fit RoRoR (C/min/min)",None), fitRoR, QApplication.translate("Label","Actual RoR at FCs",None), RoR_FCs_act])
                 segmentresultstr += "{}{}".format("\n", tbl2.get_string(border=False,header=False))
@@ -31175,6 +31191,9 @@ class ApplicationWindow(QMainWindow):
         QApplication.processEvents()
 
         try:
+            #initialize the results
+            resultstr = ""
+
             #run all analysis in celsius
             if aw.qmc.mode == "F":
                 restoreF = True
@@ -31252,6 +31271,7 @@ class ApplicationWindow(QMainWindow):
             # curve fit results
             self.cfr = {} #use dict to allow more flexible expansion
 
+            # background
             if exp == 4:
                 res = self.analysisGetResults(exp=4, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
                 self.cfr["equ_background"] = QApplication.translate("Label","Bkgd",None)
@@ -31320,13 +31340,19 @@ class ApplicationWindow(QMainWindow):
             
             self.cfr['segmentresultstr'] = res['segmentresultstr'] 
             
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " analysisfitCurves(): {0}").format(str(e)),exc_tb.tb_lineno)
+
+        try:
             # convert back to Fahrenheit if the profile was converted to Celsius
             if restoreF:
                 self.qmc.convertTemperature("F", silent=True, setdefaultaxes=False)
                 self.analysisRecomputeDeltas()
 
-            # create the results annotation and update the graph 
-            self.analysisShowResults(resultstr, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
+            # create the results annotation and update the graph
+            if len(resultstr) > 0:
+                self.analysisShowResults(resultstr, curvefit_starttime=curvefit_starttime, curvefit_endtime=curvefit_endtime, analysis_starttime=analysis_starttime, analysis_endtime=analysis_endtime)
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -33390,9 +33416,9 @@ class HUDDlg(ArtisanDialog):
         if self.univarCheck.isChecked():
             aw.qmc.univariate()
         if self.lnvarCheck.isChecked():
-            aw.qmc.lnRegression()
+            self.lnvar(0)
         if self.expvarCheck.isChecked():
-            aw.qmc.lnRegression(power=self.exppower)
+            self.expvar(0)
         if self.polyfitCheck.isChecked():
             self.doPolyfit()
         if not self.polyfitCheck.isChecked() and not self.expvarCheck.isChecked() and not self.lnvarCheck.isChecked() and not self.univarCheck.isChecked() and not self.interpCheck.isChecked():
