@@ -47233,6 +47233,7 @@ class serialport(object):
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetDCMotorAttach(self,channel,serial):
+        aw.sendmessage("attachDCMotor:" + str(channel) + "," + str(serial))
         if not serial in aw.ser.PhidgetDCMotor:
             if aw.qmc.phidgetManager is None:
                 aw.qmc.startPhidgetManager()
@@ -47273,15 +47274,18 @@ class serialport(object):
             ch.setOnAttachHandler(self.phidgetOUTattached)
             ch.setOnDetachHandler(self.phidgetOUTdetached)
             if not ch.getAttached():
+                aw.sendmessage("wait for attach")
                 if aw.qmc.phidgetRemoteFlag:
                     ch.openWaitForAttachment(3000)
                 else:
                     ch.openWaitForAttachment(1200)
+                aw.sendmessage("attached:" + str(ch.getAttached()))
                 if serial is None and ch.getAttached():
                     # we make this also accessible via its serial number + port
                     s = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
                     aw.ser.PhidgetDCMotor[s] = aw.ser.PhidgetDCMotor[None]
-        except:
+        except Exception as e:
+            aw.sendmessage("Exception:" + str(e))
             pass
 
     # value: float
@@ -47298,14 +47302,18 @@ class serialport(object):
 
     # value: float
     def phidgetDCMotorSetVelocity(self,channel,value,serial=None):
-        #self.phidgetDCMotorAttach(channel,serial)
+        aw.sendmessage("phidgetDCMotorSetVelocity:" + str(channel) + "," + str(value) + "," + str(serial))
+        self.phidgetDCMotorAttach(channel,serial)
         if serial in aw.ser.PhidgetDCMotor:
             dcm = aw.ser.PhidgetDCMotor[serial]
+            aw.sendmessage("dcm found")
             # set velocity
             try:
+                aw.sendmessage("len(dcm)" + len(dcm))
                 if len(dcm) > channel and dcm[channel].getAttached():
                     dcm.setTargetVelocity(value)
-            except Exception:
+            except Exception as e:
+                aw.sendmessage("Exception:" + str(e))
                 pass
     
     def phidgetDCMotorClose(self):
