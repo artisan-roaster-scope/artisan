@@ -165,10 +165,11 @@ with open('Info.plist', 'r+b') as fp:
     plist['CFBundleVersion'] = 'Artisan ' + VERSION
     plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
     plist['LSMultipleInstancesProhibited'] = 'false'
-    plist['LSPrefersPPC'] = False,
-    plist['LSArchitecturePriority'] = 'x86_64',
+#    plist['LSPrefersPPC'] = False # not in use longer
+    plist['LSArchitecturePriority'] = ['x86_64']
     plist['NSHumanReadableCopyright'] = LICENSE
     plist['NSHighResolutionCapable'] = True
+    plist['NSRequiresAquaSystemAppearance'] = False # important to activate the automatic dark mode of Qt on OS X 10.14 or later
     fp.seek(0, os.SEEK_SET)
     fp.truncate()
     plistlib.dump(plist, fp)
