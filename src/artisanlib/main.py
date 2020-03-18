@@ -18171,7 +18171,7 @@ class ApplicationWindow(QMainWindow):
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
                 value = (self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]
-                if action != 14: # only for VOUT Commands we keep the floats
+                if not (action in [6,14,21]): # only for IO, VOUT and RC Commands we keep the floats
                     value = int(round(value))
                 if action in [8,9,16,17,18]: # for Hottop/R1 Heater or Fan, we just forward the value
                     cmd = value
@@ -47223,15 +47223,13 @@ class serialport(object):
         aw.ser.PhidgetAnalogOut = {}
 
 
-
-
 #--- Phidget DCMotor
 #  only supporting
 #     1 channel VINT DCC1000 and DCC1002
 #     2 channel VINT DCC1003
 #  commands: 
-#     accel(c,v[,sn]) with c channel number and v acceleration as a float, and sn erial the optional serial/port number of the addressed module
-#     vel(c,v[,sn])   with c channel number and v target velocity as a float, and sn erial the optional serial/port number of the addressed module
+#     accel(c,v[,sn]) with c channel number and v acceleration as a float, and sn serial the optional serial/port number of the addressed module
+#     vel(c,v[,sn])   with c channel number and v target velocity as a float, and sn serial the optional serial/port number of the addressed module
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetDCMotorAttach(self,channel,serial):
@@ -47300,7 +47298,7 @@ class serialport(object):
 
     # value: float
     def phidgetDCMotorSetVelocity(self,channel,value,serial=None):
-        self.phidgetDCMotorAttach(channel,serial)
+        #self.phidgetDCMotorAttach(channel,serial)
         if serial in aw.ser.PhidgetDCMotor:
             dcm = aw.ser.PhidgetDCMotor[serial]
             # set velocity
@@ -47316,7 +47314,6 @@ class serialport(object):
             for i in range(len(dcm)):
                 try:
                     if dcm[i].getAttached():
-                        dcm[i].setEnabled(False)
                         self.phidgetOUTdetached(dcm[i])
                     dcm[i].close()
                 except Exception:
