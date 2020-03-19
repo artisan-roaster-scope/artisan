@@ -13886,8 +13886,15 @@ class ApplicationWindow(QMainWindow):
         self.clearresultsAction.triggered.connect(self.clearResults)
         self.clearresultsAction.setShortcut("Ctrl+Alt+K")
         self.analyzeMenu.addAction(self.clearresultsAction)
-            
-                    
+
+#        compareAction = QAction(UIconst.TOOLKIT_MENU_COMPARE,self)
+#        calculatorAction.triggered.connect(self.compare)
+#        self.ToolkitMenu.addAction(compareAction)
+
+#        transformAction = QAction(UIconst.TOOLKIT_MENU_TRANSFORM,self)
+#        transformAction.triggered.connect(self.transform)
+#        self.ToolkitMenu.addAction(transformAction)
+        
         # VIEW menu
         
         self.controlsAction = QAction(UIconst.CONF_MENU_CONTROLS,self)
@@ -47309,7 +47316,7 @@ class serialport(object):
             aw.sendmessage("dcm found")
             # set velocity
             try:
-                aw.sendmessage("len(dcm)" + len(dcm))
+                aw.sendmessage("len(dcm)" + str(len(dcm)))
                 if len(dcm) > channel and dcm[channel].getAttached():
                     dcm.setTargetVelocity(value)
             except Exception as e:
