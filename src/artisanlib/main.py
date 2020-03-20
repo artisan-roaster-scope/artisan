@@ -191,7 +191,6 @@ from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
 from artisanlib.cropster import extractProfileCropsterXLS
 from artisanlib.ikawa import extractProfileIkawaCSV
-from artisanlib.transformer import transformer
 
 from yoctopuce.yocto_api import YAPI, YRefParam
 
