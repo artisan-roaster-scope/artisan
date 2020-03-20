@@ -204,8 +204,14 @@ def extractProfileCropsterXLS(file):
                                 res["timeindex"][1] = timex_idx
                             elif comment_type == "First crack":
                                 res["timeindex"][2] = timex_idx
+                            elif comment_type == "First crack end":
+                                res["timeindex"][3] = timex_idx
                             elif comment_type == "Second crack":
                                 res["timeindex"][4] = timex_idx
+                            elif comment_type == "Second crack end":
+                                res["timeindex"][5] = timex_idx
+                            elif comment_type == "Duration":
+                                res["timeindex"][6] = timex_idx
                             else:
                                 specialevents.append(timex_idx)
                                 if comment_type == "Airflow":

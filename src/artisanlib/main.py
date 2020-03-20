@@ -86,7 +86,7 @@ except:
 from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport
                          QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @Reimport
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @Reimport
-                         QLCDNumber, QSpinBox, QComboBox, QHeaderView, # @Reimport 
+                         QLCDNumber, QSpinBox, QComboBox, QHeaderView, QAbstractItemView, # @Reimport 
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton, # @Reimport
                          QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
                          QListView, QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox,QButtonGroup) # @Reimport
@@ -97,7 +97,7 @@ from PyQt5.QtGui import (QImageReader, QWindow, QFontMetrics,  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
                           qVersion,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
-                          QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
+                          QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler, QSize)  # @Reimport
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
 try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
@@ -191,6 +191,7 @@ from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
 from artisanlib.cropster import extractProfileCropsterXLS
 from artisanlib.ikawa import extractProfileIkawaCSV
+from artisanlib.transformer import transformer
 
 from yoctopuce.yocto_api import YAPI, YRefParam
 
@@ -23750,7 +23751,8 @@ class ApplicationWindow(QMainWindow):
                         aw.updateCanvasColors()
                     # remove window geometry settings
                     for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry",
-                        "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","AlarmsGeometry","PIDGeometry","DeviceAssignmentGeometry"]:
+                        "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","AlarmsGeometry","PIDGeometry","DeviceAssignmentGeometry",
+                        "TransformatorGeometry"]:
                         settings.remove(s)
                     #
                     aw.setFonts()
@@ -31648,6 +31650,16 @@ class ApplicationWindow(QMainWindow):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ(): {0}").format(str(e)),exc_tb.tb_lineno)
 
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def transform(self,_=False):
+        dialog = profileTranformatorDlg(self)
+        dialog.show()
+#        dialog.setFixedSize(dialog.size()) # setting this fixed size badly interacts with remembering the screen geometry in app settings
+        QApplication.processEvents()
+
+
+
 ########################################################################################
 #####################  Artisan QDialog Subclass  #######################################
 ########################################################################################
@@ -35763,8 +35775,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         timeLayoutBox.addStretch()
         mainLayout = QVBoxLayout()
         mainLayout.setContentsMargins(3, 3, 3, 3)
-#        mainLayout.addLayout(timeLayoutBox)
-#        mainLayout.addStretch()
         eventbuttonLayout = QHBoxLayout()
         eventbuttonLayout.addWidget(self.copyeventTableButton)
         eventbuttonLayout.addWidget(self.createalarmTableButton)
@@ -36957,7 +36967,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             if i in aw.qmc.specialevents:
                 self.datatable.item(i,0).setBackground(QColor('yellow'))
             
-            if i:                
+            if i:
                     #identify by color and add notation
                 if i == aw.qmc.timeindex[0]:
                     self.datatable.item(i,0).setBackground(QColor('#f07800'))
@@ -39271,7 +39281,216 @@ class calculatorDlg(ArtisanDialog):
     def closeEvent(self, _):
         settings = QSettings()
         #save window geometry
-        settings.setValue("CalculatorGeometry",self.saveGeometry())              
+        settings.setValue("CalculatorGeometry",self.saveGeometry())
+
+########################################################################################
+######################## Profile Transformator  #######################################
+########################################################################################
+
+class profileTranformatorDlg(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(profileTranformatorDlg,self).__init__(parent)
+        self.setModal(True)
+        
+        settings = QSettings()
+        if settings.contains("TransformatorGeometry"):
+            self.restoreGeometry(settings.value("TransformatorGeometry"))
+        
+        self.phasestable = QTableWidget()
+        self.timetable = QTableWidget()
+        self.temptable = QTableWidget()
+        
+        # time table widgets initialized by createTimeTable() to a list of rows with each holding 5 widgets
+        self.time_widgets = None
+        
+        self.createPhasesTable()
+        self.createTimeTable()
+        self.createTempTable()
+        
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(self.applyTransformations)
+        self.dialogbuttons.rejected.connect(self.restoreState)
+        self.applyButton = self.dialogbuttons.addButton(QDialogButtonBox.Apply)
+        self.resetButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
+        
+        #buttons
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addWidget(self.dialogbuttons)
+        
+        phasesHLayout = QHBoxLayout()
+        phasesHLayout.addStretch()
+        phasesHLayout.addWidget(self.phasestable)
+        phasesHLayout.addStretch()
+        phasesLayout = QVBoxLayout()
+        phasesLayout.addLayout(phasesHLayout)
+        
+        timeHLayout = QHBoxLayout()
+        timeHLayout.addWidget(self.timetable)
+        timeHLayout.addStretch()
+        timeLayout = QVBoxLayout()
+        timeLayout.addLayout(timeHLayout)
+        timeLayout.addStretch()
+
+        tempHLayout = QHBoxLayout()
+        tempHLayout.addWidget(self.temptable)
+        tempHLayout.addStretch()
+        tempLayout = QVBoxLayout()
+        tempLayout.addLayout(tempHLayout)
+        tempLayout.addStretch()
+        
+        phasesGroupLayout = QGroupBox(QApplication.translate("Table","Phases",None))
+        phasesGroupLayout.setLayout(phasesLayout)
+        timeGroupLayout = QGroupBox(QApplication.translate("Table","Time",None))
+        timeGroupLayout.setLayout(timeLayout)
+        tempGroupLayout = QGroupBox(QApplication.translate("Table","BT",None))
+        tempGroupLayout.setLayout(tempLayout)
+        
+        #main
+        mainlayout = QVBoxLayout()
+        mainlayout.addWidget(phasesGroupLayout)
+        mainlayout.addWidget(timeGroupLayout)
+        mainlayout.addWidget(tempGroupLayout)
+        mainlayout.addStretch()
+        mainlayout.addLayout(buttonsLayout)
+        self.setLayout(mainlayout)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+
+    #called from OK button
+    @pyqtSlot()
+    def applyTransformations(self):
+        print("applyTransformations")
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("TransformatorGeometry",self.saveGeometry())
+        
+        self.accept()
+
+    #called from Cancel button
+    @pyqtSlot()
+    def restoreState(self):
+        print("restoreState")
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("TransformatorGeometry",self.saveGeometry())
+        
+        self.reject()
+
+    def closeEvent(self, _):
+        print("closeEvent")
+        self.restoreState()
+    
+    def createPhasesTable(self):
+        self.phasestable.setRowCount(3)
+        self.phasestable.setColumnCount(3)
+        self.phasestable.horizontalHeader().setStretchLastSection(False)
+#        self.phasestable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.phasestable.setHorizontalHeaderLabels([QApplication.translate("Label","Drying",None),
+                                                         QApplication.translate("Label","Mailard",None),
+                                                         QApplication.translate("Label","Finishing",None)])
+        self.phasestable.setVerticalHeaderLabels([QApplication.translate("Table","Profile",None),
+                                                         QApplication.translate("Table","Target",None),
+                                                         QApplication.translate("Table","Result",None)])
+        self.phasestable.setShowGrid(True)
+        self.phasestable.setAlternatingRowColors(True)
+        self.phasestable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.phasestable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+#        self.phasestable.resizeColumnsToContents()
+#        self.phasestable.resizeRowsToContents()
+#        self.phasestable.setFrameStyle(QTableWidget.NoFrame)
+        self.phasestable.setFixedSize(
+            self.phasestable.horizontalHeader().length() + 
+#                self.phasestable.verticalHeader().width(), # only the width of the default labels (numbers)
+                self.phasestable.verticalHeader().sizeHint().width(),
+            self.phasestable.verticalHeader().length() + 
+                self.phasestable.horizontalHeader().height())
+    
+    def createTimeTable(self):
+        self.timetable.clear()
+        self.timetable.setRowCount(3)
+        self.timetable.setColumnCount(5)
+        self.timetable.horizontalHeader().setStretchLastSection(False)
+        self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed) #QHeaderView.ResizeToContents
+        self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.timetable.horizontalHeader().setHighlightSections(False)
+        self.timetable.setHorizontalHeaderLabels([QApplication.translate("Label","CHARGE",None),
+                                                         QApplication.translate("Label","DRY END",None),
+                                                         QApplication.translate("Label","FC START",None),
+                                                         QApplication.translate("Label","SC START",None),
+                                                         QApplication.translate("Label","DROP",None)])
+        self.timetable.setVerticalHeaderLabels([QApplication.translate("Table","Profile",None),
+                                                         QApplication.translate("Table","Target",None),
+                                                         QApplication.translate("Table","Result",None)])
+        self.timetable.setShowGrid(True)
+        self.timetable.setAlternatingRowColors(False)
+        self.timetable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.timetable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+#        self.timetable.resizeColumnsToContents()
+#        self.timetable.resizeRowsToContents()
+#        self.timetable.setFrameStyle(QTableWidget.NoFrame)
+        self.timetable.setFixedSize(
+            self.timetable.horizontalHeader().length() + 
+#                self.timetable.verticalHeader().width(), # only the width of the default labels (numbers)
+                self.timetable.verticalHeader().sizeHint().width(),
+            self.timetable.verticalHeader().length() + 
+                self.timetable.horizontalHeader().height())
+                
+        self.timetable.setEditTriggers(QAbstractItemView.NoEditTriggers);
+        self.timetable.setFocusPolicy(Qt.NoFocus);
+        self.timetable.setSelectionMode(QAbstractItemView.NoSelection)
+        self.timetable.setAutoScroll(False)
+        
+        self.timetable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
+        
+        self.time_widgets = []
+        profile_widgets = []
+        target_widgets = []
+        result_widgets = []
+        for i in range(5):
+            profile_widget = QTableWidgetItem("12:00")
+            profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+            profile_widgets.append(profile_widget)
+            self.timetable.setItem(0,i,profile_widget)
+            target_widget = QLineEdit("13:00")
+            target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+            self.timetable.setCellWidget(1,i,target_widget)
+            target_widgets.append(target_widget)
+            result_widget = QTableWidgetItem("14:00")
+            result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+            self.timetable.setItem(2,i,result_widget)
+            result_widgets.append(result_widget)
+        self.time_widgets.append(profile_widgets)
+        self.time_widgets.append(target_widgets)
+        self.time_widgets.append(result_widgets)
+
+    
+    def createTempTable(self):
+        self.temptable.setRowCount(3)
+        self.temptable.setColumnCount(5)
+        self.temptable.horizontalHeader().setStretchLastSection(False)
+#        self.temptable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+#        self.temptable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.temptable.setHorizontalHeaderLabels([QApplication.translate("Label","CHARGE",None),
+                                                         QApplication.translate("Label","DRY END",None),
+                                                         QApplication.translate("Label","FC START",None),
+                                                         QApplication.translate("Label","SC START",None),
+                                                         QApplication.translate("Label","DROP",None)])
+        self.temptable.setVerticalHeaderLabels([QApplication.translate("Table","Profile",None),
+                                                         QApplication.translate("Table","Target",None),
+                                                         QApplication.translate("Table","Result",None)])
+        self.temptable.setShowGrid(True)
+        self.temptable.setAlternatingRowColors(True)
+        self.temptable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.temptable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+#        self.temptable.resizeColumnsToContents()
+#        self.temptable.resizeRowsToContents()
+#        self.temptable.setFrameStyle(QTableWidget.NoFrame)
+        self.temptable.setFixedSize(
+            self.temptable.horizontalHeader().length() + 
+#                self.temptable.verticalHeader().width(), # only the width of the default labels (numbers)
+                self.temptable.verticalHeader().sizeHint().width(),
+            self.temptable.verticalHeader().length() + 
+                self.temptable.horizontalHeader().height())
+
 
 ##########################################################################
 #####################  EVENTS CONFIGURATION DLG     ######################
@@ -39608,7 +39827,7 @@ class EventsDlg(ArtisanResizeablDialog):
         delButton.setToolTip(QApplication.translate("Tooltip","Delete the last extra Event button",None))
         #delButton.setMaximumWidth(100)
         delButton.setFocusPolicy(Qt.NoFocus)
-        delButton.clicked.connect(self.delextraeventbutton)        
+        delButton.clicked.connect(self.delextraeventbutton)
         self.insertButton = QPushButton(QApplication.translate("Button","Insert",None))
         self.insertButton.clicked.connect(self.insertextraeventbuttonSlot)
         self.insertButton.setMinimumWidth(80)
@@ -47240,7 +47459,6 @@ class serialport(object):
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetDCMotorAttach(self,channel,serial):
-        aw.sendmessage("attachDCMotor:" + str(channel) + "," + str(serial))
         if not serial in aw.ser.PhidgetDCMotor:
             if aw.qmc.phidgetManager is None:
                 aw.qmc.startPhidgetManager()
@@ -47281,18 +47499,15 @@ class serialport(object):
             ch.setOnAttachHandler(self.phidgetOUTattached)
             ch.setOnDetachHandler(self.phidgetOUTdetached)
             if not ch.getAttached():
-                aw.sendmessage("wait for attach")
                 if aw.qmc.phidgetRemoteFlag:
                     ch.openWaitForAttachment(3000)
                 else:
                     ch.openWaitForAttachment(1200)
-                aw.sendmessage("attached:" + str(ch.getAttached()))
                 if serial is None and ch.getAttached():
                     # we make this also accessible via its serial number + port
                     s = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
                     aw.ser.PhidgetDCMotor[s] = aw.ser.PhidgetDCMotor[None]
-        except Exception as e:
-            aw.sendmessage("Exception:" + str(e))
+        except:
             pass
 
     # value: float
@@ -47303,24 +47518,21 @@ class serialport(object):
             # set velocity
             try:
                 if len(dcm) > channel and dcm[channel].getAttached():
-                    dcm.setAcceleration(value)
+                    dcm[channel].setAcceleration(value)
             except Exception:
                 pass
 
     # value: float
     def phidgetDCMotorSetVelocity(self,channel,value,serial=None):
-        aw.sendmessage("phidgetDCMotorSetVelocity:" + str(channel) + "," + str(value) + "," + str(serial))
         self.phidgetDCMotorAttach(channel,serial)
         if serial in aw.ser.PhidgetDCMotor:
             dcm = aw.ser.PhidgetDCMotor[serial]
             aw.sendmessage("dcm found")
             # set velocity
             try:
-                aw.sendmessage("len(dcm)" + str(len(dcm)))
                 if len(dcm) > channel and dcm[channel].getAttached():
-                    dcm.setTargetVelocity(value)
+                    dcm[channel].setTargetVelocity(value)
             except Exception as e:
-                aw.sendmessage("Exception:" + str(e))
                 pass
     
     def phidgetDCMotorClose(self):

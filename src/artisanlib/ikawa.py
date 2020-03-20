@@ -63,8 +63,11 @@ def extractProfileIkawaCSV(file):
             item[name] = value.strip()
         # take i as time in seconds
         timex.append(i)
+        if 'inlet temp' in item:
+            temp2.append(float(item['inlet temp']))
+        else:
+            temp1.append(-1)
         # we map IKAWA Exhaust to BT as main events like CHARGE and DROP are marked on BT in Artisan
-        temp1.append(-1)
         if 'exaust temp' in item:
             temp2.append(float(item['exaust temp']))
         else:
