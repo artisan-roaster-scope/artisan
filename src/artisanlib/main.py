@@ -2169,14 +2169,14 @@ class tgraphcanvas(FigureCanvas):
     def resizeEvent(self, event):
         super(tgraphcanvas,self).resizeEvent(event)
         # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
-        if aw.logofilename != "":
+        if aw.redrawOnResize and aw.logofilename != "":
             dw = event.size().width() - event.oldSize().width()   # width change
             dh = event.size().height() - event.oldSize().height() # height change
             t = libtime.time()
             # ensure that we redraw during resize only once per second
             if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
                 self.resizeredrawing = t
-                QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False))
+                QTimer.singleShot(1, lambda : self.redraw(recomputeAllDeltas=False))
     
     # update the aw.qmc.deltaBTspan and deltaETspan from the given sampling interval, aw.qmc.deltaETsamples and aw.qmc.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
@@ -7770,8 +7770,8 @@ class tgraphcanvas(FigureCanvas):
             #self.fig.canvas.draw()
             self.fig.canvas.draw_idle()
         except Exception:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             pass
             
     def flavorChartLabelText(self,i):
@@ -12978,7 +12978,7 @@ class ApplicationWindow(QMainWindow):
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
         self.MaxRecentFiles = 20
-        self.recentFileActs = []        
+        self.recentFileActs = []
         self.recentSettingActs = []
         self.recentThemeActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
@@ -13214,6 +13214,8 @@ class ApplicationWindow(QMainWindow):
         self.logoimgalpha = 2.0
         self.logoimgflag = False # display during OnMonitor?
         self.logofilename = ""
+        
+        self.redrawOnResize = True # if a logofilename is set and redrawOnResize is True a redraw is triggered; usually set to True!
 
         # set window title
         if app.artisanviewerMode:
@@ -17561,8 +17563,8 @@ class ApplicationWindow(QMainWindow):
        
     def setFonts(self,redraw=True):
         # try to select the right font for matplotlib according to the given locale and plattform
-        if self.qmc.graphfont == 0:     
-            try:                    
+        if self.qmc.graphfont == 0:
+            try:
                 rcParams['font.size'] = 12.0
                 if platf == "Darwin":
                     mpl.rcParams['font.family'] = "Arial Unicode MS"
@@ -29370,10 +29372,12 @@ class ApplicationWindow(QMainWindow):
             self.qmc.delta_ax = None
             self.wheeldialog = WheelDlg(self)
         if self.qmc.wheelflag:
+            aw.redrawOnResize = True
             self.qmc.exitviewmode()
             aw.enableEditMenus()
             aw.showControls()
         else:
+            aw.redrawOnResize = False
             aw.hideControls()
             aw.hideLCDs(False)
             aw.hideSliders(False)
@@ -29482,13 +29486,13 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def flavorchart(self,_=False):
+        self.redrawOnResize = False # disable the redraw triggered on resize (eg. by hiding widgets) that replaces the logo icon
         self.hideControls()
         self.hideLCDs(False)
         self.hideSliders(False)
         self.hideExtraButtons()
         dialog = flavorDlg(self)
         dialog.show()
-#        dialog.setFixedSize(dialog.size())
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -29496,6 +29500,7 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.designerflag:
             self.stopdesigner()
         else:
+            aw.qmc.ai.remove()
             self.startdesigner()
 
     def startdesigner(self):
@@ -35350,7 +35355,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.greens_temp_edit.setAlignment(Qt.AlignRight)
         self.greens_temp_edit.editingFinished.connect(self.greens_temp_editing_finished)
         greens_temp = QHBoxLayout()
-        greens_temp.addStretch()        
+        greens_temp.addStretch()
         #Moisture Greens
         moisture_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture",None)) + "</b>")
         moisture_greens_unit_label = QLabel(QApplication.translate("Label", "%",None))
@@ -35358,7 +35363,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.moisture_greens_edit.setText("%g" % aw.float2float(aw.qmc.moisture_greens))
         self.moisture_greens_edit.setMaximumWidth(70)
         self.moisture_greens_edit.setValidator(aw.createCLocaleDoubleValidator(0., 100., 1, self.moisture_greens_edit))
-        self.moisture_greens_edit.setAlignment(Qt.AlignRight)                
+        self.moisture_greens_edit.setAlignment(Qt.AlignRight)
         #Moisture Roasted
         #bag humidity
         moisture_roasted_label = QLabel("<b>" + u(QApplication.translate("Label", "Roasted",None)) + "</b>")
@@ -38868,6 +38873,8 @@ class WindowsDlg(ArtisanDialog):
         else:
             self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(t_min))
             self.xlimitEdit.setText(aw.qmc.stringfromseconds(t_max))
+        self.xlimitEdit_min.repaint()
+        self.xlimitEdit.repaint()
         
     def changexrotation(self):
         aw.qmc.xrotation = self.xrotationSpinBox.value()
@@ -39633,6 +39640,7 @@ class profileTransformatorDlg(ArtisanDialog):
         aw.qmc.l_event_flags_dict = {}
         aw.qmc.l_annotations_dict = {}
         self.applyTimeTransformation()
+        aw.autoAdjustAxis()
         aw.qmc.redraw()
     
     #called from Restore button
@@ -43022,7 +43030,6 @@ class flavorDlg(ArtisanResizeablDialog):
         if x is not None:
             labeledit = self.flavortable.cellWidget(x,0)
             aw.qmc.flavorlabels[x] = labeledit.text()
-#            aw.qmc.flavorchart() # slow full redraw
             aw.qmc.updateFlavorchartLabel(x) # fast incremental redraw
 
     @pyqtSlot(float)
@@ -43094,7 +43101,7 @@ class flavorDlg(ArtisanResizeablDialog):
     def close(self):
         settings = QSettings()
         #save window geometry
-        settings.setValue("FlavorProperties",self.saveGeometry())  
+        settings.setValue("FlavorProperties",self.saveGeometry())
         self.savetable()
         aw.qmc.fileDirty()
         if aw.qmc.ax1 is not None:
@@ -43104,6 +43111,7 @@ class flavorDlg(ArtisanResizeablDialog):
                 pass
         aw.qmc.fig.clf()
         aw.qmc.clearFlavorChart()
+        aw.redrawOnResize = True
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.showControls()
         self.accept()
