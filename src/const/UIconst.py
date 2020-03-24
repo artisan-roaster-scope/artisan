@@ -154,17 +154,19 @@ CONF_MENU_CHINESE_TW = u("\u7e41\u9ad4\u4e2d\u6587") # Do not translate
 TOOLKIT_MENU = QApplication.translate("Menu", "Tools", None)
 if platf != 'Darwin':
     TOOLKIT_MENU = "&" + TOOLKIT_MENU
-TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None)    
-TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None)
+TOOLKIT_MENU_ANALYZER = QApplication.translate("Menu", "Analyzer", None)
+TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None)  
+TOOLKIT_MENU_SIMULATOR = QApplication.translate("Menu", "Simulator", None)  
+TOOLKIT_MENU_ROASTCOMPARE = QApplication.translate("Menu", "Roast Compare", None)
 TOOLKIT_MENU_WHEELGRAPH = QApplication.translate("Menu", "Wheel Graph", None)
+TOOLKIT_MENU_TEMPERATURE = QApplication.translate("Menu", "Convert Profile Temperature", None)
+TOOLKIT_MENU_TRANSFORM = QApplication.translate("Menu", "Transformator", None)
+TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None)
+
 TOOLKIT_MENU_LCDS = QApplication.translate("Menu", "Main LCDs", None)
 TOOLKIT_MENU_DELTA_LCDS = QApplication.translate("Menu", "Delta LCDs", None)
 TOOLKIT_MENU_PID_LCDS = QApplication.translate("Menu", "PID LCDs", None)
 TOOLKIT_MENU_EXTRA_LCDS = QApplication.translate("Menu", "Extra LCDs", None)
-TOOLKIT_MENU_TEMPERATURE = QApplication.translate("Menu", "Convert Profile Temperature", None)
-TOOLKIT_MENU_ANALYZE = QApplication.translate("Menu", "Analyze", None)
-TOOLKIT_MENU_COMPARE = QApplication.translate("Menu", "Compare", None)
-TOOLKIT_MENU_TRANSFORM = QApplication.translate("Menu", "Transform", None)
 
 
 #Settings menu

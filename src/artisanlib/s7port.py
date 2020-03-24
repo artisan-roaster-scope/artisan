@@ -38,7 +38,7 @@ class s7port(object):
         self.aw = aw
         
         self.readRetries = 1
-        self.channels = 8 # maximal number of S7 channels
+        self.channels = 10 # maximal number of S7 channels
         self.host = '127.0.0.1' # the TCP host
         self.port = 102 # the TCP port
         self.rack = 0 # 0,..,7

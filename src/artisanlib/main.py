@@ -41,6 +41,7 @@ import ast
 import platform
 import math
 import time as libtime
+import copy
 import datetime
 import warnings
 import string as libstring
@@ -97,7 +98,7 @@ from PyQt5.QtGui import (QImageReader, QWindow, QFontMetrics,  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
                           qVersion,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
-                          QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler, QSize)  # @Reimport
+                          QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
 try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
@@ -1079,6 +1080,7 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget HUB IO Digital 0",  #107
                        "Yocto 4-20mA Rx",           #108
                        "+MODBUS 78",                #109
+                       "+S7 910",                   #110
                        ]
 
         # ADD DEVICE:
@@ -1532,6 +1534,9 @@ class tgraphcanvas(FigureCanvas):
         # projection variables of change of rate
         self.projectionconstant = 1
         self.projectionmode = 0     # 0 = linear; 1 = newton
+        
+        # profile transformator mapping mode
+        self.transMappingMode = 0 # 0: discrete, 1: linear, 2: quadratic
 
         self.weight_units = ["g","Kg","lb","oz"]
         #[0]weight in, [1]weight out, [2]units (string)
@@ -5172,7 +5177,7 @@ class tgraphcanvas(FigureCanvas):
                     t0 = timex[t0idx]
                 else:
                     t0idx = 0
-                    t0 = timex[0]
+                    t0 = 0
                 if timeindex[0] != -1:
                     y = stemp[t0idx]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
@@ -5211,7 +5216,7 @@ class tgraphcanvas(FigureCanvas):
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
                 #Add Dry End markers
                 if timeindex[1]:
-                    tidx = timeindex[1]                    
+                    tidx = timeindex[1]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE {0}", None),u(self.stringfromseconds(timex[tidx]-t0,False)))
                     if timeindex2:
@@ -5678,6 +5683,10 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.clear()
                 self.ax.set_facecolor(self.palette["background"])
                 self.delta_ax.clear()
+                self.ax.set_yticks([])
+                self.ax.set_xticks([])
+                self.delta_ax.set_yticks([])
+                self.delta_ax.set_xticks([])
 
 
                 self.ax.set_ylim(self.ylimit_min, self.ylimit)
@@ -5797,9 +5806,9 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.fmt_ydata = self.fmt_data
                 self.ax.fmt_xdata = self.fmt_timedata
 
+                self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
                 if two_ax_mode:
                     #create a second set of axes in the same position as self.ax
-                    #self.delta_ax = self.ax.twinx()
                     self.delta_ax.tick_params(\
                         axis='y',           # changes apply to the x-axis
                         which='both',       # both major and minor ticks are affected
@@ -5811,7 +5820,6 @@ class tgraphcanvas(FigureCanvas):
                         labelleft=False,
                         labelbottom=False)   # labels along the bottom edge are on
 
-                    self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
 
                     self.ax.patch.set_visible(True)
                     if aw.qmc.flagstart:
@@ -5833,7 +5841,6 @@ class tgraphcanvas(FigureCanvas):
                     self.delta_ax.fmt_xdata = self.fmt_timedata
                 #put a right tick on the graph
                 else:
-                    self.delta_ax = None
     #                if aw.qmc.graphstyle:
     #                    self.ax.spines['right'].set_color('none')
     #                    self.ax.spines['top'].set_color('none')
@@ -13826,43 +13833,8 @@ class ApplicationWindow(QMainWindow):
             
 
         # TOOLKIT menu
-        self.designerAction = QAction(UIconst.TOOLKIT_MENU_DESIGNER,self)
-        self.designerAction.triggered.connect(self.designerTriggered)
-        self.designerAction.setCheckable(True)
-        self.designerAction.setChecked(self.qmc.designerflag)
-        self.ToolkitMenu.addAction(self.designerAction)
 
-        calculatorAction = QAction(UIconst.TOOLKIT_MENU_CALCULATOR,self)
-        calculatorAction.triggered.connect(self.calculator)
-        self.ToolkitMenu.addAction(calculatorAction)
-
-        self.wheeleditorAction = QAction(UIconst.TOOLKIT_MENU_WHEELGRAPH,self)
-        self.wheeleditorAction.triggered.connect(self.graphwheel)
-        self.wheeleditorAction.setCheckable(True)
-        self.wheeleditorAction.setChecked(self.qmc.wheelflag)
-        self.ToolkitMenu.addAction(self.wheeleditorAction)
-
-        self.ToolkitMenu.addSeparator()
-
-        self.temperatureMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_TEMPERATURE)
-        
-        self.ConvertToFahrenheitAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_FAHRENHEIT,self)
-        self.ConvertToFahrenheitAction.triggered.connect(self.qmc.convertTemperatureF)
-        self.temperatureMenu.addAction(self.ConvertToFahrenheitAction)
-
-        self.ConvertToCelsiusAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_CELSIUS,self)
-        self.ConvertToCelsiusAction.triggered.connect(self.qmc.convertTemperatureC)
-        self.temperatureMenu.addAction(self.ConvertToCelsiusAction)
-
-        if self.qmc.mode == "F":
-            self.FahrenheitAction.setDisabled(True)
-            self.ConvertToFahrenheitAction.setDisabled(True)
-        else:
-            self.CelsiusAction.setDisabled(True)
-            self.ConvertToCelsiusAction.setDisabled(True)
-
-        self.ToolkitMenu.addSeparator()
-        self.analyzeMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_ANALYZE)
+        self.analyzeMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_ANALYZER)
         self.fitIdealautoAction = QAction(QApplication.translate("Menu","Auto All",None),self)
         self.fitIdealautoAction.triggered.connect(self.analysisfitCurvesALL)
         self.fitIdealautoAction.setShortcut("Ctrl+K")
@@ -13887,14 +13859,60 @@ class ApplicationWindow(QMainWindow):
         self.clearresultsAction.setShortcut("Ctrl+Alt+K")
         self.analyzeMenu.addAction(self.clearresultsAction)
 
-#        compareAction = QAction(UIconst.TOOLKIT_MENU_COMPARE,self)
-#        calculatorAction.triggered.connect(self.compare)
-#        self.ToolkitMenu.addAction(compareAction)
-
-#        transformAction = QAction(UIconst.TOOLKIT_MENU_TRANSFORM,self)
-#        transformAction.triggered.connect(self.transform)
-#        self.ToolkitMenu.addAction(transformAction)
+        self.designerAction = QAction(UIconst.TOOLKIT_MENU_DESIGNER,self)
+        self.designerAction.triggered.connect(self.designerTriggered)
+        self.designerAction.setCheckable(True)
+        self.designerAction.setChecked(self.qmc.designerflag)
+        self.ToolkitMenu.addAction(self.designerAction)
         
+#        self.simulatorAction = QAction(UIconst.TOOLKIT_MENU_SIMULATOR,self)
+##        self.simulatorAction.triggered.connect(self.simulatorTriggered)
+#        self.simulatorAction.setCheckable(True)
+##        self.simulatorAction.setChecked(self.qmc.simulatorflag)
+#        self.ToolkitMenu.addAction(self.simulatorAction)
+
+#        self.roastCompareAction = QAction(UIconst.TOOLKIT_MENU_ROASTCOMPARE,self)
+##        self.roastCompareAction.triggered.connect(self.roastCompare)
+#        self.roastCompareAction.setCheckable(True)
+##        self.roastCompareAction.setChecked(self.qmc.roastcompareflag)
+#        self.ToolkitMenu.addAction(self.roastCompareAction)
+
+        self.wheeleditorAction = QAction(UIconst.TOOLKIT_MENU_WHEELGRAPH,self)
+        self.wheeleditorAction.triggered.connect(self.graphwheel)
+        self.wheeleditorAction.setCheckable(True)
+        self.wheeleditorAction.setChecked(self.qmc.wheelflag)
+        self.ToolkitMenu.addAction(self.wheeleditorAction)
+        
+        self.ToolkitMenu.addSeparator()
+
+#        self.transformAction = QAction(UIconst.TOOLKIT_MENU_TRANSFORM,self)
+#        self.transformAction.triggered.connect(self.transform)
+#        self.ToolkitMenu.addAction(self.transformAction)
+
+        self.temperatureMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_TEMPERATURE)
+        
+        self.ConvertToFahrenheitAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_FAHRENHEIT,self)
+        self.ConvertToFahrenheitAction.triggered.connect(self.qmc.convertTemperatureF)
+        self.temperatureMenu.addAction(self.ConvertToFahrenheitAction)
+
+        self.ConvertToCelsiusAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_CELSIUS,self)
+        self.ConvertToCelsiusAction.triggered.connect(self.qmc.convertTemperatureC)
+        self.temperatureMenu.addAction(self.ConvertToCelsiusAction)
+
+        if self.qmc.mode == "F":
+            self.FahrenheitAction.setDisabled(True)
+            self.ConvertToFahrenheitAction.setDisabled(True)
+        else:
+            self.CelsiusAction.setDisabled(True)
+            self.ConvertToCelsiusAction.setDisabled(True)
+
+        self.ToolkitMenu.addSeparator()
+
+        calculatorAction = QAction(UIconst.TOOLKIT_MENU_CALCULATOR,self)
+        calculatorAction.triggered.connect(self.calculator)
+        self.ToolkitMenu.addAction(calculatorAction)
+
+
         # VIEW menu
         
         self.controlsAction = QAction(UIconst.CONF_MENU_CONTROLS,self)
@@ -15587,14 +15605,24 @@ class ApplicationWindow(QMainWindow):
             return True
         return super(ApplicationWindow, self).eventFilter(obj, event)
     
-    # search the given QTable table for a row with the given widget in column col
+    # search the given QTable table for a row with the given widget as cellWidget or item in column col or as a sub-widget contained in the layout of a widget in place
     # returns the row number if the widget was found or None
     def findWidgetsRow(self,table,widget,col):
         for r in range(table.rowCount()):
-            if table.cellWidget(r,col) == widget:
+            if table.cellWidget(r,col) == widget or table.item(r,col) == widget or \
+                (table.cellWidget(r,col) is not None and table.cellWidget(r,col).layout() is not None and table.cellWidget(r,col).layout().indexOf(widget) > -1):
                 return r
         return None
-    
+
+    # search the given QTable table for a column with the given widget in row
+    # returns the column number if the widget was found or None
+    def findWidgetsColumn(self,table,widget,row):
+        for c in range(table.columnCount()):
+            if table.cellWidget(row,c) == widget or table.item(row,c) == widget or \
+                (table.cellWidget(row,c) is not None and table.cellWidget(row,c).layout() is not None and table.cellWidget(row,c).layout().indexOf(widget) > -1):
+                return c
+        return None
+
     @pyqtSlot()
     def redraw_action(self):
         try:
@@ -18551,6 +18579,20 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.03
                                 except Exception:
                                     pass
+                            elif cs.startswith("button"):
+                                # cmd has format "button(0)" # 0 or 1 or True or False
+                                try:
+                                    cmds = eval(cs[len('button'):])
+                                    last = self.lastbuttonpressed
+                                    if last != -1 and len(self.buttonlist)>last:
+                                        #block resetting style of last button
+                                        self.lastbuttonpressed = -1
+                                        if cmds:
+                                            aw.setExtraEventButtonStyle(last, style="pressed")
+                                        else:
+                                            aw.setExtraEventButtonStyle(last, style="normal")
+                                except Exception:
+                                    pass
                 elif action == 5: # DTA Command
                     try:
                         DTAvalue=cmd_str.split(':')[1]
@@ -19460,12 +19502,14 @@ class ApplicationWindow(QMainWindow):
         #
         plain_style = "QPushButton {" + buttonstyle + core_style%(color,self.createGradient(backgroundcolor))
         pressed_style = "QPushButton:hover:pressed {" + buttonstyle + core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(80).name()))
-        hover_style = "QPushButton:hover:!pressed {"+ buttonstyle + core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(110).name()))
+        hover_style = "QPushButton:hover:!pressed {" + buttonstyle + core_style%(color,self.createGradient(QColor(backgroundcolor).lighter(110).name()))
         return plain_style + hover_style + pressed_style
         
     def setExtraEventButtonStyle(self, tee, style="normal"):
         button_style = self.extraEventButtonStyle(tee, style)
+        QApplication.processEvents() # without this the next call might crash
         self.buttonlist[tee].setStyleSheet(button_style)
+        QApplication.processEvents() # without this the prev call might crash
     
     @pyqtSlot(bool)
     def recordextraevent_slot(self,_):
@@ -19924,6 +19968,7 @@ class ApplicationWindow(QMainWindow):
         self.wheeleditorAction.setEnabled(True)
         self.hudAction.setEnabled(True)
         self.analyzeMenu.setEnabled(True)
+        self.transformAction.setEnabled(True)
         self.loadSettingsAction.setEnabled(True)
         self.openRecentSettingMenu.setEnabled(True)
         self.saveAsSettingsAction.setEnabled(True)
@@ -19989,6 +20034,7 @@ class ApplicationWindow(QMainWindow):
             self.WindowconfigAction.setEnabled(False)
             self.colorsAction.setEnabled(False)
         self.analyzeMenu.setEnabled(False)
+        self.transformAction.setEnabled(False)
         self.loadSettingsAction.setEnabled(False)
         self.openRecentSettingMenu.setEnabled(False)
         self.saveAsSettingsAction.setEnabled(False)
@@ -23751,7 +23797,7 @@ class ApplicationWindow(QMainWindow):
                     # remove window geometry settings
                     for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry",
                         "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","AlarmsGeometry","PIDGeometry","DeviceAssignmentGeometry",
-                        "TransformatorGeometry"]:
+                        "TransformatorPosition"]:
                         settings.remove(s)
                     #
                     aw.setFonts()
@@ -24500,6 +24546,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("xextrabuttonactionstrings"):
                 self.qmc.xextrabuttonactionstrings = list(map(str,list(toStringList(settings.value("xextrabuttonactionstrings",self.qmc.xextrabuttonactionstrings)))))
             settings.endGroup()
+            self.qmc.transMappingMode = toInt(settings.value("transMappingMode",self.qmc.transMappingMode))
             settings.beginGroup("HUD")
             self.qmc.projectFlag = bool(toBool(settings.value("Projection",self.qmc.projectFlag)))
             self.qmc.projectionmode = toInt(settings.value("ProjectionMode",self.qmc.projectionmode))
@@ -25802,6 +25849,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("xextrabuttonactions",self.qmc.xextrabuttonactions)
             settings.setValue("xextrabuttonactionstrings",self.qmc.xextrabuttonactionstrings)
             settings.endGroup()
+            settings.setValue("transMappingMode",self.qmc.transMappingMode)
             settings.beginGroup("HUD")
             settings.setValue("Projection",self.qmc.projectFlag)
             settings.setValue("ProjectionMode",self.qmc.projectionmode)
@@ -31652,11 +31700,8 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def transform(self,_=False):
-        dialog = profileTranformatorDlg(self)
+        dialog = profileTransformatorDlg(self)
         dialog.show()
-#        dialog.setFixedSize(dialog.size()) # setting this fixed size badly interacts with remembering the screen geometry in app settings
-        QApplication.processEvents()
-
 
 
 ########################################################################################
@@ -32120,6 +32165,7 @@ class HUDDlg(ArtisanDialog):
         inputFilter2.addSpacing(20)
         inputFilter2.addWidget(maxlabel)
         inputFilter2.addWidget(self.maxLimit)
+        
         inputFilterVBox = QVBoxLayout()
         inputFilterVBox.addLayout(inputFilter1)
         inputFilterVBox.addLayout(inputFilter2) 
@@ -34906,24 +34952,16 @@ class editGraphDlg(ArtisanResizeablDialog):
                 dryEndIndex = aw.findDryEnd(TP_index)
             self.charge_idx = aw.findBTbreak(0,dryEndIndex,offset=0.5)
             self.drop_idx = aw.findBTbreak(dryEndIndex,offset=0.2)
-#            if self.charge_idx != 0 and self.charge_idx != aw.qmc.timeindex[0]:
-#                if aw.qmc.timeindex[0] == -1:
-#                    time_diff = int(round(aw.qmc.timex[self.charge_idx]))
-#                else:
-#                    time_diff = int(round(aw.qmc.timex[self.charge_idx] - aw.qmc.timex[aw.qmc.timeindex[0]]))
-#                charge_str = aw.qmc.stringfromseconds(time_diff)
             if self.drop_idx != 0 and self.drop_idx != aw.qmc.timeindex[6]:
                 drop_str = aw.qmc.stringfromseconds(int(aw.qmc.timex[self.drop_idx]-aw.qmc.timex[aw.qmc.timeindex[0]]))
-#        self.chargeestimate = QLabel(charge_str)
         drylabel = QLabel("<b>" + u(QApplication.translate("Label", "DRY END",None)) + "</b>")
         drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[1] and aw.qmc.timeindex[1] < len(aw.qmc.timex):
-            t2 = int(aw.qmc.timex[aw.qmc.timeindex[1]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+            t2 = aw.qmc.timex[aw.qmc.timeindex[1]]-aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
             t2 = 0
         self.dryedit = QLineEdit(aw.qmc.stringfromseconds(t2))
-#        self.dryedit.setFocusPolicy(Qt.NoFocus)
         self.dryedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dryeditcopy = aw.qmc.stringfromseconds(t2)
         self.dryedit.setValidator(QRegExpValidator(regextime,self))
@@ -34934,7 +34972,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         Cstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[2] and aw.qmc.timeindex[2] < len(aw.qmc.timex):
-            t3 = int(aw.qmc.timex[aw.qmc.timeindex[2]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+            t3 = aw.qmc.timex[aw.qmc.timeindex[2]]-aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
             t3 = 0
         self.Cstartedit = QLineEdit(aw.qmc.stringfromseconds(t3))
@@ -34950,7 +34988,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         Cendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[3] and aw.qmc.timeindex[3] < len(aw.qmc.timex):
-            t4 = int(aw.qmc.timex[aw.qmc.timeindex[3]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+            t4 = aw.qmc.timex[aw.qmc.timeindex[3]]-aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
             t4 = 0
         self.Cendedit = QLineEdit(aw.qmc.stringfromseconds(t4))
@@ -34965,7 +35003,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         CCstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[4] and aw.qmc.timeindex[4] < len(aw.qmc.timex):
-            t5 = int(aw.qmc.timex[aw.qmc.timeindex[4]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+            t5 = aw.qmc.timex[aw.qmc.timeindex[4]]-aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
             t5 = 0
         self.CCstartedit = QLineEdit(aw.qmc.stringfromseconds(t5))
@@ -34980,7 +35018,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         CCendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[5] and aw.qmc.timeindex[5] < len(aw.qmc.timex):
-            t6 = int(aw.qmc.timex[aw.qmc.timeindex[5]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+            t6 = aw.qmc.timex[aw.qmc.timeindex[5]]-aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
             t6 = 0
         self.CCendedit = QLineEdit(aw.qmc.stringfromseconds(t6))
@@ -34995,7 +35033,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         droplabel.setStyleSheet("background-color:'#f07800';")
         droplabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         if aw.qmc.timeindex[6] and aw.qmc.timeindex[6] < len(aw.qmc.timex):
-            t7 = int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+            t7 = aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
             t7 = 0
         self.dropedit = QLineEdit(aw.qmc.stringfromseconds(t7))
@@ -35011,7 +35049,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         coollabel.setStyleSheet("background-color:'#6666ff';")
         coollabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         if aw.qmc.timeindex[7] and aw.qmc.timeindex[7] < len(aw.qmc.timex):
-            t8 = int(aw.qmc.timex[aw.qmc.timeindex[7]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+            t8 = aw.qmc.timex[aw.qmc.timeindex[7]]-aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
             t8 = 0
         self.cooledit = QLineEdit(aw.qmc.stringfromseconds(t8))
@@ -35071,7 +35109,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         
         #DATA Table
         self.datatable = QTableWidget()
-        self.datatable.setTabKeyNavigation(True)     
+        self.datatable.setTabKeyNavigation(True)
         self.copydataTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
         self.copydataTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copydataTableButton.setFocusPolicy(Qt.NoFocus)
@@ -37219,12 +37257,12 @@ class editGraphDlg(ArtisanResizeablDialog):
                 aw.qmc.specialeventstype = []
                 aw.qmc.specialeventsStrings = []
                 aw.qmc.specialeventsvalue = []
-                self.createEventTable()
-                aw.qmc.redraw(recomputeAllDeltas=False)
-                aw.qmc.fileDirty()
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
+        self.createEventTable()
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        aw.qmc.fileDirty()
     
     @pyqtSlot(bool)
     def createAlarmEventTable(self,_=False):
@@ -39286,21 +39324,43 @@ class calculatorDlg(ArtisanDialog):
 ######################## Profile Transformator  #######################################
 ########################################################################################
 
-class profileTranformatorDlg(ArtisanDialog):
+class profileTransformatorDlg(ArtisanDialog):
     def __init__(self, parent = None):
-        super(profileTranformatorDlg,self).__init__(parent)
+        super(profileTransformatorDlg,self).__init__(parent)
         self.setModal(True)
+        self.setWindowTitle(QApplication.translate("Form Caption","Profile Transformator",None))
         
-        settings = QSettings()
-        if settings.contains("TransformatorGeometry"):
-            self.restoreGeometry(settings.value("TransformatorGeometry"))
+        self.regextime = QRegExp(r"^$|^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        self.regextemp = QRegExp(r"^$|^-?[0-9]?[0-9]?[0-9]?\.?[0-9]$")
+        
+        # original data
+        self.org_timex = aw.qmc.timex[:]
+        self.org_temp2 = aw.qmc.temp2[:]
+        self.org_extratimex = copy.deepcopy(aw.qmc.extratimex)
         
         self.phasestable = QTableWidget()
         self.timetable = QTableWidget()
         self.temptable = QTableWidget()
         
-        # time table widgets initialized by createTimeTable() to a list of rows with each holding 5 widgets
-        self.time_widgets = None
+        # time table widgets initialized by createTimeTable() to a list (target/result) with 4 widgets each
+        #   DRY, FCs, SCs, DROP
+        # if an event is not set in the profile, None is set instead of a widget
+        self.time_target_widgets = None
+        self.time_result_widgets = None
+        
+        # list of DRY, FCs, SCs and DROP times in seconds if event is set, otherwise None
+        self.profileTimes = self.getProfileTimes()
+        # list of DRY, FCs, SCs, and DROP target times in seconds as specified by the user, or if not set None
+        self.targetTimes = self.getTargetTimes()
+        
+        # list of CHARGE, DRY, FCs, SCs and DROP BT temperatures
+        self.profileTemps = self.getProfileTemps()
+        
+        # temp table widgets initialized by createTempTable() to a list (target/result) with 5 widgets each
+        #   CHARGE, DRY, FCs, SCs, DROP
+        # if an event is not set in the profile, None is set instead of a widget
+        self.temp_target_widgets = None
+        self.temp_result_widgets = None
         
         self.createPhasesTable()
         self.createTimeTable()
@@ -39310,11 +39370,27 @@ class profileTranformatorDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.applyTransformations)
         self.dialogbuttons.rejected.connect(self.restoreState)
         self.applyButton = self.dialogbuttons.addButton(QDialogButtonBox.Apply)
-        self.resetButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
+        self.resetButton = self.dialogbuttons.addButton(QDialogButtonBox.Reset)
+        self.dialogbuttons.button(QDialogButtonBox.Apply).clicked.connect(self.apply)
+        self.dialogbuttons.button(QDialogButtonBox.Reset).clicked.connect(self.restore)
         
         #buttons
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(self.dialogbuttons)
+        
+        mappingLabel = QLabel(QApplication.translate("Label","Mapping",None))
+        self.mappingModeComboBox = QComboBox()
+        self.mappingModeComboBox.addItems([QApplication.translate("ComboBox","discrete",None),
+                                              QApplication.translate("ComboBox","linear",None),
+                                              QApplication.translate("ComboBox","quadratic",None)])
+        self.mappingModeComboBox.setCurrentIndex(aw.qmc.transMappingMode)
+        self.mappingModeComboBox.currentIndexChanged.connect(self.changeMappingMode)
+        
+        settingsHLayout = QHBoxLayout()
+        settingsHLayout.addStretch()
+        settingsHLayout.addWidget(mappingLabel)
+        settingsHLayout.addWidget(self.mappingModeComboBox)
+        settingsHLayout.addStretch()
         
         phasesHLayout = QHBoxLayout()
         phasesHLayout.addStretch()
@@ -39324,6 +39400,7 @@ class profileTranformatorDlg(ArtisanDialog):
         phasesLayout.addLayout(phasesHLayout)
         
         timeHLayout = QHBoxLayout()
+        timeHLayout.addStretch()
         timeHLayout.addWidget(self.timetable)
         timeHLayout.addStretch()
         timeLayout = QVBoxLayout()
@@ -39346,21 +39423,237 @@ class profileTranformatorDlg(ArtisanDialog):
         
         #main
         mainlayout = QVBoxLayout()
+        mainlayout.addLayout(settingsHLayout)
         mainlayout.addWidget(phasesGroupLayout)
         mainlayout.addWidget(timeGroupLayout)
         mainlayout.addWidget(tempGroupLayout)
         mainlayout.addStretch()
         mainlayout.addLayout(buttonsLayout)
+        
+        
         self.setLayout(mainlayout)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+
+        settings = QSettings()
+        if settings.contains("TransformatorPosition"):
+            self.move(settings.value("TransformatorPosition"))
+        
+        mainlayout.setSizeConstraint(QLayout.SetFixedSize)
+        
+    
+    @pyqtSlot(int)
+    def changeMappingMode(self,i):
+        aw.qmc.transMappingMode = i
+        self.updateTimeResults()
+    
+    @pyqtSlot(int)
+    def timeTableColumnHeaderClicked(self,i):
+        # clear target value i
+        if self.time_target_widgets[i] is not None:
+            self.time_target_widgets[i].setText("")
+            self.updateTimeResults()
+
+    @pyqtSlot(int)
+    def timeTableRowHeaderClicked(self,i):
+        if i == 1:
+            # clear all targets
+            for tw in self.time_target_widgets:
+                if tw is not None:
+                    tw.setText("")
+            self.updateTimeResults()
+    
+    # returns list of DRY, FCs, SCs and DROP profile times in seconds if event is set, otherwise None
+    def getProfileTimes(self):
+        offset = 0
+        if aw.qmc.timeindex[0] != -1:
+            offset = aw.qmc.timex[aw.qmc.timeindex[0]]
+        res = []
+        for i in [1,2,4,6]:
+            idx = aw.qmc.timeindex[i]
+            if idx == 0 or len(aw.qmc.timex) < idx:
+                res.append(None)
+            else:
+                res.append(aw.qmc.timex[idx] - offset)
+        return res
+
+    # returns list of DRY, FCs, SCs and DROP target times in seconds if event is set, otherwise None
+    def getTargetTimes(self):
+        res = []
+        if self.time_target_widgets is not None:
+            for w in self.time_target_widgets:
+                r = None
+                if w is not None:
+                    txt = w.text()
+                    if txt is not None and txt != "":
+                        r = aw.qmc.stringtoseconds(txt)
+                res.append(r)
+        return res
+
+    # returns list of CHARGE, DRY, FCs, SCs and DROP BT tempertures if event is set, otherwise None
+    def getProfileTemps(self):
+        res = []
+        for i in [0,1,2,4,6]:
+            idx = aw.qmc.timeindex[i]
+            if idx in [-1,0] or len(aw.qmc.timex) < idx:
+                res.append(None)
+            elif len(aw.qmc.temp2) > idx:
+                res.append(aw.qmc.temp2[idx])
+            else:
+                res.append(None)
+        return res
+    
+    @pyqtSlot()
+    def updateTempResults(self):
+        print("updateTempResults")
+    
+    @pyqtSlot()
+    def updateTimeResults(self):
+        print("updateTimeResults")
+        self.targetTimes = self.getTargetTimes()
+        if aw.qmc.transMappingMode == 0:
+            # discrete mapping
+            factors,profile_offsets,target_offsets = self.calcTimeFactors()
+            for i in range(4):
+                if self.profileTimes[i] is not None and self.time_result_widgets[i] is not None:
+                        r = (self.profileTimes[i] - profile_offsets[i]) * factors[i] + target_offsets[i]
+                        self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r))
+        else:
+            fit = self.calcTimePolyfit()
+            print("display fit",fit)
+            if fit is not None:
+                for i in range(4):
+                    if self.profileTimes[i] is not None and self.time_result_widgets[i] is not None:
+                            r = fit(self.profileTimes[i])
+                            self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r))
+
+    # calculates the linear (aw.qmc.transMappingMode = 1) or quadratic (aw.qmc.transMappingMode = 2) mapping
+    # between the profileTimes and the targetTimes
+    def calcTimePolyfit(self):
+        # initialized by CHARGE time 00:00
+        xa = [0]
+        ya = [0]
+        for i in range(4):
+            if self.targetTimes[i] is not None:
+                xa.append(self.profileTimes[i])
+                ya.append(self.targetTimes[i])
+        deg = aw.qmc.transMappingMode
+        if len(xa) > 1:
+            try:
+                z = numpy.polyfit(xa, ya, deg)
+                return numpy.poly1d(z)
+            except:
+                return None
+        else:
+            return None
+
+    def calcTimeFactors(self):
+        factors = [None]*5 # all factors initially unset
+        profile_offsets = [0]*5
+        profile_offset = 0
+        target_offsets = [0]*5
+        target_offset = 0
+        for i in range(4):
+            profile_offsets[i] = profile_offset
+            target_offsets[i] = target_offset
+            if self.profileTimes[i] is not None:
+                # we skip events not in the profile
+                if self.targetTimes[i] is not None:
+                    k = (self.targetTimes[i] - target_offset) / (self.profileTimes[i] - profile_offset)
+                    factors[i] = k
+                    profile_offset = self.profileTimes[i]
+                    target_offset = self.targetTimes[i]
+                    # apply to those before that are not yet set
+                    for j in range(i):
+                        if factors[j] is None:
+                            factors[j] = k
+        # copy last set factor to all trailing positions
+        try:
+            last_set = factors.index(None)
+            if last_set == 0: # all factors are None:
+                factors = [1]*5
+            else:
+                factors = factors[:last_set] + [factors[last_set-1]]*(5-last_set)
+        except:
+            pass
+        profile_offsets[4] = profile_offset
+        target_offsets[4] = target_offset
+        return factors,profile_offsets,target_offsets
+    
+    def applyTimeTransformation(self):
+        self.targetTimes = self.getTargetTimes()
+        offset = 0
+        if aw.qmc.timeindex[0] != -1:
+            offset = self.org_timex[aw.qmc.timeindex[0]]
+        if aw.qmc.transMappingMode == 0:
+            # discrete mapping
+            factors,profile_offsets,target_offsets = self.calcTimeFactors()
+            f = 1 # factor
+            for i in range(len(self.org_timex)):
+                if aw.qmc.timeindex[1] > 0 and i <= aw.qmc.timeindex[1]:
+                    j = 0
+                elif aw.qmc.timeindex[2] > 0 and i <= aw.qmc.timeindex[2]:
+                    j = 1
+                elif aw.qmc.timeindex[4] > 0 and i <= aw.qmc.timeindex[4]:
+                    j = 2
+                elif aw.qmc.timeindex[6] > 0 and i <= aw.qmc.timeindex[6]:
+                    j = 3
+                else:
+                    # after DROP
+                    j = 4
+                f = factors[j]
+                profile_offset = profile_offsets[j]
+                target_offset = target_offsets[j]
+                aw.qmc.timex[i] = (self.org_timex[i]-offset - profile_offset) * f + target_offset
+            if aw.qmc.timeindex[0] != -1:
+                foffset = aw.qmc.timex[0]
+                aw.qmc.timex = [tx+foffset for tx in aw.qmc.timex]
+            # TODO: apply this mapping also to the extra timex
+        else:
+            fit = self.calcTimePolyfit()
+            if fit is not None:
+                aw.qmc.timex = [fit(tx-offset) for tx in self.org_timex]
+                if aw.qmc.timeindex[0] != -1:
+                    foffset = aw.qmc.timex[0]
+                    aw.qmc.timex = [tx+foffset for tx in aw.qmc.timex]
+                extratimex = []
+                for timex in self.org_extratimex:
+                    offset = 0
+                    if aw.qmc.timeindex[0] != -1:
+                        offset = timex[aw.qmc.timeindex[0]]
+                    new_timex = [fit(tx-offset) for tx in timex]
+                    if aw.qmc.timeindex[0] != -1:
+                        foffset = new_timex[0]
+                        new_timex = [tx+foffset for tx in new_timex]
+                    extratimex.append(new_timex)
+    
+    #called from Apply button
+    @pyqtSlot()
+    def apply(self):
+        print("apply")
+        aw.qmc.l_event_flags_dict = {}
+        aw.qmc.l_annotations_dict = {}
+        self.applyTimeTransformation()
+        aw.qmc.redraw()
+    
+    #called from Restore button
+    @pyqtSlot()
+    def restore(self):
+        print("restore")
+        aw.qmc.l_event_flags_dict = {}
+        aw.qmc.l_annotations_dict = {}
+        aw.qmc.timex = self.org_timex[:]
+        aw.qmc.temp2 = self.org_temp2[:]
+        aw.qmc.extratimex = copy.deepcopy(self.org_extratimex)
+        aw.qmc.redraw()
 
     #called from OK button
     @pyqtSlot()
     def applyTransformations(self):
         print("applyTransformations")
+        
+        #save window position (only; not size!)
         settings = QSettings()
-        #save window geometry
-        settings.setValue("TransformatorGeometry",self.saveGeometry())
+        settings.setValue("TransformatorPosition",self.geometry().topLeft())
         
         self.accept()
 
@@ -39368,14 +39661,14 @@ class profileTranformatorDlg(ArtisanDialog):
     @pyqtSlot()
     def restoreState(self):
         print("restoreState")
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("TransformatorGeometry",self.saveGeometry())
         
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("TransformatorPosition",self.geometry().topLeft())
+
         self.reject()
 
     def closeEvent(self, _):
-        print("closeEvent")
         self.restoreState()
     
     def createPhasesTable(self):
@@ -39406,13 +39699,12 @@ class profileTranformatorDlg(ArtisanDialog):
     def createTimeTable(self):
         self.timetable.clear()
         self.timetable.setRowCount(3)
-        self.timetable.setColumnCount(5)
+        self.timetable.setColumnCount(4)
         self.timetable.horizontalHeader().setStretchLastSection(False)
-        self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed) #QHeaderView.ResizeToContents
+        self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.timetable.horizontalHeader().setHighlightSections(False)
-        self.timetable.setHorizontalHeaderLabels([QApplication.translate("Label","CHARGE",None),
-                                                         QApplication.translate("Label","DRY END",None),
+        self.timetable.setHorizontalHeaderLabels([QApplication.translate("Label","DRY END",None),
                                                          QApplication.translate("Label","FC START",None),
                                                          QApplication.translate("Label","SC START",None),
                                                          QApplication.translate("Label","DROP",None)])
@@ -39423,8 +39715,6 @@ class profileTranformatorDlg(ArtisanDialog):
         self.timetable.setAlternatingRowColors(False)
         self.timetable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.timetable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-#        self.timetable.resizeColumnsToContents()
-#        self.timetable.resizeRowsToContents()
 #        self.timetable.setFrameStyle(QTableWidget.NoFrame)
         self.timetable.setFixedSize(
             self.timetable.horizontalHeader().length() + 
@@ -39432,42 +39722,53 @@ class profileTranformatorDlg(ArtisanDialog):
                 self.timetable.verticalHeader().sizeHint().width(),
             self.timetable.verticalHeader().length() + 
                 self.timetable.horizontalHeader().height())
-                
         self.timetable.setEditTriggers(QAbstractItemView.NoEditTriggers);
         self.timetable.setFocusPolicy(Qt.NoFocus);
         self.timetable.setSelectionMode(QAbstractItemView.NoSelection)
         self.timetable.setAutoScroll(False)
-        
         self.timetable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
+        self.timetable.verticalHeader().sectionClicked.connect(self.timeTableRowHeaderClicked)
+        self.timetable.horizontalHeader().sectionClicked.connect(self.timeTableColumnHeaderClicked)
         
-        self.time_widgets = []
-        profile_widgets = []
-        target_widgets = []
-        result_widgets = []
-        for i in range(5):
-            profile_widget = QTableWidgetItem("12:00")
-            profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
-            profile_widgets.append(profile_widget)
-            self.timetable.setItem(0,i,profile_widget)
-            target_widget = QLineEdit("13:00")
-            target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
-            self.timetable.setCellWidget(1,i,target_widget)
-            target_widgets.append(target_widget)
-            result_widget = QTableWidgetItem("14:00")
-            result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
-            self.timetable.setItem(2,i,result_widget)
-            result_widgets.append(result_widget)
-        self.time_widgets.append(profile_widgets)
-        self.time_widgets.append(target_widgets)
-        self.time_widgets.append(result_widgets)
+        self.time_target_widgets = []
+        self.time_result_widgets = []
+        
+        for i in range(4):
+            if len(self.profileTimes) > i and self.profileTimes[i] is not None:
+                profile_time_str = aw.qmc.stringfromseconds(self.profileTimes[i])
+                profile_widget = QTableWidgetItem(profile_time_str)
+                profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                self.timetable.setItem(0,i,profile_widget)
+                #
+                target_widget = QLineEdit("")
+                target_widget.setValidator(QRegExpValidator(self.regextime))
+                target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_widget.editingFinished.connect(self.updateTimeResults)
+                target_cell_widget = QWidget()
+                target_cell_layout = QHBoxLayout(target_cell_widget)
+                target_cell_layout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_cell_layout.setContentsMargins(4,4,4,4)
+                target_cell_layout.addWidget(target_widget)
+                target_cell_widget.setLayout(target_cell_layout)
+                self.timetable.setCellWidget(1,i,target_cell_widget)
+                #
+                result_widget = QTableWidgetItem(profile_time_str)
+                result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                self.timetable.setItem(2,i,result_widget)
+            else:
+                target_widget = None
+                result_widget = None
+            self.time_target_widgets.append(target_widget)
+            self.time_result_widgets.append(result_widget)
 
     
     def createTempTable(self):
+        self.temptable.clear()
         self.temptable.setRowCount(3)
         self.temptable.setColumnCount(5)
         self.temptable.horizontalHeader().setStretchLastSection(False)
-#        self.temptable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-#        self.temptable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.temptable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.temptable.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.temptable.setHorizontalHeaderLabels([QApplication.translate("Label","CHARGE",None),
                                                          QApplication.translate("Label","DRY END",None),
                                                          QApplication.translate("Label","FC START",None),
@@ -39477,11 +39778,9 @@ class profileTranformatorDlg(ArtisanDialog):
                                                          QApplication.translate("Table","Target",None),
                                                          QApplication.translate("Table","Result",None)])
         self.temptable.setShowGrid(True)
-        self.temptable.setAlternatingRowColors(True)
+        self.temptable.setAlternatingRowColors(False)
         self.temptable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.temptable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-#        self.temptable.resizeColumnsToContents()
-#        self.temptable.resizeRowsToContents()
 #        self.temptable.setFrameStyle(QTableWidget.NoFrame)
         self.temptable.setFixedSize(
             self.temptable.horizontalHeader().length() + 
@@ -39489,6 +39788,51 @@ class profileTranformatorDlg(ArtisanDialog):
                 self.temptable.verticalHeader().sizeHint().width(),
             self.temptable.verticalHeader().length() + 
                 self.temptable.horizontalHeader().height())
+        self.temptable.setEditTriggers(QAbstractItemView.NoEditTriggers);
+        self.temptable.setFocusPolicy(Qt.NoFocus);
+        self.temptable.setSelectionMode(QAbstractItemView.NoSelection)
+        self.temptable.setAutoScroll(False)
+        self.temptable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
+        
+        self.temp_target_widgets = []
+        self.temp_result_widgets = []
+        for i in range(5):
+            if len(self.profileTemps) > i and self.profileTemps[i] is not None:
+                profile_temp_str = str(aw.float2float(self.profileTemps[i])) + aw.qmc.mode
+                profile_widget = QTableWidgetItem(profile_temp_str)
+                profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                self.temptable.setItem(0,i,profile_widget)
+                #
+#                target_widget = QDoubleSpinBox()
+#                target_widget.setLocale(QLocale(QLocale.C))
+#                target_widget.setRange(0,1000)
+#                target_widget.setDecimals(1)
+#                target_widget.setSuffix(aw.qmc.mode)
+#                target_widget.setValue(self.profileTemps[i])
+#                target_widget.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                
+                target_widget = QLineEdit("")
+                target_widget.setValidator(QRegExpValidator(self.regextemp))
+                target_widget.editingFinished.connect(self.updateTempResults)
+                target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                
+                target_cell_widget = QWidget()
+                target_cell_layout = QHBoxLayout(target_cell_widget)
+                target_cell_layout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_cell_layout.setContentsMargins(4,4,4,4)
+                target_cell_layout.addWidget(target_widget)
+#                target_cell_layout.addWidget(QLabel(aw.qmc.mode))
+                target_cell_widget.setLayout(target_cell_layout)
+                self.temptable.setCellWidget(1,i,target_cell_widget)
+                #
+                result_widget = QTableWidgetItem(profile_temp_str)
+                result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                self.temptable.setItem(2,i,result_widget)
+            else:
+                target_widget = None
+                result_widget = None
+            self.temp_target_widgets.append(target_widget)
+            self.temp_result_widgets.append(result_widget)
 
 
 ##########################################################################
@@ -42672,7 +43016,8 @@ class flavorDlg(ArtisanResizeablDialog):
             aw.qmc.customflavorlabels = aw.qmc.flavorlabels
 
     @pyqtSlot()
-    def setlabel(self):
+    @pyqtSlot("QString")
+    def setlabel(self,_):
         x = aw.findWidgetsRow(self.flavortable,self.sender(),0)
         if x is not None:
             labeledit = self.flavortable.cellWidget(x,0)
@@ -44207,6 +44552,7 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_D_0,  #107
                                    self.YOCTO_generic,        #108
                                    self.MODBUS_78,            #109
+                                   self.S7_910,               #110
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -44772,6 +45118,11 @@ class serialport(object):
     def S7_78(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.S7read(3)
+        return tx,t2,t1
+
+    def S7_910(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.S7read(4)
         return tx,t2,t1
 
     def R1_DTBT(self):
@@ -45686,6 +46037,7 @@ class serialport(object):
     # mode=1 to read ch3+4
     # mode=2 to read ch5+6
     # mode=3 to read ch7+8
+    # mode=4 to read ch9+10
     def S7read(self,mode):
         # fill the S7 optimizer (if active) with data for all read requests specified in the device S7 tab using block reads
         aw.s7.readActiveRegisters()
@@ -47531,7 +47883,7 @@ class serialport(object):
             try:
                 if len(dcm) > channel and dcm[channel].getAttached():
                     dcm[channel].setTargetVelocity(value)
-            except Exception as e:
+            except:
                 pass
     
     def phidgetDCMotorClose(self):
@@ -53508,6 +53860,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 109 is +MODBUS_78 but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 110 is +S7_010 but +DEVICE cannot be set as main device
+                ##########################
 
                 # ADD DEVICE:
 
@@ -53633,6 +53988,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 107
                 1, # 108
                 7, # 109
+                1, # 110
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
