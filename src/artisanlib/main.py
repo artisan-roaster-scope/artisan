@@ -13896,8 +13896,8 @@ class ApplicationWindow(QMainWindow):
         
         self.ToolkitMenu.addSeparator()
 
-#        self.transformAction = QAction(UIconst.TOOLKIT_MENU_TRANSFORM,self)
-#        self.transformAction.triggered.connect(self.transform)
+        self.transformAction = QAction(UIconst.TOOLKIT_MENU_TRANSFORM,self)
+        self.transformAction.triggered.connect(self.transform)
 #        self.ToolkitMenu.addAction(self.transformAction)
 
         self.temperatureMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_TEMPERATURE)
