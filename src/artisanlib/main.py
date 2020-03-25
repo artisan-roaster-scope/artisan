@@ -138,7 +138,6 @@ from matplotlib.backend_bases import LocationEvent as mplLocationevent
 
 import matplotlib.backends.qt_editor.figureoptions as figureoptions
 
-
 from Phidget22.DeviceID import DeviceID
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
 from Phidget22.Devices.HumiditySensor import HumiditySensor as PhidgetHumiditySensor
