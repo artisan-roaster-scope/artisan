@@ -1447,7 +1447,7 @@ class tgraphcanvas(FigureCanvas):
         
 #PLUS
         # the default store selected by the user (save in the  app settings)
-        self.plus_default_store = None        
+        self.plus_default_store = None
         # the current profiles coffee or blend and associated store ids (saved in the *.alog profile)
         self.plus_store = None # holds the plus hr_id of the selected store of the current profile or None
         self.plus_store_label = None # holds the plus label of the selected store of the current profile or None
@@ -1455,8 +1455,9 @@ class tgraphcanvas(FigureCanvas):
         self.plus_coffee_label = None # holds the plus label of the selected coffee of the current profile or None
         self.plus_blend_spec = None # the plus blend structure [<blend_label>,[[<coffee_label>,<hr_id>,<ratio>],...,[<coffee_label>,<hr_id>,<ratio>]]] # label + ingredients
         self.plus_blend_spec_labels = None # a list of labels as long as the list of ingredients in self.plus_blend_spec or None
+        self.plus_blend_label = None # holds the plus selected label of the selected blend of the current profile or None
         self.plus_sync_record_hash = None
-                
+
         self.beans = ""
 
         #flags to show projections, draw Delta ET, and draw Delta BT
@@ -2845,10 +2846,12 @@ class tgraphcanvas(FigureCanvas):
             return aw.s7.type[4+c] == 0 and aw.s7.mode[4+c] == 0 and aw.s7.div[4+c] == 0
         elif aw.qmc.extradevices[n] == 82: # S7_78
             return aw.s7.type[6+c] == 0 and aw.s7.mode[6+c] == 0 and aw.s7.div[6+c] == 0
+        elif aw.qmc.extradevices[n] == 110: # S7_910
+            return aw.s7.type[8+c] == 0 and aw.s7.mode[8+c] == 0 and aw.s7.div[8+c] == 0
         else:
             False
-            
-    def update_additional_artists(self): 
+
+    def update_additional_artists(self):
         if aw.qmc.flagstart and (aw.qmc.device == 18 or aw.qmc.showtimeguide) and aw.qmc.l_timeline is not None: # not NONE device
             tx = int(aw.qmc.timeclock.elapsed()/1000.)
             #aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
@@ -7867,10 +7870,13 @@ class tgraphcanvas(FigureCanvas):
                 self.extraNoneTempHint2.append(aw.modbus.inputModes[1] == "")
             elif d == 33: # +MODBUS 34
                 self.extraNoneTempHint1.append(aw.modbus.inputModes[2] == "")
-                self.extraNoneTempHint2.append(aw.modbus.inputModes[3] == "")  
+                self.extraNoneTempHint2.append(aw.modbus.inputModes[3] == "")
             elif d == 55: # +MODBUS 56
                 self.extraNoneTempHint1.append(aw.modbus.inputModes[4] == "")
-                self.extraNoneTempHint2.append(aw.modbus.inputModes[5] == "") 
+                self.extraNoneTempHint2.append(aw.modbus.inputModes[5] == "")
+            elif d == 109: # +MODBUS 78
+                self.extraNoneTempHint1.append(aw.modbus.inputModes[6] == "")
+                self.extraNoneTempHint2.append(aw.modbus.inputModes[7] == "")
             elif d == 79: # S7
                 self.extraNoneTempHint1.append(not bool(aw.s7.mode[0]))
                 self.extraNoneTempHint2.append(not bool(aw.s7.mode[1]))
@@ -7883,6 +7889,9 @@ class tgraphcanvas(FigureCanvas):
             elif d == 82: # +S7 78
                 self.extraNoneTempHint1.append(not bool(aw.s7.mode[6]))
                 self.extraNoneTempHint2.append(not bool(aw.s7.mode[7]))
+            elif d == 110: # +S7 910
+                self.extraNoneTempHint1.append(not bool(aw.s7.mode[8]))
+                self.extraNoneTempHint2.append(not bool(aw.s7.mode[9]))
             else:
                 self.extraNoneTempHint1.append(False)
                 self.extraNoneTempHint2.append(False)
