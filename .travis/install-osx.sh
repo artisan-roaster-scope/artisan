@@ -7,7 +7,7 @@ brew update # this seems to help to work around some homebrew issues; and fails 
 
 # Python 3.7.5 is installed by default
 # to update use either:
-brew upgrade python
+#brew upgrade python
 # or, to avoid issues with brew auto updates by deactivating them,
 #HOMEBREW_NO_AUTO_UPDATE=1 brew install python
 
