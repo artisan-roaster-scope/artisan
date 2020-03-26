@@ -9859,17 +9859,17 @@ class tgraphcanvas(FigureCanvas):
 
             #if DROP
             if self.timeindex[6] and self.timeindex[2]:
-                totaltime = int(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
+                totaltime = self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]
                 if totaltime == 0:
                     return dryEndIndex, statisticstimes
 
                 statisticstimes[0] = totaltime
-                dryphasetime = aw.float2float(dryEndTime - self.timex[self.timeindex[0]])
-                midphasetime = aw.float2float(self.timex[self.timeindex[2]] - dryEndTime)
-                finishphasetime = aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
+                dryphasetime = dryEndTime - self.timex[self.timeindex[0]] # aw.float2float(dryEndTime - self.timex[self.timeindex[0]])
+                midphasetime = self.timex[self.timeindex[2]] - dryEndTime # aw.float2float(self.timex[self.timeindex[2]] - dryEndTime)
+                finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]] # aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
 
                 if self.timeindex[7]:
-                    coolphasetime = int(round(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]]))
+                    coolphasetime = self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]] # int(round(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]]))
                 else:
                     coolphasetime = 0
 
@@ -13341,7 +13341,7 @@ class ApplicationWindow(QMainWindow):
         # same as SaveAs, just that the saved file gets a new roastUUID assigned
         self.fileSaveCopyAsAction = QAction(UIconst.FILE_MENU_SAVECOPYAS,self)
         self.fileSaveCopyAsAction.triggered.connect(self.fileSave_copy_action)
-#        self.fileMenu.addAction(self.fileSaveCopyAsAction)
+        self.fileMenu.addAction(self.fileSaveCopyAsAction)
 
         self.fileMenu.addSeparator()
 
@@ -13897,7 +13897,7 @@ class ApplicationWindow(QMainWindow):
 
         self.transformAction = QAction(UIconst.TOOLKIT_MENU_TRANSFORM,self)
         self.transformAction.triggered.connect(self.transform)
-        self.ToolkitMenu.addAction(self.transformAction)
+#        self.ToolkitMenu.addAction(self.transformAction)
 
         self.temperatureMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_TEMPERATURE)
         
@@ -23078,15 +23078,15 @@ class ApplicationWindow(QMainWindow):
             # we calcuate the statistics here as the profile might not have yet been rendered and thus the statistics are not yet computed
             _,statisticstimes = self.qmc.calcStatistics(TP_index)
             if statisticstimes[0]:
-                computedProfile["totaltime"] = statisticstimes[0]
+                computedProfile["totaltime"] = aw.float2float(statisticstimes[0],3)
             if statisticstimes[1]:
-                computedProfile["dryphasetime"] = statisticstimes[1]
+                computedProfile["dryphasetime"] = aw.float2float(statisticstimes[1],3)
             if statisticstimes[2]:
-                computedProfile["midphasetime"] = statisticstimes[2]
+                computedProfile["midphasetime"] = aw.float2float(statisticstimes[2],3)
             if statisticstimes[3]:
-                computedProfile["finishphasetime"] = statisticstimes[3]
+                computedProfile["finishphasetime"] = aw.float2float(statisticstimes[3],3)
             if statisticstimes[4]:
-                computedProfile["coolphasetime"] = statisticstimes[4]
+                computedProfile["coolphasetime"] = aw.float2float(statisticstimes[4],3)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -39355,6 +39355,8 @@ class profileTransformatorDlg(ArtisanDialog):
         self.org_curFile = aw.curFile
         self.org_UUID = aw.qmc.roastUUID
         self.org_safesaveflag = aw.qmc.safesaveflag
+        self.org_l_event_flags_dict = aw.qmc.l_event_flags_dict
+        self.org_l_annotations_dict = aw.qmc.l_annotations_dict
         
         self.phasestable = QTableWidget()
         self.timetable = QTableWidget()
@@ -39363,10 +39365,16 @@ class profileTransformatorDlg(ArtisanDialog):
         # time table widgets initialized by createTimeTable() to a list (target/result) with 4 widgets each
         #   DRY, FCs, SCs, DROP
         # if an event is not set in the profile, None is set instead of a widget
+        #
+        self.phases_target_widgets_time = None
+        self.phases_target_widgets_percent = None
+        self.phases_result_widgets_time = None
+        self.phases_result_widgets_percent = None
+        #
         self.time_target_widgets = None
         self.time_result_widgets = None
         
-        # list of DRY, FCs, SCs and DROP times in seconds if event is set, otherwise None
+        # profileTimes: list of DRY, FCs, SCs and DROP times in seconds if event is set, otherwise None
         self.profileTimes = self.getProfileTimes()
         # list of DRY, FCs, SCs, and DROP target times in seconds as specified by the user, or if not set None
         self.targetTimes = self.getTargetTimes()
@@ -39471,6 +39479,14 @@ class profileTransformatorDlg(ArtisanDialog):
             return 0
 
     @pyqtSlot(int)
+    def phasesTableColumnHeaderClicked(self,i):
+        pass
+    
+    @pyqtSlot(int)
+    def phasesTableRowHeaderClicked(self,i):
+        pass
+    
+    @pyqtSlot(int)
     def timeTableColumnHeaderClicked(self,i):
         if self.time_target_widgets[i] is not None:
             # clear target value i
@@ -39540,30 +39556,36 @@ class profileTransformatorDlg(ArtisanDialog):
     @pyqtSlot()
     def updateTimeResults(self):
         self.targetTimes = self.getTargetTimes()
-        if aw.qmc.transMappingMode == 0:
-            # discrete mapping
-            factors,profile_offsets,target_offsets = self.calcTimeFactors()
+        if all(v is None for v in self.targetTimes):
+            # no targets set
             for i in range(4):
-                if self.profileTimes[i] is not None and self.time_result_widgets[i] is not None:
-                    r = (self.profileTimes[i] - profile_offsets[i]) * factors[i] + target_offsets[i]
-                    self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r,leadingzero=False))
+                if self.time_result_widgets[i] is not None:
+                    self.time_result_widgets[i].setText("")
         else:
-            with warnings.catch_warnings():
-                warnings.filterwarnings('error')
-                try:
-                    fit = self.calcTimePolyfit()
-                    for i in range(4):
-                        if self.time_result_widgets[i] is not None:
-                            if fit is not None and self.profileTimes[i] is not None:
-                                r = fit(self.profileTimes[i])
-                                self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r,leadingzero=False))
-                            else:
-                                r = aw.qmc.stringfromseconds(self.profileTimes[i],leadingzero=False)
-                                self.time_result_widgets[i].setText(r)
-                except numpy.RankWarning:
-                    pass
-                except Exception as e:
-                    pass
+            if aw.qmc.transMappingMode == 0:
+                # discrete mapping
+                factors,profile_offsets,target_offsets = self.calcTimeFactors()
+                for i in range(4):
+                    if self.profileTimes[i] is not None and self.time_result_widgets[i] is not None:
+                        r = (self.profileTimes[i] - profile_offsets[i]) * factors[i] + target_offsets[i]
+                        self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r,leadingzero=False))
+            else:
+                with warnings.catch_warnings():
+                    warnings.filterwarnings('error')
+                    try:
+                        fit = self.calcTimePolyfit()
+                        for i in range(4):
+                            if self.time_result_widgets[i] is not None:
+                                if fit is not None and self.profileTimes[i] is not None:
+                                    r = fit(self.profileTimes[i])
+                                    self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r,leadingzero=False))
+                                else:
+                                    r = aw.qmc.stringfromseconds(self.profileTimes[i],leadingzero=False)
+                                    self.time_result_widgets[i].setText(r)
+                    except numpy.RankWarning:
+                        pass
+                    except Exception as e:
+                        pass
 
     # calculates the linear (aw.qmc.transMappingMode = 1) or quadratic (aw.qmc.transMappingMode = 2) mapping
     # between the profileTimes and the targetTimes
@@ -39641,61 +39663,69 @@ class profileTransformatorDlg(ArtisanDialog):
             foffset = res_timex[0]
             res_timex = [tx+foffset for tx in res_timex]
         return res_timex
-        
+    
+    # returns False if no transformation was applied
     def applyTimeTransformation(self):
         # first update the targets
         self.targetTimes = self.getTargetTimes()
-        # calculate the offset of 00:00
-        offset = 0
-        if aw.qmc.timeindex[0] != -1:
-            offset = self.org_timex[aw.qmc.timeindex[0]]
-        # apply either the discrete or the polyfit mappings
-        if aw.qmc.transMappingMode == 0:
-            # discrete mapping
-            # calculate factors and offsets
-            factors,profile_offsets,target_offsets = self.calcTimeFactors()
-            # apply to the main timex
-            aw.qmc.timex = self.applyDiscreteTimeMapping(self.org_timex,offset,factors,profile_offsets,target_offsets)
-            # apply to the extra timex
-            aw.qmc.extratimex = []
-            for timex in self.org_extratimex:
-                aw.qmc.extratimex.append(self.applyDiscreteTimeMapping(timex,offset,factors,profile_offsets,target_offsets))
+        if all(v is None for v in self.targetTimes):
+            return False
         else:
-            with warnings.catch_warnings():
-                warnings.filterwarnings('error')
-                try:
-                    fit = self.calcTimePolyfit()
-                    if fit is not None:
-                        aw.qmc.timex = [fit(tx-offset) for tx in self.org_timex]
-                        if aw.qmc.timeindex[0] != -1:
-                            foffset = aw.qmc.timex[0]
-                            aw.qmc.timex = [tx+foffset for tx in aw.qmc.timex]
-                        extratimex = []
-                        for timex in self.org_extratimex:
-                            offset = 0
+            # calculate the offset of 00:00
+            offset = 0
+            if aw.qmc.timeindex[0] != -1:
+                offset = self.org_timex[aw.qmc.timeindex[0]]
+            # apply either the discrete or the polyfit mappings
+            if aw.qmc.transMappingMode == 0:
+                # discrete mapping
+                # calculate factors and offsets
+                factors,profile_offsets,target_offsets = self.calcTimeFactors()
+                # apply to the main timex
+                aw.qmc.timex = self.applyDiscreteTimeMapping(self.org_timex,offset,factors,profile_offsets,target_offsets)
+                # apply to the extra timex
+                aw.qmc.extratimex = []
+                for timex in self.org_extratimex:
+                    aw.qmc.extratimex.append(self.applyDiscreteTimeMapping(timex,offset,factors,profile_offsets,target_offsets))
+            else:
+                with warnings.catch_warnings():
+                    warnings.filterwarnings('error')
+                    try:
+                        fit = self.calcTimePolyfit()
+                        if fit is not None:
+                            aw.qmc.timex = [fit(tx-offset) for tx in self.org_timex]
                             if aw.qmc.timeindex[0] != -1:
-                                offset = timex[aw.qmc.timeindex[0]]
-                            new_timex = [fit(tx-offset) for tx in timex]
-                            if aw.qmc.timeindex[0] != -1:
-                                foffset = new_timex[0]
-                                new_timex = [tx+foffset for tx in new_timex]
-                            extratimex.append(new_timex)
-                        aw.qmc.extratimex = extratimex
-                except np.RankWarning:
-                    pass
+                                foffset = aw.qmc.timex[0]
+                                aw.qmc.timex = [tx+foffset for tx in aw.qmc.timex]
+                            extratimex = []
+                            for timex in self.org_extratimex:
+                                offset = 0
+                                if aw.qmc.timeindex[0] != -1:
+                                    offset = timex[aw.qmc.timeindex[0]]
+                                new_timex = [fit(tx-offset) for tx in timex]
+                                if aw.qmc.timeindex[0] != -1:
+                                    foffset = new_timex[0]
+                                    new_timex = [tx+foffset for tx in new_timex]
+                                extratimex.append(new_timex)
+                            aw.qmc.extratimex = extratimex
+                    except np.RankWarning:
+                        pass
+            return True
     
     #called from Apply button
     @pyqtSlot()
     def apply(self):
-        aw.qmc.roastUUID = None
-        aw.setCurrentFile(None,addToRecent=False)
-        aw.qmc.l_event_flags_dict = {}
-        aw.qmc.l_annotations_dict = {}
-        self.applyTimeTransformation()
-        aw.qmc.safesaveflag = True
-        aw.qmc.timealign()
-        aw.autoAdjustAxis()
-        aw.qmc.redraw()
+        applied = self.applyTimeTransformation()
+        if applied:
+            aw.qmc.roastUUID = None
+            aw.setCurrentFile(None,addToRecent=False)
+            aw.qmc.l_event_flags_dict = {}
+            aw.qmc.l_annotations_dict = {}
+            aw.qmc.safesaveflag = True
+            aw.qmc.timealign()
+            aw.autoAdjustAxis()
+            aw.qmc.redraw()
+        else:
+            self.restore()
     
     #called from Restore button
     @pyqtSlot()
@@ -39703,8 +39733,8 @@ class profileTransformatorDlg(ArtisanDialog):
         aw.qmc.roastUUID = self.org_UUID
         aw.setCurrentFile(self.org_curFile,addToRecent=False)
         aw.qmc.safesaveflag = self.org_safesaveflag
-        aw.qmc.l_event_flags_dict = {}
-        aw.qmc.l_annotations_dict = {}
+        aw.qmc.l_event_flags_dict = self.org_l_event_flags_dict
+        aw.qmc.l_annotations_dict = self.org_l_annotations_dict
         aw.qmc.timex = self.org_timex[:]
         aw.qmc.temp2 = self.org_temp2[:]
         aw.qmc.extratimex = copy.deepcopy(self.org_extratimex)
@@ -39736,7 +39766,9 @@ class profileTransformatorDlg(ArtisanDialog):
         self.phasestable.setRowCount(3)
         self.phasestable.setColumnCount(3)
         self.phasestable.horizontalHeader().setStretchLastSection(False)
-#        self.phasestable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.timetable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.timetable.horizontalHeader().setHighlightSections(False)
         self.phasestable.setHorizontalHeaderLabels([QApplication.translate("Label","Drying",None),
                                                          QApplication.translate("Label","Mailard",None),
                                                          QApplication.translate("Label","Finishing",None)])
@@ -39747,8 +39779,6 @@ class profileTransformatorDlg(ArtisanDialog):
         self.phasestable.setAlternatingRowColors(True)
         self.phasestable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.phasestable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-#        self.phasestable.resizeColumnsToContents()
-#        self.phasestable.resizeRowsToContents()
 #        self.phasestable.setFrameStyle(QTableWidget.NoFrame)
         self.phasestable.setFixedSize(
             self.phasestable.horizontalHeader().length() + 
@@ -39756,7 +39786,60 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.phasestable.verticalHeader().sizeHint().width(),
             self.phasestable.verticalHeader().length() + 
                 self.phasestable.horizontalHeader().height())
-    
+        self.phasestable.setEditTriggers(QAbstractItemView.NoEditTriggers);
+        self.phasestable.setFocusPolicy(Qt.NoFocus);
+        self.phasestable.setSelectionMode(QAbstractItemView.NoSelection)
+        self.phasestable.setAutoScroll(False)
+        self.phasestable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
+        self.phasestable.verticalHeader().sectionClicked.connect(self.phasesTableRowHeaderClicked)
+        self.phasestable.horizontalHeader().sectionClicked.connect(self.phasesTableColumnHeaderClicked)
+
+        self.phases_target_widgets_time = []
+        self.phases_target_widgets_percent = []
+        self.phases_result_widgets_time = []
+        self.phases_result_widgets_percent = []
+        
+        profilePhasesTimes = [None]*3 # DRYING, MAILARD, FINISHING
+        profilePhasesPercentages = [None] * 3
+        #
+        profilePhasesTimes[0] = self.profileTimes[0] # DRYING == DRY
+        if self.profileTimes[0] is not None and self.profileTimes[1] is not None:
+            profilePhasesTimes[1] = self.profileTimes[1] - self.profileTimes[0]
+        if self.profileTimes[1] is not None and self.profileTimes[3] is not None:
+            profilePhasesTimes[2] = self.profileTimes[3] - self.profileTimes[1]
+        #
+        if self.profileTimes[3] is not None:
+            profilePhasesPercentages = [(ppt/self.profileTimes[3])*100 for ppt in profilePhasesTimes if ppt is not None]
+        
+        for i in range(3):
+            if len(profilePhasesTimes) > i and profilePhasesTimes[i] is not None:
+                profile_phases_time_str = \
+                    "{}    {}%".format(aw.qmc.stringfromseconds(profilePhasesTimes[i],leadingzero=False),aw.float2float(profilePhasesPercentages[i]))
+                profile_phases_widget = QTableWidgetItem(profile_phases_time_str)
+                profile_phases_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                self.phasestable.setItem(0,i,profile_phases_widget)
+                #
+#                target_widget = QLineEdit("")
+#                target_widget.setValidator(QRegExpValidator(self.regextime))
+#                target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+#                target_widget.editingFinished.connect(self.updateTimeResults)
+#                target_cell_widget = QWidget()
+#                target_cell_layout = QHBoxLayout(target_cell_widget)
+#                target_cell_layout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+#                target_cell_layout.setContentsMargins(4,4,4,4)
+#                target_cell_layout.addWidget(target_widget)
+#                target_cell_widget.setLayout(target_cell_layout)
+#                self.phasestable.setCellWidget(1,i,target_cell_widget)
+#                #
+#                result_widget = QTableWidgetItem(profile_time_str)
+#                result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+#                self.phasestable.setItem(2,i,result_widget)
+#            else:
+#                target_widget = None
+#                result_widget = None
+#            self.time_target_widgets.append(target_widget)
+#            self.time_result_widgets.append(result_widget)
+
     def createTimeTable(self):
         self.timetable.clear()
         self.timetable.setRowCount(3)
@@ -39813,7 +39896,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 target_cell_widget.setLayout(target_cell_layout)
                 self.timetable.setCellWidget(1,i,target_cell_widget)
                 #
-                result_widget = QTableWidgetItem(profile_time_str)
+                result_widget = QTableWidgetItem("") #profile_time_str)
                 result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 self.timetable.setItem(2,i,result_widget)
             else:
@@ -39863,14 +39946,6 @@ class profileTransformatorDlg(ArtisanDialog):
                 profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 self.temptable.setItem(0,i,profile_widget)
                 #
-#                target_widget = QDoubleSpinBox()
-#                target_widget.setLocale(QLocale(QLocale.C))
-#                target_widget.setRange(0,1000)
-#                target_widget.setDecimals(1)
-#                target_widget.setSuffix(aw.qmc.mode)
-#                target_widget.setValue(self.profileTemps[i])
-#                target_widget.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                
                 target_widget = QLineEdit("")
                 target_widget.setValidator(QRegExpValidator(self.regextemp))
                 target_widget.editingFinished.connect(self.updateTempResults)
@@ -39885,7 +39960,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 target_cell_widget.setLayout(target_cell_layout)
                 self.temptable.setCellWidget(1,i,target_cell_widget)
                 #
-                result_widget = QTableWidgetItem(profile_temp_str)
+                result_widget = QTableWidgetItem("")
                 result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 self.temptable.setItem(2,i,result_widget)
             else:
