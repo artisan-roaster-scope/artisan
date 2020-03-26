@@ -13341,7 +13341,7 @@ class ApplicationWindow(QMainWindow):
         # same as SaveAs, just that the saved file gets a new roastUUID assigned
         self.fileSaveCopyAsAction = QAction(UIconst.FILE_MENU_SAVECOPYAS,self)
         self.fileSaveCopyAsAction.triggered.connect(self.fileSave_copy_action)
-        self.fileMenu.addAction(self.fileSaveCopyAsAction)
+#        self.fileMenu.addAction(self.fileSaveCopyAsAction)
 
         self.fileMenu.addSeparator()
 
@@ -13897,7 +13897,7 @@ class ApplicationWindow(QMainWindow):
 
         self.transformAction = QAction(UIconst.TOOLKIT_MENU_TRANSFORM,self)
         self.transformAction.triggered.connect(self.transform)
-#        self.ToolkitMenu.addAction(self.transformAction)
+        self.ToolkitMenu.addAction(self.transformAction)
 
         self.temperatureMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_TEMPERATURE)
         
@@ -18709,7 +18709,7 @@ class ApplicationWindow(QMainWindow):
                                 b = toInt(cs_a[1]) - 1 # gui button list is indexed from 1
                                 c = toInt(cs_a[2])
                                 v = toInt(cs_a[3])
-                                if cs_len > 3:
+                                if cs_len > 4:
                                     sn = cs_a[4]
                                 else:
                                     sn = None
@@ -39352,6 +39352,9 @@ class profileTransformatorDlg(ArtisanDialog):
         self.org_timex = aw.qmc.timex[:]
         self.org_temp2 = aw.qmc.temp2[:]
         self.org_extratimex = copy.deepcopy(aw.qmc.extratimex)
+        self.org_curFile = aw.curFile
+        self.org_UUID = aw.qmc.roastUUID
+        self.org_safesaveflag = aw.qmc.safesaveflag
         
         self.phasestable = QTableWidget()
         self.timetable = QTableWidget()
@@ -39461,12 +39464,25 @@ class profileTransformatorDlg(ArtisanDialog):
         aw.qmc.transMappingMode = i
         self.updateTimeResults()
     
+    def backgroundOffset(self):
+        if aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
+            return aw.qmc.timeB[aw.qmc.timeindexB[0]]
+        else:
+            return 0
+
     @pyqtSlot(int)
     def timeTableColumnHeaderClicked(self,i):
-        # clear target value i
         if self.time_target_widgets[i] is not None:
-            self.time_target_widgets[i].setText("")
-            self.updateTimeResults()
+            # clear target value i
+            if self.time_target_widgets[i].text() != "":
+                self.time_target_widgets[i].setText("")
+                self.updateTimeResults()
+            elif aw.qmc.background:
+                timeidx = [1,2,4,6][i]
+                if aw.qmc.timeindex[timeidx] and aw.qmc.timeindexB[timeidx]:
+                    s = aw.qmc.stringfromseconds(aw.qmc.timeB[aw.qmc.timeindexB[timeidx]]-self.backgroundOffset(),False)
+                    self.time_target_widgets[i].setText(s)
+                    self.updateTimeResults()
 
     @pyqtSlot(int)
     def timeTableRowHeaderClicked(self,i):
@@ -39523,23 +39539,31 @@ class profileTransformatorDlg(ArtisanDialog):
     
     @pyqtSlot()
     def updateTimeResults(self):
-        print("updateTimeResults")
         self.targetTimes = self.getTargetTimes()
         if aw.qmc.transMappingMode == 0:
             # discrete mapping
             factors,profile_offsets,target_offsets = self.calcTimeFactors()
             for i in range(4):
                 if self.profileTimes[i] is not None and self.time_result_widgets[i] is not None:
-                        r = (self.profileTimes[i] - profile_offsets[i]) * factors[i] + target_offsets[i]
-                        self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r))
+                    r = (self.profileTimes[i] - profile_offsets[i]) * factors[i] + target_offsets[i]
+                    self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r,leadingzero=False))
         else:
-            fit = self.calcTimePolyfit()
-            print("display fit",fit)
-            if fit is not None:
-                for i in range(4):
-                    if self.profileTimes[i] is not None and self.time_result_widgets[i] is not None:
-                            r = fit(self.profileTimes[i])
-                            self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r))
+            with warnings.catch_warnings():
+                warnings.filterwarnings('error')
+                try:
+                    fit = self.calcTimePolyfit()
+                    for i in range(4):
+                        if self.time_result_widgets[i] is not None:
+                            if fit is not None and self.profileTimes[i] is not None:
+                                r = fit(self.profileTimes[i])
+                                self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(r,leadingzero=False))
+                            else:
+                                r = aw.qmc.stringfromseconds(self.profileTimes[i],leadingzero=False)
+                                self.time_result_widgets[i].setText(r)
+                except numpy.RankWarning:
+                    pass
+                except Exception as e:
+                    pass
 
     # calculates the linear (aw.qmc.transMappingMode = 1) or quadratic (aw.qmc.transMappingMode = 2) mapping
     # between the profileTimes and the targetTimes
@@ -39554,6 +39578,7 @@ class profileTransformatorDlg(ArtisanDialog):
         deg = aw.qmc.transMappingMode
         if len(xa) > 1:
             try:
+                deg = min(len(xa) - 1,deg)
                 z = numpy.polyfit(xa, ya, deg)
                 return numpy.poly1d(z)
             except:
@@ -39594,94 +39619,114 @@ class profileTransformatorDlg(ArtisanDialog):
         target_offsets[4] = target_offset
         return factors,profile_offsets,target_offsets
     
+    def applyDiscreteTimeMapping(self,timex,offset,factors,profile_offsets,target_offsets):
+        res_timex = []
+        for i in range(len(timex)):
+            if aw.qmc.timeindex[1] > 0 and i <= aw.qmc.timeindex[1]:
+                j = 0
+            elif aw.qmc.timeindex[2] > 0 and i <= aw.qmc.timeindex[2]:
+                j = 1
+            elif aw.qmc.timeindex[4] > 0 and i <= aw.qmc.timeindex[4]:
+                j = 2
+            elif aw.qmc.timeindex[6] > 0 and i <= aw.qmc.timeindex[6]:
+                j = 3
+            else:
+                # after DROP
+                j = 4
+            f = factors[j] # factor to be applied
+            profile_offset = profile_offsets[j]
+            target_offset = target_offsets[j]
+            res_timex.append((timex[i]-offset - profile_offset) * f + target_offset)
+        if aw.qmc.timeindex[0] != -1:
+            foffset = res_timex[0]
+            res_timex = [tx+foffset for tx in res_timex]
+        return res_timex
+        
     def applyTimeTransformation(self):
+        # first update the targets
         self.targetTimes = self.getTargetTimes()
+        # calculate the offset of 00:00
         offset = 0
         if aw.qmc.timeindex[0] != -1:
             offset = self.org_timex[aw.qmc.timeindex[0]]
+        # apply either the discrete or the polyfit mappings
         if aw.qmc.transMappingMode == 0:
             # discrete mapping
+            # calculate factors and offsets
             factors,profile_offsets,target_offsets = self.calcTimeFactors()
-            f = 1 # factor
-            for i in range(len(self.org_timex)):
-                if aw.qmc.timeindex[1] > 0 and i <= aw.qmc.timeindex[1]:
-                    j = 0
-                elif aw.qmc.timeindex[2] > 0 and i <= aw.qmc.timeindex[2]:
-                    j = 1
-                elif aw.qmc.timeindex[4] > 0 and i <= aw.qmc.timeindex[4]:
-                    j = 2
-                elif aw.qmc.timeindex[6] > 0 and i <= aw.qmc.timeindex[6]:
-                    j = 3
-                else:
-                    # after DROP
-                    j = 4
-                f = factors[j]
-                profile_offset = profile_offsets[j]
-                target_offset = target_offsets[j]
-                aw.qmc.timex[i] = (self.org_timex[i]-offset - profile_offset) * f + target_offset
-            if aw.qmc.timeindex[0] != -1:
-                foffset = aw.qmc.timex[0]
-                aw.qmc.timex = [tx+foffset for tx in aw.qmc.timex]
-            # TODO: apply this mapping also to the extra timex
+            # apply to the main timex
+            aw.qmc.timex = self.applyDiscreteTimeMapping(self.org_timex,offset,factors,profile_offsets,target_offsets)
+            # apply to the extra timex
+            aw.qmc.extratimex = []
+            for timex in self.org_extratimex:
+                aw.qmc.extratimex.append(self.applyDiscreteTimeMapping(timex,offset,factors,profile_offsets,target_offsets))
         else:
-            fit = self.calcTimePolyfit()
-            if fit is not None:
-                aw.qmc.timex = [fit(tx-offset) for tx in self.org_timex]
-                if aw.qmc.timeindex[0] != -1:
-                    foffset = aw.qmc.timex[0]
-                    aw.qmc.timex = [tx+foffset for tx in aw.qmc.timex]
-                extratimex = []
-                for timex in self.org_extratimex:
-                    offset = 0
-                    if aw.qmc.timeindex[0] != -1:
-                        offset = timex[aw.qmc.timeindex[0]]
-                    new_timex = [fit(tx-offset) for tx in timex]
-                    if aw.qmc.timeindex[0] != -1:
-                        foffset = new_timex[0]
-                        new_timex = [tx+foffset for tx in new_timex]
-                    extratimex.append(new_timex)
+            with warnings.catch_warnings():
+                warnings.filterwarnings('error')
+                try:
+                    fit = self.calcTimePolyfit()
+                    if fit is not None:
+                        aw.qmc.timex = [fit(tx-offset) for tx in self.org_timex]
+                        if aw.qmc.timeindex[0] != -1:
+                            foffset = aw.qmc.timex[0]
+                            aw.qmc.timex = [tx+foffset for tx in aw.qmc.timex]
+                        extratimex = []
+                        for timex in self.org_extratimex:
+                            offset = 0
+                            if aw.qmc.timeindex[0] != -1:
+                                offset = timex[aw.qmc.timeindex[0]]
+                            new_timex = [fit(tx-offset) for tx in timex]
+                            if aw.qmc.timeindex[0] != -1:
+                                foffset = new_timex[0]
+                                new_timex = [tx+foffset for tx in new_timex]
+                            extratimex.append(new_timex)
+                        aw.qmc.extratimex = extratimex
+                except np.RankWarning:
+                    pass
     
     #called from Apply button
     @pyqtSlot()
     def apply(self):
-        print("apply")
+        aw.qmc.roastUUID = None
+        aw.setCurrentFile(None,addToRecent=False)
         aw.qmc.l_event_flags_dict = {}
         aw.qmc.l_annotations_dict = {}
         self.applyTimeTransformation()
+        aw.qmc.safesaveflag = True
+        aw.qmc.timealign()
         aw.autoAdjustAxis()
         aw.qmc.redraw()
     
     #called from Restore button
     @pyqtSlot()
     def restore(self):
-        print("restore")
+        aw.qmc.roastUUID = self.org_UUID
+        aw.setCurrentFile(self.org_curFile,addToRecent=False)
+        aw.qmc.safesaveflag = self.org_safesaveflag
         aw.qmc.l_event_flags_dict = {}
         aw.qmc.l_annotations_dict = {}
         aw.qmc.timex = self.org_timex[:]
         aw.qmc.temp2 = self.org_temp2[:]
         aw.qmc.extratimex = copy.deepcopy(self.org_extratimex)
+        aw.autoAdjustAxis()
         aw.qmc.redraw()
 
     #called from OK button
     @pyqtSlot()
     def applyTransformations(self):
-        print("applyTransformations")
-        
+        self.apply()
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("TransformatorPosition",self.geometry().topLeft())
-        
         self.accept()
 
     #called from Cancel button
     @pyqtSlot()
     def restoreState(self):
-        print("restoreState")
-        
+        self.restore()
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("TransformatorPosition",self.geometry().topLeft())
-
         self.reject()
 
     def closeEvent(self, _):
@@ -39751,7 +39796,7 @@ class profileTransformatorDlg(ArtisanDialog):
         
         for i in range(4):
             if len(self.profileTimes) > i and self.profileTimes[i] is not None:
-                profile_time_str = aw.qmc.stringfromseconds(self.profileTimes[i])
+                profile_time_str = aw.qmc.stringfromseconds(self.profileTimes[i],leadingzero=False)
                 profile_widget = QTableWidgetItem(profile_time_str)
                 profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 self.timetable.setItem(0,i,profile_widget)
@@ -39777,7 +39822,6 @@ class profileTransformatorDlg(ArtisanDialog):
             self.time_target_widgets.append(target_widget)
             self.time_result_widgets.append(result_widget)
 
-    
     def createTempTable(self):
         self.temptable.clear()
         self.temptable.setRowCount(3)
@@ -62386,7 +62430,7 @@ def main():
     global app
     global artisanviewerFirstStart
     
-    # supress all Qt messages        
+    # supress all Qt messages
     qInstallMessageHandler(qt_message_handler)
     
     # suppress all warnings
