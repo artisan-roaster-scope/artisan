@@ -7,5 +7,5 @@ matplotlib==3.2.1
 PyQt5==5.13.2
 openpyxl==3.0.3
 pyinstaller==3.6
-pywin32==225
+pywin32==227
 keyring==19.2.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
