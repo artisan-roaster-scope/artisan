@@ -21083,14 +21083,21 @@ class ApplicationWindow(QMainWindow):
         self.qmc.alarmstate = [-1]*len(self.qmc.alarmflag)  #-1 = not triggered; otherwise idx = triggered
 
     # returns True if data got updated, False otherwise
-    def calcVirtualdevices(self):
+    def calcVirtualdevices(self,update=False):
         try:
             dirty = False
             for j in range(len(self.qmc.extradevices)):
                 if aw.qmc.extradevices[j] == 25:  #virtual device
-                    if len(aw.qmc.extratimex[j]) > 0:  # move on if the virtual device already has data
+                    if len(aw.qmc.extratimex[j]) > 0 and not update:  # move on if the virtual device already has data
                         continue
-                        
+                    
+                    if update and not len(aw.qmc.extratimex[j]) > 0:
+                        self.qmc.extratimex[j] = aw.qmc.timex[:]
+                        self.qmc.extratemp1[j] = [-1]*len((self.qmc.timex))
+                        self.qmc.extratemp2[j] = [-1]*len((self.qmc.timex))
+                        y_range1 = []
+                        y_range2 = []
+
                     nonempty_mathexpression1 = bool(self.qmc.extramathexpression1[j] is not None and len(self.qmc.extramathexpression1[j].strip()))
                     nonempty_mathexpression2 = bool(self.qmc.extramathexpression2[j] is not None and len(self.qmc.extramathexpression2[j].strip()))
                     
@@ -53276,7 +53283,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def updateVirtualdevicesinprofile(self,_):
         try:
             self.savedevicetable(redraw=False)
-            if aw.calcVirtualdevices():
+            if aw.calcVirtualdevices(update=True):
                 aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
