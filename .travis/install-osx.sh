@@ -1,15 +1,22 @@
 #!/bin/sh
 
 set -ex # reduced logging
-#set -e
+#set -e # increased logging
 
-brew update # this seems to help to work around some homebrew issues; and fails on others
+.travis/slience.sh brew update # this seems to help to work around some homebrew issues; and fails on others
 
 # Python 3.7.5 is installed by default
 # to update use either:
 #brew upgrade python
 # or, to avoid issues with brew auto updates by deactivating them,
 #HOMEBREW_NO_AUTO_UPDATE=1 brew install python
+
+brew uninstall numpy
+brew unlink python@2
+brew upgrade python
+hash -r
+which python
+python --version
 
 # following https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew/51125014#51125014
 # to install Python 3.6.5
@@ -31,5 +38,5 @@ sudo pip3 install -r src/requirements.txt
 sudo pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
 sudo rm -rf /usr/local/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data
 
-#.travis/install-phidgets.sh
+#.travis/install-phidgets.sh # now installed via pip
 .travis/install-snap7.sh

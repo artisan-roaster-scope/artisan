@@ -71,7 +71,7 @@ extraeventsvisibility=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
 clusterEventsFlag=false
 quantifieractive=1, 1, 1, 1
 quantifiercoarse=0, 0, 0, 0
-quantifiermax=180, 60, 250, 100
+quantifiermax=350, 60, 250, 100
 quantifiermin=80, 35, 0, 0
 quantifiersource=7, 4, 5, 6
 
@@ -108,7 +108,7 @@ eventslidertemp=0, 0, 1, 0
 slideractions=12, 12, 12, 12
 slidercommands="setDBint(2,16,{})", "setDBint(2,18,{})", "setDBint(2,10,{})", "setDBint(2,14,{})"
 sliderfactors=1, 1, 1, 1
-slidermax=180, 60, 250, 100
+slidermax=350, 60, 250, 100
 slidermin=80, 35, 0, 0
 slideroffsets=0, 0, 0, 1
 slidervisibilities=1, 1, 1, 1

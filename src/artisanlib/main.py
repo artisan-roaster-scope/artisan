@@ -1805,6 +1805,7 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveflag = 0
         self.autosaveprefix = ""
         self.autosavepath = ""
+        self.autosavealsopath = ""
         
         self.autosaveimage = False # if true save an image along alog files
         self.autosaveimageformat = "PDF" # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP, CSV, JSON
@@ -20625,25 +20626,31 @@ class ApplicationWindow(QMainWindow):
                 if res:
                     #write
                     self.serialize(filename_path,self.getProfile())
-                    #restore dirs
-                    QDir.setCurrent(oldDir)
                     self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
                     self.setCurrentFile(filename,False) # we do not add autosaved files any longer to the recent file menu
                     self.qmc.fileClean()
                     
+                    if self.qmc.autosavealsopath != "":
+                        other_filename_path = os.path.join(self.qmc.autosavealsopath,filename)
+                    else:
+                        other_filename_path = os.path.join(self.qmc.autosavepath,filename)
+                    
                     if self.qmc.autosaveimage and not aw.qmc.flagon:
-                        if ".alog" in filename:
-                            filename = filename[0:-5]
+                        if other_filename_path.endswith(".alog"):
+                            other_filename_path = other_filename_path[0:-5]
                         if self.qmc.autosaveimageformat == "PDF":
-                            self.saveVectorGraph(extension=".pdf",fname=filename) 
+                            self.saveVectorGraph(extension=".pdf",fname=other_filename_path) 
                         elif self.qmc.autosaveimageformat == "SVG":
-                            self.saveVectorGraph(extension=".svg",fname=filename)
+                            self.saveVectorGraph(extension=".svg",fname=other_filename_path)
                         elif self.qmc.autosaveimageformat == "CSV":
-                            self.exportCSV(filename + ".csv")
+                            self.exportCSV(other_filename_path + ".csv")
                         elif self.qmc.autosaveimageformat == "JSON":
-                            self.exportJSON(filename + ".json")
+                            self.exportJSON(other_filename_path + ".json")
                         else:
-                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename)
+                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=other_filename_path)
+                    #restore dirs
+                    QDir.setCurrent(oldDir)
+                    
                     return filename
                 else:
                     self.sendmessage(QApplication.translate("Message","Autosave path does not exist. Autosave failed.", None))
@@ -24662,6 +24669,8 @@ class ApplicationWindow(QMainWindow):
                 self.wheelpath = toString(settings.value("wheelpath",self.wheelpath))
             if settings.contains("autosavepath"):
                 self.qmc.autosavepath = toString(settings.value("autosavepath",self.qmc.autosavepath))
+            if settings.contains("autosavealsopath"):
+                self.qmc.autosavealsopath = toString(settings.value("autosavealsopath",self.qmc.autosavealsopath))
             if settings.contains("externalprogram"):
                 self.ser.externalprogram = toString(settings.value("externalprogram",self.ser.externalprogram))
             if settings.contains("externaloutprogram"):
@@ -25946,6 +25955,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("settingspath",self.settingspath)
             settings.setValue("wheelpath",self.wheelpath)
             settings.setValue("autosavepath",self.qmc.autosavepath)
+            settings.setValue("autosavealsopath",self.qmc.autosavealsopath)
             settings.setValue("externalprogram",self.ser.externalprogram)
             settings.setValue("externaloutprogram",self.ser.externaloutprogram)
             settings.setValue("externaloutprogramFlag",self.ser.externaloutprogramFlag)
@@ -38203,6 +38213,12 @@ class autosaveDlg(ArtisanDialog):
         self.pathEdit = QLineEdit(u(aw.qmc.autosavepath))
         self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None))
         pathButton.clicked.connect(self.getpath)
+        
+        pathAlsoButton = QPushButton(QApplication.translate("Button","Path", None))
+        pathAlsoButton.setFocusPolicy(Qt.NoFocus)
+        self.pathAlsoEdit = QLineEdit(u(aw.qmc.autosavealsopath))
+        self.pathAlsoEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store the save also files",None))
+        pathAlsoButton.clicked.connect(self.getalsopath)
 
         helpButton = QPushButton(QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(self.autosavehelp)
@@ -38225,6 +38241,8 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(self.autopdfcheckbox,5,0,Qt.AlignRight)
         autolayout.addWidget(autopdflabel,5,1)
         autolayout.addWidget(self.imageTypesComboBox,5,2)
+        autolayout.addWidget(pathAlsoButton,6,0)
+        autolayout.addWidget(self.pathAlsoEdit,6,1,1,2)
         autolayout.setColumnStretch(0,0)
         autolayout.setColumnStretch(1,10)
         autolayout.setColumnStretch(2,0)
@@ -38263,9 +38281,15 @@ class autosaveDlg(ArtisanDialog):
         filename = aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Path", None))
         self.pathEdit.setText(filename)
 
+    @pyqtSlot(bool)
+    def getalsopath(self,_):
+        filename = aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Save Also Path", None))
+        self.pathAlsoEdit.setText(filename)
+
     @pyqtSlot()
     def autoChanged(self):
         aw.qmc.autosavepath = u(self.pathEdit.text())
+        aw.qmc.autosavealsopath = u(self.pathAlsoEdit.text())
         if self.autocheckbox.isChecked():
             aw.qmc.autosaveflag = 1
             aw.qmc.autosaveprefix = u(self.prefixEdit.text())
@@ -39345,8 +39369,9 @@ class profileTransformatorDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Profile Transformator",None))
         
-        self.regextime = QRegExp(r"^$|^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.regextemp = QRegExp(r"^$|^-?[0-9]?[0-9]?[0-9]?\.?[0-9]$")
+        self.regexpercent = QRegExp(r"^$|^?[0-9]?[0-9].[0-9]$")
+        self.regextime = QRegExp(r"^$|^?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        self.regextemp = QRegExp(r"^$|^?[0-9]?[0-9]?[0-9]?\.?[0-9]$")
         
         # original data
         self.org_timex = aw.qmc.timex[:]
@@ -39354,6 +39379,10 @@ class profileTransformatorDlg(ArtisanDialog):
         self.org_extratimex = copy.deepcopy(aw.qmc.extratimex)
         self.org_curFile = aw.curFile
         self.org_UUID = aw.qmc.roastUUID
+        self.org_roastdate = aw.qmc.roastdate
+        self.org_roastepoch = aw.qmc.roastepoch
+        self.org_roasttzoffset = aw.qmc.roasttzoffset
+        self.org_roastbatchnr = aw.qmc.roastbatchnr
         self.org_safesaveflag = aw.qmc.safesaveflag
         self.org_l_event_flags_dict = aw.qmc.l_event_flags_dict
         self.org_l_annotations_dict = aw.qmc.l_annotations_dict
@@ -39368,8 +39397,7 @@ class profileTransformatorDlg(ArtisanDialog):
         #
         self.phases_target_widgets_time = None
         self.phases_target_widgets_percent = None
-        self.phases_result_widgets_time = None
-        self.phases_result_widgets_percent = None
+        self.phases_result_widgets = None
         #
         self.time_target_widgets = None
         self.time_result_widgets = None
@@ -39554,6 +39582,10 @@ class profileTransformatorDlg(ArtisanDialog):
         print("updateTempResults")
     
     @pyqtSlot()
+    def updatePhasesResults(self):
+        print("updatePhasesResults")
+    
+    @pyqtSlot()
     def updateTimeResults(self):
         self.targetTimes = self.getTargetTimes()
         if all(v is None for v in self.targetTimes):
@@ -39717,10 +39749,14 @@ class profileTransformatorDlg(ArtisanDialog):
         applied = self.applyTimeTransformation()
         if applied:
             aw.qmc.roastUUID = None
+            aw.qmc.roastdate = QDateTime.currentDateTime()
+            aw.qmc.roastepoch = aw.qmc.roastdate.toTime_t()
+            aw.qmc.roasttzoffset = libtime.timezone
+            aw.qmc.roastbatchnr = 0
             aw.setCurrentFile(None,addToRecent=False)
             aw.qmc.l_event_flags_dict = {}
             aw.qmc.l_annotations_dict = {}
-            aw.qmc.safesaveflag = True
+            aw.qmc.fileDirty()
             aw.qmc.timealign()
             aw.autoAdjustAxis()
             aw.qmc.redraw()
@@ -39730,9 +39766,16 @@ class profileTransformatorDlg(ArtisanDialog):
     #called from Restore button
     @pyqtSlot()
     def restore(self):
-        aw.qmc.roastUUID = self.org_UUID
         aw.setCurrentFile(self.org_curFile,addToRecent=False)
-        aw.qmc.safesaveflag = self.org_safesaveflag
+        aw.qmc.roastUUID = self.org_UUID
+        aw.qmc.roastdate = self.org_roastdate
+        aw.qmc.roastepoch = self.org_roastepoch
+        aw.qmc.roasttzoffset = self.org_roasttzoffset
+        aw.qmc.roastbatchnr = self.org_roastbatchnr
+        if self.org_safesaveflag:
+            aw.qmc.fileDirty()
+        else:
+            aw.qmc.fileClean()
         aw.qmc.l_event_flags_dict = self.org_l_event_flags_dict
         aw.qmc.l_annotations_dict = self.org_l_annotations_dict
         aw.qmc.timex = self.org_timex[:]
@@ -39796,8 +39839,7 @@ class profileTransformatorDlg(ArtisanDialog):
 
         self.phases_target_widgets_time = []
         self.phases_target_widgets_percent = []
-        self.phases_result_widgets_time = []
-        self.phases_result_widgets_percent = []
+        self.phases_result_widgets = []
         
         profilePhasesTimes = [None]*3 # DRYING, MAILARD, FINISHING
         profilePhasesPercentages = [None] * 3
@@ -39819,26 +39861,33 @@ class profileTransformatorDlg(ArtisanDialog):
                 profile_phases_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 self.phasestable.setItem(0,i,profile_phases_widget)
                 #
-#                target_widget = QLineEdit("")
-#                target_widget.setValidator(QRegExpValidator(self.regextime))
-#                target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
-#                target_widget.editingFinished.connect(self.updateTimeResults)
-#                target_cell_widget = QWidget()
-#                target_cell_layout = QHBoxLayout(target_cell_widget)
-#                target_cell_layout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
-#                target_cell_layout.setContentsMargins(4,4,4,4)
-#                target_cell_layout.addWidget(target_widget)
-#                target_cell_widget.setLayout(target_cell_layout)
-#                self.phasestable.setCellWidget(1,i,target_cell_widget)
-#                #
-#                result_widget = QTableWidgetItem(profile_time_str)
-#                result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
-#                self.phasestable.setItem(2,i,result_widget)
-#            else:
-#                target_widget = None
-#                result_widget = None
-#            self.time_target_widgets.append(target_widget)
-#            self.time_result_widgets.append(result_widget)
+                target_widget_time = QLineEdit("")
+                target_widget_time.setValidator(QRegExpValidator(self.regextime))
+                target_widget_time.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_widget_time.editingFinished.connect(self.updatePhasesResults)
+                target_widget_percent = QLineEdit("")
+                target_widget_percent.setValidator(QRegExpValidator(self.regexpercent))
+                target_widget_percent.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_widget_percent.editingFinished.connect(self.updatePhasesResults)
+                target_cell_widget = QWidget()
+                target_cell_layout = QHBoxLayout(target_cell_widget)
+                target_cell_layout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                target_cell_layout.setContentsMargins(4,4,4,4)
+                target_cell_layout.addWidget(target_widget_time)
+                target_cell_layout.addWidget(target_widget_percent)
+                target_cell_widget.setLayout(target_cell_layout)
+                self.phasestable.setCellWidget(1,i,target_cell_widget)
+                #
+                result_widget = QTableWidgetItem("")
+                result_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+                self.phasestable.setItem(2,i,result_widget)
+            else:
+                target_widget_time = None
+                target_widget_percent = None
+                result_widget = None
+            self.phases_target_widgets_time.append(target_widget_time)
+            self.phases_target_widgets_percent.append(target_widget_percent)
+            self.phases_result_widgets.append(result_widget)
 
     def createTimeTable(self):
         self.timetable.clear()
@@ -43722,7 +43771,6 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.readChecks()
         self.createEventTable()
         self.createDataTable()
-        #aw.qmc.safesaveflag = True
 
     def createEventTable(self):
         ndata = len(aw.qmc.backgroundEvents)

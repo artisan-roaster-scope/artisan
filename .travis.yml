@@ -16,8 +16,9 @@ matrix:
     - env: ARTISAN_OS=rpi
   include:
   - os: linux
+    only: master
     python: 3.8
-    sudo: required
+#    sudo: required # deprecated
     dist: xenial
     cache:
       - pip
@@ -26,15 +27,21 @@ matrix:
       - ARTISAN_OS=linux
   - os: linux
     language: generic
-    sudo: required
+    only: master
+#    sudo: required # deprecated
     dist: xenial
     env:
       ARTISAN_OS=rpi
   - os: osx
     python: 3.7
     language: generic
+    only: master
     cache:
-      - pip
+      # As for now travis caches only "$HOME/.cache/pip"
+      # https://docs.travis-ci.com/user/caching/#pip-cache
+      pip: false
+      directories:
+      - $HOME/Library/Caches/pip    
     env:
       - ARTISAN_OS=osx
 
@@ -57,7 +64,7 @@ script:
 after_success:
   - cd src
   - curl -L -O https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - export UPLOADTOOL_BODY="WARNING: pre-release builds may not work. Use at your own risk."
+  - export UPLOADTOOL_BODY="WARNING pre-release builds may not work. Use at your own risk."
   - if [ "$ARTISAN_OS" = "osx" ]; then bash upload.sh artisan*.dmg; fi
   - if [ "$ARTISAN_OS" = "rpi" ]; then bash upload.sh artisan*.deb; fi
   - if [ "$ARTISAN_OS" = "linux" ]; then bash upload.sh artisan*.rpm artisan*.deb; fi 
