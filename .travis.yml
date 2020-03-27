@@ -16,7 +16,6 @@ matrix:
     - env: ARTISAN_OS=rpi
   include:
   - os: linux
-    only: master
     python: 3.8
 #    sudo: required # deprecated
     dist: xenial
@@ -27,7 +26,6 @@ matrix:
       - ARTISAN_OS=linux
   - os: linux
     language: generic
-    only: master
 #    sudo: required # deprecated
     dist: xenial
     env:
@@ -35,7 +33,6 @@ matrix:
   - os: osx
     python: 3.7
     language: generic
-    only: master
     cache:
       # As for now travis caches only "$HOME/.cache/pip"
       # https://docs.travis-ci.com/user/caching/#pip-cache
