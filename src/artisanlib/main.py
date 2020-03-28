@@ -19402,7 +19402,8 @@ class ApplicationWindow(QMainWindow):
             if s and (s[0] == '"' or s[0] == "'") and s[0] == s[-1]:
                 return s[1:-1]
             return s
-        return [strip_quotes(p).replace('\\"', '"').replace("\\'", "'") for p in re.findall(r'"(?:\\.|[^"])*"|\'(?:\\.|[^\'])*\'|[^\s]+', s)]
+        return [strip_quotes(p).replace('\\"', '"').replace("\\'", "'") for p in re.findall(r'"(?:\\.|[^"])*"|\'(?:\\.|[^\'])*\'|[^\s]+', s)] 
+    # dummy ' for syntax parsers confused by odd numbers of quotes
         
                         
     def call_prog_with_args(self,cmd_str):
@@ -20510,7 +20511,7 @@ class ApplicationWindow(QMainWindow):
         return ''.join(c for c in d(cleanedFilename) if c in validFilenameChars)
     
     
-    def generateFilename(self,prefix="",fakeon=False):
+    def generateFilename(self,prefix="",previewmode=0):
         filename = ""
         try:
             if prefix == "":
@@ -20526,7 +20527,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     filename += str(aw.qmc.roastdate.toString(u("yy-MM-dd_hhmm")))
             else:
-                filename = self.parseAutosaveprefix(prefix, fakeon=fakeon)
+                filename = self.parseAutosaveprefix(prefix,previewmode=previewmode)
             filename += ".alog"
             #clean name
             filename = self.removeDisallowedFilenameChars(u(filename))
@@ -20536,9 +20537,10 @@ class ApplicationWindow(QMainWindow):
         return filename
 
     #replace fields delimited as %field% with the corresponding value
-    def parseAutosaveprefix(self,fn,fakeon=False):
+    #previewmode 0=not preview, 1=preview for while recording, 2=preview for while not recording
+    def parseAutosaveprefix(self,fn,previewmode=0):
         try:
-            #it's text only when there are no disallowed characters, so add the date for backward compatibility and return.
+            #it is text only when there are no disallowed characters, so add the date for backward compatibility and return.
             if fn == self.removeDisallowedFilenameChars(u(fn)):
                 fn += '_' + u(self.qmc.roastdate.toString(u("yy-MM-dd_hhmm")))
                 return fn
@@ -20554,7 +20556,7 @@ class ApplicationWindow(QMainWindow):
             fn = fn.replace('\n', '')  
 
             #if flagon then the batchcounter has not yet been incremented so we do that here
-            if (self.qmc.flagon or fakeon) and self.qmc.batchcounter != -1:
+            if (self.qmc.flagon or previewmode==1) and self.qmc.batchcounter != -1:
                 bnr = self.qmc.batchcounter + 1
             else:
                 bnr = self.qmc.roastbatchnr
@@ -20594,10 +20596,11 @@ class ApplicationWindow(QMainWindow):
                 (QApplication.translate("AutosaveField", "beans",None),u(beansline[:30])),
                 ]
 
-            #text between single quotes ' will show only when flagon is True
-            fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (self.qmc.flagon or fakeon) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
+            #text between single quotes ' will show only when recording or for preview recording
+            fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
             #text between double quotes " will show only when flagon is False
-            fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if not (self.qmc.flagon or fakeon) else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
+#            fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if not (self.qmc.flagon or fakeon) else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
+            fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon))  else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
             #replace the fields with content
             for i in range(len(fields)):
                 fn = fn.replace(self.fieldDelim + fields[i][0], u(fields[i][1]))
@@ -38273,9 +38276,9 @@ class autosaveDlg(ArtisanDialog):
 
     @pyqtSlot()
     def prefixChanged(self):
-        preview = aw.generateFilename(self.prefixEdit.text())
+        preview = aw.generateFilename(self.prefixEdit.text(),previewmode=2)
         self.prefixPreview.setText(preview)
-        previewrecording = aw.generateFilename(self.prefixEdit.text(),fakeon=True)
+        previewrecording = aw.generateFilename(self.prefixEdit.text(),previewmode=1)
         if previewrecording == preview:
             self.prefixpreviewrecordingLabel.setText("")
             self.prefixPreviewrecording.setText("")
