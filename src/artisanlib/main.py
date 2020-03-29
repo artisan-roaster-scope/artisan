@@ -13898,7 +13898,7 @@ class ApplicationWindow(QMainWindow):
 
         self.transformAction = QAction(UIconst.TOOLKIT_MENU_TRANSFORM,self)
         self.transformAction.triggered.connect(self.transform)
-#        self.ToolkitMenu.addAction(self.transformAction)
+        self.ToolkitMenu.addAction(self.transformAction)
 
         self.temperatureMenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_TEMPERATURE)
         
@@ -15609,6 +15609,42 @@ class ApplicationWindow(QMainWindow):
         
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
+
+    # takes a fit from numpy.polyfit and renders it as string to be copied as symbolic formula
+    def fit2str(self,fit):
+        s = ""
+        sign = "+"
+        fit = fit[::-1]
+        try:
+            for i in range(len(fit)):
+                v = abs(fit[i])
+                if round(v,3) != 0.0:
+                    if i == 0:
+                        s = ("%.4f" % v)
+                    elif i == 1:
+                        if s != "":
+                            s = " " + sign + " " + s
+                        if v == 1:
+                            s = ("x" + s)
+                        else:
+                            s = ("%.4f*x" % v + s)
+                    else:
+                        if s != "":
+                            s = " " + sign + " " + s
+                        if v == 1:
+                            s = ("x^%i" % i + s)
+                        else:
+                            s = ("%.4f*x^%i" % (v,i) + s)
+                    s = s.rstrip('0').rstrip('.')
+                    if fit[i] < 0:
+                        sign = "-"
+                    else:
+                        sign = "+"
+            if sign == "-":
+                s = sign + s
+        except:
+            pass
+        return s
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.ApplicationPaletteChange:  # called if the palette changed (switch between dark and light mode on macOS)
@@ -33599,28 +33635,7 @@ class HUDDlg(ArtisanDialog):
                     res = False
                     return False
         if res and z is not None:
-            s = ""
-            sign = "+"
-            z = z[::-1]
-            for i in range(len(z)):
-                v = abs(z[i])
-                if round(v,3) != 0.0:
-                    if i == 0:
-                        s = "%.4f" % v
-                    elif i == 1:
-                        if s != "":
-                            s = " " + sign + " " + s
-                        s = "%.4f*x" % v + s
-                    else:
-                        if s != "":
-                            s = " " + sign + " " + s
-                        s = "%.4f*x^%i" % (v,i) + s
-                    if z[i] < 0:
-                        sign = "-"
-                    else:
-                        sign = "+"
-            if sign == "-":
-                s = sign + s
+            s = aw.fit2str(z)
             self.result.setText(s)
             self.result.repaint()
             return True
@@ -39384,6 +39399,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.regextemp = QRegExp(r"^$|^?[0-9]?[0-9]?[0-9]?(\.[0-9])?$")
         
         # original data
+        self.org_transMappingMode = aw.qmc.transMappingMode
         self.org_timex = aw.qmc.timex[:]
         self.org_temp2 = aw.qmc.temp2[:]
         self.org_extratimex = copy.deepcopy(aw.qmc.extratimex)
@@ -39414,17 +39430,19 @@ class profileTransformatorDlg(ArtisanDialog):
         
         # profileTimes: list of DRY, FCs, SCs and DROP times in seconds if event is set, otherwise None
         self.profileTimes = self.getProfileTimes()
-        # list of DRY, FCs, SCs, and DROP target times in seconds as specified by the user, or if not set None
+        # list of DRY, FCs, SCs, and DROP target times in seconds as specified by the user, or None if not set
         self.targetTimes = self.getTargetTimes()
-        
-        # list of CHARGE, DRY, FCs, SCs and DROP BT temperatures
-        self.profileTemps = self.getProfileTemps()
         
         # temp table widgets initialized by createTempTable() to a list (target/result) with 5 widgets each
         #   CHARGE, DRY, FCs, SCs, DROP
         # if an event is not set in the profile, None is set instead of a widget
         self.temp_target_widgets = None
         self.temp_result_widgets = None
+        
+        # list of CHARGE, DRY, FCs, SCs and DROP BT temperatures
+        self.profileTemps = self.getProfileTemps()
+        # list of DRY, FCs, SCs, and DROP target temperatures as specified by the user, or None if not set
+        self.targetTemps = self.getTargetTemps()
         
         self.createPhasesTable()
         self.createTimeTable()
@@ -39435,8 +39453,10 @@ class profileTransformatorDlg(ArtisanDialog):
         self.dialogbuttons.rejected.connect(self.restoreState)
         self.applyButton = self.dialogbuttons.addButton(QDialogButtonBox.Apply)
         self.resetButton = self.dialogbuttons.addButton(QDialogButtonBox.Reset)
+        self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
         self.dialogbuttons.button(QDialogButtonBox.Apply).clicked.connect(self.apply)
         self.dialogbuttons.button(QDialogButtonBox.Reset).clicked.connect(self.restore)
+        self.dialogbuttons.button(QDialogButtonBox.Help).clicked.connect(self.help)
         
         #buttons
         buttonsLayout = QHBoxLayout()
@@ -39449,6 +39469,8 @@ class profileTransformatorDlg(ArtisanDialog):
                                               QApplication.translate("ComboBox","quadratic",None)])
         self.mappingModeComboBox.setCurrentIndex(aw.qmc.transMappingMode)
         self.mappingModeComboBox.currentIndexChanged.connect(self.changeMappingMode)
+        
+        self.temp_formula = QLabel()
         
         settingsHLayout = QHBoxLayout()
         settingsHLayout.addStretch()
@@ -39474,8 +39496,13 @@ class profileTransformatorDlg(ArtisanDialog):
         tempHLayout = QHBoxLayout()
         tempHLayout.addWidget(self.temptable)
         tempHLayout.addStretch()
+        formulaHLayout = QHBoxLayout()
+        formulaHLayout.addStretch()
+        formulaHLayout.addWidget(self.temp_formula)
+        formulaHLayout.addStretch()
         tempLayout = QVBoxLayout()
         tempLayout.addLayout(tempHLayout)
+        tempLayout.addLayout(formulaHLayout)
         tempLayout.addStretch()
         
         phasesGroupLayout = QGroupBox(QApplication.translate("Table","Phases",None))
@@ -39502,25 +39529,140 @@ class profileTransformatorDlg(ArtisanDialog):
             self.move(settings.value("TransformatorPosition"))
         
         mainlayout.setSizeConstraint(QLayout.SetFixedSize)
-        
-    
-    @pyqtSlot(int)
-    def changeMappingMode(self,i):
-        aw.qmc.transMappingMode = i
-        self.updatePhasesResults()
-        self.updateTimeResults()
+
+
+    # utility functions
     
     def forgroundOffset(self):
         if aw.qmc.timeindex[0] == -1:
             return 0
         else:
-            return aw.qmc.timex[aw.qmc.timeindex[0]]
+            return self.org_timex[aw.qmc.timeindex[0]]
     
     def backgroundOffset(self):
         if aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
             return aw.qmc.timeB[aw.qmc.timeindexB[0]]
         else:
             return 0
+    
+    def clearPhasesTargetTimes(self):
+        for i in range(3):
+            if self.phases_target_widgets_time[i] is not None:
+                self.phases_target_widgets_time[i].setText("")
+    
+    def clearPhasesTargetPercent(self):
+        for i in range(3):
+            if self.phases_target_widgets_percent[i] is not None:
+                self.phases_target_widgets_percent[i].setText("")
+    
+    def clearPhasesResults(self):
+        for i in range(3):
+            if self.phases_result_widgets[i] is not None:
+                self.phases_result_widgets[i].setText("")
+    
+    def clearTimeTargets(self):
+        for i in range(4):
+            if self.time_target_widgets[i] is not None:
+                self.time_target_widgets[i].setText("")
+    
+    def clearTimeResults(self):
+        for i in range(4):
+            if self.time_result_widgets[i] is not None:
+                self.time_result_widgets[i].setText("")
+    
+    def clearTempTargets(self):
+        for i in range(5):
+            if self.temp_target_widgets[i] is not None:
+                self.temp_target_widgets[i].setText("")
+    
+    def clearTempResults(self):
+        for i in range(5):
+            if self.temp_result_widgets[i] is not None:
+                self.temp_result_widgets[i].setText("")
+
+    # returns list of DRY, FCs, SCs and DROP profile times in seconds if event is set, otherwise None
+    def getProfileTimes(self):
+        offset = self.forgroundOffset()
+        res = []
+        for i in [1,2,4,6]:
+            idx = aw.qmc.timeindex[i]
+            if idx == 0 or len(aw.qmc.timex) < idx:
+                res.append(None)
+            else:
+                res.append(aw.qmc.timex[idx] - offset)
+        return res
+        
+    # returns list of CHARGE, DRY, FCs, SCs and DROP BT temperatures if event is set, otherwise None
+    def getProfileTemps(self):
+        res = []
+        for i in [0,1,2,4,6]:
+            idx = aw.qmc.timeindex[i]
+            if idx in [-1,0] or len(aw.qmc.timex) < idx:
+                res.append(None)
+            elif len(aw.qmc.temp2) > idx:
+                res.append(aw.qmc.temp2[idx])
+            else:
+                res.append(None)
+        return res
+    
+    # returns list of DRYING, MAILARD, FINISHING target phases times in seconds as first result and phases percentages (float) as second result
+    # if a phase is set not set None is returned instead of a value
+    def getTargetPhases(self):
+        res_times = []
+        res_phases = []
+        if self.phases_target_widgets_time is not None:
+            for w in self.phases_target_widgets_time:
+                r = None
+                if w is not None:
+                    txt = w.text()
+                    if txt is not None and txt != "":
+                        r = aw.qmc.stringtoseconds(txt)
+                res_times.append(r)
+        if self.phases_target_widgets_percent is not None:
+            for w in self.phases_target_widgets_percent:
+                r = None
+                if w is not None:
+                    txt = w.text()
+                    if txt is not None and txt != "":
+                        r = float(txt)
+                res_phases.append(r)
+        return res_times, res_phases
+
+    # returns list of DRY, FCs, SCs and DROP target times in seconds if event is set, otherwise None
+    def getTargetTimes(self):
+        res = []
+        if self.time_target_widgets is not None:
+            for w in self.time_target_widgets:
+                r = None
+                if w is not None:
+                    txt = w.text()
+                    if txt is not None and txt != "":
+                        r = aw.qmc.stringtoseconds(txt)
+                res.append(r)
+        return res
+
+    # returns list of CHARGE, DRY, FCs, SCs and DROP BT temperatures if event is set, otherwise None
+    def getTargetTemps(self):
+        res = []
+        if self.temp_target_widgets is not None:
+            for w in self.temp_target_widgets:
+                r = None
+                if w is not None:
+                    txt = w.text()
+                    if txt is not None and txt != "":
+                        r = float(txt)
+                res.append(r)
+        return res
+
+
+    # message slots
+    
+    @pyqtSlot(int)
+    def changeMappingMode(self,i):
+        aw.qmc.transMappingMode = i
+        self.updatePhasesResults()
+        self.updateTimeResults()
+        self.updateTempResults()
 
     @pyqtSlot(int)
     def phasesTableColumnHeaderClicked(self,i):
@@ -39578,97 +39720,24 @@ class profileTransformatorDlg(ArtisanDialog):
             self.clearTimeTargets()
             self.clearTimeResults()
 
-    # returns list of DRY, FCs, SCs and DROP profile times in seconds if event is set, otherwise None
-    def getProfileTimes(self):
-        offset = self.forgroundOffset()
-        res = []
-        for i in [1,2,4,6]:
-            idx = aw.qmc.timeindex[i]
-            if idx == 0 or len(aw.qmc.timex) < idx:
-                res.append(None)
-            else:
-                res.append(aw.qmc.timex[idx] - offset)
-        return res
-
-    # returns list of DRY, FCs, SCs and DROP target times in seconds if event is set, otherwise None
-    def getTargetTimes(self):
-        res = []
-        if self.time_target_widgets is not None:
-            for w in self.time_target_widgets:
-                r = None
-                if w is not None:
-                    txt = w.text()
-                    if txt is not None and txt != "":
-                        r = aw.qmc.stringtoseconds(txt)
-                res.append(r)
-        return res
+    @pyqtSlot(int)
+    def tempTableColumnHeaderClicked(self,i):
+        if self.temp_target_widgets[i] is not None:
+            # clear target value i
+            if self.temp_target_widgets[i].text() != "":
+                self.temp_target_widgets[i].setText("")
+                self.updateTempResults()
+            elif aw.qmc.background:
+                timeidx = [0,1,2,4,6][i]
+                if aw.qmc.timeindexB[timeidx] > 0:
+                    self.temp_target_widgets[i].setText(str(aw.float2float(aw.qmc.temp2B[aw.qmc.timeindexB[timeidx]])))
+                    self.updateTempResults()
     
-    # returns list of DRYING, MAILARD, FINISHING target phases times in seconds as first result and phases percentages (float) as second result
-    # if a phase is set not set None is returned instead of a value
-    def getTargetPhases(self):
-        res_times = []
-        res_phases = []
-        if self.phases_target_widgets_time is not None:
-            for w in self.phases_target_widgets_time:
-                r = None
-                if w is not None:
-                    txt = w.text()
-                    if txt is not None and txt != "":
-                        r = aw.qmc.stringtoseconds(txt)
-                res_times.append(r)
-        if self.phases_target_widgets_percent is not None:
-            for w in self.phases_target_widgets_percent:
-                r = None
-                if w is not None:
-                    txt = w.text()
-                    if txt is not None and txt != "":
-                        r = float(txt)
-                res_phases.append(r)
-        return res_times, res_phases
-
-    # returns list of CHARGE, DRY, FCs, SCs and DROP BT tempertures if event is set, otherwise None
-    def getProfileTemps(self):
-        res = []
-        for i in [0,1,2,4,6]:
-            idx = aw.qmc.timeindex[i]
-            if idx in [-1,0] or len(aw.qmc.timex) < idx:
-                res.append(None)
-            elif len(aw.qmc.temp2) > idx:
-                res.append(aw.qmc.temp2[idx])
-            else:
-                res.append(None)
-        return res
-    
-    @pyqtSlot()
-    def updateTempResults(self):
-        print("updateTempResults")
-    
-    # returns the list of results times in seconds
-    def calcTimeResults(self):
-        res = []
-        if aw.qmc.transMappingMode == 0:
-            # discrete mapping
-            factors,profile_offsets,target_offsets = self.calcTimeFactors()
-            for i in range(4):
-                if self.profileTimes[i] is not None:
-                    res.append((self.profileTimes[i] - profile_offsets[i]) * factors[i] + target_offsets[i])
-                else:
-                    res.append(None)
-        else:
-            with warnings.catch_warnings():
-                warnings.filterwarnings('error')
-                try:
-                    fit = self.calcTimePolyfit()
-                    for i in range(4):
-                        if fit is not None and self.profileTimes[i] is not None:
-                            res.append(fit(self.profileTimes[i]))
-                        else:
-                            res.append(None)
-                except numpy.RankWarning:
-                    pass
-                except Exception as e:
-                    pass
-        return res
+    @pyqtSlot(int)
+    def tempTableRowHeaderClicked(self,i):
+        if i == 1: # row targets
+            self.clearTempTargets()
+            self.clearTempResults()
     
     @pyqtSlot()
     def updatePhasesWidget(self):
@@ -39686,7 +39755,172 @@ class profileTransformatorDlg(ArtisanDialog):
             except:
                 pass
         self.updatePhasesResults()
+
+    @pyqtSlot()
+    def updateTimeResults(self):
+        self.targetTimes = self.getTargetTimes()
+        if all(v is None for v in self.targetTimes):
+            # clear all results if no targets are set
+            self.clearTimeResults()
+        else:
+            # clear phases target and results
+            self.clearPhasesTargetTimes()
+            self.clearPhasesTargetPercent()
+            self.clearPhasesResults()
+            # set new results
+            result_times = self.calcTimeResults()
+            for i in range(4):
+                if self.time_result_widgets[i] is not None and result_times[i] is not None:
+                    self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(result_times[i],leadingzero=False))
+
+    @pyqtSlot()
+    def updateTempResults(self):
+        self.targetTemps = self.getTargetTemps()
+        if all(v is None for v in self.targetTemps):
+            # clear all results if no targets are set
+            self.clearTempResults()
+        else:
+            # set new results
+            result_temps,fit = self.calcTempResults()
+            for i in range(5):
+                if self.temp_result_widgets[i] is not None and result_temps[i] is not None:
+                    self.temp_result_widgets[i].setText(str(aw.float2float(result_temps[i])) + aw.qmc.mode)
+            if fit is None:
+                s = ""
+            else:
+                s = aw.fit2str(fit)
+            self.temp_formula.setText(s)
+            self.temp_formula.repaint()
+
+    #called from Apply button
+    @pyqtSlot()
+    def apply(self):
+        applied_time = self.applyTimeTransformation()
+        applied_temp = self.applyTempTransformation()
+        if applied_time or applied_temp:
+            aw.qmc.roastUUID = None
+            aw.qmc.roastdate = QDateTime.currentDateTime()
+            aw.qmc.roastepoch = aw.qmc.roastdate.toTime_t()
+            aw.qmc.roasttzoffset = libtime.timezone
+            aw.qmc.roastbatchnr = 0
+            aw.setCurrentFile(None,addToRecent=False)
+            aw.qmc.l_event_flags_dict = {}
+            aw.qmc.l_annotations_dict = {}
+            aw.qmc.fileDirty()
+            aw.qmc.timealign()
+            aw.autoAdjustAxis()
+            aw.qmc.redraw()
+        else:
+            self.restore()
     
+    #called from Restore button
+    @pyqtSlot()
+    def restore(self):
+        aw.setCurrentFile(self.org_curFile,addToRecent=False)
+        aw.qmc.roastUUID = self.org_UUID
+        aw.qmc.roastdate = self.org_roastdate
+        aw.qmc.roastepoch = self.org_roastepoch
+        aw.qmc.roasttzoffset = self.org_roasttzoffset
+        aw.qmc.roastbatchnr = self.org_roastbatchnr
+        if self.org_safesaveflag:
+            aw.qmc.fileDirty()
+        else:
+            aw.qmc.fileClean()
+        aw.qmc.l_event_flags_dict = self.org_l_event_flags_dict
+        aw.qmc.l_annotations_dict = self.org_l_annotations_dict
+        aw.qmc.timex = self.org_timex[:]
+        aw.qmc.extratimex = copy.deepcopy(self.org_extratimex)
+        aw.qmc.temp2 = self.org_temp2[:]
+        aw.autoAdjustAxis()
+        aw.qmc.redraw()
+
+    #called from Help button
+    @pyqtSlot()
+    def help(self):
+        pass
+    
+    #called from OK button
+    @pyqtSlot()
+    def applyTransformations(self):
+        self.apply()
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("TransformatorPosition",self.geometry().topLeft())
+        self.accept()
+
+    #called from Cancel button
+    @pyqtSlot()
+    def restoreState(self):
+        self.restore()
+        aw.qmc.transMappingMode = self.org_transMappingMode
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("TransformatorPosition",self.geometry().topLeft())
+        self.reject()
+
+    def closeEvent(self, _):
+        self.restoreState()
+
+
+    # Calculations
+
+    # returns the list of results times in seconds
+    def calcTimeResults(self):
+        res = []
+        if aw.qmc.transMappingMode == 0:
+            # discrete mapping
+            # adding CHARGE
+            fits = self.calcDiscretefits([0] + self.profileTimes,[0] + self.targetTimes)
+            for i in range(4):
+                if self.profileTimes[i] is not None and fits[i+1] is not None:
+                    res.append(fits[i+1](self.profileTimes[i]))
+                else:
+                    res.append(None)
+        else:
+            with warnings.catch_warnings():
+                warnings.filterwarnings('error')
+                try:
+                    fit = self.calcTimePolyfit()
+                    for i in range(4):
+                        if fit is not None and self.profileTimes[i] is not None:
+                            res.append(fit(self.profileTimes[i]))
+                        else:
+                            res.append(None)
+                except numpy.RankWarning:
+                    pass
+                except Exception as e:
+                    pass
+        return res
+
+    # returns the list of results temperatures and the polyfit or None as second result
+    def calcTempResults(self):
+        res = []
+        fit = None
+        if aw.qmc.transMappingMode == 0:
+            # discrete mapping
+            fits = self.calcDiscretefits(self.profileTemps,self.targetTemps)
+            for i in range(5):
+                if self.profileTemps[i] is not None and fits[i] is not None:
+                    res.append(fits[i](self.profileTemps[i]))
+                else:
+                    res.append(None)
+        else:
+            with warnings.catch_warnings():
+                warnings.filterwarnings('error')
+                try:
+                    fit = self.calcTempPolyfit()
+                    p = numpy.poly1d(fit)
+                    for i in range(5):
+                        if fit is not None and self.profileTemps[i] is not None:
+                            res.append(p(self.profileTemps[i]))
+                        else:
+                            res.append(None)
+                except numpy.RankWarning:
+                    pass
+                except Exception as e:
+                    pass
+        return res,fit
+
     def updatePhasesResults(self):
         target_times, target_phases = self.getTargetPhases()
         # clear all results if if no targets are set
@@ -39748,48 +39982,6 @@ class profileTransformatorDlg(ArtisanDialog):
             fcs = dry + (float(self.phases_target_widgets_percent[1].text()) * drop / 100)
 
         return [dry,fcs,None,drop]
-    
-    def clearPhasesTargetTimes(self):
-        for i in range(3):
-            if self.phases_target_widgets_time[i] is not None:
-                self.phases_target_widgets_time[i].setText("")
-    
-    def clearPhasesTargetPercent(self):
-        for i in range(3):
-            if self.phases_target_widgets_percent[i] is not None:
-                self.phases_target_widgets_percent[i].setText("")
-    
-    def clearPhasesResults(self):
-        for i in range(3):
-            if self.phases_result_widgets[i] is not None:
-                self.phases_result_widgets[i].setText("")
-    
-    def clearTimeTargets(self):
-        for i in range(4):
-            if self.time_target_widgets[i] is not None:
-                self.time_target_widgets[i].setText("")
-    
-    def clearTimeResults(self):
-        for i in range(4):
-            if self.time_result_widgets[i] is not None:
-                self.time_result_widgets[i].setText("")
-    
-    @pyqtSlot()
-    def updateTimeResults(self):
-        self.targetTimes = self.getTargetTimes()
-        if all(v is None for v in self.targetTimes):
-            # clear all results if no targets are set
-            self.clearTimeResults()
-        else:
-            # clear phases target and results
-            self.clearPhasesTargetTimes()
-            self.clearPhasesTargetPercent()
-            self.clearPhasesResults()
-            # set new results
-            result_times = self.calcTimeResults()
-            for i in range(4):
-                if self.time_result_widgets[i] is not None and result_times[i] is not None:
-                    self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(result_times[i],leadingzero=False))
 
     # calculates the linear (aw.qmc.transMappingMode = 1) or quadratic (aw.qmc.transMappingMode = 2) mapping
     # between the profileTimes and the targetTimes
@@ -39812,60 +40004,90 @@ class profileTransformatorDlg(ArtisanDialog):
         else:
             return None
 
-    def calcTimeFactors(self):
-        factors = [None]*5 # all factors initially unset
-        profile_offsets = [0]*5
-        profile_offset = 0
-        target_offsets = [0]*5
-        target_offset = 0
-        for i in range(4):
-            profile_offsets[i] = profile_offset
-            target_offsets[i] = target_offset
-            if self.profileTimes[i] is not None:
-                # we skip events not in the profile
-                if self.targetTimes[i] is not None:
-                    k = (self.targetTimes[i] - target_offset) / (self.profileTimes[i] - profile_offset)
-                    factors[i] = k
-                    profile_offset = self.profileTimes[i]
-                    target_offset = self.targetTimes[i]
-                    # apply to those before that are not yet set
-                    for j in range(i):
-                        if factors[j] is None:
-                            factors[j] = k
-        # copy last set factor to all trailing positions
-        try:
-            last_set = factors.index(None)
-            if last_set == 0: # all factors are None:
-                factors = [1]*5
-            else:
-                factors = factors[:last_set] + [factors[last_set-1]]*(5-last_set)
-        except:
-            pass
-        profile_offsets[4] = profile_offset
-        target_offsets[4] = target_offset
-        return factors,profile_offsets,target_offsets
+    # calculates the linear (aw.qmc.transMappingMode = 1) or quadratic (aw.qmc.transMappingMode = 2) mapping
+    # between the profileTemps and the targetTemps
+    def calcTempPolyfit(self):
+        xa = []
+        ya = []
+        for i in range(5):
+            if self.targetTemps[i] is not None:
+                xa.append(self.profileTemps[i])
+                ya.append(self.targetTemps[i])
+        deg = aw.qmc.transMappingMode
+        if len(xa) > 0:
+            try:
+                deg = min(len(xa) - 1,deg)
+                if deg == 0:
+                    z = numpy.array([1, ya[0] - xa[0]])
+                else:
+                    z = numpy.polyfit(xa, ya, deg)
+                return z
+            except:
+                return None
+        else:
+            return None
     
-    def applyDiscreteTimeMapping(self,timex,offset,factors,profile_offsets,target_offsets):
+    # returns a list of segment-wise fits between sources and targets
+    # each fit is a numpy.array as returned by numpy.polyfit
+    # a source element of None generates None as fit
+    # a target element of None is skipped and pervious and next segements are joined
+    # the lists of sources and targets are expected to be of the same length
+    # the length of the result list is the same as that of the sources and targets
+    def calcDiscretefits(self,sources,targets):
+        if len(sources) != len(targets):
+            return [None]*len(sources)
+        fits = [None]*len(sources)
+        last_fit = None
+        for i in range(len(sources)):
+            if sources[i] is not None:
+                if targets[i] is None:
+                    # we take the last fit
+                    fits[i] = last_fit
+                else:
+                    next_idx = None # the index of the next non-empty source/target pair
+                    for j in range(i+1,len(sources)):
+                        if sources[j] is not None and targets[j] is not None:
+                            next_idx = j
+                            break
+                    if next_idx is None:
+                        if last_fit is not None:
+                            fits[i] = last_fit # copy previous fit
+                        else:
+                            # set a simple offset only as there is no previous nor next fit
+                            fits[i] = numpy.poly1d(numpy.array([1,targets[i]-sources[i]]))
+                    else:
+                        fits[i] = numpy.poly1d(numpy.polyfit([sources[i],sources[j]],[targets[i],targets[j]],1))
+                    # if this is the first fit, we copy it to all previous positions
+                    if last_fit is None:
+                        for k in range(0,i):
+                            if sources[k] is not None:
+                                fits[k] = fits[i]
+                    # register this fit
+                    last_fit = fits[i]
+        return fits
+
+    # fits of length 5
+    def applyDiscreteTimeMapping(self,timex,fits):
+        offset = self.forgroundOffset()
         res_timex = []
+        if offset == 0:
+            new_offset = 0
+        else:
+            new_offset = fits[0](offset)
         for i in range(len(timex)):
-            if aw.qmc.timeindex[1] > 0 and i <= aw.qmc.timeindex[1]:
-                j = 0
-            elif aw.qmc.timeindex[2] > 0 and i <= aw.qmc.timeindex[2]:
-                j = 1
-            elif aw.qmc.timeindex[4] > 0 and i <= aw.qmc.timeindex[4]:
-                j = 2
-            elif aw.qmc.timeindex[6] > 0 and i <= aw.qmc.timeindex[6]:
-                j = 3
-            else:
-                # after DROP
+            # first fit is to be applied for all readings before DRY
+            j = 0
+            if aw.qmc.timeindex[6] > 0 and i >= aw.qmc.timeindex[6]:
+                # last fit counts after DROP
                 j = 4
-            f = factors[j] # factor to be applied
-            profile_offset = profile_offsets[j]
-            target_offset = target_offsets[j]
-            res_timex.append((timex[i]-offset - profile_offset) * f + target_offset)
-        if aw.qmc.timeindex[0] != -1:
-            foffset = res_timex[0]
-            res_timex = [tx+foffset for tx in res_timex]
+            elif aw.qmc.timeindex[4] > 0 and i >= aw.qmc.timeindex[4]:
+                j = 3 # after SCs
+            elif aw.qmc.timeindex[2] > 0 and i >= aw.qmc.timeindex[2]:
+                j = 2 # after FCs
+            elif aw.qmc.timeindex[1] > 0 and i >= aw.qmc.timeindex[1]:
+                j = 1 # after DRY
+            fit = fits[j] # fit to be applied
+            res_timex.append(fit(timex[i] - offset)+new_offset)
         return res_timex
     
     # returns False if no transformation was applied
@@ -39873,32 +40095,37 @@ class profileTransformatorDlg(ArtisanDialog):
         # first update the targets
         self.targetTimes = self.getTargetTimes()
         if all(v is None for v in self.targetTimes):
-            self.targetTimes = self.getTargetPhasesTimes()
-            if all(v is None for v in self.targetTimes):
+            target_times, target_phases = self.getTargetPhases()
+            if all(v is None for v in target_times + target_phases):
+                aw.qmc.timex = self.org_timex[:]
+                aw.qmc.extratimex = copy.deepcopy(self.org_extratimex)
                 return False
+            else:
+                self.targetTimes = self.getTargetPhasesTimes()
         # calculate the offset of 00:00
-        offset = 0
-        if aw.qmc.timeindex[0] != -1:
-            offset = self.org_timex[aw.qmc.timeindex[0]]
+        offset = self.forgroundOffset()
         # apply either the discrete or the polyfit mappings
         if aw.qmc.transMappingMode == 0:
             # discrete mapping
-            # calculate factors and offsets
-            factors,profile_offsets,target_offsets = self.calcTimeFactors()
-            # apply to the main timex
-            aw.qmc.timex = self.applyDiscreteTimeMapping(self.org_timex,offset,factors,profile_offsets,target_offsets)
+            fits = self.calcDiscretefits([0] + self.profileTimes,[0] + self.targetTimes)
+            aw.qmc.timex = self.applyDiscreteTimeMapping(self.org_timex,fits)
             # apply to the extra timex
             aw.qmc.extratimex = []
             for timex in self.org_extratimex:
-                aw.qmc.extratimex.append(self.applyDiscreteTimeMapping(timex,offset,factors,profile_offsets,target_offsets))
+                try:
+                    timex_trans = self.applyDiscreteTimeMapping(timex,fits)
+                except:
+                    timex_trans = timex
+                aw.qmc.extratimex.append(timex_trans)
         else:
+            # polyfit mappings
             with warnings.catch_warnings():
                 warnings.filterwarnings('error')
                 try:
                     fit = self.calcTimePolyfit()
                     if fit is not None:
                         aw.qmc.timex = [fit(tx-offset) for tx in self.org_timex]
-                        if aw.qmc.timeindex[0] != -1:
+                        if len(aw.qmc.timex) > 0 and aw.qmc.timeindex[0] != -1:
                             foffset = aw.qmc.timex[0]
                             aw.qmc.timex = [tx+foffset for tx in aw.qmc.timex]
                         extratimex = []
@@ -39907,7 +40134,7 @@ class profileTransformatorDlg(ArtisanDialog):
                             if aw.qmc.timeindex[0] != -1:
                                 offset = timex[aw.qmc.timeindex[0]]
                             new_timex = [fit(tx-offset) for tx in timex]
-                            if aw.qmc.timeindex[0] != -1:
+                            if len(new_timex) > 0 and aw.qmc.timeindex[0] != -1:
                                 foffset = new_timex[0]
                                 new_timex = [tx+foffset for tx in new_timex]
                             extratimex.append(new_timex)
@@ -39916,67 +40143,46 @@ class profileTransformatorDlg(ArtisanDialog):
                     pass
         return True
     
-    #called from Apply button
-    @pyqtSlot()
-    def apply(self):
-        applied = self.applyTimeTransformation()
-        if applied:
-            aw.qmc.roastUUID = None
-            aw.qmc.roastdate = QDateTime.currentDateTime()
-            aw.qmc.roastepoch = aw.qmc.roastdate.toTime_t()
-            aw.qmc.roasttzoffset = libtime.timezone
-            aw.qmc.roastbatchnr = 0
-            aw.setCurrentFile(None,addToRecent=False)
-            aw.qmc.l_event_flags_dict = {}
-            aw.qmc.l_annotations_dict = {}
-            aw.qmc.fileDirty()
-            aw.qmc.timealign()
-            aw.autoAdjustAxis()
-            aw.qmc.redraw()
+    # returns False if no transformation was applied
+    def applyTempTransformation(self):
+        # first update the targets
+        self.targetTemps = self.getTargetTemps()
+        if all(v is None for v in self.targetTemps):
+            aw.qmc.temp2 = self.org_temp2[:]
+            return False
+        # apply either the discrete or the polyfit mappings
+        if aw.qmc.transMappingMode == 0:
+            # discrete mappings, length 5
+            fits = self.calcDiscretefits(self.profileTemps,self.targetTemps)
+            aw.qmc.temp2 = []
+            for i in range(len(self.org_temp2)):
+                # first fit is to be applied for all readings before DRY
+                j = 0
+                if aw.qmc.timeindex[6] > 0 and i >= aw.qmc.timeindex[6]:
+                    # last fit counts after DROP
+                    j = 4
+                elif aw.qmc.timeindex[4] > 0 and i >= aw.qmc.timeindex[4]:
+                    j = 3 # after SCs
+                elif aw.qmc.timeindex[2] > 0 and i >= aw.qmc.timeindex[2]:
+                    j = 2 # after FCs
+                elif aw.qmc.timeindex[1] > 0 and i >= aw.qmc.timeindex[1]:
+                    j = 1 # after DRY
+                fit = fits[j] # fit to be applied
+                aw.qmc.temp2.append(fit(self.org_temp2[i]))
+            return True
         else:
-            self.restore()
+            # polyfit mappings
+            with warnings.catch_warnings():
+                warnings.filterwarnings('error')
+                try:
+                    fit = numpy.poly1d(self.calcTempPolyfit())
+                    if fit is not None:
+                        aw.qmc.temp2 = [fit(temp) for temp in self.org_temp2]
+                except np.RankWarning:
+                    pass
+        return True
     
-    #called from Restore button
-    @pyqtSlot()
-    def restore(self):
-        aw.setCurrentFile(self.org_curFile,addToRecent=False)
-        aw.qmc.roastUUID = self.org_UUID
-        aw.qmc.roastdate = self.org_roastdate
-        aw.qmc.roastepoch = self.org_roastepoch
-        aw.qmc.roasttzoffset = self.org_roasttzoffset
-        aw.qmc.roastbatchnr = self.org_roastbatchnr
-        if self.org_safesaveflag:
-            aw.qmc.fileDirty()
-        else:
-            aw.qmc.fileClean()
-        aw.qmc.l_event_flags_dict = self.org_l_event_flags_dict
-        aw.qmc.l_annotations_dict = self.org_l_annotations_dict
-        aw.qmc.timex = self.org_timex[:]
-        aw.qmc.temp2 = self.org_temp2[:]
-        aw.qmc.extratimex = copy.deepcopy(self.org_extratimex)
-        aw.autoAdjustAxis()
-        aw.qmc.redraw()
-
-    #called from OK button
-    @pyqtSlot()
-    def applyTransformations(self):
-        self.apply()
-        #save window position (only; not size!)
-        settings = QSettings()
-        settings.setValue("TransformatorPosition",self.geometry().topLeft())
-        self.accept()
-
-    #called from Cancel button
-    @pyqtSlot()
-    def restoreState(self):
-        self.restore()
-        #save window position (only; not size!)
-        settings = QSettings()
-        settings.setValue("TransformatorPosition",self.geometry().topLeft())
-        self.reject()
-
-    def closeEvent(self, _):
-        self.restoreState()
+    # tables
     
     def createPhasesTable(self):
         self.phasestable.setRowCount(3)
@@ -40167,9 +40373,12 @@ class profileTransformatorDlg(ArtisanDialog):
         self.temptable.setSelectionMode(QAbstractItemView.NoSelection)
         self.temptable.setAutoScroll(False)
         self.temptable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
+        self.temptable.verticalHeader().sectionClicked.connect(self.tempTableRowHeaderClicked)
+        self.temptable.horizontalHeader().sectionClicked.connect(self.tempTableColumnHeaderClicked)
         
         self.temp_target_widgets = []
         self.temp_result_widgets = []
+        
         for i in range(5):
             if len(self.profileTemps) > i and self.profileTemps[i] is not None:
                 profile_temp_str = str(aw.float2float(self.profileTemps[i])) + aw.qmc.mode

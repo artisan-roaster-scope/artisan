@@ -73,10 +73,7 @@ quantifieractive=1, 1, 1, 1
 quantifiercoarse=0, 0, 0, 0
 quantifiermax=350, 60, 250, 100
 quantifiermin=80, 35, 0, 0
-quantifiersource=7, 4, 5, 6
-
-[RoC]
-LCDdecimalplaces=1
+quantifiersource=7, 4, 5, 
 
 [RoastProperties]
 roastertype=Giesen
