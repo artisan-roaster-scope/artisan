@@ -39660,7 +39660,6 @@ class profileTransformatorDlg(ArtisanDialog):
     @pyqtSlot(int)
     def changeMappingMode(self,i):
         aw.qmc.transMappingMode = i
-        self.updatePhasesResults()
         self.updateTimeResults()
         self.updateTempResults()
 
@@ -39671,7 +39670,6 @@ class profileTransformatorDlg(ArtisanDialog):
             if self.phases_target_widgets_time[i].text() != "" or self.phases_target_widgets_percent[i].text() != "":
                 self.phases_target_widgets_time[i].setText("")
                 self.phases_target_widgets_percent[i].setText("")
-                self.updatePhasesResults()
             elif aw.qmc.background and aw.qmc.timeindexB[1]>0 and aw.qmc.timeindexB[2]>0 and aw.qmc.timeindexB[6]>0 and \
                     aw.qmc.timeindex[1]>0 and aw.qmc.timeindex[2]>0 and aw.qmc.timeindex[6]>0:
                 back_offset = self.backgroundOffset()
@@ -39689,7 +39687,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 elif i == 2:
                     s = aw.qmc.stringfromseconds(back_drop - back_fcs)
                 self.phases_target_widgets_time[i].setText(s)
-                self.updatePhasesResults()
+            self.updateTimeResults()
     
     @pyqtSlot(int)
     def phasesTableRowHeaderClicked(self,i):
@@ -39742,7 +39740,7 @@ class profileTransformatorDlg(ArtisanDialog):
     @pyqtSlot()
     def updatePhasesWidget(self):
         sender = self.sender()
-        # first clear corresponding time target if percentage target is set, or the otherway around
+        # clear corresponding time target if percentage target is set, or the otherway around
         if sender.text() != "":
             try:
                 time_idx = self.phases_target_widgets_time.index(sender)
@@ -39754,24 +39752,61 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.phases_target_widgets_time[percent_idx].setText("")
             except:
                 pass
-        self.updatePhasesResults()
+        self.updateTimeResults()
 
+    # updates time and phases result widgets
     @pyqtSlot()
     def updateTimeResults(self):
         self.targetTimes = self.getTargetTimes()
-        if all(v is None for v in self.targetTimes):
-            # clear all results if no targets are set
+        time_targets_clear = all(v is None for v in self.targetTimes)
+        target_times, target_phases = self.getTargetPhases()
+        phases_targets_clear = all(v is None for v in target_times + target_phases)
+        self.clearPhasesResults()
+        self.clearTimeResults()
+        if not (phases_targets_clear and time_targets_clear):
             self.clearTimeResults()
-        else:
-            # clear phases target and results
-            self.clearPhasesTargetTimes()
-            self.clearPhasesTargetPercent()
-            self.clearPhasesResults()
-            # set new results
+            # phases targets are set, first clear the time targets
+            if not phases_targets_clear:
+                self.clearTimeTargets()
+                self.targetTimes = self.getTargetPhasesTimes()
+            else:
+                self.clearPhasesTargetTimes()
+                self.clearPhasesTargetPercent()
+                self.targetTimes = self.getTargetTimes()
+            # set new time results
             result_times = self.calcTimeResults()
             for i in range(4):
-                if self.time_result_widgets[i] is not None and result_times[i] is not None:
-                    self.time_result_widgets[i].setText(aw.qmc.stringfromseconds(result_times[i],leadingzero=False))
+                if self.time_result_widgets[i] is not None:
+                    if result_times[i] is None:
+                        s = ""
+                    else:
+                        s = aw.qmc.stringfromseconds(result_times[i],leadingzero=False)
+                    self.time_result_widgets[i].setText(s)
+            # set new phases results
+            result_times = self.calcTimeResults()
+            if all(result_times[r] is not None for r in [0,1,3]):
+                # DRYING
+                drying_period = result_times[0]
+                drying_percentage = 100 * drying_period / result_times[3]
+                drying_str = \
+                        "{}    {}%".format(aw.qmc.stringfromseconds(drying_period,leadingzero=False),aw.float2float(drying_percentage))
+                self.phases_result_widgets[0].setText(drying_str)
+                # MAILARD
+                mailard_period = result_times[1] - result_times[0]
+                mailard_percentage = 100 * mailard_period / result_times[3]
+                mailard_str = \
+                        "{}    {}%".format(aw.qmc.stringfromseconds(mailard_period,leadingzero=False),aw.float2float(mailard_percentage))
+                self.phases_result_widgets[1].setText(mailard_str)
+                # FINISHING
+                finishing_period = result_times[3] - result_times[1]
+                finishing_percentage = 100 * finishing_period / result_times[3]
+                finishing_str = \
+                        "{}    {}%".format(aw.qmc.stringfromseconds(finishing_period,leadingzero=False),aw.float2float(finishing_percentage))
+                self.phases_result_widgets[2].setText(finishing_str)
+            else:
+                for w in self.phases_result_widgets:
+                    if w is not None:
+                        w.setText("")
 
     @pyqtSlot()
     def updateTempResults(self):
@@ -39920,39 +39955,6 @@ class profileTransformatorDlg(ArtisanDialog):
                 except Exception as e:
                     pass
         return res,fit
-
-    def updatePhasesResults(self):
-        target_times, target_phases = self.getTargetPhases()
-        # clear all results if if no targets are set
-        if all(v is None for v in target_times + target_phases):
-            # no targets set
-            self.clearPhasesResults()
-        else:
-            # phases targets are set, first clear the time targets and results
-            self.clearTimeTargets()
-            self.clearTimeResults()
-            self.targetTimes = self.getTargetPhasesTimes()
-            # set new results
-            result_times = self.calcTimeResults()
-            
-            # DRYING
-            drying_period = result_times[0]
-            drying_percentage = 100 * drying_period / result_times[3]
-            drying_str = \
-                    "{}    {}%".format(aw.qmc.stringfromseconds(drying_period,leadingzero=False),aw.float2float(drying_percentage))
-            self.phases_result_widgets[0].setText(drying_str)
-            # MAILARD
-            mailard_period = result_times[1] - result_times[0]
-            mailard_percentage = 100 * mailard_period / result_times[3]
-            mailard_str = \
-                    "{}    {}%".format(aw.qmc.stringfromseconds(mailard_period,leadingzero=False),aw.float2float(mailard_percentage))
-            self.phases_result_widgets[1].setText(mailard_str)
-            # FINISHING
-            finishing_period = result_times[3] - result_times[1]
-            finishing_percentage = 100 * finishing_period / result_times[3]
-            finishing_str = \
-                    "{}    {}%".format(aw.qmc.stringfromseconds(finishing_period,leadingzero=False),aw.float2float(finishing_percentage))
-            self.phases_result_widgets[2].setText(finishing_str)
     
     # returns target times based on the phases target
     def getTargetPhasesTimes(self):
@@ -39962,26 +39964,40 @@ class profileTransformatorDlg(ArtisanDialog):
         dry = aw.qmc.timex[aw.qmc.timeindex[1]] - offset
         fcs = aw.qmc.timex[aw.qmc.timeindex[2]] - offset
         drop = aw.qmc.timex[aw.qmc.timeindex[6]] - offset
+        # flags for targets set
+        dry_set = False
+        drop_set = False
+        fcs_set = False
         
         # first determine the target DROP time (relative to the profile drop) if any
         if self.phases_target_widgets_time[2] is not None and self.phases_target_widgets_time[2].text() != "":
             drop = fcs + aw.qmc.stringtoseconds(self.phases_target_widgets_time[2].text())
+            drop_set = True
         elif self.phases_target_widgets_percent[2] is not None and self.phases_target_widgets_percent[2].text() != "":
             drop = fcs + (float(self.phases_target_widgets_percent[2].text()) * drop / 100)
+            drop_set = True
         
         # determine the target DRY time (relative to the target drop of above) if any
         if self.phases_target_widgets_time[0] is not None and self.phases_target_widgets_time[0].text() != "":
             dry = aw.qmc.stringtoseconds(self.phases_target_widgets_time[0].text())
+            dry_set = True
         elif self.phases_target_widgets_percent[0] is not None and self.phases_target_widgets_percent[0].text() != "":
             dry = float(self.phases_target_widgets_percent[0].text()) * drop / 100
+            dry_set = True
         
         # determine the target FCs time (relative to the target drop of above) if any
         if self.phases_target_widgets_time[1] is not None and self.phases_target_widgets_time[1].text() != "":
             fcs = dry + aw.qmc.stringtoseconds(self.phases_target_widgets_time[1].text())
+            fcs_set = True
         elif self.phases_target_widgets_percent[1] is not None and self.phases_target_widgets_percent[1].text() != "":
             fcs = dry + (float(self.phases_target_widgets_percent[1].text()) * drop / 100)
+            fcs_set = True
 
-        return [dry,fcs,None,drop]
+        return [
+            (dry if dry_set else (aw.qmc.timex[aw.qmc.timeindex[1]] - offset)),
+            (fcs if fcs_set else (aw.qmc.timex[aw.qmc.timeindex[2]] - offset)),
+            None,
+            (drop if drop_set else (aw.qmc.timex[aw.qmc.timeindex[6]] - offset))]
 
     # calculates the linear (aw.qmc.transMappingMode = 1) or quadratic (aw.qmc.transMappingMode = 2) mapping
     # between the profileTimes and the targetTimes
