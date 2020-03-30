@@ -1,0 +1,374 @@
+<head><style>td, th {border: 1px solid #ddd;  padding: 6px;}th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}</style></head><body><b>SYMBOLIC VARIABLES</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Symbol</th>
+        <th>Description</th>
+        <th>Can  shift?<br>(see below)</th>
+    </tr>
+    <tr>
+        <td>t</td>
+        <td>Absolute time (seconds) from begin of recording (not only the time after CHARGE!)</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>b</td>
+        <td>Absolute time (seconds) from begin of recording of the background profile</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>x</td>
+        <td>Current channel reading (not available in the Plotter)</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>Y1</td>
+        <td>ET value</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>Y2</td>
+        <td>BT value</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>Y3</td>
+        <td>Extra #1 T1 value</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>Y4</td>
+        <td>Extra #1 T2 value</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>Y5</td>
+        <td>Extra #2 T1 value</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>Y6</td>
+        <td>Extra #2 T2 value</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>...</td>
+        <td>...and so forth</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>B1</td>
+        <td>ET background</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>B2</td>
+        <td>BT background</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>B3</td>
+        <td>ExtraBackground #1-A</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>B4</td>
+        <td>ExtraBackground #1-B</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>B5</td>
+        <td>ExtraBackground #2-A</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>...</td>
+        <td>...and so forth</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>T1</td>
+        <td>ET tare value</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>T2</td>
+        <td>BT tare value</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>T3</td>
+        <td>Extra Device #1 channel 1 tare value</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>T4</td>
+        <td>Extra Device #1 channel 2 tare value</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>T5</td>
+        <td>Extra Device #2 channel 1 tare value</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>...</td>
+        <td>...and so forth</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>E1</td>
+        <td>Last event value of the first event type</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>E2</td>
+        <td>Last event value of the second event type</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>E3</td>
+        <td>Last event value of the third event type</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>E4</td>
+        <td>Last event value of the fourth event type</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>&#160;</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>R1</td>
+        <td>ET rate of rise</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>R2</td>
+        <td>BT rate of rise</td>
+        <td>Yes</td>
+    </tr>
+</table><br/><br/><b>SHIFTED SYMBOLIC VARIABLES</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <td>The symbolic variables t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt; evaluate to the current value of a sequence of values that define a roast profile. To access earlier or later values one can apply a shift value.<br><br>For example, while &quot;Y2&quot; returns the current bean temperature (BT), &quot;Y2[-1]&quot; returns the previous BT temperature and &quot;Y2[-2]&quot; the one before that. Formulas used in the Plotter are applied in sequence to all values, thus there &quot;Y2&quot; points to the current BT temperature processed, &quot;Y2[-1]&quot; the previous BT temperature processed and &quot;Y2[+1]&quot; the next BT temperature to be processed. A positive shift is only available in the Plotter, obviously not during recording.</td>
+    </tr>
+</table><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Example</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>t[+1]</td>
+        <td>Time one index ahead (plotter only)</td>
+    </tr>
+    <tr>
+        <td>t[-3]</td>
+        <td>Time three indexes delayed</td>
+    </tr>
+    <tr>
+        <td>Y1[-2]</td>
+        <td>ET value delayed by 2 indexes</td>
+    </tr>
+    <tr>
+        <td>Y2[+1]</td>
+        <td>BT value index advanced by one index (plotter only)</td>
+    </tr>
+    <tr>
+        <td>B4[-6]</td>
+        <td>ExtraBackground #1-B delayed 6 indexes</td>
+    </tr>
+    <tr>
+        <td>B5[+2]</td>
+        <td>ExtraBackground #2-A advanced 2 indexes (plotter only)</td>
+    </tr>
+    <tr>
+        <td>R1[-2]</td>
+        <td>ET rate of rise delayed two indexes</td>
+    </tr>
+</table><br/><br/><b>INDEXED SYMBOLIC VARIABLES</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Symbol</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt;</td>
+        <td>Previously recorded data assigned to the symbolic variables t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt; can also directly accessed by index. &quot;Y2{0}&quot; evaluates to the first recorded bean temperature (BT) and &quot;Y2{CHARGE}&quot; to the bean temperature at CHARGE. Additionally, the symbolic variable b can be used to access the recording time at a certain index of the background profile. Thus &quot;b{CHARGE}&quot; returns the recording time at CHARGE of the background profile.</td>
+    </tr>
+</table><br/><br/><b>AXIS MAPPING</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Symbol</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>k</td>
+        <td>Scaling factor from time to RoR axis. The range of the temperature scale divided by the range of the delta scale. </td>
+    </tr>
+    <tr>
+        <td>o</td>
+        <td>Offset from time to RoR axis. </td>
+    </tr>
+</table><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <td>Note: RoR values r can be scaled to the temperature axis using a linear approximation of the form &quot;r*k + o&quot;. As the variables k and o depend on the actual axis settings which can be changed by the user without triggering a recomputation, those variable are less useful for use in a recording, but useful in the Plotter to plot w.r.t. the RoR x-axis instead of the temperature x-axis.</td>
+    </tr>
+</table><br/><br/><b>EVENT INDEX and TIME DELTA</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Symbol</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>CHARGE, DRY, FCs, FCe, SCs, SCe, DROP</td>
+        <td>Index of the corresponding event of the profile to retrieve time and values from the corresponding data structures. Evaluates to -1 if not set.</td>
+    </tr>
+    <tr>
+        <td>bCHARGE, bDRY, bFCs, bFCe, bSCs, bSCe, bDROP</td>
+        <td>Index of the corresponding event of the background profile to retrieve time and values from the corresponding data structures. Evaluates to -1 if not set.</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>&#160;</td>
+    </tr>
+    <tr>
+        <td>dCHARGE, dDRY, dFCs, dFCe, dSCs, dSCe, dDROP</td>
+        <td>Time distance in seconds after the corresponding event. Thus dCHARGE is bound to the current roast time (after CHARGE) in seconds while t is bound to the time in seconds from the start of the recording.</td>
+    </tr>
+</table><br/><br/><b>AREA UNDER THE CURVE (AUC)</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Symbol</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>AUCbase</td>
+        <td>AUC base temperature (could be from the selected event, if set)</td>
+    </tr>
+    <tr>
+        <td>AUCtarget</td>
+        <td>AUC target value (could be from the background profile, if set)</td>
+    </tr>
+    <tr>
+        <td>AUCvalue</td>
+        <td>the current AUC value. -1 if none available.</td>
+    </tr>
+</table><br/><br/><b>PREDICITONS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Symbol</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>pDRY</td>
+        <td>Prediction of the time distance to the DRY event based on the current RoR. Evaluates to -1 on negative RoR and to 0 if the DRY event is already set.</td>
+    </tr>
+    <tr>
+        <td>pFCS</td>
+        <td>Same as pDRY, just for the FCs event.</td>
+    </tr>
+</table><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <td>Note: The same rules as for the corresponding PhasesLCDs apply to pDRY and pFCs:<br><br>If there is no background profile the DRY or FCs bean temperature used for the prediction is taken from the Config&gt;Phases setup.<br><br>If there is a background profile and there is DRY or FCs event in the background profile, the DRY or FCs bean temperature used for the prediction is taken from the background profile.<br><br>Exception to the above for DRY only: if AutoDRY is checked the DRY temperature used for the prediction is taken from the Config&gt;Phases setup.  This does not apply to FCs and AutoFCS.<br><br>The prediction value is the calculated time in seconds to reach the DRY or FCs temperature.</td>
+    </tr>
+</table><br/><br/><b>EXPRESSIONS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Expression</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>(&lt;true-expr&gt; if &lt;cond&gt; else &lt;false-expr&gt;)</td>
+        <td>Conditional. Evaluates to the value of the expression &lt;true-expr&gt; if the condition &lt;cond&gt; holds, otherwise to the value of the expression &lt;false-expr&gt;. The rules of Python are applied to decide if a value holds or not. Thus the boolean values &quot;True&quot; and &quot;False&quot; have the obvious semantic. Any number unequal to 0 evaluates to True and 0 evaluates to False. The value &quot;None&quot; is also evaluated to False.</td>
+    </tr>
+</table><br/><br/><b>MATHEMATICAL FORMULAS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Formula</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>abs(x)</td>
+        <td>Return the absolute value of x.</td>
+    </tr>
+    <tr>
+        <td>acos(x)</td>
+        <td>Return the arc cosine (measured in radians) of x.</td>
+    </tr>
+    <tr>
+        <td>asin(x)</td>
+        <td>Return the arc sine (measured in radians) of x.</td>
+    </tr>
+    <tr>
+        <td>atan(x)</td>
+        <td>Return the arc tangent (measured in radians) of x.</td>
+    </tr>
+    <tr>
+        <td>cos(x)</td>
+        <td>Return the cosine of x (measured in radians).</td>
+    </tr>
+    <tr>
+        <td>degrees(x)</td>
+        <td>Convert angle x from radians to degrees.</td>
+    </tr>
+    <tr>
+        <td>exp(x)</td>
+        <td>Return e raised to the power of x.</td>
+    </tr>
+    <tr>
+        <td>log(x[, base])</td>
+        <td>Return the logarithm of x to the given base.</td>
+    </tr>
+    <tr>
+        <td>min(x1,...,xn)</td>
+        <td>Return the minimum of the given values.</td>
+    </tr>
+    <tr>
+        <td>max(x1,...,xn)</td>
+        <td>Return the maximum of the given values.</td>
+    </tr>
+    <tr>
+        <td>pow(x, y)</td>
+        <td>Return x**y (x to the power of y).</td>
+    </tr>
+    <tr>
+        <td>radians(x)</td>
+        <td>Convert angle x from degrees to radians.</td>
+    </tr>
+    <tr>
+        <td>sin(x)</td>
+        <td>Return the sine of x (measured in radians).</td>
+    </tr>
+    <tr>
+        <td>sqrt(x)</td>
+        <td>Return the square root of x.</td>
+    </tr>
+    <tr>
+        <td>tan(x)</td>
+        <td>Return the tangent of x (measured in radians).</td>
+    </tr>
+</table><br/><br/><b>MATHEMATICAL CONSTANTS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Symbol</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>e</td>
+        <td>2.71828182845904</td>
+    </tr>
+    <tr>
+        <td>pi</td>
+        <td>3.14159265358979</td>
+    </tr>
+</table><br/><br/><b>PLOTTER EXTENSIONS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <td>Note:  This section applies only to the Plotter<br>Using math formulas in the plotter also allows to use the symbolic variables P and F (see Signals, Symbolic Assignments and the Plotter).</td>
+    </tr>
+</table><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Symbol</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>P1...P9</td>
+        <td>The variables P1,..,P9 represent the results from plot #1,..,#9. You can perform calculations in a later plot on variables of an earlier plot. That way, the plot variables P1,..,P9 allow the cascading or intermediate results. For example, plot #3 can refer to the results of plot 1 using the variable P1.</td>
+    </tr>
+    <tr>
+        <td>F1...F9</td>
+        <td>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</td>
+    </tr>
+</table></body>
