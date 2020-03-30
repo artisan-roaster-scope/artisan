@@ -190,6 +190,7 @@ from artisanlib.qtsingleapplication import QtSingleApplication
 from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
 from artisanlib.cropster import extractProfileCropsterXLS
+from artisanlib.giesen import extractProfileGiesenCSV
 from artisanlib.ikawa import extractProfileIkawaCSV
 
 from yoctopuce.yocto_api import YAPI, YRefParam
@@ -13301,6 +13302,10 @@ class ApplicationWindow(QMainWindow):
         importCropsterAction = QAction("Cropster XLS...",self)
         importCropsterAction.triggered.connect(self.importCropster)
         self.importMenu.addAction(importCropsterAction)
+
+        importGiesenAction = QAction("Giesen CSV...",self)
+        importGiesenAction.triggered.connect(self.importGiesen)
+        self.importMenu.addAction(importGiesenAction)
 
         importHH506RAAction = QAction("HH506RA...",self)
         importHH506RAAction.triggered.connect(self.importHH506RA)
@@ -30331,76 +30336,54 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " self.importBullet() {0}").format(str(ex)),exc_tb.tb_lineno)
+    
+    def importExternal(self,extractor,message,extension):
+        try:
+            filename = self.ArtisanOpenFileDialog(msg=message,ext=extension)
+            if len(filename) == 0:
+                return
+            res = aw.qmc.reset(redraw=False,soundOn=False)
+            if res:
+                obj = extractor(filename)
+                res = self.setProfile(filename,obj)
+
+            if res:
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                #update etypes combo box
+                self.etypeComboBox.clear()
+                self.etypeComboBox.addItems(self.qmc.etypes)
+                # profiles was adjusted, ensure that it does not overwrite the original file on saving
+                self.qmc.fileDirty()
+                self.curFile = None
+                #Plot everything
+                self.qmc.redraw()
+                message = u(QApplication.translate("Message","{0}  imported ", None).format(u(filename)))
+                self.sendmessage(message)
+
+        except IOError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " {1}: {0}").format(str(ex),message))
+        except ValueError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " {1}: {0}").format(str(ex),message))
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),exc_tb.tb_lineno)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importCropster(self,_=False):
-        try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import Cropster XLS", None),ext="*.xls")
-            if len(filename) == 0:
-                return
-            res = aw.qmc.reset(redraw=False,soundOn=False)
-            if res:
-                obj = extractProfileCropsterXLS(filename)
-                res = self.setProfile(filename,obj)
+        self.importExternal(extractProfileCropsterXLS,QApplication.translate("Message","Import Cropster XLS", None),"*.xls")
 
-            if res:
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-                #update etypes combo box
-                self.etypeComboBox.clear()
-                self.etypeComboBox.addItems(self.qmc.etypes)
-                # profiles was adjusted, ensure that it does not overwrite the original file on saving
-                self.qmc.fileDirty()
-                self.curFile = None
-                #Plot everything
-                self.qmc.redraw()
-                message = u(QApplication.translate("Message","{0}  imported ", None).format(u(filename)))
-                self.sendmessage(message)
-
-        except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importCropster(): {0}").format(str(ex)))
-        except ValueError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importCropster(): {0}").format(str(ex)))
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCropster() {0}").format(str(ex)),exc_tb.tb_lineno)
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importGiesen(self,_=False):
+        self.importExternal(extractProfileGiesenCSV,QApplication.translate("Message","Import Giesen CSV", None),"*.csv")
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importIkawa(self,_=False):
-        try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import IKAWA CSV", None),ext="*.csv")
-            if len(filename) == 0:
-                return
-            res = aw.qmc.reset(redraw=False,soundOn=False)
-            if res:
-                obj = extractProfileIkawaCSV(filename)
-                res = self.setProfile(filename,obj)
-
-            if res:
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-                #update etypes combo box
-                self.etypeComboBox.clear()
-                self.etypeComboBox.addItems(self.qmc.etypes)
-                # profiles was adjusted, ensure that it does not overwrite the original file on saving
-                self.qmc.fileDirty()
-                self.curFile = None
-                #Plot everything
-                self.qmc.redraw()
-                message = u(QApplication.translate("Message","{0}  imported ", None).format(u(filename)))
-                self.sendmessage(message)
-
-        except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importIkawa(): {0}").format(str(ex)))
-        except ValueError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importIkawa(): {0}").format(str(ex)))
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importIkawa() {0}").format(str(ex)),exc_tb.tb_lineno)
+        self.importExternal(extractProfileIkawaCSV,QApplication.translate("Message","Import IKAWA CSV", None),"*.csv")
 
     @pyqtSlot()
     @pyqtSlot(bool)
