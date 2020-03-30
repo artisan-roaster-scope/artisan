@@ -60,9 +60,9 @@ class AcaiaBLE():
         self.msgType = None
         self.weight = None
         self.battery = None
-        self.model = 0 # acaia models: 0: Pearl, 1: Lunar, 2: X
         self.firmware = None # on connect this is set to a tripel of ints, (major, minor, patch)-version
         self.unit = 2 # 1: kg, 2: g, 5: ounce
+        self.max_weight = 0 # in g
     
     def reset(self):
         self.__init__()
@@ -110,29 +110,29 @@ class AcaiaBLE():
     def confNotifications(self,write):
         self.sendEvent(write,
             bytes([ # pairs of key/setting
-                    0,  # weight
+                    0,  # weight id
                     5,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec)
                        # 5 or 7 seems to be good values for this app in Artisan
-#                    1,   # battery
+#                    1,   # battery id
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
-#                    2,  # timer
+#                    2,  # timer id
 #                    255, #5,  # timer argument
-#                    3,  # key
-#                    255, #4   # setting
+#                    3,  # key (not used)
+#                    255, #4   # setting (not used)
                 ])
                 )
 
     def parseInfo(self,data):
-        # TODO: the model is only indicated by the second byte of data, thus this here is wrong!!
-        if data.startswith(b'\x02\n\x02'):
-            self.model = 0 # Acaia Pearl
-        elif data.startswith(b'\x02\x14\x02'):
-            self.model = 1 # Acaia Lunar
-        elif data.startswith(b'\x02\x14\x03'):
-            self.model = 2
+#        if len(data)>1:
+#            data[1]
         if len(data)>4:
             self.firmware = (data[2],data[3],data[4])
             #print("{}.{}.{}".format(self.firmware[0],self.firmware[1],self.firmware[2]))
+        # passwd_set
+#        if len(data)>5:
+#            data[5]
+#        if len(data)>6:
+#            data[6]
    
     # returns length of consumed data or -1 on error
     def parseWeightEvent(self,payload):
@@ -154,10 +154,11 @@ class AcaiaBLE():
             elif unit == 4:
                 value /= 10000
             
-            # TODO: this factor should not be based on the module, but on the unit extracted from the scale status message!
             # convert received weight data to g
-            if self.model == 2: # if self.unit == 1 (kg) => value*1000, if self.unit == 5 => value*28.3495
+            if self.unit == 1: # kg
                 value = value * 1000
+            elif self.unit == 5: # lbs
+                value = value * 28.3495
             
             stable = (payload[5] & 0x01) != 0x01
             
@@ -233,11 +234,21 @@ class AcaiaBLE():
                 self.parseScaleEvents(payload[pos+1:])
                 
     def parseStatus(self,payload):
-        if payload and len(payload) > 1:
+        # battery level (7 bits of first byte) + TIMER_START (1bit)
+        if payload and len(payload) > 0:
             self.battery = int(payload[0] & ~(1 << 7))
             #print("bat","{}%".format(self.battery))
-        if payload and len(payload) > 2:
+        # unit (7 bits of second byte) + CD_START (1bit)
+        if payload and len(payload) > 1:
             self.unit = int(payload[1] & ~(1 << 7))
+        # mode (7 bits of third byte) + tare (1bit)
+        # sleep (4th byte), 0:off, 1:5sec, 2:10sec, 3:20sec, 4:30sec, 5:60sec
+        # key disabled (5th byte), touch key setting 0: off , 1:On
+        # sound (6th byte), beep setting 0 : off 1: on
+        # resolution (7th byte), 0 : default, 1 : high
+        # max weight (8th byte)
+        if payload and len(payload) > 7:
+            self.max_weight = (payload[7] + 1) * 1000
 
     def parseScaleData(self,write,msgType,data):
         if msgType == self.MSG_INFO:
