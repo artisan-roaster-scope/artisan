@@ -39739,6 +39739,7 @@ class profileTransformatorDlg(ArtisanDialog):
     
     @pyqtSlot()
     def updatePhasesWidget(self):
+        self.clearTimeTargets()
         sender = self.sender()
         # clear corresponding time target if percentage target is set, or the otherway around
         if sender.text() != "":
@@ -39753,9 +39754,14 @@ class profileTransformatorDlg(ArtisanDialog):
             except:
                 pass
         self.updateTimeResults()
+    
+    @pyqtSlot()
+    def updateTimesWidget(self):
+        self.clearPhasesTargetTimes()
+        self.clearPhasesTargetPercent()
+        self.updateTimeResults()
 
     # updates time and phases result widgets
-    @pyqtSlot()
     def updateTimeResults(self):
         self.targetTimes = self.getTargetTimes()
         time_targets_clear = all(v is None for v in self.targetTimes)
@@ -39767,11 +39773,8 @@ class profileTransformatorDlg(ArtisanDialog):
             self.clearTimeResults()
             # phases targets are set, first clear the time targets
             if not phases_targets_clear:
-                self.clearTimeTargets()
                 self.targetTimes = self.getTargetPhasesTimes()
             else:
-                self.clearPhasesTargetTimes()
-                self.clearPhasesTargetPercent()
                 self.targetTimes = self.getTargetTimes()
             # set new time results
             result_times = self.calcTimeResults()
@@ -39992,7 +39995,9 @@ class profileTransformatorDlg(ArtisanDialog):
         elif self.phases_target_widgets_percent[1] is not None and self.phases_target_widgets_percent[1].text() != "":
             fcs = dry + (float(self.phases_target_widgets_percent[1].text()) * drop / 100)
             fcs_set = True
-
+            
+#        return [(dry if dry_set else None),(fcs if fcs_set else None), None, (drop if drop_set else None)]
+        # set all unset target times to the profile times
         return [
             (dry if dry_set else (aw.qmc.timex[aw.qmc.timeindex[1]] - offset)),
             (fcs if fcs_set else (aw.qmc.timex[aw.qmc.timeindex[2]] - offset)),
@@ -40340,7 +40345,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 target_widget = QLineEdit("")
                 target_widget.setValidator(QRegExpValidator(self.regextime))
                 target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
-                target_widget.editingFinished.connect(self.updateTimeResults)
+                target_widget.editingFinished.connect(self.updateTimesWidget)
                 target_cell_widget = QWidget()
                 target_cell_layout = QHBoxLayout(target_cell_widget)
                 target_cell_layout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
