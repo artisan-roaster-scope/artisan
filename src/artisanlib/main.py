@@ -8076,6 +8076,10 @@ class tgraphcanvas(FigureCanvas):
                     aw.fujipid.sv = 0
             QTimer.singleShot(5,self.disconnectProbes)
 #            QApplication.processEvents()
+            # reset the canvas color when it was set by an alarm but never reset
+            if "canvas_alt" in aw.qmc.palette:
+                aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
+                aw.updateCanvasColors()
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.button_7.setEnabled(True)
@@ -57832,27 +57836,6 @@ class AlarmDlg(ArtisanResizeablDialog):
     def closeEvent(self, _):
         self.closealarms()
 
-#dave
-#    @pyqtSlot(bool)
-#    def showAlarmbuttonhelp(self,_):
-#        string  = u(QApplication.translate("Message", "<b>Nr:</b> alarm number for reference",None)) + "<br>"
-#        string += u(QApplication.translate("Message", "<b>Status:</b> activate or deactive alarm",None)) + "<br>"
-#        string += u(QApplication.translate("Message", "<b>If Alarm:</b> alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.",None)) + "<br>"  
-#        string += u(QApplication.translate("Message", "<b>But Not:</b> alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.",None)) + "<br>"
-#        string += u(QApplication.translate("Message", "<b>From:</b> alarm only triggered after the given event",None)) + "<br>"
-#        string += u(QApplication.translate("Message", "<b>Time:</b> if not 00:00, alarm is triggered mm:ss after the event 'From' happend",None)) + "<br>"
-#        string += u(QApplication.translate("Message", "<b>Source:</b> the observed temperature source",None)) + "<br>"
-#        string += u(QApplication.translate("Message", "<b>Condition:</b> alarm is triggered if source rises above or below the specified temperature",None)) + "<br>"
-#        string += u(QApplication.translate("Message", "<b>Temp:</b> the specified temperature limit",None)) + "<br>"
-#        string += u(QApplication.translate("Message", "<b>Action:</b> the action to be triggered if all conditions are fulfilled",None)) + "<br>"
-#        string += u(QApplication.translate("Message", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button, the new value of the slider or the program to call",None)) + "<br><br>"
-#        string += u(QApplication.translate("Message", "<b>NOTE:</b> each alarm is only triggered once",None))
-#        msgbox = QMessageBox(self)
-#        msgbox.setWindowTitle(QApplication.translate("Button", "Help",None))
-#        msgbox.setInformativeText(string)
-#        msgbox.show()
-        
-
     def savealarms(self):
         try:
             self.alarmtable.sortItems(0)
@@ -58205,7 +58188,7 @@ class AlarmDlg(ArtisanResizeablDialog):
 ########################################################################################
 #####################  ALARM HELP DLG  #################################################
 ########################################################################################
-class alarmHelpDlg(ArtisanDialog):  #dave
+class alarmHelpDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(alarmHelpDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Symbolic Formulas Help",None)) 
