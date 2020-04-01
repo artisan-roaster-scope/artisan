@@ -1,0 +1,5 @@
+<head><style>td, th {border: 1px solid #ddd;  padding: 6px;}th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}</style></head><body><b>MODBUS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <td>The MODBUS device corresponds to input channels1 and 2.. The MODBUS_34 extra device adds input channels 3 and 4.<br><br>Inputs with slave id set to 0 are turned off.<br><br>Modbus function 3 &quot;read holding register&quot; is the standard. Modbus function 4 triggers the use of &quot;read input register&quot;. Input registers (fct 4) usually are from 30000-39999.<br><br>Most devices hold data in 2 byte integer registers. A temperature of 145.2C is often sent as 1452. In that case you have to set the divider to &quot;x/10&quot;.<br><br>Few devices hold data as 4 byte floats in two registers. Tick the Float flag in this case.</td>
+    </tr>
+</table></body>
