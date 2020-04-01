@@ -30,6 +30,12 @@ class Simulator():
             self.extratimex = self.extratimex[start:]
         except:
             pass
+        self.temp1 = numpy.array(self.temp1)
+        self.temp2 = numpy.array(self.temp2)
+        self.timex = numpy.array(self.timex)
+        self.extratemp1 = numpy.array(self.extratemp1)
+        self.extratemp2 = numpy.array(self.extratemp2)
+        self.extratimex = numpy.array(self.extratimex)
     
     def read(self,tx):
         et = -1

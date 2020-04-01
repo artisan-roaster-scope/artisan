@@ -1599,7 +1599,7 @@ class tgraphcanvas(FigureCanvas):
         #stores the value for each event
         self.specialeventsvalue = []
         #flag that makes the events location type bars (horizontal bars) appear on the plot. flag read on redraw()
-        # 0 = no event bars; 1 = type bars (4 bars); 2 = value bars; 3 = split (combination of 0 and 2); merge (as 2, values rendered on lines)
+        # 0 = no event bars; 1 = type bars (4 bars); 2 = value bars; 3 = split (combination of 0 and 2); 4 = merge (as 2, values rendered on lines)
         self.eventsGraphflag = 2
         self.clampEvents = False # if True, custom events are drawn w.r.t. the temperature scale
         self.renderEventsDescr = False # if True, descriptions are rendered instead of type/value tags
@@ -5917,48 +5917,33 @@ class tgraphcanvas(FigureCanvas):
                 elif self.eventsGraphflag in [2,3,4]:
                     # make blended transformations to help identify EVENT types
                     if self.clampEvents:
-                        step = 10
-                        start = 100
-                        jump = 1
+                        top = 100
+                        bot = 0
                     else:
-                        if self.mode == "C":
-                            step = 5
-                            start = 60
-                        else:
-                            step = 10
-                            start = 125
-                        jump = 5
-
-                    for j in range(120):
+                        top = self.phases[0]
+                        bot = self.ylimit_min
+                    step = (top-bot)/10
+                    start = top - bot
+                    small_step = step/10 # as we have 100 items
+                    jump = 0
+                    
+                    for j in range(110):
                         i = int(j/10)
-                        if self.clampEvents:
-                            barposition = 101 - start - jump # draw custom events aligned with the temperature axis
-                        else:
-                            barposition = self.phases[0]-start-jump
+                        barposition = top - start - jump
                         if i == j/10.:
-                            if self.clampEvents:
-                                c1 = "background"
-                                c2 = "rect5"
-                            else:
-                                c1 = "rect5"
-                                c2 = "background"
+                            c1 = "rect5"
+                            c2 = "background"
                             if i == 0:
                                 color = self.palette[c1] #self.palette["rect3"] # brown
                             elif i%2:
                                 color = self.palette[c2] #self.palette["rect2"] # orange # the uneven ones
                             else:
-                                color = self.palette[c1] #self.palette["rect1"] # green # the even ones                                
-                            if not self.clampEvents or (i!=0 and i!=11): # don't draw the first and the last bar in clamp mode
+                                color = self.palette[c1] #self.palette["rect1"] # green # the even ones
+                            if (i != 10): # don't draw the first and the last bar in clamp mode
                                 rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.15)
                                 self.ax.add_patch(rectEvent)
                         self.eventpositionbars[j] = barposition
-                        if self.clampEvents:
-                            jump -= 1
-                        else:
-                            if self.mode == "C":
-                                jump -= 5/10.
-                            else:
-                                jump -= 1
+                        jump -= small_step
 
                 rcParams['path.sketch'] = (scale, length, randomness)
                 
@@ -6102,39 +6087,38 @@ class tgraphcanvas(FigureCanvas):
                         if self.eventsGraphflag in [2,3,4]:
                             self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
                             self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
-                            E1b_last = E2b_last = E3b_last = E4b_last = 0  #not really necessary but guarantees that Exb_last is defined 
+                            E1b_last = E2b_last = E3b_last = E4b_last = 0  #not really necessary but guarantees that Exb_last is defined
+                            event_pos_offset = self.eventpositionbars[0]
+                            event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
                             for i in range(len(self.backgroundEvents)):
+                                pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                     if self.clampEvents:
                                         self.E1backgroundvalues.append(pos)
                                     else:
-                                        self.E1backgroundvalues.append(self.eventpositionbars[min(110,pos)])
+                                        self.E1backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E1b_last = i
                                 elif self.backgroundEtypes[i] == 1 and aw.qmc.showEtypes[1]:
                                     self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                     if self.clampEvents:
                                         self.E2backgroundvalues.append(pos)
                                     else:
-                                        self.E2backgroundvalues.append(self.eventpositionbars[min(110,pos)])
+                                        self.E2backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E2b_last = i
                                 elif self.backgroundEtypes[i] == 2 and aw.qmc.showEtypes[2]:
                                     self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                     if self.clampEvents:
                                         self.E3backgroundvalues.append(pos)
                                     else:
-                                        self.E3backgroundvalues.append(self.eventpositionbars[min(110,pos)])
+                                        self.E3backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E3b_last = i
                                 elif self.backgroundEtypes[i] == 3 and aw.qmc.showEtypes[3]:
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                     if self.clampEvents:
                                         self.E4backgroundvalues.append(pos)
                                     else:
-                                        self.E4backgroundvalues.append(self.eventpositionbars[min(110,pos)])
+                                        self.E4backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E4b_last = i
 #                            every = None
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
@@ -6200,11 +6184,13 @@ class tgraphcanvas(FigureCanvas):
                                         Betype = self.Betypesf(self.backgroundEtypes[i])
                                         firstletter = u(Betype[0])
                                         secondletter = self.eventsvaluesShort(self.backgroundEvalues[i])
+                                        thirdletter = aw.eventsliderunits[self.backgroundEtypes[i]] # postfix
                                     else:
                                         firstletter = self.backgroundEStrings[i].strip()[:aw.qmc.eventslabelschars]
                                         if firstletter == "":
                                             firstletter = "E"
                                         secondletter = ""
+                                        thirdletter = ""
                                     if self.mode == "F":
                                         height = 50
                                     else:
@@ -6253,7 +6239,9 @@ class tgraphcanvas(FigureCanvas):
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
                                         elif self.eventsGraphflag == 4:
-                                            anno = self.ax.annotate(firstletter + secondletter, xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
+                                            if thirdletter != "":
+                                                firstletter = ""
+                                            anno = self.ax.annotate(firstletter + secondletter + thirdletter, xy=(self.timeB[int(self.backgroundEvents[i])], Btemp),
                                                          xytext=(self.timeB[int(self.backgroundEvents[i])],Btemp),
                                                          alpha=min(aw.qmc.backgroundalpha + 0.3, 1.0),
                                                          color=aw.qmc.palette["bgeventtext"],
@@ -6416,38 +6404,41 @@ class tgraphcanvas(FigureCanvas):
                         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                         E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
-                        E1_last = E2_last = E3_last = E4_last = 0  #not really necessary but guarantees that Ex_last is defined 
+                        E1_last = E2_last = E3_last = E4_last = 0  #not really necessary but guarantees that Ex_last is defined
+                        event_pos_offset = self.eventpositionbars[0]
+                        event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
                         for i in range(Nevents):
+                            pos = max(0,int(round((self.specialeventsvalue[i]-1)*10)))
                             if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
                                 self.E1timex.append(self.timex[self.specialevents[i]])
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                    self.E1values.append(int(round((self.specialeventsvalue[i]-1)*10)))
+                                    self.E1values.append(pos)
                                 else:
-                                    self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
+                                    self.E1values.append((pos*event_pos_factor)+event_pos_offset)
                                 E1_nonempty = True
                                 E1_last = i
                             elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                 self.E2timex.append(self.timex[self.specialevents[i]])
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                    self.E2values.append(int(round((self.specialeventsvalue[i]-1)*10)))
+                                    self.E2values.append(pos)
                                 else:
-                                    self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
+                                    self.E2values.append((pos*event_pos_factor)+event_pos_offset)
                                 E2_nonempty = True
                                 E2_last = i
                             elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                 self.E3timex.append(self.timex[self.specialevents[i]])
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                    self.E3values.append(int(round((self.specialeventsvalue[i]-1)*10)))
+                                    self.E3values.append(pos)
                                 else:
-                                    self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
+                                    self.E3values.append((pos*event_pos_factor)+event_pos_offset)
                                 E3_nonempty = True
                                 E3_last = i
                             elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                 self.E4timex.append(self.timex[self.specialevents[i]])
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                    self.E4values.append(int(round((self.specialeventsvalue[i]-1)*10)))
+                                    self.E4values.append(pos)
                                 else:
-                                    self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
+                                    self.E4values.append((pos*event_pos_factor)+event_pos_offset)
                                 E4_nonempty = True
                                 E4_last = i
                                 
@@ -6542,11 +6533,13 @@ class tgraphcanvas(FigureCanvas):
                                     etype = self.etypesf(self.specialeventstype[i])
                                     firstletter = u(etype[0])
                                     secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
+                                    thirdletter = aw.eventsliderunits[self.specialeventstype[i]] # postfix
                                 else:
                                     firstletter = self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars]
                                     if firstletter == "":
                                         firstletter = "E"
                                     secondletter = ""
+                                    thirdletter = ""
                                 if self.mode == "F":
                                     height = 50
                                 else:
@@ -6624,7 +6617,9 @@ class tgraphcanvas(FigureCanvas):
                                         # register draggable flag annotation to be re-created after re-positioning on redraw
                                         self.l_event_flags_dict[i] = anno
                                     elif self.eventsGraphflag == 4:
-                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                        if thirdletter != "":
+                                            firstletter = ""
+                                        anno = self.ax.annotate(firstletter + secondletter + thirdletter, xy=(self.timex[int(self.specialevents[i])], temp),
                                                      xytext=(self.timex[int(self.specialevents[i])],temp),
                                                      alpha=0.9,
                                                      color=textcolor,
@@ -7457,6 +7452,8 @@ class tgraphcanvas(FigureCanvas):
                         aw.FahrenheitAction.setEnabled(True)
                         aw.ConvertToCelsiusAction.setDisabled(True)
                         aw.ConvertToFahrenheitAction.setEnabled(True)
+                        aw.qmc.l_annotations_dict = {}
+                        aw.qmc.l_event_flags_dict = {}
                         for i in range(profilelength):
                             self.temp1[i] = self.fromCtoF(self.temp1[i])    #ET
                             self.temp2[i] = self.fromCtoF(self.temp2[i])    #BT
@@ -7512,7 +7509,9 @@ class tgraphcanvas(FigureCanvas):
                         aw.ConvertToFahrenheitAction.setDisabled(True)
                         aw.ConvertToCelsiusAction.setEnabled(True) 
                         aw.FahrenheitAction.setDisabled(True)
-                        aw.CelsiusAction.setEnabled(True)   
+                        aw.CelsiusAction.setEnabled(True)
+                        aw.qmc.l_annotations_dict = {}
+                        aw.qmc.l_event_flags_dict = {}
                         for i in range(profilelength):
                             self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
                             self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
@@ -9473,11 +9472,13 @@ class tgraphcanvas(FigureCanvas):
                             if etype < 4  and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[-1].strip()) == 0):
                                 firstletter = self.etypesf(self.specialeventstype[-1])[0]
                                 secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
+                                thirdletter = aw.eventsliderunits[self.specialeventstype[-1]] # postfix
                             else:
                                 firstletter = self.specialeventsStrings[-1].strip()[:aw.qmc.eventslabelschars]
                                 if firstletter == "":
                                     firstletter = "E"
                                 secondletter = ""
+                                thirdletter = ""
                             #if Event Type-Bars flag
                             if self.eventsGraphflag == 1 and etype < 4:
                                 if self.mode == "F":
@@ -9580,7 +9581,9 @@ class tgraphcanvas(FigureCanvas):
                                                          path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          backgroundcolor=boxcolor)
                                     elif self.eventsGraphflag == 4:
-                                        anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
+                                        if thirdletter != "":
+                                            firstletter = ""
+                                        anno = self.ax.annotate(firstletter + secondletter + thirdletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
                                                          color=textcolor,
                                                          va="center", ha="center",
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
@@ -9595,7 +9598,7 @@ class tgraphcanvas(FigureCanvas):
                                         pass
 
                         self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBacground() needed
-                        temp = "%.1f "%self.temp2[i]            
+                        temp = "%.1f "%self.temp2[i]
                         if aw.qmc.timeindex[0] != -1:
                             start = aw.qmc.timex[aw.qmc.timeindex[0]]
                         else:
@@ -18394,6 +18397,7 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.flagstart:
             value = aw.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
             description = str(aw.float2float(self.eventslidervalues[n] * self.eventsliderfactors[n] + self.eventslideroffsets[n])).rstrip('0').rstrip('.') + self.eventsliderunits[n]
+            description = str(aw.float2float(self.eventslidervalues[n] * self.eventsliderfactors[n] + self.eventslideroffsets[n])).rstrip('0').rstrip('.') + self.eventsliderunits[n]
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value,eventdescription=description)
         self.fireslideraction(n)
 
@@ -18508,7 +18512,7 @@ class ApplicationWindow(QMainWindow):
             # we added "Multiple Events" at position 20 which has to be mapped to action 3
             self.eventaction((a if (a < 3) else (3 if (a == 20) else ((a + 2) if (a > 5) else (a + 1)))), cmd)
         except Exception:
-            pass                    
+            pass
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets/Yocto IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Command; 11= p-i-d; 12= Fuji Command;
@@ -18740,7 +18744,7 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cmds = eval(cs[len('wcoil'):])
                                     if isinstance(cmds,tuple) and len(cmds) == 3:
-                                        # cmd has format "wcoil(s,r,<b>)" 
+                                        # cmd has format "wcoil(s,r,<b>)"
                                         aw.modbus.writeCoil(*cmds)
                                         followupCmd = 0.08
                                 except Exception:
@@ -23059,9 +23063,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.moisture_roasted = profile["moisture_roasted"]
             else:
                 self.qmc.moisture_roasted = 0.
-            if "anno_positions" in profile:
+            # only load annotations position if the temperature mode did not change
+            if "anno_positions" in profile and self.qmc.mode == m:
                 self.qmc.setAnnoPositions(profile["anno_positions"])
-            if "flag_positions" in profile:
+            if "flag_positions" in profile and self.qmc.mode == m:
                 self.qmc.setFlagPositions(profile["flag_positions"])
             if "legendloc_pos" in profile:
                 try:
@@ -39831,7 +39836,6 @@ class profileTransformatorDlg(ArtisanDialog):
                 back_dry = aw.qmc.timeB[aw.qmc.timeindexB[1]]
                 back_fcs = aw.qmc.timeB[aw.qmc.timeindexB[2]]
                 back_drop = aw.qmc.timeB[aw.qmc.timeindexB[6]]
-                timeidx = [1,2,6][i]
                 s = 0
                 if i == 0:
                     # DRYING
@@ -40081,7 +40085,7 @@ class profileTransformatorDlg(ArtisanDialog):
                             res.append(None)
                 except numpy.RankWarning:
                     pass
-                except Exception as e:
+                except:
                     pass
         return res
 
@@ -40110,7 +40114,7 @@ class profileTransformatorDlg(ArtisanDialog):
                             res.append(None)
                 except numpy.RankWarning:
                     pass
-                except Exception as e:
+                except:
                     pass
         return res,fit
     
@@ -40315,7 +40319,7 @@ class profileTransformatorDlg(ArtisanDialog):
                                 new_timex = [tx+foffset for tx in new_timex]
                             extratimex.append(new_timex)
                         aw.qmc.extratimex = extratimex
-                except np.RankWarning:
+                except numpy.RankWarning:
                     pass
         return True
     
@@ -40354,7 +40358,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     fit = numpy.poly1d(self.calcTempPolyfit())
                     if fit is not None:
                         aw.qmc.temp2 = [fit(temp) for temp in self.org_temp2]
-                except np.RankWarning:
+                except numpy.RankWarning:
                     pass
         return True
     
