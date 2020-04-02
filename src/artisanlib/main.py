@@ -33147,7 +33147,7 @@ class HUDDlg(ArtisanDialog):
         try:
             aw.qmc.analysisoffset = int(self.analyzetimeoffset.text())
         except:
-            aw.qmc.analysisoffset = str(aw.qmc.analysisoffset)
+            pass
         return
         
     @pyqtSlot(int)
@@ -33174,7 +33174,7 @@ class HUDDlg(ArtisanDialog):
         try:
             aw.qmc.curvefitoffset = int(self.curvefittimeoffset.text())
         except:
-            aw.qmc.curvefitoffset = str(aw.qmc.curvefitoffset)
+            pass
         return
         
     @pyqtSlot()
