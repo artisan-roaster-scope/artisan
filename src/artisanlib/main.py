@@ -2854,7 +2854,7 @@ class tgraphcanvas(FigureCanvas):
             False
 
     def update_additional_artists(self):
-        if aw.qmc.flagstart and (aw.qmc.device == 18 or aw.qmc.showtimeguide) and aw.qmc.l_timeline is not None: # not NONE device
+        if aw.qmc.flagstart and ((aw.qmc.device == 18 and aw.simulator is None) or aw.qmc.showtimeguide) and aw.qmc.l_timeline is not None: # not NONE device
             tx = int(aw.qmc.timeclock.elapsed()/1000.)
             #aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
             aw.qmc.l_timeline.set_data([tx,tx], aw.qmc.ax.get_ylim())
@@ -3212,8 +3212,7 @@ class tgraphcanvas(FigureCanvas):
                         rcParams['path.effects'] = []
 
                     #update phase lcds
-                    if aw.qmc.phasesLCDflag:
-                        aw.updatePhasesLCDs()
+                    aw.updatePhasesLCDs(updateLabels=False)
                         
                     #update AUC lcd
                     if aw.qmc.AUClcdFlag:
@@ -3256,7 +3255,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
         
                     timestr = self.stringfromseconds(ts)
-                    aw.lcd1.display(u(timestr))
+                    aw.lcd1.display(timestr)
                     
                     # update connected WebLCDs
                     if aw.WebLCDs:
@@ -4619,6 +4618,8 @@ class tgraphcanvas(FigureCanvas):
             aw.largePIDLCDs_dialog.updateDecimals()
         if aw.largeExtraLCDs_dialog is not None:
             aw.largeExtraLCDs_dialog.updateDecimals()
+        if aw.largePhasesLCDs_dialog is not None:
+            aw.largePhasesLCDs_dialog.updateDecimals()
 
     def clearMeasurements(self,andLCDs=True):
         try:
@@ -6902,7 +6903,7 @@ class tgraphcanvas(FigureCanvas):
                                                 label=aw.arabicReshape(QApplication.translate("Label", "AUCguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
-                if aw.qmc.showtimeguide or aw.qmc.device == 18:
+                if aw.qmc.showtimeguide or (aw.qmc.device == 18 and aw.simulator is None):
                     self.l_timeline, = self.ax.plot([], [],color = self.palette["timeguide"],
                                                 label=aw.arabicReshape(QApplication.translate("Label", "TIMEguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
@@ -7515,7 +7516,7 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(profilelength):
                             self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
                             self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
-                            if self.device != 18:
+                            if self.device != 18 or aw.simulator is not None:
                                 if len(self.delta1):
                                     self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
                                 if len(self.delta2):
@@ -8369,7 +8370,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.setProfileTitle("")
             if aw.qmc.delta_ax:
                 aw.qmc.delta_ax.set_ylabel("")
-                    
+            
             self.flagstart = True
             # start Monitor if not yet running
             if not self.flagon:
@@ -8519,7 +8520,7 @@ class tgraphcanvas(FigureCanvas):
                             removed = True
                             self.xaxistosm(redraw=False)
                     elif not aw.button_8.isFlat():
-                        if self.device == 18: #manual mode
+                        if self.device == 18 and aw.simulator is None: #manual mode
                             tx,et,bt = aw.ser.NONE()
                             if bt != 1 and et != -1:  #cancel
                                 self.drawmanual(et,bt,tx)
@@ -8662,7 +8663,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[1] = 0
                             removed = True
                     elif not aw.button_19.isFlat():
-                        if self.device != 18:
+                        if self.device != 18 or aw.simulator is not None:
                             self.timeindex[1] = len(self.timex)-1
                         else:
                             tx,et,bt = aw.ser.NONE()
@@ -8754,7 +8755,7 @@ class tgraphcanvas(FigureCanvas):
                             removed = True
                     elif not aw.button_3.isFlat():
                         # record 1Cs only if Charge mark has been done
-                        if self.device != 18:                
+                        if self.device != 18 or aw.simulator is not None:
                             self.timeindex[2] = len(self.timex)-1
                         else:
                             tx,et,bt = aw.ser.NONE()
@@ -8842,7 +8843,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[3] = 0
                             removed = True
                     elif not aw.button_4.isFlat():
-                        if self.device != 18:
+                        if self.device != 18 or aw.simulator is not None:
                             self.timeindex[3] = len(self.timex)-1
                         else:
                             tx,et,bt = aw.ser.NONE()
@@ -8926,7 +8927,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[4] = 0
                             removed = True
                     elif not aw.button_5.isFlat():
-                        if self.device != 18:
+                        if self.device != 18 or aw.simulator is not None:
                             self.timeindex[4] = len(self.timex)-1
                         else:
                             tx,et,bt = aw.ser.NONE()
@@ -9014,7 +9015,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[5] = 0
                             removed = True
                     elif not aw.button_6.isFlat():
-                        if self.device != 18:
+                        if self.device != 18 or aw.simulator is not None:
                             self.timeindex[5] = len(self.timex)-1
                         else:
                             tx,et,bt = aw.ser.NONE()
@@ -9112,7 +9113,7 @@ class tgraphcanvas(FigureCanvas):
                         # generate UUID
                         if self.roastUUID is None: # there might be already one assigned by undo and redo the markDROP!
                             self.roastUUID = uuid.uuid4().hex
-                        if self.device != 18:
+                        if self.device != 18 or aw.simulator is not None:
                             if self.autoDropIdx:
                                 self.timeindex[6] = self.autoDropIdx
                             else:
@@ -9316,7 +9317,7 @@ class tgraphcanvas(FigureCanvas):
                             removed = True
                         
                     elif not aw.button_20.isFlat():
-                        if self.device != 18:
+                        if self.device != 18 or aw.simulator is not None:
                             self.timeindex[7] = len(self.timex)-1
                         else:
                             tx,et,bt = aw.ser.NONE()
@@ -9420,13 +9421,13 @@ class tgraphcanvas(FigureCanvas):
             if takeLock:
                 aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
-                if len(self.timex) > 0 or self.device == 18:
+                if len(self.timex) > 0 or (self.device == 18 and aw.simulator is None):
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.fileDirty()
                     Nevents = len(self.specialevents)
                     #if in manual mode record first the last point in self.timex[]
-                    if self.device == 18:
+                    if self.device == 18 and aw.simulator is None:
                         tx,et,bt = aw.ser.NONE()
                         if bt != -1 or et != -1:
                             self.drawmanual(et,bt,tx)
@@ -12176,7 +12177,7 @@ class SampleThread(QThread):
                 tx = aw.qmc.timeclock.elapsed()/1000.
                 t1,t2 = aw.simulator.read((tx if aw.qmc.flagstart else 0))
             return tx,float(t1),float(t2)
-        except Exception:
+        except:
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1.0,-1.0
     
@@ -12231,7 +12232,7 @@ class SampleThread(QThread):
                     pass
                     
                 #if using a meter (thermocouple device)
-                if aw.qmc.device != 18: # not NONE device
+                if aw.qmc.device != 18 or aw.simulator is not None: # not NONE device
                 
                     #### first retrieve readings from the main device
                     timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
@@ -13049,6 +13050,8 @@ class ApplicationWindow(QMainWindow):
         self.LargePIDLCDsFlag = False
         self.largeExtraLCDs_dialog = None
         self.LargeExtraLCDsFlag = False
+        self.largePhasesLCDs_dialog = None
+        self.LargePhasesLCDsFlag = False
         self.WebLCDs = False
         self.WebLCDsPort = 8080
         self.WebLCDsAlerts = False
@@ -14008,6 +14011,10 @@ class ApplicationWindow(QMainWindow):
         self.extralcdsAction = QAction(UIconst.TOOLKIT_MENU_EXTRA_LCDS,self)
         self.extralcdsAction.triggered.connect(self.largeExtraLCDs)
         self.viewMenu.addAction(self.extralcdsAction)
+
+        self.phaseslcdsAction = QAction(UIconst.TOOLKIT_MENU_PHASES_LCDS,self)
+        self.phaseslcdsAction.triggered.connect(self.largePhasesLCDs)
+        self.viewMenu.addAction(self.phaseslcdsAction)
         
         self.viewMenu.addSeparator()
 
@@ -15385,7 +15392,7 @@ class ApplicationWindow(QMainWindow):
         # TP
         self.TPlabel = QLabel()
         self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
-        self.TPlcd = QLCDNumber()        
+        self.TPlcd = QLCDNumber()
         self.TPlcd.setContextMenuPolicy(Qt.CustomContextMenu)
         self.TPlcd.customContextMenuRequested.connect(self.PhaseslcdClicked)
         self.TPlcd.display("--:--")
@@ -15430,7 +15437,7 @@ class ApplicationWindow(QMainWindow):
         # AUC LCD
         self.AUClabel = QLabel()
         self.AUClabel.setText("<small><b>" + u(QApplication.translate("Label", "AUC",None)) + "</b></small>")
-        self.AUClcd = QLCDNumber()        
+        self.AUClcd = QLCDNumber()
         self.AUClcd.setContextMenuPolicy(Qt.CustomContextMenu)
         self.AUClcd.customContextMenuRequested.connect(self.AUClcdClicked)
         self.AUClcd.display("---")
@@ -16850,7 +16857,7 @@ class ApplicationWindow(QMainWindow):
                                     + "padding-bottom: 5px;"
                                     + "padding-left: 0px;"
                                     + "padding-right: 0px;"
-                                    + "}"                                   
+                                    + "}"
                                     + "QGroupBox::title {background-color:" + str(canvas_color) + ";"
                                     + "subcontrol-origin: margin;" # or border or margin
                                     + "subcontrol-position: top center;" #/* position at the top center */
@@ -16877,7 +16884,7 @@ class ApplicationWindow(QMainWindow):
 
         aw.updateSliderColors()
         aw.updatePhasesLCDsColors()
-                         
+        
         colorPairsToCheck = self.getcolorPairsToCheck()
         self.checkColors(colorPairsToCheck)
 
@@ -17190,11 +17197,14 @@ class ApplicationWindow(QMainWindow):
     def AUClcdClicked(self,_):
         aw.qmc.AUCLCDmode = (aw.qmc.AUCLCDmode + 1)%3
         if aw.qmc.AUCLCDmode == 0:
-            self.AUClabel.setText("<small><b>" + u(QApplication.translate("Label", "AUC",None))+ "</b></small>")
+            label = QApplication.translate("Label", "AUC",None)
         elif aw.qmc.AUCLCDmode == 1:
-            self.AUClabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "AUC",None)) + "</b></small>")
+            label = "&raquo;" + QApplication.translate("Label", "AUC",None)
         else:
-            self.AUClabel.setText("<small><b>" + u(QApplication.translate("Label", "AUC FCs",None)) + "</b></small>")
+            label = QApplication.translate("Label", "AUC FCs",None)
+        self.AUClabel.setText("<small><b>" + label + "</b></small>")
+        if aw.LargePhasesLCDsFlag and aw.largePhasesLCDs_dialog:
+            aw.largePhasesLCDs_dialog.updateLabels([None,None,None,label])
         aw.updateAUCLCD()
 
     def colordialog(self,c,noButtons=False,parent=None): # c a QColor
@@ -17844,6 +17854,8 @@ class ApplicationWindow(QMainWindow):
 
     def updateAUCLCD(self):
         try:
+            auc_value_str = "---"
+            auc_style = "QLCDNumber { color: black; }"
             if ((aw.qmc.AUCbegin == 0 and aw.qmc.timeindex[0] > -1) or
                 (aw.qmc.AUCbegin == 1 and aw.qmc.TPalarmtimeindex) or
                 (aw.qmc.AUCbegin == 2 and self.qmc.timeindex[1] > 0) or
@@ -17851,10 +17863,10 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.AUCLCDmode == 0:
                     v = int(round(aw.qmc.AUCvalue))
                     if v > 999:
-                        self.AUClcd.display("---")
+                        auc_value_str = "---"
                     else:
-                        self.AUClcd.display(u(v))
-                    self.AUClcd.setStyleSheet("QLCDNumber { color: black; }") 
+                        auc_value_str = str(v)
+                    auc_style = "QLCDNumber { color: black; }"
                 elif aw.qmc.AUCLCDmode == 1:
                     if aw.qmc.AUCtargetFlag and aw.qmc.background and aw.qmc.AUCbackground > 0:
                         # background AUC as target
@@ -17865,36 +17877,45 @@ class ApplicationWindow(QMainWindow):
                     d = aw.qmc.AUCvalue-target
                     if d < 0:
                         # too low => blue
-                        self.AUClcd.setStyleSheet("QLCDNumber { color: blue; }")
+                        auc_style = "QLCDNumber { color: blue; }"
                     else:
                         # too high => red
-                        self.AUClcd.setStyleSheet("QLCDNumber { color: red; }")
+                        auc_style = "QLCDNumber { color: red; }"
                         self.AUClabel.setText("<small><b>" + u(QApplication.translate("Label", "AUC",None)) + "&laquo;</b></small>")
                     v = abs(int(round(d)))
                     if v > 999:
-                        self.AUClcd.display("---")
-                        self.AUClcd.setStyleSheet("QLCDNumber { color: black; }")
+                        auc_value_str = "---"
+                        auc_style = "QLCDNumber { color: black; }"
                     else:
-                        self.AUClcd.display(u(v))
+                        auc_value_str = str(v)
                 elif aw.qmc.timeindex[2] > 0:
                     v = int(round(aw.qmc.AUCsinceFCs))
                     if v > 999:
-                        self.AUClcd.display("---")
+                        auc_value_str = "---"
                     else:
-                        self.AUClcd.display(u(v))
-                    self.AUClcd.setStyleSheet("QLCDNumber { color: black; }") 
+                        auc_value_str = str(v)
+                    auc_style = "QLCDNumber { color: black; }"
                 else:
-                    self.AUClcd.display("---")
-                    self.AUClcd.setStyleSheet("QLCDNumber { color: black; }")
-            else:
-                self.AUClcd.display("---")
-                self.AUClcd.setStyleSheet("QLCDNumber { color: black; }")
+                    auc_value_str = "---"
+                    auc_style = "QLCDNumber { color: black; }"
+            self.AUClcd.display(auc_value_str)
+            self.AUClcd.setStyleSheet(auc_style)
+            if aw.LargePhasesLCDsFlag and aw.largePhasesLCDs_dialog:
+                aw.largePhasesLCDs_dialog.updateValues([None,None],[None,auc_value_str])
+                aw.largePhasesLCDs_dialog.updateAUCstyle(auc_style)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updateAUCLCD(): {0}").format(str(ex)),exc_tb.tb_lineno)
-            
-        
-    def updatePhasesLCDs(self):
+
+    # returns multiple results on the current state of the phases:
+    #  TP, TPlabel, DRY, DRY, FCs, FCslabel
+    #  TP2DRYlabel, DRY2FCslabel
+    #  TP2DRYframeTooltip
+    #  DRY2FCsframeTooltip
+    #  phasesLCDsTooltip
+    # all are returning strings with the actual values or None if values did not change
+    def getPhasesLCDsData(self,updateLabels=True):
+        TP = TPlabel = DRY = DRYlabel = FCs = FCslabel = TP2DRYlabel = DRY2FCslabel = TP2DRYframeTooltip = DRY2FCsframeTooltip = phasesLCDsTooltip = None
         try:
             if self.qmc.timex: # requires at least some recordings
                 window_width = aw.width()
@@ -17917,23 +17938,26 @@ class ApplicationWindow(QMainWindow):
                     # FIN phase temp on LCD1
                     # FIN phase time on LCD2
                     # FIN phase percentage on LCD3
-                    self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs\nCurrently in ALL FINISHING MODE", None))
+                    if updateLabels:
+                        phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs\nCurrently in ALL FINISHING MODE", None)
                     if self.qmc.timeindex[6]: # after drop
                         ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[2]]
                     else: # before drop
                         ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
-                    self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","ALL FINISHING MODE",None)))
+                    if updateLabels:
+                        DRY2FCsframeTooltip = QApplication.translate("Label","ALL FINISHING MODE",None)
+                        TPlabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
                     #time
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
-                    self.TPlcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
+                    TP = self.qmc.stringfromseconds(ts,leadingzero=False)
                     #temp
                     if self.qmc.timeindex[6]: # after drop
                         dBT = self.qmc.temp2[self.qmc.timeindex[6]]
                     else:
                         dBT = self.qmc.temp2[-1]
                     dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[2]])
-                    self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
-                    self.DRYlcd.display(u(dBT + self.qmc.mode))
+                    if updateLabels:
+                        DRYlabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
+                    DRY = dBT + self.qmc.mode
                     #percentage
                     if totaltime:
                         finishphaseP = fmtstr%(ts*100./totaltime)
@@ -17941,36 +17965,38 @@ class ApplicationWindow(QMainWindow):
                         finishphaseP = " --- "
                     if not aw.qmc.LCDdecimalplaces and totaltime:
                         finishphaseP += " "
-                    self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "DEV%",None)) + "</b></small>")
-                    self.FCslcd.display(u(finishphaseP))
+                    if updateLabels:
+                        FCslabel = QApplication.translate("Label", "DEV%",None)
+                    FCs = finishphaseP
                     # DRY2FCs
                     if  window_width > 950 and self.qmc.timeindex[1]:
                         t = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
-                        self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                        DRY2FCslabel = self.qmc.stringfromseconds(t,leadingzero=False)
                     else:
-                        self.DRY2FCslabel.setText("")
-                        self.DRY2FCslabel.setMinimumWidth(0)
+                        DRY2FCslabel = ""
                 else:
                     # show the regular phases LCD values split by phase
 
                     # 1st PhaseLCD: TP
                     if aw.qmc.phasesLCDmode == 0: # time mode
-                        self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TIME MODE", None))
-                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>") 
+                        if updateLabels:
+                            phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TIME MODE", None)
+                            TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
                         if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
-                            # after TP                   
+                            # after TP
                             if self.qmc.timeindex[6]:
                                 ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
                             else:
                                 ts = tx - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                            tss = u(self.qmc.stringfromseconds(int(ts)))
-                            self.TPlcd.display(tss)
+                            tss = self.qmc.stringfromseconds(ts,leadingzero=False)
+                            TP = tss
                         else:
                             # before TP
-                            self.TPlcd.display(u("--:--"))
+                            TP = "--:--"
                     elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                        self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in PERCENTAGE MODE", None))
-                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
+                        if updateLabels:
+                            phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in PERCENTAGE MODE", None)
+                            TPlabel = QApplication.translate("Label", "DRY%",None)
                         if self.qmc.timeindex[1]: # after DRY
                             ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
                             if totaltime:
@@ -17979,23 +18005,24 @@ class ApplicationWindow(QMainWindow):
                                 dryphaseP = " --- "
                             if not aw.qmc.LCDdecimalplaces and totaltime:
                                 dryphaseP += " "
-                            self.TPlcd.display(u(dryphaseP))
+                            TP = dryphaseP
                         else:
-                            self.TPlcd.display(u(" --- "))
+                            TP = " --- "
                     elif aw.qmc.phasesLCDmode == 2: # temp mode
-                        self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TEMP MODE", None))
-                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
+                        if updateLabels:
+                            phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TEMP MODE", None)
+                            TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
+
                         if self.qmc.TPalarmtimeindex:
                             if self.qmc.timeindex[6]: # after drop
                                 dBT = self.qmc.temp2[self.qmc.timeindex[6]]
                             else:
                                 dBT = self.qmc.temp2[-1]
                             dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.TPalarmtimeindex])
-                            self.TPlcd.display(u(dBT + self.qmc.mode))
+                            TP = dBT + self.qmc.mode
                         else:
                             # before TP
-                            self.TPlcd.display(u(" --- "))
-                            
+                            TP = " --- "
                             
                     # 2nd PhaseLCD: DRY
                     if self.qmc.timeindex[1]:
@@ -18005,11 +18032,13 @@ class ApplicationWindow(QMainWindow):
                         else:
                             ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                         if aw.qmc.phasesLCDmode == 0: # time mode
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))
-                            self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None)) + "&raquo;</b></small>")
-                            self.DRYlcd.display(u(self.qmc.stringfromseconds(int(ts))))
+                            if updateLabels:
+                                TP2DRYframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                                DRYlabel = QApplication.translate("Label", "DRY",None) + "&raquo;"
+                            DRY = self.qmc.stringfromseconds(ts,leadingzero=False)
                         elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None)))
+                            if updateLabels:
+                                TP2DRYframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
                             if self.qmc.timeindex[2]:
                                 ts = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
                             if totaltime:
@@ -18018,31 +18047,34 @@ class ApplicationWindow(QMainWindow):
                                 midphaseP = " --- "
                             if not aw.qmc.LCDdecimalplaces and totaltime:
                                 midphaseP += " "
-                            self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "RAMP%",None)) + "</b></small>")
-                            self.DRYlcd.display(u(midphaseP))
+                            if updateLabels:
+                                DRYlabel = QApplication.translate("Label", "RAMP%",None)
+                            DRY = midphaseP
                         elif aw.qmc.phasesLCDmode == 2: # temp mode
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))
+                            if updateLabels:
+                                TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE",None)
                             if self.qmc.timeindex[6]: # after drop
                                 dBT = self.qmc.temp2[self.qmc.timeindex[6]]
                             else:
                                 dBT = self.qmc.temp2[-1]
                             dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[1]])
-                            self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None)) + "&raquo;</b></small>")
-                            self.DRYlcd.display(u(dBT + self.qmc.mode))
+                            if updateLabels:
+                                DRYlabel = QApplication.translate("Label", "DRY",None) + "&raquo;"
+                            DRY = dBT + self.qmc.mode
                         # TP2DRY
                         if window_width > 950 and self.qmc.TPalarmtimeindex:
                             t = self.qmc.timex[self.qmc.timeindex[1]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                            self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                            TP2DRYlabel = self.qmc.stringfromseconds(t,leadingzero=False)
                         else:
-                            self.TP2DRYlabel.setText("")
-                            self.TP2DRYlabel.setMinimumWidth(0)
+                            TP2DRYlabel = ""
                     else:
                         # before DRY
                         dryexpectedtime = None
-                        if aw.qmc.phasesLCDmode == 2:
-                            self.DRYlabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
-                        else:
-                            self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
+                        if updateLabels:
+                            if aw.qmc.phasesLCDmode == 2:
+                                DRYlabel = "&darr;" + QApplication.translate("Label", "DRY",None)
+                            else:
+                                DRYlabel = "&raquo;" + QApplication.translate("Label", "DRY",None)
                         if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                             # display expected time to reach DRY as defined in the background profile or the phases dialog
                             if self.qmc.background and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
@@ -18052,30 +18084,25 @@ class ApplicationWindow(QMainWindow):
                             if drytarget > self.qmc.temp2[-1]:
                                 dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
                                 if aw.qmc.phasesLCDmode == 2:
-                                    tstring = u(self.qmc.stringfromseconds(int(dryexpectedtime)))
+                                    tstring = self.qmc.stringfromseconds(dryexpectedtime,leadingzero=False)
                                 else:
-                                    tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime)))
-                                self.DRYlcd.display(tstring)
+                                    tstring = self.qmc.stringfromseconds(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime,leadingzero=False)
+                                DRY = tstring
                             else:
-                                self.DRYlcd.display(u("--:--"))
+                                DRY = "--:--"
                         else:
-                            self.DRYlcd.display(u("--:--"))
+                            DRY = "--:--"
                         
                         # TP2DRY (display estimated time between TP and DRY)
                         if dryexpectedtime and window_width > 950 and self.qmc.TPalarmtimeindex:
                             t = tx - self.qmc.timex[self.qmc.TPalarmtimeindex] + dryexpectedtime # time after TP plus expected-time-to-DRY = total time expected for 1nd phase
                             if t > 3600:
-                                self.TP2DRYlabel.setText("")
-                                self.TP2DRYlabel.setMinimumWidth(0)
+                                TP2DRYlabel = ""
                             else:
-                                self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
-                                width = self.TP2DRYlabel.fontMetrics().boundingRect("88:::88").width()
-                                self.TP2DRYlabel.setMinimumWidth(width)
+                                TP2DRYlabel = self.qmc.stringfromseconds(t,leadingzero=False)
                         else:
-                            self.TP2DRYlabel.setText("")
-                            self.TP2DRYlabel.setMinimumWidth(0)
-                            
-                            
+                            TP2DRYlabel = ""
+                    
                     # 3rd PhasesLCD: FCs
                     if self.qmc.timeindex[2]:
                         # after FCs
@@ -18084,58 +18111,61 @@ class ApplicationWindow(QMainWindow):
                         else: # before drop
                             ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
                         if aw.qmc.phasesLCDmode == 0: # time mode
-                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))
-                            self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
-                            self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
+                            if updateLabels:
+                                DRY2FCsframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                                TP2DRYframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                                FCslabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
+                            FCs = self.qmc.stringfromseconds(ts,leadingzero=False)
                         elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None)))
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None)))
+                            if updateLabels:
+                                DRY2FCsframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
+                                TP2DRYframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
+                                FCslabel = QApplication.translate("Label", "DEV%",None)
                             if totaltime:
                                 finishphaseP = fmtstr%(ts*100./totaltime)
                             else:
                                 finishphaseP = " --- "
                             if not aw.qmc.LCDdecimalplaces and totaltime:
                                 finishphaseP += " "
-                            self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "DEV%",None)) + "</b></small>")
-                            self.FCslcd.display(u(finishphaseP))
+                            FCs = finishphaseP
                         elif aw.qmc.phasesLCDmode == 2: # temp mode
-                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))
+                            if updateLabels:
+                                DRY2FCsframeTooltip = QApplication.translate("Label","TEMP MODE",None)
+                                TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE",None)
+                                FCslabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
                             if self.qmc.timeindex[6]: # after drop
                                 dBT = self.qmc.temp2[self.qmc.timeindex[6]]
                             else:
                                 dBT = self.qmc.temp2[-1]
                             dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[2]])
-                            self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
-                            self.FCslcd.display(u(dBT + self.qmc.mode))
+                            FCs = dBT + self.qmc.mode
                         # DRY2FCs
                         if  window_width > 950 and self.qmc.timeindex[1]:
                             t = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
-                            self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                            DRY2FCslabel = self.qmc.stringfromseconds(t,leadingzero=False)
                         else:
-                            self.DRY2FCslabel.setText("")
-                            self.DRY2FCslabel.setMinimumWidth(0)
+                            DRY2FCslabel = ""
                     else:
                         # before FCs
                         fcsexpectedtime = None
                         if aw.qmc.phasesLCDmode == 0:
-                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))
-                            self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
+                            if updateLabels:
+                                DRY2FCsframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                                TP2DRYframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                                FCslabel = "&raquo;" + QApplication.translate("Label", "FCs",None)
                         elif aw.qmc.phasesLCDmode == 1:
-                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None)))
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None)))
-                            self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
+                            if updateLabels:
+                                DRY2FCsframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
+                                TP2DRYframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
+                                FCslabel = "&raquo;" + QApplication.translate("Label", "FCs",None)
                         elif aw.qmc.phasesLCDmode == 2:
-                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))
-                            self.FCslabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
+                            if updateLabels:
+                                DRY2FCsframeTooltip = QApplication.translate("Label","TEMP MODE",None)
+                                TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE",None)
+                                FCslabel = "&darr;" + QApplication.translate("Label", "FCs",None)
                                 
                         if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                             ## after DRY:
-                            #ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
-                            #self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
                             if self.qmc.background and self.qmc.timeindexB[2]:
                                 fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
@@ -18144,45 +18174,106 @@ class ApplicationWindow(QMainWindow):
                             if fcstarget > self.qmc.temp2[-1]:
                                 fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
                                 if aw.qmc.phasesLCDmode == 2:
-                                    tstring = u(self.qmc.stringfromseconds(int(fcsexpectedtime)))
+                                    tstring = self.qmc.stringfromseconds(fcsexpectedtime, leadingzero=False)
                                 else:
-                                    tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime)))
-                                self.FCslcd.display(tstring)
+                                    tstring = self.qmc.stringfromseconds(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime, leadingzero=False)
+                                FCs = tstring
                             else:
-                                self.FCslcd.display(u("--:--"))
+                                FCs = "--:--"
                         else:
-                            self.FCslcd.display(u("--:--"))
-                            
+                            FCs = "--:--"
+                        
                         # DRY2FCs (display estimated time between DRY and FCs)
                         if fcsexpectedtime and window_width > 950 and self.qmc.timeindex[1]:
                             t = tx - self.qmc.timex[self.qmc.timeindex[1]] + fcsexpectedtime # time after DRY plus expected-time-to-FCs = total time expected for 2nd phase
-                            self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
-                            width = self.DRY2FCslabel.fontMetrics().boundingRect("88:::88").width()
-                            self.DRY2FCslabel.setMinimumWidth(width)
+                            DRY2FCslabel =self.qmc.stringfromseconds(t, leadingzero=False)
                         else:
-                            self.DRY2FCslabel.setText("")
-                            self.DRY2FCslabel.setMinimumWidth(0)
-                        
-                        
+                            DRY2FCslabel = ""
             else:
                 if aw.qmc.phasesLCDmode == 0: # time mode
-                    self.TPlcd.display("--:--")                
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
+                    TP = "--:--"
+                    if updateLabels:
+                        TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
                 elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                    self.TPlcd.display(u(" --- "))
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
+                    TP = " --- "
+                    if updateLabels:
+                        TPlabel = QApplication.translate("Label", "DRY%",None)
                 elif aw.qmc.phasesLCDmode == 2: # temp mode
-                    self.TPlcd.display(u(" --- "))
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
-                self.TP2DRYlabel.setText("")
-                self.TP2DRYlabel.setMinimumWidth(0)
-                self.DRYlcd.display("--:--")
-                self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
-                self.DRY2FCslabel.setText("")
-                self.DRY2FCslabel.setMinimumWidth(0)
-                self.FCslcd.display("--:--")
-                self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
-        except Exception as e:    
+                    TP = " --- "
+                    if updateLabels:
+                        TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
+                if updateLabels:
+                    DRYlabel = "&raquo;" + QApplication.translate("Label", "DRY",None)
+                    FCslabel = "&raquo;" + QApplication.translate("Label", "FCs",None)
+                TP2DRYlabel = ""
+                DRY2FCslabel = ""
+                DRY =  "--:--"
+                FCs = "--:--"
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
+        return TP,TPlabel,DRY,DRYlabel,FCs,FCslabel,TP2DRYlabel,DRY2FCslabel,TP2DRYframeTooltip,DRY2FCsframeTooltip,phasesLCDsTooltip
+
+    
+    def updatePhasesLCDs(self,updateLabels=True):
+        try:
+            if aw.qmc.phasesLCDflag or aw.LargePhasesLCDsFlag:
+                TP,TPlabel,DRY,DRYlabel,FCs,FCslabel,TP2DRYlabel,DRY2FCslabel,TP2DRYframeTooltip,DRY2FCsframeTooltip,phasesLCDsTooltip = self.getPhasesLCDsData(updateLabels=updateLabels)
+                
+                if aw.qmc.phasesLCDflag:
+                    label_fmt = "<small><b>{}</b></small>"
+                    #
+                    if TP is not None:
+                        self.TPlcd.display(TP)
+                    if DRY is not None:
+                        self.DRYlcd.display(DRY)
+                    if FCs is not None:
+                        self.FCslcd.display(FCs)
+                    #
+                    if TPlabel is not None:
+                        self.TPlabel.setText(label_fmt.format(TPlabel))
+                    if DRYlabel is not None:
+                        self.DRYlabel.setText(label_fmt.format(DRYlabel))
+                    if FCslabel is not None:
+                        self.FCslabel.setText(label_fmt.format(FCslabel))
+                    #
+                    if TP2DRYlabel is not None:
+                        self.TP2DRYlabel.setText(TP2DRYlabel)
+                        if TP2DRYlabel == "":
+                            width = 0
+                        else:
+                            width = self.TP2DRYlabel.fontMetrics().boundingRect("88:::88").width()
+                        self.TP2DRYlabel.setMinimumWidth(width)
+                    if DRY2FCslabel is not None:
+                        self.DRY2FCslabel.setText(DRY2FCslabel)
+                        if DRY2FCslabel == "":
+                            width = 0
+                        else:
+                            width = self.DRY2FCslabel.fontMetrics().boundingRect("88:::88").width()
+                        self.DRY2FCslabel.setMinimumWidth(width)
+                    #
+                    if TP2DRYframeTooltip is not None:
+                        self.TP2DRYframe.setToolTip(TP2DRYframeTooltip)
+                    if DRY2FCsframeTooltip is not None:
+                        self.DRY2FCsframe.setToolTip(DRY2FCsframeTooltip)
+                    if phasesLCDsTooltip is not None:
+                        self.phasesLCDs.setToolTip(phasesLCDsTooltip)
+                        
+                if aw.LargePhasesLCDsFlag:
+                    # update large phases LCDs
+                    try:
+                        if aw.largePhasesLCDs_dialog is not None:
+                            values1 = [TP, FCs] # TP and FCs phase LCDs
+                            values2 = [DRY, None] # DRY phase and AUC LCDs
+                            aw.largePhasesLCDs_dialog.updateValues(values1,values2)
+                            if updateLabels:
+                                aw.largePhasesLCDs_dialog.updateLabels([TPlabel,DRYlabel,FCslabel,None])
+                    except:
+                        pass
+                    
+        except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
@@ -20111,6 +20202,8 @@ class ApplicationWindow(QMainWindow):
             aw.largePIDLCDs_dialog.updateVisiblitiesPID()
         if aw.largeExtraLCDs_dialog is not None:
             aw.largeExtraLCDs_dialog.updateVisiblitiesExtra()
+        if aw.largePhasesLCDs_dialog is not None:
+            aw.largePhasesLCDs_dialog.updateVisiblitiesPhases()
         #
         if aw.ser.showFujiLCDs and aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid
             aw.LCD6frame.setVisible(True)
@@ -24001,7 +24094,7 @@ class ApplicationWindow(QMainWindow):
                         aw.updateCanvasColors()
                     # remove window geometry settings
                     for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry",
-                        "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","AlarmsGeometry","PIDGeometry","DeviceAssignmentGeometry",
+                        "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","PhasesLCDGeometry","AlarmsGeometry","PIDGeometry","DeviceAssignmentGeometry",
                         "TransformatorPosition"]:
                         settings.remove(s)
                     #
@@ -25183,6 +25276,10 @@ class ApplicationWindow(QMainWindow):
                 self.LargeExtraLCDsFlag = toBool(settings.value("LargeExtraLCDs",self.LargeExtraLCDsFlag))
             if self.LargeExtraLCDsFlag:
                 self.largeExtraLCDs()
+            if settings.contains("LargePhasesLCDs"):
+                self.LargePhasesLCDsFlag = toBool(settings.value("LargePhasesLCDs",self.LargePhasesLCDsFlag))
+            if self.LargePhasesLCDsFlag:
+                self.largePhasesLCDs()
             # start server if needed
             if self.WebLCDs:
                 self.startWebLCDs(force=True)
@@ -26268,6 +26365,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("LargeDeltaLCDs",self.LargeDeltaLCDsFlag)
             settings.setValue("LargePIDLCDs",self.LargePIDLCDsFlag)
             settings.setValue("LargeExtraLCDs",self.LargeExtraLCDsFlag)
+            settings.setValue("LargePhasesLCDs",self.LargePhasesLCDsFlag)
             #custom event buttons
             settings.beginGroup("ExtraEventButtons")
             settings.setValue("buttonlistmaxlen",self.buttonlistmaxlen)
@@ -26471,6 +26569,10 @@ class ApplicationWindow(QMainWindow):
             tmp_LargeLCDs = self.LargeExtraLCDsFlag # we keep the state to properly store it in the settings
             self.largeExtraLCDs_dialog.close()
             self.LargeExtraLCDsFlag = tmp_LargeLCDs
+        if self.LargePhasesLCDsFlag and self.largePhasesLCDs_dialog:
+            tmp_LargeLCDs = self.LargePhasesLCDsFlag # we keep the state to properly store it in the settings
+            self.largePhasesLCDs_dialog.close()
+            self.LargePhasesLCDsFlag = tmp_LargeLCDs
         # now wait until the current sampling thread is terminated
         while aw.qmc.flagsamplingthreadrunning:
             QApplication.processEvents()
@@ -29519,55 +29621,66 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def largeLCDs(self,_=False):
         if self.largeLCDs_dialog is None:
-            self.largeLCDs_dialog = LargeMainLCDs(self)
+            self.largeLCDs_dialog = LargeMainLCDs()
+            self.largeLCDs_dialog.setModal(False)
             self.LargeLCDsFlag = True
         if self.largeLCDs_dialog is not None:
-            self.largeLCDs_dialog.setModal(False)
             self.largeLCDs_dialog.show()
             self.largeLCDs_dialog.raise_()
             self.largeLCDs_dialog.activateWindow()
             QApplication.processEvents()
-        
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def largeDeltaLCDs(self,_=False):
         if self.largeDeltaLCDs_dialog is None:
-            self.largeDeltaLCDs_dialog = LargeDeltaLCDs(self)
+            self.largeDeltaLCDs_dialog = LargeDeltaLCDs()
+            self.largeDeltaLCDs_dialog.setModal(False)
             self.LargeDeltaLCDsFlag = True
         if self.largeDeltaLCDs_dialog is not None:
-            self.largeDeltaLCDs_dialog.setModal(False)
             self.largeDeltaLCDs_dialog.show()
             self.largeDeltaLCDs_dialog.raise_()
             self.largeDeltaLCDs_dialog.activateWindow()
             QApplication.processEvents()
-        
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def largePIDLCDs(self,_=False):
         if self.largePIDLCDs_dialog is None:
-            self.largePIDLCDs_dialog = LargePIDLCDs(self)
+            self.largePIDLCDs_dialog = LargePIDLCDs()
+            self.largePIDLCDs_dialog.setModal(False)
             self.LargePIDLCDsFlag = True
         if self.largePIDLCDs_dialog is not None:
-            self.largePIDLCDs_dialog.setModal(False)
             self.largePIDLCDs_dialog.show()
             self.largePIDLCDs_dialog.raise_()
             self.largePIDLCDs_dialog.activateWindow()
             QApplication.processEvents()
-        
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def largeExtraLCDs(self,_=False):
         if self.largeExtraLCDs_dialog is None:
-            self.largeExtraLCDs_dialog = LargeExtraLCDs(self)
+            self.largeExtraLCDs_dialog = LargeExtraLCDs()
+            self.largeExtraLCDs_dialog.setModal(False)
             self.LargeExtraLCDsFlag = True
         if self.largeExtraLCDs_dialog is not None:
-            self.largeExtraLCDs_dialog.setModal(False)
             self.largeExtraLCDs_dialog.show()
             self.largeExtraLCDs_dialog.raise_()
             self.largeExtraLCDs_dialog.activateWindow()
+            QApplication.processEvents()
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def largePhasesLCDs(self,_=False):
+        if self.largePhasesLCDs_dialog is None:
+            self.largePhasesLCDs_dialog = LargePhasesLCDs()
+            self.largePhasesLCDs_dialog.setModal(False)
+            self.LargePhasesLCDsFlag = True
+            self.updatePhasesLCDs()
+        if self.largePhasesLCDs_dialog is not None:
+            self.largePhasesLCDs_dialog.show()
+            self.largePhasesLCDs_dialog.raise_()
+            self.largePhasesLCDs_dialog.activateWindow()
             QApplication.processEvents()
 
     @pyqtSlot()
@@ -29744,7 +29857,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def alarmconfig(self,_=False):
-        if self.qmc.device != 18:
+        if self.qmc.device != 18 or aw.simulator is not None:
             dialog = AlarmDlg(self)
             dialog.show()
         else:
@@ -44844,6 +44957,8 @@ class StatisticsDlg(ArtisanDialog):
                 aw.AUCLCD.show()
             else:
                 aw.AUCLCD.hide()
+        if aw.largePhasesLCDs_dialog is not None:
+            aw.largePhasesLCDs_dialog.updateVisiblitiesPhases()
 
     @pyqtSlot(int)
     def changeAUCshowFlag(self,_):
@@ -56111,6 +56226,7 @@ class LargeLCDs(ArtisanDialog):
         self.makeLCDs()
         landscapelayout = QHBoxLayout()
         for i in range(min(len(self.lcds1frames),len(self.lcds2frames))):
+            self.lcds1labelsLower
             if self.swaplcds:
                 landscapelayout.addWidget(self.lcds2frames[i])
                 landscapelayout.addWidget(self.lcds1frames[i])
@@ -56136,6 +56252,45 @@ class LargeLCDs(ArtisanDialog):
         portraitlayout.setContentsMargins(0, 0, 0, 0)
         return portraitlayout
 
+    def hideAllEmptyLabels(self):
+        if all(l is not None and l.text().strip() == "" for l in (self.lcds1labelsLower + self.lcds2labelsLower)):
+            # all lower labels empty, hide them to gain space
+            self.lowerLabelssvisibility(False)
+        else:
+            self.lowerLabelssvisibility(True)
+        if all(l is not None and l.text().strip() == "" for l in (self.lcds1labelsUpper + self.lcds2labelsUpper)):
+            # all lower labels empty, hide them to gain space
+            self.upperLabelssvisibility(False)
+        else:
+            self.upperLabelssvisibility(True)
+    
+    def hideOuterEmptyLabels(self):
+        all_frames = [val for pair in zip(self.lcds1frames, self.lcds2frames) for val in pair]
+        visible_frames = list(filter(lambda f: not f.isHidden(), all_frames))
+        if visible_frames:
+            all_upper_labels = [val for pair in zip(self.lcds1labelsUpper, self.lcds2labelsUpper) for val in pair]
+            for i,l in enumerate(all_upper_labels):
+                if (all_frames[i] == visible_frames[0] and l.text().strip() == ""):
+                    # hide first visible upper label if empty
+                    l.setVisible(False)
+                else:
+                    l.setVisible(True)
+            all_lower_labels = [val for pair in zip(self.lcds1labelsLower, self.lcds2labelsLower) for val in pair]
+            for i,l in enumerate(all_lower_labels):
+                if (all_frames[i] == visible_frames[-1] and l.text().strip() == ""):
+                    # hide last visible label if empty
+                    l.setVisible(False)
+                else:
+                    l.setVisible(True)
+    
+    def lowerLabelssvisibility(self,b):
+        for l in self.lcds1labelsLower + self.lcds2labelsLower:
+            l.setVisible(b)
+    
+    def upperLabelssvisibility(self,b):
+        for l in self.lcds1labelsUpper + self.lcds2labelsUpper:
+            l.setVisible(b)
+
     # n the number of layout to be set (0: landscape, 1: portrait)
     # calling reLayout() without arg will force a relayout using the current layout
     def reLayout(self,n=None):
@@ -56151,9 +56306,13 @@ class LargeLCDs(ArtisanDialog):
                 QWidget().setLayout(self.layout())
             # install the new layout
             if newLayoutNr == 0:
+                # in horizontal mode we hide rows of empty labels to save space
                 self.setLayout(self.landscapeLayout())
+                self.hideAllEmptyLabels()
             elif newLayoutNr == 1:
                 self.setLayout(self.portraitLayout())
+                # in vertical mode we hide the top and bottom labels if empty
+                self.hideOuterEmptyLabels()
             self.raise_()
             self.activateWindow()
             self.layoutNr = newLayoutNr
@@ -56174,6 +56333,7 @@ class LargeLCDs(ArtisanDialog):
     
     def makeLabel(self,name):
         label = myQLabel(name)
+        label.setTextFormat(Qt.RichText)
         label.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
         return label
     
@@ -56257,7 +56417,7 @@ class LargeLCDs(ArtisanDialog):
                         lcd.display("  --")
 
     # note that values1 and values2 can contain None values indicating that those lcds are not updated in this round
-    def updateValues(self,values1,values2, *args, **kwargs): 
+    def updateValues(self,values1,values2, *args, **kwargs):
         del args, kwargs
         for i,v1 in enumerate(values1):
             try:
@@ -56271,6 +56431,48 @@ class LargeLCDs(ArtisanDialog):
                     self.lcds2[i].display(v2)
             except:
                 pass
+    
+    # note that all given values can contain None indicating that those labels are not updated in this round
+    def updateLabels(self,lowerlabels1,lowerlabels2,upperlabels1,upperlabels2, *args, **kwargs):
+        del args, kwargs
+        if lowerlabels1 is not None:
+            for i,v1 in enumerate(lowerlabels1):
+                try:
+                    if v1 is not None:
+                        self.lcds1labelsLower[i].setText(v1)
+                        self.lcds1labelsLower[i].repaint()
+                except:
+                    pass
+        if lowerlabels2 is not None:
+            for i,v2 in enumerate(lowerlabels2):
+                try:
+                    if v2 is not None:
+                        self.lcds2labelsLower[i].setText(v2)
+                        self.lcds2labelsLower[i].repaint()
+                except:
+                    pass
+        if upperlabels1 is not None:
+            for i,v1 in enumerate(upperlabels1):
+                try:
+                    if v1 is not None:
+                        self.lcds1labelsUpper[i].setText(v1)
+                        self.lcds1labelsUpper[i].repaint()
+                except:
+                    pass
+        if upperlabels2 is not None:
+            for i,v2 in enumerate(upperlabels2):
+                try:
+                    if v2 is not None:
+                        self.lcds2labelsUpper[i].setText(v2)
+                        self.lcds2labelsUpper[i].repaint()
+                except:
+                    pass
+        if self.layoutNr == 1:
+            # show all labels in portrait mode
+            self.hideOuterEmptyLabels()
+        elif self.layoutNr == 0:
+            # hide all empty upperlabels in landscape mode
+            self.hideAllEmptyLabels()
 
 class LargeMainLCDs(LargeLCDs):
     def __init__(self, parent = None):
@@ -56391,10 +56593,13 @@ class LargeMainLCDs(LargeLCDs):
             # install the new layout
             if newLayoutNr == 0:
                 self.setLayout(self.landscapeLayout())
+                self.hideAllEmptyLabels()
             elif newLayoutNr == 1:
                 self.setLayout(self.landscapeTightLayout())
+                self.hideAllEmptyLabels()
             elif newLayoutNr == 2:
                 self.setLayout(self.portraitLayout())
+                self.hideOuterEmptyLabels()
             self.raise_()
             self.activateWindow()
             self.layoutNr = newLayoutNr
@@ -56563,7 +56768,7 @@ class LargeExtraLCDs(LargeLCDs):
         self.updateVisiblitiesExtra()
         self.updateStyles()
         self.updateDecimals()
-    
+
     def updateVisiblitiesExtra(self):
         self.updateVisibilities(aw.extraLCDvisibility1,aw.extraLCDvisibility2)
 
@@ -56586,6 +56791,104 @@ class LargeExtraLCDs(LargeLCDs):
         settings.setValue("ExtraLCDGeometry",self.saveGeometry())
         aw.largeExtraLCDs_dialog = None
         aw.LargeExtraLCDsFlag = False
+
+class LargePhasesLCDs(LargeLCDs):
+    def __init__(self, parent = None):
+        self.labels = [" ", " ", " ", self.formatLabel("AUC")] # formated labels
+        self.values1 = [" "]*2
+        self.values2 = [" "]*2
+        super(LargePhasesLCDs,self).__init__(parent)
+        settings = QSettings()
+        if settings.contains("PhasesLCDGeometry"):
+            self.restoreGeometry(settings.value("PhasesLCDGeometry"))
+        else:
+            self.resize(100,200)
+        self.chooseLayout(self.width(),self.height())
+        self.setWindowTitle(UIconst.TOOLKIT_MENU_PHASES_LCDS)
+    
+    def formatLabel(self,l):
+        if l is None:
+            return None
+        else:
+            label_fmt = "<b>{}</b>"
+            return label_fmt.format(l)
+
+    def makeLCDs(self):
+        self.lcds1styles = ["sv","sv"]
+        self.lcds1 = [
+            self.makeLCD(self.lcds1styles[0]), # Phase 1
+            self.makeLCD(self.lcds1styles[1])  # Phase 3
+            ]
+        label1Upper = self.makeLabel(self.labels[0])
+        label1Lower = self.makeLabel(" ")
+        label3Upper = self.makeLabel(self.labels[2])
+        label3Lower = self.makeLabel(" ")
+        self.lcds1labelsUpper = [label1Upper,label3Upper]
+        self.lcds1labelsLower = [label1Lower,label3Lower]
+        self.lcds1frames = [self.makeLCDframe(label1Upper,self.lcds1[0],label1Lower),self.makeLCDframe(label3Upper,self.lcds1[1],label3Lower)]
+        for f in self.lcds1frames:
+            f.setContextMenuPolicy(Qt.CustomContextMenu)
+            f.customContextMenuRequested.connect(aw.PhaseslcdClicked)
+        #
+        self.lcds2styles = ["sv","sv"]
+        self.lcds2 = [
+            self.makeLCD(self.lcds2styles[0]), # Phase 2
+            self.makeLCD(self.lcds2styles[1])  # AUC
+            ]
+        label2Upper = self.makeLabel(self.labels[1])
+        label2Lower = self.makeLabel(" ")
+        label4Upper = self.makeLabel(self.labels[3])
+        label4Lower = self.makeLabel(" ")
+        self.lcds2labelsUpper = [label2Upper,label4Upper]
+        self.lcds2labelsLower = [label2Lower,label4Lower]
+        self.lcds2frames = [self.makeLCDframe(label2Upper,self.lcds2[0],label2Lower),self.makeLCDframe(label4Upper,self.lcds2[1],label4Lower)]
+        self.lcds2frames[0].setContextMenuPolicy(Qt.CustomContextMenu)
+        self.lcds2frames[0].customContextMenuRequested.connect(aw.PhaseslcdClicked)
+        self.lcds2frames[1].setContextMenuPolicy(Qt.CustomContextMenu)
+        self.lcds2frames[1].customContextMenuRequested.connect(aw.AUClcdClicked)
+        ##
+        for i in range(len(self.values1)):
+            self.lcds1[i].display(self.values1[i])
+        for i in range(len(self.values2)):
+            self.lcds2[i].display(self.values2[i])
+        ##
+        self.updateVisiblitiesPhases()
+        self.updateStyles()
+        self.updateDecimals()
+    
+    def updateValues(self,values1,values2):
+        # don't update None values
+        for i,v in enumerate(values1):
+            if v is not None:
+                self.values1[i] = v
+        for i,v in enumerate(values2):
+            if v is not None:
+                self.values2[i] = v
+        super(LargePhasesLCDs,self).updateValues(values1,values2)
+    
+    def updateVisiblitiesPhases(self):
+        self.updateVisibilities([True,True],[True,aw.qmc.AUClcdFlag])
+    
+    def updateDecimals(self):
+        for lcd in self.lcds1 + self.lcds2:
+            lcd.setDigitCount(6)
+    
+    def updateLabels(self,labels):
+        # don't update None values
+        for i,l in enumerate(map(self.formatLabel,labels)):
+            if l is not None:
+                self.labels[i] = l
+        super(LargePhasesLCDs,self).updateLabels([" "]*2,[" "]*2,[self.labels[0],self.labels[2]],[self.labels[1],self.labels[3]])
+    
+    def updateAUCstyle(self,style):
+        self.lcds2[1].setStyleSheet(style)
+    
+    def closeEvent(self, _):
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("PhasesLCDGeometry",self.saveGeometry())
+        aw.largePhasesLCDs_dialog = None
+        aw.LargePhasesLCDsFlag = False
 
 ############################################################
 #######################  WHEEL GRAPH CONFIG DIALOG  ########
