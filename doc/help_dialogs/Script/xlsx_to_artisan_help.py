@@ -13,6 +13,8 @@ Output is always written to ../output_files/<filename>.py
     The help.html file is useful when working with several different Excel files and
     need to only hit refresh in the browser instead of loading a new file.
 
+Note: This program has no error checking or trapping!  TBA.
+
 Excel file format:
     One Excel file for each help dialog.
     One or more tabs, each tab is a seperate table within the same help dialog.
@@ -28,7 +30,13 @@ Excel file format:
     QApplication.translate() is not applied to cells formatted as Italic, formatted with any font color 
     or if the cell has a numeric value.
     
-    Beware: Single quotes in cells will be replaced with double quotes.
+    Non-alphanumeric characters must be replaced with their Unicode encoded equivalent. Example, the degree
+    symbol º must be entered as \u00b0. In Excel the string ºC must be entered as \00b0C
+    
+    A single quote at the start of a cell string acts as a flag to Excel that the cell contains text. If the 
+    single quote at the start of a string is to be displayed and passed along to the help code it should 
+    be escaped (proceeded) with another single quote.  Example, to display the string 'Hello' put ''Hello' 
+    into the cell. Single quotes in the middle or end of a string do not need to be escaped.
     
     Single blank rows are legal. Consecutive blank rows are interpreted as the end of a table. All cells in 
     a blank row must be empty.
@@ -43,13 +51,16 @@ Excel file format:
     There is no error checking for notes position so if top and bottom notes are reversed bad things will happen.
 
 Known problems:
--The unicode elipsis \x85 "…" is not properly handled.  These seem to get into the Excel file when cut and paste from the blog.
-Must be replaced with three periods "..." in the Excel file.  
-
 - openpyxl does not always report the correct last row or column. This will be seen when rendering the HTML.  This is reported
 as not fixable. If this happens, go back to the source Excel file and manually delete the excess rows or columns manually.
 https://stackoverflow.com/questions/46569496/openpyxl-max-row-and-max-column-wrongly-reports-a-larger-figure#46571480
 A hack was added to correct for openpyxl reporting too many rows. There is not a hack for columns at this time.
+
+Recent changes:
+- Added encoding declaration to the output.py file to tolerate some non-alphanumeric characters 
+- Single quotes now tolerated
+- hacked around the problem: The unicode elipsis \x85 "…" is not properly handled.  These seem to get into the Excel file when cut and paste from the blog.
+Must be replaced with three periods "..." in the Excel file.  
 
 '''
 
@@ -81,7 +92,7 @@ def generateRows(ws):
                 cell_str = "'&#160;'"
             else:
                 if cell.data_type == 's': 
-                    cell_value = re.subn(r"'",r'"',cell.value)  #protect downstream by changing single quotes to double 
+                    cell_value = re.subn(r"'",r'&#39;',cell.value)  #protect downstream by changing single quotes to double 
                     # do not translate if the cell has italic format or any font color
                     if cell.font.italic or \
                             (cell.font.color != None and \
@@ -93,7 +104,11 @@ def generateRows(ws):
                 else:
                     # numeric value
                     cell_str = str(cell.value)
-            
+                # hack to solve error when elypsis is in the input.  
+                # Caution that the elypsis character in the line below does not get changed
+                repl = re.subn(r"…",r"...",cell_str)
+                cell_str = repl[0]
+
             this_row.append(cell_str)
         all_rows.append(this_row)
     return all_rows
@@ -147,7 +162,9 @@ def buildpyCode(fname_in,fname_out_html):
 
     outstr = ""
     
-    # wrap the output with python code to allow it to execute
+    # wrap the output with python code to allow it to execute    
+#    outstr += '#!' + sys.executable
+#    outstr += '\n' + '# -*- coding: latin-1 -*-'
     outstr += '\n' + 'import prettytable'
     outstr += '\n' + 'import re'
     outstr += '\n' + 'from PyQt5.QtWidgets import QApplication'
@@ -238,8 +255,8 @@ def buildpyCode(fname_in,fname_out_html):
     # finalize outstr - py code
     outstr += nlind + 'helpstr += "</body>"'
     
-    # add ugly stuff to clean the nbsp entity that gets escaped in the html output by PrettyTable
-    outstr += nlind + 'helpstr = re.sub(r"&amp;#160;", r"&#160;",helpstr)'
+    # add ugly stuff to clean any html entities that get escaped by PrettyTable in its html output
+    outstr += nlind + 'helpstr = re.sub(r"&amp;", r"&",helpstr)'
 
     # add trailer
     outstr += '\n'

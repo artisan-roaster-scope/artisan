@@ -1,0 +1,86 @@
+<head><style>td, th {border: 1px solid #ddd;  padding: 6px;}th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}</style></head><body><b>EVENT ANNOTATIONS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Prefix Field</th>
+        <th>Source</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>~E1</td>
+        <td>The value of Event type 1</td>
+        <td>Air</td>
+    </tr>
+    <tr>
+        <td>~E2</td>
+        <td>The value of Event type 2</td>
+        <td>Drum</td>
+    </tr>
+    <tr>
+        <td>~E3</td>
+        <td>The value of Event type 3</td>
+        <td>Damper</td>
+    </tr>
+    <tr>
+        <td>~E4</td>
+        <td>The value of Event type 4</td>
+        <td>Burner</td>
+    </tr>
+    <tr>
+        <td>~Y1</td>
+        <td>ET value</td>
+        <td>420</td>
+    </tr>
+    <tr>
+        <td>~Y2</td>
+        <td>BT value</td>
+        <td>372</td>
+    </tr>
+    <tr>
+        <td>~dCHARGE</td>
+        <td>Number of seconds since CHARGE</td>
+        <td>522</td>
+    </tr>
+    <tr>
+        <td>~dFCs</td>
+        <td>Number of seconds after FCs <br>Best used inside double quotes (see notes below) <br>Displays &#39;*&#39; prior to FCs</td>
+        <td>47</td>
+    </tr>
+    <tr>
+        <td>~preFCs</td>
+        <td>Number of seconds before FCs <br>Best used inside single quotes or back ticks (see notes below) <br>Displays &#39;*&#39; after FCs</td>
+        <td>50</td>
+    </tr>
+    <tr>
+        <td>~DTR</td>
+        <td>Development time ratio. Note: DTR=0 before FCs <br>100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</td>
+        <td>12</td>
+    </tr>
+    <tr>
+        <td>~deg</td>
+        <td>The degree symbol</td>
+        <td>°</td>
+    </tr>
+    <tr>
+        <td>~mode</td>
+        <td>Temperature mode (&#39;C&#39; or &#39;F&#39;)</td>
+        <td>F</td>
+    </tr>
+    <tr>
+        <td>~degmode</td>
+        <td>Degree symbol with Temperature mode</td>
+        <td>°C</td>
+    </tr>
+    <tr>
+        <td>~quot</td>
+        <td>Quote symbol</td>
+        <td>&quot;</td>
+    </tr>
+    <tr>
+        <td>~squot</td>
+        <td>Single quote symbol</td>
+        <td>&#39;</td>
+    </tr>
+</table><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <td>NOTES:<br>-Event annotations apply for &#39;Step&#39;, &#39;Step+&#39;, and &#39;Combo&#39; Events settings<br><br>-Anything between double quotes &quot; will show only after FCs. Example: &quot;~E1 @~DTR%&quot;<br><br>-Anything between single quotes &#39; will show only before FCs. Example: &#39;~E1 @~degmode&#39;<br><br>-Anything between back ticks ` will show only within 90 seconds before FCs. Example: &#39;~E1 `FCs~dFCs sec`&#39;<br><br>-When combining back ticks with single or double quotes the back ticks should be inside the quotes.<br><br>-Background event annotations can be seen during a roast when &#39;Annotations&#39; is checked in the Profile Background window.<br><br>-Simple scaling of the fields E1, E2, E3, and E4 is possible. Use a single math operator (&#39;*&#39;, &#39;/&#39;, &#39;+&#39; or &#39;-&#39;) immediately following the field name.<br>Examples:<br>&#39;~E1/10&#39; will divide the E1 value by 10.<br>&#39;~E2+5&#39; adds 5 to the the value of E2.<br><br>-Another style of annotations allows to replace an event&#39;s numeric value with a text string. One example where this can be useful is when an event is used to record sensory milestones. The value 20 might be used for &#39;Fresh Cut Grass&#39; aroma, 50 for &#39;Hay&#39;, 80 for &#39;Baking Bread&#39;, and 100 to represent the &#39;A Point&#39;. <br>This form of annotation must be enclosed in curly brackets &#39;{}&#39;. The first entry must be one the event fields ~E1, ~E2, ~E3, or ~E4 followed immediately by the vertical bar &#39;|&#39;, a numeric value and the text to use for the annotation. This may be followed by additional groups of vertical bars, numeric values, and text. <br>The following Annotation string (without the quote marks) implements this example assuming E4 is used to record the sensory milestones. Note that the BT is added to the annotation.<br>{~E4|20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} @~Y2~degmode</td>
+    </tr>
+</table></body>

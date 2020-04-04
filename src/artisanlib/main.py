@@ -1623,7 +1623,9 @@ class tgraphcanvas(FigureCanvas):
         self.Evaluealpha = [.8,.8,.8,.8]
         #the event value position bars are calculated at redraw()
         self.eventpositionbars = [0.]*120
-
+        self.specialeventannotations = ["","","",""]
+        self.specialeventannovisibilities = [0,0,0,0]
+        
         #curve styles
         self.linestyle_default = "-"
         self.drawstyle_default = "default"
@@ -6091,6 +6093,11 @@ class tgraphcanvas(FigureCanvas):
                             E1b_last = E2b_last = E3b_last = E4b_last = 0  #not really necessary but guarantees that Exb_last is defined
                             event_pos_offset = self.eventpositionbars[0]
                             event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
+                            #properties for the event annotation
+                            eventannotationprop = aw.mpl_fontproperties.copy()
+                            hoffset = 3  #relative to the event dot
+                            voffset = 3  #relative to the event dot
+                            eventannotationprop.set_size("x-small")
                             for i in range(len(self.backgroundEvents)):
                                 pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
@@ -6100,6 +6107,26 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         self.E1backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E1b_last = i
+                                    try:
+                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.timeindexB[6] and self.specialeventannovisibilities[0] and self.timeB[self.backgroundEvents[i]] < self.timeB[self.timeindexB[6]]:
+                                            E1b_annotation = self.parseSpecialeventannotation(self.specialeventannotations[0], i, applyto="background")
+                                            temp = self.E1backgroundvalues[-1]
+                                            anno = self.ax.annotate(E1b_annotation, xy=(hoffset + self.timeB[int(self.backgroundEvents[i])], voffset + temp),
+                                                        alpha=min(self.backgroundalpha + 0.1, 1.0),
+                                                        color=self.palette["text"],
+                                                        va="bottom", ha="left",
+                                                        fontproperties=eventannotationprop,
+                                                        path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                        )
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                    except Exception as ex:
+#                                        import traceback
+#                                        traceback.print_exc(file=sys.stdout)
+                                        _, _, exc_tb = sys.exc_info()    
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                                 elif self.backgroundEtypes[i] == 1 and aw.qmc.showEtypes[1]:
                                     self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     if self.clampEvents:
@@ -6107,6 +6134,26 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         self.E2backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E2b_last = i
+                                    try:
+                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.timeindexB[6] and self.specialeventannovisibilities[0] and self.timeB[self.backgroundEvents[i]] < self.timeB[self.timeindexB[6]]:
+                                            E2b_annotation = self.parseSpecialeventannotation(self.specialeventannotations[1], i, applyto="background")
+                                            temp = self.E2backgroundvalues[-1]
+                                            anno = self.ax.annotate(E2b_annotation, xy=(hoffset + self.timeB[int(self.backgroundEvents[i])], voffset + temp),
+                                                        alpha=min(self.backgroundalpha + 0.1, 1.0),
+                                                        color=self.palette["text"],
+                                                        va="bottom", ha="left",
+                                                        fontproperties=eventannotationprop,
+                                                        path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                        )
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                    except Exception as ex:
+#                                        import traceback
+#                                        traceback.print_exc(file=sys.stdout)
+                                        _, _, exc_tb = sys.exc_info()    
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                                 elif self.backgroundEtypes[i] == 2 and aw.qmc.showEtypes[2]:
                                     self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     if self.clampEvents:
@@ -6114,6 +6161,26 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         self.E3backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E3b_last = i
+                                    try:
+                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.timeindexB[6] and self.specialeventannovisibilities[0] and self.timeB[self.backgroundEvents[i]] < self.timeB[self.timeindexB[6]]:
+                                            E3b_annotation = self.parseSpecialeventannotation(self.specialeventannotations[2], i, applyto="background")
+                                            temp = self.E3backgroundvalues[-1]
+                                            anno = self.ax.annotate(E3b_annotation, xy=(hoffset + self.timeB[int(self.backgroundEvents[i])], voffset + temp),
+                                                        alpha=min(self.backgroundalpha + 0.1, 1.0),
+                                                        color=self.palette["text"],
+                                                        va="bottom", ha="left",
+                                                        fontproperties=eventannotationprop,
+                                                        path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                        )
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                    except Exception as ex:
+#                                        import traceback
+#                                        traceback.print_exc(file=sys.stdout)
+                                        _, _, exc_tb = sys.exc_info()    
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                                 elif self.backgroundEtypes[i] == 3 and aw.qmc.showEtypes[3]:
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     if self.clampEvents:
@@ -6121,6 +6188,26 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         self.E4backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E4b_last = i
+                                    try:
+                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.timeindexB[6] and self.specialeventannovisibilities[0] and self.timeB[self.backgroundEvents[i]] < self.timeB[self.timeindexB[6]]:
+                                            E4b_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i, applyto="background")
+                                            temp = self.E4backgroundvalues[-1]
+                                            anno = self.ax.annotate(E4b_annotation, xy=(hoffset + self.timeB[int(self.backgroundEvents[i])], voffset + temp),
+                                                        alpha=min(self.backgroundalpha + 0.1, 1.0),
+                                                        color=self.palette["text"],
+                                                        va="bottom", ha="left",
+                                                        fontproperties=eventannotationprop,
+                                                        path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                        )
+                                            try:
+                                                anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                            except: # mpl before v3.0 do not have this set_in_layout() function
+                                                pass
+                                    except Exception as ex:
+#                                        import traceback
+#                                        traceback.print_exc(file=sys.stdout)
+                                        _, _, exc_tb = sys.exc_info()    
+                                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
 #                            every = None
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if cool exists and last event was earlier
@@ -6408,6 +6495,11 @@ class tgraphcanvas(FigureCanvas):
                         E1_last = E2_last = E3_last = E4_last = 0  #not really necessary but guarantees that Ex_last is defined
                         event_pos_offset = self.eventpositionbars[0]
                         event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
+                        #properties for the event annotations
+                        eventannotationprop = aw.mpl_fontproperties.copy()
+                        hoffset = 3  #relative to the event dot
+                        voffset = 3  #relative to the event dot
+                        eventannotationprop.set_size("x-small")
                         for i in range(Nevents):
                             pos = max(0,int(round((self.specialeventsvalue[i]-1)*10)))
                             if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
@@ -6418,6 +6510,26 @@ class tgraphcanvas(FigureCanvas):
                                     self.E1values.append((pos*event_pos_factor)+event_pos_offset)
                                 E1_nonempty = True
                                 E1_last = i
+                                try:
+                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.timeindex[6] and self.specialeventannovisibilities[0] and self.timex[self.specialevents[i]] < self.timex[self.timeindex[6]]:
+                                        E1_annotation = self.parseSpecialeventannotation(self.specialeventannotations[0], i)
+                                        temp = self.E1values[-1]
+                                        anno = self.ax.annotate(E1_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                    alpha=.9,
+                                                    color=self.palette["text"],
+                                                    va="bottom", ha="left",
+                                                    fontproperties=eventannotationprop,
+                                                    path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                    )
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                except Exception as ex:
+#                                    import traceback
+#                                    traceback.print_exc(file=sys.stdout)
+                                    _, _, exc_tb = sys.exc_info()    
+                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                             elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                 self.E2timex.append(self.timex[self.specialevents[i]])
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
@@ -6426,6 +6538,26 @@ class tgraphcanvas(FigureCanvas):
                                     self.E2values.append((pos*event_pos_factor)+event_pos_offset)
                                 E2_nonempty = True
                                 E2_last = i
+                                try:
+                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.timeindex[6] and self.specialeventannovisibilities[1] and self.timex[self.specialevents[i]] < self.timex[self.timeindex[6]]:
+                                        E2_annotation = self.parseSpecialeventannotation(self.specialeventannotations[1], i)
+                                        temp = self.E2values[-1]
+                                        anno = self.ax.annotate(E2_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                    alpha=.9,
+                                                    color=self.palette["text"],
+                                                    va="bottom", ha="left",
+                                                    fontproperties=eventannotationprop,
+                                                    path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                    )
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                except Exception as ex:
+#                                    import traceback
+#                                    traceback.print_exc(file=sys.stdout)
+                                    _, _, exc_tb = sys.exc_info()    
+                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                             elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                 self.E3timex.append(self.timex[self.specialevents[i]])
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
@@ -6434,6 +6566,26 @@ class tgraphcanvas(FigureCanvas):
                                     self.E3values.append((pos*event_pos_factor)+event_pos_offset)
                                 E3_nonempty = True
                                 E3_last = i
+                                try:
+                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.timeindex[6] and self.specialeventannovisibilities[2] and self.timex[self.specialevents[i]] < self.timex[self.timeindex[6]]:
+                                        E3_annotation = self.parseSpecialeventannotation(self.specialeventannotations[2], i)
+                                        temp = self.E3values[-1]
+                                        anno = self.ax.annotate(E3_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                    alpha=.9,
+                                                    color=self.palette["text"],
+                                                    va="bottom", ha="left",
+                                                    fontproperties=eventannotationprop,
+                                                    path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                    )
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                except Exception as ex:
+#                                    import traceback
+#                                    traceback.print_exc(file=sys.stdout)
+                                    _, _, exc_tb = sys.exc_info()    
+                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                             elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                 self.E4timex.append(self.timex[self.specialevents[i]])
                                 if self.clampEvents: # in clamp mode we render also event values higher than 100:
@@ -6442,6 +6594,26 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4values.append((pos*event_pos_factor)+event_pos_offset)
                                 E4_nonempty = True
                                 E4_last = i
+                                try:
+                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.timeindex[6] and self.specialeventannovisibilities[3] and self.timex[self.specialevents[i]] < self.timex[self.timeindex[6]]:
+                                        E4_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i)
+                                        temp = self.E4values[-1]
+                                        anno = self.ax.annotate(E4_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                    alpha=.9,
+                                                    color=self.palette["text"],
+                                                    va="bottom", ha="left",
+                                                    fontproperties=eventannotationprop,
+                                                    path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
+                                                    )
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                except Exception as ex:
+#                                    import traceback
+#                                    traceback.print_exc(file=sys.stdout)
+                                    _, _, exc_tb = sys.exc_info()    
+                                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
                                 
 #                        every = None
 
@@ -6941,6 +7113,180 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
 
+
+    def parseSpecialeventannotation(self,eventanno, eventnum, applyto="foreground", postFCs=False):
+        try:
+            #background curve values
+            if applyto == "background":
+                e1 = self.backgroundEvalues[eventnum]
+                e2 = self.backgroundEvalues[eventnum]
+                e3 = self.backgroundEvalues[eventnum]
+                e4 = self.backgroundEvalues[eventnum]
+                y1 = self.temp1B[self.backgroundEvents[eventnum]]
+                y2 = self.temp2B[self.backgroundEvents[eventnum]]
+
+                if self.timeindexB[2] > 0 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[2]]:
+                    postFCs = True
+                    dtr = aw.float2float(100 * (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]]) / (self.timeB[self.timeindexB[2]] - self.timeB[self.timeindexB[0]]),1)
+                else:
+                    postFCs = False
+                    dtr = 0
+                if self.timeindexB[2] > 0:
+                    dfcs = aw.float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]],0)
+                else:
+                    dfcs = "*"
+                if self.timeindexB[2] > 0 and self.timeB[self.backgroundEvents[eventnum]] < self.timeB[self.timeindexB[2]]:
+                    prefcs = aw.float2float(self.timeB[self.timeindexB[2]] - self.timeB[self.backgroundEvents[eventnum]],0)
+                else:
+                    prefcs = '*'
+                if self.timeindexB[0] > -1 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[0]]:
+                    dcharge = aw.float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]],0)
+                else:
+                    dcharge = 0
+                if not postFCs and (self.timeB[self.timeindexB[2]] - self.timeB[self.backgroundEvents[eventnum]]) < 90:
+                    fcsWindow = True
+                else:
+                    fcsWindow = False
+
+            # plug values for the previews
+            elif applyto == "preview":
+                e1 = 8.0  #70 
+                e2 = 7.5  #65 
+                e3 = 7.0  #60 
+                e4 = 6.0  #50 
+                y1 = 420
+                y2 = 340
+                dcharge = 340
+                dfcs = 47
+                prefcs = 50
+                dtr = 12
+                fcsWindow = True
+                #postFCs supplied in the call
+
+            # foreground curve values
+            else:
+                e1 = self.specialeventsvalue[eventnum]
+                e2 = self.specialeventsvalue[eventnum]
+                e3 = self.specialeventsvalue[eventnum]
+                e4 = self.specialeventsvalue[eventnum]
+                y1 = self.temp1[self.specialevents[eventnum]]
+                y2 = self.temp2[self.specialevents[eventnum]]
+
+                if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] > self.timex[self.timeindex[2]]:
+                    postFCs = True
+                    dtr = aw.float2float(100 * (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]]) / (self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]]),1)
+                else:
+                    postFCs = False
+                    dtr = 0
+                if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] >= self.timex[self.timeindex[2]]:
+                    dfcs = aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]],0)
+                else:
+                    dfcs = "*"
+                if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] < self.timex[self.timeindex[2]]:
+                    prefcs = aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.specialevents[eventnum]],0)
+                else:
+                    prefcs = '*'
+                if self.timeindex[0] > -1 and self.timex[self.specialevents[eventnum]] > self.timex[self.timeindex[0]]:
+                    dcharge = aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]],0)
+                else:
+                    dcharge = 0
+                if not postFCs and self.timex[self.timeindex[2]] - self.timex[self.specialevents[eventnum]] < 90:
+                    fcsWindow = True
+                else:
+                    fcsWindow = False
+
+            # Caution - the events E1,E2,E3,and E4 must be the first four entries in the fields list
+            fields = [
+                (QApplication.translate("AutosaveField", "E1",None), u(aw.qmc.eventsInternal2ExternalValue(e1))),
+                (QApplication.translate("AutosaveField", "E2",None), u(aw.qmc.eventsInternal2ExternalValue(e2))),
+                (QApplication.translate("AutosaveField", "E3",None), u(aw.qmc.eventsInternal2ExternalValue(e3))),
+                (QApplication.translate("AutosaveField", "E4",None), u(aw.qmc.eventsInternal2ExternalValue(e4))),
+                (QApplication.translate("AutosaveField", "Y1",None), u(aw.float2float(y1,0))),
+                (QApplication.translate("AutosaveField", "Y2",None), u(aw.float2float(y2,0))),
+                (QApplication.translate("AutosaveField", "dCHARGE",None), u(dcharge)),
+                (QApplication.translate("AutosaveField", "dFCs",None), u(dfcs)),
+                (QApplication.translate("AutosaveField", "preFCs",None), u(prefcs)),
+                (QApplication.translate("AutosaveField", "DTR",None), u(dtr)),
+                (QApplication.translate("AutosaveField", "mode",None), u(self.mode)),
+                (QApplication.translate("AutosaveField", "degmode",None), u('\u00b0' + self.mode)),
+                (QApplication.translate("AutosaveField", "deg",None), u('\u00b0')),
+                (QApplication.translate("AutosaveField", "squot",None), u("'")),
+                (QApplication.translate("AutosaveField", "quot",None), u('"')),
+                ]
+
+            #single, leading delimiter for the fields
+            #replace with self.fieldDelim
+            self.fieldDelim = '~'  #note this value is hard coded in autosavefieldsHelpDlg(). 
+            #delimiter to show before FCs only
+            preFCsDelim = "'"
+            #delimiter to show after FCs only
+            postFCsDelim = '"'
+            #delimiter to show within a window before FCs only
+            fcsWindowDelim = '`'
+            #delimiter for explicit value substitutions
+            nominalDelimopen = '{'
+            nominalDelimclose = '}'
+            nominalstringDelim = '|'
+
+            #newlines can sneak in from cut and paste from help page 
+            eventanno = eventanno.replace('\n', '')
+
+            #text between single quotes ' will show only before FCs
+            eventanno = re.sub(fr"{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}",r"\1",eventanno) if not postFCs else re.sub(fr"{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}",r"",eventanno)
+            #text between double quotes " will show only after FCs
+            eventanno = re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',r'\1',eventanno) if postFCs else re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',r'',eventanno)
+
+            #text between back ticks ` will show only within 90 seconds before FCs
+            eventanno = re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'\1',eventanno) if (fcsWindow) else re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'',eventanno)
+
+            # substitute numeric to nominal values if in the annotationstring
+            # Caution - the events E1,E2,E3,and E4 must be the first four entries in the fields list
+            ##debug - things to watch out for in testing:  
+            # does the matchedgroup(4) always persist after the pattern.sub() above?
+            # does the pattern.split always result in the same list pattern?  ex:
+            #     ['|', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '|', '100', 'A Point', '']
+            for i in range(4):
+                pattern = re.compile(fr".*{nominalDelimopen}{self.fieldDelim}{fields[i][0]}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}")
+                matched = pattern.match(eventanno)
+                if matched != None:
+                    pattern = re.compile(fr"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)")
+                    matches = pattern.split(matched.group('nominalstr'))
+                    
+                    replacestring = ""
+                    j = 1
+                    #example form of the matches list ['|', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '']
+                    while (j < len(matches)):
+                        if fields[i][1] == matches[j]:
+                            replacestring = matches[j+1]
+                            break
+                        else:
+                            j += 3
+                    pattern = re.compile(fr"({nominalDelimopen}{self.fieldDelim}{fields[3][0]}[^{nominalDelimclose}]+{nominalDelimclose})")
+                    eventanno = pattern.sub(replacestring,eventanno)
+               
+            # make all the remaining substitutions
+            for i in range(len(fields)):
+#                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})([/*+-][0-9]+)?")
+                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
+                matched = pattern.match(eventanno)
+                if matched != None:
+
+                    # get the value associated with the field
+                    replacestring = str(fields[i][1])
+                    # do simple math if in the string
+                    if matched.group('mathop') != None:
+                        replacestring += matched.group('mathop')
+                        replacestring = str(eval(replacestring))
+
+                    pattern = re.compile(fr"{self.fieldDelim}{fields[i][0]}([/*+-][0-9]+)?")
+                    eventanno = pattern.sub(replacestring,eventanno)
+
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " parseSpecialeventannotation() {0}").format(str(ex)),exc_tb.tb_lineno)
+            eventanno = ""
+
+        return eventanno
 
     #watermark image
     def placelogoimage(self):
@@ -20869,7 +21215,6 @@ class ApplicationWindow(QMainWindow):
             #text between single quotes ' will show only when recording or for preview recording
             fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
             #text between double quotes " will show only when flagon is False
-#            fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if not (self.qmc.flagon or fakeon) else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
             fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon))  else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
             #replace the fields with content
             for i in range(len(fields)):
@@ -24319,6 +24664,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.Evaluealpha = [toDouble(x) for x in toList(settings.value("Evaluealpha",self.qmc.Evaluealpha))]
             if settings.contains("EvalueMarkerSize"):
                 self.qmc.EvalueMarkerSize = [toInt(x) for x in toList(settings.value("EvalueMarkerSize",self.qmc.EvalueMarkerSize))]
+            if settings.contains("specialeventannotations"):
+                self.qmc.specialeventannotations = list(map(str,list(toStringList(settings.value("specialeventannotations",self.qmc.specialeventannotations)))))
+            if settings.contains("specialeventannovisibilities"):
+                self.qmc.specialeventannovisibilities = [toInt(x) for x in toList(settings.value("specialeventannovisibilities",self.qmc.specialeventannovisibilities))]
             settings.endGroup()
             #restore statistics
             if settings.contains("Statistics"):
@@ -25887,7 +26236,7 @@ class ApplicationWindow(QMainWindow):
                 (self.qmc.etypes[1] != QApplication.translate("ComboBox", "Drum",None)) or
                 (self.qmc.etypes[2] != QApplication.translate("ComboBox", "Damper",None)) or
                 (self.qmc.etypes[3] != QApplication.translate("ComboBox", "Burner",None))):
-                settings.setValue("etypes",self.qmc.etypes)
+                settings.setValue("etypes",self.qmc.etypes)                
             else:   
                 settings.remove("etypes")
             settings.setValue("eventsshowflag",self.qmc.eventsshowflag)
@@ -25906,6 +26255,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Evaluelinethickness",self.qmc.Evaluelinethickness)
             settings.setValue("EvalueMarkerSize",self.qmc.EvalueMarkerSize)
             settings.setValue("Evaluealpha",self.qmc.Evaluealpha)
+            settings.setValue("specialeventannotations", self.qmc.specialeventannotations)
+            settings.setValue("specialeventannovisibilities", self.qmc.specialeventannovisibilities)
             settings.endGroup()
             #save ambient temperature source
             settings.setValue("AmbientTempSource",aw.qmc.ambientTempSource)
@@ -40727,6 +41078,126 @@ class EventsDlg(ArtisanResizeablDialog):
         if settings.contains("EventsGeometry"):
             self.restoreGeometry(settings.value("EventsGeometry"))
         self.storeState()
+
+        ## TAB 7
+        showAnnoLabel = QLabel()
+        showAnnoLabel.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
+        showAnnoLabel.setText(u(QApplication.translate("Label", "Show",None)))
+        showAnnoLabel.setFont(titlefont)
+        AnnoLabel = QLabel()
+        AnnoLabel.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
+        AnnoLabel.setText(u(QApplication.translate("Label", "Annotation",None)))
+        AnnoLabel.setFont(titlefont)
+
+        Epreview1Label = QLabel()
+        Epreview1Label.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
+        Epreview1Label.setText(u(QApplication.translate("Label", "Preview before FCs",None)))
+        Epreview1Label.setFont(titlefont)
+        Epreview2Label = QLabel()
+        Epreview2Label.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
+        Epreview2Label.setText(u(QApplication.translate("Label", "Preview after FCs",None)))
+        Epreview2Label.setFont(titlefont)
+
+        self.E1AnnoVisibility = QCheckBox(aw.qmc.etypesf(0))
+        self.E1AnnoVisibility.setFocusPolicy(Qt.NoFocus)
+        self.E1AnnoVisibility.setChecked(bool(aw.qmc.specialeventannovisibilities[0]))
+        self.E2Annovisibility = QCheckBox(aw.qmc.etypesf(1))
+        self.E2Annovisibility.setFocusPolicy(Qt.NoFocus)
+        self.E2Annovisibility.setChecked(bool(aw.qmc.specialeventannovisibilities[1]))
+        self.E3Annovisibility = QCheckBox(aw.qmc.etypesf(2))
+        self.E3Annovisibility.setFocusPolicy(Qt.NoFocus)
+        self.E3Annovisibility.setChecked(bool(aw.qmc.specialeventannovisibilities[2]))
+        self.E4Annovisibility = QCheckBox(aw.qmc.etypesf(3))
+        self.E4Annovisibility.setFocusPolicy(Qt.NoFocus)
+        self.E4Annovisibility.setChecked(bool(aw.qmc.specialeventannovisibilities[3]))
+
+        E1EditLabel = QLabel()
+        E1EditLabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        E1EditLabel.setText(u(QApplication.translate("Label", "Event 1",None)))
+        self.E1Edit = QLineEdit(aw.qmc.specialeventannotations[0])
+        self.E1Edit.setMinimumSize(self.E1Edit.sizeHint())
+        self.E1Edit.textChanged.connect(self.changeSpecialeventEdit1)
+        self.E1Edit.setToolTip(QApplication.translate("Tooltip", "Definition string for special event annotation",None))
+        self.E1Preview1 = QLabel(aw.qmc.parseSpecialeventannotation(self.E1Edit.text(),eventnum=0,applyto="preview",postFCs=False))
+        self.E1Preview2 = QLabel(aw.qmc.parseSpecialeventannotation(self.E1Edit.text(),eventnum=0,applyto="preview",postFCs=True))
+
+        E2EditLabel = QLabel()
+        E2EditLabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        E2EditLabel.setText(u(QApplication.translate("Label", "Event 2",None)))
+        self.E2Edit = QLineEdit(aw.qmc.specialeventannotations[1])
+        self.E2Edit.setMinimumSize(self.E2Edit.sizeHint())
+        self.E2Edit.textChanged.connect(self.changeSpecialeventEdit2)
+        self.E2Edit.setToolTip(QApplication.translate("Tooltip", "Definition string for special event annotation",None))
+        self.E2Preview1 = QLabel(aw.qmc.parseSpecialeventannotation(self.E2Edit.text(),eventnum=0,applyto="preview",postFCs=False))
+        self.E2Preview2 = QLabel(aw.qmc.parseSpecialeventannotation(self.E2Edit.text(),eventnum=0,applyto="preview",postFCs=True))
+
+        E3EditLabel = QLabel()
+        E3EditLabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        E3EditLabel.setText(u(QApplication.translate("Label", "Event 3",None)))
+        self.E3Edit = QLineEdit(aw.qmc.specialeventannotations[2])
+        self.E3Edit.setMinimumSize(self.E3Edit.sizeHint())
+        self.E3Edit.textChanged.connect(self.changeSpecialeventEdit3)
+        self.E3Edit.setToolTip(QApplication.translate("Tooltip", "Definition string for special event annotation",None))
+        self.E3Preview1 = QLabel(aw.qmc.parseSpecialeventannotation(self.E3Edit.text(),eventnum=0,applyto="preview",postFCs=False))
+        self.E3Preview2 = QLabel(aw.qmc.parseSpecialeventannotation(self.E3Edit.text(),eventnum=0,applyto="preview",postFCs=True))
+
+        E4EditLabel = QLabel()
+        E4EditLabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        E4EditLabel.setText(u(QApplication.translate("Label", "Event 4",None)))
+        self.E4Edit = QLineEdit(aw.qmc.specialeventannotations[3])
+        self.E4Edit.setMinimumSize(self.E4Edit.sizeHint())
+        self.E4Edit.textChanged.connect(self.changeSpecialeventEdit4)
+        self.E4Edit.setToolTip(QApplication.translate("Tooltip", "Definition string for special event annotation",None))
+        self.E4Preview1 = QLabel(aw.qmc.parseSpecialeventannotation(self.E4Edit.text(),eventnum=0,applyto="preview",postFCs=False))
+        self.E4Preview2 = QLabel(aw.qmc.parseSpecialeventannotation(self.E4Edit.text(),eventnum=0,applyto="preview",postFCs=True))
+
+        eventannoLayout = QGridLayout()
+
+        eventannoLayout.addWidget(showAnnoLabel, 0,0,Qt.AlignLeft)
+        eventannoLayout.addWidget(AnnoLabel,     0,1,Qt.AlignLeft)
+        eventannoLayout.addWidget(Epreview1Label,0,2,Qt.AlignLeft)
+        eventannoLayout.addWidget(Epreview2Label,0,3,Qt.AlignLeft)
+
+        eventannoLayout.addWidget(self.E1AnnoVisibility,1,0)
+        eventannoLayout.addWidget(self.E2Annovisibility,2,0)
+        eventannoLayout.addWidget(self.E3Annovisibility,3,0)
+        eventannoLayout.addWidget(self.E4Annovisibility,4,0)
+
+        eventannoLayout.addWidget(self.E1Edit,1,1)
+        eventannoLayout.addWidget(self.E2Edit,2,1)
+        eventannoLayout.addWidget(self.E3Edit,3,1)
+        eventannoLayout.addWidget(self.E4Edit,4,1)
+        eventannoLayout.addWidget(self.E1Preview1,1,2,Qt.AlignLeft)
+        eventannoLayout.addWidget(self.E2Preview1,2,2,Qt.AlignLeft)
+        eventannoLayout.addWidget(self.E3Preview1,3,2,Qt.AlignLeft)
+        eventannoLayout.addWidget(self.E4Preview1,4,2,Qt.AlignLeft)
+        eventannoLayout.addWidget(self.E1Preview2,1,3,Qt.AlignLeft)
+        eventannoLayout.addWidget(self.E2Preview2,2,3,Qt.AlignLeft)
+        eventannoLayout.addWidget(self.E3Preview2,3,3,Qt.AlignLeft)
+        eventannoLayout.addWidget(self.E4Preview2,4,3,Qt.AlignLeft)
+
+        eventannoLayout.setColumnStretch(0,0)
+        eventannoLayout.setColumnStretch(1,10)
+        eventannoLayout.setColumnStretch(2,8)
+        eventannoLayout.setColumnStretch(3,8)
+
+        helpButton = QPushButton(QApplication.translate("Button","Help", None))
+        helpButton.clicked.connect(self.showEventannotationhelp)
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(helpButton)
+        entryLayout = QHBoxLayout()
+        entryLayout.addLayout(eventannoLayout)
+        entryLayout.addStretch()
+        tab7Layout = QVBoxLayout()
+        tab7Layout.addLayout(entryLayout)
+        tab7Layout.addStretch()
+        tab7Layout.addSpacing(10)
+        tab7Layout.addLayout(buttonLayout)
+        
+        C7Widget = QWidget()
+        C7Widget.setLayout(tab7Layout)
+
         ## TAB 1
         self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button",None))
         self.eventsbuttonflag.setChecked(bool(aw.eventsbuttonflag))
@@ -41886,6 +42357,9 @@ class EventsDlg(ArtisanResizeablDialog):
         C4Widget = QWidget()
         C4Widget.setLayout(valueVLayout)
         self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Style",None))
+
+        self.TabWidget.addTab(C7Widget,QApplication.translate("Tab","Annotations",None))
+
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.TabWidget)
         mainLayout.setSpacing(5)
@@ -41896,6 +42370,37 @@ class EventsDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+
+    @pyqtSlot(str)
+    def changeSpecialeventEdit1(self):
+        self.specialeventEditchanged(1)
+    @pyqtSlot(str)
+    def changeSpecialeventEdit2(self):
+        self.specialeventEditchanged(2)
+    @pyqtSlot(str)
+    def changeSpecialeventEdit3(self):
+        self.specialeventEditchanged(3)
+    @pyqtSlot(str)
+    def changeSpecialeventEdit4(self):
+        self.specialeventEditchanged(4)
+    
+    def specialeventEditchanged(self,n):
+        if n == 1:
+            self.E1Preview1.setText(aw.qmc.parseSpecialeventannotation(self.E1Edit.text(),eventnum=0,applyto="preview",postFCs=False))
+            self.E1Preview2.setText(aw.qmc.parseSpecialeventannotation(self.E1Edit.text(),eventnum=0,applyto="preview",postFCs=True))
+            aw.qmc.specialeventannotations[0] = self.E1Edit.text()
+        if n == 2:
+            self.E2Preview1.setText(aw.qmc.parseSpecialeventannotation(self.E2Edit.text(),eventnum=0,applyto="preview",postFCs=False))
+            self.E2Preview2.setText(aw.qmc.parseSpecialeventannotation(self.E2Edit.text(),eventnum=0,applyto="preview",postFCs=True))
+            aw.qmc.specialeventannotations[1] = self.E2Edit.text()
+        if n == 3:
+            self.E3Preview1.setText(aw.qmc.parseSpecialeventannotation(self.E3Edit.text(),eventnum=0,applyto="preview",postFCs=False))
+            self.E3Preview2.setText(aw.qmc.parseSpecialeventannotation(self.E3Edit.text(),eventnum=0,applyto="preview",postFCs=True))
+            aw.qmc.specialeventannotations[2] = self.E3Edit.text()
+        if n == 4:
+            self.E4Preview1.setText(aw.qmc.parseSpecialeventannotation(self.E4Edit.text(),eventnum=0,applyto="preview",postFCs=False))
+            self.E4Preview2.setText(aw.qmc.parseSpecialeventannotation(self.E4Edit.text(),eventnum=0,applyto="preview",postFCs=True))
+            aw.qmc.specialeventannotations[3] = self.E4Edit.text()
 
     @pyqtSlot(bool)
     def backuppaletteeventbuttonsSlot(self,_):
@@ -42017,12 +42522,15 @@ class EventsDlg(ArtisanResizeablDialog):
             self.createEventbuttonTable()
             self.saveSliderSettings()
             self.saveQuantifierSettings()
+            self.saveAnnotationsSettings()
         elif i == 2: # switched to Slider tab
             self.updateSliderTab()
             self.saveQuantifierSettings()
+            self.saveAnnotationsSettings()
         elif i == 3: # switched to Quantifier tab
             self.saveSliderSettings()
             self.updateQuantifierTab()
+            self.saveAnnotationsSettings()
         elif i == 4: # switched to Palette tab
             # store slider settings from Slider tab to global variables
             # store sliders
@@ -42030,9 +42538,14 @@ class EventsDlg(ArtisanResizeablDialog):
             self.saveQuantifierSettings()
 #            # store buttons (not done here anymore: buttons are saved on leaving the dialog with OK)
 #            self.savetableextraeventbutton()
+            self.saveAnnotationsSettings()
         elif i == 5: # switched to Style tab
             self.updateStyleTab()
             self.saveSliderSettings()
+            self.saveQuantifierSettings()
+            self.saveAnnotationsSettings()
+        elif i == 6: # switched to Annotations tab
+            self.updateAnnotationsTab()
             self.saveQuantifierSettings()
 
     def updateQuantifierTab(self):
@@ -42152,6 +42665,18 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E3unit.setText(aw.eventsliderunits[2])
         self.E4unit.setText(aw.eventsliderunits[3])
         
+    def updateAnnotationsTab(self):
+        # set event names
+        self.E1AnnoVisibility.setText(self.etype0.text())
+        self.E2Annovisibility.setText(self.etype1.text())
+        self.E3Annovisibility.setText(self.etype2.text())
+        self.E4Annovisibility.setText(self.etype3.text())
+        # set annotation visibility
+        self.E1AnnoVisibility.setChecked(bool(aw.qmc.specialeventannovisibilities[0]))
+        self.E2Annovisibility.setChecked(bool(aw.qmc.specialeventannovisibilities[1]))
+        self.E3Annovisibility.setChecked(bool(aw.qmc.specialeventannovisibilities[2]))
+        self.E4Annovisibility.setChecked(bool(aw.qmc.specialeventannovisibilities[3]))
+
     @pyqtSlot(int)
     def setElinethickness0(self,_):
         self.setElinethickness(0)
@@ -43116,6 +43641,24 @@ class EventsDlg(ArtisanResizeablDialog):
         aw.eventquantifiermax[3] = int(self.E4max.value())
         aw.computeLinespaces()
 
+    def saveAnnotationsSettings(self):
+        checkedvisibilities = [0,0,0,0]
+        #the following line does not work
+        #checkedvisibilities = [int(self.E1AnnoVisibility.isChecked()),int(self.E3AnnoVisibility.isChecked()),int(self.E3AnnoVisibility.isChecked()),int(self.E4AnnoVisibility.isChecked())]
+        checkedvisibilities[0] = int(self.E1AnnoVisibility.isChecked())
+        checkedvisibilities[1] = int(self.E2Annovisibility.isChecked())
+        checkedvisibilities[2] = int(self.E3Annovisibility.isChecked())
+        checkedvisibilities[3] = int(self.E4Annovisibility.isChecked())
+        if aw.qmc.specialeventannovisibilities == checkedvisibilities:
+            redraw = False
+        else:
+            redraw = True
+        aw.qmc.specialeventannovisibilities[0] = int(self.E1AnnoVisibility.isChecked())
+        aw.qmc.specialeventannovisibilities[1] = int(self.E2Annovisibility.isChecked())
+        aw.qmc.specialeventannovisibilities[2] = int(self.E3Annovisibility.isChecked())
+        aw.qmc.specialeventannovisibilities[3] = int(self.E4Annovisibility.isChecked())
+        if redraw:
+            aw.qmc.redraw(recomputeAllDeltas=False)
     #the inverse to restoreState
     def storeState(self):
         # event configurations
@@ -43168,6 +43711,9 @@ class EventsDlg(ArtisanResizeablDialog):
         self.Evaluelinethickness = aw.qmc.Evaluelinethickness[:]
         self.Evaluealpha = aw.qmc.Evaluealpha[:]
         self.EvalueMarkerSize = aw.qmc.EvalueMarkerSize[:]
+        # event annotations
+        self.specialeventannovisibilities = aw.qmc.specialeventannovisibilities[:]
+        self.specialeventannotations = aw.qmc.specialeventannotations[:]
 
     #called from Cancel button
     @pyqtSlot()
@@ -43203,7 +43749,10 @@ class EventsDlg(ArtisanResizeablDialog):
         aw.qmc.Evaluelinethickness = self.Evaluelinethickness
         aw.qmc.Evaluealpha = self.Evaluealpha
         aw.qmc.EvalueMarkerSize = self.EvalueMarkerSize
-        self.accept()
+        # event annotations
+        aw.qmc.specialeventannovisibilities = self.specialeventannovisibilities[:]
+        aw.qmc.specialeventannotations = self.specialeventannotations[:]
+        self.close()
 
     #called from OK button
     @pyqtSlot()
@@ -43308,6 +43857,8 @@ class EventsDlg(ArtisanResizeablDialog):
                 aw.sendmessage(QApplication.translate("Message","Found empty event type box", None))
                 #save quantifiers
                 aw.updateSlidersProperties() # set visibility and event names on slider widgets
+            #save special event annotations   
+            self.saveAnnotationsSettings()
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -43322,6 +43873,16 @@ class EventsDlg(ArtisanResizeablDialog):
 
 
     @pyqtSlot(bool)
+    def showEventbuttonhelp(self,_=False):
+        try: # sip not supported on older PyQt versions (RPi!)
+            if self.helpdialog is None or sip.isdeleted(self.helpdialog):
+                self.helpdialog = eventbuttonsHelpDlg(self)
+        except:
+            self.helpdialog = eventbuttonsHelpDlg(self)
+        self.helpdialog.show()
+        self.helpdialog.activateWindow()
+
+    @pyqtSlot(bool)
     def showSliderHelp(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
@@ -43332,13 +43893,21 @@ class EventsDlg(ArtisanResizeablDialog):
         self.helpdialog.activateWindow()
 
     @pyqtSlot(bool)
-    def showEventbuttonhelp(self,_=False):
+    def showEventannotationhelp(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = eventbuttonsHelpDlg(self)
+                self.helpdialog = eventannotationHelpDlg(self)
         except:
-            self.helpdialog = eventbuttonsHelpDlg(self)
+            self.helpdialog = eventannotationHelpDlg(self)
         self.helpdialog.show()
+        self.helpdialog.activateWindow()
+
+    @pyqtSlot()
+    def eventannotationhelp(self):
+        if not aw.qmc.eventannotationhelpisOpen:
+            self.helpdialog = eventannotationHelpDlg(self)
+            self.helpdialog.show()
+            aw.qmc.eventannotationhelpisOpen = True
         self.helpdialog.activateWindow()
 
     def closeHelp(self):
@@ -43509,6 +44078,72 @@ class eventslidersHelpDlg(ArtisanDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("eventslidersHelpGeometry",self.saveGeometry())
+
+
+##########################################################################################
+#####################  Event Annotation HELP DLG  ########################################
+##########################################################################################
+class eventannotationHelpDlg(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(eventannotationHelpDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Form Caption","Event Annotation Help",None)) 
+        self.setModal(False)
+
+        settings = QSettings()
+        if settings.contains("eventannotationHelpGeometry"):
+            self.restoreGeometry(settings.value("eventannotationHelpGeometry"))
+        
+        # autogenerated help pasted below
+
+        newline = "\n"  #@UnusedVariable
+        helpstr = ""
+        helpstr += "<head><style>"
+        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
+        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
+        helpstr += "</style></head>"
+        helpstr += "<body>"
+        helpstr += "<b>" + u(QApplication.translate('HelpDlg','EVENT ANNOTATIONS',None)) + "</b>"
+        tbl_Annotations = prettytable.PrettyTable()
+        tbl_Annotations.field_names = [u(QApplication.translate('HelpDlg','Prefix Field',None)),u(QApplication.translate('HelpDlg','Source',None)),u(QApplication.translate('HelpDlg','Example',None))]
+        tbl_Annotations.add_row(['~E1',u(QApplication.translate('HelpDlg','The value of Event type 1',None)),u(QApplication.translate('HelpDlg','Air',None))])
+        tbl_Annotations.add_row(['~E2',u(QApplication.translate('HelpDlg','The value of Event type 2',None)),u(QApplication.translate('HelpDlg','Drum',None))])
+        tbl_Annotations.add_row(['~E3',u(QApplication.translate('HelpDlg','The value of Event type 3',None)),u(QApplication.translate('HelpDlg','Damper',None))])
+        tbl_Annotations.add_row(['~E4',u(QApplication.translate('HelpDlg','The value of Event type 4',None)),u(QApplication.translate('HelpDlg','Burner',None))])
+        tbl_Annotations.add_row(['~Y1',u(QApplication.translate('HelpDlg','ET value',None)),420])
+        tbl_Annotations.add_row(['~Y2',u(QApplication.translate('HelpDlg','BT value',None)),372])
+        tbl_Annotations.add_row(['~dCHARGE',u(QApplication.translate('HelpDlg','Number of seconds since CHARGE',None)),522])
+        tbl_Annotations.add_row(['~dFCs',u(QApplication.translate('HelpDlg','Number of seconds after FCs \nBest used inside double quotes (see notes below) \nDisplays &#39;*&#39; prior to FCs',None)),47])
+        tbl_Annotations.add_row(['~preFCs',u(QApplication.translate('HelpDlg','Number of seconds before FCs \nBest used inside single quotes or back ticks (see notes below) \nDisplays &#39;*&#39; after FCs',None)),50])
+        tbl_Annotations.add_row(['~DTR',u(QApplication.translate('HelpDlg','Development time ratio. Note: DTR=0 before FCs \n100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})',None)),12])
+        tbl_Annotations.add_row(['~deg',u(QApplication.translate('HelpDlg','The degree symbol',None)),'\u00b0'])
+        tbl_Annotations.add_row(['~mode',u(QApplication.translate('HelpDlg','Temperature mode (&#39;C&#39; or &#39;F&#39;)',None)),'F'])
+        tbl_Annotations.add_row(['~degmode',u(QApplication.translate('HelpDlg','Degree symbol with Temperature mode',None)),'\u00b0C'])
+        tbl_Annotations.add_row(['~quot',u(QApplication.translate('HelpDlg','Quote symbol',None)),'"'])
+        tbl_Annotations.add_row(['~squot',u(QApplication.translate('HelpDlg','Single quote symbol',None)),'&#39;'])
+        helpstr += tbl_Annotations.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
+        tbl_Annotationsbottom = prettytable.PrettyTable()
+        tbl_Annotationsbottom.header = False
+        tbl_Annotationsbottom.add_row([u(QApplication.translate('HelpDlg','NOTES:',None))+newline+u(QApplication.translate('HelpDlg','-Event annotations apply for &#39;Step&#39;, &#39;Step+&#39;, and &#39;Combo&#39; Events settings',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Anything between double quotes " will show only after FCs. Example: "~E1 @~DTR%"',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Anything between single quotes &#39; will show only before FCs. Example: &#39;~E1 @~degmode&#39;',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Anything between back ticks ` will show only within 90 seconds before FCs. Example: &#39;~E1 `FCs~dFCs sec`&#39;',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-When combining back ticks with single or double quotes the back ticks should be inside the quotes.',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Background event annotations can be seen during a roast when &#39;Annotations&#39; is checked in the Profile Background window.',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Simple scaling of the fields E1, E2, E3, and E4 is possible. Use a single math operator (&#39;*&#39;, &#39;/&#39;, &#39;+&#39; or &#39;-&#39;) immediately following the field name.',None))+newline+u(QApplication.translate('HelpDlg','Examples:',None))+newline+u(QApplication.translate('HelpDlg','&#39;~E1/10&#39; will divide the E1 value by 10.',None))+newline+u(QApplication.translate('HelpDlg','&#39;~E2+5&#39; adds 5 to the the value of E2.',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Another style of annotations allows to replace an event&#39;s numeric value with a text string. One example where this can be useful is when an event is used to record sensory milestones. The value 20 might be used for &#39;Fresh Cut Grass&#39; aroma, 50 for &#39;Hay&#39;, 80 for &#39;Baking Bread&#39;, and 100 to represent the &#39;A Point&#39;. ',None))+newline+u(QApplication.translate('HelpDlg','This form of annotation must be enclosed in curly brackets &#39;{}&#39;. The first entry must be one the event fields ~E1, ~E2, ~E3, or ~E4 followed immediately by the vertical bar &#39;|&#39;, a numeric value and the text to use for the annotation. This may be followed by additional groups of vertical bars, numeric values, and text. ',None))+newline+u(QApplication.translate('HelpDlg','The following Annotation string (without the quote marks) implements this example assuming E4 is used to record the sensory milestones. Note that the BT is added to the annotation.',None))+newline+u(QApplication.translate('HelpDlg','{~E4|20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} @~Y2~degmode',None))])
+        helpstr += tbl_Annotationsbottom.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
+        helpstr += "</body>"
+        helpstr = re.sub(r"&amp;", r"&",helpstr)
+
+        # autogenerated help pasted above
+                
+        phelp = QTextEdit()
+        phelp.setHtml(helpstr)
+        phelp.setReadOnly(True)
+
+        hLayout = QVBoxLayout()
+        hLayout.addWidget(phelp)        
+        self.setLayout(hLayout)
+
+    @pyqtSlot()
+    def closeEvent(self, _):
+        aw.qmc.eventannotationhelpisOpen = False
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("eventannotationHelpGeometry",self.saveGeometry())
 
 
 ##########################################################################
