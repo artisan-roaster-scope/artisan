@@ -7118,10 +7118,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             #background curve values
             if applyto == "background":
-                e1 = self.backgroundEvalues[eventnum]
-                e2 = self.backgroundEvalues[eventnum]
-                e3 = self.backgroundEvalues[eventnum]
-                e4 = self.backgroundEvalues[eventnum]
+                e = self.backgroundEvalues[eventnum]
                 y1 = self.temp1B[self.backgroundEvents[eventnum]]
                 y2 = self.temp2B[self.backgroundEvents[eventnum]]
 
@@ -7150,10 +7147,14 @@ class tgraphcanvas(FigureCanvas):
 
             # plug values for the previews
             elif applyto == "preview":
-                e1 = 8.0  #70 
-                e2 = 7.5  #65 
-                e3 = 7.0  #60 
-                e4 = 6.0  #50 
+                if eventnum == 1:
+                    e = 8.0  #70
+                if eventnum == 2:
+                    e = 8.0  #70 
+                if eventnum == 3:
+                    e = 7.0  #60
+                else:
+                    e = 6.0  #50 
                 y1 = 420
                 y2 = 340
                 dcharge = 340
@@ -7161,14 +7162,11 @@ class tgraphcanvas(FigureCanvas):
                 prefcs = 50
                 dtr = 12
                 fcsWindow = True
-                #postFCs supplied in the call
+                #postFCs supplied in the parseSpecialeventannotation() call
 
             # foreground curve values
             else:
-                e1 = self.specialeventsvalue[eventnum]
-                e2 = self.specialeventsvalue[eventnum]
-                e3 = self.specialeventsvalue[eventnum]
-                e4 = self.specialeventsvalue[eventnum]
+                e = self.specialeventsvalue[eventnum]
                 y1 = self.temp1[self.specialevents[eventnum]]
                 y2 = self.temp2[self.specialevents[eventnum]]
 
@@ -7195,28 +7193,24 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     fcsWindow = False
 
-            # Caution - the events E1,E2,E3,and E4 must be the first four entries in the fields list
+            # Caution - the event field "E" is position dependent and must be the first entry in the fields list
             fields = [
-                (QApplication.translate("AutosaveField", "E1",None), u(aw.qmc.eventsInternal2ExternalValue(e1))),
-                (QApplication.translate("AutosaveField", "E2",None), u(aw.qmc.eventsInternal2ExternalValue(e2))),
-                (QApplication.translate("AutosaveField", "E3",None), u(aw.qmc.eventsInternal2ExternalValue(e3))),
-                (QApplication.translate("AutosaveField", "E4",None), u(aw.qmc.eventsInternal2ExternalValue(e4))),
-                (QApplication.translate("AutosaveField", "Y1",None), u(aw.float2float(y1,0))),
-                (QApplication.translate("AutosaveField", "Y2",None), u(aw.float2float(y2,0))),
-                (QApplication.translate("AutosaveField", "dCHARGE",None), u(dcharge)),
-                (QApplication.translate("AutosaveField", "dFCs",None), u(dfcs)),
-                (QApplication.translate("AutosaveField", "preFCs",None), u(prefcs)),
-                (QApplication.translate("AutosaveField", "DTR",None), u(dtr)),
-                (QApplication.translate("AutosaveField", "mode",None), u(self.mode)),
-                (QApplication.translate("AutosaveField", "degmode",None), u('\u00b0' + self.mode)),
-                (QApplication.translate("AutosaveField", "deg",None), u('\u00b0')),
-                (QApplication.translate("AutosaveField", "squot",None), u("'")),
-                (QApplication.translate("AutosaveField", "quot",None), u('"')),
+                ("E", u(aw.qmc.eventsInternal2ExternalValue(e))),
+                ("Y1", u(aw.float2float(y1,0))),
+                ("Y2", u(aw.float2float(y2,0))),
+                ("dCHARGE", u(dcharge)),
+                ("dFCs", u(dfcs)),
+                ("preFCs", u(prefcs)),
+                ("DTR", u(dtr)),
+                ("mode", u(self.mode)),
+                ("degmode", u('\u00b0' + self.mode)),
+                ("deg", u('\u00b0')),
+                ("squot", u("'")),
+                ("quot", u('"')),
                 ]
 
-            #single, leading delimiter for the fields
             #replace with self.fieldDelim
-            self.fieldDelim = '~'  #note this value is hard coded in autosavefieldsHelpDlg(). 
+            self.fieldDelim = '~'
             #delimiter to show before FCs only
             preFCsDelim = "'"
             #delimiter to show after FCs only
@@ -7240,40 +7234,45 @@ class tgraphcanvas(FigureCanvas):
             eventanno = re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'\1',eventanno) if (fcsWindow) else re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'',eventanno)
 
             # substitute numeric to nominal values if in the annotationstring
-            # Caution - the events E1,E2,E3,and E4 must be the first four entries in the fields list
+            #
+            # Caution - the event field "E" is position dependent and must be the first entry in the fields list
+            # The event field E is implied in the Annotation string which should take the following form.  Enclosed by
+            #    curly brackets, entries consist of a value followed immediately (no space) by a text string.  Entries are
+            #    separated by a vertical bar '|'.
+            #   {20Fresh Cut Grass|50Hay|80Baking Bread|100A Point}
+            # Event values that do not match any value in the Annotation string return an empty string ''.
+            #
             ##debug - things to watch out for in testing:  
             # does the matchedgroup(4) always persist after the pattern.sub() above?
             # does the pattern.split always result in the same list pattern?  ex:
-            #     ['|', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '|', '100', 'A Point', '']
-            for i in range(4):
-                pattern = re.compile(fr".*{nominalDelimopen}{self.fieldDelim}{fields[i][0]}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}")
-                matched = pattern.match(eventanno)
-                if matched != None:
-                    pattern = re.compile(fr"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)")
-                    matches = pattern.split(matched.group('nominalstr'))
-                    
-                    replacestring = ""
-                    j = 1
-                    #example form of the matches list ['|', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '']
-                    while (j < len(matches)):
-                        if fields[i][1] == matches[j]:
-                            replacestring = matches[j+1]
-                            break
-                        else:
-                            j += 3
-                    pattern = re.compile(fr"({nominalDelimopen}{self.fieldDelim}{fields[3][0]}[^{nominalDelimclose}]+{nominalDelimclose})")
-                    eventanno = pattern.sub(replacestring,eventanno)
+            #     ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '|', '100', 'A Point', '']
+            pattern = re.compile(fr".*{nominalDelimopen}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}")
+            matched = pattern.match(eventanno)
+            if matched != None:
+                pattern = re.compile(r"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)")
+                matches = pattern.split(matched.group('nominalstr'))
+                #example form of the matches list ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '']
+                #print(len(matches),matches) 
+                replacestring = ""
+                j = 1
+                while (j < len(matches)):
+                    if fields[0][1] == matches[j]:
+                        replacestring = matches[j+1]
+                        break
+                    else:
+                        j += 3
+                pattern = re.compile(fr"({nominalDelimopen}[^{nominalDelimclose}]+{nominalDelimclose})")
+                eventanno = pattern.sub(replacestring,eventanno)
                
             # make all the remaining substitutions
             for i in range(len(fields)):
-#                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})([/*+-][0-9]+)?")
                 pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
                 matched = pattern.match(eventanno)
                 if matched != None:
 
                     # get the value associated with the field
                     replacestring = str(fields[i][1])
-                    # do simple math if in the string
+                    # do simple math if an operator is in the string
                     if matched.group('mathop') != None:
                         replacestring += matched.group('mathop')
                         replacestring = str(eval(replacestring))
@@ -44080,10 +44079,7 @@ class eventannotationHelpDlg(ArtisanDialog):
         helpstr += "<b>" + u(QApplication.translate('HelpDlg','EVENT ANNOTATIONS',None)) + "</b>"
         tbl_Annotations = prettytable.PrettyTable()
         tbl_Annotations.field_names = [u(QApplication.translate('HelpDlg','Prefix Field',None)),u(QApplication.translate('HelpDlg','Source',None)),u(QApplication.translate('HelpDlg','Example',None))]
-        tbl_Annotations.add_row(['~E1',u(QApplication.translate('HelpDlg','The value of Event type 1',None)),u(QApplication.translate('HelpDlg','Air',None))])
-        tbl_Annotations.add_row(['~E2',u(QApplication.translate('HelpDlg','The value of Event type 2',None)),u(QApplication.translate('HelpDlg','Drum',None))])
-        tbl_Annotations.add_row(['~E3',u(QApplication.translate('HelpDlg','The value of Event type 3',None)),u(QApplication.translate('HelpDlg','Damper',None))])
-        tbl_Annotations.add_row(['~E4',u(QApplication.translate('HelpDlg','The value of Event type 4',None)),u(QApplication.translate('HelpDlg','Burner',None))])
+        tbl_Annotations.add_row(['~E',u(QApplication.translate('HelpDlg','The value of Event',None)),60])
         tbl_Annotations.add_row(['~Y1',u(QApplication.translate('HelpDlg','ET value',None)),420])
         tbl_Annotations.add_row(['~Y2',u(QApplication.translate('HelpDlg','BT value',None)),372])
         tbl_Annotations.add_row(['~dCHARGE',u(QApplication.translate('HelpDlg','Number of seconds since CHARGE',None)),522])
@@ -44096,10 +44092,32 @@ class eventannotationHelpDlg(ArtisanDialog):
         tbl_Annotations.add_row(['~quot',u(QApplication.translate('HelpDlg','Quote symbol',None)),'"'])
         tbl_Annotations.add_row(['~squot',u(QApplication.translate('HelpDlg','Single quote symbol',None)),'&#39;'])
         helpstr += tbl_Annotations.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_Annotationsbottom = prettytable.PrettyTable()
-        tbl_Annotationsbottom.header = False
-        tbl_Annotationsbottom.add_row([u(QApplication.translate('HelpDlg','NOTES:',None))+newline+u(QApplication.translate('HelpDlg','-Event annotations apply for &#39;Step&#39;, &#39;Step+&#39;, and &#39;Combo&#39; Events settings',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Anything between double quotes " will show only after FCs. Example: "~E1 @~DTR%"',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Anything between single quotes &#39; will show only before FCs. Example: &#39;~E1 @~degmode&#39;',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Anything between back ticks ` will show only within 90 seconds before FCs. Example: &#39;~E1 `FCs~dFCs sec`&#39;',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-When combining back ticks with single or double quotes the back ticks should be inside the quotes.',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Background event annotations can be seen during a roast when &#39;Annotations&#39; is checked in the Profile Background window.',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Simple scaling of the fields E1, E2, E3, and E4 is possible. Use a single math operator (&#39;*&#39;, &#39;/&#39;, &#39;+&#39; or &#39;-&#39;) immediately following the field name.',None))+newline+u(QApplication.translate('HelpDlg','Examples:',None))+newline+u(QApplication.translate('HelpDlg','&#39;~E1/10&#39; will divide the E1 value by 10.',None))+newline+u(QApplication.translate('HelpDlg','&#39;~E2+5&#39; adds 5 to the the value of E2.',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','-Another style of annotations allows to replace an event&#39;s numeric value with a text string. One example where this can be useful is when an event is used to record sensory milestones. The value 20 might be used for &#39;Fresh Cut Grass&#39; aroma, 50 for &#39;Hay&#39;, 80 for &#39;Baking Bread&#39;, and 100 to represent the &#39;A Point&#39;. ',None))+newline+u(QApplication.translate('HelpDlg','This form of annotation must be enclosed in curly brackets &#39;{}&#39;. The first entry must be one the event fields ~E1, ~E2, ~E3, or ~E4 followed immediately by the vertical bar &#39;|&#39;, a numeric value and the text to use for the annotation. This may be followed by additional groups of vertical bars, numeric values, and text. ',None))+newline+u(QApplication.translate('HelpDlg','The following Annotation string (without the quote marks) implements this example assuming E4 is used to record the sensory milestones. Note that the BT is added to the annotation.',None))+newline+u(QApplication.translate('HelpDlg','{~E4|20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} @~Y2~degmode',None))])
-        helpstr += tbl_Annotationsbottom.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
+        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','EXAMPLES',None)) + "</b>"
+        tbl_Examplestop = prettytable.PrettyTable()
+        tbl_Examplestop.header = False
+        tbl_Examplestop.add_row([u(QApplication.translate('HelpDlg','Assumptions:  The event value is 50.  In the case of Gas the value 50 corresponds to either 5.0kPh or 50%.  \nFor a sensory milestone (see notes above) the value 50 corresponds to the "Hay" aroma. ',None))])
+        helpstr += tbl_Examplestop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
+        tbl_Examples = prettytable.PrettyTable()
+        tbl_Examples.field_names = [u(QApplication.translate('HelpDlg','Annotation Field',None)),u(QApplication.translate('HelpDlg','Displays',None))]
+        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E @~Y2~degmode',None)),u(QApplication.translate('HelpDlg','Gas 50 @340\u00b0F',None))])
+        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E% @~Y2~mode',None)),u(QApplication.translate('HelpDlg','Gas 50% @340F',None))])
+        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E/10kPh @~Y2~mode',None)),u(QApplication.translate('HelpDlg','Gas 5.0kPh @340F',None))])
+        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E% &#39;@~Y2 ~degmode&#39;"@~DTR% DTR"',None)),u(QApplication.translate('HelpDlg','Before FCs:\nGas 50% @340 \u00b0F\n\nAfter FCs:\nGas 50% @12% DTR',None))])
+        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E% &#39;@~Y2 ~degmode`, ~preFCs sec before FCs`&#39;"@~DTR% DTR"',None)),u(QApplication.translate('HelpDlg','More than 90 seconds before FCs:\nGas 50% @340 \u00b0F\n\nLess than 90 seconds before FCs:\nGas 50% @340 \u00b0F, 50 sec before FCs \n\nAfter FCs:\nGas 50% @12% DTR',None))])
+        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','{20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} @~Y2~degmode',None)),u(QApplication.translate('HelpDlg','Hay @340 \u00b0F',None))])
+        helpstr += tbl_Examples.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
+        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','NOTES:',None)) + "</b>"
+        tbl_Notes = prettytable.PrettyTable()
+        tbl_Notes.field_names = ['&#160;']
+        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Event annotations apply only for &#39;Step&#39; and &#39;Step+&#39; Events settings',None))])
+        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Anything between double quotes " will show only after FCs. Example: "~E1 @~DTR%"',None))])
+        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Anything between single quotes &#39; will show only before FCs. Example: &#39;~E1 @~degmode&#39;',None))])
+        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Anything between back ticks ` will show only within 90 seconds before FCs. Example: `~E1 `FCs~dFCs sec`',None))])
+        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','When combining back ticks with single or double quotes the back ticks should be inside the quotes.',None))])
+        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Background event annotations can be seen during a roast when &#39;Annotations&#39; is checked in the Profile Background window.',None))])
+        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Simple scaling of the event value is possible. Use a single math operator (&#39;*&#39;, &#39;/&#39;, &#39;+&#39; or &#39;-&#39;) immediately following the field name "E". For example: \n&#39;~E/10&#39; will divide the E value by 10. \n&#39;~E+5&#39; adds 5 to the the value of E.',None))])
+        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Another style of annotations allows to replace an event&#39;s numeric value with a text string, known as a nominal value. One example where this can be useful is when an event is used to record sensory milestones. The value 20 might be used for &#39;Fresh Cut Grass&#39; aroma, 50 for &#39;Hay&#39;, 80 for &#39;Baking Bread&#39;, and 100 to represent the &#39;A Point&#39;.  \n\nThis form of annotation must be enclosed in curly brackets &#39;{}&#39;. Entries are numeric values immediately followed by their nominal representation text.  Entries are separated by the vertical bar &#39;|&#39;. The following Annotation string implements this example.   \n{~E|20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} \n\nNote that if the event value  does not match any value in the Annotation definition a blank string will be returned.  In the example above an event value of 30 will return a blank string.  The easiest way to ensure these values match is to use Custom Buttons to for the Event.',None))])
+        helpstr += tbl_Notes.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
         helpstr += "</body>"
         helpstr = re.sub(r"&amp;", r"&",helpstr)
 
