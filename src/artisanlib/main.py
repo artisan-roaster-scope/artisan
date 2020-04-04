@@ -3214,7 +3214,7 @@ class tgraphcanvas(FigureCanvas):
                         rcParams['path.effects'] = []
 
                     #update phase lcds
-                    aw.updatePhasesLCDs(updateLabels=False)
+                    aw.updatePhasesLCDs()
                         
                     #update AUC lcd
                     if aw.qmc.AUClcdFlag:
@@ -18260,7 +18260,7 @@ class ApplicationWindow(QMainWindow):
     #  DRY2FCsframeTooltip
     #  phasesLCDsTooltip
     # all are returning strings with the actual values or None if values did not change
-    def getPhasesLCDsData(self,updateLabels=True):
+    def getPhasesLCDsData(self):
         TP = TPlabel = DRY = DRYlabel = FCs = FCslabel = TP2DRYlabel = DRY2FCslabel = TP2DRYframeTooltip = DRY2FCsframeTooltip = phasesLCDsTooltip = None
         try:
             if self.qmc.timex: # requires at least some recordings
@@ -18284,15 +18284,13 @@ class ApplicationWindow(QMainWindow):
                     # FIN phase temp on LCD1
                     # FIN phase time on LCD2
                     # FIN phase percentage on LCD3
-                    if updateLabels:
-                        phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs\nCurrently in ALL FINISHING MODE", None)
+                    phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs\nCurrently in ALL FINISHING MODE", None)
                     if self.qmc.timeindex[6]: # after drop
                         ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[2]]
                     else: # before drop
                         ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
-                    if updateLabels:
-                        DRY2FCsframeTooltip = QApplication.translate("Label","ALL FINISHING MODE",None)
-                        TPlabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
+                    DRY2FCsframeTooltip = QApplication.translate("Label","ALL FINISHING MODE",None)
+                    TPlabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
                     #time
                     TP = self.qmc.stringfromseconds(ts,leadingzero=False)
                     #temp
@@ -18301,8 +18299,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         dBT = self.qmc.temp2[-1]
                     dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[2]])
-                    if updateLabels:
-                        DRYlabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
+                    DRYlabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
                     DRY = dBT + self.qmc.mode
                     #percentage
                     if totaltime:
@@ -18311,8 +18308,7 @@ class ApplicationWindow(QMainWindow):
                         finishphaseP = " --- "
                     if not aw.qmc.LCDdecimalplaces and totaltime:
                         finishphaseP += " "
-                    if updateLabels:
-                        FCslabel = QApplication.translate("Label", "DEV%",None)
+                    FCslabel = QApplication.translate("Label", "DEV%",None)
                     FCs = finishphaseP
                     # DRY2FCs
                     if  window_width > 950 and self.qmc.timeindex[1]:
@@ -18325,9 +18321,8 @@ class ApplicationWindow(QMainWindow):
 
                     # 1st PhaseLCD: TP
                     if aw.qmc.phasesLCDmode == 0: # time mode
-                        if updateLabels:
-                            phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TIME MODE", None)
-                            TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
+                        phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TIME MODE", None)
+                        TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
                         if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
                             # after TP
                             if self.qmc.timeindex[6]:
@@ -18340,9 +18335,8 @@ class ApplicationWindow(QMainWindow):
                             # before TP
                             TP = "--:--"
                     elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                        if updateLabels:
-                            phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in PERCENTAGE MODE", None)
-                            TPlabel = QApplication.translate("Label", "DRY%",None)
+                        phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in PERCENTAGE MODE", None)
+                        TPlabel = QApplication.translate("Label", "DRY%",None)
                         if self.qmc.timeindex[1]: # after DRY
                             ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
                             if totaltime:
@@ -18355,9 +18349,8 @@ class ApplicationWindow(QMainWindow):
                         else:
                             TP = " --- "
                     elif aw.qmc.phasesLCDmode == 2: # temp mode
-                        if updateLabels:
-                            phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TEMP MODE", None)
-                            TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
+                        phasesLCDsTooltip = QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TEMP MODE", None)
+                        TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
 
                         if self.qmc.TPalarmtimeindex:
                             if self.qmc.timeindex[6]: # after drop
@@ -18378,13 +18371,11 @@ class ApplicationWindow(QMainWindow):
                         else:
                             ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                         if aw.qmc.phasesLCDmode == 0: # time mode
-                            if updateLabels:
-                                TP2DRYframeTooltip = QApplication.translate("Label","TIME MODE",None)
-                                DRYlabel = QApplication.translate("Label", "DRY",None) + "&raquo;"
+                            TP2DRYframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                            DRYlabel = QApplication.translate("Label", "DRY",None) + "&raquo;"
                             DRY = self.qmc.stringfromseconds(ts,leadingzero=False)
                         elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                            if updateLabels:
-                                TP2DRYframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
+                            TP2DRYframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
                             if self.qmc.timeindex[2]:
                                 ts = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
                             if totaltime:
@@ -18393,19 +18384,16 @@ class ApplicationWindow(QMainWindow):
                                 midphaseP = " --- "
                             if not aw.qmc.LCDdecimalplaces and totaltime:
                                 midphaseP += " "
-                            if updateLabels:
-                                DRYlabel = QApplication.translate("Label", "RAMP%",None)
+                            DRYlabel = QApplication.translate("Label", "RAMP%",None)
                             DRY = midphaseP
                         elif aw.qmc.phasesLCDmode == 2: # temp mode
-                            if updateLabels:
-                                TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE",None)
+                            TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE",None)
                             if self.qmc.timeindex[6]: # after drop
                                 dBT = self.qmc.temp2[self.qmc.timeindex[6]]
                             else:
                                 dBT = self.qmc.temp2[-1]
                             dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[1]])
-                            if updateLabels:
-                                DRYlabel = QApplication.translate("Label", "DRY",None) + "&raquo;"
+                            DRYlabel = QApplication.translate("Label", "DRY",None) + "&raquo;"
                             DRY = dBT + self.qmc.mode
                         # TP2DRY
                         if window_width > 950 and self.qmc.TPalarmtimeindex:
@@ -18416,11 +18404,10 @@ class ApplicationWindow(QMainWindow):
                     else:
                         # before DRY
                         dryexpectedtime = None
-                        if updateLabels:
-                            if aw.qmc.phasesLCDmode == 2:
-                                DRYlabel = "&darr;" + QApplication.translate("Label", "DRY",None)
-                            else:
-                                DRYlabel = "&raquo;" + QApplication.translate("Label", "DRY",None)
+                        if aw.qmc.phasesLCDmode == 2:
+                            DRYlabel = "&darr;" + QApplication.translate("Label", "DRY",None)
+                        else:
+                            DRYlabel = "&raquo;" + QApplication.translate("Label", "DRY",None)
                         if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                             # display expected time to reach DRY as defined in the background profile or the phases dialog
                             if self.qmc.background and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
@@ -18457,16 +18444,14 @@ class ApplicationWindow(QMainWindow):
                         else: # before drop
                             ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
                         if aw.qmc.phasesLCDmode == 0: # time mode
-                            if updateLabels:
-                                DRY2FCsframeTooltip = QApplication.translate("Label","TIME MODE",None)
-                                TP2DRYframeTooltip = QApplication.translate("Label","TIME MODE",None)
-                                FCslabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
+                            DRY2FCsframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                            TP2DRYframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                            FCslabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
                             FCs = self.qmc.stringfromseconds(ts,leadingzero=False)
                         elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                            if updateLabels:
-                                DRY2FCsframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
-                                TP2DRYframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
-                                FCslabel = QApplication.translate("Label", "DEV%",None)
+                            DRY2FCsframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
+                            TP2DRYframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
+                            FCslabel = QApplication.translate("Label", "DEV%",None)
                             if totaltime:
                                 finishphaseP = fmtstr%(ts*100./totaltime)
                             else:
@@ -18475,10 +18460,9 @@ class ApplicationWindow(QMainWindow):
                                 finishphaseP += " "
                             FCs = finishphaseP
                         elif aw.qmc.phasesLCDmode == 2: # temp mode
-                            if updateLabels:
-                                DRY2FCsframeTooltip = QApplication.translate("Label","TEMP MODE",None)
-                                TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE",None)
-                                FCslabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
+                            DRY2FCsframeTooltip = QApplication.translate("Label","TEMP MODE",None)
+                            TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE",None)
+                            FCslabel = QApplication.translate("Label", "FCs",None) + "&raquo;"
                             if self.qmc.timeindex[6]: # after drop
                                 dBT = self.qmc.temp2[self.qmc.timeindex[6]]
                             else:
@@ -18495,21 +18479,17 @@ class ApplicationWindow(QMainWindow):
                         # before FCs
                         fcsexpectedtime = None
                         if aw.qmc.phasesLCDmode == 0:
-                            if updateLabels:
-                                DRY2FCsframeTooltip = QApplication.translate("Label","TIME MODE",None)
-                                TP2DRYframeTooltip = QApplication.translate("Label","TIME MODE",None)
-                                FCslabel = "&raquo;" + QApplication.translate("Label", "FCs",None)
+                            DRY2FCsframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                            TP2DRYframeTooltip = QApplication.translate("Label","TIME MODE",None)
+                            FCslabel = "&raquo;" + QApplication.translate("Label", "FCs",None)
                         elif aw.qmc.phasesLCDmode == 1:
-                            if updateLabels:
-                                DRY2FCsframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
-                                TP2DRYframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
-                                FCslabel = "&raquo;" + QApplication.translate("Label", "FCs",None)
+                            DRY2FCsframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
+                            TP2DRYframeTooltip = QApplication.translate("Label","PERCENTAGE MODE",None)
+                            FCslabel = "&raquo;" + QApplication.translate("Label", "FCs",None)
                         elif aw.qmc.phasesLCDmode == 2:
-                            if updateLabels:
-                                DRY2FCsframeTooltip = QApplication.translate("Label","TEMP MODE",None)
-                                TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE",None)
-                                FCslabel = "&darr;" + QApplication.translate("Label", "FCs",None)
-                                
+                            DRY2FCsframeTooltip = QApplication.translate("Label","TEMP MODE",None)
+                            TP2DRYframeTooltip = QApplication.translate("Label","TEMP MODE",None)
+                            FCslabel = "&darr;" + QApplication.translate("Label", "FCs",None)
                         if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                             ## after DRY:
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
@@ -18538,19 +18518,15 @@ class ApplicationWindow(QMainWindow):
             else:
                 if aw.qmc.phasesLCDmode == 0: # time mode
                     TP = "--:--"
-                    if updateLabels:
-                        TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
+                    TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
                 elif aw.qmc.phasesLCDmode == 1: # percentage mode
                     TP = " --- "
-                    if updateLabels:
-                        TPlabel = QApplication.translate("Label", "DRY%",None)
+                    TPlabel = QApplication.translate("Label", "DRY%",None)
                 elif aw.qmc.phasesLCDmode == 2: # temp mode
                     TP = " --- "
-                    if updateLabels:
-                        TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
-                if updateLabels:
-                    DRYlabel = "&raquo;" + QApplication.translate("Label", "DRY",None)
-                    FCslabel = "&raquo;" + QApplication.translate("Label", "FCs",None)
+                    TPlabel = QApplication.translate("Label", "TP",None) + "&raquo;"
+                DRYlabel = "&raquo;" + QApplication.translate("Label", "DRY",None)
+                FCslabel = "&raquo;" + QApplication.translate("Label", "FCs",None)
                 TP2DRYlabel = ""
                 DRY2FCslabel = ""
                 DRY =  "--:--"
@@ -18563,10 +18539,10 @@ class ApplicationWindow(QMainWindow):
         return TP,TPlabel,DRY,DRYlabel,FCs,FCslabel,TP2DRYlabel,DRY2FCslabel,TP2DRYframeTooltip,DRY2FCsframeTooltip,phasesLCDsTooltip
 
     
-    def updatePhasesLCDs(self,updateLabels=True):
+    def updatePhasesLCDs(self):
         try:
             if aw.qmc.phasesLCDflag or aw.LargePhasesLCDsFlag:
-                TP,TPlabel,DRY,DRYlabel,FCs,FCslabel,TP2DRYlabel,DRY2FCslabel,TP2DRYframeTooltip,DRY2FCsframeTooltip,phasesLCDsTooltip = self.getPhasesLCDsData(updateLabels=updateLabels)
+                TP,TPlabel,DRY,DRYlabel,FCs,FCslabel,TP2DRYlabel,DRY2FCslabel,TP2DRYframeTooltip,DRY2FCsframeTooltip,phasesLCDsTooltip = self.getPhasesLCDsData()
                 
                 if aw.qmc.phasesLCDflag:
                     label_fmt = "<small><b>{}</b></small>"
@@ -18614,8 +18590,7 @@ class ApplicationWindow(QMainWindow):
                             values1 = [TP, FCs] # TP and FCs phase LCDs
                             values2 = [DRY, None] # DRY phase and AUC LCDs
                             aw.largePhasesLCDs_dialog.updateValues(values1,values2)
-                            if updateLabels:
-                                aw.largePhasesLCDs_dialog.updateLabels([TPlabel,DRYlabel,FCslabel,None])
+                            aw.largePhasesLCDs_dialog.updateLabels([TPlabel,DRYlabel,FCslabel,None])
                     except:
                         pass
                     
@@ -40835,6 +40810,9 @@ class profileTransformatorDlg(ArtisanDialog):
     # tables
     
     def createPhasesTable(self):
+    
+        self.phasestable.setStyleSheet("QTableView { background-color: red); }")
+
         self.phasestable.setRowCount(3)
         self.phasestable.setColumnCount(3)
         self.phasestable.horizontalHeader().setStretchLastSection(False)
@@ -40862,7 +40840,6 @@ class profileTransformatorDlg(ArtisanDialog):
         self.phasestable.setFocusPolicy(Qt.NoFocus);
         self.phasestable.setSelectionMode(QAbstractItemView.NoSelection)
         self.phasestable.setAutoScroll(False)
-        self.phasestable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
         self.phasestable.verticalHeader().sectionClicked.connect(self.phasesTableRowHeaderClicked)
         self.phasestable.horizontalHeader().sectionClicked.connect(self.phasesTableColumnHeaderClicked)
 
@@ -40946,7 +40923,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.timetable.setAlternatingRowColors(False)
         self.timetable.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.timetable.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-#        self.timetable.setFrameStyle(QTableWidget.NoFrame)
+        self.timetable.setFrameStyle(QTableWidget.NoFrame)
         self.timetable.setFixedSize(
             self.timetable.horizontalHeader().length() + 
 #                self.timetable.verticalHeader().width(), # only the width of the default labels (numbers)
@@ -40957,7 +40934,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.timetable.setFocusPolicy(Qt.NoFocus);
         self.timetable.setSelectionMode(QAbstractItemView.NoSelection)
         self.timetable.setAutoScroll(False)
-        self.timetable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
+#        self.timetable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
         self.timetable.verticalHeader().sectionClicked.connect(self.timeTableRowHeaderClicked)
         self.timetable.horizontalHeader().sectionClicked.connect(self.timeTableColumnHeaderClicked)
         
@@ -40965,7 +40942,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.time_result_widgets = []
         
         for i in range(4):
-            if len(self.profileTimes) > i and self.profileTimes[i] is not None:
+            if len(self.profileTimes) > i and not self.profileTimes[i] is None:
                 profile_time_str = aw.qmc.stringfromseconds(self.profileTimes[i],leadingzero=False)
                 profile_widget = QTableWidgetItem(profile_time_str)
                 profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
@@ -41022,7 +40999,6 @@ class profileTransformatorDlg(ArtisanDialog):
         self.temptable.setFocusPolicy(Qt.NoFocus);
         self.temptable.setSelectionMode(QAbstractItemView.NoSelection)
         self.temptable.setAutoScroll(False)
-        self.temptable.setStyleSheet("QTableWidget { background-color: #fafafa; }")
         self.temptable.verticalHeader().sectionClicked.connect(self.tempTableRowHeaderClicked)
         self.temptable.horizontalHeader().sectionClicked.connect(self.tempTableColumnHeaderClicked)
         
@@ -41178,8 +41154,8 @@ class EventsDlg(ArtisanResizeablDialog):
 
         eventannoLayout.setColumnStretch(0,0)
         eventannoLayout.setColumnStretch(1,10)
-        eventannoLayout.setColumnStretch(2,8)
-        eventannoLayout.setColumnStretch(3,8)
+        eventannoLayout.setColumnStretch(2,0)
+        eventannoLayout.setColumnStretch(3,0)
 
         helpButton = QPushButton(QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(self.showEventannotationhelp)
@@ -41188,7 +41164,7 @@ class EventsDlg(ArtisanResizeablDialog):
         buttonLayout.addWidget(helpButton)
         entryLayout = QHBoxLayout()
         entryLayout.addLayout(eventannoLayout)
-        entryLayout.addStretch()
+        #entryLayout.addStretch()
         tab7Layout = QVBoxLayout()
         tab7Layout.addLayout(entryLayout)
         tab7Layout.addStretch()
