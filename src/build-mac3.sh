@@ -30,10 +30,11 @@ elif [[ "$1" = "legacy" ]]; then
 else
     # standard local builds
     export PYTHON=/Library/Frameworks/Python.framework/Versions/3.8
+#    export PYTHON=/Users/luther/.pyenv/versions/3.8.2
     export PYTHONPATH=$PYTHON/lib/python3.8
     export PYTHON_V=3.8
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
-    export QT_SRC_PATH=~/Qt5.14.1/5.14.1/clang_64
+    export QT_SRC_PATH=~/Qt5.14.2/5.14.2/clang_64
     export MACOSX_DEPLOYMENT_TARGET=10.14
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
     export ARTISAN_LEGACY_BUILD=false

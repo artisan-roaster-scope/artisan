@@ -36,7 +36,7 @@ pip3 install --upgrade pip
 # (an alternative could be to use pip install --user ..)
 sudo pip3 install -r src/requirements.txt
 sudo pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
-sudo rm -rf /usr/local/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data
+sudo rm -rf /usr/local/lib/python3.7/site-packages/matplotlib/mpl-data/sample_data
 
 #.travis/install-phidgets.sh # now installed via pip
 .travis/install-snap7.sh

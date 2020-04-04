@@ -5,7 +5,7 @@
 # websocket has to be requested after the pywheel version of gevent)
 gevent==1.4.0
 gevent-websocket==0.10.1
-numpy==1.18.1
+numpy==1.18.2
 colorspacious==1.1.2 # depends on numpy thus needs to be put after
 scipy==1.3.3 # 1.3.2
 matplotlib==3.0.3 # 3.1.x requires Python 3.7, stretch comes with Python 3.5.3 only

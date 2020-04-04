@@ -8725,7 +8725,12 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventactionx(aw.qmc.xextrabuttonactions[1],aw.qmc.xextrabuttonactionstrings[1])
             except Exception:
                 pass
-                    
+
+            # update the roasts start time
+            self.roastdate = QDateTime.currentDateTime()
+            self.roastepoch = QDateTime.currentDateTime().toTime_t()
+            self.roasttzoffset = libtime.timezone
+            
             aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
             aw.qmc.roastbatchpos = 1 # initialized to 1, set to increased batchsequence on DROP
             if not aw.qmc.title_show_always:
@@ -9963,7 +9968,7 @@ class tgraphcanvas(FigureCanvas):
                                 pass
                             aw.eNumberSpinBox.blockSignals(False)
                             if aw.qmc.timeindex[0] > -1:
-                                timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+                                timez = aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]])
                                 aw.etimeline.setText(timez)
                             aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents])
                             aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents]))
@@ -21314,7 +21319,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
                 if aw.qmc.timeindex[0] > -1:
-                    timez = self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.qmc.timeindex[0]]))
+                    timez = self.qmc.stringfromseconds(self.qmc.timex[self.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.qmc.timeindex[0]])
                     self.etimeline.setText(timez)
                 self.valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[currentevent-1]))
                 self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
@@ -22183,7 +22188,7 @@ class ApplicationWindow(QMainWindow):
                 
             endtemperature = ET.SubElement(tree, "endtemperature")
             endtime = ET.SubElement(tree, "endtime")
-            cooling = ET.SubElement(tree, "coolingtime")                
+            cooling = ET.SubElement(tree, "coolingtime")
             
             roaster = ET.SubElement(tree, "roaster")
             if aw.qmc.roastertype and aw.qmc.roastertype != "":
@@ -22254,9 +22259,9 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.specialeventstype[i] == 3 and (self.qmc.timeindex[0] < 0 or self.qmc.specialevents[i] >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or self.qmc.specialevents[i] <= self.qmc.timeindex[6]):
                     data = ET.SubElement(switchpoints, "data", index=str(idx))
                     if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
-                        timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+                        timez = aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]])
                     else:
-                        timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]))
+                        timez = aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[i]])
                     t = self.qmc.specialevents[i]
                     if self.qmc.timeindex[0] > -1:
                         t = t - self.qmc.timeindex[0]
@@ -28845,7 +28850,7 @@ class ApplicationWindow(QMainWindow):
                     temps += formatString%self.qmc.temp2[sevents[i][0]] + " / " + formatString%self.qmc.temp1[sevents[i][0]]
                 html += ("<tr>"+
                      "\n<td>" + str(i+1) + "</td><td>" +
-                     self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i][0]] - start)) +
+                     self.qmc.stringfromseconds(self.qmc.timex[sevents[i][0]] - start) +
                      "</td><td align='right'>" + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
             html += '</table>\n</center>'
         return u(html)
@@ -31182,28 +31187,28 @@ class ApplicationWindow(QMainWindow):
         if len(self.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
             ETreachTime,BTreachTime,ET2reachTime,BT2reachTime = self.qmc.getTargetTime()
             if ETreachTime > 0 and ETreachTime < 2000:
-                text1 = u(QApplication.translate("Label","{0} to reach ET {1}", None).format(self.qmc.stringfromseconds(int(ETreachTime)),str(self.qmc.ETtarget) + self.qmc.mode))
+                text1 = u(QApplication.translate("Label","{0} to reach ET {1}", None).format(self.qmc.stringfromseconds(ETreachTime),str(self.qmc.ETtarget) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
-                    text1 = text1 + u(QApplication.translate("Label"," at {0}", None).format(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
+                    text1 = text1 + u(QApplication.translate("Label"," at {0}", None).format(self.qmc.stringfromseconds(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime)))
             else:
                 text1 = u(QApplication.translate("Label","{0} to reach ET {1}", None).format("xx:xx",str(self.qmc.ETtarget) + self.qmc.mode))
             if ET2reachTime > 0 and ET2reachTime < 2000:
-                text2 = u(QApplication.translate("Label","{0} to reach ET {1}", None).format(self.qmc.stringfromseconds(int(ET2reachTime)),str(self.qmc.ET2target) + self.qmc.mode))
+                text2 = u(QApplication.translate("Label","{0} to reach ET {1}", None).format(self.qmc.stringfromseconds(ET2reachTime),str(self.qmc.ET2target) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
-                    text2 = text2 + u(QApplication.translate("Label"," at {0}", None).format(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
+                    text2 = text2 + u(QApplication.translate("Label"," at {0}", None).format(self.qmc.stringfromseconds(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime)))
             else:
                 text2 = u(QApplication.translate("Label","{0} to reach ET {1}", None).format("xx:xx",str(self.qmc.ET2target) + self.qmc.mode))
                 
             if BTreachTime > 0 and BTreachTime < 2000:    
-                text3 = u(QApplication.translate("Label","{0} to reach BT {1}", None).format(self.qmc.stringfromseconds(int(BTreachTime)),str(self.qmc.BTtarget) + self.qmc.mode))
+                text3 = u(QApplication.translate("Label","{0} to reach BT {1}", None).format(self.qmc.stringfromseconds(BTreachTime),str(self.qmc.BTtarget) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
-                    text3 = text3 + u(QApplication.translate("Label"," at {0}", None).format(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
+                    text3 = text3 + u(QApplication.translate("Label"," at {0}", None).format(self.qmc.stringfromseconds(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime)))
             else:
                 text3 = u(QApplication.translate("Label","{0} to reach BT {1}", None).format("xx:xx",str(self.qmc.BTtarget) + self.qmc.mode))
             if BT2reachTime > 0 and BT2reachTime < 2000:
-                text4 = u(QApplication.translate("Label","{0} to reach BT {1}", None).format(self.qmc.stringfromseconds(int(BT2reachTime)),str(self.qmc.BT2target) + self.qmc.mode))
+                text4 = u(QApplication.translate("Label","{0} to reach BT {1}", None).format(self.qmc.stringfromseconds(BT2reachTime),str(self.qmc.BT2target) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
-                    text4 = text4 + u(QApplication.translate("Label"," at {0}", None).format(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
+                    text4 = text4 + u(QApplication.translate("Label"," at {0}", None).format(self.qmc.stringfromseconds(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime)))
             else:
                 text4 = u(QApplication.translate("Label","{0} to reach BT {1}", None).format("xx:xx",str(self.qmc.BT2target) + self.qmc.mode))
             ####  Phase Texts #####
@@ -31215,16 +31220,16 @@ class ApplicationWindow(QMainWindow):
                     afterFCs = self.qmc.timex[self.qmc.timeindex[6]] - FCs_time
                 else:
                     afterFCs = self.qmc.timex[-1] - FCs_time
-                phasetext1 = u(QApplication.translate("Label","{0} after FCs", None).format(self.qmc.stringfromseconds(int(afterFCs))))
+                phasetext1 = u(QApplication.translate("Label","{0} after FCs", None).format(self.qmc.stringfromseconds(afterFCs)))
             if self.qmc.timeindex[3]: # after FCe
                 FCe_time = self.qmc.timex[self.qmc.timeindex[3]]
                 if self.qmc.timeindex[6]: # after DROP
                     afterFCe = self.qmc.timex[self.qmc.timeindex[6]] - FCe_time
                 else:
                     afterFCe = self.qmc.timex[-1] - FCe_time
-                phasetext2 = u(QApplication.translate("Label","{0} after FCe", None).format(self.qmc.stringfromseconds(int(afterFCe))))
+                phasetext2 = u(QApplication.translate("Label","{0} after FCe", None).format(self.qmc.stringfromseconds(afterFCe)))
                 if self.qmc.timeindex[2]:
-                    phasetext2 = phasetext2 + u(" (") + u(self.qmc.stringfromseconds(int(FCe_time - self.qmc.timex[self.qmc.timeindex[2]]))) + u(" FC)")
+                    phasetext2 = phasetext2 + u(" (") + u(self.qmc.stringfromseconds(FCe_time - self.qmc.timex[self.qmc.timeindex[2]])) + u(" FC)")
             ####   ET pid    ######
             error = self.qmc.ETtarget - self.qmc.temp1[-1]
             differror = error - self.qmc.pidpreviouserror
@@ -35651,7 +35656,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.charge_idx = aw.findBTbreak(0,dryEndIndex,offset=0.5)
             self.drop_idx = aw.findBTbreak(dryEndIndex,offset=0.2)
             if self.drop_idx != 0 and self.drop_idx != aw.qmc.timeindex[6]:
-                drop_str = aw.qmc.stringfromseconds(int(aw.qmc.timex[self.drop_idx]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+                drop_str = aw.qmc.stringfromseconds(aw.qmc.timex[self.drop_idx]-aw.qmc.timex[aw.qmc.timeindex[0]])
         drylabel = QLabel("<b>" + u(QApplication.translate("Label", "DRY END",None)) + "</b>")
         drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
@@ -36242,12 +36247,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         timeLayout.addWidget(self.CCendedit,1,5,Qt.AlignHCenter)
         timeLayout.addWidget(self.dropedit,1,6,Qt.AlignHCenter)
         timeLayout.addWidget(self.cooledit,1,7,Qt.AlignHCenter)
-#        if charge_str != "":
-#            calc_chargestr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[0]]))
-#            aw.sendmessage(QApplication.translate("Message","The recorded CHARGE time ({0}) does not match the post roast calculated CHARGE time. ({1})", None).format(charge_str, calc_chargestr))
-#        if drop_str != "":
-#            calc_dropstr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
-#            aw.sendmessage(QApplication.translate("Message","The recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})", None).format(drop_str, calc_dropstr))
         textLayout = QGridLayout()
         textLayout.setHorizontalSpacing(3)
         textLayout.setVerticalSpacing(2)
@@ -37813,9 +37812,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 timeline = QLineEdit()
                 timeline.setAlignment(Qt.AlignRight)
                 if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
-                    timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+                    timez = aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]])
                 else:
-                    timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]))
+                    timez = aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[i]])
                 timeline.setText(timez)
                 timeline.setValidator(QRegExpValidator(regextime,self))
                 
@@ -39673,7 +39672,7 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def reset(self,_):
         if len(aw.qmc.timex) > 1:
-            self.xlimitEdit.setText(aw.qmc.stringfromseconds(int(aw.qmc.timex[-1])))
+            self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[-1]))
         else:
             self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx_default))
         self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx_default))
@@ -45236,7 +45235,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         else:
             start = 0
         for i in range(ndata):
-            timez = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start)))
+            timez = QTableWidgetItem(aw.qmc.stringfromseconds(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start))
             timez.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
     
             if aw.qmc.LCDdecimalplaces:

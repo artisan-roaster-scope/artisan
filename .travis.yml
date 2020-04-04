@@ -33,6 +33,9 @@ matrix:
   - os: osx
     python: 3.7
     language: generic
+    before_cache:
+      # - brew cleanup
+      - rm -f "$HOME/Library/Caches/pip/log/debug.log"
     cache:
       # As for now travis caches only "$HOME/.cache/pip"
       # https://docs.travis-ci.com/user/caching/#pip-cache
@@ -41,6 +44,8 @@ matrix:
       - $HOME/Library/Caches/pip    
     env:
       - ARTISAN_OS=osx
+      - HOMEBREW_NO_INSTALL_CLEANUP=1
+      - HOMEBREW_NO_ANALYTICS=1
 
 install:
   - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
