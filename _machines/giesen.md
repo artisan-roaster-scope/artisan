@@ -14,6 +14,7 @@ header:
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging and control of burner level, air flow, air temperature setpoint, drum speed
+  - logging of the optional infrared (IR) sensor
 
 ### Setup
 
