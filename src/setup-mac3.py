@@ -6,7 +6,7 @@ Usage:
 """
 
 # manually remove sample-data mpl subdirectory from Python installation:
-# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/matplotlib/mpl-data/sample_data
 
 # THIS PATCH SEEMS NOT TO BE NEEDED ANYMORE:
 #from distutils import sysconfig
@@ -312,7 +312,14 @@ for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
 
 # remove doublicate Qt installation
 
-subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.8/PyQt5/Qt",shell = True)
+try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.7/PyQt5/Qt",shell = True)
+except:
+    pass
+try:
+    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.8/PyQt5/Qt",shell = True)
+except:
+    pass
                         
 
 print('*** Removing unused files ***')

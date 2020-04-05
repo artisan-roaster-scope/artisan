@@ -14347,23 +14347,33 @@ class ApplicationWindow(QMainWindow):
 
         self.lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
         self.lcdsAction.triggered.connect(self.largeLCDs)
+        self.lcdsAction.setCheckable(True)
+        self.lcdsAction.setChecked(False)
         self.lcdsAction.setShortcut("Ctrl+L")
         self.viewMenu.addAction(self.lcdsAction)
 
-        deltalcdsAction = QAction(UIconst.TOOLKIT_MENU_DELTA_LCDS,self)
-        deltalcdsAction.triggered.connect(self.largeDeltaLCDs)
-        self.viewMenu.addAction(deltalcdsAction)
+        self.deltalcdsAction = QAction(UIconst.TOOLKIT_MENU_DELTA_LCDS,self)
+        self.deltalcdsAction.triggered.connect(self.largeDeltaLCDs)
+        self.deltalcdsAction.setCheckable(True)
+        self.deltalcdsAction.setChecked(False)
+        self.viewMenu.addAction(self.deltalcdsAction)
 
-        pidlcdsAction = QAction(UIconst.TOOLKIT_MENU_PID_LCDS,self)
-        pidlcdsAction.triggered.connect(self.largePIDLCDs)
-        self.viewMenu.addAction(pidlcdsAction)
+        self.pidlcdsAction = QAction(UIconst.TOOLKIT_MENU_PID_LCDS,self)
+        self.pidlcdsAction.triggered.connect(self.largePIDLCDs)
+        self.pidlcdsAction.setCheckable(True)
+        self.pidlcdsAction.setChecked(False)
+        self.viewMenu.addAction(self.pidlcdsAction)
 
         self.extralcdsAction = QAction(UIconst.TOOLKIT_MENU_EXTRA_LCDS,self)
         self.extralcdsAction.triggered.connect(self.largeExtraLCDs)
+        self.extralcdsAction.setCheckable(True)
+        self.extralcdsAction.setChecked(False)
         self.viewMenu.addAction(self.extralcdsAction)
 
         self.phaseslcdsAction = QAction(UIconst.TOOLKIT_MENU_PHASES_LCDS,self)
         self.phaseslcdsAction.triggered.connect(self.largePhasesLCDs)
+        self.phaseslcdsAction.setCheckable(True)
+        self.phaseslcdsAction.setChecked(False)
         self.viewMenu.addAction(self.phaseslcdsAction)
         
         self.viewMenu.addSeparator()
@@ -29951,67 +29961,62 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def largeLCDs(self,_=False):
         if self.largeLCDs_dialog is None:
-            self.largeLCDs_dialog = LargeMainLCDs()
+            self.largeLCDs_dialog = LargeMainLCDs(self)
             self.largeLCDs_dialog.setModal(False)
             self.LargeLCDsFlag = True
-        if self.largeLCDs_dialog is not None:
+            self.lcdsAction.setChecked(True)
             self.largeLCDs_dialog.show()
-            self.largeLCDs_dialog.raise_()
-            self.largeLCDs_dialog.activateWindow()
-            QApplication.processEvents()
+        else:
+            self.largeLCDs_dialog.close()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def largeDeltaLCDs(self,_=False):
         if self.largeDeltaLCDs_dialog is None:
-            self.largeDeltaLCDs_dialog = LargeDeltaLCDs()
+            self.largeDeltaLCDs_dialog = LargeDeltaLCDs(self)
             self.largeDeltaLCDs_dialog.setModal(False)
             self.LargeDeltaLCDsFlag = True
-        if self.largeDeltaLCDs_dialog is not None:
+            self.deltalcdsAction.setChecked(True)
             self.largeDeltaLCDs_dialog.show()
-            self.largeDeltaLCDs_dialog.raise_()
-            self.largeDeltaLCDs_dialog.activateWindow()
-            QApplication.processEvents()
+        else:
+            self.largeDeltaLCDs_dialog.close()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def largePIDLCDs(self,_=False):
         if self.largePIDLCDs_dialog is None:
-            self.largePIDLCDs_dialog = LargePIDLCDs()
+            self.largePIDLCDs_dialog = LargePIDLCDs(self)
             self.largePIDLCDs_dialog.setModal(False)
             self.LargePIDLCDsFlag = True
-        if self.largePIDLCDs_dialog is not None:
+            self.pidlcdsAction.setChecked(True)
             self.largePIDLCDs_dialog.show()
-            self.largePIDLCDs_dialog.raise_()
-            self.largePIDLCDs_dialog.activateWindow()
-            QApplication.processEvents()
+        else:
+            self.largePIDLCDs_dialog.close()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def largeExtraLCDs(self,_=False):
         if self.largeExtraLCDs_dialog is None:
-            self.largeExtraLCDs_dialog = LargeExtraLCDs()
+            self.largeExtraLCDs_dialog = LargeExtraLCDs(self)
             self.largeExtraLCDs_dialog.setModal(False)
             self.LargeExtraLCDsFlag = True
-        if self.largeExtraLCDs_dialog is not None:
+            self.extralcdsAction.setChecked(True)
             self.largeExtraLCDs_dialog.show()
-            self.largeExtraLCDs_dialog.raise_()
-            self.largeExtraLCDs_dialog.activateWindow()
-            QApplication.processEvents()
+        else:
+            self.largeExtraLCDs_dialog.close()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def largePhasesLCDs(self,_=False):
         if self.largePhasesLCDs_dialog is None:
-            self.largePhasesLCDs_dialog = LargePhasesLCDs()
+            self.largePhasesLCDs_dialog = LargePhasesLCDs(self)
             self.largePhasesLCDs_dialog.setModal(False)
             self.LargePhasesLCDsFlag = True
+            self.phaseslcdsAction.setChecked(True)
             self.updatePhasesLCDs()
-        if self.largePhasesLCDs_dialog is not None:
             self.largePhasesLCDs_dialog.show()
-            self.largePhasesLCDs_dialog.raise_()
-            self.largePhasesLCDs_dialog.activateWindow()
-            QApplication.processEvents()
+        else:
+            self.largePhasesLCDs_dialog.close()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -56499,6 +56504,8 @@ class graphColorDlg(ArtisanDialog):
                 aw.largePIDLCDs_dialog.updateStyles()
             if aw.largeExtraLCDs_dialog:
                 aw.largeExtraLCDs_dialog.updateStyles()
+            if aw.largePhasesLCDs_dialog:
+                aw.largePhasesLCDs_dialog.updateStyles()
 
     @pyqtSlot(bool)
     def paintlcdsSlot(self,_):
@@ -56557,6 +56564,8 @@ class graphColorDlg(ArtisanDialog):
                 aw.largePIDLCDs_dialog.updateStyles()
             if aw.largeExtraLCDs_dialog:
                 aw.largeExtraLCDs_dialog.updateStyles()
+            if aw.largePhasesLCDs_dialog:
+                aw.largePhasesLCDs_dialog.updateStyles()
         self.setColorButtons()
 
     def setColorButtons(self):
@@ -56836,6 +56845,7 @@ class LargeLCDs(ArtisanDialog):
         self.lcds2labelsLower = []
         self.lcds1frames = []
         self.lcds2frames = []
+        self.visibleFrames = [] # visibility flags in display order for all lcd frames
         self.tight = False
         self.layoutNr = -1 # 0: landscape, 1: portrait
         self.swaplcds = False
@@ -56894,30 +56904,40 @@ class LargeLCDs(ArtisanDialog):
     
     def hideOuterEmptyLabels(self):
         all_frames = [val for pair in zip(self.lcds1frames, self.lcds2frames) for val in pair]
-        visible_frames = list(filter(lambda f: not f.isHidden(), all_frames))
+        visible_frames = []
+        for i in range(len(all_frames)):
+            if len(self.visibleFrames) > i and self.visibleFrames[i]:
+                visible_frames.append(all_frames[i])
+        
         if visible_frames:
             all_upper_labels = [val for pair in zip(self.lcds1labelsUpper, self.lcds2labelsUpper) for val in pair]
             for i,l in enumerate(all_upper_labels):
                 if (all_frames[i] == visible_frames[0] and l.text().strip() == ""):
                     # hide first visible upper label if empty
-                    l.setVisible(False)
-                else:
+                    if not l.isHidden:
+                        l.setVisible(False)
+                elif len(self.visibleFrames) > i and self.visibleFrames[i] and l.isHidden():
                     l.setVisible(True)
             all_lower_labels = [val for pair in zip(self.lcds1labelsLower, self.lcds2labelsLower) for val in pair]
             for i,l in enumerate(all_lower_labels):
                 if (all_frames[i] == visible_frames[-1] and l.text().strip() == ""):
                     # hide last visible label if empty
-                    l.setVisible(False)
-                else:
-                    l.setVisible(True)
+                    if not l.isHidden():
+                        l.setVisible(False)
+                elif len(self.visibleFrames) > i and self.visibleFrames[i] and l.isHidden():
+                        l.setVisible(True)
     
     def lowerLabelssvisibility(self,b):
-        for l in self.lcds1labelsLower + self.lcds2labelsLower:
-            l.setVisible(b)
+        lower_labels = [val for pair in zip(self.lcds1labelsLower, self.lcds2labelsLower) for val in pair]
+        for i,l in enumerate(lower_labels):
+            if len(self.visibleFrames) > i and self.visibleFrames[i] and l.isHidden() == b:
+                l.setVisible(b)
     
     def upperLabelssvisibility(self,b):
-        for l in self.lcds1labelsUpper + self.lcds2labelsUpper:
-            l.setVisible(b)
+        upper_labels = [val for pair in zip(self.lcds1labelsUpper, self.lcds2labelsUpper) for val in pair]
+        for i,l in enumerate(upper_labels):
+            if len(self.visibleFrames) > i and self.visibleFrames[i] and l.isHidden() == b:
+                l.setVisible(b)
 
     # n the number of layout to be set (0: landscape, 1: portrait)
     # calling reLayout() without arg will force a relayout using the current layout
@@ -56934,8 +56954,8 @@ class LargeLCDs(ArtisanDialog):
                 QWidget().setLayout(self.layout())
             # install the new layout
             if newLayoutNr == 0:
-                # in horizontal mode we hide rows of empty labels to save space
                 self.setLayout(self.landscapeLayout())
+                # in horizontal mode we hide rows of empty labels to save space
                 self.hideAllEmptyLabels()
             elif newLayoutNr == 1:
                 self.setLayout(self.portraitLayout())
@@ -56979,9 +56999,10 @@ class LargeLCDs(ArtisanDialog):
         
     # to be implemented in subclasses
     def makeLCDs(self):
-        pass
+        return None
 
     def updateVisibilities(self,l1,l2):
+        self.visibleFrames = [val for pair in zip(l1,l2) for val in pair]
         for i in range(len(l1)):
             try:
                 self.lcds1frames[i].setVisible(l1[i])
@@ -57248,6 +57269,7 @@ class LargeMainLCDs(LargeLCDs):
         #free resources
         aw.largeLCDs_dialog = None
         aw.LargeLCDsFlag = False
+        aw.lcdsAction.setChecked(False)
 
 class LargeDeltaLCDs(LargeLCDs):
     def __init__(self, parent = None):
@@ -57294,6 +57316,7 @@ class LargeDeltaLCDs(LargeLCDs):
         settings.setValue("DeltaLCDGeometry",self.saveGeometry())
         aw.largeDeltaLCDs_dialog = None
         aw.LargeDeltaLCDsFlag = False
+        aw.deltalcdsAction.setChecked(False)
 
 class LargePIDLCDs(LargeLCDs):
     def __init__(self, parent = None):
@@ -57339,6 +57362,7 @@ class LargePIDLCDs(LargeLCDs):
         settings.setValue("PIDLCDGeometry",self.saveGeometry())
         aw.largePIDLCDs_dialog = None
         aw.LargePIDLCDsFlag = False
+        aw.pidlcdsAction.setChecked(False)
 
 class LargeExtraLCDs(LargeLCDs):
     def __init__(self, parent = None):
@@ -57368,7 +57392,7 @@ class LargeExtraLCDs(LargeLCDs):
             lcd1 = self.makeLCD(lcdstyle)
             self.lcds1.append(lcd1)
             self.lcds1styles.append(lcdstyle)
-            l1 = "<b>" + aw.qmc.extraname1[i] + "</b> "
+            l1 = "<b>" + aw.qmc.extraname1[i] + "</b>"
             try:
                 l1 = l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
             except:
@@ -57382,7 +57406,7 @@ class LargeExtraLCDs(LargeLCDs):
             lcd2 = self.makeLCD(lcdstyle)
             self.lcds2.append(lcd2)
             self.lcds2styles.append(lcdstyle)
-            l2 = "<b>" + aw.qmc.extraname2[i] + "</b> "
+            l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
             try:
                 l2 = l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
             except:
@@ -57419,6 +57443,7 @@ class LargeExtraLCDs(LargeLCDs):
         settings.setValue("ExtraLCDGeometry",self.saveGeometry())
         aw.largeExtraLCDs_dialog = None
         aw.LargeExtraLCDsFlag = False
+        aw.extralcdsAction.setChecked(False)
 
 class LargePhasesLCDs(LargeLCDs):
     def __init__(self, parent = None):
@@ -57517,6 +57542,7 @@ class LargePhasesLCDs(LargeLCDs):
         settings.setValue("PhasesLCDGeometry",self.saveGeometry())
         aw.largePhasesLCDs_dialog = None
         aw.LargePhasesLCDsFlag = False
+        aw.phaseslcdsAction.setChecked(False)
 
 ############################################################
 #######################  WHEEL GRAPH CONFIG DIALOG  ########
