@@ -143,7 +143,7 @@
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.14</string>
+	<string>10.13</string>
 	<key>LSMultipleInstancesProhibited</key>
 	<string>false</string>
 	<key>NSHighResolutionCapable</key>

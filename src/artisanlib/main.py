@@ -70,6 +70,7 @@ import prettytable  # @UnresolvedImport
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith("Windows"):
         os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+        os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1"
 except:
     pass
 
@@ -3254,7 +3255,7 @@ class tgraphcanvas(FigureCanvas):
         
                     # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
                     if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6]:
-                        aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
+                        aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
         
                     timestr = self.stringfromseconds(ts)
                     aw.lcd1.display(timestr)
@@ -4821,7 +4822,7 @@ class tgraphcanvas(FigureCanvas):
                 #clear AUC LCD
                 aw.updateAUCLCD()
                 
-                aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+                aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
                 
                 #roast flags
                 aw.qmc.heavyFC_flag = False
@@ -17129,7 +17130,7 @@ class ApplicationWindow(QMainWindow):
         aw.lcdpaletteF["deltabt"] = "white"
         aw.lcdpaletteB["sv"] = "black"
         aw.lcdpaletteF["sv"] = "white"
-        aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+        aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
         aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
         aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
@@ -56460,7 +56461,7 @@ class graphColorDlg(ArtisanDialog):
             color = QColor(aw.lcdpaletteF["timer"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["timer"] = str(color.name())
-            aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+            aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.updateStyles()
         elif lcd == 2:
