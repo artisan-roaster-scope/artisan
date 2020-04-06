@@ -843,6 +843,7 @@ class tgraphcanvas(FigureCanvas):
         self.phasesbuttonflag = True #False no change; True make the DRY and FC buttons change the phases during roast automatically
         self.phasesfromBackgroundflag = False # False: no change; True: set phases from background profile on load
         self.watermarksflag = True
+        self.step100temp = None # if set to a temperature value, the 100% event value in step modes is aligned with the given temperature, otherwise with the lowest phases limit
 
         #show phases LCDs during roasts
         self.phasesLCDflag = True
@@ -5682,18 +5683,6 @@ class tgraphcanvas(FigureCanvas):
                 if self.delta_ax is None:
                     self.delta_ax = self.ax.twinx()
 
-#                self.fig.clf()   #wipe out figure (remove all artists and axis). keep_observers=False
-#                # first remove previous figure axis
-#                if self.ax is not None:
-#                    try:
-#                        self.fig.delaxes(self.ax)
-#                    except:
-#                        pass
-#                self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
-#                # reset crosslines to force redrawing on new axis object
-#                self.l_horizontalcrossline = None
-#                self.l_verticalcrossline = None
-
                 # instead to remove and regenerate the axis object (as in the commented section above) we just clear and reuse it
                 self.ax.clear()
                 self.ax.set_facecolor(self.palette["background"])
@@ -5924,7 +5913,10 @@ class tgraphcanvas(FigureCanvas):
                         top = 100
                         bot = 0
                     else:
-                        top = self.phases[0]
+                        if self.step100temp is None:
+                            top = self.phases[0]
+                        else:
+                            top = self.step100temp
                         bot = self.ylimit_min
                     step = (top-bot)/10
                     start = top - bot
@@ -24565,7 +24557,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("showFujiLCDs"):
                 self.ser.showFujiLCDs = bool(toBool(settings.value("showFujiLCDs",self.ser.showFujiLCDs)))
             settings.endGroup()
-            #restore x,y formating mode            
+            #restore x,y formating mode
             if settings.contains("fmt_data_RoR"):
                 self.qmc.fmt_data_RoR = bool(toBool(settings.value("fmt_data_RoR",self.qmc.fmt_data_RoR)))
             #restore playback aid
@@ -24594,6 +24586,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phasesLCDflag = bool(toBool(settings.value("phasesLCDs",self.qmc.phasesLCDflag)))
             if settings.contains("phasesLCDmode"):
                 self.qmc.phasesLCDmode = toInt(settings.value("phasesLCDmode",self.qmc.phasesLCDmode))
+            if settings.contains("step100temp"):
+                self.qmc.step100temp = settings.value("step100temp",self.qmc.step100temp)
             # Important - this must come after the code that restores phasesLCDmode 
             # Done this way with two variables to maintain forward and backward compatibility with settings since adding LCD mode by phase.
             if settings.contains("phasesLCDmode_l"):
@@ -24601,7 +24595,7 @@ class ApplicationWindow(QMainWindow):
             elif settings.contains("phasesLCDmode"):
                 self.qmc.phasesLCDmode_l = [toInt(self.qmc.phasesLCDmode)]*3
             if settings.contains("phasesLCDmode_all"):
-                self.qmc.phasesLCDmode_all = [bool(toBool(x)) for x in toList(settings.value("phasesLCDmode_all",self.qmc.phasesLCDmode_all))]               
+                self.qmc.phasesLCDmode_all = [bool(toBool(x)) for x in toList(settings.value("phasesLCDmode_all",self.qmc.phasesLCDmode_all))]
             if settings.contains("autoDry"):
                 self.qmc.autoDRYflag = bool(toBool(settings.value("autoDry",self.qmc.autoDRYflag)))
             if settings.contains("autoFCs"):
@@ -26193,6 +26187,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phasesLCDmode",self.qmc.phasesLCDmode)
             settings.setValue("phasesLCDmode_l", self.qmc.phasesLCDmode_l)
             settings.setValue("phasesLCDmode_all", self.qmc.phasesLCDmode_all)
+            settings.setValue("step100temp",self.qmc.step100temp)
             #phase triggered DRY and FCs
             settings.setValue("autoDry",self.qmc.autoDRYflag)
             settings.setValue("autoFCs",self.qmc.autoFCsFlag)
@@ -39207,6 +39202,12 @@ class WindowsDlg(ArtisanDialog):
         ylimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
         zlimitLabel = QLabel(QApplication.translate("Label", "Max",None))
         zlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
+        step100Label = QLabel(QApplication.translate("Label", "100% Event Step",None))
+        self.step100Edit = QLineEdit()
+        self.step100Edit.setMaximumWidth(55)
+        self.step100Edit.setValidator(QIntValidator(aw.qmc.ylimit_min_max, aw.qmc.ylimit_max, self.step100Edit))
+        self.step100Edit.setAlignment(Qt.AlignRight)
+        self.step100Edit.setToolTip(QApplication.translate("Tooltip", "100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty", None))
         self.xlimitEdit = QLineEdit()
         self.xlimitEdit.setMaximumWidth(50)
         self.xlimitEdit.setMinimumWidth(50)
@@ -39241,6 +39242,10 @@ class WindowsDlg(ArtisanDialog):
             self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx))
         self.ylimitEdit.setText(str(aw.qmc.ylimit))
         self.ylimitEdit_min.setText(str(aw.qmc.ylimit_min))
+        if aw.qmc.step100temp is not None:
+            self.step100Edit.setText(str(aw.qmc.step100temp))
+        else:
+            self.step100Edit.setText("")
         self.zlimitEdit.setText(str(aw.qmc.zlimit))
         self.zlimitEdit_min.setText(str(aw.qmc.zlimit_min))
         self.legendComboBox = QComboBox()
@@ -39388,6 +39393,9 @@ class WindowsDlg(ArtisanDialog):
         hline.setFrameShape(QFrame.HLine)
         hline.setFrameShadow(QFrame.Sunken)
         
+        hline2 = QFrame()
+        hline2.setFrameShape(QFrame.HLine)
+        hline2.setFrameShadow(QFrame.Sunken)
         
         xlayout1 = QHBoxLayout()
         xlayout1.addWidget(self.autotimexFlag)
@@ -39430,6 +39438,15 @@ class WindowsDlg(ArtisanDialog):
         ylayoutHbox.addStretch()
         ylayoutHbox.addLayout(ylayout)
         ylayoutHbox.addStretch()
+        steplayoutHbox = QHBoxLayout()
+        steplayoutHbox.addWidget(step100Label)
+        steplayoutHbox.addWidget(self.step100Edit)
+        steplayoutHbox.addStretch()
+        ylayoutVbox = QVBoxLayout()
+        ylayoutVbox.addLayout(ylayoutHbox)
+        ylayoutVbox.addWidget(hline)
+        ylayoutVbox.addLayout(steplayoutHbox)
+        ylayoutVbox.addStretch()
         zlayout = QGridLayout()
         zlayout.addWidget(zlimitLabel_min,0,0,Qt.AlignRight)
         zlayout.addWidget(self.zlimitEdit_min,0,1)
@@ -39459,7 +39476,7 @@ class WindowsDlg(ArtisanDialog):
         xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None))
         xGroupLayout.setLayout(xlayout)
         yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None))
-        yGroupLayout.setLayout(ylayoutHbox)
+        yGroupLayout.setLayout(ylayoutVbox)
         zGroupLayout = QGroupBox(deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None))
         zGroupLayout.setLayout(zlayoutHbox)
         legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None))
@@ -39642,7 +39659,7 @@ class WindowsDlg(ArtisanDialog):
             aw.qmc.endofx = aw.qmc.endofx_default
             aw.qmc.locktimex_end = aw.qmc.endofx_default
         
-        startedittime_str = str(self.xlimitEdit_min.text())        
+        startedittime_str = str(self.xlimitEdit_min.text())
         if startedittime_str is not None and startedittime_str != "":
             starteditime = aw.qmc.stringtoseconds(startedittime_str)
             if starteditime >= 0 and aw.qmc.timeindex[0] != -1:
@@ -39657,7 +39674,16 @@ class WindowsDlg(ArtisanDialog):
         else:
             aw.qmc.startofx = aw.qmc.startofx_default
             aw.qmc.locktimex_start = aw.qmc.startofx_default
-            
+        
+        try:
+            step100 = self.step100Edit.text().strip()
+            if step100 == "":
+                aw.qmc.step100temp = None
+            else:
+                aw.qmc.step100temp = int(step100)
+        except:
+            pass
+        
         resettime = aw.qmc.stringtoseconds(str(self.resetEdit.text()))
         if resettime > 0:
             aw.qmc.resetmaxtime = resettime
