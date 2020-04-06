@@ -7686,6 +7686,8 @@ class tgraphcanvas(FigureCanvas):
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
                 self.phases[i] = int(round(self.fromCtoF(self.phases[i])))
+            if self.step100temp is not None:
+                self.step100temp = int(round(self.fromCtoF(self.step100temp)))
             self.ETtarget = int(round(self.fromCtoF(self.ETtarget)))
             self.ET2target = int(round(self.fromCtoF(self.ET2target)))
             self.BTtarget = int(round(self.fromCtoF(self.BTtarget)))
@@ -7724,6 +7726,8 @@ class tgraphcanvas(FigureCanvas):
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
                 self.phases[i] = int(round(self.fromFtoC(self.phases[i])))
+            if self.step100temp is not None:
+                self.step100temp = int(round(self.fromFtoC(self.step100temp)))
             self.ETtarget = int(round(self.fromFtoC(self.ETtarget)))
             self.ET2target = int(round(self.fromFtoC(self.ET2target)))
             self.BTtarget = int(round(self.fromFtoC(self.BTtarget)))
