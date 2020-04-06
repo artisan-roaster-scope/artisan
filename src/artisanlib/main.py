@@ -7764,7 +7764,7 @@ class tgraphcanvas(FigureCanvas):
     def celsiusModeRedraw(self,_=False):
         self.celsiusMode()
         self.redraw()
-        
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def convertTemperatureF(self,_=False):
