@@ -21,7 +21,7 @@ Alarms are unordered by definition. All alarm conditions of not-yet activated al
 
 If you want to load Alarms from a profile (.alog file) check Load from Profile, or if you want alarms from a background roast, check the box for Load from Background. Alarms are also saved when you save your settings.
 
-![alarm trigger](/assets/images/gsg/alarm load background.png)
+![alarm trigger](/assets/images/gsg/alarms load background.png)
 
 ### Create Alarms from a Profile
 
