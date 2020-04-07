@@ -160,7 +160,7 @@ TOOLKIT_MENU_SIMULATOR = QApplication.translate("Menu", "Simulator", None)
 TOOLKIT_MENU_ROASTCOMPARE = QApplication.translate("Menu", "Roast Compare", None)
 TOOLKIT_MENU_WHEELGRAPH = QApplication.translate("Menu", "Wheel Graph", None)
 TOOLKIT_MENU_TEMPERATURE = QApplication.translate("Menu", "Convert Profile Temperature", None)
-TOOLKIT_MENU_TRANSFORM = QApplication.translate("Menu", "Transformator", None)
+TOOLKIT_MENU_TRANSFORM = QApplication.translate("Menu", "Transposer", None)
 TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None)
 
 TOOLKIT_MENU_LCDS = QApplication.translate("Menu", "Main LCDs", None)

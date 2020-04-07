@@ -5777,6 +5777,8 @@ class tgraphcanvas(FigureCanvas):
                         st_artist.set_in_layout(False)  # remove title from tight_layout calculation
                     except:  # set_in_layout not available in mpl<3.x
                         pass
+                else:
+                    st_artist = self.fig.suptitle("")
 
     #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
     #            self.ax.spines['top'].set_color('none')
@@ -40031,7 +40033,7 @@ class profileTransformatorDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(profileTransformatorDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Profile Transformator",None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Profile Transposer",None))
         
         self.regexpercent = QRegExp(r"^$|^?[0-9]?[0-9]?(\.[0-9])?$")
         self.regextime = QRegExp(r"^$|^?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
@@ -40110,6 +40112,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.mappingModeComboBox.currentIndexChanged.connect(self.changeMappingMode)
         
         self.temp_formula = QLabel()
+        self.temp_formula.setTextInteractionFlags(Qt.TextSelectableByMouse)
         
         settingsHLayout = QHBoxLayout()
         settingsHLayout.addStretch()
