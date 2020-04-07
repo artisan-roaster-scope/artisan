@@ -6493,7 +6493,7 @@ class tgraphcanvas(FigureCanvas):
                         #properties for the event annotations
                         eventannotationprop = aw.mpl_fontproperties.copy()
                         hoffset = 3  #relative to the event dot
-                        voffset = 3  #relative to the event dot
+                        voffset = 1  #relative to the event dot
                         eventannotationprop.set_size("x-small")
                         for i in range(Nevents):
                             pos = max(0,int(round((self.specialeventsvalue[i]-1)*10)))
@@ -7116,6 +7116,9 @@ class tgraphcanvas(FigureCanvas):
                 e = self.backgroundEvalues[eventnum]
                 y1 = self.temp1B[self.backgroundEvents[eventnum]]
                 y2 = self.temp2B[self.backgroundEvents[eventnum]]
+                descr = self.backgroundEStrings[eventnum]
+                etype = self.Betypes[self.backgroundEtype[eventnum]]
+                sliderunit = aw.eventsliderunits[self.backgroundEtype[eventnum]]
 
                 if self.timeindexB[2] > 0 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[2]]:
                     postFCs = True
@@ -7152,6 +7155,9 @@ class tgraphcanvas(FigureCanvas):
                     e = 6.0  #50 
                 y1 = 420
                 y2 = 340
+                descr = "Full"
+                etype = "Air"
+                sliderunit = "kPa"
                 dcharge = 340
                 dfcs = 47
                 prefcs = 50
@@ -7164,6 +7170,9 @@ class tgraphcanvas(FigureCanvas):
                 e = self.specialeventsvalue[eventnum]
                 y1 = self.temp1[self.specialevents[eventnum]]
                 y2 = self.temp2[self.specialevents[eventnum]]
+                descr = self.specialeventsStrings[eventnum]
+                etype = self.etypes[self.specialeventstype[eventnum]]
+                sliderunit = aw.eventsliderunits[self.specialeventstype[eventnum]]
 
                 if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] > self.timex[self.timeindex[2]]:
                     postFCs = True
@@ -7193,6 +7202,9 @@ class tgraphcanvas(FigureCanvas):
                 ("E", u(aw.qmc.eventsInternal2ExternalValue(e))),
                 ("Y1", u(aw.float2float(y1,0))),
                 ("Y2", u(aw.float2float(y2,0))),
+                ("descr", u(descr)),
+                ("type", u(etype)),
+                ("sldrunit", u(sliderunit)),
                 ("dCHARGE", u(dcharge)),
                 ("dFCs", u(dfcs)),
                 ("preFCs", u(prefcs)),
@@ -43915,14 +43927,6 @@ class EventsDlg(ArtisanResizeablDialog):
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
-    @pyqtSlot()
-    def eventannotationhelp(self):
-        if not aw.qmc.eventannotationhelpisOpen:
-            self.helpdialog = eventannotationHelpDlg(self)
-            self.helpdialog.show()
-            aw.qmc.eventannotationhelpisOpen = True
-        self.helpdialog.activateWindow()
-
     def closeHelp(self):
         try: # sip not supported on older PyQt versions (RPi!)
             if not (self.helpdialog is None or sip.isdeleted(self.helpdialog)):
@@ -44121,6 +44125,9 @@ class eventannotationHelpDlg(ArtisanDialog):
         tbl_Annotations.add_row(['~E',u(QApplication.translate('HelpDlg','The value of Event',None)),60])
         tbl_Annotations.add_row(['~Y1',u(QApplication.translate('HelpDlg','ET value',None)),420])
         tbl_Annotations.add_row(['~Y2',u(QApplication.translate('HelpDlg','BT value',None)),372])
+        tbl_Annotations.add_row(['~descr',u(QApplication.translate('HelpDlg','The Description field of the Event',None)),u(QApplication.translate('HelpDlg','Gas 10',None))])
+        tbl_Annotations.add_row(['~type',u(QApplication.translate('HelpDlg','The Type field of the Event',None)),u(QApplication.translate('HelpDlg','Power',None))])
+        tbl_Annotations.add_row(['~sldrunit',u(QApplication.translate('HelpDlg','The value of the Slider Unit for this Event',None)),u(QApplication.translate('HelpDlg','kPa',None))])
         tbl_Annotations.add_row(['~dCHARGE',u(QApplication.translate('HelpDlg','Number of seconds since CHARGE',None)),522])
         tbl_Annotations.add_row(['~dFCs',u(QApplication.translate('HelpDlg','Number of seconds after FCs \nBest used inside double quotes (see notes below) \nDisplays &#39;*&#39; prior to FCs',None)),47])
         tbl_Annotations.add_row(['~preFCs',u(QApplication.translate('HelpDlg','Number of seconds before FCs \nBest used inside single quotes or back ticks (see notes below) \nDisplays &#39;*&#39; after FCs',None)),50])
@@ -44172,7 +44179,6 @@ class eventannotationHelpDlg(ArtisanDialog):
 
     @pyqtSlot()
     def closeEvent(self, _):
-        aw.qmc.eventannotationhelpisOpen = False
         settings = QSettings()
         #save window geometry
         settings.setValue("eventannotationHelpGeometry",self.saveGeometry())
