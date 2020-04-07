@@ -1627,6 +1627,7 @@ class tgraphcanvas(FigureCanvas):
         self.eventpositionbars = [0.]*120
         self.specialeventannotations = ["","","",""]
         self.specialeventannovisibilities = [0,0,0,0]
+        self.overlappct = 100
         
         #curve styles
         self.linestyle_default = "-"
@@ -6093,6 +6094,7 @@ class tgraphcanvas(FigureCanvas):
                             hoffset = 3  #relative to the event dot
                             voffset = 3  #relative to the event dot
                             eventannotationprop.set_size("x-small")
+                            self.overlapList = []
                             for i in range(len(self.backgroundEvents)):
                                 pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
@@ -6117,6 +6119,16 @@ class tgraphcanvas(FigureCanvas):
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                        try:
+                                            overlap = self.checkOverlap(anno, i, E1b_annotation)
+                                            if overlap:
+                                                anno.remove()
+                                        except:
+                                            pass
                                     except Exception as ex:
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
@@ -6144,6 +6156,16 @@ class tgraphcanvas(FigureCanvas):
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                        try:
+                                            overlap = self.checkOverlap(anno, i, E2b_annotation)
+                                            if overlap:
+                                                anno.remove()
+                                        except:
+                                            pass
                                     except Exception as ex:
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
@@ -6171,6 +6193,16 @@ class tgraphcanvas(FigureCanvas):
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                        try:
+                                            overlap = self.checkOverlap(anno, i, E3b_annotation)
+                                            if overlap:
+                                                anno.remove()
+                                        except:
+                                            pass
                                     except Exception as ex:
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
@@ -6198,6 +6230,16 @@ class tgraphcanvas(FigureCanvas):
                                                 anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                             except: # mpl before v3.0 do not have this set_in_layout() function
                                                 pass
+                                        try:
+                                            anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                        except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                        try:
+                                            overlap = self.checkOverlap(anno, i, E4b_annotation)
+                                            if overlap:
+                                                anno.remove()
+                                        except:
+                                            pass
                                     except Exception as ex:
 #                                        import traceback
 #                                        traceback.print_exc(file=sys.stdout)
@@ -6494,6 +6536,7 @@ class tgraphcanvas(FigureCanvas):
                         eventannotationprop = aw.mpl_fontproperties.copy()
                         hoffset = 3  #relative to the event dot
                         voffset = 1  #relative to the event dot
+                        self.overlapList = []
                         eventannotationprop.set_size("x-small")
                         for i in range(Nevents):
                             pos = max(0,int(round((self.specialeventsvalue[i]-1)*10)))
@@ -6519,6 +6562,12 @@ class tgraphcanvas(FigureCanvas):
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                         except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                        try:
+                                            overlap = self.checkOverlap(anno, i, E1_annotation)
+                                            if overlap:
+                                                anno.remove()
+                                        except:
                                             pass
                                 except Exception as ex:
 #                                    import traceback
@@ -6548,6 +6597,13 @@ class tgraphcanvas(FigureCanvas):
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                         except: # mpl before v3.0 do not have this set_in_layout() function
                                             pass
+                                        try:
+                                            overlap = self.checkOverlap(anno, i, E2_annotation)
+                                            if overlap:
+                                                anno.remove()
+                                        except:
+                                            pass
+                                            
                                 except Exception as ex:
 #                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
@@ -6576,6 +6632,12 @@ class tgraphcanvas(FigureCanvas):
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                         except: # mpl before v3.0 do not have this set_in_layout() function
                                             pass
+                                        try:
+                                            overlap = self.checkOverlap(anno, i, E3_annotation)
+                                            if overlap:
+                                                anno.remove()
+                                        except:
+                                            pass
                                 except Exception as ex:
 #                                    import traceback
 #                                    traceback.print_exc(file=sys.stdout)
@@ -6603,6 +6665,12 @@ class tgraphcanvas(FigureCanvas):
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                         except: # mpl before v3.0 do not have this set_in_layout() function
+                                            pass
+                                        try:
+                                            overlap = self.checkOverlap(anno, i, E4_annotation)
+                                            if overlap:
+                                                anno.remove()
+                                        except:
                                             pass
                                 except Exception as ex:
 #                                    import traceback
@@ -7108,6 +7176,50 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
 
+    def checkOverlap(self, anno, eventno, annotext):
+        overlapallowed = max(0,min(aw.qmc.overlappct,100))/100  #the input is validated but this here to prevent any escapes
+        overlap = False
+        try:
+            annocorners = self.annoboxCorners(anno)
+            xl = annocorners[0]
+            xr = annocorners[1]
+            yl = annocorners[2]
+            yu = annocorners[3]
+            area = (xr - xl) * (yu - yl)
+            for i in range(len(self.overlapList)):
+                o_xl = self.overlapList[i][0]
+                o_xr = self.overlapList[i][1]
+                o_yl = self.overlapList[i][2]
+                o_yu = self.overlapList[i][3]
+                o_area = (o_xr - o_xl) * (o_yu - o_yl)
+                dx = min(xr, o_xr) - max(xl, o_xl)
+                dy = min(yu, o_yu) - max(yl, o_yl)
+                if (dx>=0) and (dy>=0):
+                    if dx*dy/min(area,o_area) > overlapallowed:
+                        overlap = True
+                        break
+            if not overlap:
+                # note to self, the annotext can be removed from the list.  Only here for debug prints
+                self.overlapList.append((xl,xr,yl,yu,eventno,annotext))
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkOverlap() {0}").format(str(e)),exc_tb.tb_lineno)
+        return overlap
+
+    def annoboxCorners(self,anno):
+        try:
+            from matplotlib.transforms import Bbox
+            f = self.ax.get_figure()
+            r = f.canvas.get_renderer()
+            anno.update_bbox_position_size(renderer=r)
+            bb = anno.get_window_extent(renderer=r) # bounding box in display space
+            bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
+            bbox = Bbox(bbox_data) # x0, y0, width, height
+            corners = (bbox.bounds[0],bbox.bounds[0]+bbox.bounds[2],bbox.bounds[1],bbox.bounds[1]+bbox.bounds[3])
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " annoboxCorners() {0}").format(str(e)),exc_tb.tb_lineno)
+        return corners  # x0, x1, y0, y1
 
     def parseSpecialeventannotation(self,eventanno, eventnum, applyto="foreground", postFCs=False):
         try:
@@ -7117,8 +7229,8 @@ class tgraphcanvas(FigureCanvas):
                 y1 = self.temp1B[self.backgroundEvents[eventnum]]
                 y2 = self.temp2B[self.backgroundEvents[eventnum]]
                 descr = self.backgroundEStrings[eventnum]
-                etype = self.Betypes[self.backgroundEtype[eventnum]]
-                sliderunit = aw.eventsliderunits[self.backgroundEtype[eventnum]]
+                etype = self.Betypes[self.backgroundEtypes[eventnum]]
+                sliderunit = aw.eventsliderunits[self.backgroundEtypes[eventnum]]
 
                 if self.timeindexB[2] > 0 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[2]]:
                     postFCs = True
@@ -24670,6 +24782,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.specialeventannotations = list(map(str,list(toStringList(settings.value("specialeventannotations",self.qmc.specialeventannotations)))))
             if settings.contains("specialeventannovisibilities"):
                 self.qmc.specialeventannovisibilities = [toInt(x) for x in toList(settings.value("specialeventannovisibilities",self.qmc.specialeventannovisibilities))]
+            if settings.contains("overlappct"):
+                self.qmc.overlappct = toInt(settings.value("overlappct",int(self.qmc.overlappct)))
             settings.endGroup()
             #restore statistics
             if settings.contains("Statistics"):
@@ -26260,6 +26374,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Evaluealpha",self.qmc.Evaluealpha)
             settings.setValue("specialeventannotations", self.qmc.specialeventannotations)
             settings.setValue("specialeventannovisibilities", self.qmc.specialeventannovisibilities)
+            settings.setValue("overlappct", self.qmc.overlappct)
             settings.endGroup()
             #save ambient temperature source
             settings.setValue("AmbientTempSource",aw.qmc.ambientTempSource)
@@ -41176,8 +41291,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4Preview1 = QLabel(aw.qmc.parseSpecialeventannotation(self.E4Edit.text(),eventnum=0,applyto="preview",postFCs=False))
         self.E4Preview2 = QLabel(aw.qmc.parseSpecialeventannotation(self.E4Edit.text(),eventnum=0,applyto="preview",postFCs=True))
 
+        #tab 7
         eventannoLayout = QGridLayout()
-
         eventannoLayout.addWidget(showAnnoLabel, 0,0,Qt.AlignLeft)
         eventannoLayout.addWidget(AnnoLabel,     0,1,Qt.AlignLeft)
         eventannoLayout.addWidget(Epreview1Label,0,2,Qt.AlignLeft)
@@ -41206,9 +41321,19 @@ class EventsDlg(ArtisanResizeablDialog):
         eventannoLayout.setColumnStretch(2,0)
         eventannoLayout.setColumnStretch(3,0)
 
+        overlapeditLabel = QLabel(QApplication.translate("Label", "Allowed Annotation Overlap Percent (0-100)",None))
+        self.overlapEdit = QLineEdit()
+        self.overlapEdit.setValidator(QIntValidator(0, 100, self.overlapEdit))
+        self.overlapEdit.setText(str(aw.qmc.overlappct))
+        self.overlapEdit.setAlignment(Qt.AlignRight)
+        self.overlapEdit.editingFinished.connect(self.setoverlappct)
+        self.overlapEdit.setMaximumSize(self.overlapEdit.minimumSizeHint())
+
         helpButton = QPushButton(QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(self.showEventannotationhelp)
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(overlapeditLabel)
+        buttonLayout.addWidget(self.overlapEdit)
         buttonLayout.addStretch()
         buttonLayout.addWidget(helpButton)
         entryLayout = QHBoxLayout()
@@ -43896,6 +44021,10 @@ class EventsDlg(ArtisanResizeablDialog):
         #save window geometry
         settings.setValue("EventsGeometry",self.saveGeometry())
 
+    @pyqtSlot()
+    def setoverlappct(self):
+        aw.qmc.overlappct = int(self.overlapEdit.text())
+        pass
 
     @pyqtSlot(bool)
     def showEventbuttonhelp(self,_=False):
