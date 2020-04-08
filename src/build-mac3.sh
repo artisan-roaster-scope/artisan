@@ -17,7 +17,7 @@ if [ ! -z $TRAVIS ]; then
 #    export PYTHONPATH=$PYTHON/Frameworks/Python.framework/Versions/3.8/lib/python3.8    
 #    export PYTHON_V=3.8
 
-    export PYTHON=/usr/local
+    export PYTHON=$(pyenv root)/versions/3.8.2
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python3.8
     export PYTHON_V=3.8
