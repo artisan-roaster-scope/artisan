@@ -11,6 +11,7 @@ if [ ! -z $TRAVIS ]; then
 #    export PYTHONPATH=$PYTHON/lib/python3.7
 #    export PYTHON_V=3.7
     export PYTHON=/usr/local/opt/python@3.8/
+    export PYTHONBIN=$PYTHON/Frameworks/Python.framework/Versions/3.8/bin
     export PYTHONPATH=$PYTHON/Frameworks/Python.framework/Versions/3.8/lib/python3.8
     export PYTHON_V=3.8
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
@@ -20,6 +21,7 @@ if [ ! -z $TRAVIS ]; then
 elif [[ "$1" = "legacy" ]]; then
     # local legacy build featuring an outdated Qt to minimize the DEPLOYMENT_TARGET supporting older system
     export PYTHON=/Library/Frameworks/Python.framework/Versions/3.6
+    export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python3.6
     export PYTHON_V=3.6
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
@@ -32,6 +34,7 @@ else
     # standard local builds
     export PYTHON=/Library/Frameworks/Python.framework/Versions/3.8
 #    export PYTHON=/Users/luther/.pyenv/versions/3.8.2
+    export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python3.8
     export PYTHON_V=3.8
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
@@ -46,7 +49,7 @@ export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 
 # translations
-$PYTHON/bin/pylupdate5 artisan.pro
+$PYTHONBIN/pylupdate5 artisan.pro
 # there is no full Qt installation on Travis, thus don't run  lrelease
 if [ -z $TRAVIS ]; then
     $QT_SRC_PATH/bin/lrelease -verbose artisan.pro || true
