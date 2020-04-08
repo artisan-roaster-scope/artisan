@@ -7,11 +7,12 @@ set -e
 
 if [ ! -z $TRAVIS ]; then
     # Travis CI builds
-    export PYTHON=/usr/local
-    export PYTHONPATH=$PYTHON/lib/python3.7
-#    export PYTHON=/usr/local/opt/python@3.8/
-#    export PYTHONPATH=$PYTHON/lib/python3.8
-    export PYTHON_V=3.7
+#    export PYTHON=/usr/local
+#    export PYTHONPATH=$PYTHON/lib/python3.7
+#    export PYTHON_V=3.7
+    export PYTHON=/usr/local/opt/python@3.8/
+    export PYTHONPATH=$PYTHON/lib/python3.8
+    export PYTHON_V=3.8
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=${QT_PATH}
     export MACOSX_DEPLOYMENT_TARGET=10.13
@@ -35,7 +36,7 @@ else
     export PYTHON_V=3.8
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=~/Qt5.14.2/5.14.2/clang_64
-    export MACOSX_DEPLOYMENT_TARGET=10.14
+    export MACOSX_DEPLOYMENT_TARGET=10.13
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
     export ARTISAN_LEGACY_BUILD=false
 fi
