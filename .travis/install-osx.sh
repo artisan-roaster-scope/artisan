@@ -34,13 +34,14 @@ which pip3
 
 brew install p7zip
 
-pip3 install --upgrade pip
+pyton3 -m pip install --upgrade pip
 # to allow the installation of numpy >v1.15.4, avoiding the Permission denied: '/usr/local/bin/f2py' error, we run the following pip3 installs under sudo:
 # (an alternative could be to use pip install --user ..)
-sudo pip3 install -r src/requirements.txt
-sudo pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
+sudo -H python3 -m pip install -r src/requirements.txt
+sudo -H python3 -m pip install -r src/requirements-${TRAVIS_OS_NAME}.txt
 #sudo rm -rf /usr/local/lib/python3.7/site-packages/matplotlib/mpl-data/sample_data
 sudo rm -rf /usr/local/opt/python@3.8/lib/python3.8/site-packages/matplotlib/mpl-data/sample_data
+sudo rm -rf /usr/local/opt/python@3.8/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/matplotlib/mpl-data/sample_data
 
 #.travis/install-phidgets.sh # now installed via pip
 .travis/install-snap7.sh
