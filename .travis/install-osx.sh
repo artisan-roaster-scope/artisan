@@ -15,7 +15,7 @@ brew uninstall numpy gdal postgis
 brew unlink python@2
 #brew upgrade python
 brew install python@3.8
-export PATH="/usr/local/opt/python@3.8/bin:$PATH
+export PATH="/usr/local/opt/python@3.8/bin:$PATH"
 hash -r
 which python
 python --version
