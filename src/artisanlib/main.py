@@ -41321,13 +41321,13 @@ class EventsDlg(ArtisanResizeablDialog):
         eventannoLayout.setColumnStretch(2,0)
         eventannoLayout.setColumnStretch(3,0)
 
-        overlapeditLabel = QLabel(QApplication.translate("Label", "Allowed Annotation Overlap Percent (0-100)",None))
-        self.overlapEdit = QLineEdit()
-        self.overlapEdit.setValidator(QIntValidator(0, 100, self.overlapEdit))
-        self.overlapEdit.setText(str(aw.qmc.overlappct))
+        overlapeditLabel = QLabel(QApplication.translate("Label", "Allowed Annotation Overlap",None))
+        self.overlapEdit = QSpinBox()
+        self.overlapEdit.setRange(0,100)    #(min,max)
+        self.overlapEdit.setMinimumWidth(80)
         self.overlapEdit.setAlignment(Qt.AlignRight)
-        self.overlapEdit.editingFinished.connect(self.setoverlappct)
-        self.overlapEdit.setMaximumSize(self.overlapEdit.minimumSizeHint())
+        self.overlapEdit.setValue(aw.qmc.overlappct)
+        self.overlapEdit.setSuffix(" %")
 
         helpButton = QPushButton(QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(self.showEventannotationhelp)
@@ -43970,6 +43970,8 @@ class EventsDlg(ArtisanResizeablDialog):
             
             aw.qmc.eventslabelschars = self.eventslabelscharsSpinner.value()
             
+            aw.qmc.overlappct = int(self.overlapEdit.value())
+            
             aw.buttonpalette_shortcuts = self.switchPaletteByNumberKey.isChecked()
             #save etypes
             if len(u(self.etype0.text())) and len(u(self.etype1.text())) and len(u(self.etype2.text())) and len(u(self.etype3.text())):
@@ -44020,11 +44022,6 @@ class EventsDlg(ArtisanResizeablDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("EventsGeometry",self.saveGeometry())
-
-    @pyqtSlot()
-    def setoverlappct(self):
-        aw.qmc.overlappct = int(self.overlapEdit.text())
-        pass
 
     @pyqtSlot(bool)
     def showEventbuttonhelp(self,_=False):
