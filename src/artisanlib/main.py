@@ -24717,7 +24717,10 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("phasesLCDmode"):
                 self.qmc.phasesLCDmode = toInt(settings.value("phasesLCDmode",self.qmc.phasesLCDmode))
             if settings.contains("step100temp"):
-                self.qmc.step100temp = settings.value("step100temp",self.qmc.step100temp)
+                try:
+                    self.qmc.step100temp = int(settings.value("step100temp",self.qmc.step100temp))
+                except:
+                    self.qmc.step100temp = None
             # Important - this must come after the code that restores phasesLCDmode 
             # Done this way with two variables to maintain forward and backward compatibility with settings since adding LCD mode by phase.
             if settings.contains("phasesLCDmode_l"):
