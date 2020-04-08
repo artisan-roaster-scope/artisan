@@ -8,12 +8,20 @@ set -e
 if [ ! -z $TRAVIS ]; then
     # Travis CI builds
 #    export PYTHON=/usr/local
+#    export PYTHONBIN=$PYTHON/bin
 #    export PYTHONPATH=$PYTHON/lib/python3.7
 #    export PYTHON_V=3.7
-    export PYTHON=/usr/local/opt/python@3.8
-    export PYTHONBIN=$PYTHON/Frameworks/Python.framework/Versions/3.8/bin
-    export PYTHONPATH=$PYTHON/Frameworks/Python.framework/Versions/3.8/lib/python3.8
+
+#    export PYTHON=/usr/local/opt/python@3.8
+#    export PYTHONBIN=$PYTHON/Frameworks/Python.framework/Versions/3.8/bin
+#    export PYTHONPATH=$PYTHON/Frameworks/Python.framework/Versions/3.8/lib/python3.8    
+#    export PYTHON_V=3.8
+
+    export PYTHON=/usr/local
+    export PYTHONBIN=$PYTHON/bin
+    export PYTHONPATH=$PYTHON/lib/python3.8
     export PYTHON_V=3.8
+    
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=${QT_PATH}
     export MACOSX_DEPLOYMENT_TARGET=10.13
