@@ -20,6 +20,7 @@ hash -r
 which python3
 python3 --version
 which pip3
+which pylupdate5
 
 # following https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew/51125014#51125014
 # to install Python 3.6.5
