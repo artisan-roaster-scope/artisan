@@ -18,7 +18,7 @@ brew unlink python@2
 #brew install python@3.8
 #export PATH="/usr/local/opt/python@3.8/bin:$PATH"
 
-brew install pyenv
+brew upgrade pyenv
 pyenv install 3.8.2
 pyenv global 3.8.2
 
