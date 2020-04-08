@@ -34,7 +34,7 @@ which pip3
 
 brew install p7zip
 
-pyton3 -m pip install --upgrade pip
+python3 -m pip install --upgrade pip
 # to allow the installation of numpy >v1.15.4, avoiding the Permission denied: '/usr/local/bin/f2py' error, we run the following pip3 installs under sudo:
 # (an alternative could be to use pip install --user ..)
 sudo -H python3 -m pip install -r src/requirements.txt
