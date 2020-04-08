@@ -11,7 +11,7 @@ if [ ! -z $TRAVIS ]; then
 #    export PYTHONPATH=$PYTHON/lib/python3.7
 #    export PYTHON_V=3.7
     export PYTHON=/usr/local/opt/python@3.8/
-    export PYTHONPATH=$PYTHON/lib/python3.8
+    export PYTHONPATH=$PYTHON/Frameworks/Python.framework/Versions/3.8/lib/python3.8
     export PYTHON_V=3.8
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=${QT_PATH}
