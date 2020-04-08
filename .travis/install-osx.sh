@@ -17,8 +17,9 @@ brew unlink python@2
 brew install python@3.8
 export PATH="/usr/local/opt/python@3.8/bin:$PATH"
 hash -r
-which python
-python --version
+which python3
+python3 --version
+which pip3
 
 # following https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew/51125014#51125014
 # to install Python 3.6.5
