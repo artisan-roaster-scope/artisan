@@ -13,11 +13,12 @@ set -ex # reduced logging
 
 brew uninstall numpy gdal postgis
 brew unlink python@2
+brew unlink python
 #brew upgrade python
 
 brew install python@3.8
 #export PATH="/usr/local/opt/python@3.8/bin:$PATH"
-brew link --force python@3.8
+brew link --force --overwrite python@3.8
 
 #brew upgrade pyenv
 #pyenv install 3.8.2
