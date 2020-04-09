@@ -17,17 +17,11 @@ brew unlink python
 #brew upgrade python
 
 brew install python@3.8
-#export PATH="/usr/local/opt/python@3.8/bin:$PATH"
 brew link --force --overwrite python@3.8
-
-#brew upgrade pyenv
-#pyenv install 3.8.2
-#pyenv global 3.8.2
 
 hash -r
 which python3
 python3 --version
-which pip3
 
 # following https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew/51125014#51125014
 # to install Python 3.6.5

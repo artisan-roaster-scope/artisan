@@ -35609,6 +35609,7 @@ class RoastsComboBox(QComboBox):
         self.updateMenu()
         self.editTextChanged.connect(self.textEdited)
         self.setEditable(True)
+#        self.setMouseTracking(False)
 
     @pyqtSlot("QString")
     def textEdited(self,txt):
@@ -35631,8 +35632,9 @@ class RoastsComboBox(QComboBox):
 #            self.setSelection(self.currentIndex())
         if event.type() == QEvent.MouseButtonPress:
             self.updateMenu()
-            return True
-        return super(RoastsComboBox, self).eventFilter(obj, event)
+#            return True # stops processing # popup not drawn if this line is added
+#        return super(RoastsComboBox, self).eventFilter(obj, event) # this seems to slow down things on Windows and not necessary anyhow
+        return False # cont processing
 
     # the first entry is always just the current text edit line
     def updateMenu(self):
