@@ -17,7 +17,6 @@ matrix:
   include:
   - os: linux
     python: 3.8
-#    sudo: required # deprecated
     dist: xenial
     cache:
       - pip
@@ -26,7 +25,6 @@ matrix:
       - ARTISAN_OS=linux
   - os: linux
     language: generic
-#    sudo: required # deprecated
     dist: xenial
     env:
       ARTISAN_OS=rpi

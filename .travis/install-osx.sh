@@ -15,12 +15,13 @@ brew uninstall numpy gdal postgis
 brew unlink python@2
 #brew upgrade python
 
-#brew install python@3.8
+brew install python@3.8
 #export PATH="/usr/local/opt/python@3.8/bin:$PATH"
+brew link --force python@3.8
 
-brew upgrade pyenv
-pyenv install 3.8.2
-pyenv global 3.8.2
+#brew upgrade pyenv
+#pyenv install 3.8.2
+#pyenv global 3.8.2
 
 hash -r
 which python3
