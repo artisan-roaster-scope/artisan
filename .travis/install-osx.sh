@@ -40,6 +40,9 @@ python3 -m pip install --upgrade pip
 # to allow the installation of numpy >v1.15.4, avoiding the Permission denied: '/usr/local/bin/f2py' error, we run the following pip3 installs under sudo:
 # (an alternative could be to use pip install --user ..)
 sudo -H python3 -m pip install -r src/requirements.txt
+# use a custom py2app v0.21 (Python3.8) with apptemplate main-x86_64 build for 
+# target 10.13 using MacOSX10.15.sdk build on macOS 10.15 to add dark-mode support to builds
+sudo -H python3 -m pip install .travis/py2app-0.21-py38-none-any.whl
 sudo -H python3 -m pip install -r src/requirements-${TRAVIS_OS_NAME}.txt
 #sudo rm -rf /usr/local/lib/python3.7/site-packages/matplotlib/mpl-data/sample_data
 sudo rm -rf /usr/local/opt/python@3.8/lib/python3.8/site-packages/matplotlib/mpl-data/sample_data
