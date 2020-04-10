@@ -64684,6 +64684,8 @@ def main():
                     aw.loadFile(u(aw.lastLoadedProfile))
                 except:
                     pass
+            elif aw.logofilename != "":  #ensure background image aspect ratio is calculated
+                aw.qmc.reset(redraw=False, soundOn=False)
             if aw.lastLoadedBackground and aw.lastLoadedBackground != "" and not aw.curFile:
                 try:
                     aw.loadbackground(u(aw.lastLoadedBackground))
