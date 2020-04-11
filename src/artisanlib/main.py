@@ -545,7 +545,7 @@ def __dependencies_for_freezing():
     import packaging.markers # @UnresolvedImport @UnusedImport
     import packaging.requirements # @UnresolvedImport @UnusedImport
     
-    import pkg_resources.py2_warn  # @UnusedImport # for setuptools > 45.0.0.0
+    import pkg_resources.py2_warn  # @UnresolvedImport @UnusedImport # for setuptools > 45.0.0.0
     
     import PyQt5.QtSvg  # @UnusedImport
     import PyQt5.QtXml  # @UnusedImport
@@ -811,7 +811,7 @@ class tgraphcanvas(FigureCanvas):
         self.flavorchart_labels = None
         self.flavorchart_total = None
 
-        #F = Fahrenheit; C = Celsius        
+        #F = Fahrenheit; C = Celsius
         self.mode = "F"
         if platform.system() == 'Darwin':
             # try to "guess" the users preferred temperature unit
@@ -2217,7 +2217,7 @@ class tgraphcanvas(FigureCanvas):
             return s
 
     def updateBackground(self):
-        if not self.block_update:
+        if not self.block_update and aw.qmc.ax is not None:
             try:
                 aw.qmc.updateBackgroundSemaphore.acquire(1)
                 self.block_update = True
@@ -2239,7 +2239,7 @@ class tgraphcanvas(FigureCanvas):
                 # make sure that the GUI framework has a chance to run its event loop
                 # and clear any GUI events.  This needs to be in a try/except block
                 # because the default implemenation of this method is to raise
-                # NotImplementedError        
+                # NotImplementedError
                 #self.fig.canvas.flush_events() # don't FLUSH event as this can lead to a second redraw started from within the same GUI thread and 
                 # causen a hang by the blocked semaphore
             except:
@@ -2602,7 +2602,7 @@ class tgraphcanvas(FigureCanvas):
 
     def onclick(self,event):
         try:
-            if not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 3:
+            if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 3:
                 aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
@@ -3409,19 +3409,21 @@ class tgraphcanvas(FigureCanvas):
 
 # delta lines are now drawn on the main ax
     def resetlines(self):
-        #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
-        if self.linecount is None:
-            self.linecount = self.lenaxlines()
-        if self.deltalinecount is None:
-            self.deltalinecount = self.lendeltaaxlines()
-        self.ax.lines = self.ax.lines[0:(self.linecount+self.deltalinecount)]
+        if self.ax is not None:
+            #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
+            if self.linecount is None:
+                self.linecount = self.lenaxlines()
+            if self.deltalinecount is None:
+                self.deltalinecount = self.lendeltaaxlines()
+            self.ax.lines = self.ax.lines[0:(self.linecount+self.deltalinecount)]
 
 # delta lines are now drawn on the main ax
     def resetdeltalines(self):
-        if self.deltalinecount is None:
-            self.deltalinecount = self.lendeltaaxlines()
-        if self.delta_ax:
-            self.delta_ax.lines = []
+        if self.delta_ax is not None:
+            if self.deltalinecount is None:
+                self.deltalinecount = self.lendeltaaxlines()
+            if self.delta_ax:
+                self.delta_ax.lines = []
 
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = max(0,len(self.timex) - 1) # we have to ensure that alarmstate of triggered alarms is never negativ
@@ -13600,6 +13602,8 @@ class ApplicationWindow(QMainWindow):
         
         self.simulator = None # holds the simulator in simulation mode
         self.simulatorpath = None # points to the last profile used by the simulator
+        
+        self.comparator = None # holds the profile comparator
 
         ####    HUD
         self.HUD = QLabel()  #main canvas for hud widget
@@ -14401,9 +14405,9 @@ class ApplicationWindow(QMainWindow):
         self.ToolkitMenu.addAction(self.simulatorAction)
 
 #        self.roastCompareAction = QAction(UIconst.TOOLKIT_MENU_ROASTCOMPARE,self)
-##        self.roastCompareAction.triggered.connect(self.roastCompare)
+#        self.roastCompareAction.triggered.connect(self.roastCompare)
 #        self.roastCompareAction.setCheckable(True)
-##        self.roastCompareAction.setChecked(self.qmc.roastcompareflag)
+#        self.roastCompareAction.setChecked(bool(self.comparator))
 #        self.ToolkitMenu.addAction(self.roastCompareAction)
 
         self.wheeleditorAction = QAction(UIconst.TOOLKIT_MENU_WHEELGRAPH,self)
@@ -32463,6 +32467,21 @@ class ApplicationWindow(QMainWindow):
     def transform(self,_=False):
         dialog = profileTransformatorDlg(self)
         dialog.show()
+    
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def roastCompare(self,_=False):
+        print("roastCompare")
+        if bool(self.comparator):
+            self.comparator = None
+        else:
+            try:
+                filenames = self.ArtisanOpenFilesDialog(ext="*.alog")
+                if filenames:
+                    print(filenames)
+            except:
+                pass
+            self.roastCompareAction.setChecked(bool(self.comparator))
     
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -51370,6 +51389,16 @@ class serialport(object):
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("Serial Ccommand: " + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
+
+
+#########################################################################
+#############  DESIGNER CONFIG DIALOG ###################################
+#########################################################################
+
+class profileComparator():
+    def __init__(self):
+        pass
+    
 
 
 #########################################################################
