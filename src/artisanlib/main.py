@@ -545,7 +545,7 @@ def __dependencies_for_freezing():
     import packaging.markers # @UnresolvedImport @UnusedImport
     import packaging.requirements # @UnresolvedImport @UnusedImport
     
-    import import pkg_resources.py2_warn  # @UnusedImport # for setuptools > 45.0.0.0
+    import pkg_resources.py2_warn  # @UnusedImport # for setuptools > 45.0.0.0
     
     import PyQt5.QtSvg  # @UnusedImport
     import PyQt5.QtXml  # @UnusedImport
