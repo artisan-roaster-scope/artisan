@@ -526,7 +526,7 @@ if sys.platform.startswith("darwin"):
     import Foundation  # @UnresolvedImport
 #   list_ports module patched for P3k from new pyserial GitHub repository
 
-# to make py2exe happy with scipy >0.11
+# to make py2exe happy with scipy >0.11 (adding hidden imports)
 def __dependencies_for_freezing():
     import matplotlib.numerix # not to break bbfreeze 1.1.3 on Linux  @UnresolvedImport @UnusedImport
     from scipy.sparse.csgraph import _validation # @UnresolvedImport @UnusedImport
@@ -544,6 +544,8 @@ def __dependencies_for_freezing():
     import packaging.specifiers # @UnresolvedImport @UnusedImport
     import packaging.markers # @UnresolvedImport @UnusedImport
     import packaging.requirements # @UnresolvedImport @UnusedImport
+    
+    import import pkg_resources.py2_warn  # @UnusedImport # for setuptools > 45.0.0.0
     
     import PyQt5.QtSvg  # @UnusedImport
     import PyQt5.QtXml  # @UnusedImport
