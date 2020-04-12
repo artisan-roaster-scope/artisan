@@ -2599,7 +2599,6 @@ class tgraphcanvas(FigureCanvas):
         except:
             pass
 
-
     def onclick(self,event):
         try:
             if not self.designerflag and not self.wheelflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button == 3:
@@ -14392,6 +14391,12 @@ class ApplicationWindow(QMainWindow):
         self.clearresultsAction.setShortcut("Ctrl+Alt+K")
         self.analyzeMenu.addAction(self.clearresultsAction)
 
+#        self.roastCompareAction = QAction(UIconst.TOOLKIT_MENU_ROASTCOMPARE,self)
+#        self.roastCompareAction.triggered.connect(self.roastCompare)
+#        self.roastCompareAction.setCheckable(True)
+#        self.roastCompareAction.setChecked(bool(self.comparator))
+#        self.ToolkitMenu.addAction(self.roastCompareAction)
+
         self.designerAction = QAction(UIconst.TOOLKIT_MENU_DESIGNER,self)
         self.designerAction.triggered.connect(self.designerTriggered)
         self.designerAction.setCheckable(True)
@@ -14403,12 +14408,6 @@ class ApplicationWindow(QMainWindow):
         self.simulatorAction.setCheckable(True)
         self.simulatorAction.setChecked(bool(self.simulator))
         self.ToolkitMenu.addAction(self.simulatorAction)
-
-#        self.roastCompareAction = QAction(UIconst.TOOLKIT_MENU_ROASTCOMPARE,self)
-#        self.roastCompareAction.triggered.connect(self.roastCompare)
-#        self.roastCompareAction.setCheckable(True)
-#        self.roastCompareAction.setChecked(bool(self.comparator))
-#        self.ToolkitMenu.addAction(self.roastCompareAction)
 
         self.wheeleditorAction = QAction(UIconst.TOOLKIT_MENU_WHEELGRAPH,self)
         self.wheeleditorAction.triggered.connect(self.graphwheel)
@@ -40619,6 +40618,8 @@ class profileTransformatorDlg(ArtisanDialog):
                     self.temp_result_widgets[i].setText(str(aw.float2float(result_temps[i])) + aw.qmc.mode)
             if fit is None:
                 s = ""
+            elif isinstance(fit,str):
+                s = fit
             else:
                 s = aw.fit2str(fit)
             self.temp_formula.setText(s)
@@ -40705,7 +40706,7 @@ class profileTransformatorDlg(ArtisanDialog):
             fits = self.calcDiscretefits([0] + self.profileTimes,[0] + self.targetTimes)
             for i in range(4):
                 if self.profileTimes[i] is not None and fits[i+1] is not None:
-                    res.append(fits[i+1](self.profileTimes[i]))
+                    res.append(numpy.poly1d(fits[i+1])(self.profileTimes[i]))
                 else:
                     res.append(None)
         else:
@@ -40733,9 +40734,22 @@ class profileTransformatorDlg(ArtisanDialog):
             fits = self.calcDiscretefits(self.profileTemps,self.targetTemps)
             for i in range(5):
                 if self.profileTemps[i] is not None and fits[i] is not None:
-                    res.append(fits[i](self.profileTemps[i]))
+                    res.append(numpy.poly1d(fits[i])(self.profileTemps[i]))
                 else:
                     res.append(None)
+            active_fits = list(filter(lambda x: x[1][1] is not None,zip(fits,zip(self.profileTemps,self.targetTemps))))
+            if len(active_fits) > 0 and len(active_fits) < 3:
+                fit = aw.fit2str(fits[0])
+            else:
+                formula = ""
+                last_target = None
+                for f,tpl in reversed(active_fits[:-1]):
+                    if last_target is None:
+                       formula = aw.fit2str(f)
+                    else:
+                        formula = "({} if x<{} else {})".format(aw.fit2str(f), last_target, formula)
+                    last_target = tpl[1]
+                fit = formula
         else:
             with warnings.catch_warnings():
                 warnings.filterwarnings('error')
@@ -40869,9 +40883,9 @@ class profileTransformatorDlg(ArtisanDialog):
                             fits[i] = last_fit # copy previous fit
                         else:
                             # set a simple offset only as there is no previous nor next fit
-                            fits[i] = numpy.poly1d(numpy.array([1,targets[i]-sources[i]]))
+                            fits[i] = numpy.array([1,targets[i]-sources[i]])
                     else:
-                        fits[i] = numpy.poly1d(numpy.polyfit([sources[i],sources[j]],[targets[i],targets[j]],1))
+                        fits[i] = numpy.polyfit([sources[i],sources[j]],[targets[i],targets[j]],1)
                     # if this is the first fit, we copy it to all previous positions
                     if last_fit is None:
                         for k in range(0,i):
@@ -40901,7 +40915,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 j = 2 # after FCs
             elif aw.qmc.timeindex[1] > 0 and i >= aw.qmc.timeindex[1]:
                 j = 1 # after DRY
-            fit = fits[j] # fit to be applied
+            fit = numpy.poly1d(fits[j]) # fit to be applied
             res_timex.append(fit(timex[i] - offset)+new_offset)
         return res_timex
     
@@ -40982,7 +40996,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     j = 2 # after FCs
                 elif aw.qmc.timeindex[1] > 0 and i >= aw.qmc.timeindex[1]:
                     j = 1 # after DRY
-                fit = fits[j] # fit to be applied
+                fit = numpy.poly1d(fits[j]) # fit to be applied
                 aw.qmc.temp2.append(fit(self.org_temp2[i]))
             return True
         else:
@@ -46881,7 +46895,7 @@ class serialport(object):
 
     def PHIDGET_DAQ1400_CURRENT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1,_ = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"current")
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1400,0,"current")
         return tx,v1,v2
 
     def PHIDGET_DAQ1400_FREQUENCY(self):
@@ -50543,7 +50557,7 @@ class serialport(object):
                 probe = -1
                 try:
                     probe = self.phidget1018getSensorReading(0,0,deviceType,API)
-                except Exception:
+                except:
                     pass
                 return probe, -1
             elif deviceType != DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and (single or self.PhidgetIO[1].getAttached()):
@@ -50570,7 +50584,7 @@ class serialport(object):
                 if self.PhidgetIO and self.PhidgetIO[0].getAttached():
                     self.PhidgetIO[0].close()
                 if not single and self.PhidgetIO and len(self.PhidgetIO)> 1 and self.PhidgetIO[1].getAttached():
-                    self.PhidgetIO[1].close()                            
+                    self.PhidgetIO[1].close()
             except Exception:
                 pass
             self.PhidgetIO = None
