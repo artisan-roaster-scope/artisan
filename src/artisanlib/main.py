@@ -683,19 +683,19 @@ class tgraphcanvas(FigureCanvas):
 
         #default palette of colors
         self.alpha = {"analysismask":0.4,"statsanalysisbkgnd":1.0,"legendbg":0.4}
-        self.palette = {"background":'white',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
-                        "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#bde0ee',"rect5":'lightgrey',
+        self.palette = {"background":'#FFFFFF',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
+                        "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#BDE0EE',"rect5":'#D3D3D3',
                         "et":'#cc0f50',"bt":'#0A5C90',"xt":'#404040',"deltaet":'#cc0f50',
-                        "deltabt":'#0A5C90',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'#0A5C90',
-                        "canvas":'#F8F8F8',"legendbg":'white',"legendborder":'darkgrey', 
-                        "specialeventbox":'#ff5871',"specialeventtext":'white', 
-                        "bgeventmarker":'white',"bgeventtext":'black',
-                        "mettext":'white',"metbox":'#CC0F50',
-                        "aucguide":'#0c6aa6',"messages":'black',"aucarea":'#767676',
-                        "analysismask":'#bababa',"statsanalysisbkgnd":"#ffffff"}
+                        "deltabt":'#0A5C90',"markers":'#000000',"text":'#000000',"watermarks":'#FFFF00',"timeguide":'#0A5C90',
+                        "canvas":'#F8F8F8',"legendbg":'#FFFFFF',"legendborder":'#A9A9A9', 
+                        "specialeventbox":'#FF5871',"specialeventtext":'#FFFFFF', 
+                        "bgeventmarker":'#FFFFFF',"bgeventtext":'#000000',
+                        "mettext":'#FFFFFF',"metbox":'#CC0F50',
+                        "aucguide":'#0C6AA6',"messages":'#000000',"aucarea":'#767676',
+                        "analysismask":'#BABABA',"statsanalysisbkgnd":"#FFFFFF"}
         self.palette1 = self.palette.copy()
-        self.EvalueColor_default = ['#43a7cf','#49B160','#800080','#ad0427']
-        self.EvalueTextColor_default = ['white','white','white','white']
+        self.EvalueColor_default = ['#43A7CF','#49B160','#800080','#AD0427']
+        self.EvalueTextColor_default = ['white','#FFFFFF','white','#FFFFFF']
 
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Aftertaste",None),
@@ -13702,6 +13702,7 @@ class ApplicationWindow(QMainWindow):
         self.sampling_ticks_to_block_quantifiction = 15
                         
         self.extraeventsactionslastvalue = [None,None,None,None]
+        self.org_extradevicesettings = [{},{}]
 
         #event sliders
         self.eventslidervalues = [0,0,0,0]
@@ -21692,7 +21693,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     #loads stored profiles. Called from file menu
-    def loadFile(self,filename):
+    def loadFile(self,filename,quiet=False):
         f = None
         try:
             f = QFile(u(filename))
@@ -21709,7 +21710,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     org_obj_extra_devs = []
                 if res:
-                    res = self.setProfile(filename,obj)
+                    res = self.setProfile(filename,obj,quiet=quiet)
             else:
                 self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
                 res = False
@@ -22561,6 +22562,10 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.extramarkersizes1,aw.qmc.extramarkersizes2 = [],[]
             aw.qmc.extraname1,aw.qmc.extraname2 = [],[]
             aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]
+            aw.extraLCDvisibility1,aw.extraLCDvisibility2 = [False]*aw.nLCDS,[False]*aw.nLCDS
+            aw.extraCurveVisibility1,aw.extraCurveVisibility2 = [True]*aw.nLCDS,[True]*aw.nLCDS
+            aw.extraDelta1,aw.extraDelta2 = [False]*aw.nLCDS,[False]*aw.nLCDS
+            aw.extraFill1,aw.extraFill2 = [0]*aw.nLCDS,[0]*aw.nLCDS
             for i in range(len(aw.extraLCDlabel1)):
                 aw.extraLCDframe1[i].setVisible(False)
                 aw.extraLCDframe2[i].setVisible(False)
@@ -23163,29 +23168,140 @@ class ApplicationWindow(QMainWindow):
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2 + ["black"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor2)) 
     
+    def saveExtradeviceSettings(self):
+        self.org_extradevicesettings = {
+                "extradevices"           : self.qmc.extradevices,
+                "extradevicecolor1"      : self.qmc.extradevicecolor1,
+                "extradevicecolor2"      : self.qmc.extradevicecolor2,
+                "extraname1"             : self.qmc.extraname1,
+                "extraname2"             : self.qmc.extraname2,
+                "extramathexpression1"   : self.qmc.extramathexpression1,
+                "extramathexpression2"   : self.qmc.extramathexpression2,
+                "extraLCDvisibility1"    : self.extraLCDvisibility1,
+                "extraLCDvisibility2"    : self.extraLCDvisibility2,
+                "extraCurveVisibility1"  : self.extraCurveVisibility1,
+                "extraCurveVisibility2"  : self.extraCurveVisibility2,
+                "extraDelta1"            : self.extraDelta1,
+                "extraDelta2"            : self.extraDelta2,
+                "extraFill1"             : self.extraFill1,
+                "extraFill2"             : self.extraFill2,
+                "extralinestyles1"       : self.qmc.extralinestyles1,
+                "extralinestyles2"       : self.qmc.extralinestyles2,
+                "extradrawstyles1"       : self.qmc.extradrawstyles1,
+                "extradrawstyles2"       : self.qmc.extradrawstyles2,
+                "extralinewidths1"       : self.qmc.extralinewidths1,
+                "extralinewidths2"       : self.qmc.extralinewidths2,
+                "extramarkers1"          : self.qmc.extramarkers1,
+                "extramarkers2"          : self.qmc.extramarkers2,
+                "extramarkersizes1"      : self.qmc.extramarkersizes1,
+                "extramarkersizes2"      : self.qmc.extramarkersizes2,
+                }
+        
+    def restoreExtradeviceSettings(self):
+        self.qmc.extradevices         = self.org_extradevicesettings["extradevices"]         
+        self.qmc.extradevicecolor1    = self.org_extradevicesettings["extradevicecolor1"]    
+        self.qmc.extradevicecolor2    = self.org_extradevicesettings["extradevicecolor2"]    
+        self.qmc.extraname1           = self.org_extradevicesettings["extraname1"]           
+        self.qmc.extraname2           = self.org_extradevicesettings["extraname2"]           
+        self.qmc.extramathexpression1 = self.org_extradevicesettings["extramathexpression1"] 
+        self.qmc.extramathexpression2 = self.org_extradevicesettings["extramathexpression2"] 
+        self.extraLCDvisibility1      = self.org_extradevicesettings["extraLCDvisibility1"]  
+        self.extraLCDvisibility2      = self.org_extradevicesettings["extraLCDvisibility2"]  
+        self.extraCurveVisibility1    = self.org_extradevicesettings["extraCurveVisibility1"]
+        self.extraCurveVisibility2    = self.org_extradevicesettings["extraCurveVisibility2"]
+        self.extraDelta1              = self.org_extradevicesettings["extraDelta1"]          
+        self.extraDelta2              = self.org_extradevicesettings["extraDelta2"]          
+        self.extraFill1               = self.org_extradevicesettings["extraFill1"]           
+        self.extraFill2               = self.org_extradevicesettings["extraFill2"]           
+        self.qmc.extralinestyles1     = self.org_extradevicesettings["extralinestyles1"]     
+        self.qmc.extralinestyles2     = self.org_extradevicesettings["extralinestyles2"]     
+        self.qmc.extradrawstyles1     = self.org_extradevicesettings["extradrawstyles1"]     
+        self.qmc.extradrawstyles2     = self.org_extradevicesettings["extradrawstyles2"]     
+        self.qmc.extralinewidths1     = self.org_extradevicesettings["extralinewidths1"]     
+        self.qmc.extralinewidths2     = self.org_extradevicesettings["extralinewidths2"]     
+        self.qmc.extramarkers1        = self.org_extradevicesettings["extramarkers1"]        
+        self.qmc.extramarkers2        = self.org_extradevicesettings["extramarkers2"]        
+        self.qmc.extramarkersizes1    = self.org_extradevicesettings["extramarkersizes1"]    
+        self.qmc.extramarkersizes2    = self.org_extradevicesettings["extramarkersizes2"] 
+        self.updateExtradeviceSettings()
     
+    def updateExtradeviceSettings(self):
+            ndevices = len(self.qmc.extradevices)
+            if ndevices != len(self.qmc.extralinestyles1) or \
+               ndevices != len(self.qmc.extralinestyles2) or \
+               ndevices != len(self.qmc.extradrawstyles1) or \
+               ndevices != len(self.qmc.extradrawstyles2) or \
+               ndevices != len(self.qmc.extralinewidths1) or \
+               ndevices != len(self.qmc.extralinewidths2) or \
+               ndevices != len(self.qmc.extramarkers1) or \
+               ndevices != len(self.qmc.extramarkers2) or \
+               ndevices != len(self.qmc.extramarkersizes1) or \
+               ndevices != len(self.qmc.extramarkersizes2):
+                self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*ndevices
+                self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*ndevices
+                self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*ndevices
+                self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*ndevices
+                self.qmc.extralinewidths1 = [self.qmc.extra_linewidth_default]*ndevices
+                self.qmc.extralinewidths2 = [self.qmc.extra_linewidth_default]*ndevices
+                self.qmc.extramarkers1 = [self.qmc.marker_default]*ndevices
+                self.qmc.extramarkers2 = [self.qmc.marker_default]*ndevices
+                self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*ndevices
+                self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*ndevices
+            self.qmc.extratemp1 = []
+            self.qmc.extratemp2 = []
+            self.qmc.extratimex = []
+            self.qmc.extrastemp1 = []
+            self.qmc.extrastemp2 = []
+            for _ in range(len(self.qmc.extradevices)):
+                self.qmc.extratemp1.append([])
+                self.qmc.extratemp2.append([])
+                self.qmc.extratimex.append([])
+                self.qmc.extrastemp1.append([])
+                self.qmc.extrastemp2.append([])
+                self.qmc.extractimex1.append([])
+                self.qmc.extractimex2.append([])
+                self.qmc.extractemp1.append([])
+                self.qmc.extractemp2.append([])
+            #extra LCDs and other LCDs visibility
+            self.updateLCDproperties()
+        
     #called by fileLoad()
     def setProfile(self,filename,profile,quiet=False):
         try:
             #extra devices load and check
             if "extratimex" in profile:
                 if "extradevices" in profile:
-                    if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
-                        string = u(QApplication.translate("Message","To fully load this profile the extra device configuration needs to modified?\nModify your setup?",None))
+                    updateRender = False
+                    # check for difference in the Data values between the profile and current settings
+                    settingdev = ''.join([str(self.qmc.extradevices), str(self.qmc.extraname1), str(self.qmc.extraname2), 
+                                        str(self.qmc.extramathexpression1), str(aw.qmc.extramathexpression2),
+                                        ])
+                    profiledev = ''.join([str(profile["extradevices"]), str(profile["extraname1"]), str(profile["extraname2"]), 
+                                        str(profile["extramathexpression1"]), str(profile["extramathexpression2"]),
+                                        ])
+                    if settingdev != profiledev:
+                        string = u(QApplication.translate("Message","To fully load this profile the extra device configuration needs to modified.\nOverwrite your extra device definitions using the values from the profile?",None))
                         if quiet:
                             reply = QMessageBox.Yes
                         else:
-                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None), string,
+                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different set of extra devices",None), string,
                                     QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.No)
                         if reply == QMessageBox.Yes:
                             if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
+                                updateRender = True
                                 aw.qmc.resetlinecountcaches()
                                 self.qmc.extradevices = profile["extradevices"]
                             else:
                                 return False
                         elif reply == QMessageBox.No:
-                            # we remove the extra device elements that do not fit
-                            l = len(self.qmc.extradevices)
+                            pass
+                        else:
+                            return False
+
+                    # we remove the extra device elements that do not fit
+                        if reply == QMessageBox.No:
+                            #if (len(self.qmc.extradevices) < len(profile["extradevices"])):
+                            l =len(self.qmc.extradevices)
                             for k in ["extratimex","extratemp1","extratemp2"]:
                                 profile[k] = profile[k][:l]
                             profile["extradevices"] = self.qmc.extradevices
@@ -23205,8 +23321,14 @@ class ApplicationWindow(QMainWindow):
                             profile["extralinestyles2"] = self.qmc.extralinestyles2
                             profile["extradrawstyles1"] = self.qmc.extradrawstyles1
                             profile["extradrawstyles2"] = self.qmc.extradrawstyles2
-                        else:
-                            return False
+                            profile["extraLCDvisibility1"] = self.extraLCDvisibility1
+                            profile["extraLCDvisibility2"] = self.extraLCDvisibility2
+                            profile["extraCurveVisibility1"] = self.extraCurveVisibility1
+                            profile["extraCurveVisibility2"] = self.extraCurveVisibility2
+                            profile["extraDelta1"] = self.extraDelta1
+                            profile["extraDelta2"] = self.extraDelta2
+                            profile["extraFill1"] = self.extraFill1
+                            profile["extraFill2"] = self.extraFill2
 
                 # adjust extra serial device table
                 # a) remove superfluous extra serial settings
@@ -23235,68 +23357,96 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extractimex2 = [[]]*len(self.qmc.extratemp2)
                 # d) set other extra curve attribute lists
                 if "extraname1" in profile:
-                    self.qmc.extraname1 = [d(x) for x in profile["extraname1"] + self.qmc.extraname1[len(profile["extraname1"]):]]
+                    self.qmc.extraname1 = [d(x) for x in profile["extraname1"]]
                 if "extraname2" in profile:
-                    self.qmc.extraname2 = [d(x) for x in profile["extraname2"] + self.qmc.extraname2[len(profile["extraname2"]):]]
-                    
-                # we keep the mathexpressions and don't overwrite them from those of the profile to be loaded
+                    self.qmc.extraname2 = [d(x) for x in profile["extraname2"]]
                 if "extramathexpression1" in profile:
-                    old = self.qmc.extramathexpression1
-                    new = [d(x) for x in profile["extramathexpression1"]]
-                    self.qmc.extramathexpression1 = (old + new[len(old):])[:len(self.qmc.extraname1)]
+                    self.qmc.extramathexpression1 = [d(x) for x in profile["extramathexpression1"]]
                 if "extramathexpression2" in profile:
-                    old = self.qmc.extramathexpression2
-                    new = [d(x) for x in profile["extramathexpression2"]]
-                    self.qmc.extramathexpression2 = (old + new[len(old):])[:len(self.qmc.extraname2)]
+                    self.qmc.extramathexpression2 = [d(x) for x in profile["extramathexpression2"]]
+
+                if updateRender:
+                    if "extradevicecolor1" in profile:
+                        self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]]
+                    if "extradevicecolor2" in profile:
+                        self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]]
                     
-                if "extradevicecolor1" in profile:
-                    self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]] + self.qmc.extradevicecolor1[len(profile["extradevicecolor1"]):]
-                if "extradevicecolor2" in profile:
-                    self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]] + self.qmc.extradevicecolor2[len(profile["extradevicecolor2"]):]
-                    
+                    if "extraLCDvisibility1" in profile:
+                        self.extraLCDvisibility1 = profile["extraLCDvisibility1"]
+                    else:
+                        self.extraLCDvisibility1 = [False]*aw.nLCDS
+                    if "extraLCDvisibility2" in profile:
+                        self.extraLCDvisibility2 = profile["extraLCDvisibility2"]
+                    else:
+                        self.extraLCDvisibility2 = [False]*aw.nLCDS
+                    if "extraCurveVisibility1" in profile:
+                        self.extraCurveVisibility1 = profile["extraCurveVisibility1"]
+                    else:
+                        self.extraCurveVisibility1 = [False]*aw.nLCDS
+                    if "extraCurveVisibility2" in profile:
+                        self.extraCurveVisibility2 = profile["extraCurveVisibility2"]
+                    else:
+                        self.extraCurveVisibility2 = [False]*aw.nLCDS
+                    if "extraDelta1" in profile:
+                        self.extraDelta1 = profile["extraDelta1"]
+                    else:
+                        self.extraDelta1 = [False]*aw.nLCDS
+                    if "extraDelta2" in profile:
+                        self.extraDelta2 = profile["extraDelta2"]
+                    else:
+                        self.extraDelta2 = [False]*aw.nLCDS
+                    if "extraFill1" in profile:
+                        self.extraFill1 = profile["extraFill1"]
+                    else:
+                        self.extraFill1 = [0]*aw.nLCDS
+                    if "extraFill2" in profile:
+                        self.extraFill2 = profile["extraFill2"]
+                    else:
+                        self.extraFill2 = [0]*aw.nLCDS
+                    if "extramarkersizes1" in profile:
+                        self.qmc.extramarkersizes1 = profile["extramarkersizes1"]
+                    else:
+                        self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*len(self.qmc.extratemp1)
+                    if "extramarkersizes2" in profile:
+                        self.qmc.extramarkersizes2 = profile["extramarkersizes2"]
+                    else:
+                        self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*len(self.qmc.extratemp2)
+                    if "extramarkers1" in profile:
+                        self.qmc.extramarkers1 = [d(x) for x in profile["extramarkers1"]]
+                    else:
+                        self.qmc.extramarkers1 = [self.qmc.marker_default]*len(self.qmc.extratemp1)
+                    if "extramarkers2" in profile:
+                        self.qmc.extramarkers2 = [d(x) for x in profile["extramarkers2"]]
+                    else:
+                        self.qmc.extramarkers2 = [self.qmc.marker_default]*len(self.qmc.extratemp2)
+                    if "extralinewidths1" in profile:
+                        self.qmc.extralinewidths1 = [int(w) for w in profile["extralinewidths1"]]
+                    else:
+                        self.qmc.extralinewidths1 = [self.qmc.extra_linewidth_default]*len(self.qmc.extratemp1)
+                    if "extralinewidths2" in profile:
+                        self.qmc.extralinewidths2 = [int(w) for w in profile["extralinewidths2"]]
+                    else:
+                        self.qmc.extralinewidths2 = [self.qmc.extra_linewidth_default]*len(self.qmc.extratemp2)
+                    if "extralinestyles1" in profile:
+                        self.qmc.extralinestyles1 = [d(x) for x in profile["extralinestyles1"]]
+                    else:
+                        self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*len(self.qmc.extratemp1)
+                    if "extralinestyles2" in profile:
+                        self.qmc.extralinestyles2 = [d(x) for x in profile["extralinestyles2"]]
+                    else:
+                        self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*len(self.qmc.extratemp2)
+                    if "extradrawstyles1" in profile:
+                        self.qmc.extradrawstyles1 = [d(x) for x in profile["extradrawstyles1"]]
+                    else:
+                        self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp1)
+                    if "extradrawstyles2" in profile:
+                        self.qmc.extradrawstyles2 = [d(x) for x in profile["extradrawstyles2"]]
+                    else:
+                        self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp2)
+
                 # ensure that extra list length are of the size of the extradevices:
                 self.ensureCorrectExtraDeviceListLenght()
-                                        
-                if "extramarkersizes1" in profile:
-                    self.qmc.extramarkersizes1 = profile["extramarkersizes1"] + self.qmc.extramarkersizes1[len(profile["extramarkersizes1"]):]
-                else:
-                    self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*len(self.qmc.extratemp1)
-                if "extramarkersizes2" in profile:
-                    self.qmc.extramarkersizes2 = profile["extramarkersizes2"] + self.qmc.extramarkersizes2[len(profile["extramarkersizes2"]):]
-                else:
-                    self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*len(self.qmc.extratemp2)
-                if "extramarkers1" in profile:
-                    self.qmc.extramarkers1 = [d(x) for x in profile["extramarkers1"]] + self.qmc.extramarkers1[len(profile["extramarkers1"]):]
-                else:
-                    self.qmc.extramarkers1 = [self.qmc.marker_default]*len(self.qmc.extratemp1)
-                if "extramarkers2" in profile:
-                    self.qmc.extramarkers2 = [d(x) for x in profile["extramarkers2"]] + self.qmc.extramarkers2[len(profile["extramarkers2"]):]
-                else:
-                    self.qmc.extramarkers2 = [self.qmc.marker_default]*len(self.qmc.extratemp2)
-                if "extralinewidths1" in profile:
-                    self.qmc.extralinewidths1 = [int(w) for w in profile["extralinewidths1"]] + self.qmc.extralinewidths1[len(profile["extralinewidths1"]):]
-                else:
-                    self.qmc.extralinewidths1 = [self.qmc.extra_linewidth_default]*len(self.qmc.extratemp1)
-                if "extralinewidths2" in profile:
-                    self.qmc.extralinewidths2 = [int(w) for w in profile["extralinewidths2"]] + self.qmc.extralinewidths2[len(profile["extralinewidths2"]):]
-                else:
-                    self.qmc.extralinewidths2 = [self.qmc.extra_linewidth_default]*len(self.qmc.extratemp2)
-                if "extralinestyles1" in profile:
-                    self.qmc.extralinestyles1 = [d(x) for x in profile["extralinestyles1"]] + self.qmc.extralinestyles1[len(profile["extralinestyles1"]):]
-                else:
-                    self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*len(self.qmc.extratemp1)
-                if "extralinestyles2" in profile:
-                    self.qmc.extralinestyles2 = [d(x) for x in profile["extralinestyles2"]] + self.qmc.extralinestyles2[len(profile["extralinestyles2"]):]
-                else:
-                    self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*len(self.qmc.extratemp2)
-                if "extradrawstyles1" in profile:
-                    self.qmc.extradrawstyles1 = [d(x) for x in profile["extradrawstyles1"]] + self.qmc.extradrawstyles1[len(profile["extradrawstyles1"]):]
-                else:
-                    self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp1)
-                if "extradrawstyles2" in profile:
-                    self.qmc.extradrawstyles2 = [d(x) for x in profile["extradrawstyles2"]] + self.qmc.extradrawstyles2[len(profile["extradrawstyles2"]):]
-                else:
-                    self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp2)
+                    
             self.updateExtraLCDvisibility()
 
 # we don't change temp mode anymore on loading a profile
@@ -24092,6 +24242,14 @@ class ApplicationWindow(QMainWindow):
             profile["extramathexpression2"] = [encodeLocal(x) for x in self.qmc.extramathexpression2]
             profile["extradevicecolor1"] = [encodeLocal(x) for x in self.qmc.extradevicecolor1]
             profile["extradevicecolor2"] = [encodeLocal(x) for x in self.qmc.extradevicecolor2]
+            profile["extraLCDvisibility1"]     = aw.extraLCDvisibility1
+            profile["extraLCDvisibility2"]     = aw.extraLCDvisibility2
+            profile["extraCurveVisibility1"]   = aw.extraCurveVisibility1
+            profile["extraCurveVisibility2"]   = aw.extraCurveVisibility2
+            profile["extraDelta1"]             = aw.extraDelta1
+            profile["extraDelta2"]             = aw.extraDelta2
+            profile["extraFill1"]              = aw.extraFill1
+            profile["extraFill2"]              = aw.extraFill2
             profile["extramarkersizes1"] = self.qmc.extramarkersizes1
             profile["extramarkersizes2"] = self.qmc.extramarkersizes2
             profile["extramarkers1"] = [encodeLocal(x) for x in self.qmc.extramarkers1]
@@ -24272,6 +24430,7 @@ class ApplicationWindow(QMainWindow):
             loaded_profile = self.curFile
             cont = aw.qmc.reset(soundOn=False)
             if cont:
+                self.saveExtradeviceSettings()
                 outdir = self.ArtisanExistingDirectoryDialog()
                 progress = QProgressDialog(QApplication.translate("Message", "Converting...",None), None, 0, len(files), self)
                 progress.setCancelButton(None)
@@ -24298,8 +24457,9 @@ class ApplicationWindow(QMainWindow):
                     i += 1
                     aw.qmc.fileClean()
                     aw.qmc.reset(soundOn=False)
+                    self.restoreExtradeviceSettings()
                 if loaded_profile:
-                    self.loadFile(loaded_profile)
+                    self.loadFile(loaded_profile,quiet=True)
                 aw.qmc.roastpropertiesflag = flag_temp
                 progress.cancel()
                 progress = None
@@ -24350,6 +24510,7 @@ class ApplicationWindow(QMainWindow):
             loaded_profile = self.curFile
             cont = aw.qmc.reset(soundOn=False)
             if cont:
+                self.saveExtradeviceSettings()
                 fileext = ".png"
                 if filetype == "JPEG":
                     fileext = ".jpg"
@@ -24391,8 +24552,9 @@ class ApplicationWindow(QMainWindow):
                     i += 1
                     aw.qmc.fileClean()
                     aw.qmc.reset(soundOn=False)
+                    self.restoreExtradeviceSettings()
                 if loaded_profile:
-                    self.loadFile(loaded_profile)
+                    self.loadFile(loaded_profile, quiet=True)
                 aw.qmc.roastpropertiesflag = flag_temp
                 progress.cancel()
                 progress = None
@@ -24408,6 +24570,8 @@ class ApplicationWindow(QMainWindow):
     def fileConvertIMG(self,ext):
         files = self.ArtisanOpenFilesDialog(ext="*.alog")
         if files and len(files) > 0:
+            loaded_profile = self.curFile
+            self.saveExtradeviceSettings()
             outdir = self.ArtisanExistingDirectoryDialog()
             progress = QProgressDialog(QApplication.translate("Message", "Converting...",None), None, 0, len(files), self)
             progress.setCancelButton(None)
@@ -24432,7 +24596,11 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass
                 i += 1
+                aw.qmc.fileClean()
                 aw.qmc.reset(soundOn=False)
+                self.restoreExtradeviceSettings()
+            if loaded_profile:
+                self.loadFile(loaded_profile, quiet=True)
             aw.qmc.roastpropertiesflag = flag_temp
             progress.cancel()
             progress = None
@@ -24450,6 +24618,7 @@ class ApplicationWindow(QMainWindow):
     def fileConverToTemp(self,t):
         files = self.ArtisanOpenFilesDialog(ext="*.alog")
         if files and len(files) > 0:
+            self.saveExtradeviceSettings()
             loaded_profile = self.curFile
             cont = aw.qmc.reset(soundOn=False)
             if cont:
@@ -24479,8 +24648,9 @@ class ApplicationWindow(QMainWindow):
                     i += 1
                     aw.qmc.fileClean()
                     aw.qmc.reset(soundOn=False)
+                    self.restoreExtradeviceSettings()
                 if loaded_profile:
-                    self.loadFile(loaded_profile)
+                    self.loadFile(loaded_profile,quiet=True)
                 aw.qmc.roastpropertiesflag = flag_temp
                 progress.cancel()
                 progress = None
@@ -53650,6 +53820,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         resetButton.setFocusPolicy(Qt.NoFocus)
         resetButton.setMinimumWidth(100)
         resetButton.clicked.connect(self.resetextradevices)
+        extradevHelpButton = QPushButton(QApplication.translate("Button","Help",None))
+        extradevHelpButton.setMinimumWidth(100)
+        extradevHelpButton.setFocusPolicy(Qt.NoFocus)
+        extradevHelpButton.clicked.connect(self.showExtradevHelp)
         self.delButton = QPushButton(QApplication.translate("Button","Delete",None))
         self.delButton.setFocusPolicy(Qt.NoFocus)
         self.delButton.setMinimumWidth(100)
@@ -54449,6 +54623,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         bLayout.addStretch()
         bLayout.addSpacing(10)
         bLayout.addWidget(resetButton)
+        bLayout.addSpacing(10)
+        bLayout.addWidget(extradevHelpButton)
         #LAYOUT TAB 2 (Extra Devices)
         tab2Layout = QVBoxLayout()
         tab2Layout.addWidget(self.devicetable)
@@ -56038,6 +56214,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " device accept(): {0}").format(str(e)),exc_tb.tb_lineno)
+
+    @pyqtSlot(bool)
+    def showExtradevHelp(self):
+        try: # sip not supported on older PyQt versions (RPi!)
+            if self.helpdialog is None or sip.isdeleted(self.helpdialog):
+                self.helpdialog = symbolicformulasHelpDlg(self)
+        except:
+            self.helpdialog = symbolicformulasHelpDlg(self)
+        self.helpdialog.show()
+        self.helpdialog.activateWindow()
 
     @pyqtSlot(bool)
     def showSymbolicHelp(self):
@@ -64737,7 +64923,7 @@ def main():
                     aw.qmc.background = True
                     if not aw.lastLoadedProfile and not(aw.logofilename != "" and aw.logoimgflag):
                         # this extra redraw is not needed if a watermark is loaded as it is triggered by the resize-redraw mechanism
-                        aw.qmc.redraw()
+                        aw.qmc.redraw() 
                     else:
                         aw.qmc.timealign(redraw=True,recompute=True)
                 except Exception:
