@@ -7237,7 +7237,7 @@ class tgraphcanvas(FigureCanvas):
 
                 if self.timeindexB[2] > 0 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[2]]:
                     postFCs = True
-                    dtr = aw.float2float(100 * (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]]) / (self.timeB[self.timeindexB[2]] - self.timeB[self.timeindexB[0]]),1)
+                    dtr = aw.float2float(100 * (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]]) / (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]]),1)
                 else:
                     postFCs = False
                     dtr = 0
@@ -7291,7 +7291,7 @@ class tgraphcanvas(FigureCanvas):
 
                 if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] > self.timex[self.timeindex[2]]:
                     postFCs = True
-                    dtr = aw.float2float(100 * (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]]) / (self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]]),1)
+                    dtr = aw.float2float(100 * (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]]) / (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]]),1)
                 else:
                     postFCs = False
                     dtr = 0
