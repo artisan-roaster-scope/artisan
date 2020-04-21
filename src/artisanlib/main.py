@@ -7388,7 +7388,7 @@ class tgraphcanvas(FigureCanvas):
                
             # make all the remaining substitutions
             for i in range(len(fields)):
-                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
+                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9.]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
                 matched = pattern.match(eventanno)
                 if matched != None:
 
@@ -7397,9 +7397,9 @@ class tgraphcanvas(FigureCanvas):
                     # do simple math if an operator is in the string
                     if matched.group('mathop') != None:
                         replacestring += matched.group('mathop')
-                        replacestring = str(eval(replacestring))
+                        replacestring = str(aw.float2float(eval(replacestring),1))
 
-                    pattern = re.compile(fr"{self.fieldDelim}{fields[i][0]}([/*+-][0-9]+)?")
+                    pattern = re.compile(fr"{self.fieldDelim}{fields[i][0]}([/*+-][0-9.]+)?")
                     eventanno = pattern.sub(replacestring,eventanno)
 
         except Exception as ex:
@@ -41441,11 +41441,11 @@ class EventsDlg(ArtisanResizeablDialog):
 
         Epreview1Label = QLabel()
         Epreview1Label.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
-        Epreview1Label.setText(u(QApplication.translate("Label", "Preview before FCs",None)))
+        Epreview1Label.setText(u(QApplication.translate("Label", "Example before FCs",None)))
         Epreview1Label.setFont(titlefont)
         Epreview2Label = QLabel()
         Epreview2Label.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
-        Epreview2Label.setText(u(QApplication.translate("Label", "Preview after FCs",None)))
+        Epreview2Label.setText(u(QApplication.translate("Label", "Example after FCs",None)))
         Epreview2Label.setFont(titlefont)
 
         self.E1AnnoVisibility = QCheckBox(aw.qmc.etypesf(0))
