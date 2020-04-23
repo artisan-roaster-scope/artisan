@@ -32,7 +32,7 @@ class QtSingleApplication(QApplication):
             # Yes, there is.
             self._outStream = QTextStream(self._outSocket)
             self._outStream.setCodec('UTF-8')
-            # Is there another viewer runnging?
+            # Is there another viewer running?
             self._outSocketViewer = QLocalSocket()
             self._outSocketViewer.connectToServer(self._viewer_id)
             self._isRunningViewer = self._outSocketViewer.waitForConnected(-1)
