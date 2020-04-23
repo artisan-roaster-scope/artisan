@@ -41705,7 +41705,7 @@ class roastCompareDlg(ArtisanDialog):
             min_timex = None
             max_timex = None
             for p in self.profiles:
-                if p.visible:
+                if p.visible and p.aligned:
                     if min_timex is None:
                         min_timex = p.min_time
                     else:
