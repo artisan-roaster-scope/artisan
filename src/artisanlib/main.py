@@ -41585,7 +41585,10 @@ class roastCompareDlg(ArtisanDialog):
     
     @pyqtSlot(int)
     def tableSectionClicked(self,i):
-        QDesktopServices.openUrl(QUrl("file://" + self.profiles[i].filepath))
+        if platf == 'Windows':
+            QDesktopServices.openUrl(QUrl("file:///" + self.profiles[i].filepath))
+        else:
+            QDesktopServices.openUrl(QUrl("file://" + self.profiles[i].filepath))
 
     @pyqtSlot()
     def deleteSelected(self):
