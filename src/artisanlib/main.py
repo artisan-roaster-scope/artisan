@@ -32861,7 +32861,7 @@ class ApplicationWindow(QMainWindow):
                 if foreground is not None and foreground.strip() != "":
                     filenames.append(foreground)
                 if len(filenames) == 0:
-                    filenames = self.ArtisanOpenFilesDialog(ext="*.alog")
+                    filenames = aw.reportFiles()
                 if filenames and len(filenames) > 0:
                     self.deleteBackground()
                     self.comparator = roastCompareDlg(self,foreground,background)
@@ -32962,6 +32962,9 @@ class RoastProfile():
         self.l_events2 = None
         self.l_events3 = None
         self.l_events4 = None
+        # delta clipping paths
+        self.l_delta1_clipping = None
+        self.l_delta2_clipping = None
         #
         # fill profile data:
         if "roastUUID" in profile:
@@ -33197,6 +33200,11 @@ class RoastProfile():
         for l in [self.l_delta1,self.l_delta2]:
             if l is not None:
                 l.set_transform(self.getDeltaTrans())
+        # update RoR clippings
+        self.l_delta1_clipping.set_transform(self.getDeltaTrans())
+        self.l_delta1.set_clip_path(self.l_delta1_clipping)
+        self.l_delta2_clipping.set_transform(self.getDeltaTrans())
+        self.l_delta2.set_clip_path(self.l_delta2_clipping)
 
     def getTempTrans(self):
         return transforms.Affine2D().translate(-self.timeoffset,0) + aw.qmc.ax.transData
@@ -33254,22 +33262,28 @@ class RoastProfile():
 
     def drawDeltaBT(self):
         if self.timex is not None and self.delta2 is not None:
+            # we clip the RoR such that values below 0 are not displayed
+            self.l_delta2_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaBT, transform=self.getDeltaTrans())
             self.l_delta2, = aw.qmc.ax.plot(self.timex, self.delta2,transform=self.getDeltaTrans(),markersize=aw.qmc.BTdeltamarkersize,marker=aw.qmc.BTdeltamarker,visible=(self.visible and self.aligned),
                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=aw.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=aw.qmc.palette["background"])],
                 linewidth=aw.qmc.BTdeltalinewidth,linestyle=aw.qmc.BTdeltalinestyle,drawstyle=aw.qmc.BTdeltadrawstyle,
                 alpha=(self.alpha[2] if self.active else self.alpha[2]*self.alpha_dim_factor),
+                clip_path=self.l_delta2_clipping,clip_on=True,
                 color=(self.color if self.active else self.gray),
                 label="{} {}".format(self.label,aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None))))
 
     def drawDeltaET(self):
         if self.timex is not None and self.delta1 is not None:
+            # we clip the RoR such that values below 0 are not displayed
+            self.l_delta1_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaET, transform=self.getDeltaTrans())
             self.l_delta1, = aw.qmc.ax.plot(self.timex, self.delta1,transform=self.getDeltaTrans(),markersize=aw.qmc.ETdeltamarkersize,marker=aw.qmc.ETdeltamarker,visible=(self.visible and self.aligned),
                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=aw.qmc.ETdeltalinewidth+aw.qmc.patheffects,foreground=aw.qmc.palette["background"])],
                 linewidth=aw.qmc.ETdeltalinewidth,linestyle=aw.qmc.ETdeltalinestyle,drawstyle=aw.qmc.ETdeltadrawstyle,
                 alpha=(self.alpha[3] if self.active else self.alpha[3]*self.alpha_dim_factor),
+                clip_path=self.l_delta1_clipping,clip_on=True,
                 color=(self.color if self.active else self.gray),
                 label="{} {}".format(self.label,aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "ET", None))))
-    
+
     def drawMainEvents1(self):
         if self.events_timex is not None and self.events1 is not None:
             self.l_mainEvents1, = aw.qmc.ax.plot(self.events_timex,self.events1,transform=self.getTempTrans(),
@@ -41398,13 +41412,17 @@ class roastCompareDlg(ArtisanDialog):
         c = QColor.fromRgbF(*profile.color)
         color = QTableWidgetItem()
         color.setBackground(c)
-#        color.setFlags(Qt.NoItemFlags)  # do not change background color on row selection of the color items
         color.setFlags(Qt.ItemIsEnabled) # do not change background color on row selection of the color items
         self.profileTable.setItem(i,0,color)
         flag = QCheckBox()
         flag.setChecked(profile.visible)
         flag.stateChanged.connect(self.visibilityChanged)
-        self.profileTable.setCellWidget(i,1,flag)
+        flagWidget = QWidget()
+        flagLayout = QHBoxLayout(flagWidget)
+        flagLayout.addWidget(flag)
+        flagLayout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
+        flagLayout.setContentsMargins(0,0,0,0)
+        self.profileTable.setCellWidget(i,1,flagWidget)
         self.profileTable.setItem(i,2,QTableWidgetItem(profile.title))
         header = QTableWidgetItem(profile.label)
         self.profileTable.setVerticalHeaderItem(i,header)
@@ -41420,7 +41438,12 @@ class roastCompareDlg(ArtisanDialog):
             self.profileTable.setSelectionMode(QTableWidget.MultiSelection)
             self.profileTable.setShowGrid(False)
             self.profileTable.verticalHeader().setSectionResizeMode(2)
-            self.profileTable.horizontalHeader().setVisible(False)
+#            self.profileTable.horizontalHeader().setVisible(False)
+            self.profileTable.setHorizontalHeaderLabels(["",
+                                                         QApplication.translate("Label","ON",None),
+                                                         QApplication.translate("Label","Title",None)])
+            self.profileTable.horizontalHeader().sectionClicked.connect(self.columnHeaderClicked)
+            self.profileTable.setCornerButtonEnabled(True) # click in the left header corner selects all entries in the table
             self.profileTable.setSortingEnabled(False)
             
             self.profileTable.verticalHeader().setSectionsMovable(True)
@@ -41433,8 +41456,8 @@ class roastCompareDlg(ArtisanDialog):
             
             header = self.profileTable.horizontalHeader()
             header.setStretchLastSection(True)
-            header.setMinimumSectionSize(8)       # color column size
-            self.profileTable.setColumnWidth(0,8) # color column size
+            header.setMinimumSectionSize(10)       # color column size
+            self.profileTable.setColumnWidth(0,10) # color column size
             header.setSectionResizeMode(0, QHeaderView.Fixed)
             header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
             header.setSectionResizeMode(2, QHeaderView.Stretch)
@@ -41448,6 +41471,33 @@ class roastCompareDlg(ArtisanDialog):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createProfileTable() {0}").format(str(ex)),exc_tb.tb_lineno)
     
     ### SLOTS
+    
+    @pyqtSlot(int)
+    def columnHeaderClicked(self,i):
+        if i == 1: # flag header clicked
+            if all(p.visible for p in self.profiles):
+                new_state = False
+            else:
+                new_state = True
+            for r in range(self.profileTable.rowCount()):
+                layout = self.profileTable.cellWidget(r,1).layout()
+                flag = layout.itemAt(0).widget()
+                flag.blockSignals(True)
+                flag.setChecked(new_state)
+                flag.blockSignals(False)
+                self.profiles[r].setVisible(new_state)
+            # update chart
+            self.updateDeltaLimits()
+            self.autoTimeLimits()
+            self.repaint()
+        elif i == 2: # title header clicked
+            selected = self.profileTable.selectedRanges()
+            if selected and len(selected) > 0:
+                # disable selection
+                self.profileTable.clearSelection()
+            else:
+                # select all
+                self.profileTable.selectAll()
     
     @pyqtSlot(int,int,int)
     def sectionMoved(self,logicalIndex, oldVisualIndex, newVisualIndex):
@@ -41515,7 +41565,7 @@ class roastCompareDlg(ArtisanDialog):
     
     @pyqtSlot(bool)
     def add(self,_=False):
-        filenames = aw.ArtisanOpenFilesDialog(ext="*.alog")
+        filenames = aw.reportFiles()
         if filenames:
             self.addProfiles(filenames)
             
