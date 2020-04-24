@@ -1843,7 +1843,8 @@ class tgraphcanvas(FigureCanvas):
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
         self.locktimex = False # if true, do not set time axis min and max from profile on load
         self.autotimex = True # automatically set time axis min and max from profile CHARGE/DROP on load
-        self.autodeltax = True # automatically set the delta axis max (and min to 0)
+        self.autodeltaxET = False # automatically set the delta axis max to the max(DeltaET)
+        self.autodeltaxBT = True # automatically set the delta axis max to the max(DeltaBT)
         self.locktimex_start = self.startofx_default # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
         self.locktimex_end = self.endofx_default # seconds of x-axis max as locked by locktimex (needs to be interpreted wrt. CHARGE index)
         self.xgrid = 120   #initial time separation; 60 = 1 minute
@@ -17567,7 +17568,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.endofx = t_max - aw.qmc.timeB[aw.qmc.timeindexB[0]]
                 else:
                     aw.qmc.endofx = t_max
-            if aw.qmc.autodeltax and deltas:
+            if (aw.qmc.autodeltaxET or aw.qmc.autodeltaxBT) and deltas:
                 # auto delta adjust
                 if background:
                     dmax = aw.calcAutoDeltaAxisBackground()
@@ -17632,9 +17633,9 @@ class ApplicationWindow(QMainWindow):
             end = timeindex[6]
         try:
             visible_readings = []
-            if d1flag:
+            if d1flag and self.qmc.autodeltaxET:
                 visible_readings.extend(d1[start:end])
-            if d2flag:
+            if d2flag and self.qmc.autodeltaxBT:
                 visible_readings.extend(d2[start:end])
             return max(filter(None,visible_readings))
         except:
@@ -25741,8 +25742,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.locktimex = bool(toBool(settings.value("locktimex",self.qmc.locktimex)))
             if settings.contains("autotimex"):
                 self.qmc.autotimex = bool(toBool(settings.value("autotimex",self.qmc.autotimex)))
-            if settings.contains("autodeltax"):
-                self.qmc.autodeltax = bool(toBool(settings.value("autodeltax",self.qmc.autodeltax)))
+            if settings.contains("autodeltaxET"):
+                self.qmc.autodeltaxET = bool(toBool(settings.value("autodeltaxET",self.qmc.autodeltaxET)))
+            if settings.contains("autodeltaxBT"):
+                self.qmc.autodeltaxBT = bool(toBool(settings.value("autodeltaxBT",self.qmc.autodeltaxBT)))
             if settings.contains("locktimex_start"):
                 self.qmc.locktimex_start = toInt(settings.value("locktimex_start",self.qmc.locktimex_start))
             if settings.contains("locktimex_end"):
@@ -27037,7 +27040,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("lockmax",self.qmc.fixmaxtime)
             settings.setValue("locktimex",self.qmc.locktimex)
             settings.setValue("autotimex",self.qmc.autotimex)
-            settings.setValue("autodeltax",self.qmc.autodeltax)
+            settings.setValue("autodeltaxET",self.qmc.autodeltaxET)
+            settings.setValue("autodeltaxBT",self.qmc.autodeltaxBT)
             settings.setValue("locktimex_start",self.qmc.locktimex_start)
             settings.setValue("locktimex_end",self.qmc.locktimex_end)
             settings.setValue("legendloc",self.qmc.legendloc)
@@ -32967,9 +32971,9 @@ class RoastProfile():
         self.l_events2 = None
         self.l_events3 = None
         self.l_events4 = None
-        # delta clipping paths
-        self.l_delta1_clipping = None
-        self.l_delta2_clipping = None
+#        # delta clipping paths
+#        self.l_delta1_clipping = None
+#        self.l_delta2_clipping = None
         #
         # fill profile data:
         if "roastUUID" in profile:
@@ -33205,11 +33209,11 @@ class RoastProfile():
         for l in [self.l_delta1,self.l_delta2]:
             if l is not None:
                 l.set_transform(self.getDeltaTrans())
-        # update RoR clippings
-        self.l_delta1_clipping.set_transform(self.getDeltaTrans())
-        self.l_delta1.set_clip_path(self.l_delta1_clipping)
-        self.l_delta2_clipping.set_transform(self.getDeltaTrans())
-        self.l_delta2.set_clip_path(self.l_delta2_clipping)
+#        # update RoR clippings
+#        self.l_delta1_clipping.set_transform(self.getDeltaTrans())
+#        self.l_delta1.set_clip_path(self.l_delta1_clipping)
+#        self.l_delta2_clipping.set_transform(self.getDeltaTrans())
+#        self.l_delta2.set_clip_path(self.l_delta2_clipping)
 
     def getTempTrans(self):
         return transforms.Affine2D().translate(-self.timeoffset,0) + aw.qmc.ax.transData
@@ -33268,24 +33272,24 @@ class RoastProfile():
     def drawDeltaBT(self):
         if self.timex is not None and self.delta2 is not None:
             # we clip the RoR such that values below 0 are not displayed
-            self.l_delta2_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaBT, transform=self.getDeltaTrans())
+#            self.l_delta2_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaBT, transform=self.getDeltaTrans())
             self.l_delta2, = aw.qmc.ax.plot(self.timex, self.delta2,transform=self.getDeltaTrans(),markersize=aw.qmc.BTdeltamarkersize,marker=aw.qmc.BTdeltamarker,visible=(self.visible and self.aligned),
                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=aw.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=aw.qmc.palette["background"])],
                 linewidth=aw.qmc.BTdeltalinewidth,linestyle=aw.qmc.BTdeltalinestyle,drawstyle=aw.qmc.BTdeltadrawstyle,
                 alpha=(self.alpha[2] if self.active else self.alpha[2]*self.alpha_dim_factor),
-                clip_path=self.l_delta2_clipping,clip_on=True,
+#                clip_path=self.l_delta2_clipping,clip_on=True,
                 color=(self.color if self.active else self.gray),
                 label="{} {}".format(self.label,aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None))))
 
     def drawDeltaET(self):
         if self.timex is not None and self.delta1 is not None:
             # we clip the RoR such that values below 0 are not displayed
-            self.l_delta1_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaET, transform=self.getDeltaTrans())
+#            self.l_delta1_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaET, transform=self.getDeltaTrans())
             self.l_delta1, = aw.qmc.ax.plot(self.timex, self.delta1,transform=self.getDeltaTrans(),markersize=aw.qmc.ETdeltamarkersize,marker=aw.qmc.ETdeltamarker,visible=(self.visible and self.aligned),
                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=aw.qmc.ETdeltalinewidth+aw.qmc.patheffects,foreground=aw.qmc.palette["background"])],
                 linewidth=aw.qmc.ETdeltalinewidth,linestyle=aw.qmc.ETdeltalinestyle,drawstyle=aw.qmc.ETdeltadrawstyle,
                 alpha=(self.alpha[3] if self.active else self.alpha[3]*self.alpha_dim_factor),
-                clip_path=self.l_delta1_clipping,clip_on=True,
+#                clip_path=self.l_delta1_clipping,clip_on=True,
                 color=(self.color if self.active else self.gray),
                 label="{} {}".format(self.label,aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "ET", None))))
 
@@ -40347,10 +40351,13 @@ class WindowsDlg(ArtisanDialog):
         self.zgridSpinBox.valueChanged.connect(self.changezgrid)
         self.zgridSpinBox.setMaximumWidth(60)
         
-        self.autodeltaxFlag = QCheckBox(QApplication.translate("CheckBox", "Auto",None))
-        self.autodeltaxFlag.setChecked(aw.qmc.autodeltax)
-        self.autodeltaxFlag.stateChanged.connect(self.autoDeltaxFlagChanged)
-        self.autodeltaxFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from profiles and the min to 0", None))
+        self.autodeltaxLabel = QLabel(QApplication.translate("CheckBox", "Auto",None))
+        self.autodeltaxETFlag = QCheckBox(deltaLabelUTF8 + QApplication.translate("CheckBox", "ET",None))
+        self.autodeltaxETFlag.setChecked(aw.qmc.autodeltaxET)
+        self.autodeltaxBTFlag = QCheckBox(deltaLabelUTF8 + QApplication.translate("CheckBox", "BT",None))
+        self.autodeltaxBTFlag.setChecked(aw.qmc.autodeltaxBT)
+        self.autodeltaxETFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaET", None))
+        self.autodeltaxBTFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaBT", None))
         autoDeltaButton = QPushButton(QApplication.translate("Button","Calc",None))
         autoDeltaButton.setFocusPolicy(Qt.NoFocus)
         autoDeltaButton.clicked.connect(self.autoDeltaAxis)
@@ -40451,7 +40458,12 @@ class WindowsDlg(ArtisanDialog):
         ylayoutVbox.addLayout(steplayoutHbox)
         ylayoutVbox.addStretch()
         zlayout1 = QHBoxLayout()
-        zlayout1.addWidget(self.autodeltaxFlag)
+        zlayout1.addWidget(self.autodeltaxLabel)
+        zlayout1.addSpacing(5)
+        zlayout1.addWidget(self.autodeltaxETFlag)
+        zlayout1.addSpacing(5)
+        zlayout1.addWidget(self.autodeltaxBTFlag)
+        zlayout1.addSpacing(5)
         zlayout1.addWidget(autoDeltaButton)
         zlayout1.addStretch()
         zlayout = QGridLayout()
@@ -40571,13 +40583,12 @@ class WindowsDlg(ArtisanDialog):
         self.xlimitEdit_min.repaint()
         self.xlimitEdit.repaint()
     
-    @pyqtSlot(int)
-    def autoDeltaxFlagChanged(self,n):
-        if n:
-            self.autoDeltaAxis()
-    
     @pyqtSlot(bool)
     def autoDeltaAxis(self,_=False):
+        autodeltaxET_org = aw.qmc.autodeltaxET
+        autodeltaxBT_org = aw.qmc.autodeltaxBT
+        aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
+        aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
         if aw.qmc.backgroundpath and not aw.curFile:
             dmax = aw.calcAutoDeltaAxisBackground()
         else:
@@ -40585,11 +40596,11 @@ class WindowsDlg(ArtisanDialog):
             if aw.qmc.backgroundpath:
                 dmax_b = aw.calcAutoDeltaAxisBackground()
                 dmax = max(dmax,dmax_b)
-        self.zlimitEdit_min.setText("0")
-        self.zlimitEdit_min.repaint()
         if dmax > 0:
             self.zlimitEdit.setText(str(int(dmax) + 1))
             self.zlimitEdit.repaint()
+        aw.qmc.autodeltaxET = autodeltaxET_org
+        aw.qmc.autodeltaxBT = autodeltaxBT_org
     
     def changexrotation(self):
         aw.qmc.xrotation = self.xrotationSpinBox.value()
@@ -40727,7 +40738,8 @@ class WindowsDlg(ArtisanDialog):
         aw.qmc.fixmaxtime = not self.fixmaxtimeFlag.isChecked()
         aw.qmc.locktimex = self.locktimexFlag.isChecked()
         aw.qmc.autotimex = self.autotimexFlag.isChecked()
-        aw.qmc.autodeltax = self.autodeltaxFlag.isChecked()
+        aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
+        aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
         aw.qmc.redraw(recomputeAllDeltas=False)
         string = QApplication.translate("Message","xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})",None).format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))                                   
         aw.sendmessage(string)
@@ -41593,13 +41605,13 @@ class roastCompareDlg(ArtisanDialog):
 
     def updateDeltaLimits(self):
         # update delta max limit in auto mode
-        if aw.qmc.autodeltax:
+        if (aw.qmc.autodeltaxET or aw.qmc.autodeltaxBT):
             dmax = 1
             for rp in self.profiles:
                 if rp.visible and rp.aligned:
-                    if (self.cb.itemCheckState(2) == Qt.Checked): # DeltaET
+                    if (aw.qmc.autodeltaxET and self.cb.itemCheckState(2) == Qt.Checked): # DeltaET
                         dmax = max(dmax,rp.max_DeltaET)
-                    if (self.cb.itemCheckState(3) == Qt.Checked): # DeltaBT
+                    if (aw.qmc.autodeltaxBT and self.cb.itemCheckState(3) == Qt.Checked): # DeltaBT
                         dmax = max(dmax,rp.max_DeltaBT)
             aw.qmc.delta_ax.set_ylim(top=dmax) # we only autoadjust the upper limit
     
