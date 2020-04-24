@@ -1317,7 +1317,7 @@ class tgraphcanvas(FigureCanvas):
         self.compareBT = True
         self.compareDeltaET = False
         self.compareDeltaBT = True
-        self.compareMainEvents = False
+        self.compareMainEvents = True
         
         self.replayType = 0 # 0: by time, 1: by BT, 2: by ET
         self.replayedBackgroundEvents = [] # set of BackgroundEvent indicies that have already been replayed (cleared in ClearMeasurements)
@@ -17622,7 +17622,7 @@ class ApplicationWindow(QMainWindow):
         else:
             return aw.qmc.startofx, aw.qmc.endofx
     
-    def calcAutoDelta(self,d1,d2,timeindex):
+    def calcAutoDelta(self,d1,d2,timeindex,d1flag,d2flag):
         # returns the max ET/BT RoR between CHARGE and DROP
         start = 0
         end = min(len(d1),len(d2)) - 1
@@ -17631,20 +17631,25 @@ class ApplicationWindow(QMainWindow):
         if timeindex[6] > 0:
             end = timeindex[6]
         try:
-            return max(filter(None,d1[start:end]+d2[start:end]))
+            visible_readings = []
+            if d1flag:
+                visible_readings.extend(d1[start:end])
+            if d2flag:
+                visible_readings.extend(d2[start:end])
+            return max(filter(None,visible_readings))
         except:
             # if filtered list is empty, max fails and we return 0
             return 0
     
     def calcAutoDeltaAxis(self):
         if len(aw.qmc.delta1) > 3 or len(aw.qmc.delta2) > 3:
-            return self.calcAutoDelta(aw.qmc.delta1,aw.qmc.delta2,aw.qmc.timeindex)
+            return self.calcAutoDelta(self.qmc.delta1,self.qmc.delta2,self.qmc.timeindex,self.qmc.DeltaETflag,self.qmc.DeltaBTflag)
         else:
             return 0
     
     def calcAutoDeltaAxisBackground(self):
         if len(aw.qmc.delta1B) > 3 or len(aw.qmc.delta2B) > 3:
-            return self.calcAutoDelta(aw.qmc.delta1B,aw.qmc.delta2B,aw.qmc.timeindexB)
+            return self.calcAutoDelta(self.qmc.delta1B,aw.qmc.delta2B,self.qmc.timeindexB,self.qmc.DeltaETBflag,self.qmc.DeltaBTBflag)
         else:
             return 0
     
@@ -41073,6 +41078,12 @@ class CompareTableWidget(QTableWidget):
 class roastCompareDlg(ArtisanDialog):
     def __init__(self, parent = None, foreground = None, background = None):
         super(roastCompareDlg,self).__init__(parent)
+        
+        if platf == 'Windows':
+            windowFlags = self.windowFlags()
+            windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
+            self.setWindowFlags(windowFlags)
+        
         self.foreground = foreground
         self.background = background
         self.setWindowTitle(QApplication.translate("Form Caption","Comparator",None))
@@ -41146,16 +41157,21 @@ class roastCompareDlg(ArtisanDialog):
         settings1Layout = QHBoxLayout()
         settings1Layout.addStretch()
         settings1Layout.addWidget(alignLabel)
+        settings1Layout.addSpacing(5)
         settings1Layout.addWidget(self.alignComboBox)
         settings1Layout.addStretch()
+#        settings1Layout.setContentsMargins(1, 2, 1, 1) # left, top, right, bottom
         
         settings2Layout = QHBoxLayout()
         settings2Layout.addWidget(self.cb)
+        settings1Layout.addSpacing(2)
         settings2Layout.addWidget(self.eventsComboBox)
+#        settings2Layout.setContentsMargins(1, 1, 1, 2) # left, top, right, bottom
         
         settingsLayout = QVBoxLayout()
         settingsLayout.addLayout(settings2Layout)
         settingsLayout.addLayout(settings1Layout)
+#        settingsLayout.setContentsMargins(0, 2, 0, 0) # left, top, right, bottom
         
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -41163,7 +41179,7 @@ class roastCompareDlg(ArtisanDialog):
         buttonLayout.addSpacing(10)
         buttonLayout.addWidget(self.deleteButton)
         buttonLayout.addStretch()
-        buttonLayout.setContentsMargins(0, 0, 0, 0)
+#        buttonLayout.setContentsMargins(0, 2, 2, 0)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(settingsLayout)
         mainLayout.addWidget(self.profileTable)
