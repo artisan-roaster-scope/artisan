@@ -17633,9 +17633,9 @@ class ApplicationWindow(QMainWindow):
             end = timeindex[6]
         try:
             visible_readings = []
-            if d1flag and self.qmc.autodeltaxET:
+            if (d1flag and self.qmc.autodeltaxET) or (d1flag and not d2flag and self.qmc.autodeltaxBT):
                 visible_readings.extend(d1[start:end])
-            if d2flag and self.qmc.autodeltaxBT:
+            if (d2flag and self.qmc.autodeltaxBT) or (d2flag and not d1flag and self.qmc.autodeltaxET):
                 visible_readings.extend(d2[start:end])
             return max(filter(None,visible_readings))
         except:
@@ -41609,9 +41609,11 @@ class roastCompareDlg(ArtisanDialog):
             dmax = 1
             for rp in self.profiles:
                 if rp.visible and rp.aligned:
-                    if (aw.qmc.autodeltaxET and self.cb.itemCheckState(2) == Qt.Checked): # DeltaET
+                    if (self.cb.itemCheckState(2) == Qt.Checked and aw.qmc.autodeltaxET) or \
+                        (self.cb.itemCheckState(2) == Qt.Checked and self.cb.itemCheckState(3) != Qt.Checked and aw.qmc.autodeltaxBT): # DeltaET
                         dmax = max(dmax,rp.max_DeltaET)
-                    if (aw.qmc.autodeltaxBT and self.cb.itemCheckState(3) == Qt.Checked): # DeltaBT
+                    if (self.cb.itemCheckState(3) == Qt.Checked and aw.qmc.autodeltaxBT) or \
+                        (self.cb.itemCheckState(3) == Qt.Checked and self.cb.itemCheckState(2) != Qt.Checked and aw.qmc.autodeltaxET) : # DeltaBT
                         dmax = max(dmax,rp.max_DeltaBT)
             aw.qmc.delta_ax.set_ylim(top=dmax) # we only autoadjust the upper limit
     
