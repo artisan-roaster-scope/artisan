@@ -41095,12 +41095,6 @@ class CompareTableWidget(QTableWidget):
 class roastCompareDlg(ArtisanDialog):
     def __init__(self, parent = None, foreground = None, background = None):
         super(roastCompareDlg,self).__init__(parent)
-
-# this seems not to add a minimize button to this tool window on Windows      
-#        if platf == 'Windows':
-#            windowFlags = self.windowFlags()
-#            windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
-#            self.setWindowFlags(windowFlags)
         
         self.foreground = foreground
         self.background = background
