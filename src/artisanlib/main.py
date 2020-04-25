@@ -7542,6 +7542,8 @@ class tgraphcanvas(FigureCanvas):
             ll_corner_axes = self.ax.transData.inverted().transform_point((corner_pixels[0],corner_pixels[1]))
             ur_corner_axes = self.ax.transData.inverted().transform_point((corner_pixels[2],corner_pixels[3]))
             extent = [ll_corner_axes[0], ur_corner_axes[0], ll_corner_axes[1], ur_corner_axes[1]]
+            if self.ai is not None:
+                self.ai.remove()
             self.ai = self.ax.imshow(self.logoimg, zorder=0, extent=extent, alpha=aw.logoimgalpha/10, aspect='auto', resample=False)
             
         except Exception as ex:
@@ -17633,11 +17635,14 @@ class ApplicationWindow(QMainWindow):
             end = timeindex[6]
         try:
             visible_readings = []
-            if (d1flag and self.qmc.autodeltaxET) or (d1flag and not d2flag and self.qmc.autodeltaxBT):
+            if d1flag and self.qmc.autodeltaxET:
                 visible_readings.extend(d1[start:end])
-            if (d2flag and self.qmc.autodeltaxBT) or (d2flag and not d1flag and self.qmc.autodeltaxET):
+            if d2flag and self.qmc.autodeltaxBT:
                 visible_readings.extend(d2[start:end])
-            return max(filter(None,visible_readings))
+            if len(visible_readings) > 0:
+                return max(filter(None,visible_readings))
+            else:
+                return 0
         except:
             # if filtered list is empty, max fails and we return 0
             return 0
@@ -41090,11 +41095,12 @@ class CompareTableWidget(QTableWidget):
 class roastCompareDlg(ArtisanDialog):
     def __init__(self, parent = None, foreground = None, background = None):
         super(roastCompareDlg,self).__init__(parent)
-        
-        if platf == 'Windows':
-            windowFlags = self.windowFlags()
-            windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
-            self.setWindowFlags(windowFlags)
+
+# this seems not to add a minimize button to this tool window on Windows      
+#        if platf == 'Windows':
+#            windowFlags = self.windowFlags()
+#            windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
+#            self.setWindowFlags(windowFlags)
         
         self.foreground = foreground
         self.background = background
@@ -41199,12 +41205,14 @@ class roastCompareDlg(ArtisanDialog):
         mainLayout.setSpacing(0)
         mainLayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(mainLayout)
+        
         windowFlags = self.windowFlags()
         windowFlags |= Qt.Tool
+        if platf == 'Windows':
+            windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
         self.setWindowFlags(windowFlags)
-        self.clearCanvas()
-        self.drawAlignmentLine()
-        self.drawLegend()
+        
+        self.redraw()
         
         self.button_7_org_state_hidden = aw.button_7.isHidden() # RESET
         self.button_1_org_state_hidden = aw.button_1.isHidden() # ON/OFF
@@ -41418,6 +41426,7 @@ class roastCompareDlg(ArtisanDialog):
     
     def repaint(self):
         self.drawLegend()
+        aw.qmc.placelogoimage()
         aw.qmc.fig.canvas.draw()
         
     def redraw(self):
@@ -41429,8 +41438,6 @@ class roastCompareDlg(ArtisanDialog):
             rp.updateAlpha()
         self.realign()
         self.updateZorders()
-        self.drawLegend()
-        aw.qmc.placelogoimage()
         self.repaint()
     
     ### Table
@@ -41585,10 +41592,7 @@ class roastCompareDlg(ArtisanDialog):
     
     @pyqtSlot(int)
     def tableSectionClicked(self,i):
-        if platf == 'Windows':
-            QDesktopServices.openUrl(QUrl("file:///" + self.profiles[i].filepath))
-        else:
-            QDesktopServices.openUrl(QUrl("file://" + self.profiles[i].filepath))
+        QDesktopServices.openUrl(QUrl.fromLocalFile(self.profiles[i].filepath))
 
     @pyqtSlot()
     def deleteSelected(self):
@@ -41609,7 +41613,7 @@ class roastCompareDlg(ArtisanDialog):
     def updateDeltaLimits(self):
         # update delta max limit in auto mode
         if (aw.qmc.autodeltaxET or aw.qmc.autodeltaxBT):
-            dmax = 1
+            dmax = 0
             for rp in self.profiles:
                 if rp.visible and rp.aligned:
                     if (self.cb.itemCheckState(2) == Qt.Checked and aw.qmc.autodeltaxET) or \
@@ -41618,7 +41622,8 @@ class roastCompareDlg(ArtisanDialog):
                     if (self.cb.itemCheckState(3) == Qt.Checked and aw.qmc.autodeltaxBT) or \
                         (self.cb.itemCheckState(3) == Qt.Checked and self.cb.itemCheckState(2) != Qt.Checked and aw.qmc.autodeltaxET) : # DeltaBT
                         dmax = max(dmax,rp.max_DeltaBT)
-            aw.qmc.delta_ax.set_ylim(top=dmax) # we only autoadjust the upper limit
+            if dmax > 0:
+                aw.qmc.delta_ax.set_ylim(top=dmax) # we only autoadjust the upper limit
     
     def recompute(self):
         for rp in self.profiles:
