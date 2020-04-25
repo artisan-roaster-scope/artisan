@@ -20444,7 +20444,7 @@ class ApplicationWindow(QMainWindow):
                 # we just fire the action
                 cmd = u(self.extraeventsactionstrings[ee])
                 cmd = cmd.format(*(tuple([cmdvalue]*cmd.count("{}"))))
-#                self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
+                self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
                 if self.qmc.flagstart:
                     self.qmc.EventRecord(extraevent = ee)
@@ -20462,7 +20462,7 @@ class ApplicationWindow(QMainWindow):
 
                 # limit value w.r.t. the event slider min/max specification
                 new_value = min(aw.eventslidermax[etype],max(aw.eventslidermin[etype],new_value))
-                    
+                
                 # the new_value is combined with the event factor and offset as specified in the slider definition
                 actionvalue = (self.eventsliderfactors[etype] * new_value) + self.eventslideroffsets[etype]
                 if self.extraeventsactions[ee] != 14: # only for VOUT Commands we keep the floats
