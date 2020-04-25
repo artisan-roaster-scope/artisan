@@ -10837,10 +10837,7 @@ class tgraphcanvas(FigureCanvas):
                 x = p(xarray[startindex:endindex])
                 pad = max(0,len(self.timex) - startindex - len(x))
                 xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
-                if False: # deltacurvep and self.delta_ax:
-                    self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
-                else:
-                    self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
+                self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 self.fig.canvas.draw()
                 return z
             except Exception:
@@ -20402,9 +20399,7 @@ class ApplicationWindow(QMainWindow):
         
     def setExtraEventButtonStyle(self, tee, style="normal"):
         button_style = self.extraEventButtonStyle(tee, style)
-        QApplication.processEvents() # without this the next call might crash
         self.buttonlist[tee].setStyleSheet(button_style)
-        QApplication.processEvents() # without this the prev call might crash
     
     @pyqtSlot(bool)
     def recordextraevent_slot(self,_):
