@@ -1844,7 +1844,7 @@ class tgraphcanvas(FigureCanvas):
         self.locktimex = False # if true, do not set time axis min and max from profile on load
         self.autotimex = True # automatically set time axis min and max from profile CHARGE/DROP on load
         self.autodeltaxET = False # automatically set the delta axis max to the max(DeltaET)
-        self.autodeltaxBT = True # automatically set the delta axis max to the max(DeltaBT)
+        self.autodeltaxBT = False # automatically set the delta axis max to the max(DeltaBT)
         self.locktimex_start = self.startofx_default # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
         self.locktimex_end = self.endofx_default # seconds of x-axis max as locked by locktimex (needs to be interpreted wrt. CHARGE index)
         self.xgrid = 120   #initial time separation; 60 = 1 minute
@@ -2787,7 +2787,7 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     dlg.dialogbuttons.accepted.disconnect()
                     dlg.dialogbuttons.rejected.disconnect()
-                    QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+                    QApplication.processEvents() # we ensure that events concerning this dialog are processed before deletion
                     try: # sip not supported on older PyQt versions (RPi!)
                         sip.delete(dlg)
                         #print(sip.isdeleted(dlg))
@@ -7261,16 +7261,6 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.patheffects:
                     rcParams['path.effects'] = []
 
-# not needed any longer and dangerous because of interaction between processEvents(), taking the lock and a redraw() call potentially triggered by resizeEvent() during the processEvents() from here
-#                # HACK
-#                # a bug in Qt/PyQt/mpl cause the canvas not to be repainted on load/switch/reset in fullscreen mode without this
-#                try:
-#                    if platf == 'Darwin' and (app.allWindows()[0].visibility() == QWindow.FullScreen or aw.full_screen_mode_active or aw.isFullScreen()):
-#                        aw.qmc.repaint()
-#                        QApplication.processEvents()
-#                except:
-#                    pass
-
             except Exception as ex:
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
@@ -8612,10 +8602,8 @@ class tgraphcanvas(FigureCanvas):
             self.block_update = False # unblock the updating of the bitblit canvas            
             aw.updateReadingsLCDsVisibility() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
-#            QApplication.processEvents()
             if not bool(aw.simulator):
                 self.StartAsyncSamplingAction()
-#            QApplication.processEvents()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -8653,7 +8641,6 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     aw.fujipid.sv = 0
             QTimer.singleShot(5,self.disconnectProbes)
-#            QApplication.processEvents()
             # reset the canvas color when it was set by an alarm but never reset
             if "canvas_alt" in aw.qmc.palette:
                 aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
@@ -8686,7 +8673,6 @@ class tgraphcanvas(FigureCanvas):
             aw.pidcontrol.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
             aw.enableEditMenus()
-#            QApplication.processEvents()
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
             if len(self.timex) > 2:
                 # we autosave after full redraw after OFF to have the optional generated PDF containing all information
@@ -8697,7 +8683,6 @@ class tgraphcanvas(FigureCanvas):
                         pass
             #appnope.nap()
             aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
-#            QApplication.processEvents()
             if recording and self.flagKeepON:
                 self.OnMonitor()
         except Exception as ex:
@@ -13516,7 +13501,6 @@ class Athreadserver(QWidget):
             sthread = SampleThread(self)
             sthread.decay_weights = None
             sthread.temp_decay_weights = None
-            #QApplication.processEvents()
 
             #connect graphics to GUI thread
             sthread.updategraphics.connect(aw.qmc.updategraphics)
@@ -26290,9 +26274,6 @@ class ApplicationWindow(QMainWindow):
                     plus.controller.start(aw)
                 except:
                     pass
-
-#            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash (especially on Mac Legacy builds)!?
-            # but with this one in place, the window size is not properly set (just the position!?)
 
         except Exception:
             res = False
@@ -42355,7 +42336,7 @@ class profileTransformatorDlg(ArtisanDialog):
             with warnings.catch_warnings():
                 warnings.filterwarnings('error')
                 try:
-                    fit = self.calcTimePolyfit()
+                    fit = self.calcTimePolyfit() # that that this fit is already applied to numpy.polyfit !!
                     for i in range(4):
                         if fit is not None and self.profileTimes[i] is not None:
                             res.append(fit(self.profileTimes[i]))
@@ -42396,7 +42377,7 @@ class profileTransformatorDlg(ArtisanDialog):
             with warnings.catch_warnings():
                 warnings.filterwarnings('error')
                 try:
-                    fit = self.calcTempPolyfit()
+                    fit = self.calcTempPolyfit() # numpy.poly1d not yet applied to this fit
                     p = numpy.poly1d(fit)
                     for i in range(5):
                         if fit is not None and self.profileTemps[i] is not None:
@@ -42544,7 +42525,7 @@ class profileTransformatorDlg(ArtisanDialog):
         if offset == 0:
             new_offset = 0
         else:
-            new_offset = fits[0](offset)
+            new_offset = numpy.poly1d(fits[0])(offset)
         for i in range(len(timex)):
             # first fit is to be applied for all readings before DRY
             j = 0
@@ -42593,7 +42574,7 @@ class profileTransformatorDlg(ArtisanDialog):
             with warnings.catch_warnings():
                 warnings.filterwarnings('error')
                 try:
-                    fit = self.calcTimePolyfit()
+                    fit = self.calcTimePolyfit() # the fit returned here is already applied to numpy.poly1d
                     if fit is not None:
                         aw.qmc.timex = [fit(tx-offset) for tx in self.org_timex]
                         if len(aw.qmc.timex) > 0 and aw.qmc.timeindex[0] != -1:
