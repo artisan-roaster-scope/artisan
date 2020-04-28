@@ -5137,6 +5137,9 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.filterDropOuts:
                 try:
                     b = self.medfilt(numpy.array(b),5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
+## scipy alternative which performs equal
+#                    from scipy.signal import medfilt as scipy_medfilt
+#                    b = scipy_medfilt(numpy.array(b),5)
                     res = b
                 except:
                     pass
@@ -7261,6 +7264,14 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.patheffects:
                     rcParams['path.effects'] = []
 
+                # HACK
+                # a bug in Qt/PyQt/mpl cause the canvas not to be repainted on load/switch/reset in fullscreen mode without this
+                try:
+                    if platf == 'Darwin' and app.allWindows()[0].visibility() == QWindow.FullScreen or aw.full_screen_mode_active or aw.isFullScreen():
+                        aw.qmc.repaint()
+                except:
+                    pass
+                    
             except Exception as ex:
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
@@ -37697,12 +37708,16 @@ class editGraphDlg(ArtisanResizeablDialog):
             pass
         if self.scale_weight is not None and tare is not None:
             v = self.scale_weight - tare # weight in g
-            if aw.qmc.weight_units.index(aw.qmc.weight[2]) in [0,1]:
+            unit = aw.qmc.weight_units.index(aw.qmc.weight[2])
+            if unit == 0: # g selected
                 # metric
                 if v > 1000:
-                    v_formatted = "{0:.2f}kg".format(v/1000)
+                    v_formatted = "{0:.0f}g".format(v)
                 else:
                     v_formatted = "{0:.1f}g".format(v)
+            elif unit == 1: # kg selected
+                # metric (always keep the accuracy to the g
+                v_formatted = "{0:.3f}kg".format(v/1000)
             # non-metric
             else:
                 v = aw.convertWeight(v,0,aw.qmc.weight_units.index(aw.qmc.weight[2]))
@@ -38396,9 +38411,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 aw.sendmessage(QApplication.translate("Message","Data table copied to clipboard",None))
         if key == 16777220 and aw.scale.device is not None and aw.scale.device != "" and aw.scale.device != "None": # ENTER key pressed and scale connected
             if self.weightinedit.hasFocus():
-                self.inWeight(overwrite=True) # we don't add to current reading but overwrite
+                self.inWeight(True,overwrite=True) # we don't add to current reading but overwrite
             elif self.weightoutedit.hasFocus():
-                self.outWeight(overwrite=True) # we don't add to current reading but overwrite
+                self.outWeight(True,overwrite=True) # we don't add to current reading but overwrite
     
     @pyqtSlot(int)       
     def tareChanged(self,i):
@@ -38601,7 +38616,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             moisture_edit.setText("%g" % aw.float2float(m))
     
     def updateWeightEdits(self,weight_edit,w):
-        weight_edit.setText("%g" % aw.float2float(w))
+        unit = aw.qmc.weight_units.index(aw.qmc.weight[2])
+        if unit == 0: # g selected
+            decimals = 1
+        elif unit == 1: # kg selected
+            decimals = 3
+        else:
+            decimals = 2
+        weight_edit.setText("%g" % aw.float2float(w,decimals))
         self.updateScaleWeightAccumulated(w)
         self.weightouteditChanged()
     
@@ -50213,7 +50235,8 @@ class serialport(object):
                             #### lock shared resources #####
                             self.Phidget1045semaphore.acquire(1)
                             if len(self.Phidget1045values) > 0:
-                                async_res = numpy.average(self.Phidget1045values)
+#                                async_res = numpy.average(self.Phidget1045values)
+                                async_res = numpy.median(self.Phidget1045values)
                                 if deviceType == DeviceID.PHIDID_1045:
                                     rate = aw.qmc.phidget1045_dataRate
                                 elif deviceType == DeviceID.PHIDID_TMP1200:
@@ -50306,7 +50329,8 @@ class serialport(object):
                 #### lock shared resources #####
                 self.Phidget1048semaphores[channel].acquire(1)
                 if len(self.Phidget1048values[channel]) > 0:
-                    res = numpy.average(self.Phidget1048values[channel])
+#                    res = numpy.average(self.Phidget1048values[channel])
+                    res = numpy.median(self.Phidget1048values[channel])
                     
 #                    data = self.Phidget1048values[channel]
 #                    data_mean, data_std = numpy.mean(data), numpy.std(data)
@@ -50592,7 +50616,8 @@ class serialport(object):
                 #### lock shared resources #####
                 self.Phidget1046semaphores[channel].acquire(1)
                 if len(self.Phidget1046values[channel]) > 0:
-                    res = numpy.average(self.Phidget1046values[channel])
+#                    res = numpy.average(self.Phidget1046values[channel])
+                    res = numpy.median(self.Phidget1046values[channel])
                     self.Phidget1046values[channel] = self.Phidget1046values[channel][-round((aw.qmc.delay/aw.qmc.phidget1046_dataRate)):] 
             except:
                 self.Phidget1046values[channel] = []
@@ -51911,7 +51936,8 @@ class serialport(object):
                     #### lock shared resources #####
                     self.PhidgetIOsemaphores[i].acquire(1)
                     if len(self.PhidgetIOvalues[i]) > 0:
-                        res = numpy.average(self.PhidgetIOvalues[i])
+#                        res = numpy.average(self.PhidgetIOvalues[i])
+                        res = numpy.median(self.PhidgetIOvalues[i])
                         self.PhidgetIOvalues[i] = self.PhidgetIOvalues[i][-round((aw.qmc.delay/aw.qmc.phidget1018_dataRates[i])):] 
                 except Exception:
                     self.PhidgetIOvalues[i] = []
@@ -52423,7 +52449,8 @@ class serialport(object):
                             #### lock shared resources #####
                             self.YOCTOsemaphores[0].acquire(1)
                             if len(self.YOCTOvalues[0]) > 0:
-                                probe1 = numpy.average(self.YOCTOvalues[0])
+#                                probe1 = numpy.average(self.YOCTOvalues[0])
+                                probe1 = numpy.median(self.YOCTOvalues[0])
                                 self.YOCTOvalues[0] = self.YOCTOvalues[0][-max(1,round((aw.qmc.delay/aw.qmc.YOCTO_dataRate))):]
                         except:
                             self.YOCTOvalues[0] = []
@@ -52457,7 +52484,8 @@ class serialport(object):
                             #### lock shared resources #####
                             self.YOCTOsemaphores[1].acquire(1)
                             if len(self.YOCTOvalues[1]) > 0:
-                                probe2 = numpy.average(self.YOCTOvalues[1])
+#                                probe2 = numpy.average(self.YOCTOvalues[1])
+                                probe2 = numpy.median(self.YOCTOvalues[1])
                                 self.YOCTOvalues[1] = self.YOCTOvalues[1][-round((aw.qmc.delay/aw.qmc.YOCTO_dataRate)):]
                         except:
                             self.YOCTOvalues[1] = []
@@ -52485,7 +52513,8 @@ class serialport(object):
                             #### lock shared resources #####
                             self.YOCTOsemaphores[0].acquire(1)
                             if len(self.YOCTOvalues[0]) > 0:
-                                probe1 = numpy.average(self.YOCTOvalues[0])
+#                                probe1 = numpy.average(self.YOCTOvalues[0])
+                                probe1 = numpy.median(self.YOCTOvalues[0])
                                 self.YOCTOvalues[0] = self.YOCTOvalues[0][-round((aw.qmc.delay/aw.qmc.YOCTO_dataRate)):]
                         except:
                             self.YOCTOvalues[0] = []
