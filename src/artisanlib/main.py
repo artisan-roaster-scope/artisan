@@ -686,6 +686,7 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 from const import UIconst
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
+from help import transposer_help
 
 # import artisan.plus module
 import plus.config
@@ -35523,8 +35524,8 @@ class HUDDlg(ArtisanDialog):
     def changeInterpolationMode(self,_=0):
         aw.qmc.resetlines()
         aw.qmc.redraw(recomputeAllDeltas=False)
-        self.interpolation()             
-                        
+        self.interpolation()
+
     @pyqtSlot(bool)
     def showSymbolicHelp(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
@@ -36052,6 +36053,43 @@ class volumeCalculatorDlg(ArtisanDialog):
 ########################################################################################
 #####################  SYMBOLIC FORMULAS HELP DLG ######################################
 ########################################################################################
+
+class HelpDlg(ArtisanDialog):
+    def __init__(self, parent = None, title = "", content = ""):
+        super(HelpDlg,self).__init__(parent)
+        self.setWindowTitle(title) 
+        self.setModal(False)
+        
+        settings = QSettings()
+        if settings.contains("HelpGeometry"):
+            self.restoreGeometry(settings.value("HelpGeometry"))
+
+        phelp = QTextEdit()
+        phelp.setHtml(content)
+        phelp.setReadOnly(True)
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        self.dialogbuttons.accepted.connect(self.close)
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(self.dialogbuttons)
+        hLayout = QVBoxLayout()
+        hLayout.addWidget(phelp)
+        hLayout.addLayout(buttonLayout)
+        self.setLayout(hLayout)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+
+    def closeEvent(self, _):
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("HelpGeometry",self.saveGeometry())
+
+########################################################################################
+#####################  SYMBOLIC FORMULAS HELP DLG ######################################
+########################################################################################
+
 class symbolicformulasHelpDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(symbolicformulasHelpDlg,self).__init__(parent)
@@ -41832,6 +41870,8 @@ class profileTransformatorDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Profile Transposer",None))
         
+        self.helpdialog = None
+        
         self.regexpercent = QRegExp(r"^$|^?[0-9]?[0-9]?(\.[0-9])?$")
         self.regextime = QRegExp(r"^$|^?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.regextemp = QRegExp(r"^$|^?[0-9]?[0-9]?[0-9]?(\.[0-9])?$")
@@ -41894,7 +41934,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
         self.dialogbuttons.button(QDialogButtonBox.Apply).clicked.connect(self.apply)
         self.dialogbuttons.button(QDialogButtonBox.Reset).clicked.connect(self.restore)
-        self.dialogbuttons.button(QDialogButtonBox.Help).clicked.connect(self.help)
+        self.dialogbuttons.button(QDialogButtonBox.Help).clicked.connect(self.openHelp)
         
         #buttons
         buttonsLayout = QHBoxLayout()
@@ -42271,8 +42311,8 @@ class profileTransformatorDlg(ArtisanDialog):
             self.temp_formula.repaint()
 
     #called from Apply button
-    @pyqtSlot()
-    def apply(self):
+    @pyqtSlot(bool)
+    def apply(self,_=False):
         applied_time = self.applyTimeTransformation()
         applied_temp = self.applyTempTransformation()
         if applied_time or applied_temp:
@@ -42292,8 +42332,8 @@ class profileTransformatorDlg(ArtisanDialog):
             self.restore()
     
     #called from Restore button
-    @pyqtSlot()
-    def restore(self):
+    @pyqtSlot(bool)
+    def restore(self,_=False):
         aw.setCurrentFile(self.org_curFile,addToRecent=False)
         aw.qmc.roastUUID = self.org_UUID
         aw.qmc.roastdate = self.org_roastdate
@@ -42311,11 +42351,6 @@ class profileTransformatorDlg(ArtisanDialog):
         aw.qmc.temp2 = self.org_temp2[:]
         aw.autoAdjustAxis()
         aw.qmc.redraw()
-
-    #called from Help button
-    @pyqtSlot()
-    def help(self):
-        pass
     
     #called from OK button
     @pyqtSlot()
@@ -42334,7 +42369,25 @@ class profileTransformatorDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("TransformatorPosition",self.geometry().topLeft())
+        self.closeHelp()
         self.reject()
+
+    @pyqtSlot(bool)
+    def openHelp(self,_=False):
+        try: # sip not supported on older PyQt versions (RPi!)
+            if self.helpdialog is None or sip.isdeleted(self.helpdialog):
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Profile Transposer Help",None),transposer_help.content())
+        except:
+            self.helpdialog = HelpDlg(self)
+        self.helpdialog.show()
+        self.helpdialog.activateWindow()
+
+    def closeHelp(self):
+        try: # sip not supported on older PyQt versions (RPi!)
+            if not (self.helpdialog is None or sip.isdeleted(self.helpdialog)):
+                self.helpdialog.close()
+        except:
+            self.helpdialog.close()
 
     def closeEvent(self, _):
         self.restoreState()
