@@ -8,7 +8,7 @@ toc: false
 
 ### Profile Analyzer
 
-*Menu>Tools>Analyze*
+*Menu>Tools>Analyzer*
 
 
 Roasters often want to analyze their roasts to measure consistency, look for aspects of the profile that can be improved, and to create metrics to score the roast against a set quality measures.  Artisan has many ways to provide information on a roast, including the Statistics Summary, Plotter and Math tabs, AUC (area under the curve), and many others.

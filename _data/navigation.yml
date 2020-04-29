@@ -127,24 +127,32 @@ docs:
         url: /docs/autosave/
       - title: "Batches"
         url: /docs/batches/
+  - title: Tools
+    children:
+      - title: "Profile Analyzer"
+        url: /docs/analyzer/
+      - title: "Roast Comparator"
+        url: /docs/comparator/
+      - title: "Profile Designer"
+        url: /docs/designer/
+      - title: "Roast Simulator"
+        url: /docs/simulator/
+      - title: "Flavor Wheel"
+        url: /docs/wheel-graph/
+      - title: "Profile Transposer"
+        url: /docs/transposer/
+      - title: "Profile Converter"
+        url: /docs/converter/
+      - title: "Calculator"
+        url: /docs/calculator/
+      - title: "Shortcuts"
+        url: /docs/shortcuts/
   - title: Views
     children:
       - title: "Controls"
         url: /docs/controls/
       - title: "LCDs"
         url: /docs/lcds/
-  - title: Tools
-    children:
-      - title: "Designer"
-        url: /docs/designer/
-      - title: "Calculator"
-        url: /docs/calculator/
-      - title: "Flavor Wheel"
-        url: /docs/wheel-graph/
-      - title: "Profile Analyzer"
-        url: /docs/analyzer/
-      - title: "Shortcuts"
-        url: /docs/shortcuts/
   - title: Reports
     children:
       - title: "Roast Reports"

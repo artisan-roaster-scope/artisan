@@ -8,7 +8,7 @@ toc: false
 
 ### Calculator
 
-Menu>Tools>Calculator
+*Menu>Tools>Calculator*
 
 You will find a few useful calculators.  Enter the variables you know, and click in the box of the variable you wish to know and the calculator will populate that value.  
 
