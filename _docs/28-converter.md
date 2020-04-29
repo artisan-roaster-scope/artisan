@@ -16,7 +16,7 @@ Sometimes you will want to convert your profiles from Fahrenheit to Celcius and 
 
 Here is the profile in Fahrenheit
 
-![Profile in F](/assets/images/gsg/(Convert to F.jpg)
+![Profile in F](/assets/images/gsg/Convert to F.jpg)
 
 And converted to Celcius
 
