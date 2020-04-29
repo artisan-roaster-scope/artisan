@@ -43,7 +43,7 @@ The two channel Yocto-4-20mA-Rx device lets you read values returned by any indu
 
 ## [Yoctopuce 0-10V-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-tx)
 
-*(support for this module is available in Artisan v2.1.3 and later)*
+*(support for this module is available in Artisan v2.4.0 and later)*
 
 The Yocto-0-10V-Tx is a USB device with two channels that can generate independent voltages between 0 and 10V, e.g. to control modulating gas valves.
 
@@ -57,7 +57,7 @@ This Yoctopuce output can be activated via `VOUT Command` actions triggered by b
 
 ## [Yoctopuce 4-20mA-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-4-20ma-tx)
 
-*(support for this module is available in Artisan v2.1.3 and later)*
+*(support for this module is available in Artisan v2.4.0 and later)*
 
 The Yocto-4-20mA-Tx is a USB 4-20mA signal generator, e.g. to control a modulating gas valve.
 
@@ -69,7 +69,7 @@ This Yoctopuce output can be activated via `VOUT Command` actions triggered by b
 
 ## [Yoctopuce PWM-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-pwm-tx)
 
-*(support for this module is available in Artisan v2.1.3 and later)*
+*(support for this module is available in Artisan v2.4.0 and later)*
 
 The Yoctopuce PWM module can be controlled via `PWM Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`).
 
@@ -92,14 +92,14 @@ with
 
 ## Yoctopuce Relays
 
-*(support for these modules is available in Artisan v2.1.3 and later)*
+*(support for these modules is available in Artisan v2.4.0 and later)*
 
 The following Yoctopuce relays can be controlled via `IO Command` actions triggered by buttons configured in the Events tab (menu `Config >> Events`). 
 
 - [Yocto-Relay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-relay): 2x Unipolar Relay, 60VDC, 30VAC r.m.s., 2A
 - [Yocto-LatchedRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-latchedrelay): 1x Latched Relay, 60VDC, 8A 
 - [Yocto-MaxiCoupler-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxicoupler-v2): 8x SSR, 48VDC or 30VAC r.m.s., 1.3A
-- [Yocto-PowerRelay-V2](): 1x relay, 150VAC r.m.s., 5A
+- [Yocto-PowerRelay-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v2): 1x relay, 150VAC r.m.s., 5A
 - [Yocto-PowerRelay-V3](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v3): 1x relay, 250VAC r.m.s., 5A
 - [Yocto-MaxiPowerRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxipowerrelay): 5x relay, 250VAC r.m.s., 5A
 
@@ -114,7 +114,7 @@ The optional `sn` parameter specifies either the modules serial number or its lo
 
 ## [Yoctopuce Servo](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-servo)
 
-*(support for this module is available in Artisan v2.1.3 and later)*
+*(support for this module is available in Artisan v2.4.0 and later)*
 
 The Yoctopuce servo module can be controlled via `RC Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`).
 
