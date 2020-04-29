@@ -21082,7 +21082,11 @@ class ApplicationWindow(QMainWindow):
                         aw.pidcontrol.svLookahead = aw.pidcontrol.svLookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
                 elif key == 32:                       #SELECTS ACTIVE BUTTON
-                    self.moveKbutton("space")
+                    print("SPACE",self.keyboardmoveflag)
+                    if self.keyboardmoveflag:
+                        self.moveKbutton("space")
+                    else:
+                        self.qmc.EventRecord()
                 elif key == 16777220:                 #TURN ON/OFF KEYBOARD MOVES
                     self.releaseminieditor()
                     self.moveKbutton("enter")
@@ -32880,7 +32884,10 @@ class ApplicationWindow(QMainWindow):
             aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
         else:
             try:
-                filename = self.ArtisanOpenFileDialog(ext="*.alog",path=self.simulatorpath)
+                if aw.curFile is None:
+                    filename = self.ArtisanOpenFileDialog(ext="*.alog",path=self.simulatorpath)
+                else:
+                    filename = aw.curFile
                 if filename:
                     f = QFile(u(filename))
                     if not f.open(QFile.ReadOnly):

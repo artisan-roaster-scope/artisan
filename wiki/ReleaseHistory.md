@@ -31,6 +31,7 @@ v2.4.0 (xx.xx.2020)
   - adds a variant of the MODBUS mwrite command action that takes a value as further argument used to compute the value send to the slave via MODBUS function 6
   - adds MODBUS Command action `button(<bool>)` to set the extra event button state
   - adds `{BT}`, `{ET}`, `{t}` substitutions for Serial, Program, MDBUS and S7 command actions
+  - adds space key action to create plain events while keyboard short cut event navigation is off
 
 * Changes
   - remember the position of draggable annotations and the legend
