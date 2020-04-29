@@ -4173,65 +4173,90 @@ class tgraphcanvas(FigureCanvas):
                     elif mathexpression[i] == "R":
                         try:
                             if i+1 < mlen:
+                                if mathexpression[i+1] == "B": # RBnn : RoR of Background Profile
+                                    k = 1
+                                    c = "RB"
+                                else:
+                                    k = 0
+                                    c = "R"
                                 seconddigitstr = ""
-                                if mathexpression[i+1].isdigit():
-                                    nint = int(mathexpression[i+1])              #Rnumber int
+                                if mathexpression[i+k+1].isdigit():
+                                    nint = int(mathexpression[i+k+1])              #Rnumber int
                                     #check for TIMESHIFT 0-9 (one digit). Example: "R1[-2]" 
-                                    if i+5 < len(mathexpression) and mathexpression[i+2] == "[":
-                                        Yshiftval = int(mathexpression[i+4])
-                                        sign = mathexpression[i+3]
+                                    if i+k+5 < len(mathexpression) and mathexpression[i+k+2] == "[":
+                                        Yshiftval = int(mathexpression[i+k+4])
+                                        sign = mathexpression[i+k+3]
 
                                         # TWO digits shifting
-                                        if mathexpression[i+5].isdigit():
-                                            seconddigit = int(mathexpression[i+5])
-                                            seconddigitstr = mathexpression[i+5]
-                                            mathexpression = mathexpression[:i+5]+mathexpression[i+6:]
+                                        if mathexpression[i+k+5].isdigit():
+                                            seconddigit = int(mathexpression[i+k+5])
+                                            seconddigitstr = mathexpression[i+k+5]
+                                            mathexpression = mathexpression[:i+k+5]+mathexpression[i+k+6:]
                                             Yshiftval = 10*Yshiftval + seconddigit
                                         if nint == 1: #DeltaET
-                                            readings = self.delta1
+                                            if k == 0:
+                                                readings = self.delta1
+                                            else:
+                                                readings = self.delta1B
                                         elif nint == 2: #DeltaBT
-                                            readings = self.delta2
+                                            if k == 0:
+                                                readings = self.delta2
+                                            else:
+                                                readings = self.delta2
                                         val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
                                         
                                         #add expression and values found
-                                        evaltimeexpression = "".join(("R",mathexpression[i+1],evalsign*2,mathexpression[i+4],seconddigitstr,evalsign))
+                                        evaltimeexpression = "".join((c,mathexpression[i+k+1],evalsign*2,mathexpression[i+k+4],seconddigitstr,evalsign))
                                         timeshiftexpressions.append(evaltimeexpression)
                                         timeshiftexpressionsvalues.append(val)
                                         #convert "R2[+9]" to Rnumber compatible for python eval() to add to dictionary
                                         #METHOD USED: replace all non digits chars with sign value.
                                         #Example1 "R2[-7]" = "R20070"   Example2 "R2[+9]" = "R21191"
-                                        mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                        mathexpression = evaltimeexpression.join((mathexpression[:i+k],mathexpression[i+k+6:]))
                                     
                                     #direct index access: e.g. "R2{CHARGE}" or "R2{12}"
-                                    elif i+5 < len(mathexpression) and mathexpression[i+2] == "{" and mathexpression.find("}",i+3) > -1:
-                                        end_idx = mathexpression.index("}",i+3)
-                                        body = mathexpression[i+3:end_idx]
+                                    elif i+k+5 < len(mathexpression) and mathexpression[i+k+2] == "{" and mathexpression.find("}",i+k+3) > -1:
+                                        end_idx = mathexpression.index("}",i+k+3)
+                                        body = mathexpression[i+k+3:end_idx]
                                         val = -1
                                         try:
                                             absolute_index = eval(body,{"__builtins__":None},mathdictionary)
                                             if absolute_index > -1:
                                                 if nint == 1: #DeltaET
-                                                    val = self.delta1[absolute_index]
+                                                    if k == 0:
+                                                        val = self.delta1[absolute_index]
+                                                    else:
+                                                        val = self.delta1B[absolute_index]
                                                 else: # nint == 2: #DeltaBT
-                                                    val = self.delta2[absolute_index]
+                                                    if k == 0:
+                                                        val = self.delta2[absolute_index]
+                                                    else:
+                                                        val = self.delta2B[absolute_index]
                                         except:
                                             pass
                                         #add expression and values found
                                         literal_body = body
-                                        for k, v in replacements.items():
-                                            literal_body = literal_body.replace(k,v)
-                                        evaltimeexpression = "".join(("R",mathexpression[i+1],"z",literal_body,"z")) # curle brackets replaced by "z"
+                                        for j, v in replacements.items():
+                                            literal_body = literal_body.replace(j,v)
+                                        evaltimeexpression = "".join((c,mathexpression[i+1],"z",literal_body,"z")) # curle brackets replaced by "z"
                                         timeshiftexpressions.append(evaltimeexpression)
                                         timeshiftexpressionsvalues.append(val)
                                         mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
                                         
                                     #no shift
                                     else:
-                                        if mathexpression[i+1] == "1":
-                                            mathdictionary['R1'] = self.delta1[index]
-                                        elif mathexpression[i+1] == "2":
-                                            mathdictionary['R2'] = self.delta2[index]
-                        except Exception:
+                                        if mathexpression[i+k+1] == "1":
+                                            if k == 0:
+                                                mathdictionary['R1'] = self.delta1[index]
+                                            else:
+                                                mathdictionary['RB1'] = self.delta1B[index]
+                                        elif mathexpression[i+k+1] == "2":
+                                            if k == 0:
+                                                mathdictionary['R2'] = self.delta2[index]
+                                            else:
+                                                mathdictionary['RB2'] = self.delta2B[index]
+                        except:
+                            # if deltas of backgrounds are not visible the data is not calculated and thus this fails with an exception
                             pass
 
                     #Add to dict Event1-4 external value
@@ -9292,7 +9317,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_8.setFlat(True) # also deactivate CHARGE button
                 try:
                     aw.eventactionx(aw.qmc.buttonactions[1],aw.qmc.buttonactionstrings[1])
-                    st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
+                    st = self.stringfromseconds(self.timex[self.timeindex[1]]-start)
                     st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
                     message = QApplication.translate("Message","[DRY END] recorded at {0} BT = {1}", None).format(st,st2)
                     #set message at bottom
@@ -9386,7 +9415,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_8.setFlat(True)
                 aw.button_19.setFlat(True)
                 aw.eventactionx(aw.qmc.buttonactions[2],aw.qmc.buttonactionstrings[2])
-                st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
+                if self.timeindex[0] > -1:
+                    start = self.timex[self.timeindex[0]]
+                else:
+                    start = 0
+                st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-start)
                 st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
                 message = QApplication.translate("Message","[FC START] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
@@ -9471,13 +9504,17 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_19.setFlat(True)
                 aw.button_3.setFlat(True)
                 aw.eventactionx(aw.qmc.buttonactions[3],aw.qmc.buttonactionstrings[3])
-                st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
+                if self.timeindex[0] > -1:
+                    start = self.timex[self.timeindex[0]]
+                else:
+                    start = 0
+                st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-start)
                 st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
                 message = QApplication.translate("Message","[FC END] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
                 aw.onMarkMoveToNext(aw.button_4)
                 self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
-                
+    
 
     #record 2C start markers of BT. Called from button_5 of application window
     @pyqtSlot(bool)
@@ -9560,7 +9597,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_3.setFlat(True)
                 aw.button_4.setFlat(True)
                 aw.eventactionx(aw.qmc.buttonactions[4],aw.qmc.buttonactionstrings[4])
-                st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
+                if self.timeindex[0] > -1:
+                    start = self.timex[self.timeindex[0]]
+                else:
+                    start = 0
+                st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-start)
                 st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
                 message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
@@ -9619,7 +9660,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)  
-        if self.flagstart:                      
+        if self.flagstart:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.qmc.alignEvent in [5,7]:
@@ -9648,7 +9689,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_4.setFlat(True)
                 aw.button_5.setFlat(True)
                 aw.eventactionx(aw.qmc.buttonactions[5],aw.qmc.buttonactionstrings[5])
-                st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
+                if self.timeindex[0] > -1:
+                    start = self.timex[self.timeindex[0]]
+                else:
+                    start = 0
+                st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-start)
                 st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
                 message = QApplication.translate("Message","[SC END] recorded at {0} BT = {1}", None).format(st1,st2)
                 aw.sendmessage(message)
@@ -9784,7 +9829,11 @@ class tgraphcanvas(FigureCanvas):
                     
                     try:
                         aw.eventactionx(aw.qmc.buttonactions[6],aw.qmc.buttonactionstrings[6])
-                        st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
+                        if self.timeindex[0] > -1:
+                            start = self.timex[self.timeindex[0]]
+                        else:
+                            start = 0
+                        st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-start)
                         st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
                         message = QApplication.translate("Message","Roast ended at {0} BT = {1}", None).format(st1,st2)
                         aw.sendmessage(message)
@@ -9954,7 +10003,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_6.setFlat(True)
                 aw.button_9.setFlat(True)
                 aw.eventactionx(aw.qmc.buttonactions[7],aw.qmc.buttonactionstrings[7])
-                st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
+                if self.timeindex[0] > -1:
+                    start = self.timex[self.timeindex[0]]
+                else:
+                    start = 0
+                st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-start)
                 st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
                 message = QApplication.translate("Message","[COOL END] recorded at {0} BT = {1}", None).format(st1,st2)
                 #set message at bottom
@@ -41856,6 +41909,8 @@ class roastCompareDlg(ArtisanDialog):
         if self.background is not None and self.background.strip() != "":
             aw.loadbackground(self.background)
             aw.qmc.background = True
+            aw.qmc.timealign(redraw=False)
+            aw.qmc.redraw()
         if (self.foreground is None or self.foreground.strip() == "") and (self.background is None or self.background.strip() == ""):
             #selected = [aw.findWidgetsRow(self.profileTable,si,2) for si in self.profileTable.selectedItems()]
             selected = self.profileTable.getselectedRowsFast()

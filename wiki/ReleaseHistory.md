@@ -32,6 +32,7 @@ v2.4.0 (xx.xx.2020)
   - adds MODBUS Command action `button(<bool>)` to set the extra event button state
   - adds `{BT}`, `{ET}`, `{t}` substitutions for Serial, Program, MDBUS and S7 command actions
   - adds space key action to create plain events while keyboard short cut event navigation is off
+  - adds symbolic variables RB1 and RB2 to referring to the rate-of-rise readings of the background profile
 
 * Changes
   - remember the position of draggable annotations and the legend
