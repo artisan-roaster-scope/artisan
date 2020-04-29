@@ -38,4 +38,4 @@ rendered as plain step line at the bottom.
 
 If profile rows are selected in the tool, all other profiles get rendered in grey scale to hi-light the selected ones in the chart. A double click on a profile row header opens the corresponding profile in a second Artisan instance running in Viewer mode for further inspection. The Save Graph actions under menu File allow to export the graph in various file formats and direct printing is enabled as well.
 
-
+For a slightly more detailed discussion see the Artisan Blog post on Comparator (coming)
