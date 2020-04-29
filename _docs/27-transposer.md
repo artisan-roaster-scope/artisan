@@ -42,12 +42,14 @@ A click on a target row header on any of the tables clears all its target values
 **Changing the Phases**  - let’s say you want to change the times or percentages of your phases, enter the new ones in the target boxes.  You will get new targets to hit, but Transposer will not tell you how to get there with air and gas changes.  This is important to note, and you probably want to screenshot and print the dialog box results so you can plan how you will the new time targets.  
 
 ![Transposer Changed Phases](/assets/images/gsg/Transposer Changed Phases.jpg)
+
 ![Transposer Changed Phases Result](/assets/images/gsg/Transposer Changed Phases Result.jpg)
 
 
 **Change the Drop Time and/or Drop Temp** – in this example both the drop time and drop temp are lowered.  The dialog box will give you both new time and temperature targets (since you changed the drop temp), and notably a new proposed charge temp.  Again you will have to plan how to get to the targets.  When you change the Drop Time, you will see changes in the phase percentages as well.  In case you want to avoid the first two phases and the DRY END and FC START point changing, you can specify additional targets to fix those time points to their current times.
 
 ![Transposer longer time lower temp](/assets/images/gsg/Transposer longer time lower temp.jpg)
+
 ![Transposer longer time lower temp result](/assets/images/gsg/Transposer longer time lower temp result.jpg)
 
 and this image compares the Transposed profile with the original in the background
