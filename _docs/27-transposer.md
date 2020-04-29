@@ -50,7 +50,7 @@ A click on a target row header on any of the tables clears all its target values
 
 ![Transposer longer time lower temp](/assets/images/gsg/Transposer longer time lower temp.jpg)
 
-![Transposer longer time lower temp result](/assets/images/gsg/Transposer longer time lower temp result.jpg)
+![Transposer longer time lower temp result](/assets/images/gsg/Transposer longer time lower temp result .jpg)
 
 and this image compares the Transposed profile with the original in the background
 ![Transposer original background](/assets/images/gsg/Transposer original background.jpg)
