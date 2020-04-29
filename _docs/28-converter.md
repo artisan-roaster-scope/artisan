@@ -21,5 +21,5 @@ Here is the profile in Fahrenheit
 And converted to Celcius
 
 ![Convert to C](/assets/images/gsg/Convert to C.jpg)
-So for example you can now discuss with someone what FCs temp was in either temperature mode.  
+Now you can discuss a roast of similar beans with someone that has used a different temperature mode.  
 
