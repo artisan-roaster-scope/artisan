@@ -2,6 +2,87 @@ Detailed Release History
 ========================
 
 ----
+v2.4.0 (xx.xx.2020)
+------------------
+
+* New Features
+  - adds [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Comparator.html), [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Simulator.html), and [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Transposer.html)
+  - adds Cropster XLS, IKAWA CSV and Giesen Software CSV profile import
+  - adds support for the [Giesen IR sensor](https://artisan-scope.org/machines/giesen/)
+  - adds support for [Twino/Ozstar roasting machines](https://artisan-scope.org/machines/twino-ozstar/)
+  - adds S7 and MODBUS communciation optimizer
+  - adds two more S7 and MODBUS channels
+  - adds support for Yoctopuce [Yocto-0-10V-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-tx), [Yocto-4-20mA-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-4-20ma-tx), [Yocto-PWM-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-pwm-tx), [Yocto-4-20mA-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-4-20ma-rx), [Yocto-Servo](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-servo) and Yoctopuce Relays modules ([Yocto-Relay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-relay), [Yocto-LatchedRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-latchedrelay), [Yocto-MaxiCoupler-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxicoupler-v2), [Yocto-PowerRelay-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v2), [Yocto-PowerRelay-V3](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v3), and [Yocto-MaxiPowerRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxipowerrelay))
+  - adds support for Phidget VINT DCMotor modules ([DCC1000](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=965), [DCC1002](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1117) and [DCC1003](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1118)), mDNS Phidget server service discovery and support for multiple Phidget IO modules identified by their hub serial number and port
+  - better support of hi-resolution displays under Windows
+  - adds flexible automatic file name generator ([Issue #430](../../../issues/430), see also [Saving Artisan Profiles - Naming, Saving, File Location etc](https://www.home-barista.com/home-roasting/saving-artisan-profiles-naming-saving-file-location-etc-t61713.html))
+  - adds large phases LCDs
+  - adds status flags to the menu entries for all large LCD views
+  - adds automatic mode for the upper delta axis limit
+  - adds explicit upper y-axis limit for custom events 100% mark
+  - adds "load from profile" flag to Axis dialog
+  - adds link to Artisan homepage to About dialog
+  - adds check for updates menu action ([Issue #447](../../../issues/447))
+  - adds CSV and JSON to autosave file formats and allows to store extra autosave files in a separate directory
+  - adds right-click to the batch number label action in the Roast Properties dialog which allows to edit the batch number (also in Viewer mode)
+  - adds a dialog allowing to enter event details on using the right-click to BT popup to add a new event
+  - adds support for complex expressions in button command actions (e.g. `write(1,{}*10)`)
+  - adds support for multiple value substitutions in button and slider actions (ie. the placeholder `{}` can occur multiple times in the command string and gets always correctly substituted by the slider value)
+  - adds a variant of the MODBUS mwrite command action that takes a value as further argument used to compute the value send to the slave via MODBUS function 6
+  - adds MODBUS Command action `button(<bool>)` to set the extra event button state
+  - adds `{BT}`, `{ET}`, `{t}` substitutions for Serial, Program, MDBUS and S7 command actions
+
+* Changes
+  - remember the position of draggable annotations and the legend
+  - event annotations in combo mode are rendered as value with the event slider suffix added if descr. mode is not ticked (thus a Burner event of value 85 with Burner event slider suffix % is rendered as 85% instead of the default B85)
+  - the axis system to render custom events in Step/Step+/Combo mode extends now from the temperature axis minimum up to the lowest phases temperature if snap mode is not active (or the newly introduced explicit 100% y-axis limit given
+  - extends grid alpha range from 1-5 to 1-10
+  - allows to edit batch number in super mode also if the batch counter is deactivated
+  - [artisan.plus](https://artisan.plus/): after 3 month of expired subscription stop trying to login automatically!
+  - on loading profiles with extra device channels Artisan will always ask to update your setup or not. Extra devices settings concerning just the visualization (like color) will always be taken from your current Artisan settings and never modified on loading a profile.
+  - replace the generic "Select" label on extra device color buttons by the name of the selected color
+  - suppress event quantification for slider changes triggered by the Artisan PID
+  - improved online help system
+  - the layout of large LCDs have been optimized to better use the available space
+  - removes superfluous configurations relating to the removed evaluation feature from statistics dialog
+  - memory usage and performance improvements and updated main libraries (Python, Qt, PyQt, matplotlib,..) providing many fixes
+
+* Fixes
+  - fixes raw redraw issues ([Issue #390](../../../issues/390)) caused by an interaction of bitblit redraw triggered by draggable annotations and right-click event re-positioning mechanism
+  - now fully fixes the Roast/Cup Profile where values keep changing to max or min if double clicked by adding incremental redraw to the cupping dialog ([Issue #360](../../../issues/360))
+  - fixes a rare exception in device label substitution
+  - re-enable the input of negative alarm values (a regression introduced in v2.0)
+  - fixes a crash in the Yoctopuce driver on macOS 10.15
+  - fixes Phidgets DAQ1400 current input
+  - fixes Phidget HUB PWM output
+  - fixes regression that broke S7 Command actions
+  - fixes load theme inadvertently changing phases LCD modes
+  - fixes to acaia support incl. proper weight conversion
+  - fixed enable/disable of `File >> Save Copy As` and `File >> Conversion` menu actions based on app state
+  - fixes a feature interaction between the background logo image and the cupping editor, the designer and the wheel graph editor
+  - improves accuracy of displayed timestamps
+  - improved crossline, timeline, AUC guide and projection line rendering
+  - improved rendering of timestamps in mouse coordinates widget
+  - background annotations setting now restored on exiting analyzer
+  - disables dragging of items in extra event button table (header tragging is still enabled and processed)
+  - accepts floats for extra devices serial timeouts
+  - fixes to MET marker and to copy table
+  - fixes a regression introduced in v2.0 that broke the input of negative alarm values
+
+
+----
+v2.3.0
+------------------
+
+never released
+
+----
+v2.2.0
+------------------
+
+never released
+
+----
 v2.1.2 (24.12.2019)
 ------------------
 
