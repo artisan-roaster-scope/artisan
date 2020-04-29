@@ -48,7 +48,7 @@ A click on a target row header on any of the tables clears all its target values
 
 **Change the Drop Time and/or Drop Temp** – in this example both the drop time and drop temp are lowered.  The dialog box will give you both new time and temperature targets (since you changed the drop temp), and notably a new proposed charge temp.  Again you will have to plan how to get to the targets.  When you change the Drop Time, you will see changes in the phase percentages as well.  In case you want to avoid the first two phases and the DRY END and FC START point changing, you can specify additional targets to fix those time points to their current times.
 
-![Transposer longer time lower temp](/assets/images/gsg/Transposer LTLT dialog.jpg)
+![Transposer longer time lower temp dialog](/assets/images/gsg/Transposer LTLT dialog.jpg)
 
 ![Transposer longer time lower temp result](/assets/images/gsg/Transposer longer time lower temp result .jpg)
 
