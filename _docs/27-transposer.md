@@ -35,15 +35,15 @@ A click on a target row header on any of the tables clears all its target values
 
 **Original Roast** – Below you see an original roast.  Note that you may wish to turn off events (Config>Events>Markers – deselect your option).    Transposer will not tell you how to change your gas air, but it will tell you a proposed new charge temperature if you change any of the BT temps.  
 
-![Transposer Original](/assets/images/gsg/Transposer Original.jpg)
+![Transposer Original](/assets/images/gsg/Transposer original.jpg)
 
 **Background Roasts** – After you have used Transposer, you can go to Roast>Switch Profiles, select Save the profile, and it will load into as a background roast.  Remember to turn Events back on before you start roasting.  
 
 **Changing the Phases**  - let’s say you want to change the times or percentages of your phases, enter the new ones in the target boxes.  You will get new targets to hit, but Transposer will not tell you how to get there with air and gas changes.  This is important to note, and you probably want to screenshot and print the dialog box results so you can plan how you will the new time targets.  
 
-![Transposer Changed Phases](/assets/images/gsg/Transposer Changed Phases.jpg)
+![Transposer Changed Phases](/assets/images/gsg/Transposer changed phases.jpg)
 
-![Transposer Changed Phases Result](/assets/images/gsg/Transposer Changed Phases Result.jpg)
+![Transposer Changed Phases Result](/assets/images/gsg/Transposer changed phases result.jpg)
 
 
 **Change the Drop Time and/or Drop Temp** – in this example both the drop time and drop temp are lowered.  The dialog box will give you both new time and temperature targets (since you changed the drop temp), and notably a new proposed charge temp.  Again you will have to plan how to get to the targets.  When you change the Drop Time, you will see changes in the phase percentages as well.  In case you want to avoid the first two phases and the DRY END and FC START point changing, you can specify additional targets to fix those time points to their current times.
