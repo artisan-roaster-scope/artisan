@@ -27,16 +27,19 @@ When designing these consider your sorting and searching options/patterns for wh
 Home Roaster – basic batch prefix and number, along with the roast title and date:
 
 String: ~batchprefix ~batchcounter ~title ~date
+
 Output Example: CBB 663 Tanzania Mt. Kilimanjaro 2020-04-08   CBB is the batch prefix, 663 is the batch counter, Tanzania Mt. Kilimanjaro is the title of the roast, and the date.    
 
 Home Roaster using a blend in the roast title and wanting to identify the beans:
 
 String: ~batchprefix ~batchcounter ~title ~beans_line  ~date_long
+
 Output Example: CBB 690 Hama O Rama Espresso Guji Zone Ethiopia - Ahuachapan El Salvador - Nyeri Kenya 4/27/2020
 
 Production roaster interested in roaster’s name (in this case intials), machine name, drumspeed, weight, coffee name, and date.  Not shown but available are volume, density and moisture:  
 
 ~operator ~machine ~drumspeed  ~weight ~weightunits ~title ~date_long
+
 MDH NC-500 72  540.0 g Hama O Rama Espresso 2020-04-27
 
 Other date format options are available, and some other fields from Roast Properties.  See Help in the dialog box for more information and notes on specific cases. The string choices are:
