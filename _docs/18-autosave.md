@@ -20,7 +20,6 @@ The Autosave function has been greatly enhanced.  You now have the option of sav
 
 ![autosave in 2.4](/assets/images/gsg/Autosave Configuration 2.jpg)
 
-Note in the dialog box it shows zero grams as I had not entered an amount in Roast Properties yet.  
 
 **Autosave Examples**
 
