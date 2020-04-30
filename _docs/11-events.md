@@ -91,8 +91,9 @@ The above screenshot shows the Button Label and Description, Type, Value, Action
 [For more information on the configurations of sliders, you can find information from Frans Goddijn’s excellent blog](http://kostverlorenvaart.blogspot.nl/2018/03/sliders-and-offsets-in-artisan.html)
 
 [COMING IN RELEASE 2.4](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md)
+
 Step and Step+ will have new Annotation options allowing the user to customize the labels that appear on the stair steps.  
-The user will be able to describe events in plain english with the strings.
+The user will be able to describe events in plain english with the strings. If your stair steps are too close together there is a setting in the dialog box, Allowed Annotation Overlap, which allows you to not render some the events.  There is also a new setting under Config>Axes called 100% Event Step which adjusts where the stair steps show up on your graph.  
 
 The new dialog tab:
 ![Event Annotations Dialog24](/assets/images/gsg/Event Annotations 24.jpg)
@@ -102,6 +103,9 @@ The string choices:
 
 The examples:
 ![Event Annotations Examples](/assets/images/gsg/Event Examples.jpg)
+
+Sample result:
+![Event Annotations Results](/assets/images/gsg/Event Annotations Result.jpg)
 
 
 *Quantifiers*
