@@ -1,6 +1,14 @@
 
 RequestExecutionLevel admin
 
+!macro APP_ASSOCIATE_URL FILECLASS DESCRIPTION COMMANDTEXT COMMAND
+  WriteRegStr HKCR "${FILECLASS}" "" `${DESCRIPTION}`
+  WriteRegStr HKCR "${FILECLASS}" "URL Protocol" ""
+  WriteRegStr HKCR "${FILECLASS}\shell" "" "open"
+  WriteRegStr HKCR "${FILECLASS}\shell\open" "" `${COMMANDTEXT}`
+  WriteRegStr HKCR "${FILECLASS}\shell\open\command" "" `${COMMAND}`
+!macroend
+
 !macro APP_ASSOCIATE EXT FILECLASS DESCRIPTION ICON COMMANDTEXT COMMAND
   ; Backup the previously associated file class
   ReadRegStr $R0 HKCR ".${EXT}" ""
@@ -225,6 +233,9 @@ Section -Post
   !insertmacro APP_ASSOCIATE "wg" "Artisan.Wheel" "Artisan Wheel" \
      "$INSTDIR\artisanWheel.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
      
+  !insertmacro APP_ASSOCIATE_URL "artisan" "URL:artisan Protocol" \
+     "Open with URL" "$INSTDIR\artisan.exe $\"%1$\""
+     
 SectionEnd
 
 
@@ -323,6 +334,10 @@ Section Uninstall
   !insertmacro APP_UNASSOCIATE "athm" "Artisan.Theme"
   !insertmacro APP_UNASSOCIATE "aset" "Artisan.Settings"
   !insertmacro APP_UNASSOCIATE "wg" "Artisan.Wheel"
+
+  DeleteRegKey HKCR "artisan\shell"
+  DeleteRegKey HKCR "artisan\shell\open\command"
+  DeleteRegKey HKCR "artisan"
   
   SetAutoClose true
 SectionEnd

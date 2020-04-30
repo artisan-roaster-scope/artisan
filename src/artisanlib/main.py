@@ -65804,26 +65804,6 @@ def main():
     except Exception:
         pass
     
-    if platf == 'Windows':
-        # register URL handler in Windows registry
-        try:
-            # first we dig out the path of the artisan.exe file
-            if getattr(sys, 'frozen', False):
-                application_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
-                application_path += "\\artisan.exe"
-                cmdLine = "\"" + application_path + "\" \"%1\""
-            else:
-                # executing from source, get the python path and source path
-                python_path = sys.executable
-                application_path = sys.argv[0]
-                cmdLine = "\"" + python_path + "\" \"" + application_path + "\" \"%1\""
-            mxKey = QSettings("HKEY_CLASSES_ROOT\\artisan", QSettings.NativeFormat)
-            mxKey.setValue("URL Protocol", "")
-            mxOpenKey = QSettings("HKEY_CLASSES_ROOT\\artisan\\shell\\open\\command", QSettings.NativeFormat)
-            mxOpenKey.setValue(".", cmdLine)
-        except:
-            pass
-
     # write gc debug messages to stdout
 #    gc.set_debug(gc.DEBUG_STATS)
 
