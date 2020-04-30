@@ -90,6 +90,20 @@ The above screenshot shows the Button Label and Description, Type, Value, Action
 
 [For more information on the configurations of sliders, you can find information from Frans Goddijn’s excellent blog](http://kostverlorenvaart.blogspot.nl/2018/03/sliders-and-offsets-in-artisan.html)
 
+[COMING IN RELEASE 2.4](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md)
+Step and Step+ will have new Annotation options allowing the user to customize the labels that appear on the stair steps.  
+The user will be able to describe events in plain english with the strings.
+
+The new dialog tab:
+![Event Annotations Dialog24](/assets/images/gsg/Event Annotations 24.jpg)
+
+The string choices:
+![Event Annotations Dialog](/assets/images/gsg/Event Annotations.jpg)
+
+The examples:
+![Event Annotations Examples](/assets/images/gsg/Event Examples.jpg)
+
+
 *Quantifiers*
 
 Quantifiers turn readings received from a connected device into custom events on their 0-100% scale. For example, if you have a channel configured to read burner output on a scale from 0-2000 you can decide to hide the corresponding curve (as it won't fit into the range of the standard temperature axis) or turn just the changes of its readings into events by defining a corresponding quantifier. You end up with a more readable and useful profile.
