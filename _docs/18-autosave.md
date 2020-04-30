@@ -18,7 +18,7 @@ Pick and prefix and directory and choose to include a PDF or not.  You might wan
 
 The Autosave function has been greatly enhanced.  You now have the option of saving the .alog file and a .pdf to separate directories.  Further you have a great abiltiy to customize the name of your files using various strings which are documented in under Help in the dialog box.  As you enter the strings, the dialog box returns an example of the file save name.  Some examples from the strings are below.  
 
-[autosave in 2.4](/assets/images/gsg/autosave configuration2.jpg)
+![autosave in 2.4](/assets/images/gsg/autosave configuration2.jpg)
 
 **Autosave Examples**
 
@@ -41,5 +41,5 @@ MDH NC-500 72  540.0 g Hama O Rama Espresso 2020-04-27
 
 Other date format options are available, and some other fields from Roast Properties.  See Help in the dialog box for more information and notes on specific cases. The string choices are:
 
-[autosave fields](/assets/images/gsg/autosave fields.jpg)
+![autosave fields](/assets/images/gsg/autosave fields.jpg)
 
