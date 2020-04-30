@@ -20,6 +20,8 @@ The Autosave function has been greatly enhanced.  You now have the option of sav
 
 ![autosave in 2.4](/assets/images/gsg/Autosave Configuration 2.jpg)
 
+Note in the dialog box it shows zero grams as I had not entered an amount in Roast Properties yet.  
+
 **Autosave Examples**
 
 When designing these consider your sorting and searching options/patterns for where you store your profiles.  Note that the .alog files and PDFs can be stored to separate directories now.  
