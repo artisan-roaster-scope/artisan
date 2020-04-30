@@ -39,5 +39,7 @@ Production roaster interested in roaster’s name (in this case intials), machin
 ~operator ~machine ~drumspeed  ~weight ~weightunits ~title ~date_long
 MDH NC-500 72  540.0 g Hama O Rama Espresso 2020-04-27
 
-Other date format options are available, and some other fields from Roast Properties.  See help for more information.  
+Other date format options are available, and some other fields from Roast Properties.  See Help in the dialog box for more information and notes on specific cases. The string choices are:
+
+[autosave fields](/assets/images/gsg/autosave fields.jpg)
 
