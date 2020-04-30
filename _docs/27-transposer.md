@@ -10,7 +10,7 @@ toc: false
 
 *Menu>Tools>Transposer*
 
-
+[COMING IN RELEASE 2.4](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md)
 Comparing profiles recorded on different machines is a challenge as the heat and air dynamics differ on roasting machines.  There are some points in a roast that can be identified based on physical changes, like the yellow point (DRY) and the start of first-crack (FCs) that can be compared and used to construct a mapping from profiles recorded on one machine to those on another machine. The profile transposer is a tool that supports the construction and application of such mappings along the temperature axis, but also along the time axis e.g. extend or compress a profile.
 
 Menu> Tools > Transposer allows you to transpose the current loaded profile (source) along the x-axis (time) and y-axis (temperature) to create a new bean temperature profile and apply it if you wish.  In both cases, the mapping between the source and the resulting target profile is constructed from a set of value pairs. Each such pair holds a source value taken from the currently loaded profile and its intended target value as entered in the profile transposer dialog. Value pairs are taken from the key points in the roast, which are CHARGE, DRY END (yellow point), FC START (first-crack start), SC START (second-crack start) and DROP.
