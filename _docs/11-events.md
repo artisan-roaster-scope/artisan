@@ -96,15 +96,19 @@ Step and Step+ will have new Annotation options allowing the user to customize t
 The user will be able to describe events in plain english with the strings. If your stair steps are too close together there is a setting in the dialog box, Allowed Annotation Overlap, which allows you to not render some the events.  There is also a new setting under Config>Axes called 100% Event Step which adjusts where the stair steps show up on your graph.  
 
 The new dialog tab:
+
 ![Event Annotations Dialog24](/assets/images/gsg/Event Annotations 24.jpg)
 
 The string choices:
+
 ![Event Annotations Dialog](/assets/images/gsg/Event Annotations.jpg)
 
 The examples:
+
 ![Event Annotations Examples](/assets/images/gsg/Event Examples.jpg)
 
 Sample result:
+
 ![Event Annotations Results](/assets/images/gsg/Event Annotations Result.jpg)
 
 
