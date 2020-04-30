@@ -686,6 +686,15 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 from const import UIconst
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
+from help import alarms_help
+from help import autosave_help
+from help import eventannotations_help
+from help import eventbuttons_help
+from help import eventsliders_help
+from help import keyboardshortcuts_help
+from help import modbus_help
+from help import programs_help
+from help import symbolic_help
 from help import transposer_help
 
 # import artisan.plus module
@@ -13656,6 +13665,7 @@ class ApplicationWindow(QMainWindow):
         self.applicationDirectory =  QDir().current().absolutePath()
         
         super(ApplicationWindow, self).__init__(parent)
+        self.helpdialog = None
         
         # a timer that is triggered by resizing the main window
         self.redrawTimer = QTimer()
@@ -21632,36 +21642,13 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def viewKshortcuts(self,_=False):
-        string = u(QApplication.translate("Message", "<table><tr><td align='right'><b>[ENTER]</b></td><td>Turns ON/OFF Keyboard Shortcuts</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[SPACE]</b></td><td>Choses current button</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[LEFT,RIGHT,UP,DOWN]</b></td><td>Move background or key focus</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[a]</b></td><td>Autosave</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[CRTL N]</b></td><td>Autosave + Reset + START</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[t]</b></td><td>Toggle mouse cross lines</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[d]</b></td><td>Toggle xy scale (T/Delta)</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[c]</b></td><td>Shows/Hides Controls</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[x]</b></td><td>Shows/Hides LCD Readings</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[m]</b></td><td>Shows/Hides Event Buttons</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[b]</b></td><td>Shows/Hides Extra Event Buttons</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[s]</b></td><td>Shows/Hides Event Sliders</td></tr>",None))
-#        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[i]</b></td><td>Retrieve Weight In from Scale</td></tr>",None))
-#        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[o]</b></td><td>Retrieve Weight Out from Scale</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[p]</b></td><td>Toggle PID mode</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[h]</b></td><td>Load background profile</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[ALT h]</b></td><td>Remove background profile</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[l]</b></td><td>Load alarms</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[+,-]</b></td><td>Inc/dec PID lookahead</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[CRTL 0-9]</b></td><td>Changes Event Button Palettes</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[;]</b></td><td>Application ScreenShot</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[:]</b></td><td>Desktop ScreenShot</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[q,w,e,r + <i>nn</i>]</b></td><td>Quick Custom Event</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[v + <i>nnn</i>]</b></td><td>Quick PID SV</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[f]</b></td><td>Full Screen Mode</td></tr></table>",None))
-
-        msgbox = QMessageBox(self)
-        msgbox.setWindowTitle(QApplication.translate("Message", "Keyboard Shortcuts",None))
-        msgbox.setInformativeText(string)
-        msgbox.show()
+        try: # sip not supported on older PyQt versions (RPi!)
+            if self.helpdialog is None or sip.isdeleted(self.helpdialog):
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Keyboard Shortcuts Help",None),keyboardshortcuts_help.content())
+        except:
+            self.helpdialog = HelpDlg(self)
+        self.helpdialog.show()
+        self.helpdialog.activateWindow()
         
     #moves events in minieditor
     @pyqtSlot(int)
@@ -35590,9 +35577,9 @@ class HUDDlg(ArtisanDialog):
     def showSymbolicHelp(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = symbolicformulasHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Symbolic Formulas Help",None),symbolic_help.content())
         except:
-            self.helpdialog = symbolicformulasHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -36111,7 +36098,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.closeEvent(None)
 
 ########################################################################################
-#####################  SYMBOLIC FORMULAS HELP DLG ######################################
+#####################  HELP DLGs #######################################################
 ########################################################################################
 
 class HelpDlg(ArtisanDialog):
@@ -36145,185 +36132,6 @@ class HelpDlg(ArtisanDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("HelpGeometry",self.saveGeometry())
-
-########################################################################################
-#####################  SYMBOLIC FORMULAS HELP DLG ######################################
-########################################################################################
-
-class symbolicformulasHelpDlg(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(symbolicformulasHelpDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Symbolic Formulas Help",None)) 
-        self.setModal(False)
-        
-        settings = QSettings()
-        if settings.contains("symbolicformulasHelpGeometry"):
-            self.restoreGeometry(settings.value("symbolicformulasHelpGeometry"))
-
-        # autogenerated help pasted below
-
-        newline = "\n"  #@UnusedVariable
-        helpstr = ""
-        helpstr += "<head><style>"
-        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
-        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
-        helpstr += "</style></head>"
-        helpstr += "<body>"
-        helpstr += "<b>" + u(QApplication.translate('HelpDlg','SYMBOLIC VARIABLES',None)) + "</b>"
-        tbl_SymbolicVariables = prettytable.PrettyTable()
-        tbl_SymbolicVariables.field_names = [u(QApplication.translate('HelpDlg','Symbol',None)),u(QApplication.translate('HelpDlg','Description',None)),u(QApplication.translate('HelpDlg','Can  shift?\n(see below)',None))]
-        tbl_SymbolicVariables.add_row(['t',u(QApplication.translate('HelpDlg','Absolute time (seconds) from begin of recording (not only the time after CHARGE!)',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['b',u(QApplication.translate('HelpDlg','Absolute time (seconds) from begin of recording of the background profile',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['x',u(QApplication.translate('HelpDlg','Current channel reading (not available in the Plotter)',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['Y1',u(QApplication.translate('HelpDlg','ET value',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['Y2',u(QApplication.translate('HelpDlg','BT value',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['Y3',u(QApplication.translate('HelpDlg','Extra #1 T1 value',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['Y4',u(QApplication.translate('HelpDlg','Extra #1 T2 value',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['Y5',u(QApplication.translate('HelpDlg','Extra #2 T1 value',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['Y6',u(QApplication.translate('HelpDlg','Extra #2 T2 value',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['...',u(QApplication.translate('HelpDlg','...and so forth',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['B1',u(QApplication.translate('HelpDlg','ET background',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['B2',u(QApplication.translate('HelpDlg','BT background',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['B3',u(QApplication.translate('HelpDlg','ExtraBackground #1-A',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['B4',u(QApplication.translate('HelpDlg','ExtraBackground #1-B',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['B5',u(QApplication.translate('HelpDlg','ExtraBackground #2-A',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['...',u(QApplication.translate('HelpDlg','...and so forth',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['T1',u(QApplication.translate('HelpDlg','ET tare value',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['T2',u(QApplication.translate('HelpDlg','BT tare value',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['T3',u(QApplication.translate('HelpDlg','Extra Device #1 channel 1 tare value',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['T4',u(QApplication.translate('HelpDlg','Extra Device #1 channel 2 tare value',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['T5',u(QApplication.translate('HelpDlg','Extra Device #2 channel 1 tare value',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['...',u(QApplication.translate('HelpDlg','...and so forth',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['E1',u(QApplication.translate('HelpDlg','Last event value of the first event type',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['E2',u(QApplication.translate('HelpDlg','Last event value of the second event type',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['E3',u(QApplication.translate('HelpDlg','Last event value of the third event type',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['E4',u(QApplication.translate('HelpDlg','Last event value of the fourth event type',None)),'&#160;'])
-        tbl_SymbolicVariables.add_row(['&#160;','&#160;','&#160;'])
-        tbl_SymbolicVariables.add_row(['R1',u(QApplication.translate('HelpDlg','ET rate of rise',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        tbl_SymbolicVariables.add_row(['R2',u(QApplication.translate('HelpDlg','BT rate of rise',None)),u(QApplication.translate('HelpDlg','Yes',None))])
-        helpstr += tbl_SymbolicVariables.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','SHIFTED SYMBOLIC VARIABLES',None)) + "</b>"
-        tbl_ShiftedSymbolicVariablestop = prettytable.PrettyTable()
-        tbl_ShiftedSymbolicVariablestop.header = False
-        tbl_ShiftedSymbolicVariablestop.add_row([u(QApplication.translate('HelpDlg','The symbolic variables t, b, Y<n>, B<n> and R<n> evaluate to the current value of a sequence of values that define a roast profile. To access earlier or later values one can apply a shift value.',None))+newline+u(QApplication.translate('HelpDlg','\nFor example, while "Y2" returns the current bean temperature (BT), "Y2[-1]" returns the previous BT temperature and "Y2[-2]" the one before that. Formulas used in the Plotter are applied in sequence to all values, thus there "Y2" points to the current BT temperature processed, "Y2[-1]" the previous BT temperature processed and "Y2[+1]" the next BT temperature to be processed. A positive shift is only available in the Plotter, obviously not during recording.',None))])
-        helpstr += tbl_ShiftedSymbolicVariablestop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_ShiftedSymbolicVariables = prettytable.PrettyTable()
-        tbl_ShiftedSymbolicVariables.field_names = [u(QApplication.translate('HelpDlg','Example',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_ShiftedSymbolicVariables.add_row(['t[+1]',u(QApplication.translate('HelpDlg','Time one index ahead (plotter only)',None))])
-        tbl_ShiftedSymbolicVariables.add_row(['t[-3]',u(QApplication.translate('HelpDlg','Time three indexes delayed',None))])
-        tbl_ShiftedSymbolicVariables.add_row(['Y1[-2]',u(QApplication.translate('HelpDlg','ET value delayed by 2 indexes',None))])
-        tbl_ShiftedSymbolicVariables.add_row(['Y2[+1]',u(QApplication.translate('HelpDlg','BT value index advanced by one index (plotter only)',None))])
-        tbl_ShiftedSymbolicVariables.add_row(['B4[-6]',u(QApplication.translate('HelpDlg','ExtraBackground #1-B delayed 6 indexes',None))])
-        tbl_ShiftedSymbolicVariables.add_row(['B5[+2]',u(QApplication.translate('HelpDlg','ExtraBackground #2-A advanced 2 indexes (plotter only)',None))])
-        tbl_ShiftedSymbolicVariables.add_row(['R1[-2]',u(QApplication.translate('HelpDlg','ET rate of rise delayed two indexes',None))])
-        helpstr += tbl_ShiftedSymbolicVariables.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','INDEXED SYMBOLIC VARIABLES',None)) + "</b>"
-        tbl_IndexedSymbolic = prettytable.PrettyTable()
-        tbl_IndexedSymbolic.field_names = [u(QApplication.translate('HelpDlg','Symbol',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_IndexedSymbolic.add_row([u(QApplication.translate('HelpDlg','t, b, Y<n>, B<n> and R<n>',None)),u(QApplication.translate('HelpDlg','Previously recorded data assigned to the symbolic variables t, b, Y<n>, B<n> and R<n> can also directly accessed by index. "Y2{0}" evaluates to the first recorded bean temperature (BT) and "Y2{CHARGE}" to the bean temperature at CHARGE. Additionally, the symbolic variable b can be used to access the recording time at a certain index of the background profile. Thus "b{CHARGE}" returns the recording time at CHARGE of the background profile.',None))])
-        helpstr += tbl_IndexedSymbolic.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','AXIS MAPPING',None)) + "</b>"
-        tbl_AxisMapping = prettytable.PrettyTable()
-        tbl_AxisMapping.field_names = [u(QApplication.translate('HelpDlg','Symbol',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_AxisMapping.add_row(['k',u(QApplication.translate('HelpDlg','Scaling factor from time to RoR axis. The range of the temperature scale divided by the range of the delta scale. ',None))])
-        tbl_AxisMapping.add_row(['o',u(QApplication.translate('HelpDlg','Offset from time to RoR axis. ',None))])
-        helpstr += tbl_AxisMapping.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_AxisMappingbottom = prettytable.PrettyTable()
-        tbl_AxisMappingbottom.header = False
-        tbl_AxisMappingbottom.add_row([u(QApplication.translate('HelpDlg','Note: RoR values r can be scaled to the temperature axis using a linear approximation of the form "r*k + o". As the variables k and o depend on the actual axis settings which can be changed by the user without triggering a recomputation, those variable are less useful for use in a recording, but useful in the Plotter to plot w.r.t. the RoR x-axis instead of the temperature x-axis.',None))])
-        helpstr += tbl_AxisMappingbottom.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','EVENT INDEX and TIME DELTA',None)) + "</b>"
-        tbl_EventIndex = prettytable.PrettyTable()
-        tbl_EventIndex.field_names = [u(QApplication.translate('HelpDlg','Symbol',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_EventIndex.add_row(['CHARGE, DRY, FCs, FCe, SCs, SCe, DROP',u(QApplication.translate('HelpDlg','Index of the corresponding event of the profile to retrieve time and values from the corresponding data structures. Evaluates to -1 if not set.',None))])
-        tbl_EventIndex.add_row(['bCHARGE, bDRY, bFCs, bFCe, bSCs, bSCe, bDROP',u(QApplication.translate('HelpDlg','Index of the corresponding event of the background profile to retrieve time and values from the corresponding data structures. Evaluates to -1 if not set.',None))])
-        tbl_EventIndex.add_row(['&#160;','&#160;'])
-        tbl_EventIndex.add_row(['dCHARGE, dDRY, dFCs, dFCe, dSCs, dSCe, dDROP',u(QApplication.translate('HelpDlg','Time distance in seconds after the corresponding event. Thus dCHARGE is bound to the current roast time (after CHARGE) in seconds while t is bound to the time in seconds from the start of the recording.',None))])
-        helpstr += tbl_EventIndex.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','AREA UNDER THE CURVE (AUC)',None)) + "</b>"
-        tbl_AUC = prettytable.PrettyTable()
-        tbl_AUC.field_names = [u(QApplication.translate('HelpDlg','Symbol',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_AUC.add_row(['AUCbase',u(QApplication.translate('HelpDlg','AUC base temperature (could be from the selected event, if set)',None))])
-        tbl_AUC.add_row(['AUCtarget',u(QApplication.translate('HelpDlg','AUC target value (could be from the background profile, if set)',None))])
-        tbl_AUC.add_row(['AUCvalue',u(QApplication.translate('HelpDlg','the current AUC value. -1 if none available.',None))])
-        helpstr += tbl_AUC.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','PREDICITONS',None)) + "</b>"
-        tbl_Predictions = prettytable.PrettyTable()
-        tbl_Predictions.field_names = [u(QApplication.translate('HelpDlg','Symbol',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_Predictions.add_row(['pDRY',u(QApplication.translate('HelpDlg','Prediction of the time distance to the DRY event based on the current RoR. Evaluates to -1 on negative RoR and to 0 if the DRY event is already set.',None))])
-        tbl_Predictions.add_row(['pFCS',u(QApplication.translate('HelpDlg','Same as pDRY, just for the FCs event.',None))])
-        helpstr += tbl_Predictions.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_Predictionsbottom = prettytable.PrettyTable()
-        tbl_Predictionsbottom.header = False
-        tbl_Predictionsbottom.add_row([u(QApplication.translate('HelpDlg','Note: The same rules as for the corresponding PhasesLCDs apply to pDRY and pFCs:',None))+newline+u(QApplication.translate('HelpDlg','\nIf there is no background profile the DRY or FCs bean temperature used for the prediction is taken from the Config>Phases setup.',None))+newline+u(QApplication.translate('HelpDlg','\nIf there is a background profile and there is DRY or FCs event in the background profile, the DRY or FCs bean temperature used for the prediction is taken from the background profile.',None))+newline+u(QApplication.translate('HelpDlg','\nException to the above for DRY only: if AutoDRY is checked the DRY temperature used for the prediction is taken from the Config>Phases setup.  This does not apply to FCs and AutoFCS.',None))+newline+u(QApplication.translate('HelpDlg','\nThe prediction value is the calculated time in seconds to reach the DRY or FCs temperature.',None))])
-        helpstr += tbl_Predictionsbottom.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','EXPRESSIONS',None)) + "</b>"
-        tbl_Expressions = prettytable.PrettyTable()
-        tbl_Expressions.field_names = [u(QApplication.translate('HelpDlg','Expression',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_Expressions.add_row(['(<true-expr> if <cond> else <false-expr>)',u(QApplication.translate('HelpDlg','Conditional. Evaluates to the value of the expression <true-expr> if the condition <cond> holds, otherwise to the value of the expression <false-expr>. The rules of Python are applied to decide if a value holds or not. Thus the boolean values "True" and "False" have the obvious semantic. Any number unequal to 0 evaluates to True and 0 evaluates to False. The value "None" is also evaluated to False.',None))])
-        helpstr += tbl_Expressions.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','MATHEMATICAL FORMULAS',None)) + "</b>"
-        tbl_MathFormulas = prettytable.PrettyTable()
-        tbl_MathFormulas.field_names = [u(QApplication.translate('HelpDlg','Formula',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_MathFormulas.add_row(['abs(x)',u(QApplication.translate('HelpDlg','Return the absolute value of x.',None))])
-        tbl_MathFormulas.add_row(['acos(x)',u(QApplication.translate('HelpDlg','Return the arc cosine (measured in radians) of x.',None))])
-        tbl_MathFormulas.add_row(['asin(x)',u(QApplication.translate('HelpDlg','Return the arc sine (measured in radians) of x.',None))])
-        tbl_MathFormulas.add_row(['atan(x)',u(QApplication.translate('HelpDlg','Return the arc tangent (measured in radians) of x.',None))])
-        tbl_MathFormulas.add_row(['cos(x)',u(QApplication.translate('HelpDlg','Return the cosine of x (measured in radians).',None))])
-        tbl_MathFormulas.add_row(['degrees(x)',u(QApplication.translate('HelpDlg','Convert angle x from radians to degrees.',None))])
-        tbl_MathFormulas.add_row(['exp(x)',u(QApplication.translate('HelpDlg','Return e raised to the power of x.',None))])
-        tbl_MathFormulas.add_row(['log(x[, base])',u(QApplication.translate('HelpDlg','Return the logarithm of x to the given base.',None))])
-        tbl_MathFormulas.add_row(['min(x1,...,xn)',u(QApplication.translate('HelpDlg','Return the minimum of the given values.',None))])
-        tbl_MathFormulas.add_row(['max(x1,...,xn)',u(QApplication.translate('HelpDlg','Return the maximum of the given values.',None))])
-        tbl_MathFormulas.add_row(['pow(x, y)',u(QApplication.translate('HelpDlg','Return x**y (x to the power of y).',None))])
-        tbl_MathFormulas.add_row(['radians(x)',u(QApplication.translate('HelpDlg','Convert angle x from degrees to radians.',None))])
-        tbl_MathFormulas.add_row(['sin(x)',u(QApplication.translate('HelpDlg','Return the sine of x (measured in radians).',None))])
-        tbl_MathFormulas.add_row(['sqrt(x)',u(QApplication.translate('HelpDlg','Return the square root of x.',None))])
-        tbl_MathFormulas.add_row(['tan(x)',u(QApplication.translate('HelpDlg','Return the tangent of x (measured in radians).',None))])
-        helpstr += tbl_MathFormulas.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','MATHEMATICAL CONSTANTS',None)) + "</b>"
-        tbl_Constants = prettytable.PrettyTable()
-        tbl_Constants.field_names = [u(QApplication.translate('HelpDlg','Symbol',None)),u(QApplication.translate('HelpDlg','Value',None))]
-        tbl_Constants.add_row(['e',2.71828182845904])
-        tbl_Constants.add_row(['pi',3.14159265358979])
-        helpstr += tbl_Constants.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','PLOTTER EXTENSIONS',None)) + "</b>"
-        tbl_PlotterExtensionstop = prettytable.PrettyTable()
-        tbl_PlotterExtensionstop.header = False
-        tbl_PlotterExtensionstop.add_row([u(QApplication.translate('HelpDlg','Note:  This section applies only to the Plotter\nUsing math formulas in the plotter also allows to use the symbolic variables P and F (see Signals, Symbolic Assignments and the Plotter).',None))])
-        helpstr += tbl_PlotterExtensionstop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_PlotterExtensions = prettytable.PrettyTable()
-        tbl_PlotterExtensions.field_names = [u(QApplication.translate('HelpDlg','Symbol',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_PlotterExtensions.add_row(['P1...P9',u(QApplication.translate('HelpDlg','The variables P1,..,P9 represent the results from plot #1,..,#9. You can perform calculations in a later plot on variables of an earlier plot. That way, the plot variables P1,..,P9 allow the cascading or intermediate results. For example, plot #3 can refer to the results of plot 1 using the variable P1.',None))])
-        tbl_PlotterExtensions.add_row(['F1...F9',u(QApplication.translate('HelpDlg','F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.',None))])
-        helpstr += tbl_PlotterExtensions.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "</body>"
-        helpstr = re.sub(r"&amp;#160;", r"&#160;",helpstr)
-
-        # autogenerated help pasted above
-
-        phelp = QTextEdit()
-        phelp.setHtml(helpstr)
-        phelp.setReadOnly(True)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        self.dialogbuttons.accepted.connect(self.close)
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)
-        hLayout.addLayout(buttonLayout)
-        self.setLayout(hLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    def closeEvent(self, _):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("symbolicformulasHelpGeometry",self.saveGeometry())
-
 
 ########################################################################################
 #####################  PLOTTER DATA DLG  ###############################################
@@ -39997,9 +39805,9 @@ class autosaveDlg(ArtisanDialog):
         helpButton.clicked.connect(self.showautosavehelp)
 
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(helpButton)
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
+        buttonLayout.addWidget(helpButton)
         autolayout = QGridLayout()
         autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignRight)
         autolayout.addWidget(autochecklabel,0,1)
@@ -40031,9 +39839,9 @@ class autosaveDlg(ArtisanDialog):
     def showautosavehelp(self):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = autosavefieldsHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Autosave Fields Help",None),autosave_help.content())
         except:
-            self.helpdialog = autosavefieldsHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -40090,103 +39898,6 @@ class autosaveDlg(ArtisanDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("autosaveGeometry",self.saveGeometry())              
-
-########################################################################################
-#####################  AUTOSAVE FIELDS HELP DLG ########################################
-########################################################################################
-class autosavefieldsHelpDlg(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(autosavefieldsHelpDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Autosave Filename Fields Help",None)) 
-        self.setModal(False)
-        
-        settings = QSettings()
-        if settings.contains("autosavefieldsHelpGeometry"):
-            self.restoreGeometry(settings.value("autosavefieldsHelpGeometry"))
-
-        # autogenerated help pasted below
-
-        newline = "\n"  #@UnusedVariable
-        helpstr = ""
-        helpstr += "<head><style>"
-        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
-        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
-        helpstr += "</style></head>"
-        helpstr += "<body>"
-        helpstr += "<b>" + u(QApplication.translate('HelpDlg','AUTOSAVE FIELDS',None)) + "</b>"
-        tbl_Autosave = prettytable.PrettyTable()
-        tbl_Autosave.field_names = [u(QApplication.translate('HelpDlg','Prefix Field',None)),u(QApplication.translate('HelpDlg','Source',None)),u(QApplication.translate('HelpDlg','Example',None))]
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~batchprefix',None)),u(QApplication.translate('HelpDlg','The batch prefix set in Config>Batch>Prefix',None)),u(QApplication.translate('HelpDlg','Prod-',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~batchcounter',None)),u(QApplication.translate('HelpDlg','The current batch number',None)),653])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~batch',None)),u(QApplication.translate('HelpDlg','Same as "~batchprefix~batchnum"',None)),u(QApplication.translate('HelpDlg','Prod-653',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~batchposition',None)),u(QApplication.translate('HelpDlg','The current batch position, or "Roast of the Day"',None)),9])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~batch_long',None)),u(QApplication.translate('HelpDlg','Same as Batch field in Roast Properties\n "~batchprefix~batchnum (~batchposition)"',None)),u(QApplication.translate('HelpDlg','Prod-653 (9)',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~title',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Title',None)),u(QApplication.translate('HelpDlg','Ethiopia Guji',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~beans',None)),u(QApplication.translate('HelpDlg','The first 30 characters of the first line \nFrom Roast>Properties>Beans',None)),u(QApplication.translate('HelpDlg','Ethiopia Guji purchased from R',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~beans_line',None)),u(QApplication.translate('HelpDlg','The entire first line From Roast>Properties>Beans',None)),u(QApplication.translate('HelpDlg','Ethiopia Guji purchased from Royal',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~date',None)),u(QApplication.translate('HelpDlg','Roast date in format yy-MM-dd',None)),u(QApplication.translate('HelpDlg','20-02-05',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~date_long',None)),u(QApplication.translate('HelpDlg','Roast date in format yyyy-MM-dd',None)),u(QApplication.translate('HelpDlg','2020-02-05',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~time',None)),u(QApplication.translate('HelpDlg','Roast time in format hhmm',None)),1742])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~datetime',None)),u(QApplication.translate('HelpDlg','Roast date and time in format yy-MM-dd_hhmm',None)),u(QApplication.translate('HelpDlg','20-02-05_1742',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~datetime_long',None)),u(QApplication.translate('HelpDlg','Roast date and time in format yyyy-MM-dd_hhmm',None)),u(QApplication.translate('HelpDlg','2020-02-05_1742',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~operator',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Operator',None)),u(QApplication.translate('HelpDlg','Dave',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~weight',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Weight Green',None)),3])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~weightunits',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Weight',None)),u(QApplication.translate('HelpDlg','Kg',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~volume',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Volume Green',None)),4.1])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~volumeunits',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Volume',None)),u(QApplication.translate('HelpDlg','l',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~density',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Density Green',None)),756.4])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~densityunits',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Density',None)),u(QApplication.translate('HelpDlg','g_l',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~moisture',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Moisture Green',None)),11.7])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~moisturetunits',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Moisture',None)),u(QApplication.translate('HelpDlg','pct',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~machine',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Machine',None)),u(QApplication.translate('HelpDlg','SF-6',None))])
-        tbl_Autosave.add_row([u(QApplication.translate('HelpDlg','~drumspeed',None)),u(QApplication.translate('HelpDlg','From Roast>Properties>Drum Speed',None)),64])
-        helpstr += tbl_Autosave.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr = re.sub(r"&amp;#160;", r"&#160;",helpstr)
-
-        # autogenerated help pasted above
-
-        helpstr += "<UL>"
-        helpstr += QApplication.translate("AutosaveField","NOTES:",None)
-        helpstr += "<LI>" + QApplication.translate("AutosaveField","Anything between single quotes ' will show in the file name <b>only</b> when ON. \
-Example: 'REC ~batch'",None)
-        helpstr += "<LI>" + QApplication.translate("AutosaveField",'Anything between double quotes " will show in the file name <b>only</b> when OFF. \
-Example: "~operator"',None)
-        helpstr += "<LI>" + QApplication.translate("AutosaveField","Hover the mouse over the Preview field to see a preview of the prefix while the roaster scope is ON.",None)
-        helpstr += "<LI>" + QApplication.translate("AutosaveField","For backward compatibility, when the Prefix field is text only \
-the date and time is appended to the file name.\
-<BR/>Example: 'Autosave' will result in file name 'Autosave_20-01-13_1705'. \
-<BR/>To prevent this place a single '!' at the start of the Prefix field.\
-<BR/> Example: '!Autosave' will result in file name 'Autosave'.",None)
-        helpstr += "<LI>" + QApplication.translate("AutosaveField","To maintain cross platform compatibility, file names may contain only letters, numbers, spaces, \
-and the following special characters:<br/>_-.( )<br/>All other characters will be filtered out.",None)
-        helpstr += "<LI>" + QApplication.translate("AutosaveField","The 'While recording' preview shows only when the file name will be different when saved during a recording. \
-Pressing the 'a' key will save during a recording when 'Autosave [a]' is checked.",None)
-        helpstr += "</UL>"
-        helpstr += "<br/>"
-        helpstr += "</body>"
-
-        phelp = QTextEdit()
-        phelp.setHtml(helpstr)
-        phelp.setReadOnly(True)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        self.dialogbuttons.accepted.connect(self.close)
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)
-        hLayout.addLayout(buttonLayout)
-        self.setLayout(hLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    def closeEvent(self, _):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("autosavefieldsHelpGeometry",self.saveGeometry())
-
 
 ##########################################################################
 #####################  BATCH DLG  ########################################
@@ -45832,9 +45543,9 @@ class EventsDlg(ArtisanResizeablDialog):
     def showEventbuttonhelp(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = eventbuttonsHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Event Custom Buttons Help",None),eventbuttons_help.content())
         except:
-            self.helpdialog = eventbuttonsHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -45842,9 +45553,9 @@ class EventsDlg(ArtisanResizeablDialog):
     def showSliderHelp(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = eventslidersHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Event Custom Sliders Help",None),eventsliders_help.content())
         except:
-            self.helpdialog = eventslidersHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -45852,9 +45563,9 @@ class EventsDlg(ArtisanResizeablDialog):
     def showEventannotationhelp(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = eventannotationHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Event Annotations Help",None),eventannotations_help.content())
         except:
-            self.helpdialog = eventannotationHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -45864,255 +45575,6 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.helpdialog.close()
         except:
             self.helpdialog.close()
-
-########################################################################################
-#####################  EVENT CUSTOM BUTTONS HELP DLG ###################################
-########################################################################################
-class eventbuttonsHelpDlg(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(eventbuttonsHelpDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Event Custom Buttons Help",None)) 
-        self.setModal(False)
-        
-        settings = QSettings()
-        if settings.contains("eventbuttonsHelpGeometry"):
-            self.restoreGeometry(settings.value("eventbuttonsHelpGeometry"))
-
-        # autogenerated help pasted below
-
-        newline = "\n"  #@UnusedVariable
-        helpstr = ""
-        helpstr += "<head><style>"
-        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
-        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
-        helpstr += "</style></head>"
-        helpstr += "<body>"
-        helpstr += "<b>" + u(QApplication.translate('HelpDlg','EVENT CUSTOM BUTTONS',None)) + "</b>"
-        tbl_Buttons = prettytable.PrettyTable()
-        tbl_Buttons.field_names = [u(QApplication.translate('HelpDlg','COL1',None)),u(QApplication.translate('HelpDlg','COL2',None))]
-        tbl_Buttons.add_row([u(QApplication.translate('HelpDlg','Button Label',None)),u(QApplication.translate('HelpDlg','Enter \\n to create labels with multiple lines. \\t is substituted by the event type.',None))])
-        tbl_Buttons.add_row([u(QApplication.translate('HelpDlg','Event Description',None)),u(QApplication.translate('HelpDlg','Description of the Event to be recorded.< br>Event type Type of event to be recorded.',None))])
-        tbl_Buttons.add_row([u(QApplication.translate('HelpDlg','Event Value',None)),u(QApplication.translate('HelpDlg','Value of event (1-100) to be recorded',None))])
-        tbl_Buttons.add_row([u(QApplication.translate('HelpDlg','Action',None)),u(QApplication.translate('HelpDlg','Perform an action at the time of the event',None))])
-        tbl_Buttons.add_row([u(QApplication.translate('HelpDlg','Documentation',None)),'&#160;'])
-        tbl_Buttons.add_row([u(QApplication.translate('HelpDlg','Button Visibility',None)),u(QApplication.translate('HelpDlg','Hides/shows individual button',None))])
-        helpstr += tbl_Buttons.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','COMMANDS',None)) + "</b>"
-        tbl_Commands = prettytable.PrettyTable()
-        tbl_Commands.field_names = [u(QApplication.translate('HelpDlg','Command Type',None)),u(QApplication.translate('HelpDlg','Command',None))]
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','Serial',None)),u(QApplication.translate('HelpDlg','ASCII serial command or binary a2b_uu(serial command)',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','Call Program',None)),u(QApplication.translate('HelpDlg','A program/script path (absolute or relative)',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','Multiple Event',None)),u(QApplication.translate('HelpDlg','Adds events of other button numbers separated by a comma: 1,2,..',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','Modbus',None)),u(QApplication.translate('HelpDlg','write([slaveId,registe r,value],..,[slaveId,register,value]) \nwrite register: MODBUS function 6 (int) or function 16 (float)',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','wcoil(slaveId,register,<bool>) \nwrite coil: MODB US function 5',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','wcoils(slaveId,register,[<bool>,..,<bool>]) \nwrite coils: MODBUS function 15',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','mwrite(slaveId,register,andMask,orMask) \nmask write register: MODBUS function 22',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','writem(slaveId,register,value) or writem(slaveId,register,[<int>,..,<int>]) \nwrite registers: MODBUS function 16',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','writeWord(slaveId,register,value) \nwrite 32bit float to two 16bit int registers: MODBUS function 16',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','S7',None)),u(QApplication.translate('HelpDlg','getDBint(<dbnumber>,<start>) \nread int from S7 DB',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','getDBfloat(<dbnumber>,<start>) \nread fl oat from S7 DB',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','setDBint(<dbnumber>,<start>,<value>) \nwrite int to S7 DB',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','setDBfloat(<dbnumber>,<start>,<value>) \nwrite float to S7 DB',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','DTA',None)),u(QApplication.translate('HelpDlg','Insert Data address : value, ex. 4701:1000 and sv is 100. \nAlways multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','IO',None)),u(QApplication.translate('HelpDlg','set(n,0 ), set(n,1), toggle(n), pulse(n,t) to set Phidget IO digital output n',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','PWM',None)),u(QApplication.translate('HelpDlg',' out(n,v), toggle(n), pulse(n,t) set digital output channel n to PWM value v (0-100) on a Phidget OUT1100 \nouthub(n,v), togglehub(n), pulsehub(n,t) on a Phidget HUB',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','VOUT',None)),u(QApplication.translate('HelpDlg','out(n,v) set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V) on a Phidget OUT1000/OUT1001/OUT1002',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','Hotop',None)),u(QApplication.translate('HelpDlg','Hottop Heater: sets heater to value',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','Hottop Fan: sets fan to value',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','Hottop Command: motor(n),solenoid(n),stirrer(n),heater(h),fan(f) with n={0 ,1},h={0,..100},f={0,..10}',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','PID',None)),u(QApplication.translate('HelpDlg','p-i-d: configures PID to the values <p>;<i>;<d>',None))])
-        helpstr += tbl_Commands.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "</body>"
-        helpstr = re.sub(r"&amp;#160;", r"&#160;",helpstr)
-
-        # autogenerated help pasted above
-
-        phelp = QTextEdit()
-        phelp.setHtml(helpstr)
-        phelp.setReadOnly(True)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        self.dialogbuttons.accepted.connect(self.close)
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)
-        hLayout.addLayout(buttonLayout)
-        self.setLayout(hLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    def closeEvent(self, _):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("eventbuttonsHelpGeometry",self.saveGeometry())
-
-
-########################################################################################
-#####################  EVENT CUSTOM SLIDERS HELP DLG ###################################
-########################################################################################
-class eventslidersHelpDlg(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(eventslidersHelpDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Event Custom Sliders Help",None)) 
-        self.setModal(False)
-        
-        settings = QSettings()
-        if settings.contains("eventslidersHelpGeometry"):
-            self.restoreGeometry(settings.value("eventslidersHelpGeometry"))
-
-        # autogenerated help pasted below
-
-        newline = "\n"  #@UnusedVariable
-        helpstr = ""
-        helpstr += "<head><style>"
-        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
-        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
-        helpstr += "</style></head>"
-        helpstr += "<body>"
-        helpstr += "<b>" + u(QApplication.translate('HelpDlg','EVENT CUSTOM SLIDERS',None)) + "</b>"
-        tbl_Sliders = prettytable.PrettyTable()
-        tbl_Sliders.field_names = [u(QApplication.translate('HelpDlg','Command Type',None)),u(QApplication.translate('HelpDlg','Command',None))]
-        tbl_Sliders.add_row([u(QApplication.translate('HelpDlg','Event',None)),u(QApplication.translate('HelpDlg','Hide or show the corresponding slider',None))])
-        tbl_Sliders.add_row([u(QApplication.translate('HelpDlg','Action',None)),u(QApplication.translate('HelpDlg','Perform an action on the slider release',None))])
-        helpstr += tbl_Sliders.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','Commands',None)) + "</b>"
-        tbl_Commandstop = prettytable.PrettyTable()
-        tbl_Commandstop.header = False
-        tbl_Commandstop.add_row([u(QApplication.translate('HelpDlg',' Command depends on the action type ("{}" is replaced by value*factor + offset)',None))])
-        helpstr += tbl_Commandstop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_Commands = prettytable.PrettyTable()
-        tbl_Commands.field_names = [u(QApplication.translate('HelpDlg','Command Type',None)),u(QApplication.translate('HelpDlg','Command',None))]
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','Serial',None)),u(QApplication.translate('HelpDlg','ASCII serial command or binary a2b_uu(serial command)',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','Modbus',None)),u(QApplication.translate('HelpDlg','write([slaveId,register,value],..,[slaveId,register,value]) \nwrite register: MODBUS function 6 (int) or function 16 (float)',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','wcoil(slaveId,register,<bool>) \nwrite coil: MODBUS function 5',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','wcoils(slaveId,register,[<bool>,..,<bool>]) \nwrite coils: MODBUS function 15',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg',' ',None)),u(QApplication.translate('HelpDlg','mwrite(slaveId,register,andMask,orMask) \nmask write register: MODBUS function 22',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','writem(slaveId,register,value) or writem(slaveId,register,[<int>,..,<int>]) \nwrite registers: MODBUS function 16',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','writeBCD(slaveId,register,value) or writeBCD(slaveId,register,[<int>,..,<int>]) \nwrite BCD encoded int register: MODBUS function 16 (BCD)',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','writeWord(slaveId,register,value) \nwrite 32bit float to two 16bit int registers: MODBUS function 16',None))])
-        tbl_Commands.add_row(['&#160;',u(QApplication.translate('HelpDlg','writes values to the registers in slaves specified by the given id',None))])
-        tbl_Commands.add_row([u(QApplication.translate('HelpDlg','DTA',None)),u(QApplication.translate('HelpDlg','nsert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating',None))])
-        helpstr += tbl_Commands.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_Commandsbottom = prettytable.PrettyTable()
-        tbl_Commandsbottom.header = False
-        tbl_Commandsbottom.add_row([u(QApplication.translate('HelpDlg','Offset added as offset to the slider value',None))+newline+u(QApplication.translate('HelpDlg','Factor multiplicator of the slider value',None))])
-        helpstr += tbl_Commandsbottom.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "</body>"
-        helpstr = re.sub(r"&amp;#160;", r"&#160;",helpstr)
-
-        # autogenerated help pasted above
-
-        phelp = QTextEdit()
-        phelp.setHtml(helpstr)
-        phelp.setReadOnly(True)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        self.dialogbuttons.accepted.connect(self.close)
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)
-        hLayout.addLayout(buttonLayout)
-        self.setLayout(hLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    def closeEvent(self, _):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("eventslidersHelpGeometry",self.saveGeometry())
-
-
-##########################################################################################
-#####################  Event Annotation HELP DLG  ########################################
-##########################################################################################
-class eventannotationHelpDlg(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(eventannotationHelpDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Event Annotation Help",None)) 
-        self.setModal(False)
-
-        settings = QSettings()
-        if settings.contains("eventannotationHelpGeometry"):
-            self.restoreGeometry(settings.value("eventannotationHelpGeometry"))
-        
-        # autogenerated help pasted below
-
-        newline = "\n"  #@UnusedVariable
-        helpstr = ""
-        helpstr += "<head><style>"
-        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
-        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
-        helpstr += "</style></head>"
-        helpstr += "<body>"
-        helpstr += "<b>" + u(QApplication.translate('HelpDlg','EVENT ANNOTATIONS',None)) + "</b>"
-        tbl_Annotations = prettytable.PrettyTable()
-        tbl_Annotations.field_names = [u(QApplication.translate('HelpDlg','Prefix Field',None)),u(QApplication.translate('HelpDlg','Source',None)),u(QApplication.translate('HelpDlg','Example',None))]
-        tbl_Annotations.add_row(['~E',u(QApplication.translate('HelpDlg','The value of Event',None)),60])
-        tbl_Annotations.add_row(['~Y1',u(QApplication.translate('HelpDlg','ET value',None)),420])
-        tbl_Annotations.add_row(['~Y2',u(QApplication.translate('HelpDlg','BT value',None)),372])
-        tbl_Annotations.add_row(['~descr',u(QApplication.translate('HelpDlg','The Description field of the Event',None)),u(QApplication.translate('HelpDlg','Gas 10',None))])
-        tbl_Annotations.add_row(['~type',u(QApplication.translate('HelpDlg','The Type field of the Event',None)),u(QApplication.translate('HelpDlg','Power',None))])
-        tbl_Annotations.add_row(['~sldrunit',u(QApplication.translate('HelpDlg','The value of the Slider Unit for this Event',None)),u(QApplication.translate('HelpDlg','kPa',None))])
-        tbl_Annotations.add_row(['~dCHARGE',u(QApplication.translate('HelpDlg','Number of seconds since CHARGE',None)),522])
-        tbl_Annotations.add_row(['~dFCs',u(QApplication.translate('HelpDlg','Number of seconds after FCs \nBest used inside double quotes (see notes below) \nDisplays &#39;*&#39; prior to FCs',None)),47])
-        tbl_Annotations.add_row(['~preFCs',u(QApplication.translate('HelpDlg','Number of seconds before FCs \nBest used inside single quotes or back ticks (see notes below) \nDisplays &#39;*&#39; after FCs',None)),50])
-        tbl_Annotations.add_row(['~DTR',u(QApplication.translate('HelpDlg','Development time ratio. Note: DTR=0 before FCs \n100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})',None)),12])
-        tbl_Annotations.add_row(['~deg',u(QApplication.translate('HelpDlg','The degree symbol',None)),'\u00b0'])
-        tbl_Annotations.add_row(['~mode',u(QApplication.translate('HelpDlg','Temperature mode (&#39;C&#39; or &#39;F&#39;)',None)),'F'])
-        tbl_Annotations.add_row(['~degmode',u(QApplication.translate('HelpDlg','Degree symbol with Temperature mode',None)),'\u00b0C'])
-        tbl_Annotations.add_row(['~quot',u(QApplication.translate('HelpDlg','Quote symbol',None)),'"'])
-        tbl_Annotations.add_row(['~squot',u(QApplication.translate('HelpDlg','Single quote symbol',None)),'&#39;'])
-        helpstr += tbl_Annotations.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','EXAMPLES',None)) + "</b>"
-        tbl_Examplestop = prettytable.PrettyTable()
-        tbl_Examplestop.header = False
-        tbl_Examplestop.add_row([u(QApplication.translate('HelpDlg','Assumptions:  The event value is 50.  In the case of Gas the value 50 corresponds to either 5.0kPh or 50%.  \nFor a sensory milestone (see notes above) the value 50 corresponds to the "Hay" aroma. ',None))])
-        helpstr += tbl_Examplestop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_Examples = prettytable.PrettyTable()
-        tbl_Examples.field_names = [u(QApplication.translate('HelpDlg','Annotation Field',None)),u(QApplication.translate('HelpDlg','Displays',None))]
-        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E @~Y2~degmode',None)),u(QApplication.translate('HelpDlg','Gas 50 @340\u00b0F',None))])
-        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E% @~Y2~mode',None)),u(QApplication.translate('HelpDlg','Gas 50% @340F',None))])
-        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E/10kPh @~Y2~mode',None)),u(QApplication.translate('HelpDlg','Gas 5.0kPh @340F',None))])
-        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E% &#39;@~Y2 ~degmode&#39;"@~DTR% DTR"',None)),u(QApplication.translate('HelpDlg','Before FCs:\nGas 50% @340 \u00b0F\n\nAfter FCs:\nGas 50% @12% DTR',None))])
-        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','Gas ~E% &#39;@~Y2 ~degmode`, ~preFCs sec before FCs`&#39;"@~DTR% DTR"',None)),u(QApplication.translate('HelpDlg','More than 90 seconds before FCs:\nGas 50% @340 \u00b0F\n\nLess than 90 seconds before FCs:\nGas 50% @340 \u00b0F, 50 sec before FCs \n\nAfter FCs:\nGas 50% @12% DTR',None))])
-        tbl_Examples.add_row([u(QApplication.translate('HelpDlg','{20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} @~Y2~degmode',None)),u(QApplication.translate('HelpDlg','Hay @340 \u00b0F',None))])
-        helpstr += tbl_Examples.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "<br/><br/><b>" + u(QApplication.translate('HelpDlg','NOTES:',None)) + "</b>"
-        tbl_Notes = prettytable.PrettyTable()
-        tbl_Notes.field_names = ['&#160;']
-        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Event annotations apply only for &#39;Step&#39; and &#39;Step+&#39; Events settings',None))])
-        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Anything between double quotes " will show only after FCs. Example: "~E1 @~DTR%"',None))])
-        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Anything between single quotes &#39; will show only before FCs. Example: &#39;~E1 @~degmode&#39;',None))])
-        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Anything between back ticks ` will show only within 90 seconds before FCs. Example: `~E1 `FCs~dFCs sec`',None))])
-        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','When combining back ticks with single or double quotes the back ticks should be inside the quotes.',None))])
-        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Background event annotations can be seen during a roast when &#39;Annotations&#39; is checked in the Profile Background window.',None))])
-        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Simple scaling of the event value is possible. Use a single math operator (&#39;*&#39;, &#39;/&#39;, &#39;+&#39; or &#39;-&#39;) immediately following the field name "E". For example: \n&#39;~E/10&#39; will divide the E value by 10. \n&#39;~E+5&#39; adds 5 to the the value of E.',None))])
-        tbl_Notes.add_row([u(QApplication.translate('HelpDlg','Another style of annotations allows to replace an event&#39;s numeric value with a text string, known as a nominal value. One example where this can be useful is when an event is used to record sensory milestones. The value 20 might be used for &#39;Fresh Cut Grass&#39; aroma, 50 for &#39;Hay&#39;, 80 for &#39;Baking Bread&#39;, and 100 to represent the &#39;A Point&#39;.  \n\nThis form of annotation must be enclosed in curly brackets &#39;{}&#39;. Entries are numeric values immediately followed by their nominal representation text.  Entries are separated by the vertical bar &#39;|&#39;. The following Annotation string implements this example.   \n{~E|20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} \n\nNote that if the event value  does not match any value in the Annotation definition a blank string will be returned.  In the example above an event value of 30 will return a blank string.  The easiest way to ensure these values match is to use Custom Buttons to for the Event.',None))])
-        helpstr += tbl_Notes.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "</body>"
-        helpstr = re.sub(r"&amp;", r"&",helpstr)
-
-        # autogenerated help pasted above
-                
-        phelp = QTextEdit()
-        phelp.setHtml(helpstr)
-        phelp.setReadOnly(True)
-
-        hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)        
-        self.setLayout(hLayout)
-
-    @pyqtSlot()
-    def closeEvent(self, _):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("eventannotationHelpGeometry",self.saveGeometry())
 
 
 ##########################################################################
@@ -54923,9 +54385,9 @@ class comportDlg(ArtisanResizeablDialog):
     def showModbusbuttonhelp(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = modbusHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","MODBUS Help",None),modbus_help.content())
         except:
-            self.helpdialog = modbusHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -54980,61 +54442,6 @@ class comportDlg(ArtisanResizeablDialog):
 
     def closeserialports(self):
         aw.closeserialports()
-
-########################################################################################
-#####################  MODBUS HELP DLG #################################################
-########################################################################################
-class modbusHelpDlg(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(modbusHelpDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Modbus Help",None)) 
-        self.setModal(False)
-        
-        settings = QSettings()
-        if settings.contains("modbusHelpGeometry"):
-            self.restoreGeometry(settings.value("modbusHelpGeometry"))
-
-        # autogenerated help pasted below
-
-        newline = "\n"  #@UnusedVariable
-        helpstr = ""
-        helpstr += "<head><style>"
-        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
-        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
-        helpstr += "</style></head>"
-        helpstr += "<body>"
-        helpstr += "<b>" + u(QApplication.translate('HelpDlg','MODBUS',None)) + "</b>"
-        tbl_Modbustop = prettytable.PrettyTable()
-        tbl_Modbustop.header = False
-        tbl_Modbustop.add_row([u(QApplication.translate('HelpDlg','The MODBUS device corresponds to input channels1 and 2.. The MODBUS_34 extra device adds input channels 3 and 4.',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','Inputs with slave id set to 0 are turned off.',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','Modbus function 3 "read holding register" is the standard. Modbus function 4 triggers the use of "read input register". Input registers (fct 4) usually are from 30000-39999.',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','Most devices hold data in 2 byte integer registers. A temperature of 145.2C is often sent as 1452. In that case you have to set the divider to "x/10".',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','Few devices hold data as 4 byte floats in two registers. Tick the Float flag in this case.',None))])
-        helpstr += tbl_Modbustop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "</body>"
-        helpstr = re.sub(r"&amp;#160;", r"&#160;",helpstr)
-
-        # autogenerated help pasted above
-
-        phelp = QTextEdit()
-        phelp.setHtml(helpstr)
-        phelp.setReadOnly(True)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        self.dialogbuttons.accepted.connect(self.close)
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)
-        hLayout.addLayout(buttonLayout)
-        self.setLayout(hLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    def closeEvent(self, _):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("modbusHelpGeometry",self.saveGeometry())
-
 
 #################################################################################
 ##################   MODBUS Scan DIALOG for testing registers    ################
@@ -57811,9 +57218,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def showExtradevHelp(self):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = symbolicformulasHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Symbolic Formulas Help",None),symbolic_help.content())
         except:
-            self.helpdialog = symbolicformulasHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -57821,9 +57228,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def showSymbolicHelp(self):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = symbolicformulasHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Symbolic Formulas Help",None),symbolic_help.content())
         except:
-            self.helpdialog = symbolicformulasHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -57831,9 +57238,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def showhelpprogram(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = programHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","External Programs Help",None),programs_help.content())
         except:
-            self.helpdialog = programHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -57847,65 +57254,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def tabSwitched(self,_):
         self.closeHelp()
-
-########################################################################################
-#####################  PROGRAM HELP DLG ################################################
-########################################################################################
-class programHelpDlg(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(programHelpDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Symbolic Formulas Help",None)) 
-        self.setModal(False)
-        
-        settings = QSettings()
-        if settings.contains("programHelpGeometry"):
-            self.restoreGeometry(settings.value("programHelpGeometry"))
-
-        # autogenerated help pasted below
-
-        newline = "\n"  #@UnusedVariable
-        helpstr = ""
-        helpstr += "<head><style>"
-        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
-        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
-        helpstr += "</style></head>"
-        helpstr += "<body>"
-        helpstr += "<b>" + u(QApplication.translate('HelpDlg','EXTERNAL PROGRAMS',None)) + "</b>"
-        tbl_Programstop = prettytable.PrettyTable()
-        tbl_Programstop.header = False
-        tbl_Programstop.add_row([u(QApplication.translate('HelpDlg','Allows to link to external programs that print temperature when called',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','The output of the program must be to Stdout (like when using print statements)',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','this allo ws to connect meters that use any programming language',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','Example of output needed from program for single temperature (BT)',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','"100.4" (note: "" not needed)',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','Example of output needed from program for double temperature (ET,BT)',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','"200.4,100.4" (note: temperatures are separated by a comma "ET,BT")',None))])
-        helpstr += tbl_Programstop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_Programsbottom = prettytable.PrettyTable()
-        tbl_Programsbottom.header = False
-        tbl_Programsbottom.add_row([u(QApplication.translate('HelpDlg','Example of a file written in python language called test.py:',None))+newline+u(QApplication.translate('HelpDlg','#comment: print a string with two numbers separated by a comma',None))+newline+u(QApplication.translate('HelpDlg','',None))+newline+u(QApplication.translate('HelpDlg','#!/usr/bin/env python',None))+newline+u(QApplication.translate('HelpDlg','print ("237.1,100.4")',None))])
-        helpstr += tbl_Programsbottom.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "</body>"
-        helpstr = re.sub(r"&amp;#160;", r"&#160;",helpstr)
-
-        # autogenerated help pasted above
-
-        phelp = QTextEdit()
-        phelp.setHtml(helpstr)
-        phelp.setReadOnly(True)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        self.dialogbuttons.accepted.connect(self.close)
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)
-        hLayout.addLayout(buttonLayout)
-        self.setLayout(hLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    def closeEvent(self, _):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("programHelpGeometry",self.saveGeometry())
-
 
 ############################################################
 #######################  CUSTOM COLOR DIALOG  ##############
@@ -61133,9 +60481,9 @@ class AlarmDlg(ArtisanResizeablDialog):
     def showAlarmbuttonhelp(self,_=False):
         try: # sip not supported on older PyQt versions (RPi!)
             if self.helpdialog is None or sip.isdeleted(self.helpdialog):
-                self.helpdialog = alarmHelpDlg(self)
+                self.helpdialog = HelpDlg(self,QApplication.translate("Form Caption","Alarms Help",None),alarms_help.content())
         except:
-            self.helpdialog = alarmHelpDlg(self)
+            self.helpdialog = HelpDlg(self)
         self.helpdialog.show()
         self.helpdialog.activateWindow()
 
@@ -61145,74 +60493,6 @@ class AlarmDlg(ArtisanResizeablDialog):
                 self.helpdialog.close()
         except:
             self.helpdialog.close()
-
-########################################################################################
-#####################  ALARM HELP DLG  #################################################
-########################################################################################
-class alarmHelpDlg(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(alarmHelpDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Symbolic Formulas Help",None)) 
-        self.setModal(False)
-        
-        settings = QSettings()
-        if settings.contains("alarmHelpGeometry"):
-            self.restoreGeometry(settings.value("alarmHelpGeometry"))
-
-        # autogenerated help pasted below
-
-        newline = "\n"  #@UnusedVariable
-        helpstr = ""
-        helpstr += "<head><style>"
-        helpstr += "td, th {border: 1px solid #ddd;  padding: 6px;}"
-        helpstr += "th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;}"
-        helpstr += "</style></head>"
-        helpstr += "<body>"
-        helpstr += "<b>" + u(QApplication.translate('HelpDlg','ALARMS',None)) + "</b>"
-        tbl_Alarmstop = prettytable.PrettyTable()
-        tbl_Alarmstop.header = False
-        tbl_Alarmstop.add_row([u(QApplication.translate('HelpDlg','Each alarm is only triggered once.',None))])
-        helpstr += tbl_Alarmstop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        tbl_Alarms = prettytable.PrettyTable()
-        tbl_Alarms.field_names = [u(QApplication.translate('HelpDlg','Field',None)),u(QApplication.translate('HelpDlg','Description',None))]
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','Nr',None)),u(QApplication.translate('HelpDlg','Alarm number for reference',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','Status',None)),u(QApplication.translate('HelpDlg','Activate or Deactivate the alarm',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','If Alarm',None)),u(QApplication.translate('HelpDlg','Alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','But Not',None)),u(QApplication.translate('HelpDlg','Alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','From',None)),u(QApplication.translate('HelpDlg','Alarm only triggered after the given event',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','Time',None)),u(QApplication.translate('HelpDlg','If not 00:00, alarm is triggered mm:ss after the event "From" happened',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','Source',None)),u(QApplication.translate('HelpDlg','The observed temperature source',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','Condition',None)),u(QApplication.translate('HelpDlg','Alarm is triggered if source rises above or below the specified temperature',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','Temp',None)),u(QApplication.translate('HelpDlg','The specified temperature limit',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','Action',None)),u(QApplication.translate('HelpDlg','The action to be triggered if all conditions are fulfilled',None))])
-        tbl_Alarms.add_row([u(QApplication.translate('HelpDlg','Description',None)),u(QApplication.translate('HelpDlg','The text of the popup, the name of the program, the number of the event button, the new value of the slider or the program to call',None))])
-        helpstr += tbl_Alarms.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"})
-        helpstr += "</body>"
-        helpstr = re.sub(r"&amp;#160;", r"&#160;",helpstr)
-
-        # autogenerated help pasted above
-
-        phelp = QTextEdit()
-        phelp.setHtml(helpstr)
-        phelp.setReadOnly(True)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        self.dialogbuttons.accepted.connect(self.close)
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)
-        hLayout.addLayout(buttonLayout)
-        self.setLayout(hLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    def closeEvent(self, _):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("alarmHelpGeometry",self.saveGeometry())
 
 ############################################################################
 ######################## FUJI PX PID CONTROL DIALOG ########################
