@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # This work is licensed under the GNU Public License (GPL).
 # To view a copy of this license, visit http://www.gnu.org/copyleft/gpl.html
 

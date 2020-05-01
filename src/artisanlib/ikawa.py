@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # ABOUT
-# IKAWA CSV Roast Profile importer (only IKAWA CSV format V2 is supported for now)
+# IKAWA CSV Roast Profile importer for Artisan (only IKAWA CSV format V2 is supported for now)
 
 import time as libtime
 import os

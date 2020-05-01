@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # ABOUT
 # Hottop 2k+ support for Artisan

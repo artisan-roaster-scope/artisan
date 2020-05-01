@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # ABOUT
-# Cropster XLS Roast Profile importer
+# Cropster XLS Roast Profile importer for Artisan
 
 import time as libtime
 import xlrd

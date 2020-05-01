@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # ABOUT
 # This program realizes a PID controler as part of the open-source roast logging software Artisan.

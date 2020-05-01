@@ -3,6 +3,14 @@ import platform
 import sys
 import codecs
 
+deltaLabelPrefix = "<html>&Delta;&thinsp;</html>" # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
+if platform.system() == 'Linux':
+    deltaLabelUTF8 = "Delta"
+else:
+    deltaLabelUTF8 = "\u0394\u2009" # u("\u03B4") # prefix for non HTML Qt Widgets like QPushbuttons
+deltaLabelBigPrefix = "<big><b>&Delta;</b></big>&thinsp;<big><b>" # same as above for big/bold use cases
+deltaLabelMathPrefix = "$\Delta\/$"  # prefix for labels in matplibgraphs to compose DeltaET/BT by prepending this prefix to ET/BT labels
+
 def appFrozen():
     ib = False
     try:
