@@ -3,6 +3,9 @@ import platform
 import sys
 import codecs
 
+import urllib.parse as urlparse  # @Reimport
+import urllib.request as urllib  # @Reimport
+
 deltaLabelPrefix = "<html>&Delta;&thinsp;</html>" # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
 if platform.system() == 'Linux':
     deltaLabelUTF8 = "Delta"
@@ -144,3 +147,62 @@ def convertTemp(t,source_unit,target_unit):
             return fromFtoC(t)
     else:
         return t
+
+
+def path2url(path):
+    return urlparse.urljoin(
+      'file:', urllib.pathname2url(path))
+        
+# remaining artifacts from Qt4/5 compatibility layer:
+def toInt(x):
+    if x is None:
+        return 0
+    else:
+        try:
+            return int(x)
+        except:
+            return 0
+def toString(x):
+    return str(x)
+def toList(x):
+    if x is None:
+        return []
+    else:
+        return list(x)
+def toFloat(x):
+    if x is None:
+        return 0.
+    else:
+        try:
+            return float(x)
+        except:
+            return 0.
+def toDouble(x):
+    if x is None:
+        return 0.
+    else:
+        try:
+            return float(x)
+        except:
+            return 0.
+def toBool(x):
+    if x is None:
+        return False
+    else:
+        if isinstance(x,str):
+            if x in ["false","False"]:
+                return False
+            else:
+                return True
+        else:
+            return bool(x)
+def toStringList(x):
+    if x:
+        return [str(s) for s in x]
+    else:
+        return []
+def toMap(x):
+    return x
+def removeAll(l,s):
+    for _ in range(l.count(s)):  # @UndefinedVariable
+        l.remove(s) 

@@ -33,9 +33,9 @@ with suppress_stdout_stderr():
     from matplotlib import cm
 
 from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl)
+from PyQt5.QtGui import (QColor, QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
     QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox)
-from PyQt5.QtGui import (QColor, QDesktopServices)
 
 
 class RoastProfile():
