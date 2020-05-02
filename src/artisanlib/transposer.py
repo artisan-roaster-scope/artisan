@@ -16,19 +16,17 @@
 # AUTHOR
 # Marko Luther, 2020
 
+import time as libtime
 import warnings
 import copy
 import numpy
 
-from artisanlib.dialogs import ArtisanDialog, HelpDlg
+from artisanlib.dialogs import ArtisanDialog
 from help import transposer_help
 
-try: # sip not supported on older PyQt versions (RPi!)
-    from PyQt5 import sip
-except:
-    pass
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView)
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegExp)
+from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegExp, QDateTime)
+from PyQt5.QtGui import (QRegExpValidator)
 from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout)
 

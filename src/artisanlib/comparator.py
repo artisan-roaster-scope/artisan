@@ -32,10 +32,10 @@ from artisanlib.qcheckcombobox import CheckComboBox
 with suppress_stdout_stderr():
     from matplotlib import cm
 
-from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream)
+from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl)
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
     QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox)
-from PyQt5.QtGui import (QColor)
+from PyQt5.QtGui import (QColor, QDesktopServices)
 
 
 class RoastProfile():
@@ -506,7 +506,7 @@ class roastCompareDlg(ArtisanDialog):
         self.background = background
         self.setWindowTitle(QApplication.translate("Form Caption","Comparator",None))
         self.maxentries = 10 # maxium number of profiles to be compared
-        self.basecolors = list(cm.tab10(numpy.linspace(0,1,10)))
+        self.basecolors = list(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable
         self.profiles = []
         self.label_number = 0
         # align line

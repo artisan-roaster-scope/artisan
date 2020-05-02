@@ -39026,7 +39026,7 @@ class messageDlg(ArtisanDialog):
         
     def update(self):
         #convert list of messages to an html string
-        lenl = len(self.aw.qmc.messagehist)
+        lenl = len(self.aw.messagehist)
         htmlmessage = "".join(["<b>{}</b> {}<br><br>".format(lenl-i,m) for i,m in enumerate(reversed(self.aw.messagehist))])
         self.messageEdit.setHtml(htmlmessage)
     
