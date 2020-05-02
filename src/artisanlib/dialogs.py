@@ -19,7 +19,7 @@
 import platform
 
 from PyQt5.QtCore import (Qt, QSettings)
-from PyQt5.QtWidgets import (QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, QHBoxLayout, QVBoxLayout)
+from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, QHBoxLayout, QVBoxLayout)
 from PyQt5.QtGui import QKeySequence
 
 class ArtisanDialog(QDialog):

@@ -16,6 +16,8 @@
 # AUTHOR
 # Marko Luther, 2020
 
+from artisanlib.util import stringtoseconds
+
 from PyQt5.QtCore import (Qt)
 from PyQt5.QtWidgets import (QLabel, QComboBox, QDoubleSpinBox, QTableWidgetItem, QSizePolicy)
 from PyQt5.QtGui import QFontMetrics
@@ -63,7 +65,7 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem):
         b = other.sortKey.text()
         if len(a) == 5 and len(b) == 5 and a[2] == ":" and b[2] == ":":
             # we compare times
-            return aw.qmc.stringtoseconds(a) < aw.qmc.stringtoseconds(b)
+            return stringtoseconds(a) < stringtoseconds(b)
         else:
             try:
                 # if those are numbers
