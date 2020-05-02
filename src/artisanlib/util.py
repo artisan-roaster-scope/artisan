@@ -65,7 +65,7 @@ def s2a(s):
     return s.encode('ascii','ignore').decode("ascii")
 
 # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
-def stringfromseconds(self, seconds_raw, leadingzero=True):
+def stringfromseconds(seconds_raw, leadingzero=True):
     seconds = int(round(seconds_raw))
     if seconds >= 0:
         if leadingzero:

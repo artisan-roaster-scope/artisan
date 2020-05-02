@@ -24,10 +24,9 @@ import numpy
 from artisanlib.dialogs import ArtisanDialog
 from help import transposer_help
 
-from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView)
 from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegExp, QDateTime)
 from PyQt5.QtGui import (QRegExpValidator)
-from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
+from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout)
 
 class profileTransformatorDlg(ArtisanDialog):
