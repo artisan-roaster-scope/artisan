@@ -5,7 +5,7 @@
 
 import time as libtime
 import xlrd
-from PyQt5.QtCore import QDateTime, QDate, Qt
+from PyQt5.QtCore import QDateTime, Qt
 from PyQt5.QtWidgets import QApplication
 
 from artisanlib.util import encodeLocal
@@ -247,9 +247,9 @@ def extractProfileCropsterXLS(file):
                                  "--"]
                 # update
                 if airflow_event:
-                   res["etypes"][0] = "Airflow"
+                    res["etypes"][0] = "Airflow"
                 if gas_event:
-                   res["etypes"][3] = "Gas"
+                    res["etypes"][3] = "Gas"
     except:
         pass
     return res

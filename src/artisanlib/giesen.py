@@ -3,16 +3,10 @@
 # ABOUT
 # GIESEN CSV Roast Profile importer for Artisan
 
-import time as libtime
-import os
 import io
 import csv
-import re
-            
-from PyQt5.QtCore import QDateTime,Qt
-from PyQt5.QtWidgets import QApplication
 
-from artisanlib.util import encodeLocal
+from PyQt5.QtWidgets import QApplication
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
 def extractProfileGiesenCSV(file):
@@ -107,7 +101,7 @@ def extractProfileGiesenCSV(file):
                         specialeventsStrings.append(item["speed"] + "%")
                 else:
                     speed_last = None
-            except Exception as e:
+            except:
                 pass
         if "power" in item:
             try:
@@ -169,8 +163,8 @@ def extractProfileGiesenCSV(file):
                              "--"]
             # update
             if speed_event:
-               res["etypes"][0] = "Speed"
+                res["etypes"][0] = "Speed"
             if power_event:
-               res["etypes"][3] = "Power"
+                res["etypes"][3] = "Power"
     return res
                 

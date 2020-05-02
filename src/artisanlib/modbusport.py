@@ -326,7 +326,7 @@ class modbusport(object):
                         count = seq[1]-seq[0] + 1
                         res = None
                         if just_send:
-                        	self.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
+                            self.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
                         just_send = True
                         while True:
                             try:

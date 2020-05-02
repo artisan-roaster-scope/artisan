@@ -14,7 +14,7 @@ import sys
 from PyQt5.QtCore import Qt, QEvent, QRect, QTimer, pyqtSignal
 
 from PyQt5.QtGui import (
-    QPalette, QFontMetrics, QBrush, QColor, QPixmap, QGradient, QIcon
+    QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon
 )
 from PyQt5.QtWidgets import (
     QComboBox, QAbstractItemView, QAbstractItemDelegate, QStyledItemDelegate,

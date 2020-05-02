@@ -113,7 +113,7 @@ def extractProfileIkawaCSV(file):
                         specialeventsStrings.append(item["fan set (%)"] + "%")
                 else:
                     fan_last = None
-            except Exception as e:
+            except:
                 pass
         if "heater power (%)" in item:
             try:
@@ -128,7 +128,7 @@ def extractProfileIkawaCSV(file):
                         del specialeventstype[heater_last_idx]
                         del specialeventsStrings[heater_last_idx]
                         heater = heater_last
-                        heaster_last = None
+                        heater_last = None
                     else:
                         heater_last = heater
                         heater = v
@@ -174,8 +174,8 @@ def extractProfileIkawaCSV(file):
                              "--"]
             # update
             if fan_event:
-               res["etypes"][0] = "Fan"
+                res["etypes"][0] = "Fan"
             if heater_event:
-               res["etypes"][3] = "Heater"
+                res["etypes"][3] = "Heater"
     return res
                 

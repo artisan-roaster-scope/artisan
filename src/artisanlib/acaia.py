@@ -159,7 +159,7 @@ class AcaiaBLE():
             elif self.unit == 5: # lbs
                 value = value * 28.3495
             
-            stable = (payload[5] & 0x01) != 0x01
+            #stable = (payload[5] & 0x01) != 0x01
             
             # if 2nd bit of payload[5] is set, the reading is negative
             if (payload[5] & 0x02) == 0x02:

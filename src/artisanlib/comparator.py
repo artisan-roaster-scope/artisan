@@ -23,7 +23,7 @@ import matplotlib.ticker as ticker
 import matplotlib.transforms as transforms
 import matplotlib.patheffects as PathEffects
     
-from artisanlib.util import deltaLabelUTF8, d
+from artisanlib.util import deltaLabelUTF8, d, stringfromseconds
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -660,7 +660,7 @@ class roastCompareDlg(ArtisanDialog):
             temp = self.aw.float2float(p.temp2[p.timeindex[ind]])
             event_name = self.alignnames[ind]
             event_name = self.aw.arabicReshape(event_name)
-            self.aw.sendmessage("{}: {} @ {}, {}{}".format(p.label,event_name,self.aw.qmc.stringfromseconds(time,leadingzero=False),temp,self.aw.qmc.mode))
+            self.aw.sendmessage("{}: {} @ {}, {}{}".format(p.label,event_name,stringfromseconds(time,leadingzero=False),temp,self.aw.qmc.mode))
         
     def clearCanvas(self):
         if self.aw.qmc.ax is None:

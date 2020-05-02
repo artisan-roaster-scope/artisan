@@ -22,6 +22,8 @@ import copy
 import numpy
 
 from artisanlib.dialogs import ArtisanDialog
+from artisanlib.util import stringfromseconds, stringtoseconds
+
 from help import transposer_help
 
 from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegExp, QDateTime)
@@ -260,7 +262,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 if w is not None:
                     txt = w.text()
                     if txt is not None and txt != "":
-                        r = self.aw.qmc.stringtoseconds(txt)
+                        r = stringtoseconds(txt)
                 res_times.append(r)
         if self.phases_target_widgets_percent is not None:
             for w in self.phases_target_widgets_percent:
@@ -281,7 +283,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 if w is not None:
                     txt = w.text()
                     if txt is not None and txt != "":
-                        r = self.aw.qmc.stringtoseconds(txt)
+                        r = stringtoseconds(txt)
                 res.append(r)
         return res
 
@@ -323,12 +325,12 @@ class profileTransformatorDlg(ArtisanDialog):
                 s = 0
                 if i == 0:
                     # DRYING
-                    s = self.aw.qmc.stringfromseconds(back_dry - back_offset)
+                    s = stringfromseconds(back_dry - back_offset)
                 elif i == 1:
                     # MAILARD
-                    s = self.aw.qmc.stringfromseconds(back_fcs - back_dry)
+                    s = stringfromseconds(back_fcs - back_dry)
                 elif i == 2:
-                    s = self.aw.qmc.stringfromseconds(back_drop - back_fcs)
+                    s = stringfromseconds(back_drop - back_fcs)
                 self.phases_target_widgets_time[i].setText(s)
             self.updateTimeResults()
     
@@ -351,7 +353,7 @@ class profileTransformatorDlg(ArtisanDialog):
             elif self.aw.qmc.background:
                 timeidx = [1,2,4,6][i]
                 if self.aw.qmc.timeindex[timeidx] and self.aw.qmc.timeindexB[timeidx]:
-                    s = self.aw.qmc.stringfromseconds(self.aw.qmc.timeB[self.aw.qmc.timeindexB[timeidx]]-self.backgroundOffset(),False)
+                    s = stringfromseconds(self.aw.qmc.timeB[self.aw.qmc.timeindexB[timeidx]]-self.backgroundOffset(),False)
                     self.time_target_widgets[i].setText(s)
                     self.updateTimeResults()
 
@@ -426,7 +428,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     if result_times[i] is None:
                         s = ""
                     else:
-                        s = self.aw.qmc.stringfromseconds(result_times[i],leadingzero=False)
+                        s = stringfromseconds(result_times[i],leadingzero=False)
                     self.time_result_widgets[i].setText(s)
             # set new phases results
             result_times = self.calcTimeResults()
@@ -435,19 +437,19 @@ class profileTransformatorDlg(ArtisanDialog):
                 drying_period = result_times[0]
                 drying_percentage = 100 * drying_period / result_times[3]
                 drying_str = \
-                        "{}    {}%".format(self.aw.qmc.stringfromseconds(drying_period,leadingzero=False),self.aw.float2float(drying_percentage))
+                        "{}    {}%".format(stringfromseconds(drying_period,leadingzero=False),self.aw.float2float(drying_percentage))
                 self.phases_result_widgets[0].setText(drying_str)
                 # MAILARD
                 mailard_period = result_times[1] - result_times[0]
                 mailard_percentage = 100 * mailard_period / result_times[3]
                 mailard_str = \
-                        "{}    {}%".format(self.aw.qmc.stringfromseconds(mailard_period,leadingzero=False),self.aw.float2float(mailard_percentage))
+                        "{}    {}%".format(stringfromseconds(mailard_period,leadingzero=False),self.aw.float2float(mailard_percentage))
                 self.phases_result_widgets[1].setText(mailard_str)
                 # FINISHING
                 finishing_period = result_times[3] - result_times[1]
                 finishing_percentage = 100 * finishing_period / result_times[3]
                 finishing_str = \
-                        "{}    {}%".format(self.aw.qmc.stringfromseconds(finishing_period,leadingzero=False),self.aw.float2float(finishing_percentage))
+                        "{}    {}%".format(stringfromseconds(finishing_period,leadingzero=False),self.aw.float2float(finishing_percentage))
                 self.phases_result_widgets[2].setText(finishing_str)
             else:
                 for w in self.phases_result_widgets:
@@ -639,7 +641,7 @@ class profileTransformatorDlg(ArtisanDialog):
         
         # first determine the target DROP time (relative to the profile drop) if any
         if self.phases_target_widgets_time[2] is not None and self.phases_target_widgets_time[2].text() != "":
-            drop = fcs + self.aw.qmc.stringtoseconds(self.phases_target_widgets_time[2].text())
+            drop = fcs + stringtoseconds(self.phases_target_widgets_time[2].text())
             drop_set = True
         elif self.phases_target_widgets_percent[2] is not None and self.phases_target_widgets_percent[2].text() != "":
             drop = fcs + (float(self.phases_target_widgets_percent[2].text()) * drop / 100)
@@ -647,7 +649,7 @@ class profileTransformatorDlg(ArtisanDialog):
         
         # determine the target DRY time (relative to the target drop of above) if any
         if self.phases_target_widgets_time[0] is not None and self.phases_target_widgets_time[0].text() != "":
-            dry = self.aw.qmc.stringtoseconds(self.phases_target_widgets_time[0].text())
+            dry = stringtoseconds(self.phases_target_widgets_time[0].text())
             dry_set = True
         elif self.phases_target_widgets_percent[0] is not None and self.phases_target_widgets_percent[0].text() != "":
             dry = float(self.phases_target_widgets_percent[0].text()) * drop / 100
@@ -655,7 +657,7 @@ class profileTransformatorDlg(ArtisanDialog):
         
         # determine the target FCs time (relative to the target drop of above) if any
         if self.phases_target_widgets_time[1] is not None and self.phases_target_widgets_time[1].text() != "":
-            fcs = dry + self.aw.qmc.stringtoseconds(self.phases_target_widgets_time[1].text())
+            fcs = dry + stringtoseconds(self.phases_target_widgets_time[1].text())
             fcs_set = True
         elif self.phases_target_widgets_percent[1] is not None and self.phases_target_widgets_percent[1].text() != "":
             fcs = dry + (float(self.phases_target_widgets_percent[1].text()) * drop / 100)
@@ -931,7 +933,7 @@ class profileTransformatorDlg(ArtisanDialog):
         for i in range(3):
             if len(profilePhasesTimes) > i and profilePhasesTimes[i] is not None:
                 profile_phases_time_str = \
-                    "{}    {}%".format(self.aw.qmc.stringfromseconds(profilePhasesTimes[i],leadingzero=False),self.aw.float2float(profilePhasesPercentages[i]))
+                    "{}    {}%".format(stringfromseconds(profilePhasesTimes[i],leadingzero=False),self.aw.float2float(profilePhasesPercentages[i]))
                 profile_phases_widget = QTableWidgetItem(profile_phases_time_str)
                 profile_phases_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 self.phasestable.setItem(0,i,profile_phases_widget)
@@ -1009,7 +1011,7 @@ class profileTransformatorDlg(ArtisanDialog):
         
         for i in range(4):
             if len(self.profileTimes) > i and not self.profileTimes[i] is None:
-                profile_time_str = self.aw.qmc.stringfromseconds(self.profileTimes[i],leadingzero=False)
+                profile_time_str = stringfromseconds(self.profileTimes[i],leadingzero=False)
                 profile_widget = QTableWidgetItem(profile_time_str)
                 profile_widget.setTextAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 self.timetable.setItem(0,i,profile_widget)

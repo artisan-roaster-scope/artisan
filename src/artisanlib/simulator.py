@@ -16,7 +16,6 @@
 # AUTHOR
 # Marko Luther, 2020
 
-import time as libtime
 import numpy
 
 class Simulator():
