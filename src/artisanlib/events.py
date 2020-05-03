@@ -21,7 +21,7 @@ import platform
 import prettytable
 
 from artisanlib.util import uchr
-from artisanlib.dialogs import ArtisanResizeablDialog
+from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 
 from help import eventannotations_help
@@ -2881,3 +2881,62 @@ class EventsDlg(ArtisanResizeablDialog):
 
     def closeHelp(self):
         self.aw.closeHelpDialog(self.helpdialog)
+
+#########################################################################
+#############  CUSTOM EVENT DIALOG ######################################
+#########################################################################
+
+class customEventDlg(ArtisanDialog):
+    def __init__(self, parent = None, aw = None, time_idx=0,description="",event_type=4,value=0):
+        super(customEventDlg,self).__init__(parent, aw)
+        if time_idx != 0:
+            event_time = self.aw.qmc.timex[time_idx]
+            if self.aw.qmc.timeindex[0] > -1:
+                event_time -= self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+            event_time_str = " @ " + self.aw.eventtime2string(event_time)
+        else:
+            event_time_str = ""
+        self.setWindowTitle(QApplication.translate("Form Caption","Event",None) + event_time_str)
+        self.description = description
+        self.type = event_type
+        self.value = self.aw.qmc.eventsvalues(value)
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(self.accept)
+        self.dialogbuttons.rejected.connect(self.reject)
+        
+        descriptionLabel = QLabel(QApplication.translate("Table", "Description", None))
+        self.descriptionEdit = QLineEdit(self.description)
+        typeLabel = QLabel(QApplication.translate("Table", "Type", None))
+        etypes = self.aw.qmc.getetypes()
+        self.typeCombo = MyQComboBox()
+        self.typeCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.typeCombo.addItems(etypes)
+        self.typeCombo.setCurrentIndex(self.type)
+        valueLabel = QLabel(QApplication.translate("Table", "Value", None))
+        self.valueEdit = QLineEdit(str(self.value))
+        
+        grid = QGridLayout()
+        grid.addWidget(descriptionLabel,0,0)
+        grid.addWidget(self.descriptionEdit,0,1)
+        grid.addWidget(typeLabel,1,0)
+        grid.addWidget(self.typeCombo,1,1)
+        grid.addWidget(valueLabel,2,0)
+        grid.addWidget(self.valueEdit,2,1)
+
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(self.dialogbuttons)
+        
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(grid)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonsLayout)
+        self.setLayout(mainLayout)
+        
+    def accept(self):
+        self.description = self.descriptionEdit.text()
+        evalue = self.valueEdit.text()
+        self.value = self.aw.qmc.str2eventsvalue(str(evalue))
+        self.type = self.typeCombo.currentIndex()
+        super(customEventDlg,self).accept()

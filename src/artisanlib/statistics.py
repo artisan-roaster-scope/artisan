@@ -1,0 +1,267 @@
+#!/usr/bin/env python3
+
+# ABOUT
+# Artisan Statistics Dialog
+
+# LICENSE
+# This program or module is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 2 of the License, or
+# version 3 of the License, or (at your option) any later versison. It is
+# provided for educational purposes and is distributed in the hope that
+# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+# the GNU General Public License for more details.
+
+# AUTHOR
+# Marko Luther, 2020
+
+from artisanlib.dialogs import ArtisanDialog
+
+from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, 
+    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QLayout,
+    QSpinBox)
+
+class StatisticsDlg(ArtisanDialog):
+    def __init__(self, parent = None, aw = None):
+        super(StatisticsDlg,self).__init__(parent, aw)
+        self.setWindowTitle(QApplication.translate("Form Caption","Statistics",None))
+        self.setModal(True)
+        self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None))
+        self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None))
+        self.ror = QCheckBox(self.aw.qmc.mode + QApplication.translate("CheckBox","/min",None))
+        self.ts = QCheckBox(QApplication.translate("CheckBox","AUC",None))
+        self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None))
+        self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Summary",None))
+        self.ShowStatsSummary.setChecked(self.aw.qmc.statssummary)
+        self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle
+        #temp fix for possible bug self.aw.qmc.statisticsflags=[] > empty list out of range
+        if self.aw.qmc.statisticsflags:
+            if self.aw.qmc.statisticsflags[0]:
+                self.timez.setChecked(True)
+            if self.aw.qmc.statisticsflags[1]:
+                self.bar.setChecked(True)
+            if self.aw.qmc.statisticsflags[3]:
+                self.area.setChecked(True)
+            if self.aw.qmc.statisticsflags[4]:
+                self.ror.setChecked(True)
+            if self.aw.qmc.statisticsflags[5]:
+                self.ts.setChecked(True)
+        else:
+            self.aw.qmc.statisticsflags = [1,1,0,1,1,0]
+            self.timez.setChecked(True)
+            self.bar.setChecked(True)
+            self.area.setChecked(True)
+            self.ror.setChecked(True)
+            self.ts.setChecked(False)
+        self.timez.stateChanged.connect(self.changeStatisticsflag)
+        self.bar.stateChanged.connect(self.changeStatisticsflag)
+        # flag 2 not used anymore
+        self.area.stateChanged.connect(self.changeStatisticsflag)
+        self.ror.stateChanged.connect(self.changeStatisticsflag)
+        self.ts.stateChanged.connect(self.changeStatisticsflag)
+        
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(self.accept)
+        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
+        flagsLayout = QGridLayout()
+        flagsLayout.addWidget(self.timez,0,0)
+        flagsLayout.addWidget(self.bar,0,1)
+        flagsLayout.addWidget(self.ror,0,2)
+        flagsLayout.addWidget(self.ts,0,3)
+        flagsLayout.addWidget(self.area,0,4)
+        flagsLayout.addWidget(self.ShowStatsSummary,0,5)
+        
+        beginlabel =QLabel(QApplication.translate("Label", "From",None))
+        beginitems = [
+                    QApplication.translate("Label","CHARGE",None),
+                    QApplication.translate("Label","TP",None),
+                    QApplication.translate("Label","DRY END",None),
+                    QApplication.translate("Label","FC START",None)]
+        self.beginComboBox = QComboBox()
+        self.beginComboBox.setFocusPolicy(Qt.NoFocus)
+        self.beginComboBox.setMaximumWidth(120)
+        self.beginComboBox.addItems(beginitems)
+        self.beginComboBox.setCurrentIndex(self.aw.qmc.AUCbegin)
+        baselabel =QLabel(QApplication.translate("Label", "Base",None))
+        self.baseedit = QSpinBox()
+        self.baseedit.setAlignment(Qt.AlignRight)
+        self.baseedit.setRange(0,999)
+        self.baseedit.setValue(self.aw.qmc.AUCbase)
+        if self.aw.qmc.mode == "F":
+            self.baseedit.setSuffix(" F")
+        else:
+            self.baseedit.setSuffix(" C")
+        self.baseFlag = QCheckBox(QApplication.translate("CheckBox","From Event", None))
+        self.baseedit.setEnabled(not self.aw.qmc.AUCbaseFlag)
+        self.baseFlag.setChecked(self.aw.qmc.AUCbaseFlag)
+        self.baseFlag.stateChanged.connect(self.switchAUCbase)
+        targetlabel =QLabel(QApplication.translate("Label", "Target",None))
+        self.targetedit = QSpinBox()
+        self.targetedit.setAlignment(Qt.AlignRight)
+        self.targetedit.setRange(0,9999)
+        self.targetedit.setValue(self.aw.qmc.AUCtarget)
+        self.targetFlag = QCheckBox(QApplication.translate("CheckBox","Background", None))
+        self.targetedit.setEnabled(not self.aw.qmc.AUCtargetFlag)
+        self.targetFlag.setChecked(self.aw.qmc.AUCtargetFlag)
+        self.targetFlag.stateChanged.connect(self.switchAUCtarget)
+        self.guideFlag = QCheckBox(QApplication.translate("CheckBox","Guide", None))
+        self.guideFlag.setChecked(self.aw.qmc.AUCguideFlag)
+        self.AUClcdFlag = QCheckBox(QApplication.translate("CheckBox","LCD", None))
+        self.AUClcdFlag.setChecked(self.aw.qmc.AUClcdFlag)
+        self.AUClcdFlag.stateChanged.connect(self.AUCLCFflagChanged)
+        self.AUCshowFlag = QCheckBox(QApplication.translate("CheckBox","Show Area", None))
+        self.AUCshowFlag.setChecked(self.aw.qmc.AUCshowFlag)
+        self.AUCshowFlag.stateChanged.connect(self.changeAUCshowFlag)
+
+        statsmaxchrperlinelabel =QLabel(QApplication.translate("Label", "Max characters per line",None))
+        self.statsmaxchrperlineedit = QSpinBox()
+        self.statsmaxchrperlineedit.setAlignment(Qt.AlignRight)
+        self.statsmaxchrperlineedit.setRange(1,120)
+        self.statsmaxchrperlineedit.setValue(self.aw.qmc.statsmaxchrperline)
+        self.statsmaxchrperlineedit.setFocusPolicy(Qt.StrongFocus)
+        statsmaxchrperlineHorizontal = QHBoxLayout()
+        statsmaxchrperlineHorizontal.addWidget(statsmaxchrperlinelabel)
+        statsmaxchrperlineHorizontal.addWidget(self.statsmaxchrperlineedit)
+        statsmaxchrperlineHorizontal.addStretch()
+        statsmaxchrperlineGroupLayout = QGroupBox(QApplication.translate("GroupBox","Stats Summary",None))
+        statsmaxchrperlineGroupLayout.setLayout(statsmaxchrperlineHorizontal)
+
+        AUCgrid = QGridLayout()
+        AUCgrid.addWidget(beginlabel,0,0,Qt.AlignRight)
+        AUCgrid.addWidget(self.beginComboBox,0,1,1,2)
+        AUCgrid.addWidget(baselabel,1,0,Qt.AlignRight)
+        AUCgrid.addWidget(self.baseedit,1,1)
+        AUCgrid.addWidget(self.baseFlag,1,2)
+        AUCgrid.addWidget(targetlabel,2,0,Qt.AlignRight)
+        AUCgrid.addWidget(self.targetedit,2,1)
+        AUCgrid.addWidget(self.targetFlag,2,2)
+        AUCgrid.addWidget(self.AUClcdFlag,4,1)
+        AUCgrid.addWidget(self.guideFlag,4,2)
+        AUCgrid.addWidget(self.AUCshowFlag,5,1)
+        AUCgrid.setRowMinimumHeight(3, 20)
+        AUCvertical = QVBoxLayout()
+        AUCvertical.addLayout(AUCgrid)
+        AUCvertical.addStretch()
+        AUCgroupLayout = QGroupBox(QApplication.translate("GroupBox","AUC",None))
+        AUCgroupLayout.setLayout(AUCvertical)
+        displayGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display",None))
+        displayGroupLayout.setLayout(flagsLayout)
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addWidget(self.dialogbuttons)
+        vgroupLayout = QVBoxLayout()
+        vgroupLayout.addWidget(AUCgroupLayout)
+        vgroupLayout.addWidget(statsmaxchrperlineGroupLayout)
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(displayGroupLayout)
+        mainLayout.addLayout(vgroupLayout)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonsLayout)
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+        self.setLayout(mainLayout)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+
+    def AUCLCFflagChanged(self,_):
+        self.aw.qmc.AUClcdFlag = not self.aw.qmc.AUClcdFlag
+        if self.aw.qmc.flagstart:
+            if self.aw.qmc.AUClcdFlag:
+                self.aw.AUCLCD.show()
+            else:
+                self.aw.AUCLCD.hide()
+        if self.aw.largePhasesLCDs_dialog is not None:
+            self.aw.largePhasesLCDs_dialog.updateVisiblitiesPhases()
+
+    @pyqtSlot(int)
+    def changeAUCshowFlag(self,_):
+        self.aw.qmc.AUCshowFlag = not self.aw.qmc.AUCshowFlag
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
+
+    @pyqtSlot(int)
+    def switchAUCbase(self,i):
+        if i:
+            self.baseedit.setEnabled(False)
+        else:
+            self.baseedit.setEnabled(True)
+            
+    @pyqtSlot(int)
+    def switchAUCtarget(self,i):
+        if i:
+            self.targetedit.setEnabled(False)
+        else:
+            self.targetedit.setEnabled(True)
+
+    @pyqtSlot(int)
+    def changeStatsSummary(self,_):
+        self.aw.qmc.statssummary = not self.aw.qmc.statssummary
+        # IF Auto is set for the axis the recompute it
+        if self.aw.qmc.autotimex and not self.aw.qmc.statssummary:
+            self.aw.autoAdjustAxis()
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        if self.aw.qmc.statssummary and not self.aw.qmc.flagon:
+            self.aw.savestatisticsAction.setEnabled(True)
+        else:
+            self.aw.savestatisticsAction.setEnabled(False)
+    
+    @pyqtSlot(int)
+    def changeStatisticsflag(self,value):
+        sender = self.sender()
+        if sender == self.timez:
+            i = 0
+        elif sender == self.bar:
+            i = 1
+        elif sender == self.area:
+            i = 3
+        elif sender == self.ror:
+            i = 4
+        elif sender == self.ts:
+            i = 5
+        else:
+            return
+        self.aw.qmc.statisticsflags[i] = value
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
+
+    @pyqtSlot()
+    def accept(self):
+        self.aw.qmc.statsmaxchrperline = self.statsmaxchrperlineedit.value()
+        self.aw.qmc.AUCbegin = self.beginComboBox.currentIndex()
+        self.aw.qmc.AUCbase = self.baseedit.value()
+        self.aw.qmc.AUCbaseFlag = self.baseFlag.isChecked()
+        self.aw.qmc.AUCtarget = self.targetedit.value()
+        self.aw.qmc.AUCtargetFlag = self.targetFlag.isChecked()
+        self.aw.qmc.AUCguideFlag = self.guideFlag.isChecked()
+        self.aw.qmc.AUClcdFlag = self.AUClcdFlag.isChecked()
+        try:
+            if self.aw.qmc.TP_time_B:
+                _,_,auc,_ = self.aw.ts(tp=self.aw.qmc.backgroundtime2index(self.aw.qmc.TP_time_B),background=True)
+            else:
+                _,_,auc,_ = self.aw.ts(tp=0,background=True)
+            self.aw.qmc.AUCbackground = auc
+        except:
+            pass
+        if self.timez.isChecked(): 
+            self.aw.qmc.statisticsflags[0] = 1
+        else:
+            self.aw.qmc.statisticsflags[0] = 0
+            
+        if self.bar.isChecked(): 
+            self.aw.qmc.statisticsflags[1] = 1
+        else:
+            self.aw.qmc.statisticsflags[1] = 0
+            
+        if self.area.isChecked(): 
+            self.aw.qmc.statisticsflags[3] = 1
+        else:
+            self.aw.qmc.statisticsflags[3] = 0
+            
+        if self.ror.isChecked(): 
+            self.aw.qmc.statisticsflags[4] = 1
+        else:
+            self.aw.qmc.statisticsflags[4] = 0
+            
+        if self.ts.isChecked(): 
+            self.aw.qmc.statisticsflags[5] = 1
+        else:
+            self.aw.qmc.statisticsflags[5] = 0
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        self.close()

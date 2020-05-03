@@ -31,7 +31,7 @@ class flavorDlg(ArtisanResizeablDialog):
         super(flavorDlg,self).__init__(parent, aw)
         self.setModal(True)
         rcParams['path.effects'] = []
-        #avoid questionm mark context help
+        #avoid question mark context help
         flags = self.windowFlags()
         helpFlag = Qt.WindowContextHelpButtonHint
         flags = flags & (~helpFlag)

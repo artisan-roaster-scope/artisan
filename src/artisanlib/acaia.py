@@ -16,7 +16,7 @@
 # AUTHOR
 # Marko Luther, 2019
 
-class AcaiaBLE():
+class AcaiaBLE(object):
 
     SERVICE_UUID = "00001820-0000-1000-8000-00805f9b34fb"
     CHAR_UUID =    "00002a80-0000-1000-8000-00805f9b34fb"

@@ -257,7 +257,7 @@ class BleInterface(QtCore.QObject):
 def main():
     import sys
     app = QtCore.QCoreApplication(sys.argv)
-    from acaia import AcaiaBLE
+    from artisanlib.acaia import AcaiaBLE
     acaia = AcaiaBLE()
     ble = BleInterface(acaia.SERVICE_UUID,acaia.CHAR_UUID,acaia.processData,acaia.sendHeartbeat,acaia.sendStop,acaia.reset)
     ble.scanDevices()

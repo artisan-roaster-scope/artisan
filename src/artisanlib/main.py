@@ -67,17 +67,17 @@ except:
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
 
-from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport
-                         QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, # @Reimport
-                         QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @Reimport
+from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # @Reimport
+                         QInputDialog, QGroupBox, QLineEdit, # @Reimport
+                         QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport
                          QLCDNumber, QSpinBox, QComboBox, # @Reimport 
-                         QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton, # @Reimport
-                         QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
-                         QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox,QButtonGroup) # @Reimport
+                         QSlider, QStackedWidget, # @Reimport
+                         QColorDialog, QFrame, QProgressDialog, # @Reimport
+                         QStyleFactory, QMenu) # @Reimport
 from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
                             QKeySequence, 
-                            QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
-                            QRegExpValidator,QDoubleValidator, QIntValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
+                            QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport
+                            QRegExpValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
                           qVersion,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
@@ -152,7 +152,7 @@ except:
 import unicodedata # @UnresolvedImport
 
 import artisanlib.arabic_reshaper
-from artisanlib.util import (appFrozen, decs2string, stringp, uchr, u, d, encodeLocal, hex2int, s2a, str2cmd,
+from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a, 
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, deltaLabelMathPrefix, stringfromseconds, stringtoseconds,
         fromFtoC, fromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toDouble, toBool, toStringList, toMap, removeAll)
@@ -167,18 +167,30 @@ from artisanlib.ikawa import extractProfileIkawaCSV
 from artisanlib.simulator import Simulator
 from artisanlib.transposer import profileTransformatorDlg
 from artisanlib.comparator import roastCompareDlg
-from artisanlib.dialogs import ArtisanDialog, ArtisanMessageBox, HelpDlg
-from artisanlib.widgets import MyQComboBox
+from artisanlib.dialogs import ArtisanMessageBox, HelpDlg
 from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
-from artisanlib.events import EventsDlg
+from artisanlib.events import EventsDlg, customEventDlg
 from artisanlib.curves import HUDDlg
 from artisanlib.devices import DeviceAssignmentDlg
 from artisanlib.ports import comportDlg
-from artisanlib.comm import serialport
+from artisanlib.comm import serialport, colorport, scaleport
 from artisanlib.alarms import AlarmDlg
 from artisanlib.background import backgroundDlg
 from artisanlib.cup_profile import flavorDlg
+from artisanlib.pid_dialogs import PXRpidDlgControl, PXG4pidDlgControl, PID_DlgControl, DTApidDlgControl
+from artisanlib.designer import designerconfigDlg, pointDlg
+from artisanlib.sampling import SamplingDlg
+from artisanlib.wheels import WheelDlg
+from artisanlib.colors import graphColorDlg
+from artisanlib.statistics import StatisticsDlg
+from artisanlib.phases import phasesGraphDlg
+from artisanlib.calculator import calculatorDlg
+from artisanlib.axis import WindowsDlg
+from artisanlib.batches import batchDlg
+from artisanlib.autosave import autosaveDlg
+from artisanlib.platform import platformDlg
+from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
 
 from Phidget22.Phidget import Phidget as PhidgetDriver
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
@@ -542,7 +554,6 @@ def toASCII(s):
 from const import UIconst
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
-from help import autosave_help
 from help import keyboardshortcuts_help
 
 from artisanlib.roast_properties import editGraphDlg
@@ -2288,7 +2299,7 @@ class tgraphcanvas(FigureCanvas):
     # .. 
     # 10.0 to "100"
     def eventsvalues(self,v):
-        return u(self.eventsInternal2ExternalValue(v))
+        return str(self.eventsInternal2ExternalValue(v))
             
     # 100.0 to "10" and 10.1 to "1"
     def eventsvaluesShort(self,v):
@@ -2299,9 +2310,9 @@ class tgraphcanvas(FigureCanvas):
             return ""
         else:
             if True: #aw.qmc.LCDdecimalplaces:
-                return u(int(round(value)))
+                return str(int(round(value)))
             else:
-                return u(int(round(value / 10.)))
+                return str(int(round(value / 10.)))
 
     # the inverse to eventsvalues above (string -> value)
     def str2eventsvalue(self,s):
@@ -2412,9 +2423,9 @@ class tgraphcanvas(FigureCanvas):
                                 self.backgroundeventmessage += " | "
                             else:
                                 self.backgroundeventmessage += "Background: "
-                            self.backgroundeventmessage += u(self.Betypesf(self.backgroundEtypes[i])) + " = " + self.eventsvalues(self.backgroundEvalues[i])
+                            self.backgroundeventmessage += self.Betypesf(self.backgroundEtypes[i]) + " = " + self.eventsvalues(self.backgroundEvalues[i])
                             if aw.qmc.renderEventsDescr and self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
-                                self.backgroundeventmessage += " (" + u(self.backgroundEStrings[i].strip()[:aw.qmc.eventslabelschars]) + ")"
+                                self.backgroundeventmessage += " (" + self.backgroundEStrings[i].strip()[:aw.qmc.eventslabelschars] + ")"
                             self.backgroundeventmessage += " @ " + stringfromseconds(self.timeB[self.backgroundEvents[i]] - start) + " " + str(aw.float2float(self.temp2B[self.backgroundEvents[i]],digits)) + aw.qmc.mode
                             self.starteventmessagetimer()
                             break
@@ -2429,9 +2440,9 @@ class tgraphcanvas(FigureCanvas):
                                 start = 0
                             if len(self.eventmessage) != 0:
                                 self.eventmessage += " | "
-                            self.eventmessage += u(self.etypesf(self.specialeventstype[i])) + " = " + self.eventsvalues(self.specialeventsvalue[i])
+                            self.eventmessage += self.etypesf(self.specialeventstype[i]) + " = " + self.eventsvalues(self.specialeventsvalue[i])
                             if aw.qmc.renderEventsDescr and self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
-                                self.eventmessage += " (" + u(self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars]) + ")"
+                                self.eventmessage += " (" + self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars] + ")"
                             self.eventmessage += " @ " + stringfromseconds(self.timex[self.specialevents[i]] - start) + " " + str(aw.float2float(self.temp2[self.specialevents[i]],digits)) + aw.qmc.mode
                             self.starteventmessagetimer()
                             break
@@ -3331,18 +3342,18 @@ class tgraphcanvas(FigureCanvas):
             try:
                 if self.alarmaction[alarmnumber] == 0:
                     # alarm popup message with 10sec timeout
-                    amb = ArtisanMessageBox(aw,aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=aw.qmc.alarm_popup_timout,modal=False)
+                    amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber],timeout=aw.qmc.alarm_popup_timout,modal=False)
                     amb.show()
                     #send alarm also to connected WebLCDs clients
                     if aw.WebLCDs and aw.WebLCDsAlerts:
-                        aw.qmc.updateWebLCDs(alertText=u(self.alarmstrings[alarmnumber]),alertTimeout=10)
+                        aw.qmc.updateWebLCDs(alertText=self.alarmstrings[alarmnumber],alertTimeout=10)
                 elif self.alarmaction[alarmnumber] == 1:
                     # alarm call program
-                    fname = u(self.alarmstrings[alarmnumber].split('#')[0])
+                    fname = self.alarmstrings[alarmnumber].split('#')[0]
     # take care, the QDir().current() directory changes with loads and saves                
-    #                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
+    #                QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
                     if False and platf == 'Windows': # this Windows version fails on commands with arguments
-                        f = "file:///{}/{}".format(u(QApplication.applicationDirPath()),u(fname))
+                        f = "file:///{}/{}".format(QApplication.applicationDirPath(),fname)
                         res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
                     else:
                         # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
@@ -3379,7 +3390,7 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             button_number = int(str(bnr.strip())) - 1 # the event buttons presented to the user are numbered from 1 on
                         except Exception:
-                            aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(u(self.alarmstrings[alarmnumber])))
+                            aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(self.alarmstrings[alarmnumber]))
                         if button_number is not None:
                             if button_number > -1 and button_number < len(aw.buttonlist):
                                 aw.recordextraevent(button_number)
@@ -3408,7 +3419,7 @@ class tgraphcanvas(FigureCanvas):
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
-                        aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(u(self.alarmstrings[alarmnumber])))
+                        aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(self.alarmstrings[alarmnumber]))
                         
                 elif self.alarmaction[alarmnumber] == 7:
                     # START
@@ -3496,7 +3507,7 @@ class tgraphcanvas(FigureCanvas):
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
-                        aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(u(self.alarmstrings[alarmnumber])))
+                        aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(self.alarmstrings[alarmnumber]))
                 elif self.alarmaction[alarmnumber] == 22:
                     # Playback ON
                     aw.qmc.backgroundPlaybackEvents = True
@@ -3574,7 +3585,7 @@ class tgraphcanvas(FigureCanvas):
                                 QApplication.beep()
                             #write text message
                             message = "> [{}] [{}] : <b>{}</b> : {}".format(
-                                u(self.Betypesf(self.backgroundEtypes[i])),
+                                str(self.Betypesf(self.backgroundEtypes[i])),
                                 self.eventsvalues(self.backgroundEvalues[i]),
                                 stringfromseconds(timed),
                                 self.backgroundEStrings[i])
@@ -3625,7 +3636,7 @@ class tgraphcanvas(FigureCanvas):
                             # a event type is given (type!=4), the background event type is named exactly as the one of the foreground
                             # the event slider is active/visible and has an action defined
                             if aw.qmc.backgroundPlaybackEvents and self.backgroundEtypes[i] < 4 and \
-                                (u(self.etypesf(self.backgroundEtypes[i]) == u(self.Betypesf(self.backgroundEtypes[i])))) and \
+                                (str(self.etypesf(self.backgroundEtypes[i]) == str(self.Betypesf(self.backgroundEtypes[i])))) and \
                                 aw.eventslidervisibilities[self.backgroundEtypes[i]]: #  and aw.eventslideractions[self.backgroundEtypes[i]]
                                 slider_events[self.backgroundEtypes[i]] = self.eventsInternal2ExternalValue(self.backgroundEvalues[i]) # add to dict (later overwrite earlier slider moves!)
                                 # we move sliders only after processing all pending events (from the collected dict)
@@ -3641,7 +3652,7 @@ class tgraphcanvas(FigureCanvas):
                                 
                 #delete existing message
                 if reproducing is None:
-                    text = u(aw.messagelabel.text())
+                    text = aw.messagelabel.text()
                     if len(text):
                         if text[0] == ">":
                             aw.clearMessageLine(style="background-color:'transparent';")
@@ -5526,7 +5537,7 @@ class tgraphcanvas(FigureCanvas):
             bnr = self.roastbatchnr
         
         if bnr != 0 and title != "":
-            title = "{}{} {}".format(self.roastbatchprefix,u(bnr),title)
+            title = "{}{} {}".format(self.roastbatchprefix,str(bnr),title)
 
         if self.background and self.titleB and len(self.titleB) > 10:
             stl = 33
@@ -5718,10 +5729,10 @@ class tgraphcanvas(FigureCanvas):
                         if self.roastbatchnrB == 0:
                             titleB = self.titleB
                         else:
-                            titleB = self.roastbatchprefixB + u(self.roastbatchnrB) + " " + self.titleB
+                            titleB = self.roastbatchprefixB + str(self.roastbatchnrB) + " " + self.titleB
                         if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
                             titleB = toASCII(titleB)
-                        if self.title is None or u(self.title).strip() == "":
+                        if self.title is None or self.title.strip() == "":
                             st_artist = self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
                                 horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
                         else:
@@ -6020,9 +6031,9 @@ class tgraphcanvas(FigureCanvas):
 
                             for p in range(len(self.backgroundEvents)):
                                 if self.backgroundEtypes[p] < 4: 
-                                    st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])) 
+                                    st1 = self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])
                                 else:
-                                    st1 = u(self.backgroundEStrings[p].strip()[:4])
+                                    st1 = self.backgroundEStrings[p].strip()[:4]
                                     if len(st1) == 0:
                                         st1 = "E"
                                 # plot events on BT when showeventsonbt is true
@@ -6269,7 +6280,7 @@ class tgraphcanvas(FigureCanvas):
                                 if self.backgroundEtypes[i] == 4 or self.eventsGraphflag in [0,3,4]:
                                     if self.backgroundEtypes[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.backgroundEStrings[i].strip()) == 0):
                                         Betype = self.Betypesf(self.backgroundEtypes[i])
-                                        firstletter = u(Betype[0])
+                                        firstletter = str(Betype[0])
                                         secondletter = self.eventsvaluesShort(self.backgroundEvalues[i])
                                         thirdletter = aw.eventsliderunits[self.backgroundEtypes[i]] # postfix
                                     else:
@@ -6729,7 +6740,7 @@ class tgraphcanvas(FigureCanvas):
                             if self.specialeventstype[i] == 4 or self.eventsGraphflag in [0,3,4]:
                                 if self.specialeventstype[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[i].strip()) == 0):
                                     etype = self.etypesf(self.specialeventstype[i])
-                                    firstletter = u(etype[0])
+                                    firstletter = str(etype[0])
                                     secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
                                     thirdletter = aw.eventsliderunits[self.specialeventstype[i]] # postfix
                                 else:
@@ -7391,7 +7402,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if not filename:
                 filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Image File",None),ext="*.png *.jpg")
-            if len(u(filename)) == 0:
+            if len(filename) == 0:
                 return
             from matplotlib.pyplot import imread
             aw.qmc.logoimg = imread(filename)
@@ -10167,17 +10178,17 @@ class tgraphcanvas(FigureCanvas):
                                     + " " + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min", None)) \
                                     + "{1}=" + aw.arabicReshape(QApplication.translate("Label", "RoR", None)) \
                                     + " {0}=" + aw.arabicReshape(QApplication.translate("Label", "MET", None))) \
-                                    .format(u(ETmax), \
+                                    .format(ETmax, \
                                     str(ror), \
                                     str(int(tsb)))
                         if det is not None:
-                            strline = u(("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None) + " ") + strline
+                            strline = ("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None) + " " + strline
                         if FCperiod is not None:
                             strline = "min%s=" % FCperiod + QApplication.translate("Label", "FC", None) + "   " + strline
                     else:
                         strline = ""
                         if temp1_values_max and temp1_values_max > 0:
-                            strline = (QApplication.translate("Label", "MET", None) + "={0}   ").format(u(ETmax))
+                            strline = (QApplication.translate("Label", "MET", None) + "={0}   ").format(ETmax)
                         strline += (QApplication.translate("Label", "RoR", None) + "={0}" \
                                     + aw.qmc.mode + QApplication.translate("Label", "/min", None) + "   " \
                                     + QApplication.translate("Label", "AUC", None) + "={1}C*min") \
@@ -10191,11 +10202,11 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     sep = u"   "
                     msg = aw.qmc.roastdate.date().toString(Qt.SystemLocaleShortDate)
-                    tm = u(aw.qmc.roastdate.time().toString()[:-3])
+                    tm = aw.qmc.roastdate.time().toString()[:-3]
                     if tm != "00:00":
                         msg += ", " + tm
                     if aw.qmc.beans and aw.qmc.beans != "":
-                        msg += sep + aw.qmc.abbrevString(u(aw.qmc.beans),25)
+                        msg += sep + aw.qmc.abbrevString(aw.qmc.beans,25)
                     if aw.qmc.weight[0]:
                         if aw.qmc.weight[2] in ["g","oz"]:
                             msg += sep + str(aw.float2float(aw.qmc.weight[0],0)) + aw.qmc.weight[2]
@@ -10391,9 +10402,9 @@ class tgraphcanvas(FigureCanvas):
                         _,_,ts1b,_ = aw.ts(self.timeindex[0],dryEndIndex,TP_index)
                         _,_,ts2b,_ = aw.ts(dryEndIndex,self.timeindex[2],TP_index)
                         _,_,ts3b,_ = aw.ts(self.timeindex[2],self.timeindex[6],TP_index)
-                        st1 += u(ts1b) + "C*min"
-                        st2 += u(ts2b) + "C*min"
-                        st3 += u(ts3b) + "C*min"
+                        st1 += str(ts1b) + "C*min"
+                        st2 += str(ts2b) + "C*min"
+                        st3 += str(ts3b) + "C*min"
 
                 if self.statisticsflags[4] or self.statisticsflags[5]:
                     #Write flavor estimation
@@ -10955,7 +10966,7 @@ class tgraphcanvas(FigureCanvas):
                 obj["temp1"] = self.temp1
                 obj["temp2"] = self.temp2
                 obj["timeindex"] = self.timeindex
-                f = codecs.open(u(filename), 'w+', encoding='utf-8')
+                f = codecs.open(filename, 'w+', encoding='utf-8')
                 f.write(repr(obj))
                 f.close()
                 aw.sendmessage(QApplication.translate("Message","Points saved", None))
@@ -10971,8 +10982,8 @@ class tgraphcanvas(FigureCanvas):
         try:
             filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message", "Load Points",None),ext="*.adsg")
             obj = None
-            if os.path.exists(u(filename)):
-                f = codecs.open(u(filename), 'rb', encoding='utf-8')
+            if os.path.exists(filename):
+                f = codecs.open(filename, 'rb', encoding='utf-8')
                 obj=ast.literal_eval(f.read())
                 f.close()
             if obj and "timex" in obj and "temp1" in obj and "temp2" in obj:
@@ -11803,9 +11814,9 @@ class tgraphcanvas(FigureCanvas):
             return 180.+t
 
     def loadselectorwheel(self,path):
-        string = "Wheels" + "\\" + path
+        s = "Wheels" + "\\" + path
         direct = QDir()
-        pathDir = direct.toNativeSeparators(u(string))
+        pathDir = direct.toNativeSeparators(s)
         filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Open Wheel Graph",None),path=pathDir,ext="*.wg")
         if filename:
             self.connectWheel()
@@ -11815,18 +11826,18 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot()
     @pyqtSlot(bool)
     def addTocuppingnotes(self,_=False):
-        descriptor =  u(self.wheelnames[self.wheelx][self.wheelz]) 
+        descriptor = str(self.wheelnames[self.wheelx][self.wheelz]) 
         if self.cuppingnotes == "":
             self.cuppingnotes = descriptor
         else:    
             self.cuppingnotes += "\n" + descriptor 
-        string = QApplication.translate("Message", " added to cupping notes",None)
-        aw.sendmessage(descriptor + string)
+        s = QApplication.translate("Message", " added to cupping notes",None)
+        aw.sendmessage(descriptor + s)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def addToroastingnotes(self,_=False):
-        descriptor =  u(self.wheelnames[self.wheelx][self.wheelz]) + " "
+        descriptor =  str(self.wheelnames[self.wheelx][self.wheelz]) + " "
         if self.roastingnotes == "":
             self.roastingnotes = descriptor
         else:
@@ -13488,19 +13499,19 @@ class ApplicationWindow(QMainWindow):
         #create an s7 port object (main s7 device)
         self.s7 = s7port(self.sendmessage,self.qmc.adderror,self.addserial,self)
         #create scale port object
-        self.scale = scaleport()
+        self.scale = scaleport(self)
         #create color port object
-        self.color = colorport()
+        self.color = colorport(self)
         #list with extra serial ports (extra devices)
         self.extraser = []
         #extra comm port settings 
         self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
 
         # create a ET control objects
-        self.fujipid = FujiPID()
-        self.dtapid = DtaPID()
+        self.fujipid = FujiPID(self)
+        self.dtapid = DtaPID(self)
         # PID control for Arduino, Hottop and generic MODBUS devices
-        self.pidcontrol = PIDcontrol()
+        self.pidcontrol = PIDcontrol(self)
         
         self.soundflag = 0
         
@@ -16432,7 +16443,7 @@ class ApplicationWindow(QMainWindow):
                 if adjustment & 1:
                     fields.append(" ")
                 for c in range(ncols):
-                    hdr = re_strip.sub('',u(table_widget.horizontalHeaderItem(c).text()))
+                    hdr = re_strip.sub('',table_widget.horizontalHeaderItem(c).text())
                     #protect against duplicate header labels
                     while hdr in fields:
                         hdr = hdr + " "
@@ -16457,7 +16468,7 @@ class ApplicationWindow(QMainWindow):
                 if adjustment & 1:
                     clipboard += "" + '\t'
                 for c in range(ncols):
-                    clipboard += u(table_widget.horizontalHeaderItem(c).text())
+                    clipboard += table_widget.horizontalHeaderItem(c).text()
                     if c != (ncols-1):
                         clipboard += '\t'
                 clipboard += '\n'
@@ -16731,8 +16742,8 @@ class ApplicationWindow(QMainWindow):
                     sorted_subentries = natsort.natsorted(res[k],key=lambda x: x[0])
                     for e in sorted_subentries: #res[k]:
                         a = QAction(self, visible=True, triggered=triggered)
-                        a.setData((e[1],u(k)))
-                        a.setText(u(e[0]))
+                        a.setData((e[1],str(k)))
+                        a.setText(str(e[0]))
                         submenu.addAction(a)
                         one_added = True
             else:
@@ -16740,9 +16751,9 @@ class ApplicationWindow(QMainWindow):
                 a = QAction(self, visible=True, triggered=triggered)
                 a.setData((entry[1],""))
                 if k == resourceName:
-                    a.setText(u(entry[0]))
+                    a.setText(str(entry[0]))
                 else:
-                    a.setText(u(k) + " " + u(entry[0]))
+                    a.setText(str(k) + " " + str(entry[0]))
                     menu.addAction(a)
                 one_added = True
         if one_added and addMenu:
@@ -17000,7 +17011,7 @@ class ApplicationWindow(QMainWindow):
             #events buttons
             for i in range(len(aw.extraeventstypes)):
                 colorPairsToCheck.append(
-                    (QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[i]), aw.extraeventbuttoncolor[i], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[i]),
+                    (QApplication.translate("Label","Event button",None)+" "+ aw.extraeventslabels[i], aw.extraeventbuttoncolor[i], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[i]),
                 )                           
 
         except Exception as e:        
@@ -18192,7 +18203,7 @@ class ApplicationWindow(QMainWindow):
                 rcParams['font.family'] = ['Humor Sans']
             else:
                 rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
-            aw.set_mpl_fontproperties(u(self.getResourcePath() + "Humor-Sans.ttf"))
+            aw.set_mpl_fontproperties(self.getResourcePath() + "Humor-Sans.ttf")
         elif self.qmc.graphfont == 2 and not platf == "Linux":
             # font Comic selected
             rcParams['font.size'] = 12.0
@@ -18210,27 +18221,27 @@ class ApplicationWindow(QMainWindow):
     # if it contains any arabic characters
     def arabicReshape(self,s,a=None):
         if locale and locale == "ar":
-            st = u(s)
+            st = str(s)
             if artisanlib.arabic_reshaper.has_arabic_letters(st):
                 if a: 
-                    return u(artisanlib.arabic_reshaper.reshape(u(s.format(a[::-1])))[::-1])
+                    return artisanlib.arabic_reshaper.reshape(str(s.format(a[::-1])))[::-1]
                 else:
-                    return u(artisanlib.arabic_reshaper.reshape(st)[::-1])
+                    return artisanlib.arabic_reshaper.reshape(st)[::-1]
             else:
                 if a:
-                    return u(s.format(a))
+                    return s.format(a)
                 else:
-                    return u(s)
+                    return s
         elif locale and locale == "he":
             if a:
-                return u(s[::-1].format(a[::-1]))
+                return s[::-1].format(a[::-1])
             else:
-                return u(s[::-1])
+                return s[::-1]
         else:
             if a:
-                return u(s.format(a))
+                return s.format(a)
             else:
-                return u(s)
+                return s
 
     def makePhasesLCDbox(self,label,lcd):
         label.setAlignment(Qt.Alignment(Qt.AlignRight | Qt.AlignVCenter))
@@ -19027,7 +19038,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 if action in [8,9,10]:
                     from artisanlib.hottop import setHottop
-                cmd_str = u(cmd)
+                cmd_str = str(cmd)
                 
                 if aw.simulator and action != 16:
                     # disable all communicating commands in simulation mode
@@ -19062,11 +19073,11 @@ class ApplicationWindow(QMainWindow):
 #                            self.call_prog_with_args(cmd_str) # a command with argument
 #                        else:
 ## take care, the QDir().current() directory changes with loads and saves 
-##                        QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
+##                        QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
 #                            if platf in ['Windows','Linux']:
-#                                QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/" + cmd_str, QUrl.TolerantMode))
+#                                QDesktopServices.openUrl(QUrl("file:///" + str(QApplication.applicationDirPath()) + "/" + cmd_str, QUrl.TolerantMode))
 #                            else: # on Darwin
-#                                QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.TolerantMode))
+#                                QDesktopServices.openUrl(QUrl("file:///" + str(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.TolerantMode))
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " eventaction() {0}").format(str(e)),exc_tb.tb_lineno)
@@ -20057,9 +20068,9 @@ class ApplicationWindow(QMainWindow):
         if len(cmd_str_parts) > 0:
             try:
                 cmd = cmd_str_parts[0].strip()
-                qd = QDir(u(cmd))
+                qd = QDir(cmd)
                 current = QDir.current()
-                QDir.setCurrent(u(aw.getAppPath()))
+                QDir.setCurrent(aw.getAppPath())
                 my_env = self.calc_env()
                 if platf == 'Windows':
                     startupinfo = subprocess.STARTUPINFO()
@@ -20067,7 +20078,7 @@ class ApplicationWindow(QMainWindow):
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                     except AttributeError:
                         startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW  # @UndefinedVariable
-                    prg_file = u(qd.absolutePath())
+                    prg_file = str(qd.absolutePath())
 #                    CREATE_NEW_PROCESS_GROUP = 0x00000200
 #                    DETACHED_PROCESS = 0x00000008
                     #subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]], shell=False,env=my_env)
@@ -20202,7 +20213,7 @@ class ApplicationWindow(QMainWindow):
         if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type " " that does not add an event; if eventtype == 9 ("-") we have an untyped event
             if eventtype == 9: # an untyped event
                 # we just fire the action
-                cmd = u(self.extraeventsactionstrings[ee])
+                cmd = self.extraeventsactionstrings[ee]
                 cmd = cmd.format(*(tuple([cmdvalue]*cmd.count("{}"))))
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
@@ -20228,9 +20239,9 @@ class ApplicationWindow(QMainWindow):
                 if self.extraeventsactions[ee] != 14: # only for VOUT Commands we keep the floats
                     actionvalue = int(round(actionvalue))
                 if self.extraeventsactions[ee] in [8,9,16,17,18]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
-                    self.eventaction(self.extraeventsactions[ee],u(int(new_value)),parallel=parallel)
+                    self.eventaction(self.extraeventsactions[ee],str(int(new_value)),parallel=parallel)
                 else:
-                    cmd = u(self.extraeventsactionstrings[ee])
+                    cmd = self.extraeventsactionstrings[ee]
                     cmd = cmd.format(*(tuple([actionvalue]*cmd.count("{}"))))
                     self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # remember the new value as the last value set for this event
@@ -20242,7 +20253,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.EventRecord(extraevent = ee)
         else:
             # just issue the eventaction (no cmd substitution here)
-            cmd = u(self.extraeventsactionstrings[ee])
+            cmd = self.extraeventsactionstrings[ee]
             cmd = cmd.format(*(tuple([cmdvalue]*cmd.count("{}"))))
             self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
 
@@ -20786,10 +20797,10 @@ class ApplicationWindow(QMainWindow):
                             aw.qmc.redraw()
                         else:
                             self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
-                            if len(u(self.filename)) != 0:
+                            if len(self.filename) != 0:
                                 try:
                                     aw.qmc.resetlinecountcaches()
-                                    aw.loadbackground(u(self.filename))
+                                    aw.loadbackground(self.filename)
                                 except:
                                     pass
                                 aw.qmc.background = True
@@ -20803,10 +20814,10 @@ class ApplicationWindow(QMainWindow):
                             aw.analysisfitCurvesALL()
                 elif key == 76:                       #L
                     self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Alarms",None),ext="*.alrm")
-                    if len(u(self.filename)) == 0:
+                    if len(self.filename) == 0:
                         return
                     try:
-                        aw.loadAlarms(u(self.filename))
+                        aw.loadAlarms(self.filename)
                     except:
                         pass
                 elif key == 80:                       #P
@@ -20851,7 +20862,6 @@ class ApplicationWindow(QMainWindow):
                         aw.pidcontrol.svLookahead = aw.pidcontrol.svLookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
                 elif key == 32:                       #SELECTS ACTIVE BUTTON
-                    print("SPACE",self.keyboardmoveflag)
                     if self.keyboardmoveflag:
                         self.moveKbutton("space")
                     else:
@@ -21212,7 +21222,7 @@ class ApplicationWindow(QMainWindow):
                 filename = self.parseAutosaveprefix(prefix,previewmode=previewmode)
             filename += ".alog"
             #clean name
-            filename = self.removeDisallowedFilenameChars(u(filename))
+            filename = self.removeDisallowedFilenameChars(filename)
             filename = filename.strip()
         except Exception:
             pass
@@ -21223,7 +21233,7 @@ class ApplicationWindow(QMainWindow):
     def parseAutosaveprefix(self,fn,previewmode=0):
         try:
             #it is text only when there are no disallowed characters, so add the date for backward compatibility and return.
-            if fn == self.removeDisallowedFilenameChars(u(fn)):
+            if fn == self.removeDisallowedFilenameChars(str(fn)):
                 fn += '_' + self.qmc.roastdate.toString("yy-MM-dd_hhmm")
                 return fn
 
@@ -21252,11 +21262,11 @@ class ApplicationWindow(QMainWindow):
 
             #note: since fields are delimited only at the start, to avoid ambiguity requires the shortest field string to be last in the list.  Example, "date_time" must come before "date" in the list.
             fields = [
-                (QApplication.translate("AutosaveField", "batch_long",None), u(self.qmc.roastbatchprefix) + u(bnr) + ' (' + u(self.qmc.roastbatchpos) + ')'),
-                (QApplication.translate("AutosaveField", "batchprefix",None),u(self.qmc.roastbatchprefix)),
-                (QApplication.translate("AutosaveField", "batchcounter",None),u(bnr) if bnr!='' else '**'),
-                (QApplication.translate("AutosaveField", "batchposition",None),u(self.qmc.roastbatchpos)),
-                (QApplication.translate("AutosaveField", "batch",None), u(self.qmc.roastbatchprefix) + u(bnr)),
+                (QApplication.translate("AutosaveField", "batch_long",None), self.qmc.roastbatchprefix + str(bnr) + ' (' + str(self.qmc.roastbatchpos) + ')'),
+                (QApplication.translate("AutosaveField", "batchprefix",None),self.qmc.roastbatchprefix),
+                (QApplication.translate("AutosaveField", "batchcounter",None),str(bnr) if bnr!=0 else '**'),
+                (QApplication.translate("AutosaveField", "batchposition",None),str(self.qmc.roastbatchpos)),
+                (QApplication.translate("AutosaveField", "batch",None), self.qmc.roastbatchprefix + str(bnr)),
                 (QApplication.translate("AutosaveField", "title",None),self.qmc.title),
                 (QApplication.translate("AutosaveField", "datetime_long",None),self.qmc.roastdate.toString("yyyy-MM-dd_hhmm")),
                 (QApplication.translate("AutosaveField", "datetime",None),self.qmc.roastdate.toString("yy-MM-dd_hhmm")),
@@ -21284,10 +21294,10 @@ class ApplicationWindow(QMainWindow):
             fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon))  else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
             #replace the fields with content
             for i in range(len(fields)):
-                fn = fn.replace(self.fieldDelim + fields[i][0], u(fields[i][1]))
+                fn = fn.replace(self.fieldDelim + fields[i][0], str(fields[i][1]))
 
             #cleaning is performed in generateFilename()
-            #fn = self.removeDisallowedFilenameChars(u(fn))
+            #fn = self.removeDisallowedFilenameChars(str(fn))
             #fn = fn.strip()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -21302,10 +21312,10 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.autosaveprefix != "":
                     prefix = self.qmc.autosaveprefix
                 elif aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
-                    prefix += u(aw.qmc.batchprefix) + u(aw.qmc.roastbatchnr)
+                    prefix += aw.qmc.batchprefix + str(aw.qmc.roastbatchnr)
                 filename = self.generateFilename(prefix=prefix)
                 filename_path = os.path.join(self.qmc.autosavepath,filename)
-                oldDir = u(QDir.current())
+                oldDir = str(QDir.current())
                 res = QDir.setCurrent(self.qmc.autosavepath)
                 if res:
                     #write
@@ -21410,7 +21420,7 @@ class ApplicationWindow(QMainWindow):
         if lenevents:
             self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
             self.qmc.specialeventsvalue[lenevents-1] = aw.qmc.str2eventsvalue(str(self.valueEdit.text()))
-            self.qmc.specialeventsStrings[lenevents-1] = u(self.lineEvent.text())
+            self.qmc.specialeventsStrings[lenevents-1] = self.lineEvent.text()
             if aw.qmc.timeindex[0] > -1:
                 newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ stringtoseconds(str(self.etimeline.text())))
                 self.qmc.specialevents[lenevents-1] = newtime
@@ -21440,10 +21450,10 @@ class ApplicationWindow(QMainWindow):
             self.sendmessage(message)
 
     def strippedName(self, fullFileName):
-        return u(QFileInfo(fullFileName).fileName())
+        return str(QFileInfo(fullFileName).fileName())
 
     def strippedDir(self, fullFileName):
-        return u(QFileInfo(fullFileName).dir().dirName())
+        return str(QFileInfo(fullFileName).dir().dirName())
 
     def setCurrentFile(self, fileName,addToRecent=True):
         self.curFile = fileName
@@ -21502,14 +21512,14 @@ class ApplicationWindow(QMainWindow):
             filepath_dir = QDir()
             filepath_dir.setPath(f)
             filepath_elements = filepath_dir.absolutePath().split("/")[:-1] # directories as QStrings (without the filename)
-            self.userprofilepath = u(freduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
+            self.userprofilepath = str(freduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
 
     def ArtisanOpenFilesDialog(self,msg=QApplication.translate("Message","Select",None),ext="*",path=None):
         if path is None:   
             path = self.getDefaultPath()
         res = QFileDialog.getOpenFileNames(self,msg,path,ext)[0]
         for f in res:
-            self.setDefaultPath(u(f))
+            self.setDefaultPath(str(f))
         return res
                 
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
@@ -21519,8 +21529,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",ext_alt=None,path=None):
         if path is None:
             path = self.getDefaultPath()
-        res = u(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext)[0])
-        f = u(res)
+        f = str(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext)[0])
         if ext_alt is not None and not f.endswith(ext_alt):
             return ""
         else:
@@ -21532,7 +21541,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
         if path is None:
             path = self.getDefaultPath()
-        f = u(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
+        f = str(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
         self.setDefaultPath(f)
         return f
  
@@ -21541,7 +21550,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None),path=None,copy=False):
         if path is None:
             path = self.getDefaultPath()
-        f = u(QFileDialog.getExistingDirectory(self,msg,path))
+        f = str(QFileDialog.getExistingDirectory(self,msg,path))
         if not copy:
             self.setDefaultPath(f)
         return f
@@ -21626,9 +21635,9 @@ class ApplicationWindow(QMainWindow):
     def loadFile(self,filename,quiet=False):
         f = None
         try:
-            f = QFile(u(filename))
+            f = QFile(filename)
             if not f.open(QFile.ReadOnly):
-                raise IOError(u(f.errorString()))
+                raise IOError(f.errorString())
             stream = QTextStream(f)
             firstChar = stream.read(1)
             if firstChar == "{":
@@ -21660,7 +21669,7 @@ class ApplicationWindow(QMainWindow):
                 #Plot everything
                 self.qmc.redraw()
                 self.updatePhasesLCDs()
-                message = QApplication.translate("Message","{0}  loaded ", None).format(u(filename))
+                message = QApplication.translate("Message","{0}  loaded ", None).format(filename)
                 self.sendmessage(message)
 
                 if aw is not None:
@@ -21804,9 +21813,9 @@ class ApplicationWindow(QMainWindow):
     # Loads background profile
     def loadbackground(self,filename):
         try:
-            f = QFile(u(filename))
+            f = QFile(filename)
             if not f.open(QIODevice.ReadOnly):
-                raise IOError(u(f.errorString()))
+                raise IOError(f.errorString())
             stream = QTextStream(f)
             
             firstChar = stream.read(1)
@@ -22245,7 +22254,7 @@ class ApplicationWindow(QMainWindow):
             tree = ET.Element("recipe")
             
             charge = ET.SubElement(tree, "charge")
-            charge.text = u(aw.float2float(aw.convertWeight(aw.qmc.weight[0],aw.qmc.weight_units.index(aw.qmc.weight[2]),1)))
+            charge.text = str(aw.float2float(aw.convertWeight(aw.qmc.weight[0],aw.qmc.weight_units.index(aw.qmc.weight[2]),1)))
             
             beans = ET.SubElement(tree, "coffeetype")
             if aw.qmc.beans and aw.qmc.beans != "":
@@ -22515,7 +22524,7 @@ class ApplicationWindow(QMainWindow):
         infile = io.open(filename, 'r', encoding=enc)
         obj = {}
         obj["mode"] = "C"
-        obj["title"] = u(QFileInfo(filename).fileName())
+        obj["title"] = str(QFileInfo(filename).fileName())
         import csv
         obj["roastdate"] = encodeLocal(QDate.currentDate().toString())
         # read roastdate from file
@@ -22849,14 +22858,14 @@ class ApplicationWindow(QMainWindow):
                         extratemps = []
                         for j in range(len(self.qmc.extradevices)):
                             if j < len(self.qmc.extratemp1) and i < len(self.qmc.extratemp1[j]):
-                                extratemps.append(u(self.qmc.extratemp1[j][i]))
+                                extratemps.append(str(self.qmc.extratemp1[j][i]))
                             else:
                                 extratemps.append("-1")
                             if j < len(self.qmc.extratemp2) and i < len(self.qmc.extratemp2[j]):
                                 extratemps.append(str(self.qmc.extratemp2[j][i]))
                             else:
                                 extratemps.append("-1")
-                        writer.writerow([str(time1),str(time2),u(self.qmc.temp1[i]),str(self.qmc.temp2[i]),str(event)] + extratemps)
+                        writer.writerow([str(time1),str(time2),str(self.qmc.temp1[i]),str(self.qmc.temp2[i]),str(event)] + extratemps)
                     last_time = time1
                 outfile.close()
                 return True
@@ -23044,7 +23053,7 @@ class ApplicationWindow(QMainWindow):
 
     #Write object to file
     def serialize(self,filename,obj):
-        fn = u(filename)
+        fn = str(filename)
         f = codecs.open(fn, 'w+', encoding='utf-8')
         f.write(repr(obj))
         f.close()
@@ -23062,7 +23071,7 @@ class ApplicationWindow(QMainWindow):
     def deserialize(self,filename):
         try:
             obj = None
-            fn = u(filename)
+            fn = str(filename)
             if os.path.exists(fn):
                 f = codecs.open(fn, 'rb', encoding='utf-8')
                 obj=ast.literal_eval(f.read())
@@ -23768,7 +23777,7 @@ class ApplicationWindow(QMainWindow):
             if (not quiet) and "backgroundpath" in profile and d(profile["backgroundpath"]) != "":
                 self.qmc.backgroundpath = d(profile["backgroundpath"])
                 if os.path.isfile(self.qmc.backgroundpath):
-                    aw.loadbackground(u(self.qmc.backgroundpath))
+                    aw.loadbackground(self.qmc.backgroundpath)
                     aw.qmc.background = True
                     aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
                 else:
@@ -24121,7 +24130,7 @@ class ApplicationWindow(QMainWindow):
             except Exception:
                 pass
             profile["roastbatchnr"] = self.qmc.roastbatchnr
-            profile["roastbatchprefix"] = encodeLocal(u(self.qmc.roastbatchprefix))
+            profile["roastbatchprefix"] = encodeLocal(self.qmc.roastbatchprefix)
             profile["roastbatchpos"] = self.qmc.roastbatchpos
             if self.qmc.roastUUID is None:
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
@@ -24255,7 +24264,7 @@ class ApplicationWindow(QMainWindow):
                 path = QDir()
                 path.setPath(self.getDefaultPath())
                 if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0 and self.qmc.autosaveprefix == "":
-                    prefix = u(aw.qmc.batchprefix) + u(aw.qmc.roastbatchnr)
+                    prefix = aw.qmc.batchprefix + str(aw.qmc.roastbatchnr)
                 else:
                     prefix = self.qmc.autosaveprefix
                 fname = path.absoluteFilePath(self.generateFilename(prefix=prefix))
@@ -24363,15 +24372,15 @@ class ApplicationWindow(QMainWindow):
                     try:
                         progress.setValue(i)
                         QApplication.processEvents()
-                        fname = u(QFileInfo(f).fileName())
-                        fconv = u(QDir(outdir).filePath(fname + u(ext)))
+                        fname = str(QFileInfo(f).fileName())
+                        fconv = str(QDir(outdir).filePath(fname + str(ext)))
                         if not os.path.exists(fconv):
                             aw.qmc.reset(redraw=False,soundOn=False)
                             self.setProfile(f,self.deserialize(f),quiet=True)
                             aw.qmc.redraw() # we need to redraw to ensure populated delta lines
                             dumper(fconv)
                         else:
-                            aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(ext)))
+                            aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + str(ext)))
                     except Exception:
                         pass
                     i += 1
@@ -24448,8 +24457,8 @@ class ApplicationWindow(QMainWindow):
                     try:
                         progress.setValue(i)
                         QApplication.processEvents()
-                        fname = u(QFileInfo(f).fileName())
-                        fconv = u(QDir(outdir).filePath(fname + u(fileext)))
+                        fname = str(QFileInfo(f).fileName())
+                        fconv = str(QDir(outdir).filePath(fname + str(fileext)))
                         if not os.path.exists(fconv):
                             aw.qmc.reset(redraw=False,soundOn=False)
                             self.setProfile(f,self.deserialize(f),quiet=True)
@@ -24466,7 +24475,7 @@ class ApplicationWindow(QMainWindow):
                                 del painter
                             self.image.save(fconv,filetype)
                         else:
-                            aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(fileext)))                        
+                            aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + str(fileext)))                        
                     except:
                         pass
                     i += 1
@@ -24504,15 +24513,15 @@ class ApplicationWindow(QMainWindow):
                 try:
                     progress.setValue(i)
                     QApplication.processEvents()
-                    fname = u(QFileInfo(f).fileName())
-                    fconv = u(QDir(outdir).filePath(fname + u(ext)))
+                    fname = str(QFileInfo(f).fileName())
+                    fconv = str(QDir(outdir).filePath(fname + str(ext)))
                     if not os.path.exists(fconv):
                         aw.qmc.reset(redraw=False,soundOn=False)
                         self.setProfile(f,self.deserialize(f),quiet=True)
                         self.qmc.redraw()
                         aw.qmc.fig.savefig(fconv,transparent=True,facecolor='none', edgecolor='none') # transparent=True is need to get the delta curves and legend drawn
                     else:
-                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(ext)))
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + str(ext)))
                 except:
                     pass
                 i += 1
@@ -24554,8 +24563,8 @@ class ApplicationWindow(QMainWindow):
                     try:
                         progress.setValue(i)
                         QApplication.processEvents()
-                        fname = u(QFileInfo(f).fileName())
-                        fconv = u(QDir(outdir).filePath(fname))
+                        fname = str(QFileInfo(f).fileName())
+                        fconv = str(QDir(outdir).filePath(fname))
                         if not os.path.exists(fconv):
                             aw.qmc.reset(redraw=False,soundOn=False)
                             self.setProfile(f,self.deserialize(f),quiet=True)
@@ -25011,7 +25020,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("Tare")
             if settings.contains("names"):
-                self.qmc.container_names = list(map(u,list(toStringList(settings.value("names",self.qmc.container_names)))))
+                self.qmc.container_names = list(map(str,list(toStringList(settings.value("names",self.qmc.container_names)))))
             if settings.contains("weights"):
                 self.qmc.container_weights = [toInt(x) for x in toList(settings.value("weights",self.qmc.container_weights))]
             if settings.contains("idx"):
@@ -25397,7 +25406,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("buttonactions"):
                 self.qmc.buttonactions = [toInt(x) for x in toList(settings.value("buttonactions"))]
             if settings.contains("buttonactionstrings"):
-                self.qmc.buttonactionstrings = list(map(u,list(toStringList(settings.value("buttonactionstrings",self.qmc.buttonactionstrings)))))
+                self.qmc.buttonactionstrings = list(map(str,list(toStringList(settings.value("buttonactionstrings",self.qmc.buttonactionstrings)))))
             if settings.contains("extrabuttonactions"):
                 self.qmc.extrabuttonactions = [toInt(x) for x in toList(settings.value("extrabuttonactions"))]
             if settings.contains("extrabuttonactionstrings"):
@@ -25530,8 +25539,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
                 self.qmc.extradevices = [toInt(x) for x in toList(settings.value("extradevices",self.qmc.extradevices))]
-                self.qmc.extraname1 = list(map(u,list(toStringList(settings.value("extraname1",self.qmc.extraname1)))))
-                self.qmc.extraname2 = list(map(u,list(toStringList(settings.value("extraname2",self.qmc.extraname2)))))
+                self.qmc.extraname1 = list(map(str,list(toStringList(settings.value("extraname1",self.qmc.extraname1)))))
+                self.qmc.extraname2 = list(map(str,list(toStringList(settings.value("extraname2",self.qmc.extraname2)))))
                 self.qmc.extramathexpression1 = list(map(str,list(toStringList(settings.value("extramathexpression1",self.qmc.extramathexpression1)))))
                 self.qmc.extramathexpression2 = list(map(str,list(toStringList(settings.value("extramathexpression2",self.qmc.extramathexpression2)))))
                 self.qmc.extradevicecolor1 = list(map(str,list(toStringList(settings.value("extradevicecolor1",self.qmc.extradevicecolor1)))))
@@ -25745,13 +25754,13 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("roastpropertiesAutoOpenFlag"):
                 self.qmc.roastpropertiesAutoOpenFlag = toInt(settings.value("roastpropertiesAutoOpenFlag",self.qmc.roastpropertiesAutoOpenFlag))
             if settings.contains("customflavorlabels"):
-                self.qmc.customflavorlabels = list(map(u,list(toStringList(settings.value("customflavorlabels",self.qmc.customflavorlabels)))))
+                self.qmc.customflavorlabels = list(map(str,list(toStringList(settings.value("customflavorlabels",self.qmc.customflavorlabels)))))
             #restore sliders
             settings.beginGroup("Sliders")
             if settings.contains("slidervisibilities"):
                 self.eventslidervisibilities = [toInt(x) for x in toList(settings.value("slidervisibilities",self.eventslidervisibilities))]
                 self.eventslideractions = [toInt(x) for x in toList(settings.value("slideractions",self.eventslideractions))]
-                self.eventslidercommands = list(map(u,list(toStringList(settings.value("slidercommands",self.eventslidercommands)))))
+                self.eventslidercommands = list(map(str,list(toStringList(settings.value("slidercommands",self.eventslidercommands)))))
                 self.eventslideroffsets = [toDouble(x) for x in toList(settings.value("slideroffsets",self.eventslideroffsets))]
                 self.eventsliderfactors = [toDouble(x) for x in toList(settings.value("sliderfactors",self.eventsliderfactors))]
             if settings.contains("slidermin"):
@@ -25765,7 +25774,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("eventslidertemp"):
                 self.eventslidertemp = [toInt(x) for x in toList(settings.value("eventslidertemp",self.eventslidertemp))]
             if settings.contains("eventsliderunits"):
-                self.eventsliderunits = list(map(u,list(toStringList(settings.value("eventsliderunits",self.eventsliderunits)))))
+                self.eventsliderunits = list(map(str,list(toStringList(settings.value("eventsliderunits",self.eventsliderunits)))))
             if settings.contains("ModeTempSliders"):
                 self.qmc.mode_tempsliders = str(settings.value("ModeTempSliders",self.qmc.mode_tempsliders))
             settings.endGroup()
@@ -25895,9 +25904,9 @@ class ApplicationWindow(QMainWindow):
                         if self.buttonpalette[i] is None:
                             self.buttonpalette[i] = []
                 for i in range(len(self.extraeventsactionstrings)):
-                    self.extraeventsactionstrings[i] = u(self.extraeventsactionstrings[i])
-                    self.extraeventslabels[i] = u(self.extraeventslabels[i])
-                    self.extraeventsdescriptions[i] = u(self.extraeventsdescriptions[i])
+                    self.extraeventsactionstrings[i] = self.extraeventsactionstrings[i]
+                    self.extraeventslabels[i] = self.extraeventslabels[i]
+                    self.extraeventsdescriptions[i] = self.extraeventsdescriptions[i]
                     self.extraeventbuttoncolor[i] = str(self.extraeventbuttoncolor[i])
                     self.extraeventbuttontextcolor[i] = str(self.extraeventbuttontextcolor[i])
                 if settings.contains("buttonpalette_shortcuts"):
@@ -26039,7 +26048,7 @@ class ApplicationWindow(QMainWindow):
                 from artisanlib.weblcds import startWeb
                 res = startWeb(
                     self.WebLCDsPort,
-                    u(self.getResourcePath()),
+                    str(self.getResourcePath()),
                     ("&nbsp;&nbsp;-.-" if aw.qmc.LCDdecimalplaces else "&nbsp;--"),
                     aw.lcdpaletteF["timer"],
                     aw.lcdpaletteB["timer"],
@@ -27262,8 +27271,8 @@ class ApplicationWindow(QMainWindow):
     def productionData2string(self,data,units=True):
         res = {}
         # id (prefix+nr)
-        res["nr"] = u(data["batchnr"])
-        res["id"] = ((u(data["batchprefix"]) + u(data["batchnr"])) if (data["batchnr"] != 0) else "")
+        res["nr"] = str(data["batchnr"])
+        res["id"] = ((data["batchprefix"] + str(data["batchnr"])) if (data["batchnr"] != 0) else "")
         # title
         res["title"] = data["title"]
         # date and time
@@ -27438,7 +27447,7 @@ class ApplicationWindow(QMainWindow):
                 profiles = sorted(profiles, 
                     key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
                          if "roastisodate" in p and "roasttime" in p else 0))
-                with open(u(self.getResourcePath() + 'report-template.htm'), 'r') as myfile:
+                with open(self.getResourcePath() + 'report-template.htm', 'r') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ""
                 total_in = 0 
@@ -27460,7 +27469,7 @@ class ApplicationWindow(QMainWindow):
                     total_in = ('{0:.2f}'.format(total_in) if unit in ["Kg","lb", "oz"] else '{0:.0f}'.format(total_in)),
                     total_out = ('{0:.2f}'.format(total_out) if unit in ["Kg","lb", "oz"] else '{0:.0f}'.format(total_out)),
                     total_loss = '{0:.1f}'.format(aw.weight_loss(total_in,total_out)),
-                    resources = u(self.getResourcePath()),
+                    resources = str(self.getResourcePath()),
                     batch = QApplication.translate("HTML Report Template", "Batch", None),
                     time = QApplication.translate("HTML Report Template", "Date", None),
                     profile = QApplication.translate("Label", "Title", None),
@@ -27474,8 +27483,8 @@ class ApplicationWindow(QMainWindow):
                     
                 f = None
                 try:
-                    tmpdir = u(QDir.tempPath() + "/")
-                    filename = u(QDir(tmpdir).filePath("ProductionReport.html"))
+                    tmpdir = str(QDir.tempPath() + "/")
+                    filename = str(QDir(tmpdir).filePath("ProductionReport.html"))
                     try:
                         os.remove(filename)
                     except OSError:
@@ -27914,7 +27923,7 @@ class ApplicationWindow(QMainWindow):
                 profiles = sorted(profiles, 
                     key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
                          if "roastisodate" in p and "roasttime" in p else 0))
-                with open(u(self.getResourcePath() + 'ranking-template.htm'), 'r') as myfile:
+                with open(self.getResourcePath() + 'ranking-template.htm', 'r') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ""
                 charges = 0
@@ -28046,9 +28055,9 @@ class ApplicationWindow(QMainWindow):
                         try:
                             
                             if pd["batchnr"] > 0:
-                                label = u(pd["batchprefix"]) + u(pd["batchnr"])
+                                label = pd["batchprefix"] + str(pd["batchnr"])
                             elif label_chr_nr < 26:
-                                label = u(libstring.ascii_uppercase[label_chr_nr])
+                                label = str(libstring.ascii_uppercase[label_chr_nr])
                                 pd["batchnr"] = ""
                                 pd["batchprefix"] = label
                                 label_chr_nr = label_chr_nr + 1
@@ -28135,7 +28144,7 @@ class ApplicationWindow(QMainWindow):
                         linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
                     handles.append(self.l_temp)
                         
-                tmpdir = u(QDir.tempPath() + "/")
+                tmpdir = str(QDir.tempPath() + "/")
                 graph_image = ""
                 graph_image_pct = ''
     
@@ -28216,7 +28225,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.fig.set_tight_layout(False)
                         self.qmc.fig.canvas.draw()
                         # save graph                
-                        graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
+                        graph_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
                         try:
                             os.remove(graph_image)
                         except OSError:
@@ -28318,9 +28327,9 @@ class ApplicationWindow(QMainWindow):
                             continue
                         pd = self.profileProductionData(p)
                         if pd["batchnr"] > 0:
-                            label = u(pd["batchprefix"]) + u(pd["batchnr"])[:8]
+                            label = pd["batchprefix"] + pd["batchnr"][:8]
                         elif label_chr_nr < 26:
-                            label = u(libstring.ascii_uppercase[label_chr_nr])
+                            label = str(libstring.ascii_uppercase[label_chr_nr])
                             label_chr_nr = label_chr_nr + 1
                         else:
                             label = ""
@@ -28370,7 +28379,7 @@ class ApplicationWindow(QMainWindow):
                             ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(drop_time), ha='left', color=fontcolor, fontproperties=prop)
                     
                     # save graph
-                    graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
+                    graph_image_pct = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
                     try:
                         os.remove(graph_image_pct)
                     except OSError:
@@ -28399,7 +28408,7 @@ class ApplicationWindow(QMainWindow):
 
                 weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb", "oz"] else '{0:.0f}')
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
-                    resources = u(self.getResourcePath()),
+                    resources = str(self.getResourcePath()),
                     title = QApplication.translate("HTML Report Template", "Roast Ranking", None),
                     time = QApplication.translate("HTML Report Template", "Date", None),
                     profile = QApplication.translate("Label", "Title", None),
@@ -28427,7 +28436,7 @@ class ApplicationWindow(QMainWindow):
                 )
                 f = None
                 try:
-                    filename = u(QDir(tmpdir).filePath("RankingReport.html"))
+                    filename = str(QDir(tmpdir).filePath("RankingReport.html"))
                     try:
                         os.remove(filename)
                     except OSError:
@@ -28692,11 +28701,11 @@ class ApplicationWindow(QMainWindow):
     def htmlReport(self,_=False):
         try:
             rcParams['path.effects'] = []
-            with open(u(self.getResourcePath() + 'roast-template.htm'), 'r') as myfile:
+            with open(self.getResourcePath() + 'roast-template.htm', 'r') as myfile:
                 HTML_REPORT_TEMPLATE=myfile.read()
-            beans_html = u(htmllib.escape(self.qmc.beans))
+            beans_html = str(htmllib.escape(self.qmc.beans))
             if len(beans_html) > 43:
-                beans_html = u(beans_html[:41] + "&hellip;")
+                beans_html = beans_html[:41] + "&hellip;"
                 
             cp = aw.computedProfileInformation()
             
@@ -28716,9 +28725,9 @@ class ApplicationWindow(QMainWindow):
                     etbta += " [%s,%d%s]"%(cp["AUCbegin"],cp["AUCbase"],self.qmc.mode)
                 elif ("AUCbase" in cp):
                     etbta += " [%d]"%(cp["AUCbase"])
-            tmpdir = u(QDir.tempPath() + "/")
+            tmpdir = str(QDir.tempPath() + "/")
             graph_image = "roastlog-graph"
-            graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
+            graph_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
             try:
                 os.remove(graph_image)
             except OSError:
@@ -28737,7 +28746,7 @@ class ApplicationWindow(QMainWindow):
             #obtain flavor chart image
             self.qmc.flavorchart()
             flavor_image = "roastlog-flavor"
-            flavor_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + ".svg")))
+            flavor_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + ".svg")))
             try:
                 os.remove(flavor_image)
             except OSError:
@@ -28805,11 +28814,11 @@ class ApplicationWindow(QMainWindow):
                 humidity = "--"
             if self.qmc.whole_color or self.qmc.ground_color:
                 if self.qmc.whole_color:
-                    wcolor = u(self.qmc.whole_color)
+                    wcolor = str(self.qmc.whole_color)
                 else:
                     wcolor = "--"
                 if self.qmc.ground_color:
-                    gcolor = u(self.qmc.ground_color)
+                    gcolor = str(self.qmc.ground_color)
                 else:
                     gcolor = "--"
                 color = wcolor + "/" + gcolor
@@ -28825,21 +28834,21 @@ class ApplicationWindow(QMainWindow):
                 background_html = "--"
             else:
                 if aw.qmc.roastbatchnrB == 0:
-                    titleB = u(aw.qmc.titleB)
+                    titleB = aw.qmc.titleB
                 else:
-                    titleB = aw.qmc.roastbatchprefixB + u(aw.qmc.roastbatchnrB) + " " + u(aw.qmc.titleB)
-                background_html = u(titleB)
+                    titleB = aw.qmc.roastbatchprefixB + aw.qmc.roastbatchnrB + " " + aw.qmc.titleB
+                background_html = titleB
             if aw.qmc.alarmsfile:
-                alarms = u(os.path.basename(aw.qmc.alarmsfile))
+                alarms = str(os.path.basename(aw.qmc.alarmsfile))
             else:
                 alarms = "--"
             if aw.qmc.roastbatchnr == 0:
                 batch = ""
             else:
-                batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + " "
-            datetime_html=u(self.qmc.roastdate.date().toString()) + ", " + u(self.qmc.roastdate.time().toString()[:-3])
+                batch = aw.qmc.roastbatchprefix + str(aw.qmc.roastbatchnr) + " "
+            datetime_html=self.qmc.roastdate.date().toString() + ", " + self.qmc.roastdate.time().toString()[:-3]
             # add artisan or artisan.plus links to title, background and beans if possible
-            title_html = u(htmllib.escape(batch)) + u(htmllib.escape(self.qmc.title))
+            title_html = str(htmllib.escape(batch)) + str(htmllib.escape(self.qmc.title))
             if aw.qmc.roastUUID is not None and aw.qmc.roastUUID != "":
                 if plus.register.getPath(aw.qmc.roastUUID):
                     title_html = '<a href="artisan://roast/' + aw.qmc.roastUUID + '">' + title_html + "</a>"
@@ -28865,7 +28874,7 @@ class ApplicationWindow(QMainWindow):
                 volume_label=QApplication.translate("HTML Report Template", "Volume:", None),
                 volume=volume,
                 roaster_label=QApplication.translate("HTML Report Template", "Roaster:", None),
-                roaster=u(htmllib.escape(self.qmc.roastertype)),
+                roaster=str(htmllib.escape(self.qmc.roastertype)),
                 operator_label=QApplication.translate("HTML Report Template", "Operator:", None),
                 operator=str(htmllib.escape(self.qmc.operator)),
                 cup_label=QApplication.translate("HTML Report Template", "Cupping:", None),
@@ -28929,7 +28938,7 @@ class ApplicationWindow(QMainWindow):
                 cupping_notes=self.note2html(self.qmc.cuppingnotes))
             f = None
             try:
-                filename = u(QDir(tmpdir).filePath("Roastlog.html"))
+                filename = str(QDir(tmpdir).filePath("Roastlog.html"))
                 try:
                     os.remove(filename)
                 except OSError:
@@ -29063,7 +29072,7 @@ class ApplicationWindow(QMainWindow):
             res = stringfromseconds(cp[time_key]) + " (" + stringfromseconds(cp[time_key] - cp[prev_time_key]) + "m)"
         elif time_key in cp and BT_key in cp:
             res = stringfromseconds(cp[time_key])+ " (%.0f"%cp[BT_key] + "&deg;" + self.qmc.mode + ")"
-        return u(res)
+        return res
 
     def specialevents2html(self):
         html = ""
@@ -29100,19 +29109,19 @@ class ApplicationWindow(QMainWindow):
                 html += ("<tr>"+
                      "\n<td>" + str(i+1) + "</td><td>" +
                      stringfromseconds(self.qmc.timex[sevents[i][0]] - start) +
-                     "</td><td align='right'>" + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
+                     "</td><td align='right'>" + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + str(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
             html += '</table>\n</center>'
-        return u(html)
+        return html
 
     def note2html(self,notes):
         notes_html = ""
         for i in range(len(notes)):
-            if u(notes[i]) == 9:
+            if str(notes[i]) == 9:
                 notes_html += " &nbsp&nbsp&nbsp&nbsp "
-            elif u(notes[i]) == "\n":
+            elif str(notes[i]) == "\n":
                 notes_html += "<br>\n"
             else:           
-                notes_html += u(notes[i])
+                notes_html += str(notes[i])
         if notes_html != "":
             notes_html = "<br>" + notes_html
         return notes_html
@@ -29665,9 +29674,9 @@ class ApplicationWindow(QMainWindow):
         imag = self.grab()
         fmt = 'png'
         initialPath = QDir.currentPath() + "/ArtisanScreenshot." + fmt
-        fileName = u(QFileDialog.getSaveFileName(self, "Artisan ScreenShot",
+        fileName = QFileDialog.getSaveFileName(self, "Artisan ScreenShot",
                 initialPath,
-                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0])
+                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0]
         if fileName:
             imag.save(fileName, fmt) 
 
@@ -29676,9 +29685,9 @@ class ApplicationWindow(QMainWindow):
         imag = screen.grabWindow(QApplication.desktop().winId())
         fmt = 'png'
         initialPath = QDir.currentPath() + "/DesktopScreenshot." + fmt       
-        fileName = u(QFileDialog.getSaveFileName(self, "Desktop ScreenShot",
+        fileName = QFileDialog.getSaveFileName(self, "Desktop ScreenShot",
                 initialPath,
-                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0])
+                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0]
         if fileName:
             imag.save(fileName, fmt)
             
@@ -30372,7 +30381,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.reset(soundOn=False)
             if foreground_profile_path:
                 # load foreground into background
-                aw.loadbackground(u(foreground_profile_path))
+                aw.loadbackground(foreground_profile_path)
                 aw.qmc.background = True
                 aw.qmc.timealign(redraw=True,recompute=True)
             else:
@@ -30863,19 +30872,19 @@ class ApplicationWindow(QMainWindow):
   
                 title = root.find("roasttype")
                 if title is None:
-                    aw.qmc.title = u(os.path.basename(filename))
+                    aw.qmc.title = str(os.path.basename(filename))
                 else:
-                    aw.qmc.title = u(title.text)
+                    aw.qmc.title = str(title.text)
                     
                 beans = root.find("coffeetype")
                 if beans is not None:
                     if beans.text is not None:
-                        aw.qmc.beans = u(beans.text)
+                        aw.qmc.beans = str(beans.text)
                                         
                 roaster = root.find("roaster")
                 if roaster is not None:
                     if roaster.text is not None:
-                        aw.qmc.roastertype = u(roaster.text)
+                        aw.qmc.roastertype = str(roaster.text)
                     
                 chargestr = root.find("charge")
                 if chargestr is None:
@@ -30911,7 +30920,7 @@ class ApplicationWindow(QMainWindow):
                 notes = root.find("notes")
                 if notes is not None:
                     if notes.text is not None:
-                        self.qmc.roastingnotes = u(notes.text)
+                        self.qmc.roastingnotes = str(notes.text)
 
                 recipedata = None
                 historydata = None
@@ -31071,7 +31080,7 @@ class ApplicationWindow(QMainWindow):
             if len(tx) == len(bt) == len(dt):
                 self.qmc.roastertype = "Aillio Bullet R1"
                 try:
-                    self.qmc.operator = u(obj["roastMasterName"])
+                    self.qmc.operator = str(obj["roastMasterName"])
                 except:
                     pass
                 try:
@@ -31158,7 +31167,7 @@ class ApplicationWindow(QMainWindow):
                     pass
                 aw.autoAdjustAxis()
                 self.qmc.redraw()
-                aw.sendmessage(QApplication.translate("Message","Imported {0}", None).format(u(filename)))
+                aw.sendmessage(QApplication.translate("Message","Imported {0}", None).format(filename))
             else:
                 aw.sendmessage(QApplication.translate("Message","Unable to import. Inconsistent number of samples", None))
         except IOError as ex:
@@ -31191,7 +31200,7 @@ class ApplicationWindow(QMainWindow):
                 self.curFile = None
                 #Plot everything
                 self.qmc.redraw()
-                message = QApplication.translate("Message","{0}  imported ", None).format(u(filename))
+                message = QApplication.translate("Message","{0}  imported ", None).format(filename)
                 self.sendmessage(message)
 
         except IOError as ex:
@@ -31501,19 +31510,19 @@ class ApplicationWindow(QMainWindow):
             p = QPainter(img)
             p.setOpacity(0.8)
             p.setPen(QColor("slategrey"))
-            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/4.5),u(text1))
-            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/5.3),u(text2))
-            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6.6),u(text3))
-            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8.5),u(text4))
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/4.5),text1)
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/5.3),text2)
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6.6),text3)
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8.5),text4)
             #draw pid
-            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3),u(pidstring))
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3),pidstring)
             p.drawRect(Wwidth/7+140, Wheight - Wheight/3-12, 100, 12)
             p.fillRect(Wwidth/7+140, Wheight - Wheight/3-12, MVV, 12, QColor("pink"))
             delta = QApplication.translate("Label","ET - BT = {0}", None).format("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]))
-            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3.5),u(delta))
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3.5),delta)
             #draw phase texts
-            p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/6),u(phasetext1))
-            p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/8),u(phasetext2))
+            p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/6),phasetext1)
+            p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/8),phasetext2)
             p.end()
             self.HUD.setPixmap(img)
 
@@ -31559,7 +31568,7 @@ class ApplicationWindow(QMainWindow):
             p.drawEllipse(Wwidth/2 -BTradius/2 , Wheight/2 - BTradius/2 , BTradius,BTradius)
             delta = QApplication.translate("Label","ET - BT = {0}{1}", None).format("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]),self.qmc.mode)
             p.setFont(QFont('Utopia', 14, -1))
-            p.drawText(QPoint(Wwidth/2,Wheight/2),u(delta))
+            p.drawText(QPoint(Wwidth/2,Wheight/2),delta)
             p.end()
             self.HUD.setPixmap(img)
 
@@ -31570,7 +31579,7 @@ class ApplicationWindow(QMainWindow):
         #convert labels to unicode
         for i in range(len(self.qmc.wheelnames)):
             for x in range(len(self.qmc.wheelnames[i])):
-                self.qmc.wheelnames[i][x]= u(self.qmc.wheelnames[i][x])
+                self.qmc.wheelnames[i][x]= self.qmc.wheelnames[i][x]
         #two dimension lists
         wheel["wheelnames"] = self.qmc.wheelnames
         wheel["segmentlengths"] = self.qmc.segmentlengths
@@ -31590,9 +31599,9 @@ class ApplicationWindow(QMainWindow):
 
     def loadWheel(self,filename):
         try:
-            f = QFile(u(filename))
+            f = QFile(filename)
             if not f.open(QIODevice.ReadOnly):
-                raise IOError(u(f.errorString()))
+                raise IOError(f.errorString())
             stream = QTextStream(f)
             firstChar = stream.read(1)
             if firstChar == "{":
@@ -31972,9 +31981,9 @@ class ApplicationWindow(QMainWindow):
 
     def loadPalettes(self,filename,pal):
         try:
-            f = QFile(u(filename))
+            f = QFile(filename)
             if not f.open(QIODevice.ReadOnly):
-                raise IOError(u(f.errorString()))
+                raise IOError(f.errorString())
             stream = QTextStream(f)
             firstChar = stream.read(1)
             if firstChar == "{":
@@ -31993,12 +32002,12 @@ class ApplicationWindow(QMainWindow):
                                 else:
                                     nextpalette[x] = list(map(int,palette[key][x]))     #  type int
                             else:
-                                nextpalette[x] = list(map(u,palette[key][x])) #  type unicode
+                                nextpalette[x] = list(map(str,palette[key][x])) #  type unicode
                         # read in extended palette data containing slider settings:
                         if len(palette[key])==14:
                             nextpalette[9] = list(map(int,palette[key][9]))     #  type int
                             nextpalette[10] = list(map(int,palette[key][10]))   #  type int
-                            nextpalette[11] = list(map(u,palette[key][11]))     #  type unicode
+                            nextpalette[11] = list(map(str,palette[key][11]))     #  type unicode
                             nextpalette[12] = list(map(int,palette[key][12]))   #  type int
                             nextpalette[13] = list(map(float,palette[key][13])) #  type double
                         else:
@@ -32612,9 +32621,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     filename = aw.curFile
                 if filename:
-                    f = QFile(u(filename))
+                    f = QFile(filename)
                     if not f.open(QFile.ReadOnly):
-                        raise IOError(u(f.errorString()))
+                        raise IOError(f.errorString())
                     stream = QTextStream(f)
                     firstChar = stream.read(1)
                     if firstChar == "{":
@@ -32629,9450 +32638,6 @@ class ApplicationWindow(QMainWindow):
                 pass
             self.simulatorAction.setChecked(bool(self.simulator))
 
-
-##########################################################################
-#####################     SAMPLING DLG     ###############################
-##########################################################################
-
-class SamplingDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(SamplingDlg,self).__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Message","Sampling Interval", None))
-        self.setModal(True)
-        
-        self.keepOnFlag = QCheckBox(QApplication.translate("Label","Keep ON", None))
-        self.keepOnFlag.setFocusPolicy(Qt.NoFocus)
-        self.keepOnFlag.setChecked(bool(self.aw.qmc.flagKeepON))
-        
-        self.interval = QDoubleSpinBox()
-        self.interval.setSingleStep(1)
-        self.interval.setValue(self.aw.qmc.delay/1000.)
-        self.interval.setRange(self.aw.qmc.min_delay/1000.,40.)
-        self.interval.setDecimals(1)
-        self.interval.setAlignment(Qt.AlignRight)
-        self.interval.setSuffix("s")
-        
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.ok)
-        self.dialogbuttons.rejected.connect(self.close)
-        
-        flagLayout = QHBoxLayout()
-        flagLayout.addStretch()
-        flagLayout.addWidget(self.keepOnFlag)
-        flagLayout.addStretch()
-        buttonsLayout = QHBoxLayout()
-        buttonsLayout.addStretch()
-        buttonsLayout.addWidget(self.dialogbuttons)
-        
-        #incorporate layouts
-        layout = QVBoxLayout()
-        layout.addWidget(self.interval)
-        layout.addLayout(flagLayout)
-        layout.addStretch()
-        layout.addLayout(buttonsLayout)
-        layout.setSizeConstraint(QLayout.SetFixedSize)
-        self.setLayout(layout) 
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-        
-    def closeEvent(self,_):
-        self.close()
-        
-    #cancel button
-    @pyqtSlot()
-    def close(self):
-        self.reject()
-    
-    #ok button
-    @pyqtSlot()
-    def ok(self):
-        if self.keepOnFlag.isChecked():
-            self.aw.qmc.flagKeepON = True
-        else:
-            self.aw.qmc.flagKeepON = False
-        self.aw.qmc.delay = int(self.interval.value()*1000.)
-        if self.aw.qmc.delay < self.aw.qmc.default_delay:
-            QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))        
-        self.accept()
-
-
-##########################################################################
-#####################  VIEW PLATFORM      ################################
-##########################################################################
-
-class platformDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(platformDlg,self).__init__(parent, aw)
-        self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Platform", None))
-        platformdic = {}
-        platformdic["Architecture"] = str(platform.architecture())
-        platformdic["Machine"] = str(platform.machine())
-        platformdic["Platform name"] =  str(platform.platform())
-        platformdic["Processor"] = str(platform.processor())
-        platformdic["Python Build"] = str(platform.python_build())
-        platformdic["Python Compiler"] = str(platform.python_compiler())
-        platformdic["Python Branch"] = str(platform.python_branch())
-        platformdic["Python Implementation"] = str(platform.python_implementation())
-        platformdic["Python Revision"] = str(platform.python_revision())
-        platformdic["Release"] = str(platform.release())
-        platformdic["System"] = str(platform.system())
-        platformdic["Version"] = str(platform.version())
-        platformdic["Python version"] = str(platform.python_version())
-        system = str(platform.system())
-        if system == "Windows":
-            platformdic["Win32"] = str(platform.win32_ver())
-        elif system == "Darwin":
-            platformdic["Mac"] = str(platform.mac_ver())
-        elif system == "Linux":
-            platformdic["Linux"] = str(platform.linux_distribution())
-            platformdic["Libc"] = str(platform.libc_ver())
-        htmlplatform = "<b>version =</b> " + __version__ + " (" + __revision__ + ")<br>"
-        for key in sorted(platformdic):
-            htmlplatform += "<b>" + key + " = </b> <i>" + platformdic[key] + "</i><br>"
-        platformEdit = QTextEdit()
-        platformEdit.setHtml(htmlplatform)
-        platformEdit.setReadOnly(True)
-        layout = QVBoxLayout()
-        layout.addWidget(platformEdit)
-        self.setLayout(layout)
-
-
-##########################################################################
-#####################  AUTOSAVE DLG  #####################################
-##########################################################################
-
-class autosaveDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(autosaveDlg,self).__init__(parent, aw)
-        self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Autosave", None))
-
-        settings = QSettings()
-        if settings.contains("autosaveGeometry"):
-            self.restoreGeometry(settings.value("autosaveGeometry"))
-        
-        self.helpdialog = None
-
-        self.prefixEdit = QLineEdit(self.aw.qmc.autosaveprefix)
-        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name",None))
-        self.prefixEdit.textChanged.connect(self.prefixChanged)
-        prefixpreviewLabel = QLabel()
-        prefixpreviewLabel.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
-        prefixpreviewLabel.setText(QApplication.translate("Label", "Preview:",None))
-        self.prefixPreview = QLabel()
-        self.prefixpreviewrecordingLabel = QLabel()
-        self.prefixpreviewrecordingLabel.setAlignment(Qt.Alignment(Qt.AlignCenter | Qt.AlignRight))
-        self.prefixPreviewrecording = QLabel()
-        self.prefixChanged()
- 
-        autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]", None))
-        self.autocheckbox = QCheckBox()
-        self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None))
-        self.autocheckbox.setChecked(self.aw.qmc.autosaveflag)
-        autopdflabel = QLabel(QApplication.translate("CheckBox","Save also", None))
-        self.autopdfcheckbox = QCheckBox()
-        self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save image alongside .alog profiles",None))
-        self.autopdfcheckbox.setChecked(self.aw.qmc.autosaveimage)
-        imageTypes = ["PDF", "SVG", "PNG", "JPEG", "BMP", "CSV", "JSON"]
-        self.imageTypesComboBox = QComboBox()
-        self.imageTypesComboBox.addItems(imageTypes)
-        self.imageTypesComboBox.setCurrentIndex(imageTypes.index(self.aw.qmc.autosaveimageformat))
-        prefixlabel = QLabel()
-        prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        prefixlabel.setText(QApplication.translate("Label", "File Name Prefix",None))
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.autoChanged)
-        self.dialogbuttons.rejected.connect(self.close)
-        self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.Help)
-        self.dialogbuttons.button(QDialogButtonBox.Help).clicked.connect(self.showautosavehelp)
-        
-        pathButton = QPushButton(QApplication.translate("Button","Path", None))
-        pathButton.setFocusPolicy(Qt.NoFocus)
-        self.pathEdit = QLineEdit(u(self.aw.qmc.autosavepath))
-        self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None))
-        pathButton.clicked.connect(self.getpath)
-        
-        pathAlsoButton = QPushButton(QApplication.translate("Button","Path", None))
-        pathAlsoButton.setFocusPolicy(Qt.NoFocus)
-        self.pathAlsoEdit = QLineEdit(u(self.aw.qmc.autosavealsopath))
-        self.pathAlsoEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store the save also files",None))
-        pathAlsoButton.clicked.connect(self.getalsopath)
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.dialogbuttons)
-        autolayout = QGridLayout()
-        autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignRight)
-        autolayout.addWidget(autochecklabel,0,1)
-        autolayout.addWidget(prefixlabel,1,0)
-        autolayout.addWidget(self.prefixEdit,1,1,1,2)
-        autolayout.addWidget(prefixpreviewLabel,2,0)
-        autolayout.addWidget(self.prefixPreview,2,1)
-        autolayout.addWidget(self.prefixpreviewrecordingLabel,3,0)
-        autolayout.addWidget(self.prefixPreviewrecording,3,1)
-        autolayout.addWidget(pathButton,4,0)
-        autolayout.addWidget(self.pathEdit,4,1,1,2)
-        autolayout.addWidget(self.autopdfcheckbox,5,0,Qt.AlignRight)
-        autolayout.addWidget(autopdflabel,5,1)
-        autolayout.addWidget(self.imageTypesComboBox,5,2)
-        autolayout.addWidget(pathAlsoButton,6,0)
-        autolayout.addWidget(self.pathAlsoEdit,6,1,1,2)
-        autolayout.setColumnStretch(0,0)
-        autolayout.setColumnStretch(1,10)
-        autolayout.setColumnStretch(2,0)
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(autolayout)
-        mainLayout.addStretch()
-        mainLayout.addSpacing(10)
-        mainLayout.addLayout(buttonLayout)
-        self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    @pyqtSlot(bool)
-    def showautosavehelp(self,_=False):
-        self.helpdialog = self.aw.showHelpDialog(
-                self,            # this dialog as parent
-                self.helpdialog, # the existing help dialog
-                QApplication.translate("Form Caption","Autosave Fields Help",None),
-                autosave_help.content())
-
-    def closeHelp(self):
-        self.aw.closeHelpDialog(self.helpdialog)
-
-    @pyqtSlot()
-    def prefixChanged(self):
-        preview = self.aw.generateFilename(self.prefixEdit.text(),previewmode=2)
-        self.prefixPreview.setText(preview)
-        previewrecording = self.aw.generateFilename(self.prefixEdit.text(),previewmode=1)
-        if previewrecording == preview:
-            self.prefixpreviewrecordingLabel.setText("")
-            self.prefixPreviewrecording.setText("")
-        else:
-            self.prefixpreviewrecordingLabel.setText(QApplication.translate("Label", "While recording:",None))
-            self.prefixPreviewrecording.setText(previewrecording)
-
-    @pyqtSlot(bool)
-    def getpath(self,_):
-        filename = self.aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Path", None))
-        self.pathEdit.setText(filename)
-
-    @pyqtSlot(bool)
-    def getalsopath(self,_):
-        filename = self.aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Save Also Path", None))
-        self.pathAlsoEdit.setText(filename)
-
-    @pyqtSlot()
-    def autoChanged(self):
-        self.aw.qmc.autosavepath = u(self.pathEdit.text())
-        self.aw.qmc.autosavealsopath = u(self.pathAlsoEdit.text())
-        if self.autocheckbox.isChecked():
-            self.aw.qmc.autosaveflag = 1
-            self.aw.qmc.autosaveprefix = u(self.prefixEdit.text())
-            message = QApplication.translate("Message","Autosave ON. Prefix: {0}").format(self.prefixEdit.text())
-            self.aw.sendmessage(message)
-        else:
-            self.aw.qmc.autosaveflag = 0
-            self.aw.qmc.autosaveprefix = u(self.prefixEdit.text())
-            message = QApplication.translate("Message","Autosave OFF. Prefix: {0}").format(self.prefixEdit.text())
-            self.aw.sendmessage(message)
-        self.aw.qmc.autosaveimage = self.autopdfcheckbox.isChecked()
-        self.aw.qmc.autosaveimageformat = self.imageTypesComboBox.currentText()
-        self.close()
-
-    @pyqtSlot()
-    def closeEvent(self, _):
-        self.closeHelp()
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("autosaveGeometry",self.saveGeometry())
-
-##########################################################################
-#####################  BATCH DLG  ########################################
-##########################################################################
-
-class batchDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(batchDlg,self).__init__(parent, aw)
-        self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Batch", None))
-        self.prefixEdit = QLineEdit(self.aw.qmc.batchprefix)
-        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Batch prefix",None))
-        self.counterSpinBox = QSpinBox()
-        self.counterSpinBox.setRange(0,999999)
-        self.counterSpinBox.setSingleStep(1)
-        self.counterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        batchchecklabel = QLabel(QApplication.translate("CheckBox","Batch Counter", None))
-        self.batchcheckbox = QCheckBox()
-        self.batchcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF batch counter",None))
-        if self.aw.qmc.batchcounter > -1:
-            self.batchcheckbox.setChecked(True)
-        else:
-            self.batchcheckbox.setChecked(False)
-        prefixlabel = QLabel()
-        prefixlabel.setAlignment(Qt.Alignment(Qt.AlignVCenter | Qt.AlignRight))
-        prefixlabel.setText(QApplication.translate("Label", "Prefix",None))
-        counterlabel = QLabel()
-        counterlabel.setAlignment(Qt.Alignment(Qt.AlignVCenter | Qt.AlignRight))
-        counterlabel.setText(QApplication.translate("Label", "Counter",None))
-        descrLabel = QLabel("<i>" + QApplication.translate("Message", "Next batch: counter+1",None) + "</i>")
-        
-        neverOverwriteCounterlabel = QLabel(QApplication.translate("CheckBox","Never overwrite counter", None))
-        self.neverOverwriteCheckbox = QCheckBox()
-        self.neverOverwriteCheckbox.setToolTip(QApplication.translate("Tooltip", "If ticked, the batch counter is never modified by loading a settings file",None))
-        if self.aw.qmc.neverUpdateBatchCounter:
-            self.neverOverwriteCheckbox.setChecked(True)
-        else:
-            self.neverOverwriteCheckbox.setChecked(False)
-        
-        if self.aw.qmc.batchcounter > -1:
-            self.counterSpinBox.setValue(self.aw.qmc.batchcounter)
-            self.counterSpinBox.setEnabled(True)
-            self.prefixEdit.setEnabled(True)
-            self.neverOverwriteCheckbox.setEnabled(True)
-        else:
-            self.counterSpinBox.setValue(0)
-            self.counterSpinBox.setEnabled(False)
-            self.prefixEdit.setEnabled(False)
-            self.neverOverwriteCheckbox.setEnabled(False)
-        
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.batchChanged)
-        self.dialogbuttons.rejected.connect(self.close)
-        
-        self.batchcheckbox.stateChanged.connect(self.toggleCounterFlag)
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        batchlayout = QGridLayout()
-        batchlayout.addWidget(self.batchcheckbox,0,0,Qt.AlignRight)
-        batchlayout.addWidget(batchchecklabel,0,1)
-        batchlayout.addWidget(prefixlabel,1,0)
-        batchlayout.addWidget(self.prefixEdit,1,1)
-        batchlayout.addWidget(counterlabel,2,0)
-        batchlayout.addWidget(self.counterSpinBox,2,1)
-        batchlayout.addWidget(descrLabel,3,0,1,3)
-        batchlayout.addWidget(self.neverOverwriteCheckbox,4,0,Qt.AlignRight)
-        batchlayout.addWidget(neverOverwriteCounterlabel,4,1)
-        
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(batchlayout)
-        mainLayout.addStretch()
-        mainLayout.addSpacing(10)
-        mainLayout.addLayout(buttonLayout)
-        self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    @pyqtSlot(int)
-    def toggleCounterFlag(self,_):
-        if self.batchcheckbox.isChecked():
-            self.prefixEdit.setEnabled(True)
-            self.counterSpinBox.setEnabled(True)
-            self.neverOverwriteCheckbox.setEnabled(True)
-        else:
-            self.prefixEdit.setEnabled(False)
-            self.counterSpinBox.setEnabled(False)
-            self.neverOverwriteCheckbox.setEnabled(False)
-
-    @pyqtSlot()
-    def batchChanged(self):
-        self.aw.qmc.batchprefix = self.prefixEdit.text()
-        if self.batchcheckbox.isChecked():
-            self.aw.qmc.batchcounter = self.counterSpinBox.value()
-        else:
-            self.aw.qmc.batchcounter = -1
-            self.aw.qmc.batchsequence = 1
-        self.aw.qmc.neverUpdateBatchCounter = self.neverOverwriteCheckbox.isChecked()
-        self.close()
-        
-##########################################################################
-#####################  WINDOW PROPERTIES DLG  ############################
-##########################################################################
-
-class WindowsDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(WindowsDlg,self).__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Form Caption","Axes",None))
-        self.setModal(True)
-        xlimitLabel = QLabel(QApplication.translate("Label", "Max",None))
-        xlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
-        ylimitLabel = QLabel(QApplication.translate("Label", "Max",None))
-        ylimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
-        zlimitLabel = QLabel(QApplication.translate("Label", "Max",None))
-        zlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
-        step100Label = QLabel(QApplication.translate("Label", "100% Event Step",None))
-        self.step100Edit = QLineEdit()
-        self.step100Edit.setMaximumWidth(55)
-        self.step100Edit.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, self.aw.qmc.ylimit_max, self.step100Edit))
-        self.step100Edit.setAlignment(Qt.AlignRight)
-        self.step100Edit.setToolTip(QApplication.translate("Tooltip", "100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty", None))
-        self.xlimitEdit = QLineEdit()
-        self.xlimitEdit.setMaximumWidth(50)
-        self.xlimitEdit.setMinimumWidth(50)
-        self.xlimitEdit.setAlignment(Qt.AlignRight)
-        self.xlimitEdit_min = QLineEdit()
-        self.xlimitEdit_min.setMaximumWidth(55)
-        self.xlimitEdit_min.setMinimumWidth(55)
-        self.xlimitEdit_min.setAlignment(Qt.AlignRight)
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.xlimitEdit.setValidator(QRegExpValidator(regextime,self))
-        self.xlimitEdit_min.setValidator(QRegExpValidator(regextime,self))
-        self.ylimitEdit = QLineEdit()
-        self.ylimitEdit.setMaximumWidth(60)
-        self.ylimitEdit_min = QLineEdit()
-        self.ylimitEdit_min.setMaximumWidth(60)
-        self.ylimitEdit.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, self.aw.qmc.ylimit_max, self.ylimitEdit))
-        self.ylimitEdit_min.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, self.aw.qmc.ylimit_max, self.ylimitEdit_min))
-        self.ylimitEdit.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.ylimitEdit_min.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.zlimitEdit = QLineEdit()
-        self.zlimitEdit.setMaximumWidth(60)
-        self.zlimitEdit_min = QLineEdit()
-        self.zlimitEdit_min.setMaximumWidth(60)
-        self.zlimitEdit.setValidator(QIntValidator(self.aw.qmc.zlimit_min_max, self.aw.qmc.zlimit_max, self.zlimitEdit))
-        self.zlimitEdit_min.setValidator(QIntValidator(self.aw.qmc.zlimit_min_max, self.aw.qmc.zlimit_max, self.zlimitEdit_min))
-        self.zlimitEdit.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.zlimitEdit_min.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx))
-        if self.aw.qmc.timeindex[0] != -1:
-            self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
-        else:
-            self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx))
-        self.ylimitEdit.setText(str(self.aw.qmc.ylimit))
-        self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min))
-        if self.aw.qmc.step100temp is not None:
-            self.step100Edit.setText(str(self.aw.qmc.step100temp))
-        else:
-            self.step100Edit.setText("")
-        self.zlimitEdit.setText(str(self.aw.qmc.zlimit))
-        self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min))
-        self.legendComboBox = QComboBox()
-        self.legendComboBox.setMaximumWidth(160)
-        legendlocs = ["",#QApplication.translate("ComboBox", "none",None),
-                      QApplication.translate("ComboBox", "upper right",None),
-                      QApplication.translate("ComboBox", "upper left",None),
-                      QApplication.translate("ComboBox", "lower left",None),
-                      QApplication.translate("ComboBox", "lower right",None),
-                      QApplication.translate("ComboBox", "right",None),
-                      QApplication.translate("ComboBox", "center left",None),
-                      QApplication.translate("ComboBox", "center right",None),
-                      QApplication.translate("ComboBox", "lower center",None),
-                      QApplication.translate("ComboBox", "upper center",None),
-                      QApplication.translate("ComboBox", "center",None)]
-        self.legendComboBox.addItems(legendlocs)
-        self.legendComboBox.setCurrentIndex(self.aw.qmc.legendloc)
-        self.legendComboBox.currentIndexChanged.connect(self.changelegendloc)
-        resettimelabel = QLabel(QApplication.translate("Label", "Max",None))
-        self.resetEdit = QLineEdit()
-        self.resetEdit.setMaximumWidth(50)
-        self.resetEdit.setMinimumWidth(50)
-        self.resetEdit.setAlignment(Qt.AlignRight)
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.resetEdit.setValidator(QRegExpValidator(regextime,self))
-        self.resetEdit.setText(stringfromseconds(self.aw.qmc.resetmaxtime))
-        self.resetEdit.setToolTip(QApplication.translate("Tooltip", "Time axis max on RESET", None))
-        # CHARGE min
-        chargeminlabel = QLabel(QApplication.translate("Label", "RESET",None) + " " + QApplication.translate("Label", "Min",None))
-        self.chargeminEdit = QLineEdit()
-        self.chargeminEdit.setMaximumWidth(50)
-        self.chargeminEdit.setMinimumWidth(50)
-        self.chargeminEdit.setAlignment(Qt.AlignRight)
-        self.chargeminEdit.setValidator(QRegExpValidator(regextime,self))
-        self.chargeminEdit.setText(stringfromseconds(self.aw.qmc.chargemintime))
-        self.chargeminEdit.setToolTip(QApplication.translate("Tooltip", "Time axis min on RESET", None))
-        
-        # fixmaxtime flag
-        self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Expand",None))
-        self.fixmaxtimeFlag.setChecked(not self.aw.qmc.fixmaxtime)
-        self.fixmaxtimeFlag.setToolTip(QApplication.translate("Tooltip", "Automatically extend the time axis by 3min on need", None))
-        # locktimex flag
-        self.locktimexFlag = QCheckBox(QApplication.translate("CheckBox", "Lock",None))
-        self.locktimexFlag.setChecked(self.aw.qmc.locktimex)
-        self.locktimexFlag.stateChanged.connect(self.lockTimexFlagChanged)
-        self.locktimexFlag.setToolTip(QApplication.translate("Tooltip", "Do not set time axis min and max from profile on load", None))
-        # autotimex flag
-        self.autotimexFlag = QCheckBox(QApplication.translate("CheckBox", "Auto",None))
-        self.autotimexFlag.setChecked(self.aw.qmc.autotimex)
-        self.autotimexFlag.stateChanged.connect(self.autoTimexFlagChanged)
-        self.autotimexFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set time axis min and max from profile CHARGE/DROP events", None))
-        autoButton = QPushButton(QApplication.translate("Button","Calc",None))
-        autoButton.setFocusPolicy(Qt.NoFocus)
-        autoButton.clicked.connect(self.autoAxis)
-        # time axis steps
-        timegridlabel = QLabel(QApplication.translate("Label", "Step",None))
-        self.xaxislencombobox = QComboBox()
-        timelocs =   [
-                    #QApplication.translate("ComboBox", "30 seconds",None),
-                      QApplication.translate("ComboBox", "1 minute",None),
-                      QApplication.translate("ComboBox", "2 minutes",None),
-                      QApplication.translate("ComboBox", "3 minutes",None),
-                      QApplication.translate("ComboBox", "4 minutes",None),
-                      QApplication.translate("ComboBox", "5 minutes",None),
-                      QApplication.translate("ComboBox", "10 minutes",None),
-                      QApplication.translate("ComboBox", "30 minutes",None),
-                      QApplication.translate("ComboBox", "1 hour",None)]
-        self.xaxislencombobox.addItems(timelocs)
-        
-        self.xaxislencombobox.setMinimumContentsLength(6)
-        width = self.xaxislencombobox.minimumSizeHint().width()
-        self.xaxislencombobox.setMinimumWidth(width)
-        if platf == 'Darwin':
-            self.xaxislencombobox.setMaximumWidth(width)
-#        self.xaxislencombobox.setMaximumWidth(120)
-        
-        self.timeconversion = [60,120,180,240,300,600,1800,3600]
-        try:
-            self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid))
-        except Exception:
-            self.xaxislencombobox.setCurrentIndex(0)
-        self.xaxislencombobox.currentIndexChanged.connect(self.xaxislenloc)
-        self.timeGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Time",None))
-        self.timeGridCheckBox.setChecked(self.aw.qmc.time_grid)
-        self.timeGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show time grid", None))
-        self.timeGridCheckBox.setFocusPolicy(Qt.NoFocus)
-        self.tempGridCheckBox = QCheckBox(QApplication.translate("CheckBox","Temp",None))
-        self.tempGridCheckBox.setToolTip(QApplication.translate("Tooltip", "Show temperature grid", None))
-        self.tempGridCheckBox.setChecked(self.aw.qmc.temp_grid)
-        self.tempGridCheckBox.setFocusPolicy(Qt.NoFocus)
-        ygridlabel = QLabel(QApplication.translate("Label", "Step",None))
-        self.ygridSpinBox = QSpinBox()
-        self.ygridSpinBox.setRange(10,500)
-        self.ygridSpinBox.setSingleStep(5)
-        self.ygridSpinBox.setValue(self.aw.qmc.ygrid)
-        self.ygridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.ygridSpinBox.valueChanged.connect(self.changeygrid)
-        self.ygridSpinBox.setMaximumWidth(60)
-        zgridlabel = QLabel(QApplication.translate("Label", "Step",None))
-        self.zgridSpinBox = QSpinBox()
-        self.zgridSpinBox.setRange(1,100)
-        self.zgridSpinBox.setSingleStep(5)
-        self.zgridSpinBox.setValue(self.aw.qmc.zgrid)
-        self.zgridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.zgridSpinBox.valueChanged.connect(self.changezgrid)
-        self.zgridSpinBox.setMaximumWidth(60)
-        
-        self.autodeltaxLabel = QLabel(QApplication.translate("CheckBox", "Auto",None))
-        self.autodeltaxETFlag = QCheckBox(deltaLabelUTF8 + QApplication.translate("CheckBox", "ET",None))
-        self.autodeltaxETFlag.setChecked(self.aw.qmc.autodeltaxET)
-        self.autodeltaxBTFlag = QCheckBox(deltaLabelUTF8 + QApplication.translate("CheckBox", "BT",None))
-        self.autodeltaxBTFlag.setChecked(self.aw.qmc.autodeltaxBT)
-        self.autodeltaxETFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaET", None))
-        self.autodeltaxBTFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set delta axis max from DeltaBT", None))
-        autoDeltaButton = QPushButton(QApplication.translate("Button","Calc",None))
-        autoDeltaButton.setFocusPolicy(Qt.NoFocus)
-        autoDeltaButton.clicked.connect(self.autoDeltaAxis)
-
-        linestylegridlabel = QLabel(QApplication.translate("Label", "Style",None))
-        self.gridstylecombobox = QComboBox()
-        gridstyles = [QApplication.translate("ComboBox", "solid",None),
-                      QApplication.translate("ComboBox", "dashed",None),
-                      QApplication.translate("ComboBox", "dashed-dot",None),
-                      QApplication.translate("ComboBox", "dotted",None),
-                      QApplication.translate("ComboBox", "None",None)]
-        self.gridstylecombobox.addItems(gridstyles) 
-        self.gridstylecombobox.setCurrentIndex(self.aw.qmc.gridlinestyle)
-        self.gridstylecombobox.currentIndexChanged.connect(self.changegridstyle)
-        gridthicknesslabel = QLabel(QApplication.translate("Label", "Width",None))
-        self.gridwidthSpinBox = QSpinBox()
-        self.gridwidthSpinBox.setRange(1,5)
-        self.gridwidthSpinBox.setValue(self.aw.qmc.gridthickness)
-        self.gridwidthSpinBox.valueChanged.connect(self.changegridwidth)
-        self.gridwidthSpinBox.setMaximumWidth(40)
-        self.gridwidthSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        gridalphalabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
-        self.gridalphaSpinBox = QSpinBox()
-        self.gridalphaSpinBox.setRange(1,10)
-        self.gridalphaSpinBox.setValue(int(self.aw.qmc.gridalpha*10))
-        self.gridalphaSpinBox.valueChanged.connect(self.changegridalpha)
-        self.gridalphaSpinBox.setMaximumWidth(40)
-        self.gridalphaSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.updatewindow)
-        self.dialogbuttons.rejected.connect(self.close)
-        
-        resetButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
-        resetButton.clicked.connect(self.reset)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            resetButton.setText(QApplication.translate("Button","Defaults", None))
-            
-        self.loadAxisFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile",None))
-        self.loadAxisFromProfile.setChecked(self.aw.qmc.loadaxisfromprofile)
-        
-        hline = QFrame()
-        hline.setFrameShape(QFrame.HLine)
-        hline.setFrameShadow(QFrame.Sunken)
-        
-        hline2 = QFrame()
-        hline2.setFrameShape(QFrame.HLine)
-        hline2.setFrameShadow(QFrame.Sunken)
-        
-        xlayout1 = QHBoxLayout()
-        xlayout1.addWidget(self.autotimexFlag)
-        xlayout1.addWidget(autoButton)
-        xlayout1.addStretch()
-        xlayout1.addWidget(self.locktimexFlag)
-        xlayout2 = QHBoxLayout()
-        xlayout2.addWidget(xlimitLabel_min)
-        xlayout2.addWidget(self.xlimitEdit_min)
-        xlayout2.addSpacing(10)
-        xlayout2.addWidget(xlimitLabel)
-        xlayout2.addWidget(self.xlimitEdit)
-        xlayout2.addStretch()
-        xlayout2.addWidget(timegridlabel)
-        xlayout2.addWidget(self.xaxislencombobox)
-        xlayout3 = QHBoxLayout()
-        xlayout3.addWidget(chargeminlabel)
-        xlayout3.addWidget(self.chargeminEdit)
-        xlayout3.addSpacing(7)
-        xlayout3.addWidget(resettimelabel)
-        xlayout3.addWidget(self.resetEdit)
-        xlayout3.addSpacing(7)
-        xlayout3.addStretch()
-        xlayout3.addWidget(self.fixmaxtimeFlag)
-        xlayout = QVBoxLayout()
-        xlayout.addLayout(xlayout1)
-        xlayout.addLayout(xlayout2) 
-        xlayout.addWidget(hline)
-        xlayout.addLayout(xlayout3)
-        ylayout = QGridLayout()
-        ylayout.addWidget(ylimitLabel_min,0,0,Qt.AlignRight)
-        ylayout.addWidget(self.ylimitEdit_min,0,1)
-        ylayout.addWidget(ylimitLabel,0,3,Qt.AlignRight)
-        ylayout.addWidget(self.ylimitEdit,0,4)
-        ylayout.addWidget(ygridlabel,0,6,Qt.AlignRight)
-        ylayout.addWidget(self.ygridSpinBox,0,7)
-        ylayout.setColumnMinimumWidth(2,10)
-        ylayout.setColumnMinimumWidth(5,10)
-        ylayoutHbox = QHBoxLayout()
-        ylayoutHbox.addStretch()
-        ylayoutHbox.addLayout(ylayout)
-        ylayoutHbox.addStretch()
-        steplayoutHbox = QHBoxLayout()
-        steplayoutHbox.addWidget(step100Label)
-        steplayoutHbox.addWidget(self.step100Edit)
-        steplayoutHbox.addStretch()
-        ylayoutVbox = QVBoxLayout()
-        ylayoutVbox.addLayout(ylayoutHbox)
-        ylayoutVbox.addWidget(hline)
-        ylayoutVbox.addLayout(steplayoutHbox)
-        ylayoutVbox.addStretch()
-        zlayout1 = QHBoxLayout()
-        zlayout1.addWidget(self.autodeltaxLabel)
-        zlayout1.addSpacing(5)
-        zlayout1.addWidget(self.autodeltaxETFlag)
-        zlayout1.addSpacing(5)
-        zlayout1.addWidget(self.autodeltaxBTFlag)
-        zlayout1.addSpacing(5)
-        zlayout1.addWidget(autoDeltaButton)
-        zlayout1.addStretch()
-        zlayout = QGridLayout()
-        zlayout.addWidget(zlimitLabel_min,0,0,Qt.AlignRight)
-        zlayout.addWidget(self.zlimitEdit_min,0,1)
-        zlayout.addWidget(zlimitLabel,0,3,Qt.AlignRight)
-        zlayout.addWidget(self.zlimitEdit,0,4)
-        zlayout.addWidget(zgridlabel,0,6,Qt.AlignRight)
-        zlayout.addWidget(self.zgridSpinBox,0,7)
-        zlayout.setColumnMinimumWidth(2,10)
-        zlayout.setColumnMinimumWidth(5,10)
-        zlayoutHbox = QHBoxLayout()
-        zlayoutHbox.addStretch()
-        zlayoutHbox.addLayout(zlayout)
-        zlayoutHbox.addStretch()
-        zlayoutVbox = QVBoxLayout()
-        zlayoutVbox.addLayout(zlayout1)
-        zlayoutVbox.addLayout(zlayoutHbox)
-        zlayoutVbox.addStretch()
-        
-        legentlayout = QHBoxLayout()
-        legentlayout.addStretch()
-        legentlayout.addWidget(self.legendComboBox,0,Qt.AlignLeft)
-        legentlayout.addStretch()
-        graphgridlayout = QGridLayout()
-        graphgridlayout.addWidget(linestylegridlabel,1,0,Qt.AlignRight)
-        graphgridlayout.addWidget(self.gridstylecombobox,1,1,Qt.AlignLeft)
-        graphgridlayout.addWidget(gridthicknesslabel,1,2,Qt.AlignRight)
-        graphgridlayout.addWidget(self.gridwidthSpinBox,1,3,Qt.AlignLeft)
-        graphgridlayout.addWidget(self.timeGridCheckBox,2,0,Qt.AlignLeft)
-        graphgridlayout.addWidget(self.tempGridCheckBox,2,1,Qt.AlignLeft)
-        graphgridlayout.addWidget(gridalphalabel,2,2,Qt.AlignRight)
-        graphgridlayout.addWidget(self.gridalphaSpinBox,2,3,Qt.AlignLeft)
-        xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None))
-        xGroupLayout.setLayout(xlayout)
-        yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None))
-        yGroupLayout.setLayout(ylayoutVbox)
-        zGroupLayout = QGroupBox(deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None))
-        zGroupLayout.setLayout(zlayoutVbox)
-        legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None))
-        legendLayout.setLayout(legentlayout)
-        GridGroupLayout = QGroupBox(QApplication.translate("GroupBox","Grid",None))
-        GridGroupLayout.setLayout(graphgridlayout)
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.loadAxisFromProfile)
-        buttonLayout.addSpacing(10)
-        buttonLayout.addWidget(self.dialogbuttons)
-        mainLayout1 = QVBoxLayout()
-        mainLayout1.addWidget(xGroupLayout)
-        mainLayout1.addWidget(yGroupLayout)
-        mainLayout1.addStretch()
-        mainLayout2 = QVBoxLayout()
-        mainLayout2.addWidget(legendLayout)
-        mainLayout2.addWidget(GridGroupLayout)
-        mainLayout2.addWidget(zGroupLayout)
-        mainLayout2.addStretch()
-        mainHLayout = QHBoxLayout()
-        mainHLayout.addLayout(mainLayout1)
-        mainHLayout.addLayout(mainLayout2)
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(mainHLayout)
-        mainLayout.addStretch()
-        mainLayout.addLayout(buttonLayout)
-        self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-        
-        if self.aw.qmc.locktimex:
-            self.disableXAxisControls()
-        else:
-            self.enableXAxisControls()
-            
-            
-    def enableXAxisControls(self):
-        self.xlimitEdit.setEnabled(True)
-        self.xlimitEdit_min.setEnabled(True)
-        self.chargeminEdit.setEnabled(True)
-        self.resetEdit.setEnabled(True)
-        self.fixmaxtimeFlag.setEnabled(True)
-    
-    def disableXAxisControls(self):
-        self.xlimitEdit.setEnabled(False)
-        self.xlimitEdit_min.setEnabled(False)
-        self.chargeminEdit.setEnabled(False)
-        self.resetEdit.setEnabled(False)
-        self.fixmaxtimeFlag.setEnabled(False)
-        
-    @pyqtSlot(int)
-    def lockTimexFlagChanged(self,n):
-        if n:
-            self.autotimexFlag.setChecked(False)
-            self.disableXAxisControls()
-        else:
-            self.enableXAxisControls()
-    
-    @pyqtSlot(int)
-    def autoTimexFlagChanged(self,n):
-        if n:
-            self.locktimexFlag.setChecked(False) 
-            self.enableXAxisControls()
-            self.autoAxis()
-
-    @pyqtSlot(bool)
-    def autoAxis(self,_=False):
-        if self.aw.qmc.backgroundpath and not self.aw.curFile:
-            t_min,t_max = self.aw.calcAutoAxisBackground()
-        else:
-            t_min,t_max = self.aw.calcAutoAxis()
-            if self.aw.qmc.backgroundpath:
-                _,t_max_b = self.aw.calcAutoAxisBackground()
-                t_max = max(t_max,t_max_b - self.aw.qmc.timeB[self.aw.qmc.timeindexB[0]])
-        if self.aw.qmc.timeindex[0] != -1:
-            self.xlimitEdit_min.setText(stringfromseconds(t_min - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
-            self.xlimitEdit.setText(stringfromseconds(t_max - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
-        else:
-            self.xlimitEdit_min.setText(stringfromseconds(t_min))
-            self.xlimitEdit.setText(stringfromseconds(t_max))
-        self.xlimitEdit_min.repaint()
-        self.xlimitEdit.repaint()
-    
-    @pyqtSlot(bool)
-    def autoDeltaAxis(self,_=False):
-        autodeltaxET_org = self.aw.qmc.autodeltaxET
-        autodeltaxBT_org = self.aw.qmc.autodeltaxBT
-        self.aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
-        self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
-        if self.aw.qmc.backgroundpath and not self.aw.curFile:
-            dmax = self.aw.calcAutoDeltaAxisBackground()
-        else:
-            dmax = self.aw.calcAutoDeltaAxis()
-            if self.aw.qmc.backgroundpath:
-                dmax_b = self.aw.calcAutoDeltaAxisBackground()
-                dmax = max(dmax,dmax_b)
-        if dmax > 0:
-            self.zlimitEdit.setText(str(int(dmax) + 1))
-            self.zlimitEdit.repaint()
-        self.aw.qmc.autodeltaxET = autodeltaxET_org
-        self.aw.qmc.autodeltaxBT = autodeltaxBT_org
-    
-    def changexrotation(self):
-        self.aw.qmc.xrotation = self.xrotationSpinBox.value()
-        self.xrotationSpinBox.setDisabled(True)
-        self.aw.qmc.xaxistosm(redraw=False)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.xrotationSpinBox.setDisabled(False)
-        self.xrotationSpinBox.setFocus()
-
-    @pyqtSlot(int)
-    def changegridalpha(self,_):
-        self.aw.qmc.gridalpha = self.gridalphaSpinBox.value()/10.
-        self.gridalphaSpinBox.setDisabled(True)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.gridalphaSpinBox.setDisabled(False)
-        self.gridalphaSpinBox.setFocus()
-
-    @pyqtSlot(int)
-    def changegridwidth(self,_):
-        self.aw.qmc.gridthickness = self.gridwidthSpinBox.value()
-        self.gridwidthSpinBox.setDisabled(True)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.gridwidthSpinBox.setDisabled(False)
-        self.gridwidthSpinBox.setFocus()
-
-    @pyqtSlot(int)
-    def changegridstyle(self,_):
-        self.aw.qmc.gridlinestyle = self.gridstylecombobox.currentIndex()
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-
-    @pyqtSlot(int)
-    def changelegendloc(self,_):
-        self.aw.qmc.legendloc = self.legendComboBox.currentIndex()
-        self.aw.qmc.legend = None
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-
-    @pyqtSlot(int)
-    def xaxislenloc(self,_):
-        self.aw.qmc.xgrid = self.timeconversion[self.xaxislencombobox.currentIndex()]
-        self.aw.qmc.xaxistosm(redraw=False)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-
-    @pyqtSlot(int)
-    def changeygrid(self,_):
-        self.aw.qmc.ygrid = self.ygridSpinBox.value()
-        self.ygridSpinBox.setDisabled(True)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.ygridSpinBox.setDisabled(False)
-        self.ygridSpinBox.setFocus()
-
-    @pyqtSlot(int)
-    def changezgrid(self,_):
-        self.aw.qmc.zgrid = self.zgridSpinBox.value()
-        self.zgridSpinBox.setDisabled(True)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.zgridSpinBox.setDisabled(False)
-        self.zgridSpinBox.setFocus()
-
-    # exit dialog with OK
-    @pyqtSlot()
-    def updatewindow(self):
-        limits_changed = False
-        self.aw.qmc.time_grid = self.timeGridCheckBox.isChecked()
-        self.aw.qmc.temp_grid = self.tempGridCheckBox.isChecked()
-        self.aw.qmc.loadaxisfromprofile = self.loadAxisFromProfile.isChecked()
-        try:
-            yl = int(str(self.ylimitEdit.text()))
-            yl_min = int(str(self.ylimitEdit_min.text()))
-            if yl > yl_min:
-                if (self.aw.qmc.ylimit != yl) or (self.aw.qmc.ylimit_min != yl_min):
-                    limits_changed = True
-                self.aw.qmc.ylimit = yl
-                self.aw.qmc.ylimit_min = yl_min
-        except:
-            pass
-        try:
-            zl = int(str(self.zlimitEdit.text()))
-            zl_min = int(str(self.zlimitEdit_min.text()))
-            if (self.aw.qmc.zlimit != zl) or (self.aw.qmc.zlimit_min != zl_min):
-                limits_changed = True
-            if zl > zl_min:
-                self.aw.qmc.zlimit = zl
-                self.aw.qmc.zlimit_min = zl_min
-        except:
-            pass
-            
-        if limits_changed and self.aw.qmc.crossmarker == True:
-            # switch crosslines off and on again to adjust for changed axis limits
-            self.aw.qmc.togglecrosslines()
-            self.aw.qmc.togglecrosslines()
-            
-        
-        endedittime_str = str(self.xlimitEdit.text())
-        if endedittime_str is not None and endedittime_str != "":
-            endeditime = stringtoseconds(endedittime_str)
-            self.aw.qmc.endofx = endeditime
-            self.aw.qmc.locktimex_end = endeditime
-        else:
-            self.aw.qmc.endofx = self.aw.qmc.endofx_default
-            self.aw.qmc.locktimex_end = self.aw.qmc.endofx_default
-        
-        startedittime_str = str(self.xlimitEdit_min.text())
-        if startedittime_str is not None and startedittime_str != "":
-            starteditime = stringtoseconds(startedittime_str)
-            if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
-                self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + starteditime
-            elif starteditime >= 0 and self.aw.qmc.timeindex[0] == -1:
-                self.aw.qmc.startofx = starteditime
-            elif starteditime < 0 and self.aw.qmc.timeindex[0] != -1:
-                self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(starteditime)
-            else:
-                self.aw.qmc.startofx = starteditime
-            self.aw.qmc.locktimex_start = starteditime
-        else:
-            self.aw.qmc.startofx = self.aw.qmc.startofx_default
-            self.aw.qmc.locktimex_start = self.aw.qmc.startofx_default
-        
-        try:
-            step100 = self.step100Edit.text().strip()
-            if step100 == "":
-                self.aw.qmc.step100temp = None
-            else:
-                self.aw.qmc.step100temp = int(step100)
-        except:
-            pass
-        
-        resettime = stringtoseconds(str(self.resetEdit.text()))
-        if resettime > 0:
-            self.aw.qmc.resetmaxtime = resettime
-            
-        chargetime = stringtoseconds(str(self.chargeminEdit.text()))
-        if chargetime <= 0:
-            self.aw.qmc.chargemintime = chargetime
-            
-        self.aw.qmc.fixmaxtime = not self.fixmaxtimeFlag.isChecked()
-        self.aw.qmc.locktimex = self.locktimexFlag.isChecked()
-        self.aw.qmc.autotimex = self.autotimexFlag.isChecked()
-        self.aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
-        self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        string = QApplication.translate("Message","xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})",None).format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))                                   
-        self.aw.sendmessage(string)
-        self.close()
-
-    @pyqtSlot(bool)
-    def reset(self,_):
-        if len(self.aw.qmc.timex) > 1:
-            self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.timex[-1]))
-        else:
-            self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx_default))
-        self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx_default))
-        if self.aw.qmc.mode == "F":
-            self.ylimitEdit.setText(str(self.aw.qmc.ylimit_F_default))
-            self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_F_default))
-            self.zlimitEdit.setText(str(self.aw.qmc.zlimit_F_default))
-            self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_F_default))
-        else:
-            self.ylimitEdit.setText(str(self.aw.qmc.ylimit_C_default))
-            self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_C_default))
-            self.zlimitEdit.setText(str(self.aw.qmc.zlimit_C_default))
-            self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_C_default))
-
-##########################################################################
-#####################  ROAST CALCULATOR DLG   ############################
-##########################################################################
-
-class calculatorDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(calculatorDlg,self).__init__(parent, aw)
-        self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Calculator",None))
-        
-        settings = QSettings()
-        if settings.contains("CalculatorGeometry"):
-            self.restoreGeometry(settings.value("CalculatorGeometry"))
-            
-        #RATE OF CHANGE
-        self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile",None))
-        self.result2 = QLabel()
-        self.result2.setStyleSheet("background-color:'lightgrey';")
-        startlabel = QLabel(QApplication.translate("Label", "Start (00:00)",None))
-        endlabel = QLabel(QApplication.translate("Label", "End (00:00)",None))
-        self.startEdit = QLineEdit()
-        self.endEdit = QLineEdit()
-        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
-        self.startEdit.setValidator(QRegExpValidator(regextime,self))
-        self.endEdit.setValidator(QRegExpValidator(regextime,self))
-        self.startEdit.editingFinished.connect(self.calculateRC)
-        self.endEdit.editingFinished.connect(self.calculateRC)
-        nevents = len(self.aw.qmc.specialevents)
-        events_found = [QApplication.translate("ComboBox","Event #0",None)]
-        for i in range(nevents):
-            events_found.append(QApplication.translate("ComboBox","Event #{0}",None).format(str(i+1)))
-        self.eventAComboBox = QComboBox()
-        self.eventAComboBox.addItems(events_found)
-        self.eventAComboBox.currentIndexChanged.connect(self.calcEventRC)
-        self.eventBComboBox = QComboBox()
-        self.eventBComboBox.addItems(events_found)
-        self.eventBComboBox.currentIndexChanged.connect(self.calcEventRC)
-        #TEMPERATURE CONVERSION
-        flabel = QLabel(QApplication.translate("Label", "Fahrenheit",None))
-        clabel = QLabel(QApplication.translate("Label", "Celsius",None))
-        self.faEdit = QLineEdit()
-        self.ceEdit = QLineEdit()
-        self.faEdit.setValidator(self.aw.createCLocaleDoubleValidator(-999999., 9999999., 2, self.faEdit))
-        self.ceEdit.setValidator(self.aw.createCLocaleDoubleValidator(-999999., 9999999., 2, self.ceEdit))
-        self.faEdit.editingFinished.connect(self.convertTempFtoC)
-        self.ceEdit.editingFinished.connect(self.convertTempCtoF)
-        #WEIGHT CONVERSION
-        self.WinComboBox = QComboBox()
-        self.WinComboBox.addItems(self.aw.qmc.weight_units)
-        self.WinComboBox.setMaximumWidth(80)
-        self.WinComboBox.setMinimumWidth(80)
-        self.WoutComboBox = QComboBox()
-        self.WoutComboBox.setMaximumWidth(80)
-        self.WoutComboBox.setMinimumWidth(80)
-        self.WoutComboBox.addItems(self.aw.qmc.weight_units)
-        self.WoutComboBox.setCurrentIndex(2)
-        self.WinEdit = QLineEdit()
-        self.WoutEdit = QLineEdit()
-        self.WinEdit.setMaximumWidth(70)
-        self.WoutEdit.setMaximumWidth(70)
-        #self.WinEdit.setMinimumWidth(60)
-        #self.WoutEdit.setMinimumWidth(60)
-        self.WinEdit.setValidator(self.aw.createCLocaleDoubleValidator(0., 99999., 4, self.WinEdit))
-        self.WoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(0., 99999., 4, self.WoutEdit))
-        self.WinEdit.editingFinished.connect(self.convertWeightItoO)
-        self.WoutEdit.editingFinished.connect(self.convertWeightOtoI)
-        #VOLUME CONVERSION
-        self.VinComboBox = QComboBox()
-        volumeunits = [QApplication.translate("ComboBox","liter",None),
-                       QApplication.translate("ComboBox","gallon",None),
-                       QApplication.translate("ComboBox","quart",None),
-                       QApplication.translate("ComboBox","pint",None),
-                       QApplication.translate("ComboBox","cup",None),
-                       QApplication.translate("ComboBox","cm^3",None)]
-        self.VinComboBox.addItems(volumeunits)
-        self.VinComboBox.setMaximumWidth(80)
-        self.VinComboBox.setMinimumWidth(80)
-        self.VoutComboBox = QComboBox()
-        self.VoutComboBox.setMaximumWidth(80)
-        self.VoutComboBox.setMinimumWidth(80)
-        self.VoutComboBox.addItems(volumeunits)
-        self.VoutComboBox.setCurrentIndex(4)
-        self.VinEdit = QLineEdit()
-        self.VoutEdit = QLineEdit()
-        self.VinEdit.setMaximumWidth(70)
-        self.VoutEdit.setMaximumWidth(70)
-        #self.VinEdit.setMinimumWidth(60)
-        #self.VoutEdit.setMinimumWidth(60)
-        self.VinEdit.setValidator(self.aw.createCLocaleDoubleValidator(0., 99999., 4, self.VinEdit))
-        self.VoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(0., 99999., 4, self.VoutEdit))
-        self.VinEdit.editingFinished.connect(self.convertVolumeItoO)
-        self.VoutEdit.editingFinished.connect(self.convertVolumeOtoI)
-        #EXTRACTION YIELD
-        yieldlabel = QLabel(QApplication.translate("Label", "Yield (%)",None))
-        groundslabel = QLabel(QApplication.translate("Label", "Grounds (g)",None))
-        tdslabel = QLabel(QApplication.translate("Label", "TDS (%)",None))
-        coffeelabel = QLabel(QApplication.translate("Label", "Coffee (g)",None))
-        self.groundsEdit = QLineEdit()
-        self.coffeeEdit = QLineEdit()
-        self.tdsEdit = QLineEdit()
-        self.yieldEdit = QLineEdit()
-        self.yieldEdit.setReadOnly(True)
-        self.groundsEdit.setValidator(self.aw.createCLocaleDoubleValidator(1., 999999., 2, self.groundsEdit))
-        self.coffeeEdit.setValidator(self.aw.createCLocaleDoubleValidator(1., 999999., 2, self.coffeeEdit))
-        self.tdsEdit.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 2, self.tdsEdit))
-        for e in [self.groundsEdit, self.coffeeEdit, self.tdsEdit]:
-            e.editingFinished.connect(self.calculateYield)
-        #LAYOUTS
-        #Rate of chage
-        calrcLayout = QGridLayout()
-        calrcLayout.addWidget(startlabel,0,0)
-        calrcLayout.addWidget(endlabel,0,1)
-        calrcLayout.addWidget(self.startEdit,1,0)
-        calrcLayout.addWidget(self.endEdit,1,1)
-        calrcLayout.addWidget(self.eventAComboBox ,2,0)
-        calrcLayout.addWidget(self.eventBComboBox ,2,1)
-        rclayout = QVBoxLayout()
-        rclayout.addWidget(self.result1,0)
-        rclayout.addWidget(self.result2,1)
-        rclayout.addLayout(calrcLayout,2)
-        #temperature conversion
-        tempLayout = QGridLayout()
-        tempLayout.addWidget(flabel,0,0)
-        tempLayout.addWidget(clabel,0,1)
-        tempLayout.addWidget(self.faEdit,1,0)
-        tempLayout.addWidget(self.ceEdit,1,1)
-        #weight conversions
-        weightLayout = QHBoxLayout()
-        weightLayout.addWidget(self.WinComboBox)
-        weightLayout.addWidget(self.WinEdit)
-        weightLayout.addWidget(self.WoutEdit)
-        weightLayout.addWidget(self.WoutComboBox)
-        #volume conversions
-        volumeLayout = QHBoxLayout()
-        volumeLayout.addWidget(self.VinComboBox)
-        volumeLayout.addWidget(self.VinEdit)
-        volumeLayout.addWidget(self.VoutEdit)
-        volumeLayout.addWidget(self.VoutComboBox)
-        #extraction yield
-        extractionLayout = QGridLayout()
-        extractionLayout.addWidget(groundslabel,0,0)
-        extractionLayout.addWidget(self.groundsEdit,1,0)
-        extractionLayout.addWidget(coffeelabel,0,1)
-        extractionLayout.addWidget(self.coffeeEdit,1,1)
-        extractionLayout.addWidget(tdslabel,0,2)
-        extractionLayout.addWidget(self.tdsEdit,1,2)
-        extractionLayout.addWidget(yieldlabel,0,3)
-        extractionLayout.addWidget(self.yieldEdit,1,3)
-        
-        RoCGroup = QGroupBox(QApplication.translate("GroupBox","Rate of Change",None))
-        RoCGroup.setLayout(rclayout)
-        tempConvGroup = QGroupBox(QApplication.translate("GroupBox","Temperature Conversion",None))
-        tempConvGroup.setLayout(tempLayout)
-        weightConvGroup = QGroupBox(QApplication.translate("GroupBox","Weight Conversion",None))
-        weightConvGroup.setLayout(weightLayout)
-        volumeConvGroup = QGroupBox(QApplication.translate("GroupBox","Volume Conversion",None))
-        volumeConvGroup.setLayout(volumeLayout)
-        extractionYieldGroup = QGroupBox(QApplication.translate("GroupBox","Extraction Yield",None))
-        extractionYieldGroup.setLayout(extractionLayout)
-        #left side
-        leftSide = QVBoxLayout()
-        leftSide.addWidget(RoCGroup)
-        #right side
-        rightSide = QVBoxLayout()
-        rightSide.addWidget(tempConvGroup)
-        rightSide.addWidget(extractionYieldGroup)
-        #rightSide.addStretch()
-        topLayout = QHBoxLayout()
-        topLayout.addLayout(leftSide)
-        topLayout.addLayout(rightSide)
-        botLayout = QHBoxLayout()
-        botLayout.addWidget(weightConvGroup)
-        botLayout.addWidget(volumeConvGroup)
-        #main
-        mainlayout = QVBoxLayout()
-        mainlayout.addLayout(topLayout)
-        mainlayout.addLayout(botLayout)
-        self.setLayout(mainlayout)
-
-    @pyqtSlot(int)
-    def calcEventRC(self,_):
-        nevents = len(self.aw.qmc.specialevents)
-        Aevent = int(self.eventAComboBox.currentIndex())
-        Bevent = int(self.eventBComboBox.currentIndex())
-        if Aevent <= nevents and Bevent <= nevents and Aevent and Bevent:
-            if self.aw.qmc.timeindex[0] != -1:
-                start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-            else:
-                start = 0
-            self.startEdit.setText(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.specialevents[Aevent-1]] - start))
-            self.endEdit.setText(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.specialevents[Bevent-1]] - start))
-            self.calculateRC()
-
-    #calculate rate of change
-    @pyqtSlot()
-    def calculateRC(self):
-        if len(self.aw.qmc.timex)>2:
-            if not len(self.startEdit.text()) or not len(self.endEdit.text()):
-                #empty field
-                return
-            starttime = stringtoseconds(str(self.startEdit.text()))
-            endtime = stringtoseconds(str(self.endEdit.text()))
-            if starttime == -1 or endtime == -1:
-                self.result1.setText(QApplication.translate("Label", "Time syntax error. Time not valid",None))
-                self.result2.setText("")
-                return
-            if  endtime > self.aw.qmc.timex[-1] or endtime < starttime:
-                self.result1.setText(QApplication.translate("Label", "Error: End time smaller than Start time",None))
-                self.result2.setText("")
-                return
-            if self.aw.qmc.timeindex[0] != -1:
-                start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-            else:
-                start = 0
-            startindex = self.aw.qmc.time2index(starttime + start)
-            endindex = self.aw.qmc.time2index(endtime + start)
-            #delta
-            deltatime = self.aw.qmc.timex[endindex] -  self.aw.qmc.timex[startindex]
-            deltatemperature = self.aw.qmc.temp2[endindex] - self.aw.qmc.temp2[startindex]
-            if deltatime == 0:
-                deltaseconds = 0
-            else:
-                deltaseconds = deltatemperature/deltatime
-            deltaminutes = deltaseconds*60.
-            string1 = QApplication.translate("Label", "Best approximation was made from {0} to {1}",None).format(stringfromseconds(self.aw.qmc.timex[startindex]- start),stringfromseconds(self.aw.qmc.timex[endindex]- start))
-            string2 = QApplication.translate("Label", "<b>{0}</b> {1}/sec, <b>{2}</b> {3}/min",None).format("%.2f"%(deltaseconds),self.aw.qmc.mode,"%.2f"%(deltaminutes),self.aw.qmc.mode)
-            self.result1.setText(string1)
-            self.result2.setText(string2)
-        else:
-            self.result1.setText(QApplication.translate("Label", "No profile found",None))
-            self.result2.setText("")
-
-    @pyqtSlot()
-    def convertTempFtoC(self):
-        self.convertTempLocal("FtoC")
-    
-    @pyqtSlot()
-    def convertTempCtoF(self):
-        self.convertTempLocal("CtoF")
-    
-    def convertTempLocal(self,x):
-        self.faEdit.setText(self.aw.comma2dot(str(self.faEdit.text())))
-        self.ceEdit.setText(self.aw.comma2dot(str(self.ceEdit.text())))
-        if x == "FtoC":
-            newC = fromFtoC(float(str(self.faEdit.text())))
-            result = "%.2f"%newC
-            self.ceEdit.setText(result)
-        elif x == "CtoF":
-            newF = fromCtoF(float(str(self.ceEdit.text())))
-            result = "%.2f"%newF
-            self.faEdit.setText(result)
-
-    @pyqtSlot()
-    def convertWeightItoO(self):
-        self.WinEdit.setText(self.aw.comma2dot(str(self.WinEdit.text())))
-        inx = float(str(self.WinEdit.text()))
-        outx = self.aw.convertWeight(inx,self.WinComboBox.currentIndex(),self.WoutComboBox.currentIndex())
-        self.WoutEdit.setText("%.2f"%outx)
-
-    @pyqtSlot()
-    def convertWeightOtoI(self):
-        self.WoutEdit.setText(self.aw.comma2dot(str(self.WoutEdit.text())))
-        outx = float(str(self.WoutEdit.text()))
-        inx = self.aw.convertWeight(outx,self.WoutComboBox.currentIndex(),self.WinComboBox.currentIndex())
-        self.WinEdit.setText("%.2f"%inx)
-        
-    @pyqtSlot()
-    def convertVolumeItoO(self):
-        self.VinEdit.setText(self.aw.comma2dot(str(self.VinEdit.text())))
-        inx = float(str(self.VinEdit.text()))
-        outx = self.aw.convertVolume(inx,self.VinComboBox.currentIndex(),self.VoutComboBox.currentIndex())
-        self.VoutEdit.setText("%.3f"%outx)
-    
-    @pyqtSlot()
-    def convertVolumeOtoI(self):
-        self.VoutEdit.setText(self.aw.comma2dot(str(self.VoutEdit.text())))
-        outx = float(str(self.VoutEdit.text()))
-        inx = self.aw.convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
-        self.VinEdit.setText("%.3f"%inx)
-
-    @pyqtSlot()
-    def calculateYield(self):
-        self.groundsEdit.setText(self.aw.comma2dot(str(self.groundsEdit.text())))
-        self.tdsEdit.setText(self.aw.comma2dot(str(self.tdsEdit.text())))
-        self.coffeeEdit.setText(self.aw.comma2dot(str(self.coffeeEdit.text())))
-        # Extraction yield % = Brewed Coffee[g] x TDS[%] / Coffee Grounds[g]
-        if self.groundsEdit.text() == "" or self.tdsEdit.text() == "" or self.coffeeEdit.text == "":
-            return
-        grounds = float(str(self.groundsEdit.text()))
-        tds = float(str(self.tdsEdit.text()))
-        coffee = float(str(self.coffeeEdit.text()))
-        if grounds == 0:
-            return
-        cyield = coffee * tds / grounds
-        self.yieldEdit.setText("%.1f" % cyield)
-
-    def closeEvent(self, _):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("CalculatorGeometry",self.saveGeometry())
-
-
-##########################################################################
-#####################  PHASES GRAPH EDIT DLG  ############################
-##########################################################################
-
-class phasesGraphDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(phasesGraphDlg,self).__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Phases",None))
-        self.setModal(True)
-        # remember initial values for Cancel action
-        self.phases = list(self.aw.qmc.phases)
-        self.org_phasesbuttonflag = bool(self.aw.qmc.phasesbuttonflag)
-        self.org_fromBackgroundflag = bool(self.aw.qmc.phasesfromBackgroundflag)
-        self.org_watermarksflag = bool(self.aw.qmc.watermarksflag)
-        self.org_phasesLCDflag = bool(self.aw.qmc.phasesLCDflag)
-        self.org_autoDRYflag = bool(self.aw.qmc.autoDRYflag)
-        self.org_autoFCsFlag = bool(self.aw.qmc.autoFCsFlag)
-        self.org_phasesLCDmode_l = list(self.aw.qmc.phasesLCDmode_l)
-        self.org_phasesLCDmode_all = list(self.aw.qmc.phasesLCDmode_all)
-        #
-        dryLabel = QLabel(QApplication.translate("Label", "Drying",None))
-        midLabel = QLabel(QApplication.translate("Label", "Maillard",None))
-        finishLabel = QLabel(QApplication.translate("Label", "Finishing",None))
-        minf = QLabel(QApplication.translate("Label", "min",None))
-        maxf = QLabel(QApplication.translate("Label", "max",None))
-        self.startdry = QSpinBox()
-        self.startdry.setAlignment(Qt.AlignRight)
-        self.startdry.setMinimumWidth(80)
-        self.enddry = QSpinBox()
-        self.enddry.setAlignment(Qt.AlignRight)
-        self.enddry.setMinimumWidth(80)
-        self.startmid = QSpinBox()
-        self.startmid.setAlignment(Qt.AlignRight)
-        self.startmid.setMinimumWidth(80)
-        self.endmid = QSpinBox()
-        self.endmid.setAlignment(Qt.AlignRight)
-        self.endmid.setMinimumWidth(80)
-        self.startfinish = QSpinBox()
-        self.startfinish.setAlignment(Qt.AlignRight)
-        self.startfinish.setMinimumWidth(80)
-        self.endfinish = QSpinBox()
-        self.endfinish.setAlignment(Qt.AlignRight)
-        self.endfinish.setMinimumWidth(80) 
-        if self.aw.qmc.mode == "F":
-            self.startdry.setSuffix(" F")
-            self.enddry.setSuffix(" F")
-            self.startmid.setSuffix(" F")
-            self.endmid.setSuffix(" F")
-            self.startfinish.setSuffix(" F")
-            self.endfinish.setSuffix(" F")
-        elif self.aw.qmc.mode == "C":
-            self.startdry.setSuffix(" C")
-            self.enddry.setSuffix(" C")
-            self.startmid.setSuffix(" C")
-            self.endmid.setSuffix(" C")
-            self.startfinish.setSuffix(" C")
-            self.endfinish.setSuffix(" C")
-        self.startdry.setRange(0,1000)    #(min,max)
-        self.enddry.setRange(0,1000)
-        self.startmid.setRange(0,1000)
-        self.endmid.setRange(0,1000)
-        self.startfinish.setRange(0,1000)
-        self.endfinish.setRange(0,1000)
-        self.enddry.valueChanged.connect(self.startmid.setValue)
-        self.startmid.valueChanged.connect(self.enddry.setValue)
-        self.endmid.valueChanged.connect(self.startfinish.setValue)
-        self.startfinish.valueChanged.connect(self.endmid.setValue)
-        self.pushbuttonflag = QCheckBox(QApplication.translate("CheckBox","Auto Adjusted",None))
-        self.pushbuttonflag.setChecked(bool(self.aw.qmc.phasesbuttonflag))
-        self.pushbuttonflag.stateChanged.connect(self.pushbuttonflagChanged)
-        self.fromBackgroundflag = QCheckBox(QApplication.translate("CheckBox","From Background",None))
-        self.fromBackgroundflag.setChecked(bool(self.aw.qmc.phasesfromBackgroundflag))
-        self.fromBackgroundflag.stateChanged.connect(self.fromBackgroundflagChanged)
-        self.watermarksflag = QCheckBox(QApplication.translate("CheckBox","Watermarks",None))
-        self.watermarksflag.setChecked(bool(self.aw.qmc.watermarksflag))
-        self.phasesLCDflag = QCheckBox(QApplication.translate("CheckBox","Phases LCDs",None))
-        self.phasesLCDflag.setChecked(bool(self.aw.qmc.phasesLCDflag))
-        self.autoDRYflag = QCheckBox(QApplication.translate("CheckBox","Auto DRY",None))
-        self.autoDRYflag.setChecked(bool(self.aw.qmc.autoDRYflag))
-        self.autoFCsFlag = QCheckBox(QApplication.translate("CheckBox","Auto FCs",None))
-        self.autoFCsFlag.setChecked(bool(self.aw.qmc.autoFCsFlag))
-        self.watermarksflag.stateChanged.connect(self.watermarksflagChanged)
-        self.phasesLCDflag.stateChanged.connect(self.phasesLCDsflagChanged)
-        self.autoDRYflag.stateChanged.connect(self.autoDRYflagChanged)
-        self.autoFCsFlag.stateChanged.connect(self.autoFCsFlagChanged)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.updatephases)
-        self.dialogbuttons.rejected.connect(self.cancel)
-        setDefaultButton = self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
-        setDefaultButton.clicked.connect(self.setdefault)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            setDefaultButton.setText(QApplication.translate("Button","Default Temperatures", None))
-        
-        phaseLayout = QGridLayout()
-        phaseLayout.addWidget(minf,0,1,Qt.AlignHCenter|Qt.AlignBottom)
-        phaseLayout.addWidget(maxf,0,2,Qt.AlignHCenter|Qt.AlignBottom)
-        phaseLayout.addWidget(dryLabel,1,0,Qt.AlignRight)
-        phaseLayout.addWidget(self.startdry,1,1)
-        phaseLayout.addWidget(self.enddry,1,2)
-        phaseLayout.addWidget(midLabel,2,0,Qt.AlignRight)
-        phaseLayout.addWidget(self.startmid,2,1)
-        phaseLayout.addWidget(self.endmid,2,2)
-        phaseLayout.addWidget(finishLabel,3,0,Qt.AlignRight)
-        phaseLayout.addWidget(self.startfinish,3,1)
-        phaseLayout.addWidget(self.endfinish,3,2)
-
-        lcdmodes = [QApplication.translate("ComboBox","Time",None),
-                    QApplication.translate("ComboBox","Percentage",None),
-                    QApplication.translate("ComboBox","Temp",None)]
-
-        lcdmode = QLabel(QApplication.translate("Label", "Phases\nLCDs Mode",None))
-        phaseLayout.addWidget(lcdmode,0,3,Qt.AlignCenter)
-        lcdmode = QLabel(QApplication.translate("Label", "Phases\nLCDs All",None))
-        phaseLayout.addWidget(lcdmode,0,4,Qt.AlignCenter)
-
-        self.lcdmodeComboBox_dry = QComboBox()
-        self.lcdmodeComboBox_dry.setFocusPolicy(Qt.NoFocus)
-        self.lcdmodeComboBox_dry.addItems(lcdmodes)
-        self.lcdmodeComboBox_dry.currentIndexChanged.connect(self.lcdmodeComboBox_dryChanged)
-        self.lcdmodeComboBox_mid = QComboBox()
-        self.lcdmodeComboBox_mid.setFocusPolicy(Qt.NoFocus)
-        self.lcdmodeComboBox_mid.addItems(lcdmodes)
-        self.lcdmodeComboBox_mid.currentIndexChanged.connect(self.lcdmodeComboBox_midChanged)
-        self.lcdmodeComboBox_fin = QComboBox()
-        self.lcdmodeComboBox_fin.setFocusPolicy(Qt.NoFocus)
-        self.lcdmodeComboBox_fin.addItems(lcdmodes)
-        self.lcdmodeComboBox_fin.currentIndexChanged.connect(self.lcdmodeComboBox_finChanged)
-        phaseLayout.addWidget(self.lcdmodeComboBox_dry,1,3)
-        phaseLayout.addWidget(self.lcdmodeComboBox_mid,2,3)
-        phaseLayout.addWidget(self.lcdmodeComboBox_fin,3,3)
-
-        self.lcdmodeComboBox_dry.setCurrentIndex(self.aw.qmc.phasesLCDmode_l[0])
-        self.lcdmodeComboBox_dry.setEnabled(not bool(self.aw.qmc.phasesLCDmode_all[0]))
-        self.lcdmodeComboBox_mid.setCurrentIndex(self.aw.qmc.phasesLCDmode_l[1])
-        self.lcdmodeComboBox_mid.setEnabled(not bool(self.aw.qmc.phasesLCDmode_all[1]))
-        self.lcdmodeComboBox_fin.setCurrentIndex(self.aw.qmc.phasesLCDmode_l[2])
-        self.lcdmodeComboBox_fin.setEnabled(not bool(self.aw.qmc.phasesLCDmode_all[2]))
-        
-        self.lcdmodeFlag_all_fin = QCheckBox()
-        self.lcdmodeFlag_all_fin.setFocusPolicy(Qt.NoFocus)
-        self.lcdmodeFlag_all_fin.setChecked(self.aw.qmc.phasesLCDmode_all[2])
-        self.lcdmodeFlag_all_fin.stateChanged.connect(self.lcdmodeFlagFinChanged)
-        phaseLayout.addWidget(self.lcdmodeFlag_all_fin,3,4,Qt.AlignCenter)
-               
-        self.events2phases()
-        
-        boxedPhaseLayout = QHBoxLayout()
-        boxedPhaseLayout.addStretch()
-        boxedPhaseLayout.addLayout(phaseLayout)
-        boxedPhaseLayout.addStretch()
-        boxedPhaseFlagGrid = QGridLayout()
-        boxedPhaseFlagGrid.addWidget(self.pushbuttonflag,0,0)
-        boxedPhaseFlagGrid.addWidget(self.fromBackgroundflag,0,1)
-        boxedPhaseFlagGrid.addWidget(self.autoDRYflag,1,0)
-        boxedPhaseFlagGrid.addWidget(self.autoFCsFlag,1,1)
-        boxedPhaseFlagGrid.addWidget(self.watermarksflag,2,0)
-        boxedPhaseFlagGrid.addWidget(self.phasesLCDflag,2,1)
-        boxedPhaseFlagLayout = QHBoxLayout()
-        boxedPhaseFlagLayout.addStretch()
-        boxedPhaseFlagLayout.addLayout(boxedPhaseFlagGrid)
-        boxedPhaseFlagLayout.addStretch()
-        buttonsLayout = QHBoxLayout()
-        buttonsLayout.addWidget(self.dialogbuttons)
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(boxedPhaseLayout)
-        mainLayout.addLayout(boxedPhaseFlagLayout)
-        mainLayout.addStretch()
-        mainLayout.addSpacing(10)
-        mainLayout.addLayout(buttonsLayout)
-        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
-        self.setLayout(mainLayout)
-        self.getphases()
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-        
-    @pyqtSlot(int)
-    def lcdmodeFlagFinChanged(self,value):
-        self.aw.qmc.phasesLCDmode_all[2] = bool(value)
-        self.lcdmodeComboBox_fin.setEnabled(not bool(self.aw.qmc.phasesLCDmode_all[2]))
-    
-    @pyqtSlot(int)
-    def lcdmodeComboBox_dryChanged(self,_):
-        self.aw.qmc.phasesLCDmode_l[0] = self.lcdmodeComboBox_dry.currentIndex()
-        self.aw.qmc.phasesLCD = self.aw.qmc.phasesLCDmode_l[0]
-
-    @pyqtSlot(int)
-    def lcdmodeComboBox_midChanged(self,_):
-        self.aw.qmc.phasesLCDmode_l[1] = self.lcdmodeComboBox_mid.currentIndex()
-
-    @pyqtSlot(int)
-    def lcdmodeComboBox_finChanged(self,_):
-        self.aw.qmc.phasesLCDmode_l[2] = self.lcdmodeComboBox_fin.currentIndex()
-
-    def savePhasesSettings(self):
-        if not self.aw.qmc.phasesbuttonflag:
-            settings = QSettings()
-            #save phases
-            settings.setValue("Phases",self.aw.qmc.phases)
-
-    def bevents2phases(self):
-        if self.aw.qmc.phasesfromBackgroundflag and self.aw.qmc.background:
-            # adjust phases by DryEnd and FCs events from background profile
-            if self.aw.qmc.timeindexB[1]:
-                self.aw.qmc.phases[1] = int(round(self.aw.qmc.temp2B[self.aw.qmc.timeindexB[1]]))
-            if self.aw.qmc.timeindexB[2]:
-                self.aw.qmc.phases[2] = int(round(self.aw.qmc.temp2B[self.aw.qmc.timeindexB[2]]))
-            
-    def events2phases(self):
-        if self.aw.qmc.phasesbuttonflag:
-            # adjust phases by DryEnd and FCs events
-            if self.aw.qmc.timeindex[1]:
-                self.aw.qmc.phases[1] = int(round(self.aw.qmc.temp2[self.aw.qmc.timeindex[1]]))
-            self.enddry.setDisabled(True)
-            self.startmid.setDisabled(True)
-            if self.aw.qmc.timeindex[2]:
-                self.aw.qmc.phases[2] = int(round(self.aw.qmc.temp2[self.aw.qmc.timeindex[2]]))
-            self.endmid.setDisabled(True)
-            self.startfinish.setDisabled(True)
-
-    @pyqtSlot(int)
-    def watermarksflagChanged(self,_):
-        self.aw.qmc.watermarksflag = not self.aw.qmc.watermarksflag
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-
-    @pyqtSlot(int)
-    def phasesLCDsflagChanged(self,_):
-        self.aw.qmc.phasesLCDflag = not self.aw.qmc.phasesLCDflag
-        if self.aw.qmc.flagstart:
-            if self.aw.qmc.phasesLCDflag:
-                self.aw.phasesLCDs.show()
-            else:
-                self.aw.phasesLCDs.hide()
-
-    @pyqtSlot(int)
-    def autoDRYflagChanged(self,_):
-        self.aw.qmc.autoDRYflag = not self.aw.qmc.autoDRYflag
-        if self.aw.qmc.autoDRYflag:
-            self.pushbuttonflag.setChecked(False)
-        
-    @pyqtSlot(int)
-    def autoFCsFlagChanged(self,_):
-        self.aw.qmc.autoFCsFlag = not self.aw.qmc.autoFCsFlag
-        if self.aw.qmc.autoFCsFlag:
-            self.pushbuttonflag.setChecked(False)
-
-    @pyqtSlot(int)
-    def fromBackgroundflagChanged(self,i):
-        if i:
-            self.aw.qmc.phasesfromBackgroundflag = True
-            self.bevents2phases()
-            self.getphases()
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
-        else:
-            self.aw.qmc.phasesfromBackgroundflag = False
-    
-    @pyqtSlot(int)
-    def pushbuttonflagChanged(self,i):
-        if i:
-            self.aw.qmc.phasesbuttonflag = True
-            self.events2phases()
-            self.getphases()
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
-        else:
-            self.aw.qmc.phasesbuttonflag = False
-            self.enddry.setEnabled(True)
-            self.startmid.setEnabled(True)
-            self.endmid.setEnabled(True)
-            self.startfinish.setEnabled(True)
-        if self.aw.qmc.phasesbuttonflag:
-            self.autoDRYflag.setChecked(False)
-            self.autoFCsFlag.setChecked(False)
-
-    @pyqtSlot()
-    def updatephases(self):
-        self.aw.qmc.phases[0] = self.startdry.value()
-        self.aw.qmc.phases[1] = self.enddry.value()
-        self.aw.qmc.phases[2] = self.endmid.value()
-        self.aw.qmc.phases[3] = self.endfinish.value()
-
-        if self.pushbuttonflag.isChecked():
-            self.aw.qmc.phasesbuttonflag = True
-        else:
-            self.aw.qmc.phasesbuttonflag = False
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.savePhasesSettings()
-        self.accept()
-
-    @pyqtSlot()
-    def cancel(self):
-        self.aw.qmc.phases = list(self.phases)
-        self.aw.qmc.phasesbuttonflag = bool(self.org_phasesbuttonflag)
-        self.aw.qmc.phasesfromBackgroundflag = bool(self.org_fromBackgroundflag)
-        self.aw.qmc.watermarksflag = bool(self.org_watermarksflag)
-        self.aw.qmc.phasesLCDflag = bool(self.org_phasesLCDflag)
-        self.aw.qmc.autoDRYflag = bool(self.org_autoDRYflag)
-        self.aw.qmc.autoFCsFlag = bool(self.org_autoFCsFlag)
-        self.aw.qmc.phasesLCDmode_l = list(self.org_phasesLCDmode_l)
-        self.aw.qmc.phasesLCDmode_all = list(self.org_phasesLCDmode_all)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.savePhasesSettings()
-        self.reject()
-
-    def getphases(self):
-        self.startdry.setValue(self.aw.qmc.phases[0])
-        self.startdry.repaint()
-        self.enddry.setValue(self.aw.qmc.phases[1])
-        self.enddry.repaint()
-        self.endmid.setValue(self.aw.qmc.phases[2])
-        self.endmid.repaint()
-        self.endfinish.setValue(self.aw.qmc.phases[3])
-        self.endfinish.repaint()
-        
-    @pyqtSlot(bool)
-    def setdefault(self,_):
-        if self.aw.qmc.mode == "F":
-            self.aw.qmc.phases = list(self.aw.qmc.phases_fahrenheit_defaults)
-        elif self.aw.qmc.mode == "C":
-            self.aw.qmc.phases = list(self.aw.qmc.phases_celsius_defaults)
-        self.events2phases()
-        self.getphases()
-        self.aw.sendmessage(QApplication.translate("Message","Phases changed to {0} default: {1}",None).format(self.aw.qmc.mode,str(self.aw.qmc.phases)))
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-
-
-#############################################################################
-################  Statistics DIALOG ########################
-#############################################################################
-
-class StatisticsDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(StatisticsDlg,self).__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Form Caption","Statistics",None))
-        self.setModal(True)
-        self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None))
-        self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None))
-        self.ror = QCheckBox(self.aw.qmc.mode + QApplication.translate("CheckBox","/min",None))
-        self.ts = QCheckBox(QApplication.translate("CheckBox","AUC",None))
-        self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None))
-        self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Summary",None))
-        self.ShowStatsSummary.setChecked(self.aw.qmc.statssummary)
-        self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle
-        #temp fix for possible bug self.aw.qmc.statisticsflags=[] > empty list out of range
-        if self.aw.qmc.statisticsflags:
-            if self.aw.qmc.statisticsflags[0]:
-                self.timez.setChecked(True)
-            if self.aw.qmc.statisticsflags[1]:
-                self.bar.setChecked(True)
-            if self.aw.qmc.statisticsflags[3]:
-                self.area.setChecked(True)
-            if self.aw.qmc.statisticsflags[4]:
-                self.ror.setChecked(True)
-            if self.aw.qmc.statisticsflags[5]:
-                self.ts.setChecked(True)
-        else:
-            self.aw.qmc.statisticsflags = [1,1,0,1,1,0]
-            self.timez.setChecked(True)
-            self.bar.setChecked(True)
-            self.area.setChecked(True)
-            self.ror.setChecked(True)
-            self.ts.setChecked(False)
-        self.timez.stateChanged.connect(self.changeStatisticsflag)
-        self.bar.stateChanged.connect(self.changeStatisticsflag)
-        # flag 2 not used anymore
-        self.area.stateChanged.connect(self.changeStatisticsflag)
-        self.ror.stateChanged.connect(self.changeStatisticsflag)
-        self.ts.stateChanged.connect(self.changeStatisticsflag)
-        
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.accept)
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        flagsLayout = QGridLayout()
-        flagsLayout.addWidget(self.timez,0,0)
-        flagsLayout.addWidget(self.bar,0,1)
-        flagsLayout.addWidget(self.ror,0,2)
-        flagsLayout.addWidget(self.ts,0,3)
-        flagsLayout.addWidget(self.area,0,4)
-        flagsLayout.addWidget(self.ShowStatsSummary,0,5)
-        
-        beginlabel =QLabel(QApplication.translate("Label", "From",None))
-        beginitems = [
-                    QApplication.translate("Label","CHARGE",None),
-                    QApplication.translate("Label","TP",None),
-                    QApplication.translate("Label","DRY END",None),
-                    QApplication.translate("Label","FC START",None)]
-        self.beginComboBox = QComboBox()
-        self.beginComboBox.setFocusPolicy(Qt.NoFocus)
-        self.beginComboBox.setMaximumWidth(120)
-        self.beginComboBox.addItems(beginitems)
-        self.beginComboBox.setCurrentIndex(self.aw.qmc.AUCbegin)
-        baselabel =QLabel(QApplication.translate("Label", "Base",None))
-        self.baseedit = QSpinBox()
-        self.baseedit.setAlignment(Qt.AlignRight)
-        self.baseedit.setRange(0,999)
-        self.baseedit.setValue(self.aw.qmc.AUCbase)
-        if self.aw.qmc.mode == "F":
-            self.baseedit.setSuffix(" F")
-        else:
-            self.baseedit.setSuffix(" C")
-        self.baseFlag = QCheckBox(QApplication.translate("CheckBox","From Event", None))
-        self.baseedit.setEnabled(not self.aw.qmc.AUCbaseFlag)
-        self.baseFlag.setChecked(self.aw.qmc.AUCbaseFlag)
-        self.baseFlag.stateChanged.connect(self.switchAUCbase)
-        targetlabel =QLabel(QApplication.translate("Label", "Target",None))
-        self.targetedit = QSpinBox()
-        self.targetedit.setAlignment(Qt.AlignRight)
-        self.targetedit.setRange(0,9999)
-        self.targetedit.setValue(self.aw.qmc.AUCtarget)
-        self.targetFlag = QCheckBox(QApplication.translate("CheckBox","Background", None))
-        self.targetedit.setEnabled(not self.aw.qmc.AUCtargetFlag)
-        self.targetFlag.setChecked(self.aw.qmc.AUCtargetFlag)
-        self.targetFlag.stateChanged.connect(self.switchAUCtarget)
-        self.guideFlag = QCheckBox(QApplication.translate("CheckBox","Guide", None))
-        self.guideFlag.setChecked(self.aw.qmc.AUCguideFlag)
-        self.AUClcdFlag = QCheckBox(QApplication.translate("CheckBox","LCD", None))
-        self.AUClcdFlag.setChecked(self.aw.qmc.AUClcdFlag)
-        self.AUClcdFlag.stateChanged.connect(self.AUCLCFflagChanged)
-        self.AUCshowFlag = QCheckBox(QApplication.translate("CheckBox","Show Area", None))
-        self.AUCshowFlag.setChecked(self.aw.qmc.AUCshowFlag)
-        self.AUCshowFlag.stateChanged.connect(self.changeAUCshowFlag)
-
-        statsmaxchrperlinelabel =QLabel(QApplication.translate("Label", "Max characters per line",None))
-        self.statsmaxchrperlineedit = QSpinBox()
-        self.statsmaxchrperlineedit.setAlignment(Qt.AlignRight)
-        self.statsmaxchrperlineedit.setRange(1,120)
-        self.statsmaxchrperlineedit.setValue(self.aw.qmc.statsmaxchrperline)
-        self.statsmaxchrperlineedit.setFocusPolicy(Qt.StrongFocus)
-        statsmaxchrperlineHorizontal = QHBoxLayout()
-        statsmaxchrperlineHorizontal.addWidget(statsmaxchrperlinelabel)
-        statsmaxchrperlineHorizontal.addWidget(self.statsmaxchrperlineedit)
-        statsmaxchrperlineHorizontal.addStretch()
-        statsmaxchrperlineGroupLayout = QGroupBox(QApplication.translate("GroupBox","Stats Summary",None))
-        statsmaxchrperlineGroupLayout.setLayout(statsmaxchrperlineHorizontal)
-
-        AUCgrid = QGridLayout()
-        AUCgrid.addWidget(beginlabel,0,0,Qt.AlignRight)
-        AUCgrid.addWidget(self.beginComboBox,0,1,1,2)
-        AUCgrid.addWidget(baselabel,1,0,Qt.AlignRight)
-        AUCgrid.addWidget(self.baseedit,1,1)
-        AUCgrid.addWidget(self.baseFlag,1,2)
-        AUCgrid.addWidget(targetlabel,2,0,Qt.AlignRight)
-        AUCgrid.addWidget(self.targetedit,2,1)
-        AUCgrid.addWidget(self.targetFlag,2,2)
-        AUCgrid.addWidget(self.AUClcdFlag,4,1)
-        AUCgrid.addWidget(self.guideFlag,4,2)
-        AUCgrid.addWidget(self.AUCshowFlag,5,1)
-        AUCgrid.setRowMinimumHeight(3, 20)
-        AUCvertical = QVBoxLayout()
-        AUCvertical.addLayout(AUCgrid)
-        AUCvertical.addStretch()
-        AUCgroupLayout = QGroupBox(QApplication.translate("GroupBox","AUC",None))
-        AUCgroupLayout.setLayout(AUCvertical)
-        displayGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display",None))
-        displayGroupLayout.setLayout(flagsLayout)
-        buttonsLayout = QHBoxLayout()
-        buttonsLayout.addWidget(self.dialogbuttons)
-        vgroupLayout = QVBoxLayout()
-        vgroupLayout.addWidget(AUCgroupLayout)
-        vgroupLayout.addWidget(statsmaxchrperlineGroupLayout)
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(displayGroupLayout)
-        mainLayout.addLayout(vgroupLayout)
-        mainLayout.addStretch()
-        mainLayout.addLayout(buttonsLayout)
-        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
-        self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-
-    def AUCLCFflagChanged(self,_):
-        self.aw.qmc.AUClcdFlag = not self.aw.qmc.AUClcdFlag
-        if self.aw.qmc.flagstart:
-            if self.aw.qmc.AUClcdFlag:
-                self.aw.AUCLCD.show()
-            else:
-                self.aw.AUCLCD.hide()
-        if self.aw.largePhasesLCDs_dialog is not None:
-            self.aw.largePhasesLCDs_dialog.updateVisiblitiesPhases()
-
-    @pyqtSlot(int)
-    def changeAUCshowFlag(self,_):
-        self.aw.qmc.AUCshowFlag = not self.aw.qmc.AUCshowFlag
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-
-    @pyqtSlot(int)
-    def switchAUCbase(self,i):
-        if i:
-            self.baseedit.setEnabled(False)
-        else:
-            self.baseedit.setEnabled(True)
-            
-    @pyqtSlot(int)
-    def switchAUCtarget(self,i):
-        if i:
-            self.targetedit.setEnabled(False)
-        else:
-            self.targetedit.setEnabled(True)
-
-    @pyqtSlot(int)
-    def changeStatsSummary(self,_):
-        self.aw.qmc.statssummary = not self.aw.qmc.statssummary
-        # IF Auto is set for the axis the recompute it
-        if self.aw.qmc.autotimex and not self.aw.qmc.statssummary:
-            self.aw.autoAdjustAxis()
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        if self.aw.qmc.statssummary and not self.aw.qmc.flagon:
-            self.aw.savestatisticsAction.setEnabled(True)
-        else:
-            self.aw.savestatisticsAction.setEnabled(False)
-    
-    @pyqtSlot(int)
-    def changeStatisticsflag(self,value):
-        sender = self.sender()
-        if sender == self.timez:
-            i = 0
-        elif sender == self.bar:
-            i = 1
-        elif sender == self.area:
-            i = 3
-        elif sender == self.ror:
-            i = 4
-        elif sender == self.ts:
-            i = 5
-        else:
-            return
-        self.aw.qmc.statisticsflags[i] = value
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-
-    @pyqtSlot()
-    def accept(self):
-        self.aw.qmc.statsmaxchrperline = self.statsmaxchrperlineedit.value()
-        self.aw.qmc.AUCbegin = self.beginComboBox.currentIndex()
-        self.aw.qmc.AUCbase = self.baseedit.value()
-        self.aw.qmc.AUCbaseFlag = self.baseFlag.isChecked()
-        self.aw.qmc.AUCtarget = self.targetedit.value()
-        self.aw.qmc.AUCtargetFlag = self.targetFlag.isChecked()
-        self.aw.qmc.AUCguideFlag = self.guideFlag.isChecked()
-        self.aw.qmc.AUClcdFlag = self.AUClcdFlag.isChecked()
-        try:
-            if self.aw.qmc.TP_time_B:
-                _,_,auc,_ = self.aw.ts(tp=self.aw.qmc.backgroundtime2index(self.aw.qmc.TP_time_B),background=True)
-            else:
-                _,_,auc,_ = self.aw.ts(tp=0,background=True)
-            self.aw.qmc.AUCbackground = auc
-        except:
-            pass
-        if self.timez.isChecked(): 
-            self.aw.qmc.statisticsflags[0] = 1
-        else:
-            self.aw.qmc.statisticsflags[0] = 0
-            
-        if self.bar.isChecked(): 
-            self.aw.qmc.statisticsflags[1] = 1
-        else:
-            self.aw.qmc.statisticsflags[1] = 0
-            
-        if self.area.isChecked(): 
-            self.aw.qmc.statisticsflags[3] = 1
-        else:
-            self.aw.qmc.statisticsflags[3] = 0
-            
-        if self.ror.isChecked(): 
-            self.aw.qmc.statisticsflags[4] = 1
-        else:
-            self.aw.qmc.statisticsflags[4] = 0
-            
-        if self.ts.isChecked(): 
-            self.aw.qmc.statisticsflags[5] = 1
-        else:
-            self.aw.qmc.statisticsflags[5] = 0
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        self.close()
-
-class extraserialport(object):
-    def __init__(self):
-        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
-        self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated.
-        self.baudrate = 19200
-        self.bytesize = 8
-        self.parity= 'N'
-        self.stopbits = 1
-        self.timeout = 1.0
-        self.devicefunctionlist = {}
-        self.device = None
-        self.SP = None
-
-    def confport(self):
-        self.SP.port = self.comport
-        self.SP.baudrate = self.baudrate
-        self.SP.bytesize = self.bytesize
-        self.SP.parity = self.parity
-        self.SP.stopbits = self.stopbits
-        self.SP.timeout = self.timeout
-
-    def openport(self):
-        try:
-            self.confport()
-            #open port
-            if not self.SP.isOpen():
-                self.SP.open()
-        except Exception:
-            self.SP.close()
-#            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
-            error = QApplication.translate("Error Message","Serial Exception:",None)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(error + " Unable to open serial port",exc_tb.tb_lineno)
-
-    def closeport(self):
-        if self.SP is not None:
-            self.SP.close()
-            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
-
-    # this one is called from scale and color meter code
-    def connect(self,error=True):
-        if self.SP is None:
-            try:
-                import serial  # @UnusedImport
-                self.SP = serial.Serial()
-            except Exception as e:
-                if error:
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None) + " connect() {0}").format(str(e)),exc_tb.tb_lineno)
-        if self.SP is not None:
-            try:
-                self.openport()
-                if self.SP.isOpen():
-                    return True
-                else:
-                    return False
-            except Exception as e:
-                if error:
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None) + " connect() {0}").format(str(e)),exc_tb.tb_lineno)
-                return False
-        else:
-            return False
-
-
-
-class scaleport(extraserialport):
-    """ this class handles the communications with the scale"""
-    def __init__(self):
-        super(scaleport, self).__init__()
-        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
-        self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated.
-        self.baudrate = 19200
-        self.bytesize = 8
-        self.parity= 'N'
-        self.stopbits = 1
-        self.timeout = 0.2
-        self.devicefunctionlist = {
-            "None" : None,
-            "KERN NDE" : self.readKERN_NDE,
-            "acaia" : self.readAcaia,
-            #"Shore 930" : self.readShore930,
-        }
-
-    def closeport(self):
-        if u(self.device) == "acaia":
-            # disconnect from acaia scale
-            try:
-                if self.SP.isOpen():
-                    self.SP.write(str2cmd('BTDS\r\n'))
-            except Exception:
-                pass
-        super(scaleport, self).closeport()
-        
-    # returns one of weight (g), density (g/l), or moisture (%).  Others return -1.
-    def readWeight(self,scale_weight=None):
-        if scale_weight != None:
-            return scale_weight,-1,-1
-        else:
-            if self.device is not None and self.device != "None" and self.device != "" and self.device != "acaia":
-                wei,den,moi = self.devicefunctionlist[u(self.device)]()
-                if moi is not None and moi > -1:
-                    return -1, -1, aw.float2float(moi)
-                elif den is not None and den > -1:
-                    return -1, aw.float2float(den), -1
-                elif wei is not None and wei > -1:
-                    return aw.float2float(wei), -1, -1
-                else:
-                    return -1,-1,-1
-            else:
-                return -1,-1,-1
-            
-    def readLine(self):
-        return str(self.SP.readline().decode('ascii'))
-
-    # replaced by BLE direct implementation
-    def readAcaia(self):
-        pass
-
-    def readKERN_NDE(self):
-        try:
-            if not self.SP:
-                self.connect()
-            if self.SP:
-                if not self.SP.isOpen():
-                    self.openport()
-                if self.SP.isOpen():
-                    #self.SP.write(str2cmd('s')) # only stable
-                    self.SP.write(str2cmd('w')) # any weight
-                    v = self.SP.readline()
-                    if len(v) == 0:
-                        return -1,-1,-1
-                    sa = v.decode('ascii').split('g')
-                    if len(sa) == 2:
-                        return int(sa[0].replace(" ", "")), -1, -1
-                    else:
-                        # some times the unit is just missing, we assume it is g
-                        sa = v.decode('ascii').split('\r\n')
-                        if len(sa) == 2:
-                            return int(sa[0].replace(" ", "")),-1,-1
-                        return -1, -1, -1
-        except Exception:
-            return -1, -1, -1
-
-    def readShore930(self):
-        try:
-            if not self.SP:
-                self.connect()
-            if self.SP:
-                if not self.SP.isOpen():
-                    self.openport()
-                if self.SP.isOpen():
-                    line1 = self.SP.readline()
-                    weight = re.search(r'Current Weight:',str(line1))
-                    if weight:                    
-                        w = re.findall(r'([0-9\.]+)',str(line1))
-                        if len(w) == 1:
-                            return toFloat(w[0]),-1,-1
-                        else:
-                            return -1,-1,-1
-
-                    density = re.search(r'Test Weight',str(line1))
-                    if density:
-                        line2 = self.SP.readline()
-                        d = re.findall(r'[0-9\.\-]+',str(line2))
-                        if len(d) == 1:
-                            den = toFloat(d[0]) *12.8718597   # convert from LBS/BU to g/
-                            return -1,toFloat(den),-1
-                        else:
-                            return -1,-1,-1
-
-                    moisture = re.search(r'Beans',str(line1))
-                    if moisture:
-                        line2 = self.SP.readline()
-                        m = re.findall(r'[0-9\.\-]+',str(line2))
-#                        line3 = self.SP.readline() # unused!
-                        if len(m) == 1:
-                            return -1,-1,toFloat(m[0])
-                        else:
-                            return -1,-1,-1
-
-                    else:
-                        return -1,-1,-1
-        except Exception:
-            return -1,-1,-1
-
-
-class colorport(extraserialport):
-    """ this class handles the communications with the color meter"""
-    def __init__(self):
-        super(colorport, self).__init__()
-        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
-        self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated.
-        self.baudrate = 115200
-        self.bytesize = 8
-        self.parity= 'N'
-        self.stopbits = 1
-        self.timeout = 2
-        self.devicefunctionlist = {
-            "None" : None,
-            "Tiny Tonino" : self.readTonino,
-            "Classic Tonino" : self.readTonino
-        }
-
-    # returns color as int or -1 if something went wrong
-    def readColor(self):
-        if self.device is not None and self.device != "None" and self.device != "":
-            return self.devicefunctionlist[u(self.device)]()
-        else:
-            return -1
-
-    def readline_terminated(self,eol=b'\r'):
-        leneol = len(eol)
-        line = bytearray()
-        while True:
-            c = self.SP.read(1)
-            if c:
-                line += c
-                if line[-leneol:] == eol:
-                    break
-            else:
-                break
-        return bytes(line)
-
-    def readTonino(self,retry=2):
-        try:
-            if not self.SP:
-                self.connect()
-                libtime.sleep(2)
-                # put Tonino into PC mode on first connect
-                self.SP.write(str2cmd('\nTONINO\n'))
-                #self.SP.flush()
-                self.readline_terminated(b'\n')
-            if self.SP:
-                if not self.SP.isOpen():
-                    self.openport()
-                if self.SP.isOpen():
-                    self.SP.reset_input_buffer()
-                    self.SP.reset_output_buffer()
-                    self.SP.write(str2cmd('\nSCAN\n'))
-                    #self.SP.flush()
-                    v = self.readline_terminated(b'\n').decode('ascii')
-                    if "SCAN" in v:
-                        n = int(v.split(":")[1]) # response should have format "SCAN:128"
-                        return n
-                    elif retry > 0:
-                        return self.readTonino(self,retry-1)
-                    else:
-                        return -1
-        except Exception:
-            return -1
-
-
-#########################################################################
-#############  DESIGNER CONFIG DIALOG ###################################
-#########################################################################
-
-class designerconfigDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(designerconfigDlg,self).__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Form Caption","Designer Config",None))
-        self.setModal(True)
-        #landmarks
-        charge = QLabel(QApplication.translate("Label", "CHARGE",None))
-        charge.setAlignment(Qt.AlignRight)
-        charge.setStyleSheet("background-color: #f07800")
-        self.dryend = QCheckBox(QApplication.translate("CheckBox","DRY END",None))
-        self.dryend.setStyleSheet("background-color: orange")
-        self.fcs = QCheckBox(QApplication.translate("CheckBox","FC START",None))
-        self.fcs.setStyleSheet("background-color: orange")
-        self.fce = QCheckBox(QApplication.translate("CheckBox","FC END",None))
-        self.fce.setStyleSheet("background-color: orange")
-        self.scs = QCheckBox(QApplication.translate("CheckBox","SC START",None))
-        self.scs.setStyleSheet("background-color: orange")
-        self.sce = QCheckBox(QApplication.translate("CheckBox","SC END",None))
-        self.sce.setStyleSheet("background-color: orange")
-        drop = QLabel(QApplication.translate("Label", "DROP",None))
-        drop.setAlignment(Qt.AlignRight)
-        drop.setStyleSheet("background-color: #f07800")
-        self.loadconfigflags()
-        self.dryend.clicked.connect(self.changeflags)
-        self.fcs.clicked.connect(self.changeflags)
-        self.fce.clicked.connect(self.changeflags)
-        self.scs.clicked.connect(self.changeflags)
-        self.sce.clicked.connect(self.changeflags)
-        if self.aw.qmc.timeindex[0] != -1:
-            start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-        else:
-            start = 0
-        markersettinglabel = QLabel(QApplication.translate("Label", "Marker",None))
-        markersettinglabel.setAlignment(Qt.AlignCenter)
-        timesettinglabel = QLabel(QApplication.translate("Label", "Time",None))
-        timesettinglabel.setAlignment(Qt.AlignCenter)
-        btsettinglabel = QLabel(QApplication.translate("Label", "BT",None))
-        btsettinglabel.setAlignment(Qt.AlignCenter)
-        etsettinglabel = QLabel(QApplication.translate("Label", "ET",None))
-        etsettinglabel.setAlignment(Qt.AlignCenter)
-        self.Edit0 = QLineEdit(stringfromseconds(0))
-        self.Edit0.setEnabled(False)
-        self.Edit0bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[0]])
-        self.Edit0et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[0]])
-        self.Edit0.setAlignment(Qt.AlignRight)
-        self.Edit0bt.setAlignment(Qt.AlignRight)
-        self.Edit0et.setAlignment(Qt.AlignRight)
-        if self.aw.qmc.timeindex[1]:
-            self.Edit1 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[1]] - start))
-            self.Edit1bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])
-            self.Edit1et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[1]])
-        else:
-            self.Edit1 = QLineEdit(stringfromseconds(0))
-            self.Edit1bt = QLineEdit("0.0")
-            self.Edit1et = QLineEdit("0.0")
-        self.Edit1.setAlignment(Qt.AlignRight)
-        self.Edit1bt.setAlignment(Qt.AlignRight)
-        self.Edit1et.setAlignment(Qt.AlignRight)
-        if self.aw.qmc.timeindex[2]:
-            self.Edit2 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[2]] - start))
-            self.Edit2bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])
-            self.Edit2et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[2]])
-        else:
-            self.Edit2 = QLineEdit(stringfromseconds(0))
-            self.Edit2bt = QLineEdit("0.0")
-            self.Edit2et = QLineEdit("0.0")
-        self.Edit2.setAlignment(Qt.AlignRight)
-        self.Edit2bt.setAlignment(Qt.AlignRight)
-        self.Edit2et.setAlignment(Qt.AlignRight)
-        if self.aw.qmc.timeindex[3]:
-            self.Edit3 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[3]] - start))
-            self.Edit3bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[3]])
-            self.Edit3et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[3]])
-        else:
-            self.Edit3 = QLineEdit(stringfromseconds(0))
-            self.Edit3bt = QLineEdit("0.0")
-            self.Edit3et = QLineEdit("0.0")
-        self.Edit3.setAlignment(Qt.AlignRight)
-        self.Edit3bt.setAlignment(Qt.AlignRight)
-        self.Edit3et.setAlignment(Qt.AlignRight)
-        if self.aw.qmc.timeindex[4]:
-            self.Edit4 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[4]] - start))
-            self.Edit4bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[4]])
-            self.Edit4et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[4]])
-        else:
-            self.Edit4 = QLineEdit(stringfromseconds(0))
-            self.Edit4bt = QLineEdit("0.0")
-            self.Edit4et = QLineEdit("0.0")
-        self.Edit4.setAlignment(Qt.AlignRight)
-        self.Edit4bt.setAlignment(Qt.AlignRight)
-        self.Edit4et.setAlignment(Qt.AlignRight)
-        if self.aw.qmc.timeindex[5]:
-            self.Edit5 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[5]] - start))
-            self.Edit5bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[5]])
-            self.Edit5et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[5]])
-        else:
-            self.Edit5 = QLineEdit(stringfromseconds(0))
-            self.Edit5bt = QLineEdit("0.0")
-            self.Edit5et = QLineEdit("0.0")
-        self.Edit5.setAlignment(Qt.AlignRight)
-        self.Edit5bt.setAlignment(Qt.AlignRight)
-        self.Edit5et.setAlignment(Qt.AlignRight)
-        if self.aw.qmc.timeindex[6]:
-            self.Edit6 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[6]] - start))
-            self.Edit6bt = QLineEdit("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[6]])
-            self.Edit6et = QLineEdit("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[6]])
-        else:
-            self.Edit6 = QLineEdit(stringfromseconds(0))
-            self.Edit6bt = QLineEdit("0.0")
-            self.Edit6et = QLineEdit("0.0")
-        self.Edit6.setAlignment(Qt.AlignRight)
-        self.Edit6bt.setAlignment(Qt.AlignRight)
-        self.Edit6et.setAlignment(Qt.AlignRight)
-        maxwidth = 70
-        self.Edit0.setMaximumWidth(maxwidth)
-        self.Edit1.setMaximumWidth(maxwidth)
-        self.Edit2.setMaximumWidth(maxwidth)
-        self.Edit3.setMaximumWidth(maxwidth)
-        self.Edit4.setMaximumWidth(maxwidth)
-        self.Edit5.setMaximumWidth(maxwidth)
-        self.Edit6.setMaximumWidth(maxwidth)
-        self.Edit0bt.setMaximumWidth(maxwidth)
-        self.Edit1bt.setMaximumWidth(maxwidth)
-        self.Edit2bt.setMaximumWidth(maxwidth)
-        self.Edit3bt.setMaximumWidth(maxwidth)
-        self.Edit4bt.setMaximumWidth(maxwidth)
-        self.Edit5bt.setMaximumWidth(maxwidth)
-        self.Edit6bt.setMaximumWidth(maxwidth)
-        self.Edit0et.setMaximumWidth(maxwidth)
-        self.Edit1et.setMaximumWidth(maxwidth)
-        self.Edit2et.setMaximumWidth(maxwidth)
-        self.Edit3et.setMaximumWidth(maxwidth)
-        self.Edit4et.setMaximumWidth(maxwidth)
-        self.Edit5et.setMaximumWidth(maxwidth)
-        self.Edit6et.setMaximumWidth(maxwidth)
-        self.Edit1copy = self.Edit1.text()
-        self.Edit2copy = self.Edit2.text()
-        self.Edit3copy = self.Edit3.text()
-        self.Edit4copy = self.Edit4.text()
-        self.Edit5copy = self.Edit5.text()
-        self.Edit6copy = self.Edit6.text()
-        self.Edit0btcopy = self.Edit0bt.text()
-        self.Edit1btcopy = self.Edit1bt.text()
-        self.Edit2btcopy = self.Edit2bt.text()
-        self.Edit3btcopy = self.Edit3bt.text()
-        self.Edit4btcopy = self.Edit4bt.text()
-        self.Edit5btcopy = self.Edit5bt.text()
-        self.Edit6btcopy = self.Edit6bt.text()
-        self.Edit0etcopy = self.Edit0et.text()
-        self.Edit1etcopy = self.Edit1et.text()
-        self.Edit2etcopy = self.Edit2et.text()
-        self.Edit3etcopy = self.Edit3et.text()
-        self.Edit4etcopy = self.Edit4et.text()
-        self.Edit5etcopy = self.Edit5et.text()
-        self.Edit6etcopy = self.Edit6et.text()
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.Edit0.setValidator(QRegExpValidator(regextime,self))
-        self.Edit1.setValidator(QRegExpValidator(regextime,self))
-        self.Edit2.setValidator(QRegExpValidator(regextime,self))
-        self.Edit3.setValidator(QRegExpValidator(regextime,self))
-        self.Edit4.setValidator(QRegExpValidator(regextime,self))
-        self.Edit5.setValidator(QRegExpValidator(regextime,self))
-        self.Edit6.setValidator(QRegExpValidator(regextime,self))
-        regextemp = QRegExp(r"^-?[0-9]?[0-9]?[0-9]?\.?[0-9]?$")
-        self.Edit0bt.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit1bt.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit2bt.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit3bt.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit4bt.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit5bt.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit6bt.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit0et.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit1et.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit2et.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit3et.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit4et.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit5et.setValidator(QRegExpValidator(regextemp,self))
-        self.Edit6et.setValidator(QRegExpValidator(regextemp,self))
-        curvinesslabel = QLabel(QApplication.translate("Label", "Curviness",None))
-        etcurviness = QLabel(QApplication.translate("Label", "ET",None))
-        btcurviness = QLabel(QApplication.translate("Label", "BT",None))
-        etcurviness.setAlignment(Qt.AlignRight)
-        btcurviness.setAlignment(Qt.AlignRight)
-        self.ETsplineComboBox = QComboBox()
-        self.ETsplineComboBox.addItems(["1","2","3","4","5"])
-        self.ETsplineComboBox.setCurrentIndex(self.aw.qmc.ETsplinedegree - 1)
-        self.ETsplineComboBox.currentIndexChanged.connect(self.redrawcurviness)
-        self.BTsplineComboBox = QComboBox()
-        self.BTsplineComboBox.addItems(["1","2","3","4","5"])
-        self.BTsplineComboBox.setCurrentIndex(self.aw.qmc.BTsplinedegree - 1)
-        self.BTsplineComboBox.currentIndexChanged.connect(self.redrawcurviness)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Ok))
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        
-        self.dialogbuttons.addButton(QDialogButtonBox.Close)
-        self.dialogbuttons.addButton(QDialogButtonBox.Apply)
-        self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Reset", None))
-        
-        self.dialogbuttons.rejected.connect(self.accept)
-        self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.reset)
-        self.dialogbuttons.button(QDialogButtonBox.Apply).clicked.connect(self.settimes)
-        
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        marksLayout = QGridLayout()
-        marksLayout.addWidget(markersettinglabel,0,0)
-        marksLayout.addWidget(timesettinglabel,0,1)
-        marksLayout.addWidget(btsettinglabel,0,2)
-        marksLayout.addWidget(etsettinglabel,0,3)
-        marksLayout.addWidget(charge,1,0)
-        marksLayout.addWidget(self.Edit0,1,1)
-        marksLayout.addWidget(self.Edit0bt,1,2)
-        marksLayout.addWidget(self.Edit0et,1,3)
-        marksLayout.addWidget(self.dryend,2,0)
-        marksLayout.addWidget(self.Edit1,2,1)
-        marksLayout.addWidget(self.Edit1bt,2,2)
-        marksLayout.addWidget(self.Edit1et,2,3)
-        marksLayout.addWidget(self.fcs,3,0)
-        marksLayout.addWidget(self.Edit2,3,1)
-        marksLayout.addWidget(self.Edit2bt,3,2)
-        marksLayout.addWidget(self.Edit2et,3,3)
-        marksLayout.addWidget(self.fce,4,0)
-        marksLayout.addWidget(self.Edit3,4,1)
-        marksLayout.addWidget(self.Edit3bt,4,2)
-        marksLayout.addWidget(self.Edit3et,4,3)
-        marksLayout.addWidget(self.scs,5,0)
-        marksLayout.addWidget(self.Edit4,5,1)
-        marksLayout.addWidget(self.Edit4bt,5,2)
-        marksLayout.addWidget(self.Edit4et,5,3)
-        marksLayout.addWidget(self.sce,6,0)
-        marksLayout.addWidget(self.Edit5,6,1)
-        marksLayout.addWidget(self.Edit5bt,6,2)
-        marksLayout.addWidget(self.Edit5et,6,3)
-        marksLayout.addWidget(drop,7,0)
-        marksLayout.addWidget(self.Edit6,7,1)
-        marksLayout.addWidget(self.Edit6bt,7,2)
-        marksLayout.addWidget(self.Edit6et,7,3)
-        settingsLayout = QVBoxLayout()
-        settingsLayout.addLayout(marksLayout)
-        curvinessLayout = QHBoxLayout()
-        curvinessLayout.addWidget(curvinesslabel)
-        curvinessLayout.addWidget(etcurviness)
-        curvinessLayout.addWidget(self.ETsplineComboBox)
-        curvinessLayout.addWidget(btcurviness)
-        curvinessLayout.addWidget(self.BTsplineComboBox)
-        modLayout = QVBoxLayout()
-        modLayout.addLayout(curvinessLayout)
-        marksGroupLayout = QGroupBox(QApplication.translate("GroupBox","Initial Settings",None))
-        marksGroupLayout.setLayout(settingsLayout)
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(marksGroupLayout)
-        mainLayout.addLayout(modLayout)
-        mainLayout.addLayout(buttonLayout)
-        self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Close).setFocus()
-
-    @pyqtSlot(int)
-    def redrawcurviness(self,_):
-        ETcurviness = int(str(self.ETsplineComboBox.currentText()))
-        BTcurviness = int(str(self.BTsplineComboBox.currentText()))
-        timepoints = len(self.aw.qmc.timex)
-        if (timepoints - ETcurviness) >= 1:
-            self.aw.qmc.ETsplinedegree = ETcurviness
-        else:
-            self.aw.qmc.ETsplinedegree = len(self.aw.qmc.timex)-1
-            self.ETsplineComboBox.setCurrentIndex(self.aw.qmc.ETsplinedegree-1)
-            ms = QApplication.translate("Message","Not enough time points for an ET curviness of {0}. Set curviness to {1}",None).format(ETcurviness,self.aw.qmc.ETsplinedegree)
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),ms)
-        if (timepoints - BTcurviness) >= 1:
-            self.aw.qmc.BTsplinedegree = BTcurviness
-        else:
-            self.aw.qmc.BTsplinedegree = len(self.aw.qmc.timex)-1
-            self.BTsplineComboBox.setCurrentIndex(self.aw.qmc.BTsplinedegree-1)
-            ms = QApplication.translate("Message","Not enough time points for an BT curviness of {0}. Set curviness to {1}",None).format(BTcurviness,self.aw.qmc.BTsplinedegree)
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),ms)
-        self.aw.qmc.redrawdesigner()
-
-    @pyqtSlot(bool)
-    def settimes(self,_):
-        #check input
-        strings = [QApplication.translate("Message","CHARGE",None),
-                   QApplication.translate("Message","DRY END",None),
-                   QApplication.translate("Message","FC START",None),
-                   QApplication.translate("Message","FC END",None),
-                   QApplication.translate("Message","SC START",None),
-                   QApplication.translate("Message","SC END",None),
-                   QApplication.translate("Message","DROP",None)]
-        timecheck = self.validatetime()
-        if timecheck != 1000:
-            st = QApplication.translate("Message","Incorrect time format. Please recheck {0} time",None).format(strings[timecheck])
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),st)
-            return 1
-        checkvalue = self.validatetimeorder()
-        if checkvalue != 1000:
-            st = QApplication.translate("Message","Times need to be in ascending order. Please recheck {0} time",None).format(strings[checkvalue+1])
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),st)
-            return 1
-        if self.Edit0bt.text() != self.Edit0btcopy:
-            self.aw.qmc.temp2[self.aw.qmc.timeindex[0]] = float(str(self.Edit0bt.text()))
-            self.Edit0btcopy = self.Edit0bt.text()
-        if self.Edit0et.text() != self.Edit0etcopy:
-            self.aw.qmc.temp1[self.aw.qmc.timeindex[0]] = float(str(self.Edit0et.text()))
-            self.Edit0etcopy = self.Edit0et.text()
-        if self.dryend.isChecked():
-            if self.Edit1.text() != self.Edit1copy:
-                if stringtoseconds(str(self.Edit1.text())):
-                    timez = stringtoseconds(str(self.Edit1.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[1]] = timez
-                    self.Edit1copy = self.Edit1.text()
-            if self.Edit1bt.text() != self.Edit1btcopy:
-                self.aw.qmc.temp2[self.aw.qmc.timeindex[1]] = float(str(self.Edit1bt.text()))
-                self.Edit1btcopy = self.Edit1bt.text()
-            if self.Edit1et.text() != self.Edit1etcopy:
-                self.aw.qmc.temp1[self.aw.qmc.timeindex[1]] = float(str(self.Edit1et.text()))
-                self.Edit1etcopy = self.Edit1et.text()
-        if self.fcs.isChecked():
-            if self.Edit2.text() != self.Edit2copy:
-                if stringtoseconds(str(self.Edit2.text())):
-                    timez = stringtoseconds(str(self.Edit2.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[2]] = timez
-                    self.Edit2copy = self.Edit2.text()
-            if self.Edit2bt.text() != self.Edit2btcopy:
-                self.aw.qmc.temp2[self.aw.qmc.timeindex[2]] = float(str(self.Edit2bt.text()))
-                self.Edit2btcopy = self.Edit2bt.text()
-            if self.Edit2et.text() != self.Edit2etcopy:
-                self.aw.qmc.temp1[self.aw.qmc.timeindex[2]] = float(str(self.Edit2et.text()))
-                self.Edit2etcopy = self.Edit2et.text()
-        if self.fce.isChecked():
-            if self.Edit3.text() != self.Edit3copy:
-                if stringtoseconds(str(self.Edit3.text())):
-                    timez = stringtoseconds(str(self.Edit3.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[3]] = timez
-                    self.Edit3copy = self.Edit3.text()
-            if self.Edit3bt.text() != self.Edit3btcopy:
-                self.aw.qmc.temp2[self.aw.qmc.timeindex[3]] = float(str(self.Edit3bt.text()))
-                self.Edit3btcopy = self.Edit3bt.text()
-            if self.Edit3et.text() != self.Edit3etcopy:
-                self.aw.qmc.temp1[self.aw.qmc.timeindex[3]] = float(str(self.Edit3et.text()))
-                self.Edit3etcopy = self.Edit3et.text()
-        if self.scs.isChecked():
-            if self.Edit4.text() != self.Edit4copy:
-                if stringtoseconds(str(self.Edit4.text())):
-                    timez = stringtoseconds(str(self.Edit4.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[4]] = timez
-                    self.Edit4copy = self.Edit4.text()
-            if self.Edit4bt.text() != self.Edit4btcopy:
-                self.aw.qmc.temp2[self.aw.qmc.timeindex[4]] = float(str(self.Edit4bt.text()))
-                self.Edit4btcopy = self.Edit4bt.text()
-            if self.Edit4et.text() != self.Edit4etcopy:
-                self.aw.qmc.temp1[self.aw.qmc.timeindex[4]] = float(str(self.Edit4et.text()))
-                self.Edit4etcopy = self.Edit4et.text()
-        if self.sce.isChecked():
-            if self.Edit5.text() != self.Edit5copy:
-                if stringtoseconds(str(self.Edit5.text())):
-                    timez = stringtoseconds(str(self.Edit5.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[5]] = timez
-                    self.Edit5copy = self.Edit5.text()
-            if self.Edit5bt.text() != self.Edit5btcopy:
-                self.aw.qmc.temp2[self.aw.qmc.timeindex[5]] = float(str(self.Edit5bt.text()))
-                self.Edit5btcopy = self.Edit5bt.text()
-            if self.Edit5et.text() != self.Edit5etcopy:
-                self.aw.qmc.temp1[self.aw.qmc.timeindex[5]] = float(str(self.Edit5et.text()))
-                self.Edit5etcopy = self.Edit5et.text()
-        if self.Edit6.text() != self.Edit6copy:
-            if stringtoseconds(str(self.Edit6.text())):
-                timez = stringtoseconds(str(self.Edit6.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                self.aw.qmc.timex[self.aw.qmc.timeindex[6]] = timez
-                self.Edit6copy = self.Edit6.text()
-        if self.Edit6bt.text() != self.Edit6btcopy:
-            self.aw.qmc.temp2[self.aw.qmc.timeindex[6]] = float(str(self.Edit6bt.text()))
-            self.Edit6btcopy = self.Edit6bt.text()
-        if self.Edit6et.text() != self.Edit6etcopy:
-            self.aw.qmc.temp1[self.aw.qmc.timeindex[6]] = float(str(self.Edit6et.text()))
-            self.Edit6etcopy = self.Edit6et.text()
-        for i in range(1,6): #1-5
-            self.aw.qmc.designertimeinit[i] = self.aw.qmc.timex[self.aw.qmc.timeindex[i]]
-        self.aw.qmc.xaxistosm(redraw=False)
-        self.aw.qmc.redrawdesigner()
-        return 0
-
-    #supporting function for settimes()
-    def validatetimeorder(self):
-        time = []
-        checks = self.readchecks()
-        time.append(stringtoseconds(str(self.Edit0.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit1.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit2.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit3.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit4.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit5.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit6.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        for i in range(len(time)-1):
-            if time[i+1] <= time[i] and checks[i+1] != 0:
-                return i
-        return 1000
-
-    def validatetime(self):
-        strings = []
-        strings.append(self.Edit0.text())
-        strings.append(self.Edit1.text())
-        strings.append(self.Edit2.text())
-        strings.append(self.Edit3.text())
-        strings.append(self.Edit4.text())
-        strings.append(self.Edit5.text())
-        strings.append(self.Edit6.text())
-        for i in range(len(strings)):
-            if len(str(strings[i])) < 5:
-                return i
-        else:
-            return 1000
-
-    #supporting function for settimes()
-    @pyqtSlot(bool)
-    def readchecks(self,_=False):
-        checks = [0,0,0,0,0,0,0]
-        if self.dryend.isChecked(): 
-            checks[1] = 1
-        if self.fcs.isChecked():
-            checks[2] = 1
-        if self.fce.isChecked():
-            checks[3] = 1
-        if self.scs.isChecked():
-            checks[4] = 1
-        if self.sce.isChecked():
-            checks[5] = 1
-        return checks
-
-    def create(self):
-        self.close()
-        self.aw.qmc.convert_designer()
-
-    #reset
-    @pyqtSlot(bool)
-    def reset(self,_):
-        self.dryend.setChecked(True)
-        self.fcs.setChecked(True)
-        self.fce.setChecked(True)
-        self.scs.setChecked(True)
-        self.sce.setChecked(True)
-        #reset designer
-        self.aw.qmc.reset_designer()
-        #update editboxes
-        self.Edit0.setText(stringfromseconds(0))
-        self.Edit1.setText(stringfromseconds(self.aw.qmc.designertimeinit[1]))
-        self.Edit2.setText(stringfromseconds(self.aw.qmc.designertimeinit[2]))
-        self.Edit3.setText(stringfromseconds(self.aw.qmc.designertimeinit[3]))
-        self.Edit4.setText(stringfromseconds(self.aw.qmc.designertimeinit[4]))
-        self.Edit5.setText(stringfromseconds(self.aw.qmc.designertimeinit[5]))
-        self.Edit6.setText(stringfromseconds(self.aw.qmc.designertimeinit[6]))
-        self.Edit0bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[0]])
-        self.Edit1bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])
-        self.Edit2bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])
-        self.Edit3bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[3]])
-        self.Edit4bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[4]])
-        self.Edit5bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[5]])
-        self.Edit6bt.setText("%.1f"%self.aw.qmc.temp2[self.aw.qmc.timeindex[6]])
-        self.Edit0et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[0]])
-        self.Edit1et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[1]])
-        self.Edit2et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[2]])
-        self.Edit3et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[3]])
-        self.Edit4et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[4]])
-        self.Edit5et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[5]])
-        self.Edit6et.setText("%.1f"%self.aw.qmc.temp1[self.aw.qmc.timeindex[6]])
-        self.aw.sendmessage(QApplication.translate("Message","Designer has been reset",None))
-
-    def loadconfigflags(self):
-        self.dryend.setChecked(self.aw.qmc.timeindex[1])
-        self.fcs.setChecked(self.aw.qmc.timeindex[2])
-        self.fce.setChecked(self.aw.qmc.timeindex[3])
-        self.scs.setChecked(self.aw.qmc.timeindex[4])
-        self.sce.setChecked(self.aw.qmc.timeindex[5])
-
-    #adds deletes landmarks
-    @pyqtSlot(bool)
-    def changeflags(self,_):
-        sender = self.sender()
-        if sender == self.dryend:
-            idi = 1
-        elif sender == self.fcs:
-            idi = 2
-        elif sender == self.fce:
-            idi = 3
-        elif sender == self.scs:
-            idi = 4
-        elif sender == self.sce:
-            idi = 5
-        else:
-            return
-        if self.validatetimeorder() != 1000:
-            if idi == 1:
-                if self.dryend.isChecked():
-                    self.dryend.setChecked(False)
-            elif idi == 2:
-                if self.fcs.isChecked():
-                    self.fcs.setChecked(False)
-            elif idi == 3:
-                if self.fce.isChecked():
-                    self.fce.setChecked(False)
-            elif idi == 4:
-                if self.scs.isChecked():
-                    self.scs.setChecked(False)
-            elif idi == 5:
-                if self.sce.isChecked():
-                    self.sce.setChecked(False)
-            #ERROR time from edit boxes is not in ascending order
-            strings = [QApplication.translate("Message","CHARGE",None),
-                       QApplication.translate("Message","DRY END",None),
-                       QApplication.translate("Message","FC START",None),
-                       QApplication.translate("Message","FC END",None),
-                       QApplication.translate("Message","SC START",None),
-                       QApplication.translate("Message","SC END",None),
-                       QApplication.translate("Message","DROP",None)]
-            st = QApplication.translate("Message","Times need to be in ascending order. Please recheck {0} time",None).format(strings[idi])
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),st)
-            return
-        #idi = id index
-        if self.aw.qmc.timeindex[idi]:
-            #ERASE mark point
-            self.aw.qmc.currentx = self.aw.qmc.timex[self.aw.qmc.timeindex[idi]]
-            self.aw.qmc.currenty = self.aw.qmc.temp2[self.aw.qmc.timeindex[idi]]
-            self.aw.qmc.removepoint()
-        else:
-            #ADD mark point
-            if idi == 1:
-                timez = stringtoseconds(str(self.Edit1.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                bt = float(str(self.Edit1bt.text()))
-                et = float(str(self.Edit1et.text()))
-            if idi == 2:
-                timez = stringtoseconds(str(self.Edit2.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                bt = float(str(self.Edit2bt.text()))
-                et = float(str(self.Edit2et.text()))
-            if idi == 3:
-                timez = stringtoseconds(str(self.Edit3.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                bt = float(str(self.Edit3bt.text()))
-                et = float(str(self.Edit3et.text()))
-            if idi == 4:
-                timez = stringtoseconds(str(self.Edit4.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                bt = float(str(self.Edit4bt.text()))
-                et = float(str(self.Edit4et.text()))
-            if idi == 5:
-                timez = stringtoseconds(str(self.Edit5.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                bt = float(str(self.Edit5bt.text()))
-                et = float(str(self.Edit5et.text()))
-            self.aw.qmc.currentx = timez 
-            self.aw.qmc.currenty = bt
-            newindex = self.aw.qmc.addpoint(manual=False)
-            self.aw.qmc.timeindex[idi] = newindex
-            self.aw.qmc.temp2[self.aw.qmc.timeindex[idi]] = bt
-            self.aw.qmc.temp1[self.aw.qmc.timeindex[idi]] = et
-            self.aw.qmc.xaxistosm(redraw=False)
-            self.aw.qmc.redrawdesigner()
-
-class pointDlg(ArtisanDialog):
-    def __init__(self,parent = None, aw = None, values = [0,0]):
-        super(pointDlg,self).__init__(parent, aw)
-        self.values = values
-        self.setWindowTitle(QApplication.translate("Form Caption","Add Point",None))
-        self.tempEdit = QLineEdit(str(int(round(self.values[1]))))
-        self.tempEdit.setValidator(QIntValidator(0, 999, self.tempEdit))
-        self.tempEdit.setFocus()
-        self.tempEdit.setAlignment(Qt.AlignRight)
-        templabel = QLabel(QApplication.translate("Label", "temp",None))
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.timeEdit = QLineEdit(stringfromseconds(self.values[0],leadingzero=False))
-        self.timeEdit.setAlignment(Qt.AlignRight)
-        self.timeEdit.setValidator(QRegExpValidator(regextime,self))
-        timelabel = QLabel(QApplication.translate("Label", "time",None))
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.return_values)
-        self.dialogbuttons.rejected.connect(self.reject)
-        
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
-        grid = QGridLayout()
-        grid.addWidget(timelabel,0,0)
-        grid.addWidget(self.timeEdit,0,1)
-        grid.addWidget(templabel,1,0)
-        grid.addWidget(self.tempEdit,1,1)
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(grid)
-        mainLayout.addStretch()  
-        mainLayout.addLayout(buttonLayout)
-        self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-    
-    @pyqtSlot()
-    def return_values(self):
-        self.values[0] = stringtoseconds(str(self.timeEdit.text()))
-        self.values[1] = float(self.tempEdit.text())
-        self.accept()
-
-#########################################################################
-#############  CUSTOM EVENT DIALOG ######################################
-#########################################################################
-
-class customEventDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None, time_idx=0,description="",event_type=4,value=0):
-        super(customEventDlg,self).__init__(parent, aw)
-        if time_idx != 0:
-            event_time = self.aw.qmc.timex[time_idx]
-            if self.aw.qmc.timeindex[0] > -1:
-                event_time -= self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-            event_time_str = " @ " + self.aw.eventtime2string(event_time)
-        else:
-            event_time_str = ""
-        self.setWindowTitle(QApplication.translate("Form Caption","Event",None) + event_time_str)
-        self.description = description
-        self.type = event_type
-        self.value = self.aw.qmc.eventsvalues(value)
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.accept)
-        self.dialogbuttons.rejected.connect(self.reject)
-        
-        descriptionLabel = QLabel(QApplication.translate("Table", "Description", None))
-        self.descriptionEdit = QLineEdit(self.description)
-        typeLabel = QLabel(QApplication.translate("Table", "Type", None))
-        etypes = self.aw.qmc.getetypes()
-        self.typeCombo = MyQComboBox()
-        self.typeCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.typeCombo.addItems(etypes)
-        self.typeCombo.setCurrentIndex(self.type)
-        valueLabel = QLabel(QApplication.translate("Table", "Value", None))
-        self.valueEdit = QLineEdit(str(self.value))
-        
-        grid = QGridLayout()
-        grid.addWidget(descriptionLabel,0,0)
-        grid.addWidget(self.descriptionEdit,0,1)
-        grid.addWidget(typeLabel,1,0)
-        grid.addWidget(self.typeCombo,1,1)
-        grid.addWidget(valueLabel,2,0)
-        grid.addWidget(self.valueEdit,2,1)
-
-        buttonsLayout = QHBoxLayout()
-        buttonsLayout.addStretch()
-        buttonsLayout.addWidget(self.dialogbuttons)
-        
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(grid)
-        mainLayout.addStretch()
-        mainLayout.addLayout(buttonsLayout)
-        self.setLayout(mainLayout)
-        
-    def accept(self):
-        self.description = self.descriptionEdit.text()
-        evalue = self.valueEdit.text()
-        self.value = self.aw.qmc.str2eventsvalue(str(evalue))
-        self.type = self.typeCombo.currentIndex()
-        super(customEventDlg,self).accept()
-
-#########################################################################
-#############  NONE DEVICE DIALOG #######################################
-#########################################################################
-
-#inputs temperature
-class nonedevDlg(QDialog,object):
-    __slots__ = ['etEdit','btEdit','ETbox','okButton','cancelButton'] # save some memory by using slots
-    def __init__(self, parent = None):
-        super(nonedevDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Manual Temperature Logger",None))
-        if len(aw.qmc.timex):
-            if aw.qmc.manuallogETflag:
-                etval = str(int(aw.qmc.temp1[-1]))
-            else:
-                etval = "0"
-            btval = str(int(aw.qmc.temp2[-1])) 
-        else:
-            etval = "0"
-            btval = "0"
-        self.etEdit = QLineEdit(etval)
-        btlabel = QLabel(QApplication.translate("Label", "BT",None))
-        self.btEdit = QLineEdit(btval)
-        self.etEdit.setValidator(QIntValidator(0, 1000, self.etEdit))
-        self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
-        self.btEdit.setFocus()
-        self.ETbox = QCheckBox(QApplication.translate("CheckBox","ET",None))
-        if aw.qmc.manuallogETflag == True:
-            self.ETbox.setChecked(True)
-        else:
-            self.ETbox.setChecked(False)
-            self.etEdit.setVisible(False)
-        self.ETbox.stateChanged.connect(self.changemanuallogETflag)
-        self.okButton = QPushButton(QApplication.translate("Button","OK",None))
-        self.cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        self.cancelButton.setFocusPolicy(Qt.NoFocus)
-        self.okButton.clicked.connect(self.accept)
-        self.cancelButton.clicked.connect(self.reject)
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.cancelButton)
-        buttonLayout.addWidget(self.okButton)
-        grid = QGridLayout()
-        grid.addWidget(self.ETbox,0,0)
-        grid.addWidget(self.etEdit,0,1)
-        grid.addWidget(btlabel,1,0)
-        grid.addWidget(self.btEdit,1,1)
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(grid)
-        mainLayout.addStretch()  
-        mainLayout.addLayout(buttonLayout)
-        self.setLayout(mainLayout)
-
-    @pyqtSlot(int)
-    def changemanuallogETflag(self,_):
-        if self.ETbox.isChecked():
-            aw.qmc.manuallogETflag = 1
-            self.etEdit.setVisible(True)
-            self.etEdit.setFocus()
-        else:
-            aw.qmc.manuallogETflag = 0
-            self.etEdit.setVisible(False)
-            self.btEdit.setFocus()
-
-
-
-############################################################
-#######################  CUSTOM COLOR DIALOG  ##############
-############################################################
-
-class graphColorDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(graphColorDlg,self).__init__(parent, aw)
-        self.setAttribute(Qt.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
-        self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Colors", None))
-        titlefont = QFont()
-        titlefont.setBold(True)
-        titlefont.setWeight(75)
-        self.commonstyle = "border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;"
-        
-        #TAB0
-        profilecolorlabel = QLabel(QApplication.translate("Label","Profile Colors",None))
-        profilecolorlabel.setFont(titlefont)
-        bgcolorlabel = QLabel(QApplication.translate("Label","Background Profile Colors",None))
-        bgcolorlabel.setFont(titlefont)
-        profilecolorlabel.setMaximumSize(180,20)
-        bgcolorlabel.setMaximumSize(180,20)
-        profilecolorlabel.setMinimumSize(150,20)
-        bgcolorlabel.setMinimumSize(150,20)
-        
-        self.metLabel = QLabel(QApplication.translate("Button","ET", None))
-        self.metLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.metButton = QPushButton()
-        self.metButton.setFocusPolicy(Qt.NoFocus)
-        self.metButton.clicked.connect(self.setColorSlot)
-        self.btLabel = QLabel(QApplication.translate("Button","BT", None))
-        self.btLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.btButton = QPushButton()
-        self.btButton.setFocusPolicy(Qt.NoFocus)
-        self.btButton.clicked.connect(self.setColorSlot)
-        self.deltametLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Button","ET", None))
-        self.deltametLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.deltametButton = QPushButton()
-        self.deltametButton.setFocusPolicy(Qt.NoFocus)
-        self.deltametButton.clicked.connect(self.setColorSlot)
-        self.deltabtLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Button","BT", None))
-        self.deltabtLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.deltabtButton = QPushButton()
-        self.deltabtButton.setFocusPolicy(Qt.NoFocus)
-        self.deltabtButton.clicked.connect(self.setColorSlot)
-
-        self.bgmetLabel = QLabel(QApplication.translate("Button","ET", None))
-        self.bgmetLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.bgmetButton = QPushButton()
-        self.bgmetButton.setFocusPolicy(Qt.NoFocus)
-        self.bgmetButton.clicked.connect(self.setbgColorSlot)
-        self.bgbtLabel = QLabel(QApplication.translate("Button","BT", None))
-        self.bgbtLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.bgbtButton = QPushButton()
-        self.bgbtButton.setFocusPolicy(Qt.NoFocus)
-        self.bgbtButton.clicked.connect(self.setbgColorSlot)
-        self.bgdeltametLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Button","ET", None))
-        self.bgdeltametLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.bgdeltametButton = QPushButton()
-        self.bgdeltametButton.setFocusPolicy(Qt.NoFocus)
-        self.bgdeltametButton.clicked.connect(self.setbgColorSlot)
-        self.bgdeltabtLabel = QLabel(deltaLabelUTF8 + QApplication.translate("Button","BT", None))
-        self.bgdeltabtLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.bgdeltabtButton = QPushButton()
-        self.bgdeltabtButton.setFocusPolicy(Qt.NoFocus)
-        self.bgdeltabtButton.clicked.connect(self.setbgColorSlot)
-
-        self.bgextraLabel = QLabel(QApplication.translate("Button","Extra", None))
-        self.bgextraLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.bgextraButton = QPushButton()
-        self.bgextraButton.setFocusPolicy(Qt.NoFocus)
-        self.bgextraButton.clicked.connect(self.setbgColorSlot)
-            
-        opaqbgLabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
-        opaqbgLabel.setAlignment(Qt.AlignRight)
-        self.opaqbgSpinBox = QSpinBox()
-        self.opaqbgSpinBox.setAlignment(Qt.AlignRight)
-        self.opaqbgSpinBox.setRange(1,10)
-        self.opaqbgSpinBox.setSingleStep(1)
-        self.opaqbgSpinBox.setValue(self.aw.qmc.backgroundalpha * 10)
-        self.opaqbgSpinBox.valueChanged.connect(self.adjustintensity)
-        self.opaqbgSpinBox.setFocusPolicy(Qt.NoFocus)
-        self.opaqbgLayout = QHBoxLayout()
-        self.opaqbgLayout.addWidget(opaqbgLabel)
-        self.opaqbgLayout.addWidget(self.opaqbgSpinBox)
-            
-        #TAB1
-        self.backgroundLabel = QLabel(QApplication.translate("Button","Background", None))
-        self.backgroundLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.backgroundButton = QPushButton()
-        self.backgroundButton = self.colorButton(self.aw.qmc.palette["background"])
-        self.backgroundButton.setFocusPolicy(Qt.NoFocus)
-        self.backgroundButton.clicked.connect(self.setColorSlot)
-        self.gridLabel = QLabel(QApplication.translate("Button","Grid", None))
-        self.gridLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.gridButton = QPushButton()
-        self.gridButton = self.colorButton(self.aw.qmc.palette["grid"])
-        self.gridButton.setFocusPolicy(Qt.NoFocus)
-        self.gridButton.clicked.connect(self.setColorSlot)
-        self.titleLabel = QLabel(QApplication.translate("Button","Title", None))
-        self.titleLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.titleButton = QPushButton()
-        self.titleButton = self.colorButton(self.aw.qmc.palette["title"])
-        self.titleButton.setFocusPolicy(Qt.NoFocus)
-        self.titleButton.clicked.connect(self.setColorSlot)
-        self.yLabel = QLabel(QApplication.translate("Button","Y Label", None))
-        self.yLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.yButton = QPushButton()
-        self.yButton = self.colorButton(self.aw.qmc.palette["ylabel"])
-        self.yButton.setFocusPolicy(Qt.NoFocus)
-        self.yButton.clicked.connect(self.setColorSlot)
-        self.xLabel = QLabel(QApplication.translate("Button","X Label", None))
-        self.xLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.xButton = self.colorButton(self.aw.qmc.palette["xlabel"])
-        self.xButton.setFocusPolicy(Qt.NoFocus)
-        self.xButton.clicked.connect(self.setColorSlot)
-        self.rect1Label = QLabel(QApplication.translate("Button","Drying Phase", None))
-        self.rect1Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.rect1Button = QPushButton()
-        self.rect1Button = self.colorButton(self.aw.qmc.palette["rect1"])
-        self.rect1Button.setFocusPolicy(Qt.NoFocus)
-        self.rect1Button.clicked.connect(self.setColorSlot)
-        self.rect2Label = QLabel(QApplication.translate("Button","Maillard Phase", None))
-        self.rect2Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.rect2Button = QPushButton()
-        self.rect2Button = self.colorButton(self.aw.qmc.palette["rect2"])
-        self.rect2Button.setFocusPolicy(Qt.NoFocus)
-        self.rect2Button.clicked.connect(self.setColorSlot)
-        self.rect3Label = QLabel(QApplication.translate("Button","Finishing Phase", None))
-        self.rect3Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.rect3Button = QPushButton()
-        self.rect3Button = self.colorButton(self.aw.qmc.palette["rect3"])
-        self.rect3Button.setFocusPolicy(Qt.NoFocus)
-        self.rect3Button.clicked.connect(self.setColorSlot)
-        self.rect4Label = QLabel(QApplication.translate("Button","Cooling Phase", None))
-        self.rect4Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.rect4Button = QPushButton()
-        self.rect4Button = self.colorButton(self.aw.qmc.palette["rect4"])
-        self.rect4Button.setFocusPolicy(Qt.NoFocus)
-        self.rect4Button.clicked.connect(self.setColorSlot)
-        self.rect5Label = QLabel(QApplication.translate("Button","Bars Bkgnd", None))
-        self.rect5Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.rect5Button = QPushButton()
-        self.rect5Button = self.colorButton(self.aw.qmc.palette["rect5"])
-        self.rect5Button.setFocusPolicy(Qt.NoFocus)
-        self.rect5Button.clicked.connect(self.setColorSlot)
-        self.markersLabel = QLabel(QApplication.translate("Button","Markers", None))
-        self.markersLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.markersButton = QPushButton()
-        self.markersButton = self.colorButton(self.aw.qmc.palette["markers"])
-        self.markersButton.setFocusPolicy(Qt.NoFocus)
-        self.markersButton.clicked.connect(self.setColorSlot)
-        self.textLabel = QLabel(QApplication.translate("Button","Text", None))
-        self.textLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.textButton = QPushButton()
-        self.textButton = self.colorButton(self.aw.qmc.palette["text"])
-        self.textButton.setFocusPolicy(Qt.NoFocus)
-        self.textButton.clicked.connect(self.setColorSlot)
-        self.watermarksLabel = QLabel(QApplication.translate("Button","Watermarks", None))
-        self.watermarksLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.watermarksButton = QPushButton()
-        self.watermarksButton = self.colorButton(self.aw.qmc.palette["watermarks"])
-        self.watermarksButton.setFocusPolicy(Qt.NoFocus)
-        self.watermarksButton.clicked.connect(self.setColorSlot)
-        self.timeguideLabel = QLabel(QApplication.translate("Button","Time Guide", None))
-        self.timeguideLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.timeguideButton = QPushButton()
-        self.timeguideButton = self.colorButton(self.aw.qmc.palette["timeguide"])
-        self.timeguideButton.setFocusPolicy(Qt.NoFocus)
-        self.timeguideButton.clicked.connect(self.setColorSlot)
-        self.aucguideLabel = QLabel(QApplication.translate("Button","AUC Guide", None))
-        self.aucguideLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.aucguideButton = QPushButton()
-        self.aucguideButton = self.colorButton(self.aw.qmc.palette["aucguide"])
-        self.aucguideButton.setFocusPolicy(Qt.NoFocus)
-        self.aucguideButton.clicked.connect(self.setColorSlot)
-        self.aucareaLabel = QLabel(QApplication.translate("Button","AUC Area", None))
-        self.aucareaLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.aucareaButton = QPushButton()
-        self.aucareaButton = self.colorButton(self.aw.qmc.palette["aucarea"])
-        self.aucareaButton.setFocusPolicy(Qt.NoFocus)
-        self.aucareaButton.clicked.connect(self.setColorSlot)
-        self.legendbgLabel = QLabel(QApplication.translate("Button","Legend bkgnd", None))
-        self.legendbgLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.legendbgButton = QPushButton()
-        self.legendbgButton = self.colorButton(self.aw.qmc.palette["legendbg"])
-        self.legendbgButton.setFocusPolicy(Qt.NoFocus)
-        self.legendbgButton.clicked.connect(self.setColorSlot)
-        self.legendbgSpinBox = QSpinBox()
-        self.legendbgSpinBox.setAlignment(Qt.AlignRight)
-        self.legendbgSpinBox.setRange(1,10)
-        self.legendbgSpinBox.setSingleStep(1)
-        self.legendbgSpinBox.setValue(self.aw.qmc.alpha["legendbg"] * 10)
-        self.legendbgSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)
-        self.legendbgSpinBox.setFocusPolicy(Qt.StrongFocus)
-        self.legendbgButton.setSizePolicy(QSizePolicy.Expanding,self.legendbgButton.sizePolicy().verticalPolicy())
-        self.legendbgLayout = QHBoxLayout()
-        self.legendbgLayout.addWidget(self.legendbgButton)
-        self.legendbgLayout.addWidget(self.legendbgSpinBox)
-        self.legendborderLabel = QLabel(QApplication.translate("Button","Legend border", None))
-        self.legendborderLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.legendborderButton = QPushButton()
-        self.legendborderButton = self.colorButton(self.aw.qmc.palette["legendborder"])
-        self.legendborderButton.setFocusPolicy(Qt.StrongFocus)
-        self.legendborderButton.clicked.connect(self.setColorSlot)
-
-        self.canvasLabel = QLabel(QApplication.translate("Button","Canvas", None))
-        self.canvasLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.canvasButton = QPushButton()
-        self.canvasButton = self.colorButton(self.aw.qmc.palette["canvas"])
-        if str(self.aw.qmc.palette["canvas"]) == 'None':
-            self.canvasButton.setPalette(QPalette(QColor("#f0f0f0")))
-        else:
-            self.canvasButton.setPalette(QPalette(QColor(self.aw.qmc.palette["canvas"])))
-        self.canvasButton.setFocusPolicy(Qt.NoFocus)
-        self.canvasButton.clicked.connect(self.setColorSlot)
-
-        self.specialeventboxLabel = QLabel(QApplication.translate("Button","SpecialEvent Marker", None))
-        self.specialeventboxLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.specialeventboxButton = QPushButton()
-        self.specialeventboxButton = self.colorButton(self.aw.qmc.palette["specialeventbox"])
-        self.specialeventboxButton.setFocusPolicy(Qt.NoFocus)
-        self.specialeventboxButton.clicked.connect(self.setColorSlot)
-        self.specialeventtextLabel = QLabel(QApplication.translate("Button","SpecialEvent Text", None))
-        self.specialeventtextLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.specialeventtextButton = QPushButton()
-        self.specialeventtextButton = self.colorButton(self.aw.qmc.palette["specialeventtext"])
-        self.specialeventtextButton.setFocusPolicy(Qt.NoFocus)
-        self.specialeventtextButton.clicked.connect(self.setColorSlot)
-        self.bgeventmarkerLabel = QLabel(QApplication.translate("Button","Bkgd Event Marker", None))
-        self.bgeventmarkerLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.bgeventmarkerButton = QPushButton()
-        self.bgeventmarkerButton = self.colorButton(self.aw.qmc.palette["bgeventmarker"])
-        self.bgeventmarkerButton.setFocusPolicy(Qt.NoFocus)
-        self.bgeventmarkerButton.clicked.connect(self.setColorSlot)
-        self.bgeventtextLabel = QLabel(QApplication.translate("Button","Bkgd Event Text", None))
-        self.bgeventtextLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.bgeventtextButton = QPushButton()
-        self.bgeventtextButton = self.colorButton(self.aw.qmc.palette["bgeventtext"])
-        self.bgeventtextButton.setFocusPolicy(Qt.NoFocus)
-        self.bgeventtextButton.clicked.connect(self.setColorSlot)
-        self.mettextLabel = QLabel(QApplication.translate("Button","MET Text", None))
-        self.mettextLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.mettextButton = QPushButton()
-        self.mettextButton = self.colorButton(self.aw.qmc.palette["mettext"])
-        self.mettextButton.setFocusPolicy(Qt.NoFocus)
-        self.mettextButton.clicked.connect(self.setColorSlot)
-        self.metboxLabel = QLabel(QApplication.translate("Button","MET Box", None))
-        self.metboxLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.metboxButton = QPushButton()
-        self.metboxButton = self.colorButton(self.aw.qmc.palette["metbox"])
-        self.metboxButton.setFocusPolicy(Qt.NoFocus)
-        self.metboxButton.clicked.connect(self.setColorSlot)
-        self.analysismaskLabel = QLabel(QApplication.translate("Button","Analysis Mask", None))
-        self.analysismaskLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.analysismaskButton = QPushButton()
-        self.analysismaskButton = self.colorButton(self.aw.qmc.palette["analysismask"])
-        self.analysismaskButton.setFocusPolicy(Qt.StrongFocus)
-        self.analysismaskButton.clicked.connect(self.setColorSlot)
-        self.analysismaskSpinBox = QSpinBox()
-        self.analysismaskSpinBox.setAlignment(Qt.AlignRight)
-        self.analysismaskSpinBox.setRange(1,10)
-        self.analysismaskSpinBox.setSingleStep(1)
-        self.analysismaskSpinBox.setValue(self.aw.qmc.alpha["analysismask"] * 10)
-        self.analysismaskSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)
-        self.analysismaskLayout = QHBoxLayout()
-        self.analysismaskButton.setSizePolicy(QSizePolicy.Expanding,self.analysismaskButton.sizePolicy().verticalPolicy())
-        self.analysismaskLayout.addWidget(self.analysismaskButton)
-        self.analysismaskLayout.addWidget(self.analysismaskSpinBox)
-        self.statsanalysisbkgndLabel = QLabel(QApplication.translate("Button","Stats&Analysis Bkgnd", None))
-        self.statsanalysisbkgndLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.statsanalysisbkgndButton = QPushButton()
-        self.statsanalysisbkgndButton = self.colorButton(self.aw.qmc.palette["statsanalysisbkgnd"])
-        self.statsanalysisbkgndButton.setFocusPolicy(Qt.StrongFocus)
-        self.statsanalysisbkgndButton.clicked.connect(self.setColorSlot)
-        self.statsanalysisbkgndSpinBox = QSpinBox()
-        self.statsanalysisbkgndSpinBox.setAlignment(Qt.AlignRight)
-        self.statsanalysisbkgndSpinBox.setRange(1,10)
-        self.statsanalysisbkgndSpinBox.setSingleStep(1)
-        self.statsanalysisbkgndSpinBox.setValue(self.aw.qmc.alpha["statsanalysisbkgnd"] * 10)
-        self.statsanalysisbkgndSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)
-        self.statsanalysisbkgndSpinBox.setFocusPolicy(Qt.StrongFocus)
-        self.statsanalysisbkgndLayout = QHBoxLayout()
-        self.statsanalysisbkgndButton.setSizePolicy(QSizePolicy.Expanding,self.statsanalysisbkgndButton.sizePolicy().verticalPolicy())
-        self.statsanalysisbkgndLayout.addWidget(self.statsanalysisbkgndButton)
-        self.statsanalysisbkgndLayout.addWidget(self.statsanalysisbkgndSpinBox)
-
-        #TAB2
-        self.lcd1LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
-        self.lcd1LEDButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd2LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
-        self.lcd2LEDButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd3LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
-        self.lcd3LEDButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd4LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
-        self.lcd4LEDButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd5LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
-        self.lcd5LEDButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd6LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
-        self.lcd6LEDButton.clicked.connect(self.paintlcdsSlot)
-        
-        self.lcd1backButton = QPushButton(QApplication.translate("Button","Background",None))
-        self.lcd1backButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd2backButton = QPushButton(QApplication.translate("Button","Background",None))
-        self.lcd2backButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd3backButton = QPushButton(QApplication.translate("Button","Background",None))
-        self.lcd3backButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd4backButton = QPushButton(QApplication.translate("Button","Background",None))
-        self.lcd4backButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd5backButton = QPushButton(QApplication.translate("Button","Background",None))
-        self.lcd5backButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd6backButton = QPushButton(QApplication.translate("Button","Background",None))
-        self.lcd6backButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd1LEDButton.setMinimumWidth(80)
-        self.lcd2LEDButton.setMinimumWidth(80)
-        self.lcd3LEDButton.setMinimumWidth(80)
-        self.lcd4LEDButton.setMinimumWidth(80)
-        self.lcd5LEDButton.setMinimumWidth(80)
-        self.lcd6LEDButton.setMinimumWidth(80)
-
-        LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None))
-        LCDdefaultButton.clicked.connect(self.setLCD_bw)
-            
-        #LAYOUTS
-        #tab0 layout
-        lines = QGridLayout()
-        lines.setAlignment(Qt.AlignCenter)
-        lines.setVerticalSpacing(1)
-        lines.setColumnMinimumWidth(0,0)   #0,80
-#        lines.setColumnMaximumWidth(0,30)
-        lines.setColumnMinimumWidth(1,150)   #1,180
-        lines.setColumnMinimumWidth(2,50)   #2,80
-        lines.setColumnMinimumWidth(3,150)   #3,180
-
-        lines.addWidget(profilecolorlabel,0,1)
-        lines.addWidget(self.metButton,1,1)
-        lines.addWidget(self.metLabel,1,0)
-        lines.addWidget(self.btButton,2,1)
-        lines.addWidget(self.btLabel,2,0)
-        lines.addWidget(self.deltametButton,3,1)
-        lines.addWidget(self.deltametLabel,3,0)
-        lines.addWidget(self.deltabtButton,4,1)
-        lines.addWidget(self.deltabtLabel,4,0)
-
-        lines.addWidget(bgcolorlabel,0,3)
-        lines.addWidget(self.bgmetButton,1,3)
-        lines.addWidget(self.bgmetLabel,1,2)
-        lines.addWidget(self.bgbtButton,2,3)
-        lines.addWidget(self.bgbtLabel,2,2)
-        lines.addWidget(self.bgdeltametButton,3,3)
-        lines.addWidget(self.bgdeltametLabel,3,2)
-        lines.addWidget(self.bgdeltabtButton,4,3)
-        lines.addWidget(self.bgdeltabtLabel,4,2)
-        lines.addWidget(self.bgextraButton,5,3)
-        lines.addWidget(self.bgextraLabel,5,2)
-#        lines.addWidget(opaqbgLabel,6,2)
-        lines.addLayout(self.opaqbgLayout,6,3)
-
-        graphlinesLayout = QVBoxLayout()
-        graphlinesLayout.addLayout(lines)
-        
-        #tab1 layout
-        grid = QGridLayout()
-        grid.setAlignment(Qt.AlignCenter)
-#        grid.setColumnStretch(1,12)
-#        grid.setColumnStretch(3,12)
-        grid.setVerticalSpacing(1)
-        grid.setColumnMinimumWidth(0,80)
-        grid.setColumnMinimumWidth(2,80)
-        grid.setColumnMinimumWidth(1,110)  #1,80
-        grid.setColumnMinimumWidth(3,110)  #3,80
-        grid.addWidget(self.canvasButton,0,1)
-        grid.addWidget(self.canvasLabel,0,0)
-        grid.addWidget(self.backgroundButton,1,1)
-        grid.addWidget(self.backgroundLabel,1,0)
-        grid.addWidget(self.titleButton,2,1)
-        grid.addWidget(self.titleLabel,2,0)
-        grid.addWidget(self.gridButton,3,1)
-        grid.addWidget(self.gridLabel,3,0)
-        grid.addWidget(self.yButton,4,1)
-        grid.addWidget(self.yLabel,4,0)
-        grid.addWidget(self.xButton,5,1)
-        grid.addWidget(self.xLabel,5,0)
-        grid.addWidget(self.markersButton,6,1)
-        grid.addWidget(self.markersLabel,6,0)
-        grid.addWidget(self.textButton,7,1)
-        grid.addWidget(self.textLabel,7,0)
-        grid.addLayout(self.legendbgLayout,8,1) 
-        grid.addWidget(self.legendbgLabel,8,0) 
-        grid.addWidget(self.legendborderButton,9,1)
-        grid.addWidget(self.legendborderLabel,9,0) 
-        grid.addWidget(self.watermarksButton,10,1)
-        grid.addWidget(self.watermarksLabel,10,0)
-        grid.addWidget(self.aucguideButton,11,1)
-        grid.addWidget(self.aucguideLabel,11,0)
-        grid.addWidget(self.aucareaButton,12,1)
-        grid.addWidget(self.aucareaLabel,12,0)
-        grid.addWidget(self.rect1Button,0,3)
-        grid.addWidget(self.rect1Label,0,2)
-        grid.addWidget(self.rect2Button,1,3)
-        grid.addWidget(self.rect2Label,1,2)
-        grid.addWidget(self.rect3Button,2,3)
-        grid.addWidget(self.rect3Label,2,2)
-        grid.addWidget(self.rect4Button,3,3)
-        grid.addWidget(self.rect4Label,3,2)
-        grid.addWidget(self.rect5Button,4,3)
-        grid.addWidget(self.rect5Label,4,2)
-        grid.addWidget(self.specialeventboxButton,5,3) 
-        grid.addWidget(self.specialeventboxLabel,5,2) 
-        grid.addWidget(self.specialeventtextButton,6,3) 
-        grid.addWidget(self.specialeventtextLabel,6,2) 
-        grid.addWidget(self.bgeventmarkerButton,7,3) 
-        grid.addWidget(self.bgeventmarkerLabel,7,2) 
-        grid.addWidget(self.bgeventtextButton,8,3) 
-        grid.addWidget(self.bgeventtextLabel,8,2) 
-        grid.addWidget(self.metboxButton,9,3) 
-        grid.addWidget(self.metboxLabel,9,2) 
-        grid.addWidget(self.mettextButton,10,3) 
-        grid.addWidget(self.mettextLabel,10,2) 
-        grid.addWidget(self.timeguideButton,11,3)
-        grid.addWidget(self.timeguideLabel,11,2)
-        grid.addLayout(self.analysismaskLayout,12,3)
-        grid.addWidget(self.analysismaskLabel,12,2)
-        grid.addLayout(self.statsanalysisbkgndLayout,13,3)
-        grid.addWidget(self.statsanalysisbkgndLabel,13,2)
-        graphLayout = QVBoxLayout()
-        graphLayout.addLayout(grid)
-
-        #tab 2 layout
-        lcd1layout = QHBoxLayout()
-        lcd1layout.addWidget(self.lcd1LEDButton,0)
-        lcd1layout.addWidget(self.lcd1backButton,1)
-        lcd2layout = QHBoxLayout()
-        lcd2layout.addWidget(self.lcd2LEDButton,0)
-        lcd2layout.addWidget(self.lcd2backButton,1)
-        lcd3layout = QHBoxLayout()
-        lcd3layout.addWidget(self.lcd3LEDButton,0)
-        lcd3layout.addWidget(self.lcd3backButton,1)
-        lcd4layout = QHBoxLayout()
-        lcd4layout.addWidget(self.lcd4LEDButton,0)
-        lcd4layout.addWidget(self.lcd4backButton,1)
-        lcd5layout = QHBoxLayout()
-        lcd5layout.addWidget(self.lcd5LEDButton,0)
-        lcd5layout.addWidget(self.lcd5backButton,1)
-        lcd6layout = QHBoxLayout()
-        lcd6layout.addWidget(self.lcd6LEDButton,0)
-        lcd6layout.addWidget(self.lcd6backButton,1)
-        LCD1GroupLayout = QGroupBox(QApplication.translate("GroupBox","Timer LCD",None))
-        LCD1GroupLayout.setLayout(lcd1layout)
-        lcd1layout.setContentsMargins(0,0,0,0)
-        LCD2GroupLayout = QGroupBox(QApplication.translate("GroupBox","ET LCD",None))
-        LCD2GroupLayout.setLayout(lcd2layout)
-        lcd2layout.setContentsMargins(0,0,0,0)
-        LCD3GroupLayout = QGroupBox(QApplication.translate("GroupBox","BT LCD",None))
-        LCD3GroupLayout.setLayout(lcd3layout)
-        lcd3layout.setContentsMargins(0,0,0,0)
-        LCD4GroupLayout = QGroupBox(deltaLabelUTF8 + QApplication.translate("GroupBox","ET LCD",None))
-        LCD4GroupLayout.setLayout(lcd4layout)
-        lcd4layout.setContentsMargins(0,0,0,0)
-        LCD5GroupLayout = QGroupBox(deltaLabelUTF8 + QApplication.translate("GroupBox","BT LCD",None))
-        LCD5GroupLayout.setLayout(lcd5layout)
-        lcd5layout.setContentsMargins(0,0,0,0)
-        LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV LCD",None))
-        LCD6GroupLayout.setLayout(lcd6layout)
-        lcd6layout.setContentsMargins(0,0,0,0)
-        buttonlayout = QHBoxLayout()
-        buttonlayout.addStretch()
-        buttonlayout.addWidget(LCDdefaultButton)
-        buttonlayout.setContentsMargins(0,0,0,0)
-        buttonlayout.setSpacing(0)
-        
-        lcdlayout1 = QVBoxLayout()
-        lcdlayout1.addWidget(LCD2GroupLayout)
-        lcdlayout1.addWidget(LCD3GroupLayout)
-        lcdlayout1.addWidget(LCD1GroupLayout)
-        lcdlayout2 = QVBoxLayout()
-        lcdlayout2.addWidget(LCD4GroupLayout)
-        lcdlayout2.addWidget(LCD5GroupLayout)
-        lcdlayout2.addWidget(LCD6GroupLayout)
-        lcdlayout = QHBoxLayout()
-        lcdlayout.addLayout(lcdlayout1)
-        lcdlayout.addLayout(lcdlayout2)
-        lllayout = QVBoxLayout()
-        lllayout.addLayout(lcdlayout)
-        lllayout.addLayout(buttonlayout)
-        lllayout.setContentsMargins(0,0,0,0)
-        lllayout.setSpacing(5)
-
-        ###################################
-        self.TabWidget = QTabWidget()
-        C0Widget = QWidget()
-        C0Widget.setLayout(graphlinesLayout)
-        self.TabWidget.addTab(C0Widget,QApplication.translate("Tab","Curves",None))
-        C1Widget = QWidget()
-        C1Widget.setLayout(graphLayout)
-        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Graph",None))
-        C2Widget = QWidget()
-        C2Widget.setLayout(lllayout)
-        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","LCDs",None))
-
-        # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.accept)
-        self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.Cancel))
-        self.dialogbuttons.addButton(QDialogButtonBox.RestoreDefaults)
-        self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.recolor1)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            self.dialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Defaults", None))
-        
-        greyButton = QPushButton(QApplication.translate("Button","Grey", None))
-        greyButton.setFocusPolicy(Qt.NoFocus)
-        greyButton.clicked.connect(self.recolor2)
-        
-        self.dialogbuttons.addButton(greyButton, QDialogButtonBox.ActionRole)
-
-        okLayout = QHBoxLayout()
-        okLayout.addStretch()
-        okLayout.addWidget(self.dialogbuttons)
-        okLayout.setContentsMargins(10, 10, 10, 10)
-        self.TabWidget.setContentsMargins(0, 0, 0, 0)
-        C0Widget.setContentsMargins(5, 10, 5, 10)
-        C1Widget.setContentsMargins(5, 10, 5, 10)
-        C2Widget.setContentsMargins(5, 10, 5, 10)
-        graphLayout.setContentsMargins(5,0,5,0)
-        #incorporate layouts
-        Mlayout = QVBoxLayout()
-        Mlayout.addWidget(self.TabWidget)
-        Mlayout.addLayout(okLayout)
-        Mlayout.setContentsMargins(5,10,5,0)
-        Mlayout.setSpacing(0)
-        self.setLayout(Mlayout)
-        self.setColorButtons()
-        if platf == 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.Ok)
-        else:
-            self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
-        self.layout().setSizeConstraint(QLayout.SetFixedSize) # don't allow resizing
-
-    @pyqtSlot(bool)
-    def setLCD_bw(self,_):
-        self.aw.setLCDsBW()
-        self.setColorButtons()
-        
-    def setLED(self,hue,lcd):
-        if lcd == 1:
-            color = QColor(self.aw.lcdpaletteF["timer"])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF["timer"] = str(color.name())
-            self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
-            if self.aw.largeLCDs_dialog:
-                self.aw.largeLCDs_dialog.updateStyles()
-        elif lcd == 2:
-            color = QColor(self.aw.lcdpaletteF["et"])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF["et"] = str(color.name())
-            self.aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["et"],self.aw.lcdpaletteB["et"]))
-            if self.aw.largeLCDs_dialog:
-                self.aw.largeLCDs_dialog.updateStyles()
-        elif lcd == 3:
-            color = QColor(self.aw.lcdpaletteF["bt"])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF["bt"] = str(color.name())
-            self.aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["bt"],self.aw.lcdpaletteB["bt"]))
-            if self.aw.largeLCDs_dialog:
-                self.aw.largeLCDs_dialog.updateStyles()
-        elif lcd == 4:
-            color = QColor(self.aw.lcdpaletteF["deltaet"])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF["deltaet"] = str(color.name())
-            self.aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["deltaet"],self.aw.lcdpaletteB["deltaet"]))
-            if self.aw.largeDeltaLCDs_dialog:
-                self.aw.largeDeltaLCDs_dialog.updateStyles()
-        elif lcd == 5:
-            color = QColor(self.aw.lcdpaletteF["deltabt"])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF["deltabt"] = str(color.name())
-            self.aw.lcd5.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["deltabt"],self.aw.lcdpaletteB["deltabt"]))
-            if self.aw.largeDeltaLCDs_dialog:
-                self.aw.largeDeltaLCDs_dialog.updateStyles()
-        elif lcd == 6:
-            color = QColor(self.aw.lcdpaletteF["sv"])
-            color.setHsv(hue,255,255,255)
-            self.aw.lcdpaletteF["sv"] = str(color.name())
-            self.aw.lcd6.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["sv"],self.aw.lcdpaletteB["sv"]))
-            self.aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["sv"],self.aw.lcdpaletteB["sv"]))
-            for i in range(len(self.aw.qmc.extradevices)):
-                self.aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["sv"],self.aw.lcdpaletteB["sv"]))
-                self.aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["sv"],self.aw.lcdpaletteB["sv"]))
-            if self.aw.largePIDLCDs_dialog:
-                self.aw.largePIDLCDs_dialog.updateStyles()
-            if self.aw.largeExtraLCDs_dialog:
-                self.aw.largeExtraLCDs_dialog.updateStyles()
-            if self.aw.largePhasesLCDs_dialog:
-                self.aw.largePhasesLCDs_dialog.updateStyles()
-
-    @pyqtSlot(bool)
-    def paintlcdsSlot(self,_):
-        lcdButton = self.sender()
-        if lcdButton in [self.lcd1LEDButton,self.lcd1backButton]:
-            if lcdButton == self.lcd1backButton:
-                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,"timer")
-            else:
-                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"timer")
-            self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
-            if self.aw.largeLCDs_dialog:
-                self.aw.largeLCDs_dialog.updateStyles()
-        if lcdButton in [self.lcd2LEDButton,self.lcd2backButton]:
-            if lcdButton == self.lcd2backButton:
-                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,"et")
-            else:
-                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"et")
-            self.aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["et"],self.aw.lcdpaletteB["et"]))
-            if self.aw.largeLCDs_dialog:
-                self.aw.largeLCDs_dialog.updateStyles()
-        if lcdButton in [self.lcd3LEDButton,self.lcd3backButton]:
-            if lcdButton == self.lcd3backButton:
-                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,"bt")
-            else:
-                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"bt")
-            self.aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["bt"],self.aw.lcdpaletteB["bt"]))
-            if self.aw.largeLCDs_dialog:
-                self.aw.largeLCDs_dialog.updateStyles()
-        if lcdButton in [self.lcd4LEDButton,self.lcd4backButton]:
-            if lcdButton == self.lcd4backButton:
-                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,"deltaet")
-            else:
-                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"deltaet")
-            self.aw.lcd4.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["deltaet"],self.aw.lcdpaletteB["deltaet"]))
-            if self.aw.largeDeltaLCDs_dialog:
-                self.aw.largeDeltaLCDs_dialog.updateStyles()
-        if lcdButton in [self.lcd5LEDButton,self.lcd5backButton]:
-            if lcdButton == self.lcd5backButton:
-                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,"deltabt")
-            else:
-                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"deltabt")
-            self.aw.lcd5.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["deltabt"],self.aw.lcdpaletteB["deltabt"]))
-            if self.aw.largeDeltaLCDs_dialog:
-                self.aw.largeDeltaLCDs_dialog.updateStyles()
-        if lcdButton in [self.lcd6LEDButton,self.lcd6backButton]:
-            if lcdButton == self.lcd6backButton:
-                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,"sv")
-            else:
-                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"sv")
-            self.aw.lcd6.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["sv"],self.aw.lcdpaletteB["sv"]))
-            self.aw.lcd7.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["sv"],self.aw.lcdpaletteB["sv"]))
-            for i in range(len(self.aw.qmc.extradevices)):
-                self.aw.extraLCD1[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["sv"],self.aw.lcdpaletteB["sv"]))
-                self.aw.extraLCD2[i].setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["sv"],self.aw.lcdpaletteB["sv"]))
-            if self.aw.largePIDLCDs_dialog:
-                self.aw.largePIDLCDs_dialog.updateStyles()
-            if self.aw.largeExtraLCDs_dialog:
-                self.aw.largeExtraLCDs_dialog.updateStyles()
-            if self.aw.largePhasesLCDs_dialog:
-                self.aw.largePhasesLCDs_dialog.updateStyles()
-        self.setColorButtons()
-
-    def setColorButtons(self):
-        for l,t in [
-                # Curves (background curves handled separately)
-                (self.metButton,"et"),
-                (self.btButton,"bt"),
-                (self.deltametButton,"deltaet"),
-                (self.deltabtButton,"deltabt"),
-                # Graph
-                (self.canvasButton,"canvas"),
-                (self.backgroundButton,"background"),
-                (self.titleButton,"title"),
-                (self.gridButton,"grid"),
-                (self.yButton,"ylabel"),
-                (self.xButton,"xlabel"),
-                (self.timeguideButton,"timeguide"),
-                (self.aucguideButton,"aucguide"),
-                (self.aucareaButton,"aucarea"),
-                (self.watermarksButton,"watermarks"),
-                (self.rect1Button,"rect1"),
-                (self.rect2Button,"rect2"),
-                (self.rect3Button,"rect3"),
-                (self.rect4Button,"rect4"),
-                (self.rect5Button,"rect5"),
-                (self.markersButton,"markers"),
-                (self.textButton,"text"),
-                (self.legendbgButton,"legendbg"),
-                (self.legendborderButton,"legendborder"),
-                (self.specialeventboxButton,"specialeventbox"),
-                (self.specialeventtextButton,"specialeventtext"),
-                (self.bgeventmarkerButton,"bgeventmarker"),
-                (self.bgeventtextButton,"bgeventtext"),
-                (self.mettextButton,"mettext"),
-                (self.metboxButton,"metbox"),
-                (self.analysismaskButton,"analysismask"),
-                (self.statsanalysisbkgndButton,"statsanalysisbkgnd"),
-                ]:
-            self.setColorButton(l,t)
-            
-        # Curves, set background colors and alpha
-        self.bgmetButton.setText(self.aw.qmc.backgroundmetcolor)
-        self.bgbtButton.setText(self.aw.qmc.backgroundbtcolor)
-        self.bgdeltametButton.setText(self.aw.qmc.backgrounddeltaetcolor)
-        self.bgdeltabtButton.setText(self.aw.qmc.backgrounddeltabtcolor)
-        self.bgextraButton.setText(self.aw.qmc.backgroundxtcolor)
-        self.bgmetButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgroundmetcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgroundmetcolor) + ";" + self.commonstyle + "}")
-        self.bgbtButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgroundbtcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgroundbtcolor) + ";" + self.commonstyle + "}")
-        self.bgdeltametButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgrounddeltaetcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgrounddeltaetcolor) + ";" + self.commonstyle + "}")
-        self.bgdeltabtButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgrounddeltabtcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgrounddeltabtcolor) + ";" + self.commonstyle + "}")
-        self.bgextraButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgroundxtcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgroundxtcolor) + ";" + self.commonstyle + "}")
-        self.opaqbgSpinBox.setValue(self.aw.qmc.backgroundalpha * 10)
-
-        # LEDs
-        self.lcd1backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['timer'] + "; color: " + self.aw.lcdpaletteF['timer'] + ";" + self.commonstyle)
-        self.lcd1LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['timer'] + "; color: " + self.aw.lcdpaletteF['timer'] + ";" + self.commonstyle)
-        self.lcd2backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['et'] + "; color: " + self.aw.lcdpaletteF['et'] + ";" + self.commonstyle)
-        self.lcd2LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['et'] + "; color: " + self.aw.lcdpaletteF['et'] + ";" + self.commonstyle)
-        self.lcd3backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['bt'] + "; color: " + self.aw.lcdpaletteF['bt'] + ";" + self.commonstyle)
-        self.lcd3LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['bt'] + "; color: " + self.aw.lcdpaletteF['bt'] + ";" + self.commonstyle)
-        self.lcd4backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['deltaet'] + "; color: " + self.aw.lcdpaletteF['deltaet'] + ";" + self.commonstyle)
-        self.lcd4LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['deltaet'] + "; color: " + self.aw.lcdpaletteF['deltaet'] + ";" + self.commonstyle)
-        self.lcd5backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['deltabt'] + "; color: " + self.aw.lcdpaletteF['deltabt'] + ";" + self.commonstyle)
-        self.lcd5LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['deltabt'] + "; color: " + self.aw.lcdpaletteF['deltabt'] + ";" + self.commonstyle)
-        self.lcd6backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['sv'] + "; color: " + self.aw.lcdpaletteF['sv'] + ";" + self.commonstyle)
-        self.lcd6LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['sv'] + "; color: " + self.aw.lcdpaletteF['sv'] + ";" + self.commonstyle)
-            
-        if str(self.aw.qmc.palette["canvas"]) == 'None':
-#            self.canvasLabel.setStyleSheet("QLabel { background-color: #f0f0f0 }")
-            self.canvasLabel.setStyleSheet("QPushButton {background-color: #f0f0f0 ;" + self.commonstyle + "}")
-            
-    def setColorButton(self,button,tag):
-        c = self.aw.qmc.palette[tag]
-        button.setText(c)
-        tc = self.aw.labelBorW(c)
-        button.setStyleSheet("QPushButton {background: " + c + "; color: " + tc + ";" + self.commonstyle + "}")
-
-    # adds a new event to the Dlg
-    @pyqtSlot(bool)
-    def recolor1(self,_):
-        self.aw.qmc.changeGColor(1)
-        self.setColorButtons()
-    
-    @pyqtSlot(bool)
-    def recolor2(self,_):
-        self.aw.qmc.changeGColor(2)
-        self.setColorButtons()
-
-    def adjustOpaqenesss(self,spinbox,coloralpha):
-        #block button
-        spinbox.setDisabled(True)
-        self.aw.qmc.alpha[coloralpha] = spinbox.value()/10.
-#        coloralpha = spinbox.value()/10.
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        #reactivate button
-        spinbox.setDisabled(False)
-
-    @pyqtSlot(int)
-    def adjustOpaqenesssSlot(self,_):
-        widget = self.sender()
-#        if widget == self.opaqbgSpinBox:
-#            self.adjustOpaqenesss(self.opaqbgSpinBox,self.aw.qmc.backgroundalpha)
-        if widget == self.legendbgSpinBox:
-            self.adjustOpaqenesss(self.legendbgSpinBox,"legendbg")
-        if widget == self.analysismaskSpinBox:
-            self.adjustOpaqenesss(self.analysismaskSpinBox,"analysismask")
-        if widget == self.statsanalysisbkgndSpinBox:
-            self.adjustOpaqenesss(self.statsanalysisbkgndSpinBox,"statsanalysisbkgnd")
-
-    @pyqtSlot(bool)
-    def setbgColorSlot(self,_):
-        widget = self.sender()
-        if widget == self.bgmetButton:
-            self.setbgColor("ET",self.bgmetButton,self.aw.qmc.backgroundmetcolor)
-        elif widget == self.bgbtButton:
-            self.setbgColor("BT",self.bgbtButton,self.aw.qmc.backgroundbtcolor)
-        elif widget == self.bgdeltametButton:
-            self.setbgColor("DeltaET",self.bgdeltametButton,self.aw.qmc.backgrounddeltaetcolor)
-        elif widget == self.bgdeltabtButton:
-            self.setbgColor("DeltaBT",self.bgdeltabtButton,self.aw.qmc.backgrounddeltabtcolor)
-        elif widget == self.bgextraButton:
-            self.setbgColor("Extra",self.bgextraButton,self.aw.qmc.backgroundxtcolor)
-
-    def setbgColor(self,title,var,color):
-        labelcolor = QColor(color)
-        colorf = self.aw.colordialog(labelcolor)
-        if colorf.isValid():
-            color = str(colorf.name())
-            self.aw.updateCanvasColors()
-            tc = self.aw.labelBorW(color)
-            var.setText(colorf.name())
-            var.setStyleSheet("QPushButton { background-color: " + color + "; color: " + tc + ";" + self.commonstyle + "}");
-#  is this needed?            var.setPalette(QPalette(colorf))
-            self.aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
-            if title == "ET":
-                self.aw.qmc.backgroundmetcolor = color
-            elif title == "BT":
-                self.aw.qmc.backgroundbtcolor = color
-            elif title == "DeltaET":
-                self.aw.qmc.backgrounddeltaetcolor = color
-            elif title == "DeltaBT":
-                self.aw.qmc.backgrounddeltabtcolor = color
-            elif title == "Extra":
-                self.aw.qmc.backgroundxtcolor = color
-            self.aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(color)))
-
-    def setlcdColor(self,palette,disj_palette,select):
-        res = self.aw.colordialog(QColor(palette[select]))
-        if QColor.isValid(res):
-            nc = str(res.name())
-            if nc != disj_palette[select]:
-                palette[select] = nc
-            else:
-                QMessageBox.question(aw,QApplication.translate("Message", "Config LCD colors",None),
-                    "Digits color and Background color cannot be the same.", QMessageBox.Ok)
-    
-    @pyqtSlot(bool)
-    def setColorSlot(self,_):
-        widget = self.sender()
-        if widget == self.metButton:
-            self.setColor("ET",self.metButton,"et")
-        elif widget == self.btButton:
-            self.setColor("BT",self.btButton,"bt")
-        elif widget == self.deltametButton:
-            self.setColor("DeltaET",self.deltametButton,"deltaet")
-        elif widget == self.deltabtButton:
-            self.setColor("DeltaBT",self.deltabtButton,"deltabt")
-        elif widget == self.backgroundButton:
-            self.setColor("Background",self.backgroundButton,"background")
-        elif widget == self.gridButton:
-            self.setColor("Grid",self.gridButton,"grid")
-        elif widget == self.titleButton:
-            self.setColor("Title",self.titleButton,"title")
-        elif widget ==self.yButton:
-            self.setColor("Y Button",self.yButton,"ylabel")
-        elif widget == self.xButton:
-            self.setColor("X Button",self.xButton,"xlabel")
-        elif widget == self.rect1Button:
-            self.setColor("Drying Phase",self.rect1Button,"rect1")
-        elif widget == self.rect2Button:
-            self.setColor("Maillard Phase",self.rect2Button,"rect2")
-        elif widget == self.rect3Button:
-            self.setColor("Finishing Phase",self.rect3Button,"rect3")
-        elif widget == self.rect4Button:
-            self.setColor("Cooling Phase",self.rect4Button,"rect4")
-        elif widget == self.rect5Button:
-            self.setColor("Bars Bkgnd",self.rect5Button,"rect5")
-        elif widget == self.markersButton:
-            self.setColor("Markers",self.markersButton,"markers")
-        elif widget == self.textButton:
-            self.setColor("Text",self.textButton,"text")
-        elif widget == self.watermarksButton:
-            self.setColor("Watermarks",self.watermarksButton,"watermarks")
-        elif widget == self.timeguideButton:
-            self.setColor("Time Guide",self.timeguideButton,"timeguide")
-        elif widget == self.aucguideButton:
-            self.setColor("AUC Guide",self.aucguideButton,"aucguide")
-        elif widget == self.aucareaButton:
-            self.setColor("AUC Area",self.aucareaButton,"aucarea")
-        elif widget == self.legendbgButton:
-            self.setColor("legendbg",self.legendbgButton,"legendbg")
-        elif widget == self.legendborderButton:
-            self.setColor("legendborder",self.legendborderButton,"legendborder")
-        elif widget == self.canvasButton:
-            self.setColor("canvas",self.canvasButton,"canvas")
-        elif widget == self.specialeventboxButton:
-            self.setColor("specialeventbox",self.specialeventboxButton,"specialeventbox")
-        elif widget == self.specialeventtextButton:
-            self.setColor("specialeventtext",self.specialeventtextButton,"specialeventtext")
-        elif widget == self.bgeventmarkerButton:
-            self.setColor("bgeventmarker",self.bgeventmarkerButton,"bgeventmarker")
-        elif widget == self.bgeventtextButton:
-            self.setColor("bgeventtext",self.bgeventtextButton,"bgeventtext")
-        elif widget == self.mettextButton:
-            self.setColor("mettext",self.mettextButton,"mettext")
-        elif widget == self.metboxButton:
-            self.setColor("metbox",self.metboxButton,"metbox")
-        elif widget == self.analysismaskButton:
-            self.setColor("Analysis Mask",self.analysismaskButton,"analysismask")
-        elif widget == self.statsanalysisbkgndButton:
-            self.setColor("Analysis Result",self.statsanalysisbkgndButton,"statsanalysisbkgnd")
-            
-    def colorButton(self,s):
-        button = QPushButton(s)
-        button.setPalette(QPalette(QColor(s)))
-        button.setStyleSheet("QPushButton {background-color:" + s + ";" + self.commonstyle + "}")
-        return button
-
-    def setColor(self,title,var,color):
-        labelcolor = QColor(self.aw.qmc.palette[color])
-        colorf = self.aw.colordialog(labelcolor)
-        if colorf.isValid():
-            self.aw.qmc.palette[color] = str(colorf.name())
-            self.aw.updateCanvasColors()
-            self.aw.applyStandardButtonVisibility()
-            self.aw.update_extraeventbuttons_visibility()
-            var.setText(colorf.name())
-            tc = self.aw.labelBorW(self.aw.qmc.palette[color])
-            var.setStyleSheet("QPushButton { background: " + self.aw.qmc.palette[color] + "; color: " + tc + ";" + self.commonstyle + "}")
-#            var.setPalette(QPalette(colorf))
-            self.aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
-            if title == "ET":
-                self.aw.setLabelColor(self.aw.label2,QColor(self.aw.qmc.palette[color]))
-            elif title == "BT":
-                self.aw.setLabelColor(self.aw.label3,QColor(self.aw.qmc.palette[color]))
-            elif title == "DeltaET":
-                self.aw.setLabelColor(self.aw.label4,QColor(self.aw.qmc.palette[color]))
-            elif title == "DeltaBT":
-                self.aw.setLabelColor(self.aw.label5,QColor(self.aw.qmc.palette[color]))
-            self.aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(self.aw.qmc.palette[color])))
-
-    @pyqtSlot(int)
-    def adjustintensity(self,_):
-        #block button
-        self.opaqbgSpinBox.setDisabled(True)
-        self.aw.qmc.backgroundalpha = self.opaqbgSpinBox.value()/10.
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
-        #reactivate button
-        self.opaqbgSpinBox.setDisabled(False)
-
-
-############################################################
-#######################  WHEEL GRAPH CONFIG DIALOG  ########
-############################################################
-
-class WheelDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(WheelDlg,self).__init__(parent, aw)
-        self.setAttribute(Qt.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
-        
-        rcParams['path.effects'] = []
-            
-        self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None))
-        #table
-        self.datatable = QTableWidget()
-        self.createdatatable()
-        #table for labels
-        self.labeltable = QTableWidget()
-
-        self.subdialogbuttons = QDialogButtonBox(QDialogButtonBox.Close | QDialogButtonBox.RestoreDefaults, Qt.Horizontal)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults).setText(QApplication.translate("Button","Reset Parents", None))
-            self.subdialogbuttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close",None))
-        self.subdialogbuttons.rejected.connect(self.closelabels)
-        self.subdialogbuttons.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.resetlabelparents)
-        
-        self.labelwheelx = 0   #index of wheel being edited on labeltable
-        self.hierarchyButton = QPushButton(QApplication.translate("Button","Reverse Hierarchy",None))
-        self.hierarchyButton.setToolTip(QApplication.translate("Tooltip","Sets graph hierarchy child->parent instead of parent->child",None))
-        self.hierarchyButton.clicked.connect(self.aw.qmc.setWheelHierarchy)
-        self.labeltable.setVisible(False)
-        self.subdialogbuttons.setVisible(False)
-        aspectlabel = QLabel(QApplication.translate("Label","Ratio",None))
-        self.aspectSpinBox = QDoubleSpinBox()
-        self.aspectSpinBox.setToolTip(QApplication.translate("Tooltip","Aspect Ratio",None))
-        self.aspectSpinBox.setRange(0.,2.)
-        self.aspectSpinBox.setSingleStep(.1)
-        self.aspectSpinBox.setValue(self.aw.qmc.wheelaspect)
-        self.aspectSpinBox.valueChanged.connect(self.setaspect)
-        txtlabel = QLabel(QApplication.translate("Label","Text",None))
-        txtButtonplus = QPushButton(QApplication.translate("Button","+",None))
-        txtButtonplus.setToolTip(QApplication.translate("Tooltip","Increase size of text in all the graph",None))
-        txtButtonplus.clicked.connect(self.changetext1)
-        txtButtonminus = QPushButton(QApplication.translate("Button","-",None))
-        txtButtonminus.setToolTip(QApplication.translate("Tooltip","Decrease size of text in all the graph",None))
-        txtButtonminus.clicked.connect(self.changetext0)
-        edgelabel = QLabel(QApplication.translate("Label","Edge",None))
-        self.edgeSpinBox = QSpinBox()
-        self.edgeSpinBox.setToolTip(QApplication.translate("Tooltip","Decorative edge beween wheels",None))
-        self.edgeSpinBox.setRange(0,5)
-        self.edgeSpinBox.setValue(int(self.aw.qmc.wheeledge*100))
-        self.edgeSpinBox.valueChanged.connect(self.setedge)
-        linewidthlabel = QLabel(QApplication.translate("Label","Line",None))
-        self.linewidthSpinBox = QSpinBox()
-        self.linewidthSpinBox.setToolTip(QApplication.translate("Tooltip","Line thickness",None))
-        self.linewidthSpinBox.setRange(0,20)
-        self.linewidthSpinBox.setValue(self.aw.qmc.wheellinewidth)
-        self.linewidthSpinBox.valueChanged.connect(self.setlinewidth)
-        linecolor = QPushButton(QApplication.translate("Button","Line Color",None))
-        linecolor.setToolTip(QApplication.translate("Tooltip","Line color",None))
-        linecolor.clicked.connect(self.setlinecolor)        
-        textcolor = QPushButton(QApplication.translate("Button","Text Color",None))
-        textcolor.setToolTip(QApplication.translate("Tooltip","Text color",None))
-        textcolor.clicked.connect(self.settextcolor)        
-        colorlabel = QLabel(QApplication.translate("Label","Color pattern",None))
-        self.colorSpinBox = QSpinBox()
-        self.colorSpinBox.setToolTip(QApplication.translate("Tooltip","Apply color pattern to whole graph",None))
-        self.colorSpinBox.setRange(0,255)
-        self.colorSpinBox.setValue(self.aw.qmc.wheelcolorpattern)
-        self.colorSpinBox.setWrapping(True)
-        self.colorSpinBox.valueChanged.connect(self.setcolorpattern)
-        addButton = QPushButton(QApplication.translate("Button","Add",None))
-        addButton.setToolTip(QApplication.translate("Tooltip","Add new wheel",None))
-        addButton.clicked.connect(self.insertwheel)
-        rotateLeftButton = QPushButton(QApplication.translate("Button","<",None))
-        rotateLeftButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree counter clockwise",None))
-        rotateLeftButton.clicked.connect(self.rotatewheels1)
-        rotateRightButton = QPushButton(QApplication.translate("Button",">",None))
-        rotateRightButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree clockwise",None))
-        rotateRightButton.clicked.connect(self.rotatewheels0)
-        
-        self.main_buttons = QDialogButtonBox()
-        
-        saveButton = QPushButton(QApplication.translate("Button","Save File",None))
-        saveButton.clicked.connect(self.fileSave)
-        saveButton.setToolTip(QApplication.translate("Tooltip","Save graph to a text file.wg",None))
-        self.main_buttons.addButton(saveButton,QDialogButtonBox.ActionRole)
-        
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None))
-        saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
-        #saveImgButton.clicked.connect(self.aw.resizeImg_0_1) # save as PNG (raster)
-        saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
-        self.main_buttons.addButton(saveImgButton,QDialogButtonBox.ActionRole)
-        
-        openButton = self.main_buttons.addButton(QDialogButtonBox.Open)
-        openButton.setToolTip(QApplication.translate("Tooltip","open wheel graph file",None))
-        openButton.clicked.connect(self.loadWheel)
-        
-        viewModeButton = self.main_buttons.addButton(QDialogButtonBox.Close)
-        viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None))
-        viewModeButton.clicked.connect(self.viewmode)
-        
-        if self.aw.locale not in self.aw.qtbase_locales:
-            self.main_buttons.button(QDialogButtonBox.Close).setText(QApplication.translate("Button","Close", None))
-            self.main_buttons.button(QDialogButtonBox.Open).setText(QApplication.translate("Button","Open",None))
-        
-        self.aw.qmc.drawWheel()
-        label1layout = QVBoxLayout()
-        label2layout = QHBoxLayout()
-        label1layout.addWidget(self.labeltable)
-        label2layout.addWidget(self.subdialogbuttons)
-        label1layout.addLayout(label2layout)
-        self.labelGroupLayout = QGroupBox(QApplication.translate("GroupBox","Label Properties",None))
-        self.labelGroupLayout.setLayout(label1layout)
-        self.labelGroupLayout.setVisible(False)
-        buttonlayout = QHBoxLayout()
-        buttonlayout.addWidget(self.main_buttons)
-        configlayout =  QHBoxLayout()
-        configlayout.addWidget(colorlabel)
-        configlayout.addWidget(self.colorSpinBox)
-        configlayout.addWidget(aspectlabel)
-        configlayout.addWidget(self.aspectSpinBox)
-        configlayout.addWidget(edgelabel)
-        configlayout.addWidget(self.edgeSpinBox)
-        configlayout.addWidget(linewidthlabel)
-        configlayout.addWidget(self.linewidthSpinBox)
-        configlayout.addWidget(linecolor)
-        configlayout.addWidget(textcolor)
-        configlayout.addWidget(txtlabel)
-        configlayout.addWidget(txtButtonplus)
-        configlayout.addWidget(txtButtonminus)
-        controlLayout = QHBoxLayout()
-        controlLayout.addWidget(addButton)
-        controlLayout.addWidget(rotateLeftButton)
-        controlLayout.addWidget(rotateRightButton)
-        controlLayout.addWidget(self.hierarchyButton)
-        mainlayout = QVBoxLayout()
-        mainlayout.addWidget(self.datatable)
-        mainlayout.addWidget(self.labelGroupLayout)
-        mainlayout.addLayout(controlLayout)
-        mainlayout.addLayout(configlayout)
-        mainlayout.addLayout(buttonlayout)
-        self.setLayout(mainlayout)
-        
-    def close(self):
-        self.accept()
-
-    #creates config table for wheel with index x
-    @pyqtSlot(bool)
-    def createlabeltable(self,_):
-        x = self.aw.findWidgetsRow(self.datatable,self.sender(),3)
-        if x is not None:
-            self.createlabeltablex(x)
-
-    def createlabeltablex(self,x):
-        self.labelwheelx = x                    #wheel being edited
-        self.labelGroupLayout.setVisible(True)
-        self.labeltable.setVisible(True)
-        self.subdialogbuttons.setVisible(True)
-        
-        nlabels = len(self.aw.qmc.wheelnames[x])
-        # self.labeltable.clear() # this crashes Ubuntu 16.04
-        self.labeltable.clearSelection() # this seems to work also for Ubuntu 16.04
-        
-        if nlabels:
-            self.labeltable.setRowCount(nlabels)
-            self.labeltable.setColumnCount(5)
-            self.labeltable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None),
-                                                       QApplication.translate("Table","Parent",None),
-                                                       QApplication.translate("Table","Width",None),
-                                                       QApplication.translate("Table","Color",None),
-                                                       QApplication.translate("Table","Opaqueness",None)])
-            self.labeltable.setAlternatingRowColors(True)
-            self.labeltable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.labeltable.setSelectionMode(QTableWidget.SingleSelection)
-            self.labeltable.setShowGrid(True)
-            self.labeltable.verticalHeader().setSectionResizeMode(2)
-            #populate table
-            for i in range(nlabels):
-                label = QTableWidgetItem(self.aw.qmc.wheelnames[x][i])
-                parentComboBox =  QComboBox()
-                if x > 0:
-                    items = self.aw.qmc.wheelnames[x-1][:]
-                    items.insert(0,"")
-                    parentComboBox.addItems(items)
-                    if self.aw.qmc.wheellabelparent[x][i]:
-                        parentComboBox.setCurrentIndex(self.aw.qmc.wheellabelparent[x][i])
-                else:
-                    parentComboBox.addItems([])
-                parentComboBox.currentIndexChanged.connect(self.setwheelchild)
-                labelwidthSpinBox = QDoubleSpinBox()
-                labelwidthSpinBox.setRange(1.,100.)
-                labelwidthSpinBox.setValue(self.aw.qmc.segmentlengths[x][i])
-                labelwidthSpinBox.setSuffix("%")
-                labelwidthSpinBox.valueChanged.connect(self.setlabelwidth)
-                colorButton = QPushButton("Set Color")
-                colorButton.clicked.connect(self.setsegmentcolor)
-                alphaSpinBox = QSpinBox()
-                alphaSpinBox.setRange(0,10)
-                alphaSpinBox.setValue(int(self.aw.qmc.segmentsalpha[x][i]*10))
-                alphaSpinBox.valueChanged.connect(self.setsegmentalpha)
-                #add widgets to the table
-                self.labeltable.setItem(i,0,label)
-                self.labeltable.setCellWidget(i,1,parentComboBox)
-                self.labeltable.setCellWidget(i,2,labelwidthSpinBox)
-                self.labeltable.setCellWidget(i,3,colorButton)
-                self.labeltable.setCellWidget(i,4,alphaSpinBox)
-
-    @pyqtSlot(bool)
-    def setsegmentcolor(self,_):
-        i = self.aw.findWidgetsRow(self.labeltable,self.sender(),3)
-        if i is not None:
-            x = self.labelwheelx
-            colorf = self.aw.colordialog(QColor(self.aw.qmc.wheelcolor[x][i]))
-            if colorf.isValid():
-                colorname = str(colorf.name())
-                self.aw.qmc.wheelcolor[x][i] = colorname      #add new color to label
-                self.createdatatable()                           #update main table with label names (label::color)
-                self.aw.qmc.drawWheel()
-
-    #sets a uniform color in wheel
-    @pyqtSlot(bool)
-    def setwheelcolor(self,_):
-        x = self.aw.findWidgetsRow(self.datatable,self.sender(),8)
-        if x is not None:
-            colorf = self.aw.colordialog(QColor(self.aw.qmc.wheelcolor[x][0]))
-            if colorf.isValid():
-                colorname = str(colorf.name())
-                for i in range(len(self.aw.qmc.wheelcolor[x])):
-                    self.aw.qmc.wheelcolor[x][i] =  colorname
-            self.createdatatable()
-            self.aw.qmc.drawWheel()
-
-    #sets color pattern (many colors) in wheel
-    @pyqtSlot(int)
-    def setwheelcolorpattern(self,_):
-        x = self.aw.findWidgetsRow(self.datatable,self.sender(),9)
-        if x is not None:
-            wsb =  self.datatable.cellWidget(x,9)
-            wpattern = wsb.value()
-            wlen = len(self.aw.qmc.wheelcolor[x])
-            for i in range(wlen):
-                color = QColor()
-                color.setHsv((360/wlen)*i*wpattern,255,255,255)
-                self.aw.qmc.wheelcolor[x][i] = str(color.name())
-            self.aw.qmc.drawWheel()
-
-    #sets color pattern (many colors) for whole graph
-    @pyqtSlot(int)
-    def setcolorpattern(self,_):
-        self.aw.qmc.wheelcolorpattern = self.colorSpinBox.value()
-        if self.aw.qmc.wheelcolorpattern:
-            for x in range(len(self.aw.qmc.wheelcolor)):
-                wlen = len(self.aw.qmc.wheelcolor[x])
-                for i in range(wlen):
-                    color = QColor()
-                    color.setHsv((360/wlen)*i*self.aw.qmc.wheelcolorpattern,255,255,255)
-                    self.aw.qmc.wheelcolor[x][i] = str(color.name())
-            self.aw.qmc.drawWheel()
-
-    @pyqtSlot(int)
-    def setsegmentalpha(self,z):
-        u = self.aw.findWidgetsRow(self.labeltable,self.sender(),4)
-        if u is not None:
-            x = self.labelwheelx
-            self.aw.qmc.segmentsalpha[x][u] = float(z/10.)
-            self.aw.qmc.drawWheel()
-
-    #rotate whole graph
-    @pyqtSlot(bool)
-    def rotatewheels1(self,_):
-        for i in range(len(self.aw.qmc.startangle)):
-            self.aw.qmc.startangle[i] += 1
-        self.aw.qmc.drawWheel()
-    
-    @pyqtSlot(bool)
-    def rotatewheels0(self,_):
-        for i in range(len(self.aw.qmc.startangle)):
-            self.aw.qmc.startangle[i] -= 1
-        self.aw.qmc.drawWheel()
-
-    #z= new width%, x= wheel number index, u = index of segment in the wheel
-    @pyqtSlot(float)
-    def setlabelwidth(self,z):
-        u = self.aw.findWidgetsRow(self.labeltable,self.sender(),2)
-        if u is not None:
-            x = self.labelwheelx
-            newwidth = z
-            oldwidth = self.aw.qmc.segmentlengths[x][u]
-            diff = newwidth - oldwidth
-            l = len(self.aw.qmc.segmentlengths[x])
-            for i in range(l):
-                if i != u:
-                    if diff > 0:
-                        self.aw.qmc.segmentlengths[x][i] -= abs(float(diff))/(l-1)
-                    else:
-                        self.aw.qmc.segmentlengths[x][i] += abs(float(diff))/(l-1)
-            self.aw.qmc.segmentlengths[x][u] = newwidth
-            self.aw.qmc.drawWheel()
-
-    #input: z = index of parent in previus wheel; x = wheel number; i = index of element in wheel
-    @pyqtSlot(int)
-    def setwheelchild(self,z):
-        i = self.aw.findWidgetsRow(self.labeltable,self.sender(),1)
-        if i is not None:
-            self.aw.qmc.setwheelchild(z,self.labelwheelx,i)
-            self.aw.qmc.drawWheel()
-            self.createdatatable() #update data table
-
-    #deletes parent-child relation in a wheel. It obtains the wheel index by self.labelwheelx
-    @pyqtSlot(bool)
-    def resetlabelparents(self,_):
-        x = self.labelwheelx
-        nsegments = len(self.aw.qmc.wheellabelparent[x])
-        for i in range(nsegments):
-            self.aw.qmc.wheellabelparent[x][i] = 0
-            self.aw.qmc.segmentlengths[x][i] = 100./nsegments
-        self.aw.qmc.drawWheel()
-        self.createlabeltablex(x)
-
-    @pyqtSlot(float)
-    def setaspect(self,_):
-        self.aw.qmc.wheelaspect = self.aspectSpinBox.value()
-        self.aw.qmc.drawWheel()
-
-    #adjust decorative edge between wheels
-    @pyqtSlot(int)
-    def setedge(self):
-        self.aw.qmc.wheeledge = float(self.edgeSpinBox.value())/100.
-        self.aw.qmc.drawWheel()
-
-    #adjusts line thickness
-    @pyqtSlot(int)
-    def setlinewidth(self,_):
-        self.aw.qmc.wheellinewidth = self.linewidthSpinBox.value()
-        self.aw.qmc.drawWheel()
-
-    #sets line color
-    @pyqtSlot(bool)
-    def setlinecolor(self,_):
-        colorf = self.aw.colordialog(QColor(self.aw.qmc.wheellinecolor))
-        if colorf.isValid():
-            colorname = str(colorf.name())
-            #self.aw.qmc.wheellinealpha = colorf.alphaF()
-            self.aw.qmc.wheellinecolor = colorname      #add new color to label
-            self.aw.qmc.drawWheel()
-            
-    #sets text color
-    @pyqtSlot(bool)
-    def settextcolor(self,_):
-        colorf = self.aw.colordialog(QColor(self.aw.qmc.wheeltextcolor))
-        if colorf.isValid():
-            colorname = str(colorf.name())
-            #self.aw.qmc.wheeltextalpha = colorf.alphaF()
-            self.aw.qmc.wheeltextcolor = colorname      #add new color to label
-            self.aw.qmc.drawWheel()
-
-    #makes not visible the wheel config table
-    @pyqtSlot()
-    def closelabels(self):
-        self.labelGroupLayout.setVisible(False)
-        self.labeltable.setVisible(False)
-#        self.labelCloseButton.setVisible(False)
-#        self.labelResetButton.setVisible(False)
-        self.subdialogbuttons.setVisible(False)
-
-    #creates graph table
-    def createdatatable(self):
-        ndata = len(self.aw.qmc.wheelnames)
-        
-        # self.datatable.clear() # this crashes Ubuntu 16.04
-#        if ndata != 0:
-#            self.datatable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
-        self.datatable.clearSelection() # this seems to work also for Ubuntu 16.04
-        
-        self.datatable.setRowCount(ndata)
-        self.datatable.setColumnCount(10)
-        self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Delete Wheel",None),
-                                                  QApplication.translate("Table","Edit Labels",None),
-                                                  QApplication.translate("Table","Update Labels",None),
-                                                  QApplication.translate("Table","Properties",None),
-                                                  QApplication.translate("Table","Radius",None),
-                                                  QApplication.translate("Table","Starting angle",None),
-                                                  QApplication.translate("Table","Projection",None),
-                                                  QApplication.translate("Table","Text Size",None),
-                                                  QApplication.translate("Table","Color",None),
-                                                  QApplication.translate("Table","Color Pattern",None)])
-        self.datatable.setAlternatingRowColors(True)
-        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
-        self.datatable.setShowGrid(True)
-        self.datatable.verticalHeader().setSectionResizeMode(2)
-        #populate table
-        for i in range(ndata):
-            delButton = QPushButton(QApplication.translate("Button","Delete",None))
-            delButton.clicked.connect(self.popwheel)
-            labelsedit = QLineEdit(str(",".join(self.aw.qmc.wheelnames[i])))
-            updateButton = QPushButton(QApplication.translate("Button","Update",None))
-            updateButton.clicked.connect(self.updatelabels)
-            setButton = QPushButton(QApplication.translate("Button","Select",None))
-            setButton.clicked.connect(self.createlabeltable)
-            widthSpinBox = QDoubleSpinBox()
-            widthSpinBox.setRange(1.,100.)
-            widthSpinBox.setValue(self.aw.qmc.wradii[i])
-            widthSpinBox.setSuffix("%")
-            widthSpinBox.valueChanged.connect(self.setwidth)
-            angleSpinBox = QSpinBox()
-            angleSpinBox.setSuffix(QApplication.translate("Label"," dg",None))
-            angleSpinBox.setRange(0,359)
-            angleSpinBox.setWrapping(True)
-            angleSpinBox.setValue(self.aw.qmc.startangle[i])
-            angleSpinBox.valueChanged.connect(self.setangle)
-            projectionComboBox =  QComboBox()
-            projectionComboBox.addItems([QApplication.translate("ComboBox","Flat",None),
-                                         QApplication.translate("ComboBox","Perpendicular",None),
-                                         QApplication.translate("ComboBox","Radial",None)])
-            projectionComboBox.setCurrentIndex(self.aw.qmc.projection[i])
-            projectionComboBox.currentIndexChanged.connect(self.setprojection)
-            txtSpinBox = QSpinBox()
-            txtSpinBox.setRange(1,30)
-            txtSpinBox.setValue(self.aw.qmc.wheeltextsize[i])
-            txtSpinBox.valueChanged.connect(self.setTextsizeX)
-            colorButton = QPushButton(QApplication.translate("Button","Set Color",None))
-            colorButton.clicked.connect(self.setwheelcolor)
-            colorSpinBox = QSpinBox()
-            colorSpinBox.setRange(0,255)
-            colorSpinBox.setWrapping(True)
-            colorSpinBox.valueChanged.connect(self.setwheelcolorpattern)
-            #add widgets to the table
-            self.datatable.setCellWidget(i,0,delButton)
-            self.datatable.setCellWidget(i,1,labelsedit)
-            self.datatable.setCellWidget(i,2,updateButton)
-            self.datatable.setCellWidget(i,3,setButton)
-            self.datatable.setCellWidget(i,4,widthSpinBox)
-            self.datatable.setCellWidget(i,5,angleSpinBox)
-            self.datatable.setCellWidget(i,6,projectionComboBox)
-            self.datatable.setCellWidget(i,7,txtSpinBox)
-            self.datatable.setCellWidget(i,8,colorButton)
-            self.datatable.setCellWidget(i,9,colorSpinBox)
-
-    #reads label edit box for wheel with index x, and updates labels
-    @pyqtSlot(bool)
-    def updatelabels(self,_):
-        x = self.aw.findWidgetsRow(self.datatable,self.sender(),2)
-        if x is not None:
-            labelsedit =  self.datatable.cellWidget(x,1)
-            text  = str(labelsedit.text())
-            if "\\n" in text:              #make multiple line text if "\n" found in label string
-                parts = text.split("\\n")
-                text = chr(10).join(parts)
-            newwheellabels = text.strip().split(",")
-            newnlabels = len(newwheellabels)
-            oldnlabels = len(self.aw.qmc.wheelnames[x])
-            #adjust segments len and alpha for each wheel if number of labels changed
-            if oldnlabels != newnlabels:
-                self.aw.qmc.segmentlengths[x] = [100./newnlabels]*newnlabels
-                self.aw.qmc.segmentsalpha[x] = [.3]*newnlabels
-                self.aw.qmc.wheellabelparent[x] = [0]*newnlabels
-                self.aw.qmc.wheelcolor[x] = [self.aw.qmc.wheelcolor[x][0]]*newnlabels
-            self.aw.qmc.wheelnames[x] = newwheellabels[:]
-            self.aw.qmc.drawWheel()
-
-    #sets radii for a wheel
-    @pyqtSlot(float)
-    def setwidth(self,_):
-        x = self.aw.findWidgetsRow(self.datatable,self.sender(),4)
-        if x is not None:
-            widthSpinBox = self.datatable.cellWidget(x,4)
-            newwidth = widthSpinBox.value()
-            oldwidth = self.aw.qmc.wradii[x]
-            diff = newwidth - oldwidth
-            l = len(self.aw.qmc.wradii)
-            for i in range(l):
-                if i != x:
-                    if diff > 0:
-                        self.aw.qmc.wradii[i] -= abs(float(diff))/(l-1)
-                    else:
-                        self.aw.qmc.wradii[i] += abs(float(diff))/(l-1)
-            self.aw.qmc.wradii[x] = newwidth
-            #Need 100.0% coverage. Correct for numerical floating point rounding errors:
-            count = 0.
-            for i in range(len(self.aw.qmc.wradii)):
-                count +=  self.aw.qmc.wradii[i]
-            diff = 100. - count
-            if diff  != 0.:
-                if diff > 0.000:  #if count smaller
-                    self.aw.qmc.wradii[x] += abs(diff)
-                else:
-                    self.aw.qmc.wradii[x] -= abs(diff)
-            self.aw.qmc.drawWheel()
-
-    #sets starting angle (rotation) for a wheel with index x
-    @pyqtSlot(int)
-    def setangle(self,_):
-        x = self.aw.findWidgetsRow(self.datatable,self.sender(),5)
-        if x is not None:
-            angleSpinBox = self.datatable.cellWidget(x,5)
-            self.aw.qmc.startangle[x] = angleSpinBox.value()
-            self.aw.qmc.drawWheel()
-
-    #sets text projection style for a wheel with index x
-    @pyqtSlot(int)
-    def setprojection(self,_):
-        x = self.aw.findWidgetsRow(self.datatable,self.sender(),6)
-        if x is not None:
-            projectionComboBox = self.datatable.cellWidget(x,6)
-            self.aw.qmc.projection[x] = projectionComboBox.currentIndex()
-            self.aw.qmc.drawWheel()
-
-    #chages text size in wheel with index x
-    @pyqtSlot(int)
-    def setTextsizeX(self,_):
-        x = self.aw.findWidgetsRow(self.datatable,self.sender(),7)
-        if x is not None:
-            txtSpinBox = self.datatable.cellWidget(x,7)
-            self.aw.qmc.wheeltextsize[x] = txtSpinBox.value()
-            self.aw.qmc.drawWheel()
-
-    #changes size of text in whole graph
-    @pyqtSlot(bool)
-    def changetext1(self,_):
-        for i in range(len(self.aw.qmc.wheeltextsize)):
-            self.aw.qmc.wheeltextsize[i] += 1
-        self.aw.qmc.drawWheel()
-    
-    @pyqtSlot(bool)
-    def changetext0(self,_):
-        for i in range(len(self.aw.qmc.wheeltextsize)):
-            self.aw.qmc.wheeltextsize[i] -= 1
-        self.aw.qmc.drawWheel()
-
-    #adds new top wheel
-    @pyqtSlot(bool)
-    def insertwheel(self,_):
-        ndata = len(self.aw.qmc.wradii)
-        if ndata:
-            count = 0.
-            for i in range(ndata):
-                self.aw.qmc.wradii[i] = 100./(ndata+1)
-                count += self.aw.qmc.wradii[i]
-            self.aw.qmc.wradii.append(100.-count)
-        else:
-            self.aw.qmc.wradii.append(100.)
-        #find number of labels of most outer wheel (last)
-        if len(self.aw.qmc.wheelnames):
-            nwheels = len(self.aw.qmc.wheelnames[-1])
-        else:                                       #if no wheels
-            nwheels = 3
-        wn,sl,sa,wlp,co = [],[],[],[],[]
-        for i in range(nwheels+1):
-            wn.append("W%i %i"%(len(self.aw.qmc.wheelnames)+1,i+1))
-            sl.append(100./(nwheels+1))
-            sa.append(.3)
-            wlp.append(0)
-            color = QColor()
-            color.setHsv((360/(nwheels+1))*i,255,255,255)
-            co.append(str(color.name()))
-        self.aw.qmc.wheelnames.append(wn)
-        self.aw.qmc.segmentlengths.append(sl)
-        self.aw.qmc.segmentsalpha.append(sa)
-        self.aw.qmc.wheellabelparent.append(wlp)
-        self.aw.qmc.startangle.append(0)
-        self.aw.qmc.projection.append(2)
-        self.aw.qmc.wheeltextsize.append(10)
-        self.aw.qmc.wheelcolor.append(co)
-        self.createdatatable()
-        self.aw.qmc.drawWheel()
-
-    #deletes wheel with index x
-    @pyqtSlot(bool)
-    def popwheel(self,_):
-        x = self.aw.findWidgetsRow(self.datatable,self.sender(),0)
-        if x is not None:
-            #correct raius of other wheels (to use 100% coverage)
-            width = self.aw.qmc.wradii[x]
-            l = len(self.aw.qmc.wradii)
-            for i in range(l):
-                if i != x:
-                    self.aw.qmc.wradii[i] += float(width)/(l-1)
-            self.aw.qmc.wheelnames.pop(x)
-            self.aw.qmc.wradii.pop(x)
-            self.aw.qmc.startangle.pop(x)
-            self.aw.qmc.projection.pop(x)
-            self.aw.qmc.wheeltextsize.pop(x)
-            self.aw.qmc.segmentlengths.pop(x)
-            self.aw.qmc.segmentsalpha.pop(x)
-            self.aw.qmc.wheellabelparent.pop(x)
-            self.aw.qmc.wheelcolor.pop(x)
-            self.createdatatable()
-            self.aw.qmc.drawWheel()
-    
-    @pyqtSlot(bool)
-    def fileSave(self,_):
-        try:
-            filename = self.aw.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Wheel graph",None),ext="*.wg")
-            if filename:
-                #write
-                self.aw.serialize(filename,self.aw.getWheelGraph())
-                self.aw.sendmessage(QApplication.translate("Message","Wheel Graph saved",None))
-        except IOError as e:
-            self.aw.qmc.adderror((QApplication.translate("Error Message","IO Error:",None) + " Wheel graph filesave(): {0}").format(str(e)))
-            return
-
-    @pyqtSlot(bool)
-    def loadWheel(self,_):
-        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Open Wheel Graph",None),path = self.aw.getDefaultPath(),ext="*.wg")
-        if filename:
-            self.aw.loadWheel(filename)
-            self.aw.wheelpath = filename
-            self.createdatatable()
-            self.aw.qmc.drawWheel()
-
-    def closeEvent(self, _):
-        self.viewmode(False)
-
-    @pyqtSlot(bool)
-    def viewmode(self,_):
-        self.close()
-        self.aw.qmc.connectWheel()
-        self.aw.qmc.drawWheel()
-
-
-
-############################################################################
-######################## FUJI PX PID CONTROL DIALOG ########################
-############################################################################
-
-# common code for all Fuji PXxx subclasses
-class PXpidDlgControl(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(PXpidDlgControl,self).__init__(parent, aw)
-
-    @pyqtSlot(bool)
-    def setpointET(self,_):
-        self.setpoint("ET")
-    
-    @pyqtSlot(bool)
-    def setpointBT(self,_):
-        self.setpoint("BT")
-    
-    def setpoint(self,PID):
-        if PID == "ET":
-            slaveID = self.aw.ser.controlETpid[1]
-            if self.aw.ser.controlETpid[0] == 0:
-                reg_dict = self.aw.fujipid.PXG4
-            elif self.aw.ser.controlETpid[0] == 1:
-                reg_dict = self.aw.fujipid.PXR
-            else:
-                reg_dict = self.aw.fujipid.PXF
-        else: # "BT"
-            slaveID = self.aw.ser.readBTpid[1]
-            if self.aw.ser.readBTpid[0] == 0:
-                reg_dict = self.aw.fujipid.PXG4
-            elif self.aw.ser.readBTpid[0] == 1:
-                reg_dict = self.aw.fujipid.PXR
-            else:
-                reg_dict = self.aw.fujipid.PXF
-        command = ""
-        reg = None
-        try:
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(reg_dict["decimalposition"][1],6)
-                if reg:
-                    self.aw.modbus.writeSingleRegister(slaveID,reg,1)
-                r = command
-            else:
-                command = self.aw.fujipid.message2send(slaveID,6,reg_dict["decimalposition"][1],1)
-                r = self.aw.ser.sendFUJIcommand(command,8)
-            #check response from pid and update message on main window
-            if r == command:
-                message = QApplication.translate("StatusBar","Decimal position successfully set to 1",None)
-                self.status.showMessage(message, 5000)
-            else:
-                self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None),5000)
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setpoint(): {0}").format(str(e)),exc_tb.tb_lineno)
-
-    @pyqtSlot(bool)
-    def setthermocoupletypeET(self,_):
-        self.setthermocoupletype("ET")
-
-    @pyqtSlot(bool)
-    def setthermocoupletypeBT(self,_):
-        self.setthermocoupletype("BT")
-
-    def setthermocoupletype(self,PID):
-        if PID == "ET":
-            slaveID = self.aw.ser.controlETpid[1]
-            index = self.ETthermocombobox.currentIndex()
-            if self.aw.ser.controlETpid[0] == 0:
-                reg_dict = self.aw.fujipid.PXG4
-                conversiontoindex = self.aw.fujipid.PXGconversiontoindex
-            elif self.aw.ser.controlETpid[0] == 1:
-                reg_dict = self.aw.fujipid.PXR
-                conversiontoindex = self.aw.fujipid.PXRconversiontoindex
-            else:
-                reg_dict = self.aw.fujipid.PXF
-                conversiontoindex = self.aw.fujipid.PXFconversiontoindex
-        else: # "BT"
-            slaveID = self.aw.ser.readBTpid[1]
-            index = self.BTthermocombobox.currentIndex()
-            if self.aw.ser.readBTpid[0] == 0:
-                reg_dict = self.aw.fujipid.PXG4
-                conversiontoindex = self.aw.fujipid.PXGconversiontoindex
-            elif self.aw.ser.readBTpid[0] == 1:
-                reg_dict = self.aw.fujipid.PXR
-                conversiontoindex = self.aw.fujipid.PXRconversiontoindex
-            else:
-                reg_dict = self.aw.fujipid.PXF
-                conversiontoindex = self.aw.fujipid.PXFconversiontoindex
-        command = ""
-        reg = None
-        try:
-            if self.aw.ser.useModbusPort:
-                value = conversiontoindex[index]
-                reg = self.aw.modbus.address2register(reg_dict["pvinputtype"][1],6)
-                if reg:
-                    self.aw.modbus.writeSingleRegister(slaveID,reg,value)
-                r = command
-            else:
-                value = conversiontoindex[index]
-                command = self.aw.fujipid.message2send(slaveID,6,reg_dict["pvinputtype"][1],value)
-                r = self.aw.ser.sendFUJIcommand(command,8)
-            #check response from pid and update message on main window
-            if r == command:
-                reg_dict["pvinputtype"][0] = conversiontoindex[index]
-                message = QApplication.translate("StatusBar","Thermocouple type successfully set",None)
-                self.status.showMessage(message, 5000)
-            else:
-                self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None),5000)
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setthermocoupletype(): {0}").format(str(e)),exc_tb.tb_lineno)
-
-    @pyqtSlot(bool)
-    def readthermocoupletypeET(self,_):
-        self.readthermocoupletype("ET")
-
-    @pyqtSlot(bool)
-    def readthermocoupletypeBT(self,_):
-        self.readthermocoupletype("BT")
-    
-    def readthermocoupletype(self,PID):
-        if PID == "ET":
-            unitID = self.aw.ser.controlETpid[1]
-            if self.aw.ser.controlETpid[0] == 0:
-                reg_dict = self.aw.fujipid.PXG4
-                conversiontoindex = self.aw.fujipid.PXGconversiontoindex
-                thermotypes = self.aw.fujipid.PXGthermotypes
-            elif self.aw.ser.controlETpid[0] == 1:
-                reg_dict = self.aw.fujipid.PXR
-                conversiontoindex = self.aw.fujipid.PXRconversiontoindex
-                thermotypes = self.aw.fujipid.PXRthermotypes
-            else:
-                reg_dict = self.aw.fujipid.PXF
-                conversiontoindex = self.aw.fujipid.PXFconversiontoindex
-                thermotypes = self.aw.fujipid.PXFthermotypes
-        else: # "BT"
-            unitID = self.aw.ser.readBTpid[1]
-            if self.aw.ser.readBTpid[0] == 0:
-                reg_dict = self.aw.fujipid.PXG4
-                conversiontoindex = self.aw.fujipid.PXGconversiontoindex
-                thermotypes = self.aw.fujipid.PXGthermotypes
-            elif self.aw.ser.readBTpid[0] == 1:
-                reg_dict = self.aw.fujipid.PXR
-                conversiontoindex = self.aw.fujipid.PXRconversiontoindex
-                thermotypes = self.aw.fujipid.PXRthermotypes
-            else:
-                reg_dict = self.aw.fujipid.PXF
-                conversiontoindex = self.aw.fujipid.PXFconversiontoindex
-                thermotypes = self.aw.fujipid.PXFthermotypes
-        command = ""
-        message = "empty"
-        reg = None
-        Thtype = None
-        try:
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(reg_dict["pvinputtype"][1],3)
-                if reg:
-                    Thtype = self.aw.modbus.readSingleRegister(unitID,reg,3)
-            else:
-                command = self.aw.fujipid.message2send(unitID,3,reg_dict["pvinputtype"][1],1)
-                if command:
-                    Thtype = self.aw.fujipid.readoneword(command)
-            if Thtype is not None:
-                if PID == "ET":
-                    if Thtype in conversiontoindex:
-                        reg_dict["pvinputtype"][0] = Thtype
-                        self.ETthermocombobox.setCurrentIndex(conversiontoindex.index(Thtype))
-                        message = "ET type %i: %s"%(Thtype,thermotypes[conversiontoindex.index(Thtype)])
-                    else:
-                        message = "ERR"
-                elif PID == "BT":
-                    if Thtype in conversiontoindex:
-                        reg_dict["pvinputtype"][0] = Thtype
-                        message = "BT type %i: %s"%(Thtype,thermotypes[conversiontoindex.index(Thtype)])
-                        self.BTthermocombobox.setCurrentIndex(conversiontoindex.index(Thtype))
-                self.status.showMessage(message,5000)
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " readthermocoupletype(): {0}").format(str(e)),exc_tb.tb_lineno)
-
-
-
-#########################################################################
-######################## FUJI PXR CONTROL DIALOG  #######################
-#########################################################################
-
-class PXRpidDlgControl(PXpidDlgControl):
-    def __init__(self, parent = None, aw = None):
-        super(PXRpidDlgControl,self).__init__(parent,aw)
-        self.setModal(True)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXR PID Control",None))
-        #create Ramp Soak control button colums
-        self.labelrs1 = QLabel()
-        self.labelrs1.setContentsMargins(5,5,5,5)
-        self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<BR>(1-4)",None) + "</b></font>")
-        self.labelrs2 = QLabel()
-        self.labelrs2.setContentsMargins(5,5,5,5)
-        self.labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<BR>(5-8)",None) + "</b></font>")
-        labelpattern = QLabel(QApplication.translate("Label", "Ramp/Soak Pattern",None))
-        self.patternComboBox =  QComboBox()
-        self.patternComboBox.addItems(["1-4","5-8","1-8"])
-        self.patternComboBox.setCurrentIndex(self.aw.fujipid.PXR["rampsoakpattern"][0])
-        self.status = QStatusBar()
-        self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready",None),5000)
-        self.label_rs1 =  QLabel()
-        self.label_rs2 =  QLabel()
-        self.label_rs3 =  QLabel()
-        self.label_rs4 =  QLabel()
-        self.label_rs5 =  QLabel()
-        self.label_rs6 =  QLabel()
-        self.label_rs7 =  QLabel()
-        self.label_rs8 =  QLabel()
-        self.paintlabels()
-        #update button and exit button
-        button_getall = QPushButton(QApplication.translate("Button","Read Ra/So values",None))
-        button_getall.setFocusPolicy(Qt.NoFocus)
-        button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None))
-        button_rson.setFocusPolicy(Qt.NoFocus)
-        button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None))
-        button_rsoff.setFocusPolicy(Qt.NoFocus)
-        button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None))
-        button_standbyON.setFocusPolicy(Qt.NoFocus)
-        button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None))
-        button_standbyOFF.setFocusPolicy(Qt.NoFocus)
-
-        button_exit = QPushButton(QApplication.translate("Button","OK",None))
-        button_exit.setFocus()
-
-        self.patternComboBox.currentIndexChanged.connect(self.paintlabels)
-        button_getall.clicked.connect(self.getallsegments)
-        button_rson.clicked.connect(self.setONrampsoak)
-        button_rsoff.clicked.connect(self.setOFFrampsoak)
-        button_standbyON.clicked.connect(self.setONstandby)
-        button_standbyOFF.clicked.connect(self.setOFFstandby)
-        button_exit.clicked.connect(self.reject)
-        #TAB 2
-        tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None))
-        tab2svbutton.setFocusPolicy(Qt.NoFocus)
-        
-        self.tab2easySVbuttonsFlag = QCheckBox(QApplication.translate("Label","SV Buttons",None))
-        self.tab2easySVbuttonsFlag.setChecked(self.aw.pidcontrol.svButtons)
-        self.tab2easySVbuttonsFlag.stateChanged.connect(self.setSVbuttons)
-        self.tab2easySVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None))
-        self.tab2easySVsliderFlag.setChecked(self.aw.pidcontrol.svSlider)
-        self.tab2easySVsliderFlag.stateChanged.connect(self.setSVsliderSlot)
-        
-        
-        tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV",None))
-        tab2getsvbutton.setFocusPolicy(Qt.NoFocus)
-        self.readsvedit = QLineEdit()
-        tab2svbutton.clicked.connect(self.setsv)
-        tab2getsvbutton.clicked.connect(self.getsv)
-        svwarning1 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None) + "</b><br>"
-                            + QApplication.translate("Label", "Writing eeprom memory",None) + "<br>"
-                            + QApplication.translate("Label", "<u>Max life</u> 10,000 writes",None) + "<br>"
-                            + QApplication.translate("Label", "Infinite read life.",None) + "</CENTER>")
-        svwarning2 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None) + "</b><br>"
-                            + QApplication.translate("Label", "After <u>writing</u> an adjustment,<br>never power down the pid<br>for the next 5 seconds <br>or the pid may never recover.",None) + "<br>"
-                            + QApplication.translate("Label", "Read operations manual",None) + "</CENTER>")
-        self.svedit = QLineEdit()
-        self.svedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.svedit))
-        #TAB 3
-        button_p = QPushButton(QApplication.translate("Button","Set p",None))
-        button_p.setFocusPolicy(Qt.NoFocus)
-        button_i = QPushButton(QApplication.translate("Button","Set i",None))
-        button_i.setFocusPolicy(Qt.NoFocus)
-        button_d = QPushButton(QApplication.translate("Button","Set d",None))
-        button_d.setFocusPolicy(Qt.NoFocus)
-        plabel =  QLabel("p")
-        ilabel =  QLabel("i")
-        dlabel =  QLabel("d")
-        self.pedit = QLineEdit(str(self.aw.fujipid.PXR["p"][0]))
-        self.iedit = QLineEdit(str(self.aw.fujipid.PXR["i"][0]))
-        self.dedit = QLineEdit(str(self.aw.fujipid.PXR["d"][0]))
-        self.pedit.setMaximumWidth(60)
-        self.iedit.setMaximumWidth(60)
-        self.dedit.setMaximumWidth(60)
-        self.pedit.setValidator(QIntValidator(0., 999, self.pedit))
-        self.iedit.setValidator(QIntValidator(0, 3200, self.iedit))
-        self.dedit.setValidator(QIntValidator(0., 999, self.dedit))
-        button_autotuneON = QPushButton(QApplication.translate("Button","Autotune ON",None))
-        button_autotuneON.setFocusPolicy(Qt.NoFocus)
-        button_autotuneOFF = QPushButton(QApplication.translate("Button","Autotune OFF",None))
-        button_autotuneOFF.setFocusPolicy(Qt.NoFocus)
-        button_readpid = QPushButton(QApplication.translate("Button","Read PID Values",None))
-        button_readpid.setFocusPolicy(Qt.NoFocus)
-        button_autotuneON.clicked.connect(self.setONautotune)
-        button_autotuneOFF.clicked.connect(self.setOFFautotune)
-        button_p.clicked.connect(self.setpid_p)
-        button_i.clicked.connect(self.setpid_i)
-        button_d.clicked.connect(self.setpid_d)
-        button_readpid.clicked.connect(self.getpid)
-        #TAB4
-        #table for setting segments
-        self.segmenttable = QTableWidget()
-        self.createsegmenttable()
-        #****************************   TAB5 WIDGETS
-        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None))
-        self.ETthermocombobox = QComboBox()
-        self.BTthermocombobox = QComboBox()
-        #self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
-        self.ETthermocombobox.addItems(self.aw.fujipid.PXRthermotypes)
-        if self.aw.ser.readBTpid[0] == 0:        #fuji PXG
-            self.BTthermocombobox.addItems(self.aw.fujipid.PXGthermotypes)
-        elif self.aw.ser.readBTpid[0] == 1:      #fuji PXR
-            self.BTthermocombobox.addItems(self.aw.fujipid.PXRthermotypes)
-        else: # fuji PXF
-            self.BTthermocombobox.addItems(self.aw.fujipid.PXFthermotypes)
-        if self.aw.fujipid.PXR["pvinputtype"][0] in self.aw.fujipid.PXRconversiontoindex:
-            self.ETthermocombobox.setCurrentIndex(self.aw.fujipid.PXRconversiontoindex.index(self.aw.fujipid.PXR["pvinputtype"][0]))
-        setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
-        setETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
-        setBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
-        getETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
-        getBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        setETthermocouplebutton.setMaximumWidth(80)
-        getETthermocouplebutton.setMaximumWidth(80)
-        setBTthermocouplebutton.setMaximumWidth(80)
-        getBTthermocouplebutton.setMaximumWidth(80)
-        setETthermocouplebutton.clicked.connect(self.setthermocoupletypeET)
-        setBTthermocouplebutton.clicked.connect(self.setthermocoupletypeBT)
-        getETthermocouplebutton.clicked.connect(self.readthermocoupletypeET)
-        getBTthermocouplebutton.clicked.connect(self.readthermocoupletypeBT)
-        PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None))
-        PointButtonET.setFocusPolicy(Qt.NoFocus)
-        PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None))
-        PointButtonBT.setFocusPolicy(Qt.NoFocus)
-        PointButtonET.setMaximumWidth(250)
-        PointButtonBT.setMaximumWidth(250)
-        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
-        PointButtonET.clicked.connect(self.setpointET)
-        PointButtonBT.clicked.connect(self.setpointBT)
-        
-                
-        # Follow Background 
-        self.followBackground = QCheckBox(QApplication.translate("CheckBox", "Follow Background",None))
-        self.followBackground.setChecked(self.aw.fujipid.followBackground)
-        self.followBackground.setFocusPolicy(Qt.NoFocus)
-        self.followBackground.stateChanged.connect(self.changeFollowBackground)         #toggle
-        # Follow Background Lookahead
-        self.pidSVLookahead = QSpinBox()
-        self.pidSVLookahead.setAlignment(Qt.AlignRight)
-        self.pidSVLookahead.setRange(0,999)
-        self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(self.aw.fujipid.lookahead)  
-        self.pidSVLookahead.setSuffix(" s")
-        self.pidSVLookahead.setFocusPolicy(Qt.NoFocus)
-        self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
-        pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))  
-        followLayout = QHBoxLayout()
-        followLayout.addStretch()
-        followLayout.addWidget(pidSVLookaheadLabel)
-        followLayout.addWidget(self.pidSVLookahead)
-        followLayout.addStretch() 
-        
-        
-        #create layouts
-        buttonMasterLayout = QGridLayout()
-        buttonRampSoakLayout1 = QVBoxLayout()
-        buttonRampSoakLayout2 = QVBoxLayout()
-        tab3layout = QGridLayout()
-        svlayout = QGridLayout()
-        #place rs buttoms in RampSoakLayout1
-        buttonRampSoakLayout1.addWidget(self.labelrs1,0)
-        buttonRampSoakLayout1.addWidget(self.label_rs1,1)
-        buttonRampSoakLayout1.addWidget(self.label_rs2,2)
-        buttonRampSoakLayout1.addWidget(self.label_rs3,3)
-        buttonRampSoakLayout1.addWidget(self.label_rs4,4)
-        buttonRampSoakLayout2.addWidget(self.labelrs2,0)
-        buttonRampSoakLayout2.addWidget(self.label_rs5,1)
-        buttonRampSoakLayout2.addWidget(self.label_rs6,2)
-        buttonRampSoakLayout2.addWidget(self.label_rs7,3)
-        buttonRampSoakLayout2.addWidget(self.label_rs8,4)
-        buttonMasterLayout.addLayout(buttonRampSoakLayout1,0,0)
-        buttonMasterLayout.addLayout(buttonRampSoakLayout2,0,1)
-        buttonMasterLayout.addWidget(labelpattern,1,0)
-        buttonMasterLayout.addWidget(self.patternComboBox,1,1)
-        buttonMasterLayout.addWidget(button_rson,2,0)
-        buttonMasterLayout.addWidget(button_rsoff,2,1)
-        buttonMasterLayout.addWidget(button_autotuneOFF,3,1)
-        buttonMasterLayout.addWidget(button_autotuneON,3,0)
-        buttonMasterLayout.addWidget(button_standbyOFF,4,0)
-        buttonMasterLayout.addWidget(button_standbyON,4,1)
-        buttonMasterLayout.addWidget(self.followBackground,5,0)
-        buttonMasterLayout.addLayout(followLayout,5,1)
-        buttonMasterLayout.addWidget(button_getall,6,0)
-
-        ############################
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(button_exit)
-        
-                
-        #tab 2
-        svlayout.addWidget(svwarning2,0,0)
-        svlayout.addWidget(svwarning1,0,1)
-        svlayout.addWidget(self.readsvedit,1,0)
-        svlayout.addWidget(tab2getsvbutton,1,1)
-        svlayout.addWidget(self.svedit,2,0)
-        svlayout.addWidget(tab2svbutton,2,1)
-        svlayout.addWidget(self.tab2easySVbuttonsFlag,3,0)
-        svlayout.addWidget(self.tab2easySVsliderFlag,3,1)
-        #tab 3
-        tab3layout.addWidget(plabel,0,0)
-        tab3layout.addWidget(self.pedit,0,1)
-        tab3layout.addWidget(button_p,0,2)
-        tab3layout.addWidget(ilabel,1,0)
-        tab3layout.addWidget(self.iedit,1,1)
-        tab3layout.addWidget(button_i,1,2)
-        tab3layout.addWidget(dlabel,2,0)
-        tab3layout.addWidget(self.dedit,2,1)
-        tab3layout.addWidget(button_d,2,2)
-        tab3layout.addWidget(button_autotuneON,3,1)
-        tab3layout.addWidget(button_autotuneOFF,3,2)
-        tab3layout.addWidget(button_readpid,4,1)
-        #tab4
-        tab4layout = QVBoxLayout()
-        tab4layout.addWidget(self.segmenttable)
-        
-        #tab5
-        thermolayoutET = QHBoxLayout()
-        thermolayoutET.addWidget(self.ETthermocombobox)
-        thermolayoutET.addStretch()
-        thermolayoutET.addWidget(getETthermocouplebutton)
-        thermolayoutET.addWidget(setETthermocouplebutton)
-        ETGroupBox = QGroupBox(QApplication.translate("Label","ET Thermocouple type",None))
-        ETGroupBox.setLayout(thermolayoutET)
-        thermolayoutBT = QHBoxLayout()
-        thermolayoutBT.addWidget(self.BTthermocombobox)
-        thermolayoutBT.addStretch()
-        thermolayoutBT.addWidget(getBTthermocouplebutton)
-        thermolayoutBT.addWidget(setBTthermocouplebutton)
-        BTGroupBox = QGroupBox(QApplication.translate("Label","BT Thermocouple type",None))
-        BTGroupBox.setLayout(thermolayoutBT)
-        tab5Layout = QVBoxLayout()
-        tab5Layout.addWidget(ETGroupBox)
-        tab5Layout.addWidget(BTGroupBox)
-        tab5Layout.addWidget(BTthermolabelnote)
-        tab5Layout.addStretch()
-        tab5Layout.addWidget(pointlabel)
-        tab5Layout.addWidget(PointButtonET)
-        tab5Layout.addWidget(PointButtonBT)
-        tab5Layout.addStretch()
-        ###################################
-        TabWidget = QTabWidget()
-        C1Widget = QWidget()
-        C1Widget.setLayout(buttonMasterLayout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","RS",None))
-        C2Widget = QWidget()
-        C2Widget.setLayout(svlayout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","SV",None))
-        tab3Hlayout = QHBoxLayout()
-        tab3Hlayout.addStretch()
-        tab3Hlayout.addLayout(tab3layout)
-        tab3Hlayout.addStretch()
-        tab3Vlayout = QVBoxLayout()
-        tab3Vlayout.addStretch()
-        tab3Vlayout.addLayout(tab3Hlayout)
-        tab3Vlayout.addStretch()
-        C3Widget = QWidget()        
-        C3Widget.setLayout(tab3Vlayout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","PID",None))
-        C4Widget = QWidget()
-        C4Widget.setLayout(tab4layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Set RS",None))
-        C5Widget = QWidget()
-        C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Extra",None))
-        #incorporate layouts
-        Mlayout = QVBoxLayout()
-        Mlayout.addWidget(self.status,0)
-        Mlayout.addWidget(TabWidget,1)
-        Mlayout.addLayout(buttonLayout,2)
-        self.setLayout(Mlayout)
-    
-    @pyqtSlot(int)
-    def setSVbuttons(self,flag):
-        self.aw.pidcontrol.svButtons = bool(flag)
-    
-    @pyqtSlot(int)
-    def setSVsliderSlot(self,flag):
-        self.setSVslider(flag)
-        self.aw.pidcontrol.activateSVSlider(flag)
-
-    def setSVslider(self,flag):
-        self.aw.pidcontrol.svSlider = bool(flag)
-
-    @pyqtSlot(int)
-    def changeLookAhead(self,_):
-        self.aw.fujipid.lookahead = int(self.pidSVLookahead.value())
-    
-    @pyqtSlot(int)
-    def changeFollowBackground(self,_):
-        self.aw.fujipid.followBackground = not self.aw.fujipid.followBackground
-
-    @pyqtSlot(int)
-    def paintlabels(self,_=0):
-        str1 = "T = " + str(self.aw.fujipid.PXR["segment1sv"][0]) + ", Ramp = " + stringfromseconds(self.aw.fujipid.PXR["segment1ramp"][0]) + ", Soak = " + stringfromseconds(self.aw.fujipid.PXR["segment1soak"][0])
-        str2 = "T = " + str(self.aw.fujipid.PXR["segment2sv"][0]) + ", Ramp = " + stringfromseconds(self.aw.fujipid.PXR["segment2ramp"][0]) + ", Soak = " + stringfromseconds(self.aw.fujipid.PXR["segment2soak"][0])
-        str3 = "T = " + str(self.aw.fujipid.PXR["segment3sv"][0]) + ", Ramp = " + stringfromseconds(self.aw.fujipid.PXR["segment3ramp"][0]) + ", Soak = " + stringfromseconds(self.aw.fujipid.PXR["segment3soak"][0])
-        str4 = "T = " + str(self.aw.fujipid.PXR["segment4sv"][0]) + ", Ramp = " + stringfromseconds(self.aw.fujipid.PXR["segment4ramp"][0]) + ", Soak = " + stringfromseconds(self.aw.fujipid.PXR["segment4soak"][0])
-        str5 = "T = " + str(self.aw.fujipid.PXR["segment5sv"][0]) + ", Ramp = " + stringfromseconds(self.aw.fujipid.PXR["segment5ramp"][0]) + ", Soak = " + stringfromseconds(self.aw.fujipid.PXR["segment5soak"][0])
-        str6 = "T = " + str(self.aw.fujipid.PXR["segment6sv"][0]) + ", Ramp = " + stringfromseconds(self.aw.fujipid.PXR["segment6ramp"][0]) + ", Soak = " + stringfromseconds(self.aw.fujipid.PXR["segment6soak"][0])
-        str7 = "T = " + str(self.aw.fujipid.PXR["segment7sv"][0]) + ", Ramp = " + stringfromseconds(self.aw.fujipid.PXR["segment7ramp"][0]) + ", Soak = " + stringfromseconds(self.aw.fujipid.PXR["segment7soak"][0])
-        str8 = "T = " + str(self.aw.fujipid.PXR["segment8sv"][0]) + ", Ramp = " + stringfromseconds(self.aw.fujipid.PXR["segment8ramp"][0]) + ", Soak = " + stringfromseconds(self.aw.fujipid.PXR["segment8soak"][0])
-        self.label_rs1.setText(str1)
-        self.label_rs2.setText(str2)
-        self.label_rs3.setText(str3)
-        self.label_rs4.setText(str4)
-        self.label_rs5.setText(str5)
-        self.label_rs6.setText(str6)
-        self.label_rs7.setText(str7)
-        self.label_rs8.setText(str8)
-        pattern = [[1,1,1,1,0,0,0,0],
-                  [0,0,0,0,1,1,1,1],
-                  [1,1,1,1,1,1,1,1]]
-        self.aw.fujipid.PXR["rampsoakpattern"][0] = self.patternComboBox.currentIndex()
-        if pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][0]:   
-            self.label_rs1.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs1.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][1]:
-            self.label_rs2.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs2.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][2]:   
-            self.label_rs3.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs3.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][3]:   
-            self.label_rs4.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs4.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][4]:   
-            self.label_rs5.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs5.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][5]:   
-            self.label_rs6.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs6.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][6]:   
-            self.label_rs7.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs7.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][7]:   
-            self.label_rs8.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs8.setStyleSheet("background-color:white;")
-
-    @pyqtSlot(bool)
-    def setONautotune(self,_):
-        self.setONOFFautotune(1)
-    
-    @pyqtSlot(bool)
-    def setOFFautotune(self,_):
-        self.setONOFFautotune(0)
-    
-    def setONOFFautotune(self,flag):
-        self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None),500)
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(self.aw.fujipid.PXR["autotuning"][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,flag)
-            r = "00000000"
-        else:
-            command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,self.aw.fujipid.PXR["autotuning"][1],flag)
-            #TX and RX
-            r = self.aw.ser.sendFUJIcommand(command,8)
-        if len(r) == 8:
-            if flag == 0:
-                self.aw.fujipid.PXR["autotuning"][0] = 0
-                self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned OFF",None),5000)
-            if flag == 1:
-                self.aw.fujipid.PXR["autotuning"][0] = 1
-                self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned ON",None),5000)
-        else:
-            mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFautotune()"
-            self.status.showMessage(mssg,5000)
-            self.aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setONOFFautotune()")
-
-    @pyqtSlot(bool)
-    def setONstandby(self,_):
-        self.setONOFFstandby(1)
-    
-    @pyqtSlot(bool)
-    def setOFFstandby(self,_):
-        self.setONOFFstandby(0)
-
-    def setONOFFstandby(self,flag):
-        try:
-            #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
-            #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-            self.status.showMessage(QApplication.translate("StatusBar","wait...",None),500)
-            res = self.aw.fujipid.setONOFFstandby(flag)
-            if res:
-                if flag == 1:
-                    message = QApplication.translate("StatusBar","PID OFF",None)     #put pid in standby 1 (pid off)
-                else:
-                    message = QApplication.translate("StatusBar","PID ON",None)      #put pid in standby 0 (pid on)
-                self.status.showMessage(message,5000)
-            else:
-                mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
-                self.status.showMessage(mssg,5000)
-                self.aw.qmc.adderror(mssg)
-        except Exception as e:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby() {0}").format(str(e)),exc_tb.tb_lineno)
-
-    @pyqtSlot(bool)
-    def setsv(self,_):
-        self.svedit.setText(self.aw.comma2dot(str(self.svedit.text())))
-        if self.svedit.text() != "":
-            newSVvalue = int(float(self.svedit.text())*10) #multiply by 10 because of decimal point
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(self.aw.fujipid.PXR["sv0"][1],6)
-                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,newSVvalue)
-                message = QApplication.translate("StatusBar","SV successfully set to {0}",None).format(self.svedit.text())
-                self.aw.fujipid.PXR["sv0"][0] = float(str(self.svedit.text()))
-                self.status.showMessage(message,5000)
-                #record command as an Event 
-                strcommand = "SETSV::"+ str("%.1f"%(newSVvalue/10.))
-                self.aw.qmc.DeviceEventRecord(strcommand)
-            else:          
-                command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,self.aw.fujipid.PXR["sv0"][1],newSVvalue)
-                r = self.aw.ser.sendFUJIcommand(command,8)
-                if r == command:
-                    message = QApplication.translate("StatusBar","SV successfully set to {0}",None).format(self.svedit.text())
-                    self.aw.fujipid.PXR["sv0"][0] = float(str(self.svedit.text()))
-                    self.status.showMessage(message,5000)
-                    #record command as an Event 
-                    strcommand = "SETSV::"+ str("%.1f"%(newSVvalue/10.))
-                    self.aw.qmc.DeviceEventRecord(strcommand)
-                else:
-                    mssg = QApplication.translate("Error Message","Exception:",None) + " setsv()"
-                    self.status.showMessage(mssg,5000)
-                    self.aw.qmc.adderror(mssg)
-        else:
-            self.status.showMessage(QApplication.translate("StatusBar","Empty SV box",None),5000)
-            
-    @pyqtSlot(bool)
-    def getsv(self,_):
-        temp = self.aw.fujipid.readcurrentsv()
-        if temp != -1:
-            self.aw.fujipid.PXR["sv0"][0] =  temp
-            self.aw.lcd6.display(self.aw.fujipid.PXR["sv0"][0])
-            self.readsvedit.setText(str(self.aw.fujipid.PXR["sv0"][0]))
-        else:
-            self.status.showMessage(QApplication.translate("StatusBar","Unable to read SV",None),5000)
-
-    def checkrampsoakmode(self):
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(self.aw.fujipid.PXR["rampsoakmode"][1],3)
-            currentmode = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
-        else:
-            msg = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR["rampsoakmode"][1],1)
-            currentmode = self.aw.fujipid.readoneword(msg)
-        self.aw.fujipid.PXR["rampsoakmode"][0] = currentmode
-        if currentmode == 0:
-            mode = ["0",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 1:
-            mode = ["1",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 2:
-            mode = ["2",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 3:
-            mode = ["3",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 4:
-            mode = ["4",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 5:
-            mode = ["5",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 6:
-            mode = ["6",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 7:
-            mode = ["7",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 8:
-            mode = ["8",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 9:
-            mode = ["9",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 10:
-            mode = ["10",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 11:
-            mode = ["11",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 12:
-            mode = ["12",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 13:
-            mode = ["13",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 14:
-            mode = ["14",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 15:
-            mode = ["15",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","ON",None)]
-        else:
-            return -1
-        string =  QApplication.translate("Message","The rampsoak-mode tells how to start and end the ramp/soak",None) + "\n\n"
-        string += QApplication.translate("Message","Your rampsoak mode in this pid is:",None) + "\n\n"
-        string += QApplication.translate("Message","Mode = {0}",None).format(mode[0]) + "\n"
-        string += "-----------------------------------------------------------------------\n"
-        string += QApplication.translate("Message","Start to run from PV value: {0}",None).format(mode[1]) + "\n"
-        string += QApplication.translate("Message","End output status at the end of ramp/soak: {0}",None).format(mode[2]) + "\n"
-        string += QApplication.translate("Message","Output status while ramp/soak operation set to OFF: {0}",None).format(mode[3]) + "\n"
-        string += QApplication.translate("Message","\nRepeat Operation at the end: {0}",None).format(mode[4]) + "\n"
-        string += "-----------------------------------------------------------------------\n"
-        string += QApplication.translate("Message","Recomended Mode = 0",None) + "\n\n"
-        string += QApplication.translate("Message","If you need to change it, change it now and come back later",None) + "\n"
-        string += QApplication.translate("Message","Use the Parameter Loader Software by Fuji if you need to\n\n",None) + "\n\n\n"
-        string += QApplication.translate("Message","Continue?",None)
-        reply = QMessageBox.question(aw,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-        if reply == QMessageBox.Cancel:
-            return 0
-        elif reply == QMessageBox.Yes:
-            return 1
-
-    @pyqtSlot(bool)
-    def setONrampsoak(self,_):
-        self.setONOFFrampsoak(1)
-    
-    @pyqtSlot(bool)
-    def setOFFrampsoak(self,_):
-        self.setONOFFrampsoak(0)
-    
-    def setONOFFrampsoak(self,flag):
-        #flag =0 OFF, flag = 1 ON, flag = 2 hold
-        #set rampsoak pattern ON
-        if flag == 1:
-            check = self.checkrampsoakmode()
-            if check == 0:
-                self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak operation cancelled",None), 5000)
-                return
-            elif check == -1:
-                self.status.showMessage(QApplication.translate("StatusBar","No RX data",None), 5000)
-            self.status.showMessage(QApplication.translate("StatusBar","RS ON",None),500)
-            #0 = 1-4
-            #1 = 5-8
-            #2 = 1-8
-            selectedmode = self.patternComboBox.currentIndex()
-            currentmode = self.aw.fujipid.getrampsoakmode()
-            if currentmode != -1:
-                self.aw.fujipid.PXR["rampsoakpattern"][0] = currentmode
-                if currentmode != selectedmode:
-                    #set mode in pid to match the mode selected in the combobox
-                    self.status.showMessage(QApplication.translate("StatusBar","Need to change pattern mode...",None),1000)
-                    res = self.aw.fujipid.setrampsoakmode(selectedmode)
-                    if res:
-                        self.status.showMessage(QApplication.translate("StatusBar","Pattern has been changed. Wait 5 secs.",None), 500)
-                    else:
-                        self.status.showMessage(QApplication.translate("StatusBar","Pattern could not be changed",None), 5000)
-                        return
-                #combobox mode matches pid mode
-                #set ramp soak mode ON/OFF
-                res = self.aw.fujipid.setrampsoak(flag)
-                if res:
-                    #record command as an Event if flag = 1
-                    self.status.showMessage(QApplication.translate("StatusBar","RS ON",None), 5000)
-                    #ramp soak pattern. 0=executes 1 to 4; 1=executes 5 to 8; 2=executes 1 to 8
-                    pattern =[[1,4],[5,8],[1,8]]
-                    start = pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][0]
-                    end = pattern[self.aw.fujipid.PXR["rampsoakpattern"][0]][1]+1
-                    strcommand = "SETRS"
-                    result = ""
-                    for i in range(start,end):
-                        svkey = "segment"+str(i)+"sv"
-                        rampkey = "segment"+str(i)+"ramp"
-                        soakkey = "segment"+str(i)+"soak"
-                        strcommand += "::" + str(self.aw.fujipid.PXR[svkey][0]) + "::" + str(self.aw.fujipid.PXR[rampkey][0]) + "::" + str(self.aw.fujipid.PXR[soakkey][0])+"::"
-                        result += strcommand
-                        strcommand = "SETRS"
-                    result = result.strip("::")
-                    self.aw.qmc.DeviceEventRecord(result)
-                else:
-                    self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None), 5000)
-            else:
-                mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFrampsoak()"
-                self.status.showMessage(mssg,5000)
-                self.aw.qmc.adderror(mssg)
-        #set ramp soak OFF
-        elif flag == 0:
-            self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None),500)
-            self.aw.fujipid.setrampsoak(flag)
-
-    #get all Ramp Soak values for all 8 segments
-    @pyqtSlot(bool)
-    def getallsegments(self,_):
-        for i in range(8):
-            msg = QApplication.translate("StatusBar","Reading Ramp/Soak {0} ...",None).format(str(i+1))
-            self.status.showMessage(msg,500)
-            k = self.aw.fujipid.getsegment(i+1)
-            libtime.sleep(0.03)
-            if k == -1:
-                self.status.showMessage(QApplication.translate("StatusBar","problem reading Ramp/Soak",None),5000)
-                return
-            self.paintlabels()
-        self.status.showMessage(QApplication.translate("StatusBar","Finished reading Ramp/Soak val.",None),5000)
-        self.createsegmenttable()
-
-    @pyqtSlot(bool)
-    def getpid(self,_):
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(self.aw.fujipid.PXR["p"][1],3)
-            p = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)/10.
-        else:    
-            pcommand= self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR["p"][1],1)
-            p = self.aw.fujipid.readoneword(pcommand)/10.
-        if p == -1 :
-            return -1
-        else:
-            self.pedit.setText(str(int(p)))
-            self.aw.fujipid.PXR["p"][0] = p
-        #i is int range 0-3200
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(self.aw.fujipid.PXR["i"][1],3)
-            i = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)/10.
-        else:
-            icommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR["i"][1],1)
-            i = self.aw.fujipid.readoneword(icommand)/10.
-        if i == -1:
-            return -1
-        else:
-            self.iedit.setText(str(int(i)))
-            self.aw.fujipid.PXR["i"][0] = i
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(self.aw.fujipid.PXR["d"][1],3)
-            d = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)/10.
-        else:
-            dcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR["d"][1],1)
-            d = self.aw.fujipid.readoneword(dcommand)/10.
-        if d == -1:
-            return -1
-        else:
-            self.dedit.setText(str(int(d)))
-            self.aw.fujipid.PXR["d"][0] = d
-            
-        self.status.showMessage(QApplication.translate("StatusBar","Finished reading pid values",None),5000)
-
-    @pyqtSlot(bool)
-    def setpid_p(self,_):
-        if str(self.pedit.text()).isdigit():
-            p = int(str(self.pedit.text()))
-            self.aw.fujipid.setpidPXR("p",p)
-    
-    @pyqtSlot(bool)
-    def setpid_i(self,_):
-        if str(self.iedit.text()).isdigit():
-            i = int(str(self.iedit.text()))
-            self.aw.fujipid.setpidPXR("i",i)
-    
-    @pyqtSlot(bool)
-    def setpid_d(self,_):
-        if str(self.dedit.text()).isdigit():
-            d = int(str(self.dedit.text()))
-            self.aw.fujipid.setpidPXR("d",d)
-
-    def createsegmenttable(self):
-        self.segmenttable.setRowCount(8)
-        self.segmenttable.setColumnCount(4)
-        self.segmenttable.setHorizontalHeaderLabels([QApplication.translate("Table","SV",None),
-                                                     QApplication.translate("Table","Ramp HH:MM",None),
-                                                     QApplication.translate("Table","Soak HH:MM",None),""])
-        self.segmenttable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
-        self.segmenttable.setShowGrid(True)
-        self.segmenttable.verticalHeader().setSectionResizeMode(2)
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        #populate table
-        for i in range(8):
-            #create widgets
-            svkey = "segment" + str(i+1) + "sv"
-            rampkey = "segment" + str(i+1) + "ramp"
-            soakkey = "segment" + str(i+1) + "soak"
-            
-            svedit = QLineEdit(str(self.aw.fujipid.PXR[svkey][0]))
-            svedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, svedit))
-            rampedit = QLineEdit(stringfromseconds(self.aw.fujipid.PXR[rampkey][0]))
-            rampedit.setValidator(QRegExpValidator(regextime,self))
-            soakedit  = QLineEdit(stringfromseconds(self.aw.fujipid.PXR[soakkey][0]))
-            soakedit.setValidator(QRegExpValidator(regextime,self))
-            setButton = QPushButton(QApplication.translate("Button","Set",None))
-            setButton.clicked.connect(self.setsegment)
-            setButton.setFocusPolicy(Qt.NoFocus)
-            #add widgets to the table
-            self.segmenttable.setCellWidget(i,0,svedit)
-            self.segmenttable.setCellWidget(i,1,rampedit)
-            self.segmenttable.setCellWidget(i,2,soakedit)
-            self.segmenttable.setCellWidget(i,3,setButton)
-
-    #idn = id number, sv = float set value, ramp = ramp value, soak = soak value
-    @pyqtSlot(bool)
-    def setsegment(self,_):
-        i = self.aw.findWidgetsRow(self.segmenttable,self.sender(),3)
-        if i is not None:
-            idn = i+1
-            svedit =  self.segmenttable.cellWidget(i,0)
-            rampedit = self.segmenttable.cellWidget(i,1)
-            soakedit = self.segmenttable.cellWidget(i,2)
-            sv = float(self.aw.comma2dot(str(svedit.text())))
-            ramp = stringtoseconds(str(rampedit.text()))
-            soak = stringtoseconds(str(soakedit.text()))
-            svkey = "segment" + str(idn) + "sv"
-            rampkey = "segment" + str(idn) + "ramp"
-            soakkey = "segment" + str(idn) + "soak"
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(self.aw.fujipid.PXR[svkey][1],6)
-                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,int(sv*10))
-                libtime.sleep(0.1) #important time between writings
-                reg = self.aw.modbus.address2register(self.aw.fujipid.PXR[rampkey][1],6)
-                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,ramp)
-                libtime.sleep(0.1) #important time between writings
-                reg = self.aw.modbus.address2register(self.aw.fujipid.PXR[soakkey][1],6)
-                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,soak)
-                r1 = r2 = r3 = "        "
-            else:
-                svcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,self.aw.fujipid.PXR[svkey][1],int(sv*10))
-                r1 = self.aw.ser.sendFUJIcommand(svcommand,8)
-                libtime.sleep(0.1) #important time between writings
-                rampcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,self.aw.fujipid.PXR[rampkey][1],ramp)
-                r2 = self.aw.ser.sendFUJIcommand(rampcommand,8)
-                libtime.sleep(0.1) #important time between writings
-                soakcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,self.aw.fujipid.PXR[soakkey][1],soak)
-                r3 = self.aw.ser.sendFUJIcommand(soakcommand,8)
-            #check if OK
-            if len(r1) == 8 and len(r2) == 8 and len(r3) == 8:
-                self.aw.fujipid.PXR[svkey][0] = sv
-                self.aw.fujipid.PXR[rampkey][0] = ramp
-                self.aw.fujipid.PXR[soakkey][0] = soak
-                self.paintlabels()
-                self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully written",None),5000) 
-            else:
-                self.aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None))
-
-
-############################################################################
-######################## FUJI PXG4 PID CONTROL DIALOG ######################
-############################################################################
-
-class PXG4pidDlgControl(PXpidDlgControl):
-    def __init__(self, parent = None, aw = None):
-        super(PXG4pidDlgControl,self).__init__(parent, aw)
-        self.setModal(True)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        if self.aw.ser.controlETpid[0] == 0:
-            self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXG PID Control",None))
-        else:
-            self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXF PID Control",None))
-        self.status = QStatusBar()
-        self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready",None),5000)
-        #*************    TAB 1 WIDGETS
-        labelrs1 = QLabel()
-        labelrs1.setContentsMargins(5,5,5,5)
-        labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(1-7)",None) + "</b></font>")
-        #labelrs1.setMaximumSize(90, 42)
-        #labelrs1.setMinimumHeight(50)
-        labelrs2 = QLabel()
-        labelrs2.setContentsMargins(5,5,5,5)
-        labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(8-16)",None) + "</b></font>")
-        #labelrs2.setMaximumSize(90, 42)
-        #labelrs2.setMinimumHeight(50)
-        self.label_rs1 =  QLabel()
-        self.label_rs2 =  QLabel()
-        self.label_rs3 =  QLabel()
-        self.label_rs4 =  QLabel()
-        self.label_rs5 =  QLabel()
-        self.label_rs6 =  QLabel()
-        self.label_rs7 =  QLabel()
-        self.label_rs8 =  QLabel()
-        self.label_rs9 =  QLabel()
-        self.label_rs10 =  QLabel()
-        self.label_rs11 =  QLabel()
-        self.label_rs12 =  QLabel()
-        self.label_rs13 =  QLabel()
-        self.label_rs14 =  QLabel()
-        self.label_rs15 =  QLabel()
-        self.label_rs16 =  QLabel()
-        self.label_rs1.setMinimumWidth(170)
-        self.label_rs2.setMinimumWidth(170)
-        self.label_rs3.setMinimumWidth(170)
-        self.label_rs4.setMinimumWidth(170)
-        self.label_rs5.setMinimumWidth(170)
-        self.label_rs6.setMinimumWidth(170)
-        self.label_rs7.setMinimumWidth(170)
-        self.label_rs8.setMinimumWidth(170)
-        self.label_rs9.setMinimumWidth(170)
-        self.label_rs10.setMinimumWidth(170)
-        self.label_rs11.setMinimumWidth(170)
-        self.label_rs12.setMinimumWidth(170)
-        self.label_rs13.setMinimumWidth(170)
-        self.label_rs14.setMinimumWidth(170)
-        self.label_rs15.setMinimumWidth(170)
-        self.label_rs16.setMinimumWidth(170)
-        self.patternComboBox =  QComboBox()
-        self.patternComboBox.addItems(["1-4","5-8","1-8","9-12","13-16","9-16","1-16"])
-        if self.aw.ser.controlETpid[0] == 0:
-            self.patternComboBox.setCurrentIndex(self.aw.fujipid.PXG4["rampsoakpattern"][0])
-        else:
-            self.patternComboBox.setCurrentIndex(self.aw.fujipid.PXF["rampsoakpattern"][0])
-        self.patternComboBox.setFocusPolicy(Qt.NoFocus)
-        self.patternComboBox.currentIndexChanged.connect(self.paintlabels)
-        self.paintlabels()
-        button_load = QPushButton(QApplication.translate("Button","Load",None))
-        button_load.setFocusPolicy(Qt.NoFocus)
-        button_save = QPushButton(QApplication.translate("Button","Save",None))
-        button_save.setFocusPolicy(Qt.NoFocus)
-        button_writeall = QPushButton(QApplication.translate("Button","Write All",None))
-        button_writeall.setFocusPolicy(Qt.NoFocus)
-        patternlabel = QLabel(QApplication.translate("Label","Pattern",None))
-        patternlabel.setAlignment(Qt.AlignRight)
-        button_getall = QPushButton(QApplication.translate("Button","Read RS values",None))
-        button_getall.setFocusPolicy(Qt.NoFocus)
-        button_writeallrs = QPushButton(QApplication.translate("Button","Write RS values",None))
-        button_writeallrs.setFocusPolicy(Qt.NoFocus)
-        button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None)) 
-        button_rson.setFocusPolicy(Qt.NoFocus)
-        button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None))
-        button_rsoff.setFocusPolicy(Qt.NoFocus)
-        button_exit = QPushButton(QApplication.translate("Button","OK",None))
-        button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None))
-        button_standbyON.setFocusPolicy(Qt.NoFocus)
-        button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None))
-        button_standbyOFF.setFocusPolicy(Qt.NoFocus)
-        button_getall.clicked.connect(self.getallsegments)
-        button_writeallrs.clicked.connect(self.writeRSValues)
-        button_rson.clicked.connect(self.setONrampsoak)
-        button_rsoff.clicked.connect(self.setOFFrampsoak)
-        button_standbyON.clicked.connect(self.setONstandby)
-        button_standbyOFF.clicked.connect(self.setOFFstandby)
-        button_exit.clicked.connect(self.accept)
-        button_load.clicked.connect(self.load)
-        button_save.clicked.connect(self.save)
-        button_writeall.clicked.connect(self.writeAll)
-
-        #create layouts and place tab1 widgets inside 
-        buttonRampSoakLayout1 = QVBoxLayout() #TAB1/COLUNM 1
-        buttonRampSoakLayout1.setSpacing(10)
-        buttonRampSoakLayout2 = QVBoxLayout() #TAB1/COLUMN 2
-        buttonRampSoakLayout2.setSpacing(10)
-        #place rs labels in RampSoakLayout1 #TAB1/COLUNM 1
-        buttonRampSoakLayout1.addWidget(labelrs1)
-        buttonRampSoakLayout1.addWidget(self.label_rs1)
-        buttonRampSoakLayout1.addWidget(self.label_rs2)
-        buttonRampSoakLayout1.addWidget(self.label_rs3)
-        buttonRampSoakLayout1.addWidget(self.label_rs4)
-        buttonRampSoakLayout1.addWidget(self.label_rs5)
-        buttonRampSoakLayout1.addWidget(self.label_rs6)
-        buttonRampSoakLayout1.addWidget(self.label_rs7)
-        buttonRampSoakLayout1.addWidget(self.label_rs8)
-        #place rs labels in RampSoakLayout2 #TAB1/COLUMN 2
-        buttonRampSoakLayout2.addWidget(labelrs2)
-        buttonRampSoakLayout2.addWidget(self.label_rs9)
-        buttonRampSoakLayout2.addWidget(self.label_rs10)
-        buttonRampSoakLayout2.addWidget(self.label_rs11)
-        buttonRampSoakLayout2.addWidget(self.label_rs12)
-        buttonRampSoakLayout2.addWidget(self.label_rs13)
-        buttonRampSoakLayout2.addWidget(self.label_rs14)
-        buttonRampSoakLayout2.addWidget(self.label_rs15)
-        buttonRampSoakLayout2.addWidget(self.label_rs16)
-        
-        # Follow Background 
-        self.followBackground = QCheckBox(QApplication.translate("CheckBox", "Follow Background",None))
-        self.followBackground.setChecked(self.aw.fujipid.followBackground)
-        self.followBackground.setFocusPolicy(Qt.NoFocus)
-        self.followBackground.stateChanged.connect(self.changeFollowBackground)         #toggle
-        # Follow Background Lookahead
-        self.pidSVLookahead = QSpinBox()
-        self.pidSVLookahead.setAlignment(Qt.AlignRight)
-        self.pidSVLookahead.setRange(0,999)
-        self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(self.aw.fujipid.lookahead)
-        self.pidSVLookahead.setSuffix(" s")
-        self.pidSVLookahead.setFocusPolicy(Qt.NoFocus)
-        self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
-        pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))
-        
-        # *************** TAB 2 WIDGETS
-        labelsv = QLabel()
-        labelsv.setContentsMargins(10,10,10,10)
-        labelsv.setStyleSheet("background-color:'#CCCCCC';")
-        labelsv.setText("<font color='white'><b>" + QApplication.translate("Label", "SV (7-0)",None) + "</b></font>")
-        labelsv.setMaximumSize(100, 42)
-        labelsv.setMinimumHeight(50)
-        labelsvedit = QLabel()
-        labelsvedit.setContentsMargins(10,10,10,10)
-        labelsvedit.setStyleSheet("background-color:'#CCCCCC';")
-        labelsvedit.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None) + "</b></font>")
-        labelsvedit.setMaximumSize(100, 42)
-        labelsvedit.setMinimumHeight(50)
-        button_sv1 =QPushButton(QApplication.translate("Button","Write SV1",None))
-        button_sv1.setFocusPolicy(Qt.NoFocus)
-        button_sv2 =QPushButton(QApplication.translate("Button","Write SV2",None))
-        button_sv2.setFocusPolicy(Qt.NoFocus)
-        button_sv3 =QPushButton(QApplication.translate("Button","Write SV3",None))
-        button_sv3.setFocusPolicy(Qt.NoFocus)
-        button_sv4 =QPushButton(QApplication.translate("Button","Write SV4",None))
-        button_sv4.setFocusPolicy(Qt.NoFocus)
-        button_sv5 =QPushButton(QApplication.translate("Button","Write SV5",None))
-        button_sv5.setFocusPolicy(Qt.NoFocus)
-        button_sv6 =QPushButton(QApplication.translate("Button","Write SV6",None))
-        button_sv6.setFocusPolicy(Qt.NoFocus)
-        button_sv7 =QPushButton(QApplication.translate("Button","Write SV7",None))
-        button_sv7.setFocusPolicy(Qt.NoFocus)
-        button_sv1.clicked.connect(self.setsv1)
-        button_sv2.clicked.connect(self.setsv2)
-        button_sv3.clicked.connect(self.setsv3)
-        button_sv4.clicked.connect(self.setsv4)
-        button_sv5.clicked.connect(self.setsv5)
-        button_sv6.clicked.connect(self.setsv6)
-        button_sv7.clicked.connect(self.setsv7)
-        self.sv1edit = QLineEdit(str(self.aw.fujipid.PXG4["sv1"][0]))
-        self.sv2edit = QLineEdit(str(self.aw.fujipid.PXG4["sv2"][0]))
-        self.sv3edit = QLineEdit(str(self.aw.fujipid.PXG4["sv3"][0]))
-        self.sv4edit = QLineEdit(str(self.aw.fujipid.PXG4["sv4"][0]))
-        self.sv5edit = QLineEdit(str(self.aw.fujipid.PXG4["sv5"][0]))
-        self.sv6edit = QLineEdit(str(self.aw.fujipid.PXG4["sv6"][0]))
-        self.sv7edit = QLineEdit(str(self.aw.fujipid.PXG4["sv7"][0]))
-        self.sv1edit.setMaximumWidth(80)
-        self.sv2edit.setMaximumWidth(80)
-        self.sv3edit.setMaximumWidth(80)
-        self.sv4edit.setMaximumWidth(80)
-        self.sv5edit.setMaximumWidth(80)
-        self.sv6edit.setMaximumWidth(80)
-        self.sv7edit.setMaximumWidth(80)
-        self.sv1edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.sv1edit))
-        self.sv2edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.sv2edit))
-        self.sv3edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.sv3edit))
-        self.sv4edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.sv4edit))
-        self.sv5edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.sv5edit))
-        self.sv6edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.sv6edit))
-        self.sv7edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.sv7edit))
-        self.radiosv1 = QRadioButton()
-        self.radiosv2 = QRadioButton()
-        self.radiosv3 = QRadioButton()
-        self.radiosv4 = QRadioButton()
-        self.radiosv5 = QRadioButton()
-        self.radiosv6 = QRadioButton()
-        self.radiosv7 = QRadioButton()
-        N = self.aw.fujipid.PXG4["selectsv"][0]
-        if N == 1:
-            self.radiosv1.setChecked(True)
-        elif N == 2:
-            self.radiosv2.setChecked(True)
-        elif N == 3:
-            self.radiosv3.setChecked(True)
-        elif N == 4:
-            self.radiosv4.setChecked(True)
-        elif N == 5:
-            self.radiosv5.setChecked(True)
-        elif N == 6:
-            self.radiosv6.setChecked(True)
-        elif N == 7:
-            self.radiosv7.setChecked(True)
-        self.tab2easySVbuttonsFlag = QCheckBox(QApplication.translate("Label","SV Buttons",None))
-        self.tab2easySVbuttonsFlag.setChecked(self.aw.pidcontrol.svButtons)
-        self.tab2easySVbuttonsFlag.stateChanged.connect(self.setSVbuttons)
-        self.tab2easySVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None))
-        self.tab2easySVsliderFlag.setChecked(self.aw.pidcontrol.svSlider)
-        self.tab2easySVsliderFlag.stateChanged.connect(self.setSVsliderSlot)
-        self.pidSVSliderMin = QSpinBox()
-        self.pidSVSliderMin.setAlignment(Qt.AlignRight)
-        self.pidSVSliderMin.setRange(0,999)
-        self.pidSVSliderMin.setSingleStep(10)
-        self.pidSVSliderMin.setValue(self.aw.pidcontrol.svSliderMin)
-        self.pidSVSliderMin.valueChanged.connect(self.sliderMinValueChangedSlot)
-        pidSVSliderMinLabel = QLabel(QApplication.translate("Label","SV min",None))
-        self.pidSVSliderMax = QSpinBox()
-        self.pidSVSliderMax.setAlignment(Qt.AlignRight)
-        self.pidSVSliderMax.setRange(0,999)
-        self.pidSVSliderMax.setSingleStep(10)
-        self.pidSVSliderMax.setValue(self.aw.pidcontrol.svSliderMax)
-        self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangedSlot)
-        pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","SV max",None))
-        if self.aw.qmc.mode == "F":
-            self.pidSVSliderMin.setSuffix(" F")
-            self.pidSVSliderMax.setSuffix(" F")
-        elif self.aw.qmc.mode == "C":
-            self.pidSVSliderMin.setSuffix(" C")
-            self.pidSVSliderMax.setSuffix(" C")
-
-        tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV (7-0)",None))
-        tab2getsvbutton.setFocusPolicy(Qt.NoFocus)
-        tab2putsvbutton = QPushButton(QApplication.translate("Button","Write SV (7-0)",None))
-        tab2putsvbutton.setFocusPolicy(Qt.NoFocus)
-        tab2getsvbutton.clicked.connect(self.getallsv)
-        tab2putsvbutton.clicked.connect(self.writeSetValues)
-        self.radiosv1.clicked.connect(self.setNsvSlot)
-        self.radiosv2.clicked.connect(self.setNsvSlot)
-        self.radiosv3.clicked.connect(self.setNsvSlot)
-        self.radiosv4.clicked.connect(self.setNsvSlot)
-        self.radiosv5.clicked.connect(self.setNsvSlot)
-        self.radiosv6.clicked.connect(self.setNsvSlot)
-        self.radiosv7.clicked.connect(self.setNsvSlot)
-        #****************   TAB 3 WIDGETS
-        plabel = QLabel()
-        plabel.setContentsMargins(10,10,10,10)
-        plabel.setStyleSheet("background-color:'#CCCCCC';")
-        plabel.setText("<font color='white'><b>" + QApplication.translate("Label", "P",None) + "</b></font>")
-        plabel.setMaximumSize(50, 42)
-        plabel.setMinimumHeight(50)
-        ilabel = QLabel()
-        ilabel.setContentsMargins(10,10,10,10)
-        ilabel.setStyleSheet("background-color:'#CCCCCC';")
-        ilabel.setText("<font color='white'><b>" + QApplication.translate("Label", "I",None) + "</b></font>")
-        ilabel.setMaximumSize(50, 42)
-        ilabel.setMinimumHeight(50)
-        dlabel = QLabel()
-        dlabel.setContentsMargins(10,10,10,10)
-        dlabel.setStyleSheet("background-color:'#CCCCCC';")
-        dlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "D",None) + "</b></font>")
-        dlabel.setMaximumSize(50, 42)
-        dlabel.setMinimumHeight(50)
-        wlabel = QLabel()
-        wlabel.setContentsMargins(10,10,10,10)
-        wlabel.setStyleSheet("background-color:'#CCCCCC';")
-        wlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None) + "</b></font>")
-        wlabel.setMaximumSize(100, 42)
-        wlabel.setMinimumHeight(50)
-        self.p1edit =  QLineEdit(str(self.aw.fujipid.PXG4["p1"][0]))
-        self.p2edit =  QLineEdit(str(self.aw.fujipid.PXG4["p2"][0]))
-        self.p3edit =  QLineEdit(str(self.aw.fujipid.PXG4["p3"][0]))
-        self.p4edit =  QLineEdit(str(self.aw.fujipid.PXG4["p4"][0]))
-        self.p5edit =  QLineEdit(str(self.aw.fujipid.PXG4["p5"][0]))
-        self.p6edit =  QLineEdit(str(self.aw.fujipid.PXG4["p6"][0]))
-        self.p7edit =  QLineEdit(str(self.aw.fujipid.PXG4["p7"][0]))
-        self.i1edit =  QLineEdit(str(self.aw.fujipid.PXG4["i1"][0]))
-        self.i2edit =  QLineEdit(str(self.aw.fujipid.PXG4["i2"][0]))
-        self.i3edit =  QLineEdit(str(self.aw.fujipid.PXG4["i3"][0]))
-        self.i4edit =  QLineEdit(str(self.aw.fujipid.PXG4["i4"][0]))
-        self.i5edit =  QLineEdit(str(self.aw.fujipid.PXG4["i5"][0]))
-        self.i6edit =  QLineEdit(str(self.aw.fujipid.PXG4["i6"][0]))
-        self.i7edit =  QLineEdit(str(self.aw.fujipid.PXG4["i7"][0]))
-        self.d1edit =  QLineEdit(str(self.aw.fujipid.PXG4["d1"][0]))
-        self.d2edit =  QLineEdit(str(self.aw.fujipid.PXG4["d2"][0]))
-        self.d3edit =  QLineEdit(str(self.aw.fujipid.PXG4["d3"][0]))
-        self.d4edit =  QLineEdit(str(self.aw.fujipid.PXG4["d4"][0]))
-        self.d5edit =  QLineEdit(str(self.aw.fujipid.PXG4["d5"][0]))
-        self.d6edit =  QLineEdit(str(self.aw.fujipid.PXG4["d6"][0]))
-        self.d7edit =  QLineEdit(str(self.aw.fujipid.PXG4["d7"][0]))
-        self.p1edit.setMaximumSize(50, 42)
-        self.p2edit.setMaximumSize(50, 42)
-        self.p3edit.setMaximumSize(50, 42)
-        self.p4edit.setMaximumSize(50, 42)
-        self.p5edit.setMaximumSize(50, 42)
-        self.p6edit.setMaximumSize(50, 42)
-        self.p7edit.setMaximumSize(50, 42)
-        self.i1edit.setMaximumSize(50, 42)
-        self.i2edit.setMaximumSize(50, 42)
-        self.i3edit.setMaximumSize(50, 42)
-        self.i4edit.setMaximumSize(50, 42)
-        self.i5edit.setMaximumSize(50, 42)
-        self.i6edit.setMaximumSize(50, 42)
-        self.i7edit.setMaximumSize(50, 42)
-        self.d1edit.setMaximumSize(50, 42)
-        self.d2edit.setMaximumSize(50, 42)
-        self.d3edit.setMaximumSize(50, 42)
-        self.d4edit.setMaximumSize(50, 42)
-        self.d5edit.setMaximumSize(50, 42)
-        self.d6edit.setMaximumSize(50, 42)
-        self.d7edit.setMaximumSize(50, 42)
-        #p = 0-999.9
-        self.p1edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.p1edit))
-        self.p2edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.p2edit))
-        self.p3edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.p3edit))
-        self.p4edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.p4edit))
-        self.p5edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.p5edit))
-        self.p6edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.p6edit))
-        self.p7edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.p7edit))
-        #i are int 0-3200
-        self.i1edit.setValidator(QIntValidator(0, 3200, self.i1edit))
-        self.i2edit.setValidator(QIntValidator(0, 3200, self.i2edit))
-        self.i3edit.setValidator(QIntValidator(0, 3200, self.i3edit))
-        self.i4edit.setValidator(QIntValidator(0, 3200, self.i4edit))
-        self.i5edit.setValidator(QIntValidator(0, 3200, self.i5edit))
-        self.i6edit.setValidator(QIntValidator(0, 3200, self.i6edit))
-        self.i7edit.setValidator(QIntValidator(0, 3200, self.i7edit))
-        #d 0-999.9
-        self.d1edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.d1edit))
-        self.d2edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.d2edit))
-        self.d3edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.d3edit))
-        self.d4edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.d4edit))
-        self.d5edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.d5edit))
-        self.d6edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.d6edit))
-        self.d7edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.d7edit))
-        self.pid1button = QPushButton(QApplication.translate("Button","pid 1",None))
-        self.pid1button.setFocusPolicy(Qt.NoFocus)
-        self.pid2button = QPushButton(QApplication.translate("Button","pid 2",None))
-        self.pid2button.setFocusPolicy(Qt.NoFocus)
-        self.pid3button = QPushButton(QApplication.translate("Button","pid 3",None))
-        self.pid3button.setFocusPolicy(Qt.NoFocus)
-        self.pid4button = QPushButton(QApplication.translate("Button","pid 4",None))
-        self.pid4button.setFocusPolicy(Qt.NoFocus)
-        self.pid5button = QPushButton(QApplication.translate("Button","pid 5",None))
-        self.pid5button.setFocusPolicy(Qt.NoFocus)
-        self.pid6button = QPushButton(QApplication.translate("Button","pid 6",None))
-        self.pid6button.setFocusPolicy(Qt.NoFocus)
-        self.pid7button = QPushButton(QApplication.translate("Button","pid 7",None))
-        self.pid7button.setFocusPolicy(Qt.NoFocus)
-        pidreadallbutton = QPushButton(QApplication.translate("Button","Read PIDs",None))
-        pidreadallbutton.setFocusPolicy(Qt.NoFocus)
-        pidwriteallbutton = QPushButton(QApplication.translate("Button","Write PIDs",None))
-        pidwriteallbutton.setFocusPolicy(Qt.NoFocus)
-        autotuneONbutton = QPushButton(QApplication.translate("Button","Autotune ON",None))
-        autotuneONbutton.setFocusPolicy(Qt.NoFocus)
-        autotuneOFFbutton = QPushButton(QApplication.translate("Button","Autotune OFF",None))
-        autotuneOFFbutton.setFocusPolicy(Qt.NoFocus)
-        cancel3button = QPushButton(QApplication.translate("Button","Cancel",None))
-        cancel3button.setFocusPolicy(Qt.NoFocus)
-        self.radiopid1 = QRadioButton()
-        self.radiopid2 = QRadioButton()
-        self.radiopid3 = QRadioButton()
-        self.radiopid4 = QRadioButton()
-        self.radiopid5 = QRadioButton()
-        self.radiopid6 = QRadioButton()
-        self.radiopid7 = QRadioButton()
-        pidreadallbutton.clicked.connect(self.getallpid)
-        pidwriteallbutton.clicked.connect(self.writePIDValues)
-        self.radiopid1.clicked.connect(self.setNpidSlot)
-        self.radiopid2.clicked.connect(self.setNpidSlot)
-        self.radiopid3.clicked.connect(self.setNpidSlot)
-        self.radiopid4.clicked.connect(self.setNpidSlot)
-        self.radiopid5.clicked.connect(self.setNpidSlot)
-        self.radiopid6.clicked.connect(self.setNpidSlot)
-        self.radiopid7.clicked.connect(self.setNpidSlot)
-        self.pid1button.clicked.connect(self.setpidSlot)
-        self.pid2button.clicked.connect(self.setpidSlot)
-        self.pid3button.clicked.connect(self.setpidSlot)
-        self.pid4button.clicked.connect(self.setpidSlot)
-        self.pid5button.clicked.connect(self.setpidSlot)
-        self.pid6button.clicked.connect(self.setpidSlot)
-        self.pid7button.clicked.connect(self.setpidSlot)
-        cancel3button.clicked.connect(self.cancelAction)
-        autotuneONbutton.clicked.connect(self.setONautotune)
-        autotuneOFFbutton.clicked.connect(self.setOFFautotune)
-        #****************************   TAB4 WIDGETS
-        #table for setting segments
-        self.segmenttable = QTableWidget()
-        self.createsegmenttable()
-        #****************************   TAB5 WIDGETS
-        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None))
-        self.ETthermocombobox = QComboBox()
-        self.ETthermocombobox.setFocusPolicy(Qt.NoFocus)
-        self.BTthermocombobox = QComboBox()
-        self.BTthermocombobox.setFocusPolicy(Qt.NoFocus)
-        if self.aw.ser.controlETpid[0] == 0: # PXG
-            self.ETthermocombobox.addItems(self.aw.fujipid.PXGthermotypes)
-            if self.aw.fujipid.PXG4["pvinputtype"][0] in self.aw.fujipid.PXGconversiontoindex:
-                self.ETthermocombobox.setCurrentIndex(self.aw.fujipid.PXGconversiontoindex.index(self.aw.fujipid.PXG4["pvinputtype"][0]))
-        else: # PXF
-            self.ETthermocombobox.addItems(self.aw.fujipid.PXFthermotypes)
-            if self.aw.fujipid.PXF["pvinputtype"][0] in self.aw.fujipid.PXFconversiontoindex:
-                self.ETthermocombobox.setCurrentIndex(self.aw.fujipid.PXFconversiontoindex.index(self.aw.fujipid.PXF["pvinputtype"][0]))
-        if self.aw.ser.readBTpid[0] == 0:        #fuji PXG
-            self.BTthermocombobox.addItems(self.aw.fujipid.PXGthermotypes)
-        elif self.aw.ser.readBTpid[0] == 1:      #fuji PXR
-            self.BTthermocombobox.addItems(self.aw.fujipid.PXRthermotypes)
-        else:      #fuji PXF
-            self.BTthermocombobox.addItems(self.aw.fujipid.PXFthermotypes)
-        setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
-        setETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
-        setBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
-        getETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
-        getBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        setETthermocouplebutton.setMaximumWidth(80)
-        getETthermocouplebutton.setMaximumWidth(80)
-        setBTthermocouplebutton.setMaximumWidth(80)
-        getBTthermocouplebutton.setMaximumWidth(80)
-        setETthermocouplebutton.clicked.connect(self.setthermocoupletypeET)
-        setBTthermocouplebutton.clicked.connect(self.setthermocoupletypeBT)
-        getETthermocouplebutton.clicked.connect(self.readthermocoupletypeET)
-        getBTthermocouplebutton.clicked.connect(self.readthermocoupletypeBT)
-        PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None))
-        PointButtonET.setFocusPolicy(Qt.NoFocus)
-        PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None))
-        PointButtonBT.setFocusPolicy(Qt.NoFocus)
-        timeunitsbutton = QPushButton(QApplication.translate("Button","Set ET PID to MM:SS time units",None))
-        timeunitsbutton.setFocusPolicy(Qt.NoFocus)
-        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
-        if self.aw.ser.controlETpid[0] == 0:
-            timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None))
-        else:
-            timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXF uses MINUTES:SECONDS units in Ramp/Soaks",None))
-        PointButtonET.clicked.connect(self.setpointET)
-        PointButtonBT.clicked.connect(self.setpointBT)
-        timeunitsbutton.clicked.connect(self.settimeunits)
-        # LAYOUTS
-        tab1Layout = QGridLayout() #TAB1
-        tab1Layout.setSpacing(10)
-        tab1Layout.setSizeConstraint(2)
-        tab1Layout.addLayout(buttonRampSoakLayout1,0,0)
-        tab1Layout.addLayout(buttonRampSoakLayout2,0,1)
-        tab1Layout.addWidget(button_rson,1,0)
-        tab1Layout.addWidget(button_rsoff,1,1)
-        tab1Layout.addWidget(button_standbyOFF,2,0)
-        tab1Layout.addWidget(button_standbyON,2,1)
-        tab1Layout.addWidget(patternlabel,3,0)
-        tab1Layout.addWidget(self.patternComboBox,3,1)
-        tab1Layout.addWidget(button_getall,4,0)
-        tab1Layout.addWidget(button_writeallrs,4,1)
-        tab2Layout = QGridLayout() #TAB2 
-        tab2Layout.setSpacing(10)
-        tab2Layout.setSizeConstraint(2)
-        tab2Layout.addWidget(labelsv,0,0)
-        tab2Layout.addWidget(labelsvedit,0,1)
-        tab2Layout.addWidget(self.sv7edit,1,0)
-        tab2Layout.addWidget(button_sv7,1,1)
-        tab2Layout.addWidget(self.sv6edit,2,0)
-        tab2Layout.addWidget(button_sv6,2,1)
-        tab2Layout.addWidget(self.sv5edit,3,0)
-        tab2Layout.addWidget(button_sv5,3,1)
-        tab2Layout.addWidget(self.sv4edit,4,0)
-        tab2Layout.addWidget(button_sv4,4,1)
-        tab2Layout.addWidget(self.sv3edit,5,0)
-        tab2Layout.addWidget(button_sv3,5,1)
-        tab2Layout.addWidget(self.sv2edit,6,0)
-        tab2Layout.addWidget(button_sv2,6,1)
-        tab2Layout.addWidget(self.sv1edit,7,0)
-        tab2Layout.addWidget(button_sv1,7,1)
-        tab2Layout.addWidget(self.radiosv7,1,2)
-        tab2Layout.addWidget(self.radiosv6,2,2)
-        tab2Layout.addWidget(self.radiosv5,3,2)
-        tab2Layout.addWidget(self.radiosv4,4,2)
-        tab2Layout.addWidget(self.radiosv3,5,2)
-        tab2Layout.addWidget(self.radiosv2,6,2)
-        tab2Layout.addWidget(self.radiosv1,7,2)
-        tab2Layout.addWidget(self.tab2easySVbuttonsFlag,8,0)
-        tab2Layout.addWidget(self.tab2easySVsliderFlag,8,1)
-        tab2Layout.addWidget(pidSVSliderMinLabel,8,3)
-        tab2Layout.addWidget(self.pidSVSliderMin,8,4)
-#        tab2Layout.addWidget(tab2easyOFFsvslider,9,0)
-#        tab2Layout.addWidget(tab2easyONsvslider,9,1)
-        tab2Layout.addWidget(pidSVSliderMaxLabel,9,3)
-        tab2Layout.addWidget(self.pidSVSliderMax,9,4)
-        tab2Layout.addWidget(tab2getsvbutton,9,0)
-        tab2Layout.addWidget(tab2putsvbutton,9,1)
-        tab3Layout = QGridLayout() #TAB3
-        tab3Layout.setSpacing(10)
-        tab3Layoutbutton = QGridLayout()
-        tab3MasterLayout = QVBoxLayout()
-        tab3MasterLayout.addLayout(tab3Layout,0)
-        tab3MasterLayout.addLayout(tab3Layoutbutton,1)
-        tab3Layout.addWidget(plabel,0,0)
-        tab3Layout.addWidget(ilabel,0,1)
-        tab3Layout.addWidget(dlabel,0,2)
-        tab3Layout.addWidget(wlabel,0,3)
-        tab3Layout.addWidget(self.p1edit,1,0)
-        tab3Layout.addWidget(self.i1edit,1,1)
-        tab3Layout.addWidget(self.d1edit,1,2)
-        tab3Layout.addWidget(self.pid1button,1,3)
-        tab3Layout.addWidget(self.p2edit,2,0)
-        tab3Layout.addWidget(self.i2edit,2,1)
-        tab3Layout.addWidget(self.d2edit,2,2)
-        tab3Layout.addWidget(self.pid2button,2,3)
-        tab3Layout.addWidget(self.p3edit,3,0)
-        tab3Layout.addWidget(self.i3edit,3,1)
-        tab3Layout.addWidget(self.d3edit,3,2)
-        tab3Layout.addWidget(self.pid3button,3,3)
-        tab3Layout.addWidget(self.p4edit,4,0)
-        tab3Layout.addWidget(self.i4edit,4,1)
-        tab3Layout.addWidget(self.d4edit,4,2)
-        tab3Layout.addWidget(self.pid4button,4,3)
-        tab3Layout.addWidget(self.p5edit,5,0)
-        tab3Layout.addWidget(self.i5edit,5,1)
-        tab3Layout.addWidget(self.d5edit,5,2)
-        tab3Layout.addWidget(self.pid5button,5,3)
-        tab3Layout.addWidget(self.p6edit,6,0)
-        tab3Layout.addWidget(self.i6edit,6,1)
-        tab3Layout.addWidget(self.d6edit,6,2)
-        tab3Layout.addWidget(self.pid6button,6,3)
-        tab3Layout.addWidget(self.p7edit,7,0)
-        tab3Layout.addWidget(self.i7edit,7,1)
-        tab3Layout.addWidget(self.d7edit,7,2)
-        tab3Layout.addWidget(self.pid7button,7,3)
-        tab3Layout.addWidget(self.radiopid1,1,4)
-        tab3Layout.addWidget(self.radiopid2,2,4)
-        tab3Layout.addWidget(self.radiopid3,3,4)
-        tab3Layout.addWidget(self.radiopid4,4,4)
-        tab3Layout.addWidget(self.radiopid5,5,4)
-        tab3Layout.addWidget(self.radiopid6,6,4)
-        tab3Layout.addWidget(self.radiopid7,7,4)
-        tab3Layoutbutton.addWidget(autotuneONbutton,0,0)
-        tab3Layoutbutton.addWidget(autotuneOFFbutton,0,1)
-        tab3Layoutbutton.addWidget(pidreadallbutton,1,0)
-        tab3Layoutbutton.addWidget(pidwriteallbutton,1,1)
-        #tab 4
-        tab4layout = QVBoxLayout()
-        tab4layout.addWidget(self.segmenttable)
-        #tab5
-        thermolayoutET = QHBoxLayout()
-        thermolayoutET.addWidget(self.ETthermocombobox)
-        thermolayoutET.addStretch()
-        thermolayoutET.addWidget(getETthermocouplebutton)
-        thermolayoutET.addWidget(setETthermocouplebutton)
-        ETGroupBox = QGroupBox(QApplication.translate("Label","ET Thermocouple type",None))
-        ETGroupBox.setLayout(thermolayoutET)
-        thermolayoutBT = QHBoxLayout()
-        thermolayoutBT.addWidget(self.BTthermocombobox)
-        thermolayoutBT.addStretch()
-        thermolayoutBT.addWidget(getBTthermocouplebutton)
-        thermolayoutBT.addWidget(setBTthermocouplebutton)
-        BTGroupBox = QGroupBox(QApplication.translate("Label","BT Thermocouple type",None))
-        BTGroupBox.setLayout(thermolayoutBT)
-        tab5Layout = QVBoxLayout()
-        tab5Layout.addStretch()
-        tab5Layout.addWidget(ETGroupBox)
-        tab5Layout.addWidget(BTGroupBox)
-        tab5Layout.addWidget(BTthermolabelnote)
-        tab5Layout.addStretch()
-        tab5Layout.addWidget(pointlabel)
-        tab5Layout.addWidget(PointButtonET)
-        tab5Layout.addWidget(PointButtonBT)
-        tab5Layout.addStretch()
-        tab5Layout.addWidget(timelabel)
-        tab5Layout.addWidget(timeunitsbutton)
-        tab5Layout.addStretch()
-        ############################
-        followLayout = QHBoxLayout()
-        followLayout.addStretch()
-        followLayout.addWidget(self.followBackground)
-        followLayout.addStretch()
-        followLayout.addWidget(pidSVLookaheadLabel)
-        followLayout.addWidget(self.pidSVLookahead)
-        followLayout.addStretch()
-        ############################
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(button_load)
-        buttonLayout.addWidget(button_save)
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(button_writeall)
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(button_exit)
-        ############################
-        TabWidget = QTabWidget()
-        C1Widget = QWidget()
-        C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","RS",None))
-        C2Widget = QWidget()
-        C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","SV",None))
-        C3Widget = QWidget()
-        C3Widget.setLayout(tab3MasterLayout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","PID",None))
-        C4Widget = QWidget()
-        C4Widget.setLayout(tab4layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Set RS",None))
-        C5Widget = QWidget()
-        C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Extra",None))
-        #incorporate layouts
-        layout = QVBoxLayout()
-        layout.addWidget(self.status,0)
-        layout.addWidget(TabWidget,1)
-        layout.addLayout(followLayout,2)
-        layout.addLayout(buttonLayout,3)
-        self.setLayout(layout)
-    
-    @pyqtSlot(bool)
-    def cancelAction(self,_):
-        self.reject()
-    
-    @pyqtSlot(int)
-    def sliderMinValueChangedSlot(self,i):
-        self.aw.pidcontrol.sliderMinValueChanged(i)
-    
-    @pyqtSlot(int)
-    def sliderMaxValueChangedSlot(self,i):
-        self.aw.pidcontrol.sliderMaxValueChanged(i)
-    
-    @pyqtSlot(int)
-    def setSVbuttons(self,flag):
-        self.aw.pidcontrol.svButtons = bool(flag)
-        
-    @pyqtSlot(int)
-    def setSVsliderSlot(self,i):
-        self.setSVslider(i)
-        self.aw.pidcontrol.activateSVSlider(i)
-
-    def setSVslider(self,flag):
-        self.aw.pidcontrol.svSlider = bool(flag)
-
-    @pyqtSlot(int)
-    def changeLookAhead(self,_):
-        self.aw.fujipid.lookahead = int(self.pidSVLookahead.value())
-    
-    @pyqtSlot(int)
-    def changeFollowBackground(self,_):
-        self.aw.fujipid.followBackground = not self.aw.fujipid.followBackground
-    
-    @pyqtSlot(bool)
-    def load(self,_):
-        self.aw.fileImport(QApplication.translate("Message", "Load PID Settings",None),self.loadPIDJSON)
-
-    def loadPIDJSON(self,filename):
-        try:
-            import io
-            infile = io.open(filename, 'r', encoding='utf-8')
-            from json import load as json_load
-            pids = json_load(infile)
-            infile.close()
-            # load set values
-            setvalues = pids["setvalues"]
-            for i in range(7):
-                svkey = "sv" + str(i+1)
-                self.aw.fujipid.PXG4[svkey][0] = setvalues[svkey]
-            self.sv1edit.setText(str(self.aw.fujipid.PXG4["sv1"][0]))
-            self.sv2edit.setText(str(self.aw.fujipid.PXG4["sv2"][0]))
-            self.sv3edit.setText(str(self.aw.fujipid.PXG4["sv3"][0]))
-            self.sv4edit.setText(str(self.aw.fujipid.PXG4["sv4"][0]))
-            self.sv5edit.setText(str(self.aw.fujipid.PXG4["sv5"][0]))
-            self.sv6edit.setText(str(self.aw.fujipid.PXG4["sv6"][0]))
-            self.sv7edit.setText(str(self.aw.fujipid.PXG4["sv7"][0]))
-            # load PID values
-            pidvalues = pids["pidvalues"]
-            for i in range(7):
-                pkey = "p" + str(i+1)
-                ikey = "i" + str(i+1)
-                dkey = "d" + str(i+1)
-                self.aw.fujipid.PXG4[pkey][0] = pidvalues[pkey]
-                self.aw.fujipid.PXG4[ikey][0] = pidvalues[ikey]
-                self.aw.fujipid.PXG4[dkey][0] = pidvalues[dkey]
-            self.p1edit.setText(str(self.aw.fujipid.PXG4["p1"][0]))
-            self.p2edit.setText(str(self.aw.fujipid.PXG4["p2"][0]))
-            self.p3edit.setText(str(self.aw.fujipid.PXG4["p3"][0]))
-            self.p4edit.setText(str(self.aw.fujipid.PXG4["p4"][0]))
-            self.p5edit.setText(str(self.aw.fujipid.PXG4["p5"][0]))
-            self.p6edit.setText(str(self.aw.fujipid.PXG4["p6"][0]))
-            self.p7edit.setText(str(self.aw.fujipid.PXG4["p7"][0]))
-            self.i1edit.setText(str(self.aw.fujipid.PXG4["i1"][0]))
-            self.i2edit.setText(str(self.aw.fujipid.PXG4["i2"][0]))
-            self.i3edit.setText(str(self.aw.fujipid.PXG4["i3"][0]))
-            self.i4edit.setText(str(self.aw.fujipid.PXG4["i4"][0]))
-            self.i5edit.setText(str(self.aw.fujipid.PXG4["i5"][0]))
-            self.i6edit.setText(str(self.aw.fujipid.PXG4["i6"][0]))
-            self.i7edit.setText(str(self.aw.fujipid.PXG4["i7"][0]))
-            self.d1edit.setText(str(self.aw.fujipid.PXG4["d1"][0]))
-            self.d2edit.setText(str(self.aw.fujipid.PXG4["d2"][0]))
-            self.d3edit.setText(str(self.aw.fujipid.PXG4["d3"][0]))
-            self.d4edit.setText(str(self.aw.fujipid.PXG4["d4"][0]))
-            self.d5edit.setText(str(self.aw.fujipid.PXG4["d5"][0]))
-            self.d6edit.setText(str(self.aw.fujipid.PXG4["d6"][0]))
-            self.d7edit.setText(str(self.aw.fujipid.PXG4["d7"][0]))
-            # load ramp-soak segments
-            segments = pids["segments"]
-            for i in range(16):
-                svkey = "segment" + str(i+1) + "sv"
-                rampkey = "segment" + str(i+1) + "ramp"
-                soakkey = "segment" + str(i+1) + "soak"
-                self.aw.fujipid.PXG4[svkey][0] = segments[svkey]
-                self.aw.fujipid.PXG4[rampkey][0] = stringtoseconds(segments[rampkey])
-                self.aw.fujipid.PXG4[soakkey][0] = stringtoseconds(segments[soakkey])
-            self.createsegmenttable()
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadPIDJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
-
-    @pyqtSlot(bool)
-    def writeSetValues(self,_=False):
-        for i in range(7):
-            self.setsv(i+1)
-
-    @pyqtSlot(bool)
-    def writePIDValues(self,_=False):
-        for i in range(7):
-            self.setpid(i+1)
-
-    @pyqtSlot(bool)
-    def writeRSValues(self,_=False):
-        for i in range(16):
-            self.setsegment(i)
-
-    @pyqtSlot(bool)
-    def writeAll(self,_):
-        self.writeSetValues()
-        self.writePIDValues()
-        self.writeRSValues()
-
-    @pyqtSlot(bool)
-    def save(self,_):
-        self.aw.fileExport(QApplication.translate("Message", "Save PID Settings",None),"*.apid",self.savePIDJSON)
-
-    def savePIDJSON(self,filename):
-        try:
-            pids = {}
-            # store set values
-            setvalues = {}
-            for i in range(7):
-                svkey = "sv" + str(i+1)
-                setvalues[svkey] = self.aw.fujipid.PXG4[svkey][0]
-            pids["setvalues"] = setvalues
-            # store PID values
-            pidvalues = {}
-            for i in range(7):
-                pkey = "p" + str(i+1)
-                ikey = "i" + str(i+1)
-                dkey = "d" + str(i+1)
-                pidvalues[pkey] = self.aw.fujipid.PXG4[pkey][0]
-                pidvalues[ikey] = self.aw.fujipid.PXG4[ikey][0]
-                pidvalues[dkey] = self.aw.fujipid.PXG4[dkey][0]
-            pids["pidvalues"] = pidvalues
-            # store ramp-soak segments
-            segments = {}
-            for i in range(16):
-                svkey = "segment" + str(i+1) + "sv"
-                rampkey = "segment" + str(i+1) + "ramp"
-                soakkey = "segment" + str(i+1) + "soak"
-                segments[svkey] = self.aw.fujipid.PXG4[svkey][0]
-                segments[rampkey] = stringfromseconds(self.aw.fujipid.PXG4[rampkey][0])
-                segments[soakkey] = stringfromseconds(self.aw.fujipid.PXG4[soakkey][0])
-            pids["segments"] = segments
-            outfile = open(filename, 'w')
-            from json import dump as json_dump
-            json_dump(pids, outfile, ensure_ascii=True)
-            outfile.write('\n')
-            outfile.close()
-            return True
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " savePIDJSON(): {0}").format(str(ex)),exc_tb.tb_lineno)
-            return False
-
-    @pyqtSlot(bool)
-    def settimeunits(self,_):
-        if self.aw.ser.controlETpid[0] == 0:
-            reg_dict = self.aw.fujipid.PXG4
-        else:
-            reg_dict = self.aw.fujipid.PXF
-        try:
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(reg_dict["timeunits"][1],6)
-                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,1)
-                r = command = ""
-            else:
-                command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict["timeunits"][1],1)
-                r = self.aw.ser.sendFUJIcommand(command,8)
-            #check response from pid and update message on main window
-            if r == command:
-                message = QApplication.translate("StatusBar","Time Units successfully set to MM:SS",None)
-                self.status.showMessage(message, 5000)
-            else:
-                self.status.showMessage(QApplication.translate("StatusBar","Problem setting time units",None),5000)
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " settimeunits(): {0}").format(str(e)),exc_tb.tb_lineno)
-    
-    @pyqtSlot(int)
-    def paintlabels(self,_=0):
-        #read values of computer variables (not the actual pid values) to place in buttons
-        str1 = "1 [T " + str(self.aw.fujipid.PXG4["segment1sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment1ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment1soak"][0]) + "]"
-        str2 = "2 [T " + str(self.aw.fujipid.PXG4["segment2sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment2ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment2soak"][0]) + "]"
-        str3 = "3 [T " + str(self.aw.fujipid.PXG4["segment3sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment3ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment3soak"][0]) + "]"
-        str4 = "4 [T " + str(self.aw.fujipid.PXG4["segment4sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment4ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment4soak"][0]) + "]"
-        str5 = "5 [T " + str(self.aw.fujipid.PXG4["segment5sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment5ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment5soak"][0]) + "]"
-        str6 = "6 [T " + str(self.aw.fujipid.PXG4["segment6sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment6ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment6soak"][0]) + "]"
-        str7 = "7 [T " + str(self.aw.fujipid.PXG4["segment7sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment7ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment7soak"][0]) + "]"
-        str8 = "8 [T " + str(self.aw.fujipid.PXG4["segment8sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment8ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment8soak"][0]) + "]"
-        str9 = "9 [T " + str(self.aw.fujipid.PXG4["segment9sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment9ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment9soak"][0]) + "]"
-        str10 = "10 [T " + str(self.aw.fujipid.PXG4["segment10sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment10ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment10soak"][0]) + "]"
-        str11 = "11 [T " + str(self.aw.fujipid.PXG4["segment11sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment11ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment11soak"][0]) + "]"
-        str12 = "12 [T " + str(self.aw.fujipid.PXG4["segment12sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment12ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment12soak"][0]) + "]"
-        str13 = "13 [T " + str(self.aw.fujipid.PXG4["segment13sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment13ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment13soak"][0]) + "]"
-        str14 = "14 [T " + str(self.aw.fujipid.PXG4["segment14sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment14ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment14soak"][0]) + "]"
-        str15 = "15 [T " + str(self.aw.fujipid.PXG4["segment15sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment15ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment15soak"][0]) + "]"
-        str16 = "16 [T " + str(self.aw.fujipid.PXG4["segment16sv"][0]) + "] [R " + stringfromseconds(self.aw.fujipid.PXG4["segment16ramp"][0]) + "] [S " + stringfromseconds(self.aw.fujipid.PXG4["segment16soak"][0]) + "]"
-        self.label_rs1.setText(u(str1))
-        self.label_rs2.setText(u(str2))
-        self.label_rs3.setText(u(str3))
-        self.label_rs4.setText(u(str4))
-        self.label_rs5.setText(u(str5))
-        self.label_rs6.setText(u(str6))
-        self.label_rs7.setText(u(str7))
-        self.label_rs8.setText(u(str8))
-        self.label_rs9.setText(u(str9))
-        self.label_rs10.setText(u(str10))
-        self.label_rs11.setText(u(str11))
-        self.label_rs12.setText(u(str12))
-        self.label_rs13.setText(u(str13))
-        self.label_rs14.setText(u(str14))
-        self.label_rs15.setText(u(str15))
-        self.label_rs16.setText(u(str16))
-        pattern = [[1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
-                  [0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
-                  [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0],
-                  [0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0],
-                  [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],
-                  [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1],
-                  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]
-        self.aw.fujipid.PXG4["rampsoakpattern"][0] = self.patternComboBox.currentIndex()
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][0]:
-            self.label_rs1.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs1.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][1]:
-            self.label_rs2.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs2.setStyleSheet("background-color:white;")
-
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][2]:
-            self.label_rs3.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs3.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][3]:
-            self.label_rs4.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs4.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][4]:
-            self.label_rs5.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs5.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][5]:
-            self.label_rs6.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs6.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][6]:
-            self.label_rs7.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs7.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][7]:
-            self.label_rs8.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs8.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][8]:
-            self.label_rs9.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs9.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][9]:
-            self.label_rs10.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs10.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][10]:
-            self.label_rs11.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs11.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][11]:
-            self.label_rs12.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs12.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][12]:
-            self.label_rs13.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs13.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][13]:
-            self.label_rs14.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs14.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][14]:
-            self.label_rs15.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs15.setStyleSheet("background-color:white;")
-        if pattern[self.aw.fujipid.PXG4["rampsoakpattern"][0]][15]:
-            self.label_rs16.setStyleSheet("background-color:'#FFCC99';")
-        else:
-            self.label_rs16.setStyleSheet("background-color:white;")
-
-    @pyqtSlot(bool)
-    def setNsvSlot(self,_):
-        widget = self.sender()
-        if widget == self.radiosv1:
-            self.setNsv(1)
-        elif widget == self.radiosv2:
-            self.setNsv(2)
-        elif widget == self.radiosv3:
-            self.setNsv(3)
-        elif widget == self.radiosv4:
-            self.setNsv(4)
-        elif widget == self.radiosv5:
-            self.setNsv(5)
-        elif widget == self.radiosv6:
-            self.setNsv(6)
-        elif widget == self.radiosv7:
-            self.setNsv(7)
-
-    #selects an sv
-    def setNsv(self,svn):
-        if self.aw.ser.controlETpid[0] == 0:
-            reg_dict = self.aw.fujipid.PXG4
-        else:
-            reg_dict = self.aw.fujipid.PXF
-        # read current sv N
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(reg_dict["selectsv"][1],3)
-            N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
-        else:
-            command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict["selectsv"][1],1)
-            N = self.aw.fujipid.readoneword(command)
-        # if current svN is different than requested svN
-        if N != -1:
-            if N != svn:
-                string = QApplication.translate("Message","Current sv = {0}. Change now to sv = {1}?",None).format(str(N),str(svn))
-                reply = QMessageBox.question(aw,QApplication.translate("Message","Change svN",None),string,
-                                    QMessageBox.Yes|QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
-                    #change variable svN
-                    if self.aw.ser.useModbusPort:
-                        reg = self.aw.modbus.address2register(reg_dict["selectsv"][1],6)
-                        self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,svn)
-                        r = command = ""
-                    else:
-                        command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict["selectsv"][1],svn)
-                        r = self.aw.ser.sendFUJIcommand(command,8)
-                    #check response from pid and update message on main window
-                    if r == command:
-                        if svn > 0:
-                            reg_dict["selectsv"][0] = svn
-                            key = "sv" + str(svn)
-                            message = QApplication.translate("StatusBar","SV{0} set to {1}",None).format(str(svn),str(reg_dict[key][0]))
-                            self.aw.lcd6.display(str(reg_dict[key][0]))
-                            self.status.showMessage(message, 5000)
-                    else:
-                        self.status.showMessage(QApplication.translate("StatusBar","Problem setting SV",None),5000)
-                elif reply == QMessageBox.Cancel:
-                    self.status.showMessage(QApplication.translate("StatusBar","Cancelled svN change",None),5000)
-                    #set radio button
-                    if N == 1:
-                        self.radiosv1.setChecked(True)
-                    elif N == 2:
-                        self.radiosv2.setChecked(True)
-                    elif N == 3:
-                        self.radiosv3.setChecked(True)
-                    elif N == 4:
-                        self.radiosv4.setChecked(True)
-                    elif N == 5:
-                        self.radiosv5.setChecked(True)
-                    elif N == 6:
-                        self.radiosv6.setChecked(True)
-                    elif N == 7:
-                        self.radiosv7.setChecked(True)
-                    return 
-            else:
-                mssg = QApplication.translate("StatusBar","PID already using sv{0}",None).format(str(N))
-                self.status.showMessage(mssg,1000)
-        else:
-            mssg = QApplication.translate("StatusBar","setNsv(): bad response",None)
-            self.status.showMessage(mssg,1000)
-            self.aw.qmc.adderror(mssg)
-
-    def setNpidSlot(self,_):
-        widget = self.sender()
-        if widget == self.radiopid1:
-            self.setNpid(1)
-        elif widget == self.radiopid2:
-            self.setNpid(2)
-        elif widget == self.radiopid3:
-            self.setNpid(3)
-        elif widget == self.radiopid4:
-            self.setNpid(4)
-        elif widget == self.radiopid5:
-            self.setNpid(5)
-        elif widget == self.radiopid6:
-            self.setNpid(6)
-        elif widget == self.radiopid7:
-            self.setNpid(7)
-        
-    #selects an sv
-    def setNpid(self,pidn):
-        if self.aw.ser.controlETpid[0] == 0:
-            reg_dict = self.aw.fujipid.PXG4
-        else:
-            reg_dict = self.aw.fujipid.PXF
-        # read current sv N
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(reg_dict["selectedpid"][1],3)
-            N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
-        else:
-            command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict["selectedpid"][1],1)
-            N = self.aw.fujipid.readoneword(command)
-        if N is not None and N != -1:
-            reg_dict["selectedpid"][0] = N
-            # if current svN is different than requested svN
-            if N != pidn:
-                string = QApplication.translate("Message","Current pid = {0}. Change now to pid ={1}?",None).format(str(N),str(pidn))
-                reply = QMessageBox.question(aw,QApplication.translate("Message","Change svN",None),string,
-                                    QMessageBox.Yes|QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
-                    #change variable svN
-                    if self.aw.ser.useModbusPort:
-                        reg = self.aw.modbus.address2register(reg_dict["selectedpid"][1],6)
-                        self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,pidn)
-                        r = command = ""
-                    else:
-                        command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict["selectedpid"][1],pidn)
-                        r = self.aw.ser.sendFUJIcommand(command,8)
-                    #check response from pid and update message on main window
-                    if r == command:
-                        reg_dict["selectedpid"][0] = pidn
-                        #key = "sv" + str(pidn)
-                        message = QApplication.translate("StatusBar","pid changed to {0}",None).format(str(pidn))
-                        self.status.showMessage(message, 5000)
-                    else:
-                        mssg = QApplication.translate("StatusBar","setNpid(): bad confirmation",None)
-                        self.status.showMessage(mssg,1000)
-                        self.aw.qmc.adderror(mssg)
-                elif reply == QMessageBox.Cancel:
-                    self.status.showMessage(QApplication.translate("StatusBar","Cancelled pid change",None),5000)
-                    #put back radio button
-                    if N == 1:
-                        self.radiosv1.setChecked(True)
-                        self.radiopid1.setChecked(True)
-                    elif N == 2:
-                        self.radiosv2.setChecked(True)
-                        self.radiopid2.setChecked(True)
-                    elif N == 3:
-                        self.radiosv3.setChecked(True)
-                        self.radiopid3.setChecked(True)
-                    elif N == 4:
-                        self.radiosv4.setChecked(True)
-                        self.radiopid4.setChecked(True)
-                    elif N == 5:
-                        self.radiosv5.setChecked(True)
-                        self.radiopid5.setChecked(True)
-                    elif N == 6:
-                        self.radiosv6.setChecked(True)
-                        self.radiopid6.setChecked(True)
-                    elif N == 7:
-                        self.radiosv7.setChecked(True)
-                        self.radiopid7.setChecked(True)
-                    return
-            else:
-                mssg = QApplication.translate("StatusBar","PID was already using pid {0}",None).format(str(N))
-                self.status.showMessage(mssg,1000)
-        else:
-            mssg = QApplication.translate("StatusBar","setNpid(): Unable to set pid {0} ",None).format(str(N))
-            self.status.showMessage(mssg,1000)
-            self.aw.qmc.adderror(mssg)
-
-    @pyqtSlot(bool)
-    def setsv1(self,_):
-        self.setsv(1)
-    @pyqtSlot(bool)
-    def setsv2(self,_):
-        self.setsv(2)
-    @pyqtSlot(bool)
-    def setsv3(self,_):
-        self.setsv(3)
-    @pyqtSlot(bool)
-    def setsv4(self,_):
-        self.setsv(4)
-    @pyqtSlot(bool)
-    def setsv5(self,_):
-        self.setsv(5)
-    @pyqtSlot(bool)
-    def setsv6(self,_):
-        self.setsv(6)
-    @pyqtSlot(bool)
-    def setsv7(self,_):
-        self.setsv(7)
-
-    #writes new value on sv(i)
-    def setsv(self,i):
-        if self.aw.ser.controlETpid[0] == 0:
-            reg_dict = self.aw.fujipid.PXG4
-        else:
-            reg_dict = self.aw.fujipid.PXF
-        #first get the new sv value from the correspondig edit line
-        if i == 1:
-            self.sv1edit.setText(self.aw.comma2dot(str(self.sv1edit.text())))
-            if self.sv1edit.text() != "":
-                newSVvalue = int(float(str(self.sv1edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
-        elif i == 2:
-            self.sv2edit.setText(self.aw.comma2dot(str(self.sv2edit.text())))
-            if self.sv2edit.text() != "":
-                newSVvalue = int(float(str(self.sv2edit.text()))*10.)
-        elif i == 3:
-            self.sv3edit.setText(self.aw.comma2dot(str(self.sv3edit.text())))
-            if self.sv3edit.text() != "":
-                newSVvalue = int(float(str(self.sv3edit.text()))*10.)
-        elif i == 4:
-            self.sv4edit.setText(self.aw.comma2dot(str(self.sv4edit.text())))
-            if self.sv4edit.text() != "":
-                newSVvalue = int(float(str(self.sv4edit.text()))*10.)
-        elif i == 5:
-            self.sv5edit.setText(self.aw.comma2dot(str(self.sv5edit.text())))
-            if self.sv5edit.text() != "":
-                newSVvalue = int(float(str(self.sv5edit.text()))*10.)
-        elif i == 6:
-            self.sv6edit.setText(self.aw.comma2dot(str(self.sv6edit.text())))
-            if self.sv6edit.text() != "":
-                newSVvalue = int(float(str(self.sv6edit.text()))*10.)
-        elif i == 7:
-            self.sv7edit.setText(self.aw.comma2dot(str(self.sv7edit.text())))
-            if self.sv7edit.text() != "":
-                newSVvalue = int(float(str(self.sv7edit.text()))*10.)
-        #send command to the right sv
-        svkey = "sv"+ str(i)
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(reg_dict[svkey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,newSVvalue)
-            r = "00000000"
-        else:
-            command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[svkey][1],newSVvalue)
-            r = self.aw.ser.sendFUJIcommand(command,8)
-        #verify it went ok
-        if len(r) == 8:
-            if i == 1:
-                self.sv1edit.setText(self.aw.comma2dot(str(self.sv1edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv1edit.text()))
-                message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv1edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNsv(1)
-                self.aw.lcd6.display(str(self.sv1edit.text()))
-            elif i == 2:
-                self.sv2edit.setText(self.aw.comma2dot(str(self.sv2edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv2edit.text()))
-                message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv2edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNsv(2)
-                self.aw.lcd6.display(str(self.sv2edit.text()))
-            elif i == 3:
-                self.sv3edit.setText(self.aw.comma2dot(str(self.sv3edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv3edit.text()))
-                message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv3edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNsv(3)
-                self.aw.lcd6.display(str(self.sv3edit.text()))
-            elif i == 4:
-                self.sv4edit.setText(self.aw.comma2dot(str(self.sv4edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv4edit.text()))
-                message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv4edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNsv(4)
-                self.aw.lcd6.display(str(self.sv4edit.text()))
-            elif i == 5:
-                self.sv5edit.setText(self.aw.comma2dot(str(self.sv5edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv5edit.text()))
-                message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv5edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNsv(5)
-                self.aw.lcd6.display(str(self.sv5edit.text()))
-            elif i == 6:
-                self.sv6edit.setText(self.aw.comma2dot(str(self.sv6edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv6edit.text()))
-                message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv6edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNsv(6)
-                self.aw.lcd6.display(str(self.sv6edit.text()))
-            elif i == 7:
-                self.sv7edit.setText(self.aw.comma2dot(str(self.sv7edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv7edit.text()))
-                message = QApplication.translate("StatusBar","SV{0} successfully set to {1}",None).format(str(i),str(self.sv7edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNsv(7)
-                self.aw.lcd6.display(str(self.sv7edit.text()))
-            #record command as an Event 
-            strcommand = "SETSV::" + str("%.1f"%(newSVvalue/10.))
-            self.aw.qmc.DeviceEventRecord(strcommand)
-        else:
-            mssg = QApplication.translate("StatusBar","setsv(): Unable to set SV",None)
-            self.status.showMessage(mssg,5000)
-            self.aw.qmc.adderror(mssg)
-
-    @pyqtSlot(bool)
-    def setpidSlot(self,_):
-        widget = self.sender()
-        if widget == self.pid1button:
-            self.setpid(1)
-        elif widget == self.pid2button:
-            self.setpid(2)
-        elif widget == self.pid3button:
-            self.setpid(3)
-        elif widget == self.pid4button:
-            self.setpid(4)
-        elif widget == self.pid5button:
-            self.setpid(5)
-        elif widget == self.pid6button:
-            self.setpid(6)
-        elif widget == self.pid7button:
-            self.setpid(7)
-
-    #writes new values for p - i - d
-    def setpid(self,k):
-        if self.aw.ser.controlETpid[0] == 0:
-            reg_dict = self.aw.fujipid.PXG4
-        else:
-            reg_dict = self.aw.fujipid.PXF
-        #first get the new sv value from the correspondig edit ine
-        if k == 1:
-            if self.p1edit.text() != "" and self.i1edit.text() != "" and self.d1edit.text() != "":
-                newPvalue = int(float(str(self.p1edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i1edit.text().replace(',','.')))*10.)
-                newDvalue = int(float(str(self.d1edit.text().replace(',','.')))*10.)
-        elif k == 2:
-            if self.p2edit.text() != "" and self.i2edit.text() != "" and self.d2edit.text() != "":
-                newPvalue = int(float(str(self.p2edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i2edit.text().replace(',','.')))*10.)
-                newDvalue = int(float(str(self.d2edit.text().replace(',','.')))*10.) 
-        elif k == 3:
-            if self.p3edit.text() != "" and self.i3edit.text() != "" and self.d3edit.text() != "":
-                newPvalue = int(float(str(self.p3edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i3edit.text().replace(',','.')))*10.)
-                newDvalue = int(float(str(self.d3edit.text().replace(',','.')))*10.)
-        elif k == 4:
-            if self.p4edit.text() != "" and self.i4edit.text() != "" and self.d4edit.text() != "":
-                newPvalue = int(float(str(self.p4edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i4edit.text().replace(',','.')))*10.)
-                newDvalue = int(float(str(self.d4edit.text().replace(',','.')))*10.) 
-        elif k == 5:
-            if self.p5edit.text() != "" and self.i5edit.text() != "" and self.d5edit.text() != "":
-                newPvalue = int(float(str(self.p5edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i5edit.text().replace(',','.')))*10.)
-                newDvalue = int(float(str(self.d5edit.text().replace(',','.')))*10.) 
-        elif k == 6:
-            if self.p6edit.text() != "" and self.i6edit.text() != "" and self.d6edit.text() != "":
-                newPvalue = int(float(str(self.p6edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i6edit.text().replace(',','.')))*10.)
-                newDvalue = int(float(str(self.d6edit.text().replace(',','.')))*10.) 
-        elif k == 7:
-            if self.p7edit.text() != "" and self.i7edit.text() != "" and self.d7edit.text() != "":
-                newPvalue = int(float(str(self.p7edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i7edit.text().replace(',','.')))*10.)
-                newDvalue = int(float(str(self.d7edit.text().replace(',','.')))*10.) 
-        #send command to the right sv
-        pkey = "p" + str(k)
-        ikey = "i" + str(k)
-        dkey = "d" + str(k)
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(reg_dict[pkey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,newPvalue)
-            reg = self.aw.modbus.address2register(reg_dict[ikey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,newIvalue)
-            reg = self.aw.modbus.address2register(reg_dict[dkey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,newDvalue)
-            p = i = d = "        "
-        else:
-            commandp = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[pkey][1],newPvalue)
-            commandi = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[ikey][1],newIvalue)
-            commandd = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[dkey][1],newDvalue)
-            p = self.aw.ser.sendFUJIcommand(commandp,8)
-            libtime.sleep(0.035) 
-            i = self.aw.ser.sendFUJIcommand(commandi,8)
-            libtime.sleep(0.035) 
-            d = self.aw.ser.sendFUJIcommand(commandd,8)
-            libtime.sleep(0.035) 
-        #verify it went ok
-        if len(p) == 8 and len(i)==8 and len(d) == 8:
-            if k == 1:               
-                reg_dict[pkey][0] = float(str(self.p1edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i1edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d1edit.text().replace(',','.')))
-                message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
-                                                   )).format(str(k),str(self.p1edit.text()),str(self.i1edit.text()),str(self.d1edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNpid(1)
-            elif k == 2:
-                reg_dict[pkey][0] = float(str(self.p2edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i2edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d2edit.text().replace(',','.')))
-                message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
-                                                   )).format(str(k),str(self.p2edit.text()),str(self.i2edit.text()),str(self.d2edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNpid(2)
-            elif k == 3:
-                reg_dict[pkey][0] = float(str(self.p3edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i3edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d3edit.text().replace(',','.')))
-                message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
-                                                   )).format(str(k),str(self.p3edit.text()),str(self.i3edit.text()),str(self.d3edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNpid(3)
-            elif k == 4:
-                reg_dict[pkey][0] = float(str(self.p4edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i4edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d4edit.text().replace(',','.')))
-                message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
-                                                   )).format(str(k),str(self.p4edit.text()),str(self.i4edit.text()),str(self.d4edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNpid(4)
-            elif k == 5:
-                reg_dict[pkey][0] = float(str(self.p5edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i5edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d5edit.text().replace(',','.')))
-                message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
-                                                   )).format(str(k),str(self.p5edit.text()),str(self.i5edit.text()),str(self.d5edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNpid(5)
-            elif k == 6:
-                reg_dict[pkey][0] = float(str(self.p6edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i6edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d6edit.text().replace(',','.')))
-                message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
-                                                   )).format(str(k),str(self.p6edit.text()),str(self.i6edit.text()),str(self.d6edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNpid(6)
-            elif k == 7:
-                reg_dict[pkey][0] = float(str(self.p7edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i7edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d7edit.text().replace(',','.')))
-                message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
-                                                   )).format(str(k),str(self.p7edit.text()),str(self.i7edit.text()),str(self.d7edit.text()))
-                self.status.showMessage(message,5000)
-                self.setNpid(7) 
-        else:
-            lp = len(p)
-            li = len(i)
-            ld = len(d)
-            mssg = QApplication.translate("StatusBar","pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) ",None
-                                                   ).format(str(k),str(lp),str(li),str(ld))
-            self.status.showMessage(mssg,5000)
-            self.aw.qmc.adderror(mssg)
-    
-    @pyqtSlot(bool)
-    def getallpid(self,_):
-        if self.aw.ser.controlETpid[0] == 0:
-            reg_dict = self.aw.fujipid.PXG4
-        else:
-            reg_dict = self.aw.fujipid.PXF
-        for k in range(1,8):
-            pkey = "p" + str(k)
-            ikey = "i" + str(k)
-            dkey = "d" + str(k)
-            msg = QApplication.translate("StatusBar","sending commands for p{0} i{1} d{2}",None).format(str(k),str(k),str(k))
-            self.status.showMessage(msg,1000)
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(reg_dict[pkey][1],3)
-                p = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)/10.
-            else:
-                commandp = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict[pkey][1],1)
-                p = self.aw.fujipid.readoneword(commandp)/10.
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(reg_dict[ikey][1],3)
-                i = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)/10.
-            else:
-                commandi = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict[ikey][1],1)
-                i = self.aw.fujipid.readoneword(commandi)/10.
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(reg_dict[dkey][1],3)
-                dd = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)/10.
-            else:
-                commandd = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict[dkey][1],1)
-                dd = self.aw.fujipid.readoneword(commandd)/10.
-            p = float(p)
-            i = float(i)
-            dd = float(dd)
-            if p != -1 and i != -1 and dd != -1:
-                reg_dict[pkey][0] = p
-                reg_dict[ikey][0] = i
-                reg_dict[dkey][0] = dd
-                if k == 1:
-                    self.p1edit.setText(str(p))
-                    self.i1edit.setText(str(i))
-                    self.d1edit.setText(str(dd))
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(dd) # No translation needed here
-                    self.status.showMessage(mssg,1000)
-                if k == 2:
-                    self.p2edit.setText(str(p))
-                    self.i2edit.setText(str(i))
-                    self.d2edit.setText(str(dd))
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(dd)
-                    self.status.showMessage(mssg,1000)
-                elif k == 3:
-                    self.p3edit.setText(str(p))
-                    self.i3edit.setText(str(i))
-                    self.d3edit.setText(str(dd))
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(dd)
-                    self.status.showMessage(mssg,1000)
-                elif k == 4:
-                    self.p4edit.setText(str(p))
-                    self.i4edit.setText(str(i))
-                    self.d4edit.setText(str(dd))
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(dd)
-                    self.status.showMessage(mssg,1000)
-                elif k == 5:
-                    self.p5edit.setText(str(p))
-                    self.i5edit.setText(str(i))
-                    self.d5edit.setText(str(dd))
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(dd)
-                    self.status.showMessage(mssg,1000)
-                elif k == 6:
-                    self.p6edit.setText(str(p))
-                    self.i6edit.setText(str(i))
-                    self.d6edit.setText(str(dd))
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(dd)
-                    self.status.showMessage(mssg,1000)
-                elif k == 7:
-                    self.p7edit.setText(str(p))
-                    self.i7edit.setText(str(i))
-                    self.d7edit.setText(str(dd))
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(dd)
-                    self.status.showMessage(mssg,1000)
-            else:
-                mssg = QApplication.translate("StatusBar","getallpid(): Unable to read pid values",None)
-                self.status.showMessage(mssg,5000)
-                self.aw.qmc.adderror(mssg)
-                return
-        #read current pidN
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(reg_dict["selectedpid"][1],3)
-            N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
-        else:
-            command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict["selectedpid"][1],1)
-            N = self.aw.fujipid.readoneword(command)
-        libtime.sleep(0.035) 
-        if N != -1:
-            self.aw.fujipid.PXG4["selectedpid"][0] = N
-            if N == 1:
-                self.radiopid1.setChecked(True)
-            elif N == 2:
-                self.radiopid2.setChecked(True)
-            elif N == 3:
-                self.radiopid3.setChecked(True)
-            elif N == 4:
-                self.radiopid4.setChecked(True)
-            elif N == 5:
-                self.radiopid5.setChecked(True)
-            elif N == 6:
-                self.radiopid6.setChecked(True)
-            elif N == 7:
-                self.radiopid7.setChecked(True)
-            mssg = QApplication.translate("StatusBar","PID is using pid = {0}",None).format(str(N))
-            self.status.showMessage(mssg,5000)
-        else:
-            mssg = QApplication.translate("StatusBar","getallpid(): Unable to read current sv",None)
-            self.status.showMessage(mssg,5000)
-            self.aw.qmc.adderror(mssg)
-
-    @pyqtSlot(bool)
-    def getallsv(self,_):
-        if self.aw.ser.controlETpid[0] == 0:
-            reg_dict = self.aw.fujipid.PXG4
-        else:
-            reg_dict = self.aw.fujipid.PXF
-        for i in reversed(list(range(1,8))):
-            svkey = "sv" + str(i)
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(reg_dict[svkey][1],3)
-                sv = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)/10.
-            else:
-                command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict[svkey][1],1)
-                sv = self.aw.fujipid.readoneword(command)/10.
-            self.aw.fujipid.PXG4[svkey][0] = sv
-            if i == 1:
-                self.sv1edit.setText(str(sv))
-                mssg = svkey + " = " + str(sv)
-                self.status.showMessage(mssg,1000)
-            elif i == 2:
-                self.sv2edit.setText(str(sv))
-                mssg = svkey + " = " + str(sv)
-                self.status.showMessage(mssg,1000)
-            elif i == 3:
-                mssg = svkey + " = " + str(sv)
-                self.status.showMessage(mssg,1000)
-                self.sv3edit.setText(str(sv))
-            elif i == 4:
-                mssg = svkey + " = " + str(sv)
-                self.status.showMessage(mssg,1000)
-                self.sv4edit.setText(str(sv))
-            elif i == 5:
-                mssg = svkey + " = " + str(sv)
-                self.status.showMessage(mssg,1000)
-                self.sv5edit.setText(str(sv))
-            elif i == 6:
-                mssg = svkey + " = " + str(sv)
-                self.status.showMessage(mssg,1000)
-                self.sv6edit.setText(str(sv))
-            elif i == 7:
-                mssg = svkey + " = " + str(sv)
-                self.status.showMessage(mssg,1000)
-                self.sv7edit.setText(str(sv))
-        #read current svN
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(reg_dict["selectsv"][1],3)
-            N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
-        else:
-            command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict["selectsv"][1],1)
-            N = self.aw.fujipid.readoneword(command)
-        if N > 0:
-            reg_dict["selectsv"][0] = N
-        if N == 1:
-            self.radiosv1.setChecked(True)
-        elif N == 2:
-            self.radiosv2.setChecked(True)
-        elif N == 3:
-            self.radiosv3.setChecked(True)
-        elif N == 4:
-            self.radiosv4.setChecked(True)
-        elif N == 5:
-            self.radiosv5.setChecked(True)
-        elif N == 6:
-            self.radiosv6.setChecked(True)
-        elif N == 7:
-            self.radiosv7.setChecked(True)
-        mssg = QApplication.translate("StatusBar","PID is using SV = {0}",None).format(str(N))
-        self.status.showMessage(mssg,5000)
-
-    def checkrampsoakmode(self):
-        currentmode = self.aw.fujipid.getCurrentRampSoakMode()
-        if currentmode == 0:
-            mode = ["0",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 1:
-            mode = ["1",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 2:
-            mode = ["2",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 3:
-            mode = ["3",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 4:
-            mode = ["4",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 5:
-            mode = ["5",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 6:
-            mode = ["6",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 7:
-            mode = ["7",
-                    QApplication.translate("Message","OFF",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 8:
-            mode = ["8",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 9:
-            mode = ["9",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 10:
-            mode = ["10",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 11:
-            mode = ["11",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 12:
-            mode = ["12",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 13:
-            mode = ["13",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
-                    QApplication.translate("Message","ON",None)]
-        elif currentmode == 14:
-            mode = ["14",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","OFF",None)]
-        elif currentmode == 15:
-            mode = ["15",
-                    QApplication.translate("Message","ON",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","STANDBY MODE",None),
-                    QApplication.translate("Message","ON",None)]
-        else:
-            return -1
-        string = "The rampsoak-mode tells how to start and end the ramp/soak\n\n"
-        string += "Your rampsoak mode in this pid is:\n"
-        string += "\nMode = " + mode[0]
-        string += "\n-----------------------------------------------------------------------"
-        string += "\nStart to run from PV value: " + mode[1]
-        string += "\nEnd output status at the end of ramp/soak: " + mode[2]
-        string += "\nOutput status while ramp/soak opearion set to OFF: " + mode[3] 
-        string += "\nRepeat Operation at the end: " + mode[4]
-        string += "\n-----------------------------------------------------------------------"
-        string += "\n\nRecomended Mode = 0\n"
-        string += "\nIf you need to change it, change it now and come back later"
-        string += "\nUse the Parameter Loader Software by Fuji if you need to\n\n"
-        string += "\n\n\nContinue?" 
-        reply = QMessageBox.question(aw,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-        if reply == QMessageBox.Cancel:
-            return 0
-        elif reply == QMessageBox.Yes:
-            return 1
-
-    @pyqtSlot(bool)
-    def setONrampsoak(self,_):
-        self.setONOFFrampsoak(1)
-    
-    @pyqtSlot(bool)
-    def setOFFrampsoak(self,_):
-        self.setONOFFrampsoak(0)
-    
-    def setONOFFrampsoak(self,flag):
-        #warning check how it ends at "rampsoakend":[0,41081] can let pid inop till value changed    UNFINISHED
-        # you can come out of this mode by putting the pid in standby (pid off) 
-        #flag =0 OFF, flag = 1 ON, flag = 2 hold        
-        #set rampsoak pattern ON
-        if flag == 1:
-            check = self.checkrampsoakmode()
-            if check == 0:
-                self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak operation cancelled",None), 5000)
-                return
-            elif check == -1:
-                self.status.showMessage(QApplication.translate("StatusBar","No RX data",None), 5000)
-            self.status.showMessage(QApplication.translate("StatusBar","RS ON",None),500)
-            selectedmode = self.patternComboBox.currentIndex()
-            currentmode = self.aw.fujipid.getrampsoakmode()
-            if currentmode != selectedmode:
-                #set mode in pid to match the mode selected in the combobox
-                self.status.showMessage(QApplication.translate("StatusBar","Need to change pattern mode...",None),1000)
-                res = self.aw.fujipid.setrampsoakmode(selectedmode)
-                if res:
-                    self.status.showMessage(QApplication.translate("StatusBar","Pattern has been changed. Wait 5 secs.",None), 500)
-                else:
-                    self.status.showMessage(QApplication.translate("StatusBar","Pattern could not be changed",None), 5000)
-                    return
-            #combobox mode matches pid mode
-            #set ramp soak mode ON/OFF
-            res = self.aw.fujipid.setrampsoak(flag)
-            if res:
-                #record command as an Event if flag = 1
-                self.status.showMessage(QApplication.translate("StatusBar","RS ON",None), 5000)
-                pattern =[[1,4],[5,8],[1,8],[9,12],[13,16],[9,16],[1,16]]
-                if self.aw.ser.controlETpid[0] == 0: #Fuji PXG
-                    reg_dict = self.aw.fujipid.PXG4
-                elif self.aw.ser.controlETpid[0] == 4: #Fuji PXF
-                    reg_dict = self.aw.fujipid.PXF
-                start = pattern[reg_dict["rampsoakpattern"][0]][0]
-                end = pattern[reg_dict["rampsoakpattern"][0]][1]+1
-                strcommand = "SETRS"
-                result = ""
-                for i in range(start,end):
-                    svkey = "segment"+str(i)+"sv"
-                    rampkey = "segment"+str(i)+"ramp"
-                    soakkey = "segment"+str(i)+"soak"
-                    strcommand += "::" + str(reg_dict[svkey][0]) + "::" + str(reg_dict[rampkey][0]) + "::" + str(reg_dict[soakkey][0])+"::"
-                    result += strcommand
-                    strcommand = "SETRS"
-                result = result.strip("::")
-                self.aw.qmc.DeviceEventRecord(result)
-            else:
-                self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None), 5000)
-        #set ramp soak OFF
-        elif flag == 0:
-            self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None),500)
-            self.aw.fujipid.setrampsoak(flag)
-
-    def setpattern(self):
-        #Need to make sure that RampSoak is not ON in order to change pattern:
-        onoff = self.getONOFFrampsoak()
-        if onoff == 0:
-            self.aw.fujipid.PXG4["rampsoakpattern"][0] = self.patternComboBox.currentIndex()
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(self.aw.fujipid.PXG4["rampsoakpattern"][1],6)
-                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,self.aw.fujipid.PXG4["rampsoakpattern"][0])
-                r = command = ""
-            else:
-                command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,self.aw.fujipid.PXG4["rampsoakpattern"][1],self.aw.fujipid.PXG4["rampsoakpattern"][0])
-                #TX and RX
-                r = self.aw.ser.sendFUJIcommand(command,8)
-            #check response from pid and update message on main window
-            if r == command:
-                patterns = ["1-4","5-8","1-8","9-12","13-16","9-16","1-16"]
-                message = QApplication.translate("Message","Pattern changed to {0}", None).format(patterns[self.aw.fujipid.PXG4["rampsoakpattern"][0]])
-            else:
-                message = QApplication.translate("Message","Pattern did not changed",None)
-            self.aw.sendmessage(message)
-        elif onoff == 1:
-            self.aw.sendmessage(QApplication.translate("Message","Ramp/Soak was found ON! Turn it off before changing the pattern", None))
-        elif onoff == 2:
-            self.aw.sendmessage(QApplication.translate("Message","Ramp/Soak was found in Hold! Turn it off before changing the pattern", None))
-
-    @pyqtSlot(bool)
-    def setONstandby(self,_):
-        self.setONOFFstandby(1)
-    
-    @pyqtSlot(bool)
-    def setOFFstandby(self,_):
-        self.setONOFFstandby(0)
-    
-    def setONOFFstandby(self,flag):
-        try:
-            #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
-            #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-            self.status.showMessage(QApplication.translate("StatusBar","wait...",None),500)
-            res = self.aw.fujipid.setONOFFstandby(flag)
-            if res:
-                if flag == 1:
-                    message = QApplication.translate("StatusBar","PID set to OFF",None)     #put pid in standby 1 (pid on)
-                else:
-                    message = QApplication.translate("StatusBar","PID set to ON",None)      #put pid in standby 0 (pid off)
-                self.status.showMessage(message,5000)
-            else:
-                message = QApplication.translate("StatusBar","Unable",None)
-                self.status.showMessage(QApplication.translate("StatusBar","No data received",None),5000)
-        except Exception as e:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby() {0}").format(str(e)),exc_tb.tb_lineno)
-
-    #get all Ramp Soak values for all 8 segments
-    @pyqtSlot(bool)
-    def getallsegments(self,_):
-        for i in range(1,17):
-            msg = QApplication.translate("StatusBar","Reading Ramp/Soak {0} ...",None).format(str(i))
-            self.status.showMessage(msg,500)
-            k = self.aw.fujipid.getsegment(i)
-            libtime.sleep(0.035)
-            if k == -1:
-                self.status.showMessage(QApplication.translate("StatusBar","problem reading Ramp/Soak",None),5000)
-                return
-            self.paintlabels()
-        self.status.showMessage(QApplication.translate("StatusBar","Finished reading Ramp/Soak val.",None),5000)
-        self.createsegmenttable()
-
-    @pyqtSlot(bool)
-    def setONautotune(self,_):
-        self.setONOFFautotune(1)
-        
-    @pyqtSlot(bool)
-    def setOFFautotune(self,_):
-        self.setONOFFautotune(0)
-
-    def setONOFFautotune(self,flag):
-        if self.aw.ser.controlETpid[0] == 0:
-            reg_dict = self.aw.fujipid.PXG4
-        else:
-            reg_dict = self.aw.fujipid.PXF
-        self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None),500)
-        #read current pidN
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(reg_dict["selectedpid"][1],3)
-            N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
-        else:
-            command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict["selectedpid"][1],1)
-            N = self.aw.fujipid.readoneword(command)
-        reg_dict["selectedpid"][0] = N
-        string = QApplication.translate("StatusBar","Current pid = {0}. Proceed with autotune command?",None).format(str(N))
-        reply = QMessageBox.question(aw,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-        if reply == QMessageBox.Cancel:
-            self.status.showMessage(QApplication.translate("StatusBar","Autotune cancelled",None),5000)
-            return 0
-        elif reply == QMessageBox.Yes:
-            if self.aw.ser.useModbusPort:
-                reg = self.aw.modbus.address2register(reg_dict["autotuning"][1],6)
-                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,flag)
-                r = "00000000"
-            else:
-                command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict["autotuning"][1],flag)
-                #TX and RX
-                r = self.aw.ser.sendFUJIcommand(command,8)
-            if len(r) == 8:
-                if flag == 0:
-                    reg_dict["autotuning"][0] = 0
-                    self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned OFF",None),5000)
-                if flag == 1:
-                    reg_dict["autotuning"][0] = 1
-                    self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned ON",None),5000) 
-            else:
-                self.status.showMessage(QApplication.translate("StatusBar","UNABLE to set Autotune",None),5000) 
-    
-    @pyqtSlot(bool)
-    def accept(self,_):
-        # store set values
-        self.aw.fujipid.PXG4["sv1"][0] = float(self.aw.comma2dot(self.sv1edit.text()))
-        self.aw.fujipid.PXG4["sv2"][0] = float(self.aw.comma2dot(self.sv2edit.text()))
-        self.aw.fujipid.PXG4["sv3"][0] = float(self.aw.comma2dot(self.sv3edit.text()))
-        self.aw.fujipid.PXG4["sv4"][0] = float(self.aw.comma2dot(self.sv4edit.text()))
-        self.aw.fujipid.PXG4["sv5"][0] = float(self.aw.comma2dot(self.sv5edit.text()))
-        self.aw.fujipid.PXG4["sv6"][0] = float(self.aw.comma2dot(self.sv6edit.text()))
-        self.aw.fujipid.PXG4["sv7"][0] = float(self.aw.comma2dot(self.sv7edit.text()))
-        # store set values
-        self.aw.fujipid.PXG4["p1"][0] = float(self.p1edit.text())
-        self.aw.fujipid.PXG4["p2"][0] = float(self.p2edit.text())
-        self.aw.fujipid.PXG4["p3"][0] = float(self.p3edit.text())
-        self.aw.fujipid.PXG4["p4"][0] = float(self.p4edit.text())
-        self.aw.fujipid.PXG4["p5"][0] = float(self.p5edit.text())
-        self.aw.fujipid.PXG4["p6"][0] = float(self.p6edit.text())
-        self.aw.fujipid.PXG4["p7"][0] = float(self.p7edit.text())
-        self.aw.fujipid.PXG4["i1"][0] = float(self.i1edit.text())
-        self.aw.fujipid.PXG4["i2"][0] = float(self.i2edit.text())
-        self.aw.fujipid.PXG4["i3"][0] = float(self.i3edit.text())
-        self.aw.fujipid.PXG4["i4"][0] = float(self.i4edit.text())
-        self.aw.fujipid.PXG4["i5"][0] = float(self.i5edit.text())
-        self.aw.fujipid.PXG4["i6"][0] = float(self.i6edit.text())
-        self.aw.fujipid.PXG4["i7"][0] = float(self.i7edit.text())
-        self.aw.fujipid.PXG4["d1"][0] = float(self.d1edit.text())
-        self.aw.fujipid.PXG4["d2"][0] = float(self.d2edit.text())
-        self.aw.fujipid.PXG4["d3"][0] = float(self.d3edit.text())
-        self.aw.fujipid.PXG4["d4"][0] = float(self.d4edit.text())
-        self.aw.fujipid.PXG4["d5"][0] = float(self.d5edit.text())
-        self.aw.fujipid.PXG4["d6"][0] = float(self.d6edit.text())
-        self.aw.fujipid.PXG4["d7"][0] = float(self.d7edit.text())
-        # store segment table
-        for i in range(16):
-            svkey = "segment" + str(i+1) + "sv"
-            rampkey = "segment" + str(i+1) + "ramp"
-            soakkey = "segment" + str(i+1) + "soak"
-            self.aw.fujipid.PXG4[svkey][0] = float(self.segmenttable.cellWidget(i,0).text())
-            self.aw.fujipid.PXG4[rampkey][0] = stringtoseconds(self.segmenttable.cellWidget(i,1).text())
-            self.aw.fujipid.PXG4[soakkey][0] = stringtoseconds(self.segmenttable.cellWidget(i,2).text())
-        # SV slider
-        self.aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
-        self.aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
-        self.close()
-
-    def createsegmenttable(self):
-        self.segmenttable.setRowCount(16)
-        self.segmenttable.setColumnCount(4)
-        self.segmenttable.setHorizontalHeaderLabels([QApplication.translate("StatusBar","SV",None),
-                                                     QApplication.translate("StatusBar","Ramp (MM:SS)",None),
-                                                     QApplication.translate("StatusBar","Soak (MM:SS)",None),""])
-        self.segmenttable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
-        self.segmenttable.setShowGrid(True)
-        self.segmenttable.verticalHeader().setSectionResizeMode(2)
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        #populate table
-        for i in range(16):
-            #create widgets
-            svkey = "segment" + str(i+1) + "sv"
-            rampkey = "segment" + str(i+1) + "ramp"
-            soakkey = "segment" + str(i+1) + "soak"
-            svedit = QLineEdit(str(self.aw.fujipid.PXG4[svkey][0]))
-            svedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, svedit))
-            rampedit = QLineEdit(stringfromseconds(self.aw.fujipid.PXG4[rampkey][0]))
-            rampedit.setValidator(QRegExpValidator(regextime,self))
-            soakedit  = QLineEdit(stringfromseconds(self.aw.fujipid.PXG4[soakkey][0]))
-            soakedit.setValidator(QRegExpValidator(regextime,self))
-            setButton = QPushButton(QApplication.translate("Button","Set",None))
-            setButton.setFocusPolicy(Qt.NoFocus)
-            setButton.clicked.connect(self.setsegment)
-            #add widgets to the table
-            self.segmenttable.setCellWidget(i,0,svedit)
-            self.segmenttable.setCellWidget(i,1,rampedit)
-            self.segmenttable.setCellWidget(i,2,soakedit)
-            self.segmenttable.setCellWidget(i,3,setButton)
-
-    #idn = id number, sv = float set value, ramp = ramp value, soak = soak value
-    @pyqtSlot(bool)
-    def setsegment(self,_):
-        i = self.aw.findWidgetsRow(self.segmenttable,self.sender(),3)
-        idn = i+1
-        svedit =  self.segmenttable.cellWidget(i,0)
-        rampedit = self.segmenttable.cellWidget(i,1)
-        soakedit = self.segmenttable.cellWidget(i,2)
-        sv = float(self.aw.comma2dot(str(svedit.text())))
-        ramp = stringtoseconds(str(rampedit.text()))
-        soak = stringtoseconds(str(soakedit.text()))
-        svkey = "segment" + str(idn) + "sv"
-        rampkey = "segment" + str(idn) + "ramp"
-        soakkey = "segment" + str(idn) + "soak"
-        if self.aw.ser.controlETpid[0] == 0: # PXG
-            reg_dict = self.aw.fujipid.PXG4
-        else: # PXF
-            reg_dict = self.aw.fujipid.PXF
-        if self.aw.ser.useModbusPort:
-            reg = self.aw.modbus.address2register(reg_dict[svkey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,int(sv*10))
-            libtime.sleep(0.1) #important time between writings
-            reg = self.aw.modbus.address2register(reg_dict[rampkey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,ramp)
-            libtime.sleep(0.1) #important time between writings
-            reg = self.aw.modbus.address2register(reg_dict[soakkey][1],6)
-            self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,soak)
-            r1 = r2 = r3 = "        "
-        else:
-            svcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[svkey][1],int(sv*10))
-            r1 = self.aw.ser.sendFUJIcommand(svcommand,8)
-            libtime.sleep(0.1) #important time between writings
-            rampcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[rampkey][1],ramp)
-            r2 = self.aw.ser.sendFUJIcommand(rampcommand,8)
-            libtime.sleep(0.1) #important time between writings
-            soakcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,reg_dict[soakkey][1],soak)
-            r3 = self.aw.ser.sendFUJIcommand(soakcommand,8)
-        #check if OK
-        if len(r1) == 8 and len(r2) == 8 and len(r3) == 8:
-            self.aw.fujipid.PXG4[svkey][0] = sv
-            self.aw.fujipid.PXG4[rampkey][0] = ramp
-            self.aw.fujipid.PXG4[soakkey][0] = soak
-            self.paintlabels()
-            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully written",None),5000) 
-        else:
-            self.aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None))
-
-###################################################################################
-##########################  FUJI PID CLASS DEFINITION  ############################
-###################################################################################
-
-# This class can work for either one Fuji PXR or one Fuji PXG. It is used for the controlling PID only.
-# NOTE: There is only one controlling PID. The second pid is only used for reading BT and therefore,
-# there is no need to create a second PID object since the second pid all it does is read temperature (always use the same command).
-# All is needed for the second pid is its unit id number stored in aw.qmc.device[].
-# The command to read T is the always the same for PXR and PXG but with the unit ID changed.
-
-class FujiPID(object):
-    def __init__(self):
-    
-        # follow background: if True, Artisan sends SV values taken from the current background profile if any
-        self.followBackground = False
-        self.lookahead = 0 # the lookahead in seconds
-        self.rampsoak = False # True if RS is active
-        self.sv = None # the last sv send to the Fuji PID
-
-        ## FUJI PXG input types
-        ##0 (JPT 100'3f)
-        ##1 (PT 100'3f)
-        ##2 (J)
-        ##3 (K)
-        ##4 (R)
-        ##5 (B)
-        ##6 (S)
-        ##7 (T)
-        ##8 (E)
-        ##9 (no function)
-        ##10 (no function)
-        ##11 (no function)
-        ##12 (N)
-        ##13 (PL- 2)
-        ##14 (no function)
-        ##15 (0V to 5V / 0mA to 20mA
-        ##16 (1V to 5V/4mA to 20mA)
-        ##17 (0mV to 10V)
-        ##18 (2V to 10V)
-        ##19 (0mV to 100mV)
-        self.PXGthermotypes = ["JPT 100",#0
-                            "PT 100",    #1
-                            "J",         #2
-                            "K",         #3
-                            "R",         #4
-                            "B",         #5
-                            "S",         #6
-                            "T",         #7
-                            "E",         #8
-                            "N",         #12
-                            "PL-2",      #13
-                            "0V-5V/0mA-20mA", #15
-                            "1V-5V/4mA-20mA", #16
-                            "0mV-10V",   #17
-                            "2V to 10V", #18
-                            "0mV-100mV"  #19
-                            ]
-        self.PXGconversiontoindex = [0,1,2,3,4,5,6,7,8,12,13,15,16,17,18,19]  #converts fuji PID PXG types to indexes
-        self.PXFthermotypes = [
-                            "PT 100-2 (0-500C)",    #8
-                            "PT 100-3 (0-600C)",    #9
-                            "PT 100-7 (-199-600C)", #13
-                            "PT 100-8 (-200-850C)", #14
-                            "J-1 (0-400C)",         #15
-                            "J-2 (-20-400C)",       #16
-                            "J-3 (0-800C)",         #17
-                            "J-4 (-2000-1300C)",    #18
-                            "K-1 (0-400C)",         #19
-                            "K-2 (-20-500C)",       #20
-                            "K-3 (0-800C)",         #21
-                            "K-4 (-200-1300C)",     #22
-                            "R",                    #23
-                            "B",                    #24
-                            "S",                    #25
-                            "T-2 (-199-400C)",      #27
-                            "E-1 (0-800C)",         #28
-                            "E-2 (-150-800C)",      #29
-                            "E-3 (-200-800C)",      #30
-                            "N",                    #34
-                            "PL-2",                 #36
-                            "0V to 5V",             #37
-                            "1V to 5V",             #38
-                            "0V to 10V",            #39
-                            "0mA to 20mA",          #42
-                            "4mA to 20mA",          #43
-                            ]        
-        self.PXFconversiontoindex = [8,9,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,34,36,37,38,39,42,43]  #converts fuji PID PXF types to indexes
-        ## FUJI PXR input types
-        ##0 (JPT 100'3f)
-        ##1 (PT 100'3f)
-        ##2 (J)
-        ##3 (K)
-        ##4 (R)
-        ##5 (B)
-        ##6 (S)
-        ##7 (T)
-        ##8 (E)
-        ##12 (N)
-        ##13 (PL- 2)
-        ##15 (0V to 5V/0mA to 20mA)
-        ##16 (1V to 5V/4mA to 20mA)
-        ##17 (0mV to 10V)
-        ##18 (2V to 10V)
-        ##19 (0mV to 100mV)        
-        self.PXRthermotypes = [
-                            "PT 100",   #1
-                            "J",        #2
-                            "K",        #3
-                            "R",        #4
-                            "B",        #5
-                            "S",        #6
-                            "T",        #7
-                            "E",        #8
-                            "N",        #12
-                            "PL-2",     #13
-                            "1V to 5V/4mA to 20mA" #16
-                            ]
-        self.PXRconversiontoindex = [1,2,3,4,5,6,7,8,12,13,16]  #converts fuji PID PXR types to indexes
-                
-        #refer to Fuji PID instruction manual for more information about the parameters and channels
-        #dictionary "KEY": [VALUE,MEMORY_ADDRESS]
-        self.PXG4={
-                  ############ CH1  Selects controller modes 
-                  # manual mode 0 = OFF(auto), 1 = ON(manual)
-                  "manual": [0,41121],
-                  #run or standby 0=OFF(during run), 1 = ON(during standby)
-                  "runstandby": [0,41004],
-                  #autotuning run command modes available 0=off, 1=on, 2=low
-                  "autotuning": [0,41005],
-                  #rampsoak command modes available 0=off, 1=run; 2=hold
-                  "rampsoak": [0,41082],
-                  #select SV sv1,...,sv7
-                  "selectsv": [1,41221],
-                  #selects PID number behaviour mode: pid1,...,pid7
-                  "selectpid": [0,41222],
-                  ############ CH2  Main operating pid parameters.
-                  #proportional band  P0 (0% to 999.9%)
-                  "p": [5,41006],
-                  #integration time i0 (0 to 3200.0 sec)
-                  "i": [240,41007],
-                  #differential time d0 (0.0 to 999.9 sec)
-                  "d": [60,41008],
-                   ############ CH3 These are 7 pid storage locations
-                  "sv1": [300.0,41241], "p1": [5,41242], "i1": [240,41243], "d1": [60,41244],
-                  "sv2": [350.0,41251], "p2": [5,41252], "i2": [240,41253], "d2": [60,41254],
-                  "sv3": [400.0,41261], "p3": [5,41262], "i3": [240,41263], "d3": [60,41264],
-                  "sv4": [450.0,41271], "p4": [5,41272], "i4": [240,41273], "d4": [60,41274],
-                  "sv5": [500.0,41281], "p5": [5,41282], "i5": [240,41283], "d5": [60,41284],
-                  "sv6": [550.0,41291], "p6": [5,41292], "i6": [240,41293], "d6": [60,41294],
-                  "sv7": [575.0,41301], "p7": [5,41302], "i7": [240,41303], "d7": [60,41304],
-                  "selectedpid":[7,41225],
-                  ############# CH4      Creates a pattern of temperatures (profiles) using ramp soak combination
-                  #sv stands for Set Value (desired temperature value)
-                  #the time to reach sv is called ramp 
-                  #the time to hold the temperature at sv is called soak 
-                  "timeunits": [1,41562],  #0=hh.MM (hour:min)  1=MM.SS (min:sec)                             # PXG has two time formats HH:MM (factory default) and MM:SS 
-                  # Example. Dry roast phase. selects 3 or 4 minutes                                          # PXG needs to have parameter TIMU set to 1 (MM:SS)
-                  "segment1sv": [270.0,41581],"segment1ramp": [180,41582],"segment1soak": [0,41583],          # See PXG Manual chapter 6: Ramp/Soak Time Units to set the parameter TIMU    
-                  "segment2sv": [300.0,41584],"segment2ramp": [180,41585],"segment2soak": [0,41586],
-                  "segment3sv": [350.0,41587],"segment3ramp": [180,41588],"segment3soak": [0,41589],
-                  "segment4sv": [400.0,41590],"segment4ramp": [180,41591],"segment4soak": [0,41592],
-                  # Example. Phase to 1C. selects 6 or 8 mins
-                  "segment5sv": [530.0,41593],"segment5ramp": [180,41594],"segment5soak": [0,41595],
-                  "segment6sv": [530.0,41596],"segment6ramp": [180,41597],"segment6soak": [0,41598],
-                  "segment7sv": [540.0,41599],"segment7ramp": [180,41600],"segment7soak": [0,41601],
-                  "segment8sv": [540.0,41602],"segment8ramp": [180,41603],"segment8soak": [0,41604],
-                  "segment9sv": [550.0,41605],"segment9ramp": [180,41606],"segment9soak": [0,41607],
-                  "segment10sv": [550.0,41608],"segment10ramp": [180,41609],"segment10soak": [0,41610],
-                  "segment11sv": [560.0,41611],"segment11ramp": [180,41612],"segment11soak": [0,41613],
-                  "segment12sv": [560.0,41614],"segment12ramp": [180,41615],"segment12soak": [0,41616],
-                  # Eaxample. Finish phase. selects 3 mins for regular coffee or 5 mins for espresso
-                  "segment13sv": [570.0,41617],"segment13ramp": [180,41618],"segment13soak": [0,41619],
-                  "segment14sv": [570.0,41620],"segment14ramp": [180,41621],"segment14soak": [0,41622],
-                  "segment15sv": [580.0,41623],"segment15ramp": [180,41624],"segment15soak": [0,41625],
-                  "segment16sv": [580.0,41626],"segment16ramp": [180,41627],"segment16soak": [0,41628],
-                  # "rampsoakmode" 0-15 = 1-16 IMPORTANT: Factory setting is 3 (BAD). Set it up to number 0 or it will
-                  # sit on stanby (SV blinks) at the end till rampsoakmode changes. It will appear as if the PID broke (unresponsive)
-                  "rampsoakmode":[0,41081],
-                  "rampsoakpattern": [6,41561],  #ramp soak activation pattern 0=(1-4) 1=(5-8) 2=(1-8) 3=(9-12) 4=(13-16) 5=(9-16) 6=(1-16)
-                  ################  CH5    Checks the ramp soak progress, control output, remaining time and other status functions
-                  "stat":[41561], #reads only. 0=off,1=1ramp,2=1soak,3=2ramp,4=2soak,...31=16ramp,32=16soak,33=end
-                  ################  CH6    Sets up the thermocouple type, input range, output range and other items for the controller
-                  #input type: 0=NA,1=PT100ohms,2=J,3=K,4=R,5=B,6=S,7=T,8=E,12=N,13=PL2,15=(0-5volts),16=(1-5V),17=(0-10V),18=(2-10V),19=(0-100mV)
-                  "pvinputtype": [3,41016],
-                  "pvinputlowerlimit":[0,41018],
-                  "pvinputupperlimit":[9999,41019],
-                  "decimalposition": [1,41020],
-                  "unitdisplay":[1,41345],         #0=Celsius; 1=Fahrenheit
-                  #################  CH7    Assigns functions for DI (digital input), DO (digital output), LED lamp and other controls
-                  "rampslopeunit":[1,41432], #0=hour,1=min
-                  "controlmethod":[0,41002],  #0=pid,2=fuzzy,2=self,3=pid2
-                  #################  CH8     Sets the defect conditions for each type of alarm
-                  #################  CH9     Sets the station number _id and communication parameters of the PID controller
-                  #################  CH10    Changes settings for valve control 
-                  #################  CH11    Sets passwords
-                  #################  CH12    Sets the parameters mask functions to hide parameters from the user
-                  ################# READ ONLY MEMORY (address starts with digit 3)
-                  "pv?":[0,31001],"sv?":[0,31002],"alarm?":[31007],"fault?":[31008],"stat?":[31041],"mv1":[0,31042]
-                  }
-        
-        # "KEY": [VALUE,MEMORY_ADDRESS]
-        self.PXR = {"autotuning":[0,41005],
-                    "segment1sv":[100.0,41057],"segment1ramp":[3,41065],"segment1soak":[0,41066], #PXR uses only HH:MM time format but stored as minutes in artisan
-                    "segment2sv":[100.0,41058],"segment2ramp":[3,41067],"segment2soak":[0,41068],
-                    "segment3sv":[100.0,41059],"segment3ramp":[3,41069],"segment3soak":[0,41070],
-                    "segment4sv":[100.0,41060],"segment4ramp":[3,41071],"segment4soak":[0,41072],
-                    "segment5sv":[100.0,41061],"segment5ramp":[3,41073],"segment5soak":[0,41074],
-                    "segment6sv":[100.0,41062],"segment6ramp":[3,41075],"segment6soak":[0,41076],
-                    "segment7sv":[100.0,41063],"segment7ramp":[3,41077],"segment7soak":[0,41078],
-                    "segment8sv":[100.0,41064],"segment8ramp":[3,41079],"segment8soak":[0,41080],
-                    #Tells what to do after finishing or how to start. See documentation under ramp soak pattern: 0-15 
-                    "rampsoakmode":[0,41081],
-                    #rampsoak command 0=OFF, 1= RUN, 2= HALTED, 3=END
-                    "rampsoak":[0,41082],
-                    #ramp soak pattern. 0=executes 1 to 4; 1=executes 5 to 8; 2=executes 1 to 8
-                    "rampsoakpattern":[0,41083],
-                    #PID=0,FUZZY=1,SELF=2
-                    "controlmethod":[0,41002],
-                    #sv set value
-                    "sv0":[0,41003],
-                    # run standby 0=RUN 1=STANDBY
-                    "runstandby": [0,41004],
-                    "p":[5,41006],
-                    "i":[240,41007],
-                    "d":[60,41008],
-                    "decimalposition": [1,41020],
-                    "svlowerlimit":[0,41031],
-                    "svupperlimit":[0,41032],
-                    "pvinputtype":[3,41016],
-                    #READ ONLY
-                    #current pv
-                    "pv?":[0,31001],
-                    #current sv on display (during ramp soak it changes)
-                    "sv?":[0,31002],
-                    #rampsoak current running position (1-8)
-                    "segment?":[0,31009],
-                    "mv1":[0,31004]   #duty cycle rx -300 to 10300  = -3.00% to 103.00%
-                    }
-        self.PXF=dict(self.PXG4)
-        # initialize the PXF register numbers from the PXG and an offset of 1000
-        for k in self.PXF.keys():
-            if len(self.PXF[k]) > 1:
-                self.PXF[k] = [self.PXF[k][0],self.PXF[k][1]+1000]
-            else:
-                self.PXF[k] = [self.PXF[k][0]+1000]
-
-    #writes new values for p - i - d
-    def setpidPXG(self,k,newPvalue,newIvalue,newDvalue):
-        if k is not None and k > 0:
-            #send command to the right sv
-            pkey = "p" + str(k)
-            ikey = "i" + str(k)
-            dkey = "d" + str(k)
-            if aw.ser.useModbusPort:
-                reg = aw.modbus.address2register(aw.fujipid.PXG4[pkey][1],6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(float(newPvalue)*10.))
-                libtime.sleep(0.035)
-                reg = aw.modbus.address2register(aw.fujipid.PXG4[ikey][1],6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(float(newIvalue)*10.))
-                libtime.sleep(0.035)
-                reg = aw.modbus.address2register(aw.fujipid.PXG4[dkey][1],6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(float(newDvalue)*10.))
-                libtime.sleep(0.035)
-                p = i = d = "        "
-            else:
-                commandp = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[pkey][1],int(float(newPvalue)*10.))
-                commandi = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[ikey][1],int(float(newIvalue)*10.))
-                commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[dkey][1],int(float(newDvalue)*10.))
-                p = aw.ser.sendFUJIcommand(commandp,8)
-                libtime.sleep(0.035) 
-                i = aw.ser.sendFUJIcommand(commandi,8)
-                libtime.sleep(0.035) 
-                d = aw.ser.sendFUJIcommand(commandd,8)
-                libtime.sleep(0.035) 
-            #verify it went ok
-            if len(p) == 8 and len(i)==8 and len(d) == 8:
-                aw.fujipid.PXG4[pkey][0] = float(newPvalue)
-                aw.fujipid.PXG4[ikey][0] = float(newIvalue)
-                aw.fujipid.PXG4[dkey][0] = float(newDvalue)
-                message = QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
-                                                       ).format(str(k),str(newPvalue),str(newIvalue),str(newDvalue))
-                aw.sendmessage(message)
-            else:
-                lp = len(p)
-                li = len(i)
-                ld = len(d)
-                message = QApplication.translate("StatusBar","pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) ",None
-                                                       ).format(str(k),str(lp),str(li),str(ld))
-                aw.sendmessage(message)
-                aw.qmc.adderror(message)
-
-    # updates and returns the current ramp soak mode
-    def getCurrentRampSoakMode(self):
-        if aw.ser.controlETpid[0] == 0: # PXG
-            register = aw.fujipid.PXG4["rampsoakmode"][1]
-        elif aw.ser.controlETpid[0] == 1: # PXR
-            register = aw.fujipid.PXR["rampsoakmode"][1]
-        elif aw.ser.controlETpid[0] == 4: # PXF
-            register = aw.fujipid.PXF["rampsoakmode"][1]
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(register,3)
-            currentmode = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
-        else:
-            msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,register,1)
-            currentmode = aw.fujipid.readoneword(msg)
-        if aw.ser.controlETpid[0] == 0: # PXG
-            aw.fujipid.PXG4["rampsoakmode"][0] = currentmode
-        elif aw.ser.controlETpid[0] == 1: # PXR
-            aw.fujipid.PXG4["rampsoakmode"][0] = currentmode
-        elif aw.ser.controlETpid[0] == 4: # PXF
-            aw.fujipid.PXG4["rampsoakmode"][0] = currentmode
-        return currentmode                
-                                    
-    def getCurrentPIDnumberPXG(self):
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(aw.fujipid.PXG4["selectedpid"][1],3)
-            N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
-        else:
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
-            N = aw.fujipid.readoneword(command)
-        libtime.sleep(0.035) 
-        return N
-                        
-    def setpidPXR(self,var,v):
-        r = ""
-        if var == "p":
-            p = int(v*10)
-            if aw.ser.useModbusPort:
-                reg = aw.modbus.address2register(aw.fujipid.PXR["p"][1],6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,p)
-                r = "        "
-            else:
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["p"][1],p)
-                r = aw.ser.sendFUJIcommand(command,8)
-        elif var == "i":
-            i = int(v*10)
-            if aw.ser.useModbusPort:
-                reg = aw.modbus.address2register(aw.fujipid.PXR["i"][1],6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,i)
-                r = "        "
-            else:
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["i"][1],i)
-                r = aw.ser.sendFUJIcommand(command,8)
-        elif var == "d":
-            d = int(v*10)
-            if aw.ser.useModbusPort:
-                reg = aw.modbus.address2register(aw.fujipid.PXR["d"][1],6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,d)
-                r = "        "
-            else:
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["d"][1],d)
-                r = aw.ser.sendFUJIcommand(command,8)
-
-        if len(r) == 8:
-            message = QApplication.translate("StatusBar","{0} successfully sent to pid ",None).format(var)
-            aw.sendmessage(message)
-            if var == "p":
-                aw.fujipid.PXR["p"][0] = int(v)
-            elif var == "i":
-                aw.fujipid.PXR["i"][0] = int(v)
-            elif var == "d":
-                aw.fujipid.PXR["d"][0] = int(v)
-        else:
-            message = QApplication.translate("StatusBar","setpid(): There was a problem setting {0}",None).format(var)
-            aw.sendmessage(message)
-            aw.qmc.adderror(message)
-                    
-    def calcSV(self,tx):
-        if aw.qmc.background:
-            # Follow Background mode
-            if aw.qmc.swapETBT: # we observe the BT
-                res = aw.qmc.backgroundSmoothedBTat(tx + self.lookahead) # smoothed and approximated background
-                if res == -1:
-                    return None # no background value for that time point
-                else:
-                    return res
-            else: # we observe the ET
-                res = aw.qmc.backgroundSmoothedETat(tx + self.lookahead) # smoothed and approximated background
-                if res == -1:
-                    return None # no background value for that time point
-                else:
-                    return res
-        else:
-            return None
-    
-    ##TX/RX FUNCTIONS
-    #This function reads read-only memory (with 3xxxx memory we need function=4)
-    #both PXR3 and PXG4 use the same memory location 31001 (3xxxx = read only)
-    # pidType: 0=PXG, 1=PXR, 2=None, 3=DTA, 4=PXF (here we support only 0, 1 and 4 for now)
-    def gettemperature(self, pidType, stationNo):
-        if pidType == 0:
-            reg = self.PXG4["pv?"][1]
-        elif pidType == 1:
-            reg = self.PXR["pv?"][1]
-        elif pidType == 4:
-            reg = self.PXF["pv?"][1]
-        else:
-            return -1
-        if aw.ser.useModbusPort:
-            # we use the pymodbus implementation
-            return aw.modbus.readSingleRegister(stationNo,aw.modbus.address2register(reg,4),4)
-        else:
-            #we compose a message then we send it by using self.readoneword()
-            return self.readoneword(self.message2send(stationNo,4,reg,1))
-
-    # activates the SV slider
-    def activateONOFFsliderSV(self,flag):
-        aw.pidcontrol.activateSVSlider(flag)
-
-    def readcurrentsv(self):
-        if aw.ser.useModbusPort:
-            reg = None
-            #if control pid is fuji PXG4
-            if aw.ser.controlETpid[0] == 0:
-                reg = aw.modbus.address2register(self.PXG4["sv?"][1],4)
-            #or if control pid is fuji PXR
-            elif aw.ser.controlETpid[0] == 1:
-                reg = aw.modbus.address2register(self.PXR["sv?"][1],4)
-            #or if control pid is fuji PXF
-            elif aw.ser.controlETpid[0] == 4:
-                reg = aw.modbus.address2register(self.PXF["sv?"][1],4)
-            if reg is not None:
-                val = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,4)/10.
-            else:
-                val = -0.1
-        else:
-            command = ""
-            #if control pid is fuji PXG4
-            if aw.ser.controlETpid[0] == 0:
-                command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["sv?"][1],1)
-            #or if control pid is fuji PXR
-            elif aw.ser.controlETpid[0] == 1:
-                command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
-            elif aw.ser.controlETpid[0] == 4:
-                command = self.message2send(aw.ser.controlETpid[1],4,self.PXF["sv?"][1],1)
-            val = self.readoneword(command)/10.
-        if val != -0.1:
-            return val
-        else:
-            return -1
-
-    # returns Fuji duty signal in the range 0-100 or -1
-    def readdutycycle(self):
-        if aw.ser.useModbusPort:
-            reg = None
-            #if control pid is fuji PXG4
-            if aw.ser.controlETpid[0] == 0:
-                reg = aw.modbus.address2register(self.PXG4["mv1"][1],4)
-            #or if control pid is fuji PXR
-            elif aw.ser.controlETpid[0] == 1:
-                reg = aw.modbus.address2register(self.PXR["mv1"][1],4)
-            #or if control pid is fuji PXF
-            elif aw.ser.controlETpid[0] == 4:
-                reg = aw.modbus.address2register(self.PXF["mv1"][1],4)
-            if reg is not None:
-                v = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,4)
-            else:
-                val = -1
-        else:
-            command = ""
-            #if control pid is fuji PXG4
-            if aw.ser.controlETpid[0] == 0:
-                command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["mv1"][1],1)
-                v = self.readoneword(command)
-            #or if control pid is fuji PXR
-            elif aw.ser.controlETpid[0] == 1:
-                command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
-                v = self.readoneword(command)
-            #or if control pid is fuji PXF
-            elif aw.ser.controlETpid[0] == 4:
-                command = self.message2send(aw.ser.controlETpid[1],4,self.PXF["mv1"][1],1)
-                v = self.readoneword(command)
-        if v is None:
-            val = -1
-        elif v >= 65236: # -3% to 0%
-            val = 0   
-        elif v <= 10300: # <= 103%
-            val = v/100.
-        else: # value out of range (possible a communication error)
-            val = -1   
-        #val range -3 to 103%. Check for possible decimal digit user settings
-        return val
-
-    #turns ON turns OFF current ramp soak mode
-    #flag =0 OFF, flag = 1 ON, flag = 2 hold
-    #A ramp soak pattern defines a whole profile. They have a minimum of 4 segments.
-    # returns True on success, False otherwise
-    def setrampsoak(self,flag):
-        register = None
-        if aw.ser.controlETpid[0] == 0: #Fuji PXG
-            register = self.PXG4["rampsoak"][1]        
-        elif aw.ser.controlETpid[0] == 1: #Fuji PXR
-            register = self.PXR["rampsoak"][1]
-        elif aw.ser.controlETpid[0] == 4:
-            register = self.PXF["rampsoak"][1]
-        if aw.ser.useModbusPort:
-            if register is not None:
-                reg = aw.modbus.address2register(register,6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
-                if flag == 1:
-                    aw.fujipid.rampsoak = True
-                    aw.sendmessage(QApplication.translate("Message","RS ON", None))
-                elif flag == 0:
-                    aw.fujipid.rampsoak = False
-                    aw.sendmessage(QApplication.translate("Message","RS OFF", None))
-                else:
-                    aw.sendmessage(QApplication.translate("Message","RS on HOLD", None))
-                return True         
-        elif register is not None:
-            command = self.message2send(aw.ser.controlETpid[1],6,register,flag)
-            r = aw.ser.sendFUJIcommand(command,8)
-            #if OK
-            if r == command:
-                if flag == 1:
-                    aw.fujipid.rampsoak = True
-                    aw.sendmessage(QApplication.translate("Message","RS ON", None))
-                elif flag == 0:
-                    aw.fujipid.rampsoak = False
-                    aw.sendmessage(QApplication.translate("Message","RS OFF", None))
-                else:
-                    aw.sendmessage(QApplication.translate("Message","RS on HOLD", None))
-                return True
-            else:
-                aw.qmc.adderror(QApplication.translate("Error Message","RampSoak could not be changed",None))
-                return False
-        return False
-        
-    def getrampsoakmode(self):
-        if aw.ser.controlETpid[0] == 0: #Fuji PXG
-            register = self.PXG4["rampsoakpattern"][1]
-        elif aw.ser.controlETpid[0] == 1: #Fuji PXR
-            register = self.PXR["rampsoakpattern"][1]
-        elif aw.ser.controlETpid[0] == 4: #Fuji PXF
-            register = self.PXF["rampsoakpattern"][1]
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(register,3)
-            currentmode = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
-        else:                
-            msg = self.message2send(aw.ser.controlETpid[1],3,register,1)
-            currentmode = self.readoneword(msg)
-        if aw.ser.controlETpid[0] == 0: #Fuji PXG
-            self.PXG4["rampsoakpattern"][0] = currentmode
-        elif aw.ser.controlETpid[0] == 1: #Fuji PXR
-            self.PXR["rampsoakpattern"][0] = currentmode
-        elif aw.ser.controlETpid[0] == 4: #Fuji PXF
-            self.PXF["rampsoakpattern"][0] = currentmode
-        return currentmode
-        
-    # returns True on success and Fails otherwise
-    def setrampsoakmode(self,mode):
-        if aw.ser.controlETpid[0] == 0: #Fuji PXG
-            register = self.PXG4["rampsoakpattern"][1]
-        elif aw.ser.controlETpid[0] == 1: #Fuji PXR
-            register = self.PXR["rampsoakpattern"][1]
-        elif aw.ser.controlETpid[0] == 4: #Fuji PXF
-            register = self.PXF["rampsoakpattern"][1]
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(register,3)
-            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,mode)
-        else:                
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,register,mode)
-            r = aw.ser.sendFUJIcommand(command,8)
-        if aw.ser.useModbusPort or len(r) == 8:
-            if aw.ser.controlETpid[0] == 0: #Fuji PXG
-                self.PXG4["rampsoakpattern"][0] = mode
-            elif aw.ser.controlETpid[0] == 1: #Fuji PXR
-                self.PXR["rampsoakpattern"][0] = mode
-            elif aw.ser.controlETpid[0] == 4: #Fuji PXF
-                self.PXF["rampsoakpattern"][0] = mode
-            return True
-        else:
-            return False
-
-    # returns True on success, False otherwise
-    def setONOFFstandby(self,flag):
-        #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-        #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
-        #Fuji PXG
-        if aw.ser.controlETpid[0] == 0:
-            register = aw.fujipid.PXG4["runstandby"][1]
-        elif aw.ser.controlETpid[0] == 1:
-            register = aw.fujipid.PXR["runstandby"][1]
-        elif aw.ser.controlETpid[0] == 4:
-            register = aw.fujipid.PXF["runstandby"][1]
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(register,6)
-            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
-        else:
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,register,flag)
-            #TX and RX
-            r = aw.ser.sendFUJIcommand(command,8)
-        if r == command or aw.ser.useModbusPort:
-            if aw.ser.controlETpid[0] == 0:
-                aw.fujipid.PXG4["runstandby"][0] = flag
-            elif aw.ser.controlETpid[0] == 1:
-                aw.fujipid.PXR["runstandby"][0] = flag
-            elif aw.ser.controlETpid[0] == 4:
-                aw.fujipid.PXF["runstandby"][0] = flag
-            return True
-        else:
-            mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
-            aw.qmc.adderror(mssg)
-            return False
-                
-    #sets a new sv value (if slient=False, no output nor event recording is done)
-    def setsv(self,value,silent=False):
-        command = ""
-        #Fuji PXG / PXF
-        if aw.ser.controlETpid[0] in [0,4]:  # Fuji PXG or PXF
-            if aw.ser.controlETpid[0] == 0:
-                reg_dict = self.PXG4
-            elif aw.ser.controlETpid[0] == 4:
-                reg_dict = self.PXF
-            
-            #send command to the current sv (1-7)
-            
-            #-- experimental begin
-            # read the current svN (1-7) being used
-            if aw.ser.useModbusPort:
-                reg = aw.modbus.address2register(reg_dict["selectsv"][1],3)
-                N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
-            else:
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,reg_dict["selectsv"][1],1)
-                N = aw.fujipid.readoneword(command)
-            if N > 0:
-                reg_dict["selectsv"][0] = N
-            #-- experimental end
-            
-            svkey = "sv"+ str(reg_dict["selectsv"][0]) #current sv
-            if aw.ser.useModbusPort:
-                reg = aw.modbus.address2register(reg_dict[svkey][1],6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(value*10))
-            else:
-                command = self.message2send(aw.ser.controlETpid[1],6,reg_dict[svkey][1],int(value*10))
-                r = aw.ser.sendFUJIcommand(command,8)
-            #check response
-            if aw.ser.useModbusPort or r == command:
-                if not silent:
-                    # [Not sure the following will translate or even format properly... Need testing!]
-                    message = QApplication.translate("Message","PXG/PXF sv#{0} set to {1}",None).format(reg_dict["selectsv"][0],"%.1f" % float(value))
-                    aw.sendmessage(message)
-                    reg_dict[svkey][0] = value
-                    #record command as an Event 
-                    strcommand = "SETSV::" + str("%.1f"%float(value))
-                    aw.qmc.DeviceEventRecord(strcommand)
-                self.sv = value
-            else:
-                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setsv()")
-                return -1
-        #Fuji PXR
-        elif aw.ser.controlETpid[0] == 1:  
-            if aw.ser.useModbusPort:
-                reg = aw.modbus.address2register(aw.fujipid.PXR["sv0"][1],6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(value*10))
-            else:
-                command = self.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["sv0"][1],int(value*10))
-                r = aw.ser.sendFUJIcommand(command,8)
-            #check response
-            if aw.ser.useModbusPort or r == command:
-                if not silent:
-                    # [Not sure the following will translate or even format properly... Need testing!]
-                    message = QApplication.translate("Message","PXR sv set to {0}",None).format("%.1f" % float(value))
-                    aw.fujipid.PXR["sv0"][0] = value
-                    aw.sendmessage(message)
-                    #record command as an Event 
-                    strcommand = "SETSV::" + str("%.1f"%float(value))
-                    aw.qmc.DeviceEventRecord(strcommand)
-                self.sv = value
-            else:
-                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setPXRsv()")
-                return -1
-
-    #used to set up or down SV by diff degrees from current sv setting
-    def adjustsv(self,diff):
-        currentsv = self.readcurrentsv()
-        if currentsv != -1:
-            newsv = int((currentsv + diff)*10.)          #multiply by 10 because we use a decimal point
-            #   if control pid is fuji PXG
-            if aw.ser.controlETpid[0] == 0:
-                # read the current svN (1-7) being used
-                if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(aw.fujipid.PXG4["selectsv"][1],3)
-                    N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
-                else:
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,self.PXG4["selectsv"][1],1)
-                    N = aw.fujipid.readoneword(command)
-                if N > 0:
-                    aw.fujipid.PXG4["selectsv"][0] = N
-                    svkey = "sv" + str(N)
-                    if aw.ser.useModbusPort:
-                        reg = aw.modbus.address2register(self.PXG4[svkey][1],6)
-                        aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newsv)
-                    else:
-                        command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],newsv)
-                        r = aw.ser.sendFUJIcommand(command,8)
-                    if aw.ser.useModbusPort or len(r) == 8:
-                        message = QApplication.translate("Message","SV{0} changed from {1} to {2})",None).format(str(N),str(currentsv),str(newsv/10.))
-                        aw.sendmessage(message)
-                        self.PXG4[svkey][0] = newsv/10
-                        #record command as an Event to replay (not binary as it needs to be stored in a text file)
-                        strcommand = "SETSV::" + str("%.1f"%(newsv/10.))
-                        aw.qmc.DeviceEventRecord(strcommand)
-                        aw.lcd6.display("%.1f"%float(newsv/10.))
-                    else:
-                        msg = QApplication.translate("Message","Unable to set sv{0}",None).format(str(N))
-                        aw.sendmessage(msg)
-            #   or if control pid is fuji PXR
-            elif aw.ser.controlETpid[0] == 1:
-                if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(self.PXR["sv0"][1],6)
-                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newsv)
-                else:
-                    command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
-                    r = aw.ser.sendFUJIcommand(command,8)
-                if aw.ser.useModbusPort or len(r) == 8:
-                    message = QApplication.translate("Message","SV changed from {0} to {1}",None).format(str(currentsv),str(newsv/10.))                           
-                    aw.sendmessage(message)
-                    self.PXR["sv0"][0] = newsv/10
-                    #record command as an Event to replay (not binary as it needs to be stored in a text file)
-                    strcommand = "SETSV::" + str("%.1f"%(newsv/10.))
-                    aw.qmc.DeviceEventRecord(strcommand)
-                    aw.lcd6.display("%.1f"%float(newsv/10.))
-                else:
-                    aw.sendmessage(QApplication.translate("Message","Unable to set sv", None))
-        else:
-            aw.sendmessage(QApplication.translate("Message","Unable to set new sv", None))
-
-    #format of the input string Command: COMMAND::VALUE1::VALUE2::VALUE3::ETC
-    def replay(self,CommandString):
-        parts = CommandString.split("::")
-        command = parts[0]
-        values = parts[1:]
-        if command == "SETSV":
-            self.setsv(float(values[0]))
-            return
-        elif command == "SETRS":
-            self.replaysetrs(CommandString)
-            return
-
-    #example of command string with four segments (minimum for Fuji PIDs)
-    # SETRS::270.0::3::0::SETRS::300.0::3::0::SETRS::350.0::3::0::SETRS::400.0::3::0
-    def replaysetrs(self,CommandString):
-        segments =CommandString.split("SETRS")
-        if len(segments[0]) == 0:
-            segments = segments[1:]          #remove first empty [""] list [[""],[etc]]
-        if len(segments[-1]) == 0:
-            segments = segments[:-1]          #remove last empty [""] list [[etc][""]]
-        n = len(segments)
-        #if parts is < 4, make it compatible with Fuji PID (4 segments needed)
-        if n < 4:
-            for i in range(4-n):
-                #last temperature
-                lasttemp = segments[-1].split("::")[1]
-                #create a string with 4 segments ("SETRS" alredy removed) 
-                string = "::" + lasttemp + "::0::0"   #add zero ramp time and zero soak time
-                segments.append(string)
-        rs = []
-        changeflag = 0
-        for i in range(n):
-            rs.append(segments[i].split("::"))
-            if len(rs[i][0]) == 0:          #remove first empty "" [u"",u"300.5",u"3",u"0",u""] if one found
-                rs[i] = rs[i][1:]
-            if len(rs[i][-1]) == 0:          #remove last empty "" [u"300.5",u"3",u"0",u""] if one found
-                rs[i] = rs[i][:-1]
-            if len(rs[i]) == 3:
-                svkey = "segment" + str(i+1) + "sv"
-                rampkey = "segment" + str(i+1) + "ramp"
-                soakkey = "segment" + str(i+1) + "soak"
-                if aw.ser.controlETpid[0] == 0:             #PXG4
-                    if not n%4 or n > 16:
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PXG4 replaysetrs(): {0}").format(n))
-                        return
-                    if self.PXG4[svkey][0] != float(rs[i][0]):
-                        self.PXG4[svkey][0] = float(rs[i][0])
-                        changeflag = 1
-                    if self.PXG4[rampkey][0] != int(rs[i][1]):
-                        self.PXG4[rampkey][0] = int(rs[i][1])
-                        changeflag = 1
-                    if self.PXG4[soakkey][0] != int(rs[i][2]):
-                        self.PXG4[soakkey][0] = int(rs[i][2])
-                        changeflag = 1
-                    if changeflag:
-                        self.setsegment((i+1), self.PXG4[svkey][0], self.PXG4[rampkey][0] ,self.PXG4[soakkey][0])
-                        changeflag = 0
-                elif aw.ser.controlETpid[0] == 1:           #PXR
-                    if not n%4 or n > 8:
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PXR replaysetrs(): {0}").format(n))
-                        return
-                    if self.PXR[svkey][0] != float(rs[i][0]):
-                        self.PXR[svkey][0] = float(rs[i][0])
-                        changeflag = 1
-                    if self.PXR[rampkey][0] != int(rs[i][1]):
-                        self.PXR[rampkey][0] = int(rs[i][1])
-                        changeflag = 1
-                    if self.PXR[soakkey][0] != int(rs[i][2]):
-                        self.PXR[soakkey][0] = int(rs[i][2])
-                        changeflag = 1
-                    if changeflag:
-                        self.setsegment((i+1), self.PXR[svkey][0], self.PXR[rampkey][0] ,self.PXR[soakkey][0])
-                        changeflag = 0
-            else:
-                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " replaysetrs()")
-                return
-        #start ramp soak ON
-        self.setrampsoak(1)
-        
-    def getsegment(self, idn):
-        if aw.ser.controlETpid[0] == 0:
-            reg_dict = self.PXG4
-        elif aw.ser.controlETpid[0] == 1:
-            reg_dict = self.PXR
-        elif aw.ser.controlETpid[0] == 4:
-            reg_dict = self.PXF
-        svkey = "segment" + str(idn) + "sv"
-        register = reg_dict[svkey][1]
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(register,3)
-            sv = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
-        else:
-            svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,register,1)
-            sv = aw.fujipid.readoneword(svcommand)
-        if sv == -1:
-            return -1
-        reg_dict[svkey][0] = sv/10.              #divide by 10 because the decimal point is not sent by the PID
-        
-        rampkey = "segment" + str(idn) + "ramp"
-        register = reg_dict[rampkey][1]
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(register,3)
-            ramp = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
-        else:
-            rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,register,1)
-            ramp = aw.fujipid.readoneword(rampcommand)
-        
-        if ramp == -1:
-            return -1
-        reg_dict[rampkey][0] = ramp
-        
-        soakkey = "segment" + str(idn) + "soak"
-        register = reg_dict[soakkey][1]
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(register,3)
-            soak = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
-        else:
-            soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,register,1)
-            soak = aw.fujipid.readoneword(soakcommand)
-        if soak == -1:
-            return -1
-        reg_dict[soakkey][0] = soak
-        
-
-    #idn = id number, sv = float set value, ramp = ramp value, soak = soak value
-    #used in replaysetrs()    
-    def setsegment(self,idn,sv,ramp,soak):
-        svkey = "segment" + str(idn) + "sv"
-        rampkey = "segment" + str(idn) + "ramp"
-        soakkey = "segment" + str(idn) + "soak"
-        if aw.ser.useModbusPort:
-            if aw.ser.controlETpid[0] == 0:
-                reg1 = aw.modbus.address2register(self.PXG4[svkey][1],6)
-                reg2 = aw.modbus.address2register(self.PXG4[rampkey][1],6)
-                reg3 = aw.modbus.address2register(self.PXG4[soakkey][1],6)
-            elif  aw.ser.controlETpid[0] == 1:
-                reg1 = aw.modbus.address2register(self.PXR[svkey][1],6)
-                reg2 = aw.modbus.address2register(self.PXR[rampkey][1],6)
-                reg3 = aw.modbus.address2register(self.PXR[soakkey][1],6)
-            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg1,int(sv*10))
-            libtime.sleep(0.11) #important time between writings
-            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg2,ramp)
-            libtime.sleep(0.11) #important time between writings
-            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg3,soak)
-            r1 = r2 = r3 = "        "
-        else:
-            if aw.ser.controlETpid[0] == 0:
-                svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(sv*10))
-                rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[rampkey][1],ramp)
-                soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[soakkey][1],soak)
-            elif  aw.ser.controlETpid[0] == 1:
-                svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[svkey][1],int(sv*10))
-                rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[rampkey][1],ramp)
-                soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[soakkey][1],soak)
-            r1 = aw.ser.sendFUJIcommand(svcommand,8)
-            libtime.sleep(0.11) #important time between writings
-            r2 = aw.ser.sendFUJIcommand(rampcommand,8)
-            libtime.sleep(0.11) #important time between writings
-            r3 = aw.ser.sendFUJIcommand(soakcommand,8)
-        #check if OK
-        if len(r1)!=8 or len(r2)!=8 or len(r3)!=8:
-            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None))
-
-    def dec2HexRaw(self,decimal):
-        # This method converts a decimal to a raw string appropiate for Fuji serial TX
-        # Used to compose serial messages
-        Nbytes = []
-        while decimal:
-            decimal, rem = divmod(decimal, 256)
-            Nbytes.append(rem)
-        Nbytes.reverse()
-        if not Nbytes:
-            Nbytes.append(0)
-        return decs2string(Nbytes)
-
-    def message2send(self, stationNo, FunctionCode, memory, Nword):
-        # This method takes the arguments to compose a Fuji serial command and returns the complete raw string with crc16 included
-        # memory must be given as the Resistor Number Engineering unit (example of memory = 41057 )
-        #check to see if Nword is < 257. If it is, then add extra zero pad. 2^8 = 256 = 1 byte but 2 bytes always needed to send Nword
-        if Nword < 257:
-            pad1 = self.dec2HexRaw(0)
-        else:
-            pad1 = decs2string("")
-        part1 = self.dec2HexRaw(stationNo)
-        part2 = self.dec2HexRaw(FunctionCode)
-        _,r = divmod(memory,10000)
-        part3 = self.dec2HexRaw(r - 1)
-        part4 = self.dec2HexRaw(Nword)
-        datastring = part1 + part2 + part3 + pad1 + part4
-        # calculate the crc16 of all this data string
-        crc16int = self.fujiCrc16(datastring)
-        #convert crc16 to hex string to change the order of the 2 bytes from AB.CD to CD.AB to match Fuji requirements
-        crc16hex= hex(crc16int)[2:]
-        #we need 4 chars but sometimes we get only three or two because of abreviations by hex(). Therefore, add "0" if needed.
-        ll = 4 - len(crc16hex)
-        pad =["","0","00","000"]
-        crc16hex = pad[ll] + crc16hex
-        #change now from AB.CD to CD.AB and convert from hex string to int
-        crc16end = int(crc16hex[2:]+crc16hex[:2],16)
-        #now convert the crc16 from int to binary
-        part5 = self.dec2HexRaw(crc16end)
-        #return total sum of binary parts  (assembled message)
-        return (datastring + part5)
-
-    #input string command. Output integer (not binary string); used for example to read temperature or to obtain the value of a variable
-    def readoneword(self,command):
-        #takes an already formated command to read 1 word data and returns the response from the pid
-        #SEND command and RECEIVE 7 bytes back
-        r = aw.ser.sendFUJIcommand(command,7)
-        if len(r) == 7:
-            # EVERYTHINK OK: convert data part binary string to hex representation
-            s1 = hex2int(r[3],r[4])
-            #conversion from hex to dec
-            return s1
-        else:
-            #bad number of RX bytes 
-            errorcode = QApplication.translate("Error Message","pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}",None).format(len(r),command[0])
-            aw.qmc.adderror(errorcode)
-            return -1
-
-    #FUJICRC16 function calculates the CRC16 of the data. It expects a binary string as input and returns an int
-    def fujiCrc16(self,string):
-        crc16tab = (0x0000,
-                    0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241, 0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
-                    0xCC01, 0x0CC0, 0x0D80, 0xCD41, 0x0F00, 0xCFC1, 0xCE81, 0x0E40, 0x0A00, 0xCAC1, 0xCB81, 0x0B40, 0xC901, 0x09C0, 0x0880,
-                    0xC841, 0xD801, 0x18C0, 0x1980, 0xD941, 0x1B00, 0xDBC1, 0xDA81, 0x1A40, 0x1E00, 0xDEC1, 0xDF81, 0x1F40, 0xDD01, 0x1DC0,
-                    0x1C80, 0xDC41, 0x1400, 0xD4C1, 0xD581, 0x1540, 0xD701, 0x17C0, 0x1680, 0xD641, 0xD201, 0x12C0, 0x1380, 0xD341, 0x1100,
-                    0xD1C1, 0xD081, 0x1040, 0xF001, 0x30C0, 0x3180, 0xF141, 0x3300, 0xF3C1, 0xF281, 0x3240, 0x3600, 0xF6C1, 0xF781, 0x3740,
-                    0xF501, 0x35C0, 0x3480, 0xF441, 0x3C00, 0xFCC1, 0xFD81, 0x3D40, 0xFF01, 0x3FC0, 0x3E80, 0xFE41, 0xFA01, 0x3AC0, 0x3B80,
-                    0xFB41, 0x3900, 0xF9C1, 0xF881, 0x3840, 0x2800, 0xE8C1, 0xE981, 0x2940, 0xEB01, 0x2BC0, 0x2A80, 0xEA41, 0xEE01, 0x2EC0,
-                    0x2F80, 0xEF41, 0x2D00, 0xEDC1, 0xEC81, 0x2C40, 0xE401, 0x24C0, 0x2580, 0xE541, 0x2700, 0xE7C1, 0xE681, 0x2640, 0x2200,
-                    0xE2C1, 0xE381, 0x2340, 0xE101, 0x21C0, 0x2080, 0xE041, 0xA001, 0x60C0, 0x6180, 0xA141, 0x6300, 0xA3C1, 0xA281, 0x6240,
-                    0x6600, 0xA6C1, 0xA781, 0x6740, 0xA501, 0x65C0, 0x6480, 0xA441, 0x6C00, 0xACC1, 0xAD81, 0x6D40, 0xAF01, 0x6FC0, 0x6E80,
-                    0xAE41, 0xAA01, 0x6AC0, 0x6B80, 0xAB41, 0x6900, 0xA9C1, 0xA881, 0x6840, 0x7800, 0xB8C1, 0xB981, 0x7940, 0xBB01, 0x7BC0,
-                    0x7A80, 0xBA41, 0xBE01, 0x7EC0, 0x7F80, 0xBF41, 0x7D00, 0xBDC1, 0xBC81, 0x7C40, 0xB401, 0x74C0, 0x7580, 0xB541, 0x7700,
-                    0xB7C1, 0xB681, 0x7640, 0x7200, 0xB2C1, 0xB381, 0x7340, 0xB101, 0x71C0, 0x7080, 0xB041, 0x5000, 0x90C1, 0x9181, 0x5140,
-                    0x9301, 0x53C0, 0x5280, 0x9241, 0x9601, 0x56C0, 0x5780, 0x9741, 0x5500, 0x95C1, 0x9481, 0x5440, 0x9C01, 0x5CC0, 0x5D80,
-                    0x9D41, 0x5F00, 0x9FC1, 0x9E81, 0x5E40, 0x5A00, 0x9AC1, 0x9B81, 0x5B40, 0x9901, 0x59C0, 0x5880, 0x9841, 0x8801, 0x48C0,
-                    0x4980, 0x8941, 0x4B00, 0x8BC1, 0x8A81, 0x4A40, 0x4E00, 0x8EC1, 0x8F81, 0x4F40, 0x8D01, 0x4DC0, 0x4C80, 0x8C41, 0x4400,
-                    0x84C1, 0x8581, 0x4540, 0x8701, 0x47C0, 0x4680, 0x8641, 0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040)
-        cr=0xFFFF 
-        for j in string:
-            tmp = cr ^(j)
-            cr =(cr >> 8)^crc16tab[(tmp & 0xff)]
-        return cr
-
-############################################################################
-######################## Arduino CONTROL DIALOG ######################
-############################################################################
-
-class PID_DlgControl(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(PID_DlgControl,self).__init__(parent, aw)
-        self.setModal(True)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","PID Control",None))
-        
-        settings = QSettings()
-        if settings.contains("PIDGeometry"):
-            self.restoreGeometry(settings.value("PIDGeometry"))
-        
-        # PID tab
-        tab1Layout = QVBoxLayout()
-        pidGrp = QGroupBox(QApplication.translate("GroupBox","p-i-d",None))
-        self.pidKp = QDoubleSpinBox()
-        self.pidKp.setAlignment(Qt.AlignRight)
-        self.pidKp.setRange(.0,999.)
-        self.pidKp.setSingleStep(.1)
-        self.pidKp.setValue(self.aw.pidcontrol.pidKp)
-        pidKpLabel = QLabel("kp")
-        self.pidKi = QDoubleSpinBox()
-        self.pidKi.setAlignment(Qt.AlignRight)
-        self.pidKi.setRange(.0,999.)
-        self.pidKi.setSingleStep(.1)
-        self.pidKi.setValue(self.aw.pidcontrol.pidKi)
-        pidKiLabel = QLabel("ki")
-        self.pidKd = QDoubleSpinBox()
-        self.pidKd.setAlignment(Qt.AlignRight)
-        self.pidKd.setRange(.0,999.)
-        self.pidKd.setSingleStep(.1)
-        self.pidKd.setValue(self.aw.pidcontrol.pidKd)
-        pidKdLabel = QLabel("kd")
-        pidSetPID = QPushButton(QApplication.translate("Button","Set",None))
-        pidSetPID.clicked.connect(self.pidConf)
-        pidSetPID.setFocusPolicy(Qt.NoFocus)
-        
-        self.pidSource = QComboBox()
-        if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag:
-            # Arduino/TC4
-            pidSourceItems = ["1","2","3","4"]
-            self.pidSource.addItems(pidSourceItems)
-            self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource - 1)
-        else:
-            # Hottop or MODBUS or others (self.qmc.device in [53,29])
-            pidSourceItems = ["BT","ET"]
-            self.pidSource.addItems(pidSourceItems)
-            if self.aw.pidcontrol.pidSource == 1:
-                self.pidSource.setCurrentIndex(0)
-            else:
-                self.pidSource.setCurrentIndex(1)
-        
-        pidSourceLabel = QLabel(QApplication.translate("Label","Source",None))
-
-        pidGrid = QGridLayout()
-        pidGrid.addWidget(pidKpLabel,0,0)
-        pidGrid.addWidget(self.pidKp,0,1)
-        pidGrid.addWidget(pidKiLabel,1,0)
-        pidGrid.addWidget(self.pidKi,1,1)
-        pidGrid.addWidget(pidKdLabel,2,0)
-        pidGrid.addWidget(self.pidKd,2,1)
-
-
-        pidSourceBox = QHBoxLayout()
-        pidSourceBox.addStretch()
-        pidSourceBox.addWidget(pidSourceLabel)
-        pidSourceBox.addWidget(self.pidSource)
-        #pidSourceBox.addSpacing(80)
-        pidSourceBox.addStretch()
-        
-        self.pidCycle = QSpinBox()
-        self.pidCycle.setAlignment(Qt.AlignRight)
-        self.pidCycle.setRange(0,99999)
-        self.pidCycle.setSingleStep(100)
-        self.pidCycle.setValue(self.aw.pidcontrol.pidCycle)
-        self.pidCycle.setSuffix(" ms")
-        pidCycleLabel = QLabel(QApplication.translate("Label","Cycle",None))
-        
-        pidCycleBox = QHBoxLayout()
-        pidCycleBox.addStretch()  
-        pidCycleBox.addWidget(pidCycleLabel)
-        pidCycleBox.addWidget(self.pidCycle)
-        pidCycleBox.addStretch()  
-        
-        pidSetBox = QHBoxLayout()
-        pidSetBox.addStretch()
-        pidSetBox.addWidget(pidSetPID)
-        
-        self.pOnGroup = QButtonGroup()
-        self.pOnGroup.setExclusive(True)
-        self.pOnE = QRadioButton("P on Error")
-        self.pOnGroup.addButton(self.pOnE)
-        self.pOnM = QRadioButton("P on Input")
-        self.pOnGroup.addButton(self.pOnM)
-        self.pOnE.setChecked(self.aw.pidcontrol.pOnE)
-        self.pOnM.setChecked(not self.aw.pidcontrol.pOnE)
-        if self.aw.pidcontrol.externalPIDControl() in [1,2]:
-            self.pOnE.setEnabled(False)
-            self.pOnM.setEnabled(False)
-        
-        pOnLayout = QVBoxLayout() 
-        pOnLayout.addWidget(self.pOnE)
-        pOnLayout.addWidget(self.pOnM)
-        
-        pidVBox = QVBoxLayout()
-        pidVBox.addLayout(pidSourceBox)
-        if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag: # ArduinoTC4
-            pidVBox.addLayout(pidCycleBox)
-        pidVBox.addLayout(pOnLayout)
-        pidVBox.setAlignment(pOnLayout,Qt.AlignRight)
-        pidVBox.addLayout(pidSetBox)
-        pidVBox.setAlignment(pidSetBox,Qt.AlignRight)
-        
-        #PID target (only shown if interal PID for hottop/modbus/TC4 is active
-        controlItems = ["None",self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)]
-        #positiveControl
-        positiveControlLabel = QLabel(QApplication.translate("Label","Positive", None))
-        self.positiveControlCombo = QComboBox()
-        self.positiveControlCombo.addItems(controlItems)
-        self.positiveControlCombo.setFocusPolicy(Qt.NoFocus)
-        self.positiveControlCombo.setCurrentIndex(self.aw.pidcontrol.pidPositiveTarget)
-        #negativeControl
-        negativeControlLabel = QLabel(QApplication.translate("Label","Negative", None))
-        self.negativeControlCombo = QComboBox()
-        self.negativeControlCombo.addItems(controlItems)
-        self.negativeControlCombo.setFocusPolicy(Qt.NoFocus)
-        self.negativeControlCombo.setCurrentIndex(self.aw.pidcontrol.pidNegativeTarget)
-        
-        controlSelectorLayout = QGridLayout()
-        controlSelectorLayout.addWidget(positiveControlLabel,0,0)
-        controlSelectorLayout.addWidget(self.positiveControlCombo,0,1)
-        controlSelectorLayout.addWidget(negativeControlLabel,1,0)
-        controlSelectorLayout.addWidget(self.negativeControlCombo,1,1)
-                
-        self.invertControlFlag = QCheckBox(QApplication.translate("Label", "Invert Control", None))
-        self.invertControlFlag.setFocusPolicy(Qt.NoFocus)
-        self.invertControlFlag.setChecked(self.aw.pidcontrol.invertControl)
-
-        controlVBox = QVBoxLayout()
-        controlVBox.addLayout(controlSelectorLayout)
-        controlVBox.addWidget(self.invertControlFlag)
-        
-        controlHBox = QHBoxLayout()
-        controlHBox.addStretch()
-        controlHBox.addLayout(controlVBox)
-        controlHBox.addStretch()
-        
-        pidTargetGrp = QGroupBox(QApplication.translate("GroupBox","Target",None))
-        pidTargetGrp.setLayout(controlHBox)
-        pidTargetGrp.setContentsMargins(0,10,0,0)
-        
-        pidGridBox = QHBoxLayout()
-        pidGridBox.addLayout(pidGrid)
-        pidGridBox.addStretch()
-        pidGridBox.addLayout(pidVBox)
-        if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
-            pidGridBox.addWidget(pidTargetGrp)
-        
-        pidGridVBox = QVBoxLayout()
-        pidGridVBox.addLayout(pidGridBox)
-        pidGrp.setLayout(pidGridVBox)
-        pidGrp.setContentsMargins(0,10,0,0)
-        
-        self.pidSV = QSpinBox()
-        self.pidSV.setAlignment(Qt.AlignRight)
-        self.pidSV.setRange(0,999)
-        self.pidSV.setSingleStep(10)
-        self.pidSV.setValue(self.aw.pidcontrol.svValue)
-        pidSVLabel = QLabel(QApplication.translate("Label","SV",None))
-        
-        self.pidSVLookahead = QSpinBox()
-        self.pidSVLookahead.setAlignment(Qt.AlignRight)
-        self.pidSVLookahead.setRange(0,999)
-        self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(self.aw.pidcontrol.svLookahead)
-        self.pidSVLookahead.setSuffix(" s")
-        pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))
-        
-        self.pidDutySteps = QSpinBox()
-        self.pidDutySteps.setAlignment(Qt.AlignRight)
-        self.pidDutySteps.setRange(1,10)
-        self.pidDutySteps.setSingleStep(1)
-        self.pidDutySteps.setValue(self.aw.pidcontrol.dutySteps)  
-        self.pidDutySteps.setSuffix(" %")
-        pidDutyStepsLabel = QLabel(QApplication.translate("Label","Steps",None))
-        
-        pidSetSV = QPushButton(QApplication.translate("Button","Set",None))
-        pidSetSV.clicked.connect(self.setSV)
-        pidSetSV.setFocusPolicy(Qt.NoFocus)
-
-        pidSVModeLabel = QLabel(QApplication.translate("Label","Mode",None))
-        pidModeItems = [
-            QApplication.translate("Label", "Manual",None),
-            QApplication.translate("Label", "Ramp/Soak",None),
-            QApplication.translate("Label", "Background",None)]
-        self.pidMode = QComboBox()
-        self.pidMode.addItems(pidModeItems)
-        self.pidMode.setCurrentIndex(self.aw.pidcontrol.svMode)
-        
-        self.pidSVbuttonsFlag = QCheckBox(QApplication.translate("Label","Buttons",None))
-        self.pidSVbuttonsFlag.setChecked(self.aw.pidcontrol.svButtons)
-        self.pidSVbuttonsFlag.stateChanged.connect(self.activateONOFFeasySVslot)
-        self.pidSVsliderFlag = QCheckBox(QApplication.translate("Label","Slider",None))
-        self.pidSVsliderFlag.setChecked(self.aw.pidcontrol.svSlider)
-        self.pidSVsliderFlag.stateChanged.connect(self.activateSVSlider)
-        
-        self.pidSVSliderMin = QSpinBox()
-        self.pidSVSliderMin.setAlignment(Qt.AlignRight)
-        self.pidSVSliderMin.setRange(0,999)
-        self.pidSVSliderMin.setSingleStep(10)
-        self.pidSVSliderMin.setValue(self.aw.pidcontrol.svSliderMin)
-        pidSVSliderMinLabel = QLabel(QApplication.translate("Label","Min",None))
-        self.pidSVSliderMin.valueChanged.connect(self.sliderMinValueChangedSlot)
-        
-        self.pidSVSliderMax = QSpinBox()
-        self.pidSVSliderMax.setAlignment(Qt.AlignRight)
-        self.pidSVSliderMax.setRange(0,999)
-        self.pidSVSliderMax.setSingleStep(10)
-        self.pidSVSliderMax.setValue(self.aw.pidcontrol.svSliderMax)
-        pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","Max",None))
-        self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangedSlot)
-        
-        if self.aw.qmc.mode == "F":
-            self.pidSVSliderMin.setSuffix(" F")
-            self.pidSVSliderMax.setSuffix(" F")
-            self.pidSV.setSuffix(" F")
-        elif self.aw.qmc.mode == "C":
-            self.pidSVSliderMin.setSuffix(" C")
-            self.pidSVSliderMax.setSuffix(" C")
-            self.pidSV.setSuffix(" C")
-        
-        modeBox = QHBoxLayout()
-        modeBox.addWidget(pidSVModeLabel)
-        modeBox.addWidget(self.pidMode)
-        modeBox.addStretch()
-        modeBox.addWidget(pidSVLookaheadLabel)
-        modeBox.addWidget(self.pidSVLookahead)
-        
-        sliderBox = QHBoxLayout()
-        sliderBox.addWidget(self.pidSVsliderFlag)
-        sliderBox.addStretch()
-        sliderBox.addWidget(pidSVSliderMinLabel)
-        sliderBox.addWidget(self.pidSVSliderMin)
-        sliderBox.addSpacing(10)
-        sliderBox.addWidget(pidSVSliderMaxLabel)
-        sliderBox.addWidget(self.pidSVSliderMax)
-        
-        svInputBox = QHBoxLayout()
-        svInputBox.addWidget(self.pidSVbuttonsFlag)
-        svInputBox.addStretch()
-        svInputBox.addWidget(pidSVLabel)
-        svInputBox.addWidget(self.pidSV)
-        svInputBox.addWidget(pidSetSV)
-        
-        self.dutyMin = QSpinBox()
-        self.dutyMin.setAlignment(Qt.AlignRight)
-        self.dutyMin.setRange(-100,100)
-        self.dutyMin.setSingleStep(10)
-        self.dutyMin.setValue(self.aw.pidcontrol.dutyMin)
-        self.dutyMin.setSuffix(" %")
-        dutyMinLabel = QLabel(QApplication.translate("Label","Min",None))
-        
-        self.dutyMax = QSpinBox()
-        self.dutyMax.setAlignment(Qt.AlignRight)
-        self.dutyMax.setRange(-100,100)
-        self.dutyMax.setSingleStep(10)
-        self.dutyMax.setValue(self.aw.pidcontrol.dutyMax) 
-        self.dutyMax.setSuffix(" %")
-        dutyMaxLabel = QLabel(QApplication.translate("Label","Max",None))
-        
-        svGrpBox = QVBoxLayout()
-        svGrpBox.addStretch()
-        svGrpBox.addLayout(modeBox)
-        svGrpBox.addLayout(sliderBox)
-        svGrpBox.addLayout(svInputBox)
-        svGrpBox.addStretch()
-        svGrp = QGroupBox(QApplication.translate("GroupBox","Set Value",None))
-        svGrp.setLayout(svGrpBox)
-        svGrp.setContentsMargins(0,10,0,0)
-        
-        dutyGrid = QGridLayout()
-        dutyGrid.addWidget(pidDutyStepsLabel,0,0)
-        dutyGrid.addWidget(self.pidDutySteps,0,1)
-        dutyGrid.addWidget(dutyMaxLabel,1,0)
-        dutyGrid.addWidget(self.dutyMax,1,1)
-        dutyGrid.addWidget(dutyMinLabel,2,0)
-        dutyGrid.addWidget(self.dutyMin,2,1)
-        
-        
-        dutyGrpBox = QVBoxLayout()
-        dutyGrpBox.addStretch()
-        dutyGrpBox.addLayout(dutyGrid)
-        dutyGrpBox.addStretch()
-        dutyGrp = QGroupBox(QApplication.translate("GroupBox","Duty",None))
-        dutyGrp.setLayout(dutyGrpBox)
-        dutyGrp.setContentsMargins(0,15,0,0)
-        
-        pidBox = QHBoxLayout()
-        pidBox.addWidget(pidGrp)
-        
-        svBox = QHBoxLayout()
-        svBox.addWidget(svGrp)
-        svBox.addWidget(dutyGrp)
-                
-        self.startPIDonCHARGE = QCheckBox(QApplication.translate("CheckBox", "Start PID on CHARGE",None))
-        self.startPIDonCHARGE.setChecked(self.aw.pidcontrol.pidOnCHARGE)
-
-        tab1Layout.addLayout(pidBox)
-        tab1Layout.addLayout(svBox)
-        tab1Layout.addWidget(self.startPIDonCHARGE)
-        tab1Layout.addStretch()
-        
-        
-        # Ramp/Soak tab
-        tab2Layout = QVBoxLayout()
-        tab2InnerLayout = QHBoxLayout()
-        tab2Layout.addLayout(tab2InnerLayout)
-        rsGrid = QGridLayout()
-        self.SVWidgets = []
-        self.RampWidgets = []
-        self.SoakWidgets = []
-        rsGrid.addWidget(QLabel("SV"),0,1)
-        rsGrid.addWidget(QLabel("Ramp"),0,2)
-        rsGrid.addWidget(QLabel("Soak"),0,3)
-        for i in range(8):
-            n = i+1
-            svwidget = QSpinBox()
-            svwidget.setAlignment(Qt.AlignRight)
-            svwidget.setRange(0,999)
-            svwidget.setSingleStep(10)
-            if self.aw.qmc.mode == "F":
-                svwidget.setSuffix(" F")
-            elif self.aw.qmc.mode == "C":
-                svwidget.setSuffix(" C")
-            self.SVWidgets.append(svwidget)
-            rampwidget = QTimeEdit()
-            rampwidget.setDisplayFormat("mm:ss")
-            rampwidget.setAlignment(Qt.AlignRight)
-            self.RampWidgets.append(rampwidget)
-            soakwidget = QTimeEdit()
-            soakwidget.setDisplayFormat("mm:ss")
-            soakwidget.setAlignment(Qt.AlignRight)
-            self.SoakWidgets.append(soakwidget)
-            rsGrid.addWidget(QLabel(str(n)),n,0)
-            rsGrid.addWidget(svwidget,n,1)
-            rsGrid.addWidget(self.RampWidgets[i],n,2)
-            rsGrid.addWidget(self.SoakWidgets[i],n,3)
-        self.setrampsoaks()
-        importButton = QPushButton(QApplication.translate("Button","Load",None))
-        importButton.setMinimumWidth(80)
-        importButton.clicked.connect(self.importrampsoaks)
-        exportButton = QPushButton(QApplication.translate("Button","Save",None))
-        exportButton.setMinimumWidth(80)
-        exportButton.clicked.connect(self.exportrampsoaks)
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(importButton)
-        buttonLayout.addWidget(exportButton)
-        buttonLayout.addStretch()
-        self.loadRampSoakFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load Ramp/Soak table from profile",None))
-        self.loadRampSoakFromProfile.setChecked(self.aw.pidcontrol.loadRampSoakFromProfile)
-
-        tab2InnerLayout.addStretch()
-        tab2InnerLayout.addLayout(rsGrid)
-        tab2InnerLayout.addStretch()
-        tab2Layout.addLayout(buttonLayout)
-        tab2Layout.addStretch()
-        tab2Layout.addWidget(self.loadRampSoakFromProfile)
-
-
-        ############################
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
-        okButton.clicked.connect(self.okAction)
-        onButton = QPushButton(QApplication.translate("Button","On",None))
-        onButton.clicked.connect(self.pidONAction)
-        offButton = QPushButton(QApplication.translate("Button","Off",None))
-        offButton.clicked.connect(self.pidOFFAction)
-        okButtonLayout = QHBoxLayout()
-        okButtonLayout.addWidget(onButton)
-        okButtonLayout.addWidget(offButton)
-        okButtonLayout.addStretch()
-        okButtonLayout.addWidget(okButton)        
-        okButtonLayout.setContentsMargins(0,0,0,0)
-        tab1Layout.setContentsMargins(0,0,0,0) # left, top, right, bottom
-        tab1Layout.setSpacing(5)
-        tab2Layout.setContentsMargins(0,0,0,0)
-        tab2Layout.setSpacing(5)
-        tabWidget = QTabWidget()
-        C1Widget = QWidget()
-        C1Widget.setLayout(tab1Layout)
-        tabWidget.addTab(C1Widget,QApplication.translate("Tab","PID",None))
-        C2Widget = QWidget()
-        C2Widget.setLayout(tab2Layout)
-        tabWidget.addTab(C2Widget,QApplication.translate("Tab","Ramp/Soak",None))
-        tabWidget.setContentsMargins(0,0,0,0)
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(tabWidget)
-        mainLayout.addLayout(okButtonLayout)
-        mainLayout.setContentsMargins(2,10,2,2)
-        self.setLayout(mainLayout)
-        okButton.setFocus()
-    
-    @pyqtSlot(int)
-    def activateSVSlider(self,i):
-        self.aw.pidcontrol.activateSVSlider(i)
-        
-    @pyqtSlot(bool)
-    def pidONAction(self,_):
-        self.aw.pidcontrol.pidOn()
-    
-    @pyqtSlot(bool)
-    def pidOFFAction(self,_):
-        self.aw.pidcontrol.pidOff()
-    
-    @pyqtSlot(bool)
-    def okAction(self,_):
-        self.close()
-    
-    @pyqtSlot(int)
-    def activateONOFFeasySVslot(self,i):
-        self.aw.pidcontrol.activateONOFFeasySV(bool(i))
-
-    @pyqtSlot(int)
-    def sliderMinValueChangedSlot(self,i):
-        self.aw.pidcontrol.sliderMinValueChanged(i)
-    
-    @pyqtSlot(int)
-    def sliderMaxValueChangedSlot(self,i):
-        self.aw.pidcontrol.sliderMaxValueChanged(i)
-    
-    @pyqtSlot(bool)
-    def importrampsoaks(self,_):
-        self.aw.fileImport(QApplication.translate("Message", "Load Ramp/Soak Table",None),self.importrampsoaksJSON)
-        
-    def importrampsoaksJSON(self,filename):
-        try:
-            import io
-            infile = io.open(filename, 'r', encoding='utf-8')
-            from json import load as json_load
-            rampsoaks = json_load(infile)
-            infile.close()
-            self.aw.pidcontrol.svValues = rampsoaks["svValues"]
-            self.aw.pidcontrol.svRamps = rampsoaks["svRamps"]
-            self.aw.pidcontrol.svSoaks = rampsoaks["svSoaks"]
-            self.setrampsoaks()
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importrampsoaksJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
-    
-    @pyqtSlot(bool)
-    def exportrampsoaks(self,_):
-        self.aw.fileExport(QApplication.translate("Message", "Save Ramp/Soak Table",None),"*.ars",self.exportrampsoaksJSON)
-        
-    def exportrampsoaksJSON(self,filename):
-        try:
-            self.saverampsoaks()
-            rampsoaks = {}
-            rampsoaks["svValues"] = self.aw.pidcontrol.svValues
-            rampsoaks["svRamps"] = self.aw.pidcontrol.svRamps
-            rampsoaks["svSoaks"] = self.aw.pidcontrol.svSoaks
-            rampsoaks["mode"] = self.aw.qmc.mode
-            outfile = open(filename, 'w')
-            from json import dump as json_dump
-            json_dump(rampsoaks, outfile, ensure_ascii=True)
-            outfile.write('\n')
-            outfile.close()
-            return True
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " exportrampsoaksJSON(): {0}").format(str(ex)),exc_tb.tb_lineno)
-            return False
-            
-    def saverampsoaks(self):
-        for i in range(8):
-            self.aw.pidcontrol.svValues[i] = self.SVWidgets[i].value()
-            self.aw.pidcontrol.svRamps[i] = self.aw.pidcontrol.QTime2time(self.RampWidgets[i].time())
-            self.aw.pidcontrol.svSoaks[i] = self.aw.pidcontrol.QTime2time(self.SoakWidgets[i].time())
-            
-    def setrampsoaks(self):
-        for i in range(8):
-            self.SVWidgets[i].setValue(self.aw.pidcontrol.svValues[i])
-            self.RampWidgets[i].setTime(self.aw.pidcontrol.time2QTime(self.aw.pidcontrol.svRamps[i]))
-            self.SoakWidgets[i].setTime(self.aw.pidcontrol.time2QTime(self.aw.pidcontrol.svSoaks[i]))
-
-    @pyqtSlot(bool)
-    def pidConf(self,_):
-        kp = self.pidKp.value() # 5.00
-        ki = self.pidKi.value() # 0.15
-        kd = self.pidKd.value() # 0.00
-        source = self.pidSource.currentIndex() + 1 # 1-4, def 1
-        cycle = self.pidCycle.value() # def 1000 in ms
-        pOnE = bool(self.pOnE.isChecked())
-        self.aw.pidcontrol.confPID(kp,ki,kd,source,cycle,pOnE)
-        if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
-            self.aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
-            self.aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
-            self.aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
-    
-    @pyqtSlot(bool)
-    def setSV(self,_): # and DutySteps
-        self.aw.pidcontrol.setSV(self.pidSV.value())
-        self.aw.pidcontrol.setDutySteps(self.pidDutySteps.value())
-        
-    def close(self):
-        kp = self.pidKp.value() # 5.00
-        ki = self.pidKi.value() # 0.15
-        kd = self.pidKd.value() # 0.00
-        
-        source = self.pidSource.currentIndex() + 1 # 1-4, def 1
-        if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
-            self.aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
-            self.aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
-            self.aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
-        cycle = self.pidCycle.value() # def 1000 in ms
-        pOnE = bool(self.pOnE.isChecked())
-        self.aw.pidcontrol.setPID(kp,ki,kd,source,cycle,pOnE)
-        #
-        self.aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
-        self.aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
-        self.aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
-        self.aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
-        self.aw.pidcontrol.svValue = self.pidSV.value()
-        self.aw.pidcontrol.svSlider = self.pidSVsliderFlag.isChecked()
-        self.aw.pidcontrol.activateSVSlider(self.aw.pidcontrol.svSlider)
-        self.aw.pidcontrol.svButtons = self.pidSVbuttonsFlag.isChecked()
-        self.aw.pidcontrol.activateONOFFeasySV(self.aw.pidcontrol.svButtons)
-        self.aw.pidcontrol.svMode = self.pidMode.currentIndex()
-        self.aw.pidcontrol.dutyMin = min(self.dutyMin.value(),self.dutyMax.value())
-        self.aw.pidcontrol.dutyMax = max(self.dutyMin.value(),self.dutyMax.value())
-        self.aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
-        self.aw.pidcontrol.dutySteps = self.pidDutySteps.value()
-        #
-        self.saverampsoaks()
-        #
-        self.closeEvent(None)
-
-    def closeEvent(self,_):
-        settings = QSettings()
-        #save window geometry
-        settings.setValue("PIDGeometry",self.saveGeometry()) 
-        self.accept()
-
-
-############################################################################
-######################## DTA PID CONTROL DIALOG ######################
-############################################################################
-
-class DTApidDlgControl(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
-        super(DTApidDlgControl,self).__init__(parent, aw)
-        self.setModal(True)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","Delta DTA PID Control",None))
-        self.status = QStatusBar()
-        self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Work in Progress",None),5000)
-        svlabel = QLabel(QApplication.translate("Label", "SV", None))
-        self.svedit = QLineEdit(str(self.aw.dtapid.dtamem["sv"][0]))
-        self.svedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999.,1, self.svedit))
-        readsvbutton = QPushButton(QApplication.translate("Button","Read", None))
-        writesvbutton = QPushButton(QApplication.translate("Button","Write", None))
-        readsvbutton.clicked.connect(self.readsv)
-        writesvbutton.clicked.connect(self.writesv)
-        tab1Layout = QGridLayout()
-        tab1Layout.addWidget(svlabel,0,0)
-        tab1Layout.addWidget(self.svedit,0,1)
-        tab1Layout.addWidget(readsvbutton,0,2)
-        tab1Layout.addWidget(writesvbutton,0,3)
-        ############################
-        TabWidget = QTabWidget()
-        C1Widget = QWidget()
-        C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","General",None))
-        mainlayout = QVBoxLayout()
-        mainlayout.addWidget(self.status,0)
-        mainlayout.addWidget(TabWidget,1)
-        self.setLayout(mainlayout)
-
-    @pyqtSlot(bool)
-    def readsv(self,_):
-        ### create command message2send(unitID,function,address,ndata)
-        command = self.aw.dtapid.message2send(self.aw.ser.controlETpid[1],3,self.aw.dtapid.dtamem["sv"][1],1)
-        #read sv
-        sv = self.aw.ser.sendDTAcommand(command)
-        #update SV value 
-        self.aw.dtapid.dtamem["sv"][0] = sv
-        #update svedit
-        self.svedit.setText(str(sv)) 
-        #update sv LCD
-        self.aw.lcd6.display(sv)
-        #update status
-        message = QApplication.translate("StatusBar","SV = %s"%(str(sv)),None)
-        self.status.showMessage(message,5000)
-
-    #write uses function = 6
-    @pyqtSlot(bool)
-    def writesv(self,_):
-        v = self.aw.comma2dot(self.svedit.text())
-        if v:
-            newsv = hex(int(abs(float(str(v)))*10.))[2:].upper()
-            ### create command message2send(unitID,function,address,ndata)
-            command = self.aw.dtapid.message2send(self.aw.ser.controlETpid[1],6,self.aw.dtapid.dtamem["sv"][1],newsv)
-                #read sv
-        self.aw.ser.sendDTAcommand(command)
-
-###################################################################################
-##########################  ARDUINO CLASS DEFINITION  ############################
-###################################################################################
-
-class PIDcontrol(object):
-    def __init__(self):
-        self.pidActive = False
-        self.sv = None # the last sv send to the Arduino
-        #
-        self.pidOnCHARGE = False
-        self.loadRampSoakFromProfile = False
-        self.svValues = [0,0,0,0,0,0,0,0] # sv temp as int per 8 channels
-        self.svRamps = [0,0,0,0,0,0,0,0] # seconds as int per 8 channels
-        self.svSoaks = [0,0,0,0,0,0,0,0] # seconds as int per 8 channels
-        self.svSlider = False
-        self.svButtons = False
-        self.svMode = 0 # 0: manual, 1: Ramp/Soak, 2: Follow (background profile)
-        self.svLookahead = 0
-        self.dutySteps = 1
-        self.svSliderMin = 0
-        self.svSliderMax = 480
-        self.svValue = 390 # the value in the setSV textinput box of the PID dialog
-        self.dutyMin = -100
-        self.dutyMax = 100
-        self.pidKp = 20.0
-        self.pidKi = 0.01
-        self.pidKd = 3.0
-        self.lastEnergy = None
-        # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
-        self.pOnE = True # True for Proposional on Error mode, False for Proposional on Measurement Mode
-        # pidSource
-        #   either the TC4 input channel from [1,..,4] if self.qmc.device == 19 (Arduino/TC4)
-        #   in all other cases (HOTTOP, MODBUS,..), 1 is interpreted as BT and 2 as ET
-        self.pidSource = 1
-        self.pidCycle = 1000
-        # the positive target should increase with positive PID duty
-        self.pidPositiveTarget = 0 # one of [0,1,..,4] with 0: None, 1,..,4: for slider event 1-4
-        # the negative target should decrease with negative PID duty
-        self.pidNegativeTarget = 0 # one of [0,1,..,4] with 0: None, 1,..,4: for slider event 1-4
-        # if invertControl is True, a PID duty of 100% delivers 0% positive duty and a 0% PID duty delivers 100% positive duty
-        self.invertControl = False
-        # PID sv smoothing
-        self.sv_smoothing_factor = 0 # off if 0
-        self.sv_decay_weights = None
-        self.previous_svs = []
-
-    # returns True if an external PID controller is in use (MODBUS or TC4 PID firmware)
-    # and False if the internal software PID is in charge
-    # the returned value indicates the type of external PID control:
-    #  0: internal PID
-    #  1: MODBUS
-    #  2: S7
-    #  3: TC4
-    def externalPIDControl(self):
-        # TC4 with PID firmware or MODBUS and SV register set or S7 and SV area set
-        if aw.modbus.PID_slave_ID != 0:
-            return 1
-        elif aw.s7.PID_area != 0:
-            return 2
-        elif (aw.qmc.device == 19 and aw.qmc.PIDbuttonflag):
-            return 3
-        else:
-            return 0
-             
-    # v is from [-min,max]
-    def setEnergy(self,v):
-        # only update control signal if different to previous (cache reset by PID_ON)
-        if self.lastEnergy is None or self.lastEnergy != v:
-            try: 
-                if aw.pidcontrol.pidPositiveTarget:
-                    slidernr = aw.pidcontrol.pidPositiveTarget - 1
-                    if aw.pidcontrol.invertControl:
-                        vp = abs(100 - v)
-                    else:
-                        vp = v
-                    vp = min(100,max(0,int(vp)))
-                    # we need to map the duty [0%,100%] to the [slidermin,slidermax] range
-                    heat = int(round(numpy.interp(vp,[0,100],[aw.eventslidermin[slidernr],aw.eventslidermax[slidernr]])))
-                    aw.block_quantification_sampling_ticks[slidernr] = aw.sampling_ticks_to_block_quantifiction
-                    aw.qmc.temporarymovepositiveslider = (slidernr,heat)
-                if aw.pidcontrol.pidNegativeTarget:
-                    slidernr = aw.pidcontrol.pidNegativeTarget - 1
-                    if aw.pidcontrol.invertControl:
-                        vn = 0 - v
-                    else:
-                        vn = v
-                    vn = min(0,max(-100,int(vn)))
-                    # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range
-                    aw.block_quantification_sampling_ticks[slidernr] = aw.sampling_ticks_to_block_quantifiction
-                    cool = int(round(numpy.interp(vn,[-100,0],[aw.eventslidermax[slidernr],aw.eventslidermin[slidernr]])))
-                    aw.qmc.temporarymovenegativeslider = (slidernr,cool)
-            except:
-#                import traceback
-#                traceback.print_exc(file=sys.stdout)
-                pass
-        self.lastEnergy = v
-
-    def conv2celsius(self):
-        try:
-            self.svValue = int(round(fromFtoC(self.svValue)))
-            self.svSliderMin = int(round(fromFtoC(self.svSliderMin)))
-            self.svSliderMax = int(round(fromFtoC(self.svSliderMax)))
-            # establish ne limits on sliders
-            aw.sliderSV.setMinimum(self.svSliderMin)
-            aw.sliderSV.setMaximum(self.svSliderMax)
-            self.pidKp = self.pidKp * (9/5.)
-            self.pidKi = self.pidKi * (9/5.)
-            self.pidKd = self.pidKd * (9/5.)
-            for i in range(self.svValues):
-                self.svValues[i] = fromFtoC(self.svValues[i])
-        except Exception:
-            pass
-    
-    def conv2fahrenheit(self):
-        try:
-            self.svValue = fromCtoF(self.svValue)
-            self.svSliderMin = fromCtoF(self.svSliderMin)
-            self.svSliderMax = fromCtoF(self.svSliderMax)
-            # establish ne limits on sliders
-            aw.sliderSV.setMinimum(self.svSliderMin)
-            aw.sliderSV.setMaximum(self.svSliderMax)
-            self.pidKp = self.pidKp / (9/5.)
-            self.pidKi = self.pidKi / (9/5.)
-            self.pidKd = self.pidKd / (9/5.)
-            for i in range(self.svValues):
-                self.svValues[i] = fromCtoF(self.svValues[i])
-        except Exception:
-            pass
-    
-    # takes an "Arduino" float time in seconds and returns the corresponding QTime() object
-    def time2QTime(self,t):
-        return QTime(0,t/60,t%60)
-        
-    def QTime2time(self,t):
-        return t.minute() * 60 + t.second()
-        
-    def togglePID(self):
-        if self.pidActive:
-            self.pidOff()
-        else:
-            self.pidOn()
-
-    def pidOn(self):
-        if aw.qmc.flagon:
-            aw.qmc.temporayslider_force_move = True
-            self.lastEnergy = None
-            # TC4 hardware PID
-            # MODBUS hardware PID
-            if (aw.pidcontrol.externalPIDControl() == 1 and aw.modbus.PID_ON_action and aw.modbus.PID_ON_action != ""):
-                aw.eventaction(4,aw.modbus.PID_ON_action)
-                self.pidActive = True
-                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
-            # S7 hardware PID
-            elif (aw.pidcontrol.externalPIDControl() == 2 and aw.s7.PID_ON_action and aw.s7.PID_ON_action != ""):
-                aw.eventaction(15,aw.s7.PID_ON_action)
-                self.pidActive = True
-                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"]) 
-            elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
-                if aw.ser.ArduinoIsInitialized:
-                    self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle,aw.pidcontrol.pOnE) # first configure PID according to the actual settings
-                    try:
-                        #### lock shared resources #####
-                        aw.ser.COMsemaphore.acquire(1)
-                        if aw.ser.SP.isOpen():
-                            duty_min = min(100,max(0,aw.pidcontrol.dutyMin))
-                            duty_max = min(100,max(0,aw.pidcontrol.dutyMax))
-                            aw.ser.SP.write(str2cmd("PID;LIMIT;" + str(duty_min) + ";" + str(duty_max) + "\n"))
-                            aw.ser.SP.write(str2cmd("PID;ON\n"))
-                            self.pidActive = True
-                            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
-                            aw.sendmessage(QApplication.translate("Message","PID turned on", None))
-                    finally:
-                        if aw.ser.COMsemaphore.available() < 1:
-                            aw.ser.COMsemaphore.release(1)
-            # software PID
-            elif aw.qmc.Controlbuttonflag:
-                aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
-                aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
-                aw.qmc.pid.setDutySteps(aw.pidcontrol.dutySteps)
-                aw.qmc.pid.setDutyMin(aw.pidcontrol.dutyMin)
-                aw.qmc.pid.setDutyMax(aw.pidcontrol.dutyMax)
-                aw.qmc.pid.setControl(lambda v: aw.pidcontrol.setEnergy(v))
-                if aw.pidcontrol.svMode == 0:
-                    aw.pidcontrol.setSV(aw.sliderSV.value())
-#                    aw.pidcontrol.setSV(aw.pidcontrol.svValue)
-                self.pidActive = True
-                aw.qmc.pid.on()
-                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
-
-    def pidOff(self):
-        # MODBUS hardware PID
-        if (aw.pidcontrol.externalPIDControl() == 1 and aw.modbus.PID_OFF_action and aw.modbus.PID_OFF_action != ""):
-            aw.eventaction(4,aw.modbus.PID_OFF_action)
-            if not aw.HottopControlActive:
-                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
-            self.pidActive = False  
-        # S7 hardware PID
-        elif (aw.pidcontrol.externalPIDControl() == 2 and aw.s7.PID_OFF_action and aw.s7.PID_OFF_action != ""):
-            aw.eventaction(15,aw.s7.PID_OFF_action)
-            if not aw.HottopControlActive:
-                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
-            self.pidActive = False   
-        # TC4 hardware PID
-        elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag and aw.qmc.Controlbuttonflag: # ArduinoTC4 firmware PID
-            if aw.ser.ArduinoIsInitialized:
-                try:
-                    #### lock shared resources #####
-                    aw.ser.COMsemaphore.acquire(1)
-                    if aw.ser.SP.isOpen():
-                        aw.ser.SP.reset_input_buffer() # aw.ser.SP.flushInput() # deprecated in v3
-                        aw.ser.SP.reset_output_buffer() # aw.ser.SP.flushOutput() # deprecated in v3
-                        aw.ser.SP.write(str2cmd("PID;OFF\n"))
-                        aw.sendmessage(QApplication.translate("Message","PID turned off", None))
-                finally:
-                    if aw.ser.COMsemaphore.available() < 1:
-                        aw.ser.COMsemaphore.release(1)
-                if not aw.HottopControlActive:
-                    aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
-                self.pidActive = False
-        # software PID
-        elif aw.qmc.Controlbuttonflag:
-            aw.qmc.pid.setControl(lambda _: _)
-            self.pidActive = False
-            aw.qmc.pid.off()
-            if not aw.HottopControlActive:
-                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
-
-    @pyqtSlot(int)
-    def sliderMinValueChanged(self,i):
-        self.svSliderMin = i
-        aw.sliderSV.setMinimum(self.svSliderMin)
-
-    @pyqtSlot(int)
-    def sliderMaxValueChanged(self,i):
-        self.svSliderMax = i
-        aw.sliderSV.setMaximum(self.svSliderMax)
-
-    # returns SV (or None) wrt. to the ramp-soak table and the given time t
-    # (used only internally)
-    def svRampSoak(self,t):
-        segment_end_time = 0 # the (end) time of the segments
-        prev_segment_end_time = 0 # the (end) time of the previous segment
-        segment_start_sv = 0 # the (target) sv of the segment
-        prev_segment_start_sv = 0 # the (target) sv of the previous segment
-        for i in range(len(self.svValues)):
-            # Ramp
-            segment_end_time = segment_end_time + self.svRamps[i]
-            segment_start_sv = self.svValues[i]
-            if segment_end_time > t:
-                # t is within the current segment
-                k = float(segment_start_sv - prev_segment_start_sv) / float(segment_end_time - prev_segment_end_time)
-                return prev_segment_start_sv + k*(t - prev_segment_end_time)
-            prev_segment_end_time = segment_end_time
-            prev_segment_start_sv = segment_start_sv
-            # Soak
-            segment_end_time = segment_end_time + self.svSoaks[i]
-            segment_start_sv = self.svValues[i]
-            if segment_end_time > t:
-                # t is within the current segment
-                return prev_segment_start_sv
-            prev_segment_end_time = segment_end_time
-            prev_segment_start_sv = segment_start_sv
-        return None
-    
-    def smooth_sv(self,sv):
-        if self.sv_smoothing_factor:
-            # create or update smoothing decay weights
-            if self.sv_decay_weights is None or len(self.sv_decay_weights) != self.sv_smoothing_factor: # recompute only on changes
-                self.sv_decay_weights = numpy.arange(1,self.sv_smoothing_factor+1)
-            # add new value
-            self.previous_svs.append(sv)
-            # throw away superflous values
-            self.previous_svs = self.previous_svs[-self.sv_smoothing_factor:]
-            # compute smoothed output
-            if len(self.previous_svs) < self.sv_smoothing_factor:
-                res = sv # no smoothing yet
-            else:
-                res = numpy.average(self.previous_svs,weights=self.sv_decay_weights)
-            return res
-        else:
-            return sv
-
-    # returns None if in manual mode or no other sv (via ramp/soak or follow mode) defined
-    def calcSV(self,tx):
-        if self.svMode == 1:
-            # Ramp/Soak mode
-            # actual time (after CHARGE):
-            return self.svRampSoak(tx)
-        elif self.svMode == 2 and aw.qmc.background:
-            # Follow Background mode
-            followBT = True # if false, follow ET
-            if aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # in case we run TC4 with the PIDfirmware
-                if int(aw.ser.arduinoETChannel) == self.pidSource: # we observe the ET 
-                    followBT = False
-                elif int(aw.ser.arduinoBTChannel) == self.pidSource: # we observe the BT
-                    followBT = True
-                else:
-                    return None
-            else:
-                if self.pidSource == 1: # we observe the BT
-                    followBT = True
-                else:
-                    followBT = False
-                    
-#            if aw.qmc.timeindex[0] < 0 or aw.qmc.timeindex[6] > 0:
-#                # before and after DROP the SV configured in the dialog is returned (min/maxed)
-#                return max(aw.pidcontrol.svSliderMin,(min(aw.pidcontrol.svSliderMax,aw.pidcontrol.svValue)))
-            if aw.qmc.timeindex[6] > 0: # after DROP, the SV configured in the dialog is returned (min/maxed)
-                return max(aw.pidcontrol.svSliderMin,(min(aw.pidcontrol.svSliderMax,aw.pidcontrol.svValue)))
-            elif aw.qmc.timeindex[0] < 0: # before CHARGE, the CHARGE temp of the background profile is returned
-                if aw.qmc.timeindexB[0] < 0:
-                    # no CHARGE in background, return manual SV
-                    return max(aw.pidcontrol.svSliderMin,(min(aw.pidcontrol.svSliderMax,aw.pidcontrol.svValue)))
-                else:
-                    # if background contains a CHARGE event
-                    if followBT:
-                        res = aw.qmc.backgroundBTat(aw.qmc.timeB[aw.qmc.timeindexB[0]]) # smoothed and approximated background
-                    else: # in all other cases we observe the ET
-                        res = aw.qmc.backgroundETat(aw.qmc.timeB[aw.qmc.timeindexB[0]]) # smoothed and approximated background
-                    return self.smooth_sv(res)
-            elif ((not aw.qmc.timeB or tx+self.svLookahead > aw.qmc.timeB[-1]) or (aw.qmc.timeindexB[6] > 0 and tx+self.svLookahead > aw.qmc.timeB[aw.qmc.timeindexB[6]])):
-                # if tx+self.svLookahead > last background data or background has a DROP and tx+self.svLookahead index is beyond that DROP index
-                return None # "deactivate" background follow mode
-            else:
-                if followBT:
-                    res = aw.qmc.backgroundSmoothedBTat(tx + self.svLookahead) # smoothed and approximated background
-                    if res == -1:
-                        return None # no background value for that time point
-                    else:
-    #                    j = aw.qmc.backgroundtime2index(tx + self.svLookahead)
-    #                    res = aw.qmc.stemp2B[j] # smoothed background  
-                        return self.smooth_sv(res)
-                else: # in all other cases we observe the ET
-                    res = aw.qmc.backgroundSmoothedETat(tx + self.svLookahead) # smoothed and approximated background
-                    if res == -1:
-                        return None
-    #                    j = aw.qmc.backgroundtime2index(tx + self.svLookahead)
-    #                    res = aw.qmc.stemp1B[j] # smoothed background
-                    else:
-                        return self.smooth_sv(res)
-        else:
-            # return None in manual mode
-            return None
-
-    def setDutySteps(self,dutySteps):
-        if aw.qmc.Controlbuttonflag and not aw.pidcontrol.externalPIDControl():
-            aw.qmc.pid.setDutySteps(dutySteps)
-
-    
-    def setSV(self,sv,move=True,init=False):
-#        if not move:            
-#            aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv, None))
-        if (aw.pidcontrol.externalPIDControl() == 1): # MODBUS PID and Control ticked
-            self.sv = max(0,sv)
-            if move:
-                aw.moveSVslider(sv,setValue=True)
-            aw.modbus.setTarget(sv)
-            self.sv = sv # remember last sv
-        elif (aw.pidcontrol.externalPIDControl() == 2): # S7 PID and Control ticked
-            self.sv = max(0,sv)
-            if move:
-                aw.moveSVslider(sv,setValue=True)
-            aw.s7.setTarget(sv,aw.s7.SVmultiplier)
-            self.sv = sv # remember last sv
-        elif aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
-            if aw.ser.ArduinoIsInitialized:
-                sv = max(0,aw.float2float(sv,2))
-                if self.sv != sv: # nothing to do (avoid loops via moveslider!)
-                    if move == True and aw.pidcontrol.svSlider:
-                        aw.moveSVslider(sv,setValue=True) # only move the slider
-                        self.sv = sv # remember last sv
-                    try:
-                        #### lock shared resources #####
-                        aw.ser.COMsemaphore.acquire(1)
-                        if aw.ser.SP.isOpen():
-                            aw.ser.SP.reset_input_buffer() # aw.ser.SP.flushInput() # deprecated in v3
-                            aw.ser.SP.reset_output_buffer() # aw.ser.SP.flushOutput() # deprecated in v3
-                            aw.ser.SP.write(str2cmd("PID;SV;" + str(sv) +"\n"))
-                            self.sv = sv # remember last sv
-                    finally:
-                        if aw.ser.COMsemaphore.available() < 1:
-                            aw.ser.COMsemaphore.release(1)
-        elif aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
-            if move and aw.pidcontrol.svSlider:
-                aw.moveSVslider(sv,setValue=True)
-            aw.qmc.pid.setTarget(sv,init=init)
-            self.sv = sv # remember last sv
-
-    def adjustsv(self,diff):
-        self.setSV(self.sv + diff,True)
-    
-    def activateSVSlider(self,flag):
-        if flag:
-            aw.sliderGrpBoxSV.setVisible(True)
-            aw.sliderSV.blockSignals(True)
-            aw.sliderSV.setMinimum(self.svSliderMin)
-            aw.sliderSV.setMaximum(self.svSliderMax)
-            # we set the SV slider/lcd to the last SV issues or the minimum
-            if aw.pidcontrol.sv is not None:
-                sv = aw.pidcontrol.sv
-            else:
-                sv = self.svSliderMin
-            aw.updateSVSliderLCD(sv)
-            aw.sliderSV.setValue(sv)
-            aw.sliderSV.blockSignals(False)
-            self.svSlider = True
-            aw.slidersAction.setEnabled(True)
-        else:
-            aw.sliderGrpBoxSV.setVisible(False)
-            self.svSlider = False
-            aw.slidersAction.setEnabled(any(aw.eventslidervisibilities))
-
-    def activateONOFFeasySV(self,flag):
-        if flag:
-            if aw.qmc.flagon:
-                aw.button_12.setVisible(True)
-                aw.button_13.setVisible(True)
-                aw.button_14.setVisible(True)
-                aw.button_15.setVisible(True)
-                aw.button_16.setVisible(True)
-                aw.button_17.setVisible(True)
-        else:
-            aw.button_12.setVisible(False)
-            aw.button_13.setVisible(False)
-            aw.button_14.setVisible(False)
-            aw.button_15.setVisible(False)
-            aw.button_16.setVisible(False)
-            aw.button_17.setVisible(False)
-
-    # just store the p-i-d configuration
-    def setPID(self,kp,ki,kd,source=None,cycle=None,pOnE=True):
-        self.pidKp = kp
-        self.pidKi = ki
-        self.pidKd = kd
-        self.pOnE = pOnE
-        if source is not None:
-            self.pidSource = source
-        if cycle is not None:
-            self.pidCycle = cycle
-    
-    # send conf to connected PID
-    def confPID(self,kp,ki,kd,source=None,cycle=None,pOnE=True):
-        if (aw.pidcontrol.externalPIDControl() == 1): # MODBUS (external) Control active
-            aw.modbus.setPID(kp,ki,kd)
-            self.pidKp = kp
-            self.pidKi = ki
-            self.pidKd = kd
-            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
-        elif (aw.pidcontrol.externalPIDControl() == 2): # S7 (external) Control active
-            aw.s7.setPID(kp,ki,kd,aw.s7.PIDmultiplier)
-            self.pidKp = kp
-            self.pidKi = ki
-            self.pidKd = kd
-            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
-        elif aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
-            if aw.ser.ArduinoIsInitialized:
-                try:
-                    #### lock shared resources #####
-                    aw.ser.COMsemaphore.acquire(1)
-                    if aw.ser.SP.isOpen():
-                        aw.ser.SP.reset_input_buffer() # aw.ser.SP.flushInput() # deprecated in v3
-                        aw.ser.SP.reset_output_buffer() # aw.ser.SP.flushOutput() # deprecated in v3
-                        if pOnE:
-                            aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
-                        else:
-                            aw.ser.SP.write(str2cmd("PID;T_POM;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
-                        self.pidKp = kp
-                        self.pidKi = ki
-                        self.pidKd = kd
-                        if source is not None:
-                            libtime.sleep(.03)
-                            aw.ser.SP.write(str2cmd("PID;CHAN;" + str(source) + "\n"))
-                        if cycle is not None:
-                            libtime.sleep(.03)
-                            aw.ser.SP.write(str2cmd("PID;CT;" + str(cycle) + "\n"))
-                        aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
-                finally:
-                    if aw.ser.COMsemaphore.available() < 1:
-                        aw.ser.COMsemaphore.release(1)
-        elif aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
-            aw.qmc.pid.setPID(kp,ki,kd,pOnE)
-            self.pidKp = kp
-            self.pidKi = ki
-            self.pidKd = kd
-            self.pOnE = pOnE
-            aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
-            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
-
-###################################################################################
-##########################  DTA PID CLASS DEFINITION  ############################
-###################################################################################
-# documentation
-# http://www.deltaww.hu/homersekletszabalyozok/DTA_series_temperature_controller_instruction_sheet_English.pdf
-class DtaPID(object):
-    def __init__(self):
-        #refer to Delta instruction manual for more information
-        #dictionary "KEY": [VALUE,ASCII_MEMORY_ADDRESS]  note: address contains hex alpha characters
-        self.dtamem={
-                  "pv": [0,"4700"],             # process value (temperature reading)
-                  "sv": [100.0,"4701"],         # set point
-                  "p": [5,"4708"],              # p value 0-9999
-                  "i": [240,"4709"],            # i value 0-9999
-                  "d": [60,"470A"],             # d value 0-9999
-                  "duty" : [0,"471D"],          # duty
-                  "sensortype": [0,"4710"],     # 0 = K type1; 1 = K type2; 2 = J type1; 3 = J type2
-                                                # 4 = T type1; 5 = T type2; 6 = E ; 7 = N; 8 = R; 9 = S; 10 = B
-                                                # 11 = JPT100 type1; 12 = JPT100 type2; 13 = PT100 type1; 14 = PT100 type2
-                                                # 15 = PT100 type3; 16 = L ; 17 = U; 18 = Txk
-                  "controlmethod":[0,"4711"],   # 0 = pid; 1 = ON/OFF; 2 = manual
-                  "units":[1,"4717"],           # units C = 1; F = 2
-                  "controlsetting":[1,"4719"],  # 1=Run; 0 = Stop
-                  "error":[0,"472B"]            # note: read only memory. Values:
-                                                # 0 = Normal,1 = Initial process; 2 = Initial status;
-                                                # 3 = sensor not connected; 4 = sensor input error
-                                                # 5 = Exceeds max temperature; 6 = Number Internal error
-                                                # 7 EEPROM error
-                  }
-    #command  string = ID (ADR)+ FUNCTION (CMD) + ADDRESS + NDATA + LRC_CHK
-    def writeDTE(self,value,DTAaddress):
-        newsv = hex(int(abs(float(str(value)))))[2:].upper()
-        slaveID = aw.ser.controlETpid[1]
-        if aw.ser.controlETpid[0] != 2: # control pid is not a DTA PID
-            slaveID = aw.ser.readBTpid[1]
-        command = aw.dtapid.message2send(slaveID,6,str(DTAaddress),newsv)
-        aw.ser.sendDTAcommand(command)
-
-    def message2send(self,unitID,FUNCTION,ADDRESS, NDATA):
-        #compose command
-        string_unitID = str(unitID).zfill(2)
-        string_FUNCTION = str(FUNCTION).zfill(2)
-        string_ADDRESS = ADDRESS                 #ADDRESS is a 4 char string
-        string_NDATA = str(NDATA).zfill(4)
-        cmd = string_unitID + string_FUNCTION + string_ADDRESS + string_NDATA
-        checksum = hex(self.DTACalcChecksum(cmd))[2:].zfill(2).upper()
-        command = ":" + cmd + checksum + "\r\n"
-        return command
-
-    def DTACalcChecksum(self,string):
-        def tobin(x, count=8):
-            return "".join([str((x>>y)&1) for y in range(count-1, -1, -1)])
-        def twoscomp(num_str):
-            return tobin(-int(num_str,2),len(num_str))
-        length = len(string)
-        # start at index 1 because of heading ':' cmd
-        count = 0
-        val = 0x00
-        while count < length:
-            val +=  int(string[count] + string[count+1], 16)  #string[count+1] goes out of range
-            count += 2
-        h_bs = bin(val)[2:]
-        h2comp = twoscomp(h_bs)
-        rval = int(h2comp,2)
-        if (val & 0x80) == 0:
-            rval = rval | 0x80
-        return rval
 
 ###########################################################################################################################################
 ###########################################################################################################################################
@@ -42211,24 +32776,24 @@ def main():
     
     try:
         if sys.argv and len(sys.argv) > 1:
-            argv_file = sys.argv[1]
-            qfile = QFileInfo(u(argv_file))
-            file_suffix = u(qfile.suffix())
+            argv_file = str(sys.argv[1])
+            qfile = QFileInfo(argv_file)
+            file_suffix = qfile.suffix()
             if file_suffix == "alog":
                 # load Artisan profile on double-click on *.alog file
-                aw.loadFile(u(argv_file))
+                aw.loadFile(argv_file)
             elif file_suffix == "alrm":
                 # load Artisan alarms on double-click on *.alrm file
-                aw.loadAlarms(u(argv_file))
+                aw.loadAlarms(argv_file)
             elif file_suffix == "apal":
                 # load Artisan palettes on double-click on *.apal file
-                aw.getPalettes(u(argv_file),aw.buttonpalette)
+                aw.getPalettes(argv_file,aw.buttonpalette)
             elif file_suffix == "aset":
                 # load Artisan setings on double-click on *.aset file
-                aw.loadSettings(fn=u(argv_file))
+                aw.loadSettings(fn=argv_file)
             elif file_suffix == "athm":
                 # load Artisan setings on double-click on *.athm file
-                aw.loadSettings(fn=u(argv_file),reset=False)
+                aw.loadSettings(fn=argv_file,reset=False)
             elif platf == 'Windows' and re.match("artisan\:\/\/roast",argv_file):
                 if app.isRunning():
                     app.sendMessage(argv_file)
@@ -42241,14 +32806,14 @@ def main():
             # we try to reload the last loaded profile or background
             if aw.lastLoadedProfile:
                 try:
-                    aw.loadFile(u(aw.lastLoadedProfile))
+                    aw.loadFile(aw.lastLoadedProfile)
                 except:
                     pass
             elif aw.logofilename != "":  #ensure background image aspect ratio is calculated
                 aw.qmc.reset(redraw=False, soundOn=False)
             if aw.lastLoadedBackground and aw.lastLoadedBackground != "" and not aw.curFile:
                 try:
-                    aw.loadbackground(u(aw.lastLoadedBackground))
+                    aw.loadbackground(aw.lastLoadedBackground)
                     aw.qmc.background = True
                     if not aw.lastLoadedProfile and not(aw.logofilename != "" and aw.logoimgflag):
                         # this extra redraw is not needed if a watermark is loaded as it is triggered by the resize-redraw mechanism

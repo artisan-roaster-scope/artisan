@@ -19,6 +19,7 @@
 import os
 import sys
 import math
+import re
 import binascii
 import time as libtime
 import numpy
@@ -27,7 +28,7 @@ import subprocess
 import threading
 import platform
 
-from artisanlib.util import cmd2str, RoRfromCtoF, appFrozen, fromCtoF, fromFtoC, hex2int, str2cmd
+from artisanlib.util import cmd2str, RoRfromCtoF, appFrozen, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
 
 from PyQt5.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot
 from PyQt5.QtGui import QIntValidator
@@ -139,13 +140,15 @@ class YoctoThread(threading.Thread):
 #########################################################################
 
 #inputs temperature
-class nonedevDlg(QDialog,object):
+class nonedevDlg(QDialog):
     __slots__ = ['etEdit','btEdit','ETbox','okButton','cancelButton'] # save some memory by using slots
     def __init__(self, parent = None, aw = None):
-        super(nonedevDlg,self).__init__(parent, aw)
+        super(nonedevDlg,self).__init__(parent)
+        self.aw = aw
+        
         self.setWindowTitle(QApplication.translate("Form Caption","Manual Temperature Logger",None))
-        if len(aw.qmc.timex):
-            if aw.qmc.manuallogETflag:
+        if len(self.aw.qmc.timex):
+            if self.aw.qmc.manuallogETflag:
                 etval = str(int(aw.qmc.temp1[-1]))
             else:
                 etval = "0"
@@ -160,7 +163,7 @@ class nonedevDlg(QDialog,object):
         self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
         self.btEdit.setFocus()
         self.ETbox = QCheckBox(QApplication.translate("CheckBox","ET",None))
-        if aw.qmc.manuallogETflag == True:
+        if self.aw.qmc.manuallogETflag == True:
             self.ETbox.setChecked(True)
         else:
             self.ETbox.setChecked(False)
@@ -1969,7 +1972,7 @@ class serialport(object):
         return res[1], res[0]
 
     def NONEtmp(self):
-        dialogx = nonedevDlg(self.aw)
+        dialogx = nonedevDlg(self.aw, self.aw)
         
         # NOT CORRECT:
         ##from sys import getsizeof  # getsizesof not reporting the full size here!
@@ -5447,3 +5450,263 @@ class serialport(object):
             if self.aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("Serial Ccommand: " + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
+                
+
+
+#########################################################################
+#############  Extra Serial Ports #######################################
+#########################################################################
+
+class extraserialport(object):
+    def __init__(self, aw):
+        self.aw = aw
+        
+        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated.
+        self.baudrate = 19200
+        self.bytesize = 8
+        self.parity= 'N'
+        self.stopbits = 1
+        self.timeout = 1.0
+        self.devicefunctionlist = {}
+        self.device = None
+        self.SP = None
+
+    def confport(self):
+        self.SP.port = self.comport
+        self.SP.baudrate = self.baudrate
+        self.SP.bytesize = self.bytesize
+        self.SP.parity = self.parity
+        self.SP.stopbits = self.stopbits
+        self.SP.timeout = self.timeout
+
+    def openport(self):
+        try:
+            self.confport()
+            #open port
+            if not self.SP.isOpen():
+                self.SP.open()
+        except Exception:
+            self.SP.close()
+#            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
+            error = QApplication.translate("Error Message","Serial Exception:",None)
+            _, _, exc_tb = sys.exc_info()
+            self.aw.qmc.adderror(error + " Unable to open serial port",exc_tb.tb_lineno)
+
+    def closeport(self):
+        if self.SP is not None:
+            self.SP.close()
+            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
+
+    # this one is called from scale and color meter code
+    def connect(self,error=True):
+        if self.SP is None:
+            try:
+                import serial  # @UnusedImport
+                self.SP = serial.Serial()
+            except Exception as e:
+                if error:
+                    _, _, exc_tb = sys.exc_info()
+                    self.aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None) + " connect() {0}").format(str(e)),exc_tb.tb_lineno)
+        if self.SP is not None:
+            try:
+                self.openport()
+                if self.SP.isOpen():
+                    return True
+                else:
+                    return False
+            except Exception as e:
+                if error:
+                    _, _, exc_tb = sys.exc_info()
+                    self.aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None) + " connect() {0}").format(str(e)),exc_tb.tb_lineno)
+                return False
+        else:
+            return False
+
+class scaleport(extraserialport):
+    """ this class handles the communications with the scale"""
+    def __init__(self,aw):
+        super(scaleport, self).__init__(aw)
+        
+        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated.
+        self.baudrate = 19200
+        self.bytesize = 8
+        self.parity= 'N'
+        self.stopbits = 1
+        self.timeout = 0.2
+        self.devicefunctionlist = {
+            "None" : None,
+            "KERN NDE" : self.readKERN_NDE,
+            "acaia" : self.readAcaia,
+            #"Shore 930" : self.readShore930,
+        }
+
+    def closeport(self):
+        if self.device == "acaia":
+            # disconnect from acaia scale
+            try:
+                if self.SP.isOpen():
+                    self.SP.write(str2cmd('BTDS\r\n'))
+            except Exception:
+                pass
+        super(scaleport, self).closeport()
+        
+    # returns one of weight (g), density (g/l), or moisture (%).  Others return -1.
+    def readWeight(self,scale_weight=None):
+        if scale_weight != None:
+            return scale_weight,-1,-1
+        else:
+            if self.device is not None and self.device != "None" and self.device != "" and self.device != "acaia":
+                wei,den,moi = self.devicefunctionlist[self.device]()
+                if moi is not None and moi > -1:
+                    return -1, -1, self.aw.float2float(moi)
+                elif den is not None and den > -1:
+                    return -1, self.aw.float2float(den), -1
+                elif wei is not None and wei > -1:
+                    return self.aw.float2float(wei), -1, -1
+                else:
+                    return -1,-1,-1
+            else:
+                return -1,-1,-1
+            
+    def readLine(self):
+        return str(self.SP.readline().decode('ascii'))
+
+    # replaced by BLE direct implementation
+    def readAcaia(self):
+        pass
+
+    def readKERN_NDE(self):
+        try:
+            if not self.SP:
+                self.connect()
+            if self.SP:
+                if not self.SP.isOpen():
+                    self.openport()
+                if self.SP.isOpen():
+                    #self.SP.write(str2cmd('s')) # only stable
+                    self.SP.write(str2cmd('w')) # any weight
+                    v = self.SP.readline()
+                    if len(v) == 0:
+                        return -1,-1,-1
+                    sa = v.decode('ascii').split('g')
+                    if len(sa) == 2:
+                        return int(sa[0].replace(" ", "")), -1, -1
+                    else:
+                        # some times the unit is just missing, we assume it is g
+                        sa = v.decode('ascii').split('\r\n')
+                        if len(sa) == 2:
+                            return int(sa[0].replace(" ", "")),-1,-1
+                        return -1, -1, -1
+        except Exception:
+            return -1, -1, -1
+
+    def readShore930(self):
+        try:
+            if not self.SP:
+                self.connect()
+            if self.SP:
+                if not self.SP.isOpen():
+                    self.openport()
+                if self.SP.isOpen():
+                    line1 = self.SP.readline()
+                    weight = re.search(r'Current Weight:',str(line1))
+                    if weight:                    
+                        w = re.findall(r'([0-9\.]+)',str(line1))
+                        if len(w) == 1:
+                            return toFloat(w[0]),-1,-1
+                        else:
+                            return -1,-1,-1
+
+                    density = re.search(r'Test Weight',str(line1))
+                    if density:
+                        line2 = self.SP.readline()
+                        d = re.findall(r'[0-9\.\-]+',str(line2))
+                        if len(d) == 1:
+                            den = toFloat(d[0]) *12.8718597   # convert from LBS/BU to g/
+                            return -1,toFloat(den),-1
+                        else:
+                            return -1,-1,-1
+
+                    moisture = re.search(r'Beans',str(line1))
+                    if moisture:
+                        line2 = self.SP.readline()
+                        m = re.findall(r'[0-9\.\-]+',str(line2))
+#                        line3 = self.SP.readline() # unused!
+                        if len(m) == 1:
+                            return -1,-1,toFloat(m[0])
+                        else:
+                            return -1,-1,-1
+
+                    else:
+                        return -1,-1,-1
+        except Exception:
+            return -1,-1,-1
+
+
+class colorport(extraserialport):
+    """ this class handles the communications with the color meter"""
+    def __init__(self,aw):
+        super(colorport, self).__init__(aw)
+        
+        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated.
+        self.baudrate = 115200
+        self.bytesize = 8
+        self.parity= 'N'
+        self.stopbits = 1
+        self.timeout = 2
+        self.devicefunctionlist = {
+            "None" : None,
+            "Tiny Tonino" : self.readTonino,
+            "Classic Tonino" : self.readTonino
+        }
+
+    # returns color as int or -1 if something went wrong
+    def readColor(self):
+        if self.device is not None and self.device != "None" and self.device != "":
+            return self.devicefunctionlist[self.device]()
+        else:
+            return -1
+
+    def readline_terminated(self,eol=b'\r'):
+        leneol = len(eol)
+        line = bytearray()
+        while True:
+            c = self.SP.read(1)
+            if c:
+                line += c
+                if line[-leneol:] == eol:
+                    break
+            else:
+                break
+        return bytes(line)
+
+    def readTonino(self,retry=2):
+        try:
+            if not self.SP:
+                self.connect()
+                libtime.sleep(2)
+                # put Tonino into PC mode on first connect
+                self.SP.write(str2cmd('\nTONINO\n'))
+                #self.SP.flush()
+                self.readline_terminated(b'\n')
+            if self.SP:
+                if not self.SP.isOpen():
+                    self.openport()
+                if self.SP.isOpen():
+                    self.SP.reset_input_buffer()
+                    self.SP.reset_output_buffer()
+                    self.SP.write(str2cmd('\nSCAN\n'))
+                    #self.SP.flush()
+                    v = self.readline_terminated(b'\n').decode('ascii')
+                    if "SCAN" in v:
+                        n = int(v.split(":")[1]) # response should have format "SCAN:128"
+                        return n
+                    elif retry > 0:
+                        return self.readTonino(self,retry-1)
+                    else:
+                        return -1
+        except Exception:
+            return -1

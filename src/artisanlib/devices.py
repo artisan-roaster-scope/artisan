@@ -2658,3 +2658,4 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def tabSwitched(self,_):
         self.closeHelp()
+        

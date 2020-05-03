@@ -86,8 +86,8 @@ class ArtisanResizeablDialog(ArtisanDialog):
             self.setWindowFlags(windowFlags)
 
 class ArtisanMessageBox(QMessageBox):
-    def __init__(self, parent = None, aw = None, title=None, text=None, timeout=0, modal=True):
-        super(ArtisanMessageBox, self).__init__(parent, aw)
+    def __init__(self, parent = None, title=None, text=None, timeout=0, modal=True):
+        super(ArtisanMessageBox, self).__init__(parent)
         self.setWindowTitle(title)
         self.setText(text)
         self.setModal(modal)

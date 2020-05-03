@@ -43,8 +43,9 @@ def stringp(x):
     return isinstance(x, str)
 def uchr(x):
     return chr(x)
-def u(x): # convert to unicode string
-    return str(x)
+# the historical u() needed for Python2/Qt4 got eliminated or replaced by str()
+#def u(x): # convert to unicode string
+#    return str(x)
 def d(x):
     if x is not None:
         return codecs.unicode_escape_decode(x)[0]
