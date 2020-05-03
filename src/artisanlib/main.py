@@ -22124,7 +22124,6 @@ class ApplicationWindow(QMainWindow):
         self.extratimeout = self.extratimeout[:n]
         self.extratimeout.append(0.5)
 
-
     def addDevice(self):
         try:
             self.qmc.extradevices.append(25)
@@ -22153,7 +22152,7 @@ class ApplicationWindow(QMainWindow):
             self.extraFill2[n-1] = 0
 
             #create new serial port (but don't open it yet). Store initial settings
-            self.addSerialPort(self)
+            self.addSerialPort()
 
             #add new line variables
             self.qmc.extratimex = self.qmc.extratimex[:n-1]
@@ -22201,7 +22200,7 @@ class ApplicationWindow(QMainWindow):
             l = len(self.qmc.extradevices)-1  #new line index
             self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp1[l],color=self.qmc.extradevicecolor1[l],markersize=self.qmc.extramarkersizes1[l],marker=self.qmc.extramarkers1[l],linewidth=self.qmc.extralinewidths1[l],linestyle=self.qmc.extralinestyles1[l],drawstyle=self.qmc.extradrawstyles1[l],label=self.qmc.extraname1[l])[0])
             self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp2[l],color=self.qmc.extradevicecolor2[l],markersize=self.qmc.extramarkersizes2[l],marker=self.qmc.extramarkers2[l],linewidth=self.qmc.extralinewidths2[l],linestyle=self.qmc.extralinestyles2[l],drawstyle=self.qmc.extradrawstyles2[l],label=self.qmc.extraname2[l])[0])
-
+            
             self.updateExtraLCDvisibility()
         except Exception:
 #            import traceback
