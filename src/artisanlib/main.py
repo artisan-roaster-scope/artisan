@@ -7300,12 +7300,21 @@ class tgraphcanvas(FigureCanvas):
             eventanno = eventanno.replace('\n', '')
 
             #text between single quotes ' will show only before FCs
-            eventanno = re.sub(fr"{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}",r"\1",eventanno) if not postFCs else re.sub(fr"{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}",r"",eventanno)
+#            eventanno = re.sub(fr"{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}",r"\1",eventanno) if not postFCs else re.sub(fr"{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}",r"",eventanno)
+            eventanno = re.sub(r"{}([^{}]+){}".format(preFCsDelim,preFCsDelim,preFCsDelim),
+                r"\1",eventanno) if not postFCs else re.sub(r"{}([^{}]+){}".format(preFCsDelim,preFCsDelim,preFCsDelim),
+                r"",eventanno)
             #text between double quotes " will show only after FCs
-            eventanno = re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',r'\1',eventanno) if postFCs else re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',r'',eventanno)
+#            eventanno = re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',r'\1',eventanno) if postFCs else re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',r'',eventanno)
+            eventanno = re.sub(r'{}([^{}]+){}'.format(postFCsDelim,postFCsDelim,postFCsDelim),
+                r'\1',eventanno) if postFCs else re.sub(r'{}([^{}]+){}'.format(postFCsDelim,postFCsDelim,postFCsDelim),
+                r'',eventanno)
 
             #text between back ticks ` will show only within 90 seconds before FCs
-            eventanno = re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'\1',eventanno) if (fcsWindow) else re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'',eventanno)
+#            eventanno = re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'\1',eventanno) if (fcsWindow) else re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'',eventanno)
+            eventanno = re.sub(r'{}([^{}]+){}'.format(fcsWindowDelim,fcsWindowDelim,fcsWindowDelim),
+                r'\1',eventanno) if (fcsWindow) else re.sub(r'{}([^{}]+){}'.format(fcsWindowDelim,fcsWindowDelim,fcsWindowDelim),
+                r'',eventanno)
 
             # substitute numeric to nominal values if in the annotationstring
             #
@@ -7320,7 +7329,8 @@ class tgraphcanvas(FigureCanvas):
             # does the matchedgroup(4) always persist after the pattern.sub() above?
             # does the pattern.split always result in the same list pattern?  ex:
             #     ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '|', '100', 'A Point', '']
-            pattern = re.compile(fr".*{nominalDelimopen}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}")
+#            pattern = re.compile(fr".*{nominalDelimopen}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}")
+            pattern = re.compile(r".*{}(?P<nominalstr>[^{}]+){}".format(nominalDelimopen,nominalDelimclose,nominalDelimclose))
             matched = pattern.match(eventanno)
             if matched != None:
                 pattern = re.compile(r"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)")
@@ -7335,12 +7345,15 @@ class tgraphcanvas(FigureCanvas):
                         break
                     else:
                         j += 3
-                pattern = re.compile(fr"({nominalDelimopen}[^{nominalDelimclose}]+{nominalDelimclose})")
+#                pattern = re.compile(fr"({nominalDelimopen}[^{nominalDelimclose}]+{nominalDelimclose})")
+                pattern = re.compile(r"({}[^{}]+{})".format(nominalDelimopen,nominalDelimclose,nominalDelimclose))
                 eventanno = pattern.sub(replacestring,eventanno)
                
             # make all the remaining substitutions
             for i in range(len(fields)):
-                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9.]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
+#                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9.]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
+                pattern = re.compile(r"(.*{})({})(?P<mathop>[/*+-][0-9.]+)?(({}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?".format(
+                    self.fieldDelim,fields[i][0],nominalstringDelim))
                 matched = pattern.match(eventanno)
                 if matched != None:
 
@@ -7351,7 +7364,8 @@ class tgraphcanvas(FigureCanvas):
                         replacestring += matched.group('mathop')
                         replacestring = str(aw.float2float(eval(replacestring),1))
 
-                    pattern = re.compile(fr"{self.fieldDelim}{fields[i][0]}([/*+-][0-9.]+)?")
+#                    pattern = re.compile(fr"{self.fieldDelim}{fields[i][0]}([/*+-][0-9.]+)?")
+                    pattern = re.compile(r"{}{}([/*+-][0-9.]+)?".format(self.fieldDelim,fields[i][0]))
                     eventanno = pattern.sub(replacestring,eventanno)
 
         except Exception as ex:
@@ -21289,9 +21303,15 @@ class ApplicationWindow(QMainWindow):
                 ]
 
             #text between single quotes ' will show only when recording or for preview recording
-            fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
+#            fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
+            fn = re.sub(r"{}([^{}]+){}".format(onDelim,onDelim,onDelim),
+                r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(r"{}([^{}]+){}".format(
+                    onDelim,onDelim,onDelim),r"",fn)
             #text between double quotes " will show only when flagon is False
-            fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon))  else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
+#            fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon)) else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
+            fn = re.sub(r'{}([^{}]+){}'.format(offDelim,offDelim,offDelim),
+                r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon)) else re.sub(r'{}([^{}]+){}'.format(
+                    offDelim,offDelim,offDelim),r'',fn)
             #replace the fields with content
             for i in range(len(fields)):
                 fn = fn.replace(self.fieldDelim + fields[i][0], str(fields[i][1]))
