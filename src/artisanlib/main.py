@@ -23186,45 +23186,49 @@ class ApplicationWindow(QMainWindow):
         self.updateExtradeviceSettings()
     
     def updateExtradeviceSettings(self):
-            ndevices = len(self.qmc.extradevices)
-            if ndevices != len(self.qmc.extralinestyles1) or \
-               ndevices != len(self.qmc.extralinestyles2) or \
-               ndevices != len(self.qmc.extradrawstyles1) or \
-               ndevices != len(self.qmc.extradrawstyles2) or \
-               ndevices != len(self.qmc.extralinewidths1) or \
-               ndevices != len(self.qmc.extralinewidths2) or \
-               ndevices != len(self.qmc.extramarkers1) or \
-               ndevices != len(self.qmc.extramarkers2) or \
-               ndevices != len(self.qmc.extramarkersizes1) or \
-               ndevices != len(self.qmc.extramarkersizes2):
-                self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*ndevices
-                self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*ndevices
-                self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*ndevices
-                self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*ndevices
-                self.qmc.extralinewidths1 = [self.qmc.extra_linewidth_default]*ndevices
-                self.qmc.extralinewidths2 = [self.qmc.extra_linewidth_default]*ndevices
-                self.qmc.extramarkers1 = [self.qmc.marker_default]*ndevices
-                self.qmc.extramarkers2 = [self.qmc.marker_default]*ndevices
-                self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*ndevices
-                self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*ndevices
-            self.qmc.extratemp1 = []
-            self.qmc.extratemp2 = []
-            self.qmc.extratimex = []
-            self.qmc.extrastemp1 = []
-            self.qmc.extrastemp2 = []
-            for _ in range(len(self.qmc.extradevices)):
-                self.qmc.extratemp1.append([])
-                self.qmc.extratemp2.append([])
-                self.qmc.extratimex.append([])
-                self.qmc.extrastemp1.append([])
-                self.qmc.extrastemp2.append([])
-                self.qmc.extractimex1.append([])
-                self.qmc.extractimex2.append([])
-                self.qmc.extractemp1.append([])
-                self.qmc.extractemp2.append([])
-            #extra LCDs and other LCDs visibility
-            self.updateLCDproperties()
-        
+        ndevices = len(self.qmc.extradevices)
+        if ndevices != len(self.qmc.extralinestyles1) or \
+           ndevices != len(self.qmc.extralinestyles2) or \
+           ndevices != len(self.qmc.extradrawstyles1) or \
+           ndevices != len(self.qmc.extradrawstyles2) or \
+           ndevices != len(self.qmc.extralinewidths1) or \
+           ndevices != len(self.qmc.extralinewidths2) or \
+           ndevices != len(self.qmc.extramarkers1) or \
+           ndevices != len(self.qmc.extramarkers2) or \
+           ndevices != len(self.qmc.extramarkersizes1) or \
+           ndevices != len(self.qmc.extramarkersizes2):
+            self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*ndevices
+            self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*ndevices
+            self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*ndevices
+            self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*ndevices
+            self.qmc.extralinewidths1 = [self.qmc.extra_linewidth_default]*ndevices
+            self.qmc.extralinewidths2 = [self.qmc.extra_linewidth_default]*ndevices
+            self.qmc.extramarkers1 = [self.qmc.marker_default]*ndevices
+            self.qmc.extramarkers2 = [self.qmc.marker_default]*ndevices
+            self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*ndevices
+            self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*ndevices
+        self.qmc.extratemp1 = []
+        self.qmc.extratemp2 = []
+        self.qmc.extratimex = []
+        self.qmc.extrastemp1 = []
+        self.qmc.extrastemp2 = []
+        for _ in range(len(self.qmc.extradevices)):
+            self.qmc.extratemp1.append([])
+            self.qmc.extratemp2.append([])
+            self.qmc.extratimex.append([])
+            self.qmc.extrastemp1.append([])
+            self.qmc.extrastemp2.append([])
+            self.qmc.extractimex1.append([])
+            self.qmc.extractimex2.append([])
+            self.qmc.extractemp1.append([])
+            self.qmc.extractemp2.append([])
+        #extra LCDs and other LCDs visibility
+        self.updateLCDproperties()
+        # set extraLCD colors
+        for i in range(len(self.qmc.extradevices)):
+            self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
+            self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
+
     #called by fileLoad()
     def setProfile(self,filename,profile,quiet=False):
         try:
@@ -23233,8 +23237,8 @@ class ApplicationWindow(QMainWindow):
                 if "extradevices" in profile:
                     updateRender = False
                     # check for difference in the Data values between the profile and current settings
-                    settingdev = ''.join([str(self.qmc.extradevices), str(self.qmc.extraname1), str(self.qmc.extraname2), 
-                                        str(self.qmc.extramathexpression1), str(aw.qmc.extramathexpression2),
+                    settingdev = ''.join([str(self.qmc.extradevices), str([encodeLocal(n) for n in self.qmc.extraname1]), str([encodeLocal(n) for n in self.qmc.extraname2]), 
+                                        str([encodeLocal(x) for x in self.qmc.extramathexpression1]), str([encodeLocal(x) for x in self.qmc.extramathexpression2]),
                                         ])
                     profiledev = ''.join([str(profile["extradevices"]), str(profile["extraname1"]), str(profile["extraname2"]), 
                                         str(profile["extramathexpression1"]), str(profile["extramathexpression2"]),
@@ -24634,7 +24638,7 @@ class ApplicationWindow(QMainWindow):
         self.fileImport(QApplication.translate("Message", "Import RoastLogger",None),self.importRoastLogger,True)
 
     #loads the settings at the start of application. See the oppposite closeEventSettings()
-    def settingsLoad(self, filename=None):
+    def settingsLoad(self, filename=None, theme=False):
         res = False
         try: 
             updateBatchCounter = True
@@ -25556,161 +25560,121 @@ class ApplicationWindow(QMainWindow):
                 self.ser.externaloutprogram = toString(settings.value("externaloutprogram",self.ser.externaloutprogram))
             if settings.contains("externaloutprogramFlag"):
                 self.ser.externaloutprogramFlag = bool(toBool(settings.value("externaloutprogramFlag",self.ser.externaloutprogramFlag)))
-            settings.beginGroup("ExtraDev")
-            if settings.contains("extradevices"):
-                self.qmc.extradevices = [toInt(x) for x in toList(settings.value("extradevices",self.qmc.extradevices))]
-                self.qmc.extraname1 = list(map(str,list(toStringList(settings.value("extraname1",self.qmc.extraname1)))))
-                self.qmc.extraname2 = list(map(str,list(toStringList(settings.value("extraname2",self.qmc.extraname2)))))
-                self.qmc.extramathexpression1 = list(map(str,list(toStringList(settings.value("extramathexpression1",self.qmc.extramathexpression1)))))
-                self.qmc.extramathexpression2 = list(map(str,list(toStringList(settings.value("extramathexpression2",self.qmc.extramathexpression2)))))
-                self.qmc.extradevicecolor1 = list(map(str,list(toStringList(settings.value("extradevicecolor1",self.qmc.extradevicecolor1)))))
-                self.qmc.extradevicecolor2 = list(map(str,list(toStringList(settings.value("extradevicecolor2",self.qmc.extradevicecolor2)))))
-                if settings.contains("extraLCDvisibility1"):
-                    self.extraLCDvisibility1 = [toBool(x) for x in toList(settings.value("extraLCDvisibility1",self.extraLCDvisibility1))]
-                if settings.contains("extraLCDvisibility2"):
-                    self.extraLCDvisibility2 = [toBool(x) for x in toList(settings.value("extraLCDvisibility2",self.extraLCDvisibility2))]
-                if settings.contains("extraCurveVisibility1"):
-                    self.extraCurveVisibility1 = [toBool(x) for x in toList(settings.value("extraCurveVisibility1",self.extraCurveVisibility1))]
-                if settings.contains("extraCurveVisibility2"):
-                    self.extraCurveVisibility2 = [toBool(x) for x in toList(settings.value("extraCurveVisibility2",self.extraCurveVisibility2))]
-                if settings.contains("extraDelta1"):
-                    self.extraDelta1 = [toBool(x) for x in toList(settings.value("extraDelta1",self.extraDelta1))]
-                if settings.contains("extraDelta2"):
-                    self.extraDelta2 = [toBool(x) for x in toList(settings.value("extraDelta2",self.extraDelta2))]
-                if settings.contains("extraFill1"):
-                    self.extraFill1 = [toInt(x) for x in toList(settings.value("extraFill1",self.extraFill1))]
-                if settings.contains("extraFill2"):
-                    self.extraFill2 = [toInt(x) for x in toList(settings.value("extraFill2",self.extraFill2))]
-            #create empty containers
-            settings.endGroup()
-            
-            # ensure that extra list length are of the size of the extradevices:
-            self.ensureCorrectExtraDeviceListLenght()
-            
-            #restore curve styles
-            settings.beginGroup("CurveStyles")
-            if settings.contains("BTlinestyle"):
-                self.qmc.BTlinestyle = s2a(toString(settings.value("BTlinestyle",self.qmc.BTlinestyle)))
-                self.qmc.BTdrawstyle = s2a(toString(settings.value("BTdrawstyle",self.qmc.BTdrawstyle)))
-                if self.qmc.BTdrawstyle == '-':
-                    self.qmc.BTdrawstyle = self.qmc.drawstyle_default
-                self.qmc.BTlinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTlinewidth",self.qmc.BTlinewidth))))
-                self.qmc.BTmarker = s2a(toString(settings.value("BTmarker",self.qmc.BTmarker)))
-                self.qmc.BTmarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTmarkersize",self.qmc.BTmarkersize))))
-                self.qmc.ETlinestyle = s2a(toString(settings.value("ETlinestyle",self.qmc.ETlinestyle)))
-                self.qmc.ETdrawstyle = s2a(toString(settings.value("ETdrawstyle",self.qmc.ETdrawstyle)))
-                if self.qmc.ETdrawstyle == '-':
-                    self.qmc.ETdrawstyle = self.qmc.drawstyle_default
-                self.qmc.ETlinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETlinewidth",self.qmc.ETlinewidth))))
-                self.qmc.ETmarker = s2a(toString(settings.value("ETmarker",self.qmc.ETmarker)))
-                self.qmc.ETmarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETmarkersize",self.qmc.ETmarkersize))))
-                self.qmc.BTdeltalinestyle = s2a(toString(settings.value("BTdeltalinestyle",self.qmc.BTdeltalinestyle)))
-                self.qmc.BTdeltadrawstyle = s2a(toString(settings.value("BTdeltadrawstyle",self.qmc.BTdeltadrawstyle)))
-                if self.qmc.BTdeltadrawstyle == '-':
-                    self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
-                self.qmc.BTdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTdeltalinewidth",self.qmc.BTdeltalinewidth))))
-                self.qmc.BTdeltamarker = s2a(toString(settings.value("BTdeltamarker",self.qmc.BTdeltamarker)))
-                self.qmc.BTdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTdeltamarkersize",self.qmc.BTdeltamarkersize))))
-                self.qmc.ETdeltalinestyle = s2a(toString(settings.value("ETdeltalinestyle",self.qmc.ETdeltalinestyle)))
-                self.qmc.ETdeltadrawstyle = s2a(toString(settings.value("ETdeltadrawstyle",self.qmc.ETdeltadrawstyle)))
-                if self.qmc.ETdeltadrawstyle == '-':
-                    self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
-                self.qmc.ETdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETdeltalinewidth",self.qmc.ETdeltalinewidth))))
-                self.qmc.ETdeltamarker = s2a(toString(settings.value("ETdeltamarker",self.qmc.ETdeltamarker)))
-                self.qmc.ETdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETdeltamarkersize",self.qmc.ETdeltamarkersize))))
-                self.qmc.BTbacklinestyle = s2a(toString(settings.value("BTbacklinestyle",self.qmc.BTbacklinestyle)))
-                self.qmc.BTbackdrawstyle = s2a(toString(settings.value("BTbackdrawstyle",self.qmc.BTbackdrawstyle)))
-                if self.qmc.BTbackdrawstyle == '-':
-                    self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.BTbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTbacklinewidth",self.qmc.BTbacklinewidth))))
-                self.qmc.BTbackmarker = s2a(toString(settings.value("BTbackmarker",self.qmc.BTbackmarker)))
-                self.qmc.BTbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTbackmarkersize",self.qmc.BTbackmarkersize))))
-                self.qmc.ETbacklinestyle = s2a(toString(settings.value("ETbacklinestyle",self.qmc.ETbacklinestyle)))
-                self.qmc.ETbackdrawstyle = s2a(toString(settings.value("ETbackdrawstyle",self.qmc.ETbackdrawstyle)))
-                if self.qmc.ETbackdrawstyle == '-':
-                    self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.ETbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETbacklinewidth",self.qmc.ETbacklinewidth))))
-                self.qmc.ETbackmarker = s2a(toString(settings.value("ETbackmarker",self.qmc.ETbackmarker)))
-                self.qmc.ETbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETbackmarkersize",self.qmc.ETbackmarkersize))))
-                self.qmc.XTbacklinestyle = s2a(toString(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle)))
-                self.qmc.XTbackdrawstyle = s2a(toString(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle)))
-                if self.qmc.XTbackdrawstyle == '-':
-                    self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.XTbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("XTbacklinewidth",self.qmc.XTbacklinewidth))))
-                self.qmc.XTbackmarker = s2a(toString(settings.value("XTbackmarker",self.qmc.XTbackmarker)))
-                self.qmc.XTbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("XTbackmarkersize",self.qmc.ETbackmarkersize))))
-                self.qmc.extralinestyles1 = list(map(str,list(toStringList(settings.value("extralinestyles1",self.qmc.extralinestyles1)))))
-                self.qmc.extralinestyles2 = list(map(str,list(toStringList(settings.value("extralinestyles2",self.qmc.extralinestyles2)))))
-                self.qmc.extradrawstyles1 = list(map(str,list(toStringList(settings.value("extradrawstyles1",self.qmc.extradrawstyles1)))))
-                self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles1]                                
-                self.qmc.extradrawstyles2 = list(map(str,list(toStringList(settings.value("extradrawstyles2",self.qmc.extradrawstyles2)))))
-                self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles2]                                                
-                self.qmc.extralinewidths1 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extralinewidths1"))]
-                self.qmc.extralinewidths2 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extralinewidths2"))]
-                self.qmc.extramarkers1 = list(map(str,list(toStringList(settings.value("extramarkers1",self.qmc.extramarkers1)))))
-                self.qmc.extramarkers2 = list(map(str,list(toStringList(settings.value("extramarkers2",self.qmc.extramarkers2)))))
-                self.qmc.extramarkersizes1 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extramarkersizes1"))]
-                self.qmc.extramarkersizes2 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extramarkersizes2"))]
-                self.qmc.BTBdeltalinestyle = s2a(toString(settings.value("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle)))
-                self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle)))
+            if not theme:
+                settings.beginGroup("ExtraDev")
+                if settings.contains("extradevices"):
+                    self.qmc.extradevices = [toInt(x) for x in toList(settings.value("extradevices",self.qmc.extradevices))]
+                    self.qmc.extraname1 = list(map(str,list(toStringList(settings.value("extraname1",self.qmc.extraname1)))))
+                    self.qmc.extraname2 = list(map(str,list(toStringList(settings.value("extraname2",self.qmc.extraname2)))))
+                    self.qmc.extramathexpression1 = list(map(str,list(toStringList(settings.value("extramathexpression1",self.qmc.extramathexpression1)))))
+                    self.qmc.extramathexpression2 = list(map(str,list(toStringList(settings.value("extramathexpression2",self.qmc.extramathexpression2)))))
+                    self.qmc.extradevicecolor1 = list(map(str,list(toStringList(settings.value("extradevicecolor1",self.qmc.extradevicecolor1)))))
+                    self.qmc.extradevicecolor2 = list(map(str,list(toStringList(settings.value("extradevicecolor2",self.qmc.extradevicecolor2)))))
+                    if settings.contains("extraLCDvisibility1"):
+                        self.extraLCDvisibility1 = [toBool(x) for x in toList(settings.value("extraLCDvisibility1",self.extraLCDvisibility1))]
+                    if settings.contains("extraLCDvisibility2"):
+                        self.extraLCDvisibility2 = [toBool(x) for x in toList(settings.value("extraLCDvisibility2",self.extraLCDvisibility2))]
+                    if settings.contains("extraCurveVisibility1"):
+                        self.extraCurveVisibility1 = [toBool(x) for x in toList(settings.value("extraCurveVisibility1",self.extraCurveVisibility1))]
+                    if settings.contains("extraCurveVisibility2"):
+                        self.extraCurveVisibility2 = [toBool(x) for x in toList(settings.value("extraCurveVisibility2",self.extraCurveVisibility2))]
+                    if settings.contains("extraDelta1"):
+                        self.extraDelta1 = [toBool(x) for x in toList(settings.value("extraDelta1",self.extraDelta1))]
+                    if settings.contains("extraDelta2"):
+                        self.extraDelta2 = [toBool(x) for x in toList(settings.value("extraDelta2",self.extraDelta2))]
+                    if settings.contains("extraFill1"):
+                        self.extraFill1 = [toInt(x) for x in toList(settings.value("extraFill1",self.extraFill1))]
+                    if settings.contains("extraFill2"):
+                        self.extraFill2 = [toInt(x) for x in toList(settings.value("extraFill2",self.extraFill2))]
+                #create empty containers
+                settings.endGroup()
                 
-                self.qmc.BTBdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth))))
-                self.qmc.BTBdeltamarker = s2a(toString(settings.value("BTBdeltamarker",self.qmc.BTBdeltamarker)))
-                self.qmc.BTBdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTBdeltamarkersize",self.qmc.BTBdeltamarkersize))))
-                self.qmc.ETBdeltalinestyle = s2a(toString(settings.value("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle)))
-                self.qmc.ETBdeltadrawstyle = s2a(toString(settings.value("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle)))
+                # ensure that extra list length are of the size of the extradevices:
+                self.ensureCorrectExtraDeviceListLenght()
                 
-                self.qmc.ETBdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))))
-                self.qmc.ETBdeltamarker = s2a(toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker)))
-                self.qmc.ETBdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))))
-                                
-                if settings.contains("devicetablecolumnwidths"):
-                    self.qmc.devicetablecolumnwidths = [toInt(x) for x in toList(settings.value("devicetablecolumnwidths",self.qmc.devicetablecolumnwidths))]
+                #restore curve styles
+                settings.beginGroup("CurveStyles")
+                if settings.contains("BTlinestyle"):
+                    self.qmc.BTlinestyle = s2a(toString(settings.value("BTlinestyle",self.qmc.BTlinestyle)))
+                    self.qmc.BTdrawstyle = s2a(toString(settings.value("BTdrawstyle",self.qmc.BTdrawstyle)))
+                    if self.qmc.BTdrawstyle == '-':
+                        self.qmc.BTdrawstyle = self.qmc.drawstyle_default
+                    self.qmc.BTlinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTlinewidth",self.qmc.BTlinewidth))))
+                    self.qmc.BTmarker = s2a(toString(settings.value("BTmarker",self.qmc.BTmarker)))
+                    self.qmc.BTmarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTmarkersize",self.qmc.BTmarkersize))))
+                    self.qmc.ETlinestyle = s2a(toString(settings.value("ETlinestyle",self.qmc.ETlinestyle)))
+                    self.qmc.ETdrawstyle = s2a(toString(settings.value("ETdrawstyle",self.qmc.ETdrawstyle)))
+                    if self.qmc.ETdrawstyle == '-':
+                        self.qmc.ETdrawstyle = self.qmc.drawstyle_default
+                    self.qmc.ETlinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETlinewidth",self.qmc.ETlinewidth))))
+                    self.qmc.ETmarker = s2a(toString(settings.value("ETmarker",self.qmc.ETmarker)))
+                    self.qmc.ETmarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETmarkersize",self.qmc.ETmarkersize))))
+                    self.qmc.BTdeltalinestyle = s2a(toString(settings.value("BTdeltalinestyle",self.qmc.BTdeltalinestyle)))
+                    self.qmc.BTdeltadrawstyle = s2a(toString(settings.value("BTdeltadrawstyle",self.qmc.BTdeltadrawstyle)))
+                    if self.qmc.BTdeltadrawstyle == '-':
+                        self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
+                    self.qmc.BTdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTdeltalinewidth",self.qmc.BTdeltalinewidth))))
+                    self.qmc.BTdeltamarker = s2a(toString(settings.value("BTdeltamarker",self.qmc.BTdeltamarker)))
+                    self.qmc.BTdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTdeltamarkersize",self.qmc.BTdeltamarkersize))))
+                    self.qmc.ETdeltalinestyle = s2a(toString(settings.value("ETdeltalinestyle",self.qmc.ETdeltalinestyle)))
+                    self.qmc.ETdeltadrawstyle = s2a(toString(settings.value("ETdeltadrawstyle",self.qmc.ETdeltadrawstyle)))
+                    if self.qmc.ETdeltadrawstyle == '-':
+                        self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
+                    self.qmc.ETdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETdeltalinewidth",self.qmc.ETdeltalinewidth))))
+                    self.qmc.ETdeltamarker = s2a(toString(settings.value("ETdeltamarker",self.qmc.ETdeltamarker)))
+                    self.qmc.ETdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETdeltamarkersize",self.qmc.ETdeltamarkersize))))
+                    self.qmc.BTbacklinestyle = s2a(toString(settings.value("BTbacklinestyle",self.qmc.BTbacklinestyle)))
+                    self.qmc.BTbackdrawstyle = s2a(toString(settings.value("BTbackdrawstyle",self.qmc.BTbackdrawstyle)))
+                    if self.qmc.BTbackdrawstyle == '-':
+                        self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
+                    self.qmc.BTbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTbacklinewidth",self.qmc.BTbacklinewidth))))
+                    self.qmc.BTbackmarker = s2a(toString(settings.value("BTbackmarker",self.qmc.BTbackmarker)))
+                    self.qmc.BTbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTbackmarkersize",self.qmc.BTbackmarkersize))))
+                    self.qmc.ETbacklinestyle = s2a(toString(settings.value("ETbacklinestyle",self.qmc.ETbacklinestyle)))
+                    self.qmc.ETbackdrawstyle = s2a(toString(settings.value("ETbackdrawstyle",self.qmc.ETbackdrawstyle)))
+                    if self.qmc.ETbackdrawstyle == '-':
+                        self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
+                    self.qmc.ETbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETbacklinewidth",self.qmc.ETbacklinewidth))))
+                    self.qmc.ETbackmarker = s2a(toString(settings.value("ETbackmarker",self.qmc.ETbackmarker)))
+                    self.qmc.ETbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETbackmarkersize",self.qmc.ETbackmarkersize))))
+                    self.qmc.XTbacklinestyle = s2a(toString(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle)))
+                    self.qmc.XTbackdrawstyle = s2a(toString(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle)))
+                    if self.qmc.XTbackdrawstyle == '-':
+                        self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
+                    self.qmc.XTbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("XTbacklinewidth",self.qmc.XTbacklinewidth))))
+                    self.qmc.XTbackmarker = s2a(toString(settings.value("XTbackmarker",self.qmc.XTbackmarker)))
+                    self.qmc.XTbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("XTbackmarkersize",self.qmc.ETbackmarkersize))))
+                    self.qmc.extralinestyles1 = list(map(str,list(toStringList(settings.value("extralinestyles1",self.qmc.extralinestyles1)))))
+                    self.qmc.extralinestyles2 = list(map(str,list(toStringList(settings.value("extralinestyles2",self.qmc.extralinestyles2)))))
+                    self.qmc.extradrawstyles1 = list(map(str,list(toStringList(settings.value("extradrawstyles1",self.qmc.extradrawstyles1)))))
+                    self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles1]                                
+                    self.qmc.extradrawstyles2 = list(map(str,list(toStringList(settings.value("extradrawstyles2",self.qmc.extradrawstyles2)))))
+                    self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles2]                                                
+                    self.qmc.extralinewidths1 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extralinewidths1"))]
+                    self.qmc.extralinewidths2 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extralinewidths2"))]
+                    self.qmc.extramarkers1 = list(map(str,list(toStringList(settings.value("extramarkers1",self.qmc.extramarkers1)))))
+                    self.qmc.extramarkers2 = list(map(str,list(toStringList(settings.value("extramarkers2",self.qmc.extramarkers2)))))
+                    self.qmc.extramarkersizes1 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extramarkersizes1"))]
+                    self.qmc.extramarkersizes2 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extramarkersizes2"))]
+                    self.qmc.BTBdeltalinestyle = s2a(toString(settings.value("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle)))
+                    self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle)))
+                    
+                    self.qmc.BTBdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth))))
+                    self.qmc.BTBdeltamarker = s2a(toString(settings.value("BTBdeltamarker",self.qmc.BTBdeltamarker)))
+                    self.qmc.BTBdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTBdeltamarkersize",self.qmc.BTBdeltamarkersize))))
+                    self.qmc.ETBdeltalinestyle = s2a(toString(settings.value("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle)))
+                    self.qmc.ETBdeltadrawstyle = s2a(toString(settings.value("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle)))
+                    
+                    self.qmc.ETBdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))))
+                    self.qmc.ETBdeltamarker = s2a(toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker)))
+                    self.qmc.ETBdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))))
+                                    
+                    if settings.contains("devicetablecolumnwidths"):
+                        self.qmc.devicetablecolumnwidths = [toInt(x) for x in toList(settings.value("devicetablecolumnwidths",self.qmc.devicetablecolumnwidths))]
+                settings.endGroup()
+                
+                self.updateExtradeviceSettings()
 
-            settings.endGroup()
-            
-            ndevices = len(self.qmc.extradevices)
-            if ndevices != len(self.qmc.extralinestyles1) or \
-               ndevices != len(self.qmc.extralinestyles2) or \
-               ndevices != len(self.qmc.extradrawstyles1) or \
-               ndevices != len(self.qmc.extradrawstyles2) or \
-               ndevices != len(self.qmc.extralinewidths1) or \
-               ndevices != len(self.qmc.extralinewidths2) or \
-               ndevices != len(self.qmc.extramarkers1) or \
-               ndevices != len(self.qmc.extramarkers2) or \
-               ndevices != len(self.qmc.extramarkersizes1) or \
-               ndevices != len(self.qmc.extramarkersizes2):
-                self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*ndevices
-                self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*ndevices
-                self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*ndevices
-                self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*ndevices
-                self.qmc.extralinewidths1 = [self.qmc.extra_linewidth_default]*ndevices
-                self.qmc.extralinewidths2 = [self.qmc.extra_linewidth_default]*ndevices
-                self.qmc.extramarkers1 = [self.qmc.marker_default]*ndevices
-                self.qmc.extramarkers2 = [self.qmc.marker_default]*ndevices
-                self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*ndevices
-                self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*ndevices
-            self.qmc.extratemp1 = []
-            self.qmc.extratemp2 = []
-            self.qmc.extratimex = []
-            self.qmc.extrastemp1 = []
-            self.qmc.extrastemp2 = []
-            for i in range(len(self.qmc.extradevices)):
-                self.qmc.extratemp1.append([])
-                self.qmc.extratemp2.append([])
-                self.qmc.extratimex.append([])
-                self.qmc.extrastemp1.append([])
-                self.qmc.extrastemp2.append([])
-                self.qmc.extractimex1.append([])
-                self.qmc.extractimex2.append([])
-                self.qmc.extractemp1.append([])
-                self.qmc.extractemp2.append([])
-            #extra LCDs and other LCDs visibility
-            self.updateLCDproperties()
-            # set extraLCD colors
-            for i in range(len(self.qmc.extradevices)):
-                self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
-                self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
             # Extra com ports
             settings.beginGroup("ExtraComm")
             if settings.contains("extracomport"):
@@ -30173,7 +30137,7 @@ class ApplicationWindow(QMainWindow):
                 if reply == QMessageBox.Cancel:
                     return 
                 try:
-                    res = aw.settingsLoad(filename)
+                    res = aw.settingsLoad(filename,theme=True)
                     self.sendmessage(QApplication.translate("Message","Loaded theme {0}", None).format(filename))
                     if reset:
                         aw.qmc.reset(soundOn=False)
