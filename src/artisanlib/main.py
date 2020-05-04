@@ -13840,13 +13840,13 @@ class ApplicationWindow(QMainWindow):
         largeSizeAction.triggered.connect(self.resizeImg_1200_1)
         self.saveGraphMenu.addAction(largeSizeAction)
 
+        HomeBaristaAction = QAction("Home-Barista.com (1200x?)...",self)
+        HomeBaristaAction.triggered.connect(self.resizeImg_1200_1)
+        self.saveGraphMenu.addAction(HomeBaristaAction)
+
         KaffeeNetzAction = QAction("Kaffee-Netz.de (800x?)...",self)
         KaffeeNetzAction.triggered.connect(self.resizeImg_800_1)
         self.saveGraphMenu.addAction(KaffeeNetzAction)
-
-        HomeBaristaAction = QAction("Home-Barista.com (700x?)...",self)
-        HomeBaristaAction.triggered.connect(self.resizeImg_700_1)
-        self.saveGraphMenu.addAction(HomeBaristaAction)
 
         RiktigtKaffeAction = QAction("RiktigtKaffe.se (620x?)...",self)
         RiktigtKaffeAction.triggered.connect(self.resizeImg_620_1)
@@ -16106,6 +16106,7 @@ class ApplicationWindow(QMainWindow):
             dialog = HelpDlg(parent,self,title,content) # parent, application window, title, content
         dialog.show()
         dialog.activateWindow()
+        dialog.raise_()
         return dialog
     
     def closeHelpDialog(self,dialog):
