@@ -47,8 +47,13 @@ If you think Artisan is useful to you, contribute financially to its further dev
 Version History
 ---------------
 
+
+[Detailed Release History](wiki/ReleaseHistory.md)
+
+
 | Version | Date  | Comment |
 |---------|------:|---------|
+| v2.4.0  | xx.xx.2020 | Adds [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Comparator.html), [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Simulator.html), and [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Transposer.html), Cropster, IKAWA and Giesen Software profile import, support for [Twino/Ozstar roasting machines](https://artisan-scope.org/machines/twino-ozstar/) and the [Giesen IR sensor](https://artisan-scope.org/machines/giesen/), S7 and MODBUS protocol optimizations and extensions, support for additional Phidgets and Yoctopuce IO modules, flexible automatic file name generator, large PhasesLCDs, fixes and performance improvements |
 | v2.1.2  | 24.12.2019 | Bug fixes |
 | v2.1.1  | 29.11.2019 | Bug fixes |
 | v2.1.0  | 26.11.2019 | Adds [profile analyzer](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html), [extended symbolic formulas](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html), [background images](https://artisan-roasterscope.blogspot.com/2019/11/background-images.html), forward looking alarms and alarms triggered by temperature differences, support for the [Atilla](https://www.atilla.com.br/) GOLD plus 7" II, the [Besca Bee sample roaster](https://www.bescaroasters.com/roaster-detail/14/Sample-Roasters/Besca-Bee-Coffee-Roaster), additional [Coffed](https://coffed.pl/en) machines (SR3/5/15/25/60), [Coffeetool Rxx](https://coffeetool.gr/product-category/coffeeroasters/) machines with control, and [popular Phidget sets](https://artisan-scope.org/devices/phidget-sets/) (incl. the one feature in [On Idle Noise](https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html)) |
@@ -90,7 +95,6 @@ Version History
 | v0.2.0 | 31.12.2010 | CENTER 300, 301, 302, 303, 304, 305, 306, VOLTCRAFT K202, K204 300K, 302KJ, EXTECH 421509 |
 | v0.1.0 | 20.12.2010 | Initial release |
 
-[Detailed Release History](wiki/ReleaseHistory.md)
 
 ----
 License

@@ -35,7 +35,6 @@ class ArtisanDialog(QDialog):
 
 #        if platf == 'Windows':
 # setting those Windows flags could be the reason for some instabilities on Windows
-#        #self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 #            windowFlags = self.windowFlags()
 #        #windowFlags &= ~Qt.WindowContextHelpButtonHint # remove help button
 #        #windowFlags &= ~Qt.WindowMaximizeButtonHint # remove maximise button

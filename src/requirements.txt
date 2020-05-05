@@ -14,6 +14,6 @@ setuptools==46.1.3 #44.0.0 # v45.0.0 and later breaks with pyinstaller 3.6 https
 persist-queue==0.5.0
 portalocker==1.7.0
 prettytable==0.7.2
-Phidget22==1.6.20200424
+Phidget22==1.6.20200426
 natsort==7.0.1
 xlrd==1.2.0

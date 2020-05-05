@@ -604,7 +604,7 @@ class modbusport(object):
                 and register+1 in self.readingsCache[code][slave]:
                 # cache hit
                 res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
-                decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
+                decoder = getBinaryPayloadDecoderFromRegisters(res, self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_32bit_uint()
                 return convert_from_bcd(r)
             else:

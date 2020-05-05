@@ -1261,6 +1261,31 @@ class tgraphcanvas(FigureCanvas):
         self.tstemp1,self.tstemp2 = [],[] # (temporarily) smoothed version of temp1/temp2 used in sample() to compute the RoR
         self.ctimex1, self.ctimex2, self.ctemp1,self.ctemp2 = [], [],[],[] # (potential shorter) variants of timex/temp1/temp2 with -1 dropout values removed
         self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # used in sample()
+        
+        # arrays to use while monitoring but not recording
+        self.on_timex = []
+        self.on_temp1 = []
+        self.on_temp2 = []
+        self.on_ctimex1 = []
+        self.on_ctemp1 = []
+        self.on_ctimex2 = []
+        self.on_ctemp2 = []
+        self.on_tstemp1 = []
+        self.on_tstemp2 = []
+        self.on_stemp1 = []
+        self.on_stemp2 = []
+        self.on_unfiltereddelta1 = []
+        self.on_unfiltereddelta2 = []
+        self.on_delta1 = []
+        self.on_delta2 = []
+        # list of lists:
+        self.on_extratemp1 = []
+        self.on_extratemp2 = []
+        self.on_extratimex = []
+        self.on_extractimex1 = []
+        self.on_extractemp1 = []
+        self.on_extractimex2 = []
+        self.on_extractemp2 = []
 
         #indexes for CHARGE[0],DRYe[1],FCs[2],FCe[3],SCs[4],SCe[5],DROP[6] and COOLe[7]
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryEnd
@@ -2789,28 +2814,44 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.flagon:
                 #### lock shared resources #####
-                aw.qmc.samplingsemaphore.acquire(1)
+                self.samplingsemaphore.acquire(1)
                 try:
-                    if len(self.timex):
+                    # initalize the arrays depending on the recording state
+                    if self.flagstart and len(self.timex) > 0:
+                        sample_timex = self.timex
+                        sample_temp1 = self.temp1
+                        sample_temp2 = self.temp2
+                        sample_extratimex = self.extratimex
+                        sample_extratemp1 = self.extratemp1
+                        sample_extratemp2 = self.extratemp2
+                    else:
+                        sample_timex = self.on_timex
+                        sample_temp1 = self.on_temp1
+                        sample_temp2 = self.on_temp2
+                        sample_extratimex = self.extratimex
+                        sample_extratemp1 = self.on_extratemp1
+                        sample_extratemp2 = self.on_extratemp2
+                    
+                    if len(sample_timex):
                         if self.LCDdecimalplaces:
                             lcdformat = "%.1f"
                         else:
                             lcdformat = "%.0f"
                         etstr = "--"
-                        try: # if self.temp1 is None, which should never be the case, this fails
-                            if len(self.temp1) and -100 < self.temp1[-1] < 1000:
-                                etstr = lcdformat%float(self.temp1[-1])            # ET
-                            elif self.LCDdecimalplaces and len(self.temp1) and -10000 < self.temp1[-1] < 100000:
-                                etstr = "%.0f"%float(self.temp1[-1])
+                        try: # if sample_temp1 is None, which should never be the case, this fails
+                            if len(sample_temp1) and -100 < sample_temp1[-1] < 1000:
+                                etstr = lcdformat%float(sample_temp1[-1])            # ET
+                            elif self.LCDdecimalplaces and len(sample_temp1) and -10000 < sample_temp1[-1] < 100000:
+                                etstr = "%.0f"%float(sample_temp1[-1])
                         except:
                             pass
                         aw.lcd2.display(etstr)
                         btstr = "--"
                         try:
-                            if len(self.temp2) and -100 < self.temp2[-1] < 1000:
-                                btstr = lcdformat%float(self.temp2[-1])            # BT
-                            elif self.LCDdecimalplaces and len(self.temp2) and -10000 < self.temp2[-1] < 100000:
-                                btstr = "%.0f"%float(self.temp2[-1])
+                            if len(sample_temp2) and -100 < sample_temp2[-1] < 1000:
+                                btstr = lcdformat%float(sample_temp2[-1])            # BT
+                            elif self.LCDdecimalplaces and len(sample_temp2) and -10000 < sample_temp2[-1] < 100000:
+                                btstr = "%.0f"%float(sample_temp2[-1])
                         except:
                             pass
                         aw.lcd3.display(btstr)
@@ -2818,7 +2859,7 @@ class tgraphcanvas(FigureCanvas):
                         deltabtstr = "--"
                         try:
                             if -100 < self.rateofchange1 < 1000:
-                                deltaetstr = lcdformat%float(self.rateofchange1)        # rate of change MET (degress per minute)
+                                deltaetstr = lcdformat%float(self.rateofchange1)        # rate of change ET (degress per minute)
                             aw.lcd4.display(deltaetstr)
                             if -100 < self.rateofchange2 < 1000:
                                 deltabtstr = lcdformat%float(self.rateofchange2)        # rate of change BT (degrees per minute)
@@ -2842,9 +2883,9 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(ndev):
                             if i < aw.nLCDS:
                                 try:
-                                    if self.extratemp1[i]:
+                                    if sample_extratemp1[i]:
                                         fmt = lcdformat
-                                        v = float(self.extratemp1[i][-1])
+                                        v = float(sample_extratemp1[i][-1])
                                         if (v.is_integer() and self.intChannel(i,0)):
                                             fmt = "%.0f"  
                                         if -100 < v < 1000:
@@ -2861,9 +2902,9 @@ class tgraphcanvas(FigureCanvas):
                                     extra1_values.append(extra1_value)
                                     aw.extraLCD1[i].display(extra1_value)
                                 try:
-                                    if self.extratemp2[i]:
+                                    if sample_extratemp2[i]:
                                         fmt = lcdformat
-                                        v = float(self.extratemp2[i][-1])
+                                        v = float(sample_extratemp2[i][-1])
                                         if (v.is_integer() and self.intChannel(i,1)):
                                             fmt = "%.0f"  
                                         if -100 < v < 1000:
@@ -2892,12 +2933,12 @@ class tgraphcanvas(FigureCanvas):
                             self.updateLargeLCDsSignal.emit(btstr,etstr,timestr)
                         self.updateLargeExtraLCDs(extra1=extra1_values,extra2=extra2_values)
                 finally:
-                    if aw.qmc.samplingsemaphore.available() < 1:
-                        aw.qmc.samplingsemaphore.release(1)
+                    if self.samplingsemaphore.available() < 1:
+                        self.samplingsemaphore.release(1)
 
                 #check setSV
                 if self.temporarysetsv is not None:
-                    if aw.qmc.device == 0 and aw.fujipid.followBackground:
+                    if self.device == 0 and aw.fujipid.followBackground:
                         aw.fujipid.setsv(self.temporarysetsv,silent=True)
                     else:
                         aw.pidcontrol.setSV(self.temporarysetsv,init=False)
@@ -2939,46 +2980,46 @@ class tgraphcanvas(FigureCanvas):
                 for el in self.quantifiedEvent:
                     try:
                         aw.moveslider(el[0],el[1])
-                        if aw.qmc.flagstart:
+                        if self.flagstart:
                             value = aw.float2float((el[1] + 10.0) / 10.0)
-                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription="Q"+aw.qmc.eventsvalues(value),doupdategraphics=False)
+                            self.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription="Q"+self.eventsvalues(value),doupdategraphics=False)
                     except:
                         pass
                 self.quantifiedEvent = []
                     
                 if self.flagstart:
-                    if  aw.qmc.zoom_follow and aw.qmc.temp2 and len(aw.qmc.temp2)>0 and aw.qmc.temp1 and len(aw.qmc.temp1)>0: # aw.ntb._active == 'ZOOM'
+                    if  self.zoom_follow and self.temp2 and len(self.temp2)>0 and self.temp1 and len(self.temp1)>0: # aw.ntb._active == 'ZOOM'
                         # center current BT reading on canvas
-                        bt = aw.qmc.temp2[-1]
-                        tx = aw.qmc.timex[-1]
+                        bt = self.temp2[-1]
+                        tx = self.timex[-1]
                         # get current limits
-                        xlim = aw.qmc.ax.get_xlim()
+                        xlim = self.ax.get_xlim()
                         xlim_offset = (xlim[1] - xlim[0]) / 2.
                         xlim_new = (tx - xlim_offset, tx + xlim_offset)
-                        ylim = aw.qmc.ax.get_ylim()
+                        ylim = self.ax.get_ylim()
                         ylim_offset = (ylim[1] - ylim[0]) / 2.
                         ylim_new = (bt - ylim_offset, bt + ylim_offset)
                         # set new limits to center current BT on canvas
-                        aw.qmc.ax.set_xlim(xlim_new)
-                        aw.qmc.ax.set_ylim(ylim_new)
-                        two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag)))
-                        if two_ax_mode and aw.qmc.delta_ax:
-                            zlim = aw.qmc.delta_ax.set_ylim()
+                        self.ax.set_xlim(xlim_new)
+                        self.ax.set_ylim(ylim_new)
+                        two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (self.background and (self.DeltaETBflag or self.DeltaBTBflag)))
+                        if two_ax_mode and self.delta_ax:
+                            zlim = self.delta_ax.set_ylim()
                             zlim_offset = (zlim[1] - zlim[0]) / 2.
                             btd = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,bt))[1]))[1])
                             zlim_new = (btd - zlim_offset, btd + zlim_offset)
-                            aw.qmc.delta_ax.set_ylim(zlim_new)
+                            self.delta_ax.set_ylim(zlim_new)
                 
                         if ylim != ylim_new or xlim != xlim_new or (two_ax_mode and zlim != zlim_new):
                             self.ax_background = None
                     
-                    if aw.qmc.patheffects:
-                        rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette["background"])]
+                    if self.patheffects:
+                        rcParams['path.effects'] = [PathEffects.withStroke(linewidth=self.patheffects, foreground=self.palette["background"])]
                     else:
                         rcParams['path.effects'] = []
 
                     #auto mark CHARGE (this forces a realignment/redraw by reseting the cache ax_background)
-                    if self.autoChargeIdx and aw.qmc.timeindex[0] < 0:
+                    if self.autoChargeIdx and self.timeindex[0] < 0:
                         self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
                         self.autoChargeIdx = 0
 
@@ -2993,7 +3034,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoFCsIdx != 0:
                         self.mark1Cstart()
                         self.autoFCsIdx = 0
-                    if self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
+                    if self.autoDropIdx > 0 and self.timeindex[0] > -1 and not self.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx here to avoid another trigger
                         self.autoDropIdx = -1 # we set the autoDropIdx to a negative value to prevent further triggers after undo markDROP
                 
@@ -3002,43 +3043,43 @@ class tgraphcanvas(FigureCanvas):
                         if not self.block_update:
                             if self.tempory_sample_trigger_redraw:
                                 self.tempory_sample_trigger_redraw = False
-                                aw.qmc.redraw()
+                                self.redraw()
                             else:
                             #-- start update display
                                 #### lock shared resources to ensure that no other redraw is interfering with this one here #####
-                                aw.qmc.samplingsemaphore.acquire(1)
+                                self.samplingsemaphore.acquire(1)
                                 try:
                                     if self.ax_background:
                                         self.fig.canvas.restore_region(self.ax_background)
                                         # draw eventtypes
     # this seems not to be needed and hides partially event by value "Combo-type" annotations
     #                                    if self.eventsshowflag and self.eventsGraphflag in [2,3,4]:
-    #                                        aw.qmc.ax.draw_artist(self.l_eventtype1dots)
-    #                                        aw.qmc.ax.draw_artist(self.l_eventtype2dots)
-    #                                        aw.qmc.ax.draw_artist(self.l_eventtype3dots)
-    #                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
+    #                                        self.ax.draw_artist(self.l_eventtype1dots)
+    #                                        self.ax.draw_artist(self.l_eventtype2dots)
+    #                                        self.ax.draw_artist(self.l_eventtype3dots)
+    #                                        self.ax.draw_artist(self.l_eventtype4dots)
                                         # draw delta lines
                                         
-                                        if aw.qmc.swapdeltalcds:
+                                        if self.swapdeltalcds:
                                             if self.DeltaBTflag and self.l_delta2 is not None:
                                                 try:
-                                                    aw.qmc.ax.draw_artist(self.l_delta2)
+                                                    self.ax.draw_artist(self.l_delta2)
                                                 except:
                                                     pass
                                             if self.DeltaETflag and self.l_delta1 is not None:
                                                 try:
-                                                    aw.qmc.ax.draw_artist(self.l_delta1)
+                                                    self.ax.draw_artist(self.l_delta1)
                                                 except:
                                                     pass
                                         else:
                                             if self.DeltaETflag and self.l_delta1 is not None:
                                                 try:
-                                                    aw.qmc.ax.draw_artist(self.l_delta1)
+                                                    self.ax.draw_artist(self.l_delta1)
                                                 except:
                                                     pass
                                             if self.DeltaBTflag and self.l_delta2 is not None:
                                                 try:
-                                                    aw.qmc.ax.draw_artist(self.l_delta2)
+                                                    self.ax.draw_artist(self.l_delta2)
                                                 except:
                                                     pass
                                         
@@ -3047,52 +3088,52 @@ class tgraphcanvas(FigureCanvas):
                                         xtra_dev_lines2 = 0
     
                                         try:
-                                            for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                                            for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(sample_extratimex),len(sample_extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(sample_extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
                                                 if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
                                                     try:
-                                                        aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
+                                                        self.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
                                                     except:
                                                         pass
                                                     xtra_dev_lines1 = xtra_dev_lines1 + 1
                                                 if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
                                                     try:
-                                                        aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
+                                                        self.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
                                                     except:
                                                         pass
                                                     xtra_dev_lines2 = xtra_dev_lines2 + 1
                                         except:
                                             pass
-                                        if aw.qmc.swaplcds:
+                                        if self.swaplcds:
                                             # draw ET
-                                            if aw.qmc.ETcurve:
+                                            if self.ETcurve:
                                                 try:
-                                                    aw.qmc.ax.draw_artist(self.l_temp1)
+                                                    self.ax.draw_artist(self.l_temp1)
                                                 except:
                                                     pass
                                             # draw BT
-                                            if aw.qmc.BTcurve:
+                                            if self.BTcurve:
                                                 try:
-                                                    aw.qmc.ax.draw_artist(self.l_temp2)
+                                                    self.ax.draw_artist(self.l_temp2)
                                                 except:
                                                     pass
                                         else:
                                             # draw BT
-                                            if aw.qmc.BTcurve:
+                                            if self.BTcurve:
                                                 try:
-                                                    aw.qmc.ax.draw_artist(self.l_temp2)
+                                                    self.ax.draw_artist(self.l_temp2)
                                                 except:
                                                     pass
                                             # draw ET
-                                            if aw.qmc.ETcurve:
+                                            if self.ETcurve:
                                                 try:
-                                                    aw.qmc.ax.draw_artist(self.l_temp1)
+                                                    self.ax.draw_artist(self.l_temp1)
                                                 except:
                                                     pass
                                         
                                         try:
-                                            if aw.qmc.BTcurve:
+                                            if self.BTcurve:
                                                 for a in self.l_annotations:
-                                                    aw.qmc.ax.draw_artist(a)
+                                                    self.ax.draw_artist(a)
                                         except:
                                             pass
                                         
@@ -3101,35 +3142,35 @@ class tgraphcanvas(FigureCanvas):
                                         except:
                                             pass
                                             
-                                        self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
+                                        self.fig.canvas.blit(self.ax.get_figure().bbox)
     
                                     else:
                                         # we do not have a background to bitblit, so do a full redraw
                                         self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
                                         self.update_additional_artists()
                                 finally:
-                                    if aw.qmc.samplingsemaphore.available() < 1:
-                                        aw.qmc.samplingsemaphore.release(1)
+                                    if self.samplingsemaphore.available() < 1:
+                                        self.samplingsemaphore.release(1)
                             #-- end update display
                         
-                        if aw.qmc.background and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
-                            if aw.qmc.backgroundReproduce or aw.qmc.backgroundPlaybackEvents:
-                                aw.qmc.playbackevent()
-                            if aw.qmc.backgroundPlaybackDROP:
-                                aw.qmc.playbackdrop()
+                        if self.background and (self.timeindex[0] > -1 or self.timeindexB[0] < 0):
+                            if self.backgroundReproduce or self.backgroundPlaybackEvents:
+                                self.playbackevent()
+                            if self.backgroundPlaybackDROP:
+                                self.playbackdrop()
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)  
+                        self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)  
                         
                     #####
-                    if aw.qmc.patheffects:
+                    if self.patheffects:
                         rcParams['path.effects'] = []
 
                     #update phase lcds
                     aw.updatePhasesLCDs()
                         
                     #update AUC lcd
-                    if aw.qmc.AUClcdFlag:
+                    if self.AUClcdFlag:
                         aw.updateAUCLCD()
 
                     #check if HUD is ON (done after self.fig.canvas.draw())
@@ -3149,7 +3190,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)
+            self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)
 
 
     def updateLCDtime(self):
@@ -3770,10 +3811,10 @@ class tgraphcanvas(FigureCanvas):
             if shiftedindex >= len(readings):
                 shiftedindex = len(readings)- 1
             if shiftedindex < 0:
-                shiftedindex = 0
+                return -1, evalsign
             return readings[shiftedindex], evalsign
         else:
-            return 0, evalsign
+            return -1, evalsign
 
     # mathexpression = formula; t = a number to evaluate(usually time);
     # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTsval = RealTime var val
@@ -3783,10 +3824,30 @@ class tgraphcanvas(FigureCanvas):
             mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
                               "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
                               "sqrt":math.sqrt,"degrees":math.degrees}
+            
+            if aw.qmc.flagstart:
+                sample_timex = self.timex
+                sample_temp1 = self.temp1
+                sample_temp2 = self.temp2
+                sample_delta1 = self.delta1
+                sample_delta2 = self.delta2
+                sample_extratimex = self.extratimex
+                sample_extratemp1 = self.extratemp1
+                sample_extratemp2 = self.extratemp2
+            else:
+                sample_timex = self.on_timex
+                sample_temp1 = self.on_temp1
+                sample_temp2 = self.on_temp2
+                sample_delta1 = self.on_delta1
+                sample_delta2 = self.on_delta2
+                sample_extratimex = self.on_extratimex
+                sample_extratemp1 = self.on_extratemp1
+                sample_extratemp2 = self.on_extratemp2
+            
             #if sampling 
             if RTsname is not None and RTsname != "":
-                if len(self.timex):
-                    index = len(self.timex)-1
+                if len(sample_timex):
+                    index = len(sample_timex)-1
                 else:
                     index = 0
                 #load real time buffers acquired at sample() to the dictionary
@@ -3803,7 +3864,7 @@ class tgraphcanvas(FigureCanvas):
                     mathdictionary[str(RTsname)] = float(RTsval)
 
             else: # get index from the time.
-                if len(self.timex):
+                if len(sample_timex):
                     index = self.time2index(t)  # If using the plotter with loaded profile. Background index done bellow at "B"
                 else:
                     index = 0      #if plotting but nothing loaded.
@@ -3838,7 +3899,7 @@ class tgraphcanvas(FigureCanvas):
                 for i,v in enumerate(delta_main_events):
                     if (i == 0 and self.timeindex[i] > -1) or (self.timeindex[i] > 0):
                         # we return the time after the event in seconds
-                        mathdictionary[v] = self.timex[-1] - self.timex[self.timeindex[i]]
+                        mathdictionary[v] = sample_timex[-1] - sample_timex[self.timeindex[i]]
                     else:
                         # before the event we return 0
                         mathdictionary[v] = 0
@@ -3849,23 +3910,23 @@ class tgraphcanvas(FigureCanvas):
             # this evaluates to None before TP and 0 after the event
             try:
                 for v in ["pDRY","pFCs"]:
-                    if len(self.delta2) > 0 and self.delta2[-1] and self.delta2[-1] > 0:
+                    if len(sample_delta2) > 0 and sample_delta2[-1] and sample_delta2[-1] > 0:
                         mathdictionary[v] = 0
                         if v == "pDRY":
                             if self.background and self.timeindexB[1] and not self.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
                                 drytarget = self.temp2B[self.timeindexB[1]] # Background DRY BT temperature
                             else:
                                 drytarget = self.phases[1] # Drying max phases definition
-                            if drytarget > self.temp2[-1]:
-                                mathdictionary[v] = (drytarget - self.temp2[-1])/(self.delta2[-1]/60.)
+                            if drytarget > sample_temp2[-1]:
+                                mathdictionary[v] = (drytarget - sample_temp2[-1])/(sample_delta2[-1]/60.)
                         elif v == "pFCs":
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
                             if self.background and self.timeindexB[2]:
                                 fcstarget = self.temp2B[self.timeindexB[2]] # Background FCs BT temperature
                             else:
                                 fcstarget = self.phases[2] # FCs min phases definition
-                            if fcstarget > self.temp2[-1]:
-                                mathdictionary[v] = (fcstarget - self.temp2[-1])/(self.delta2[-1]/60.)
+                            if fcstarget > sample_temp2[-1]:
+                                mathdictionary[v] = (fcstarget - sample_temp2[-1])/(sample_delta2[-1]/60.)
                     else:
                         # if a prediction is not possible (before TP), we return the error value -1
                         mathdictionary[v] = -1
@@ -3887,7 +3948,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         idx = -1
                     if idx > -1: # we passed the AUCbegin event
-                        mathdictionary["AUCbase"] = self.temp2[idx]
+                        mathdictionary["AUCbase"] = sample_temp2[idx]
                     else:
                         mathdictionary["AUCbase"] = None # Event not set yet, no AUCbase
                 else:
@@ -3934,16 +3995,16 @@ class tgraphcanvas(FigureCanvas):
                                         Yshiftval = 10*Yshiftval + int(seconddigitstr)
                                     
                                     if nint == 1: #ET
-                                        readings = self.temp1
+                                        readings = sample_temp1
                                     elif nint == 2: #BT
-                                        readings = self.temp2
+                                        readings = sample_temp2
                                     elif nint > 2: 
                                         #map the extra device
                                         edindex = (nint-1)//2 - 1
                                         if nint%2:
-                                            readings = self.extratemp1[edindex]
+                                            readings = sample_extratemp1[edindex]
                                         else:
-                                            readings = self.extratemp2[edindex]
+                                            readings = sample_extratemp2[edindex]
                                     val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
 
                                     #add expression and values found
@@ -3963,16 +4024,16 @@ class tgraphcanvas(FigureCanvas):
                                         absolute_index = eval(body,{"__builtins__":None},mathdictionary)
                                         if absolute_index > -1:
                                             if nint == 1: #ET
-                                                val = self.temp1[absolute_index]
+                                                val = sample_temp1[absolute_index]
                                             elif nint == 2: #BT
-                                                val = self.temp2[absolute_index]
+                                                val = sample_temp2[absolute_index]
                                             elif nint > 2: 
                                                 #map the extra device
                                                 edindex = (nint-1)//2 - 1
                                                 if nint%2:
-                                                    val = self.extratemp1[edindex][absolute_index]
+                                                    val = sample_extratemp1[edindex][absolute_index]
                                                 else:
-                                                    val = self.extratemp2[edindex][absolute_index]
+                                                    val = sample_extratemp2[edindex][absolute_index]
                                     except:
                                         pass
                                     #add expression and values found
@@ -4039,14 +4100,14 @@ class tgraphcanvas(FigureCanvas):
                                             Yshiftval = 10*Yshiftval + seconddigit
                                         if nint == 1: #DeltaET
                                             if k == 0:
-                                                readings = self.delta1
+                                                readings = sample_delta1
                                             else:
                                                 readings = self.delta1B
                                         elif nint == 2: #DeltaBT
                                             if k == 0:
-                                                readings = self.delta2
+                                                readings = sample_delta2
                                             else:
-                                                readings = self.delta2
+                                                readings = self.delta2B
                                         val, evalsign = self.shiftValueEvalsign(readings,index,sign,Yshiftval)
                                         
                                         #add expression and values found
@@ -4068,12 +4129,12 @@ class tgraphcanvas(FigureCanvas):
                                             if absolute_index > -1:
                                                 if nint == 1: #DeltaET
                                                     if k == 0:
-                                                        val = self.delta1[absolute_index]
+                                                        val = sample_delta1[absolute_index]
                                                     else:
                                                         val = self.delta1B[absolute_index]
                                                 else: # nint == 2: #DeltaBT
                                                     if k == 0:
-                                                        val = self.delta2[absolute_index]
+                                                        val = sample_delta2[absolute_index]
                                                     else:
                                                         val = self.delta2B[absolute_index]
                                         except:
@@ -4091,12 +4152,12 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         if mathexpression[i+k+1] == "1":
                                             if k == 0:
-                                                mathdictionary['R1'] = self.delta1[index]
+                                                mathdictionary['R1'] = sample_delta1[index]
                                             else:
                                                 mathdictionary['RB1'] = self.delta1B[index]
                                         elif mathexpression[i+k+1] == "2":
                                             if k == 0:
-                                                mathdictionary['R2'] = self.delta2[index]
+                                                mathdictionary['R2'] = sample_delta2[index]
                                             else:
                                                 mathdictionary['RB2'] = self.delta2B[index]
                         except:
@@ -4121,11 +4182,11 @@ class tgraphcanvas(FigureCanvas):
                                     mathdictionary["E"+mathexpression[i+1]] = val
                                     
                     # time timeshift of absolute time (not relative to CHARGE)
-                    # t : to access the foreground profiles time (self.timex)
+                    # t : to access the foreground profiles time (sample_timex)
                     # b : to access the background profiles time (self.timeB)
                     elif mathexpression[i] in ["t","b"]:
                         if mathexpression[i] == "t":
-                            timex = self.timex
+                            timex = sample_timex
                         else:
                             timex = self.timeB
                         seconddigitstr = ""
@@ -4316,20 +4377,20 @@ class tgraphcanvas(FigureCanvas):
                     
                 #created Ys values 
                 try:
-                    if len(self.timex)>0:
+                    if len(sample_timex)>0:
                         if RTsname:
-                            Y = [self.temp1[-1], self.temp2[-1]] # in realtime mode we take the last value
+                            Y = [sample_temp1[-1], sample_temp2[-1]] # in realtime mode we take the last value
                         else:
-                            Y = [self.temp1[index], self.temp2[index]]
-                        if len(self.extratimex):
+                            Y = [sample_temp1[index], sample_temp2[index]]
+                        if len(sample_extratimex):
                             for i in range(len(self.extradevices)):
-                                if len(self.extratimex[i]):
+                                if len(sample_extratimex[i]):
                                     if RTsname:
-                                        Y.append(self.extratemp1[i][-1])
-                                        Y.append(self.extratemp2[i][-1])
+                                        Y.append(sample_extratemp1[i][-1])
+                                        Y.append(sample_extratemp2[i][-1])
                                     else:
-                                        Y.append(self.extratemp1[i][index])
-                                        Y.append(self.extratemp2[i][index])
+                                        Y.append(sample_extratemp1[i][index])
+                                        Y.append(sample_extratemp2[i][index])
 
                         #add Ys and their value to math dictionary
                         for i in range(len(Yval)):
@@ -4390,7 +4451,7 @@ class tgraphcanvas(FigureCanvas):
                 #if sample()
                 else:
                     #virtual devices with symbolic may need 2 samples min.
-                    if len(self.timex) > 2:
+                    if len(sample_timex) > 2:
                         e = str(e)
                         _, _, exc_tb = sys.exc_info()
                         mathexpression = mathexpression.replace("{","(").replace("}",")") # avoid {x} leading to key arrows
@@ -4600,7 +4661,6 @@ class tgraphcanvas(FigureCanvas):
             for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):
                 self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]            #reset all variables that need to be reset (but for the actually measurements that will be treated separately at the end of this function)
                 self.extractimex1[i],self.extractimex2[i],self.extractemp1[i],self.extractemp2[i] = [],[],[],[]
-                
             self.replayedBackgroundEvents=[]
             self.beepedBackgroundEvents=[]
             self.specialevents=[]
@@ -4655,8 +4715,6 @@ class tgraphcanvas(FigureCanvas):
             try:
                 #### lock shared resources #####
                 aw.qmc.samplingsemaphore.acquire(1)
-                if self.flagon:
-                    self.OffMonitor()
                 #reset time
                 aw.qmc.timeclock.start()
                 
@@ -4860,9 +4918,10 @@ class tgraphcanvas(FigureCanvas):
                 self.l_annotations_dict = {} # initiate the event id to temp/time annotation dict
                 self.l_background_annotations = [] # initiate the event annotations
 
-                aw.hideDefaultButtons()
-                aw.updateExtraButtonsVisibility()
-                aw.enableEditMenus()
+                if not sampling:
+                    aw.hideDefaultButtons()
+                    aw.updateExtraButtonsVisibility()
+                    aw.enableEditMenus()
                 
                 #reset alarms
                 self.temporaryalarmflag = -3
@@ -5531,14 +5590,14 @@ class tgraphcanvas(FigureCanvas):
     # if updatebackground is True, the samplingsemaphore is catched and updatebackground() is called
     @pyqtSlot(str,bool)
     def setProfileTitle(self,title,updatebackground=False):
-        if self.flagon and self.batchcounter != -1:
+        if ((self.flagon and not aw.curFile) or self.flagstart) and self.batchcounter != -1:
+            bprefix = self.batchprefix
             bnr = self.batchcounter + 1
         else:
+            bprefix = self.roastbatchprefix
             bnr = self.roastbatchnr
-        
         if bnr != 0 and title != "":
-            title = "{}{} {}".format(self.roastbatchprefix,str(bnr),title)
-
+            title = "{}{} {}".format(bprefix,str(bnr),title)
         if self.background and self.titleB and len(self.titleB) > 10:
             stl = 33
         else:
@@ -6995,7 +7054,7 @@ class tgraphcanvas(FigureCanvas):
                         self.labels.append(aw.arabicReshape(self.etypesf(3)))
                             
                 if not self.designerflag and aw.qmc.BTcurve:
-                    if self.flagon: # no smoothed lines in this case, pass normal BT
+                    if self.flagstart: # no smoothed lines in this case, pass normal BT
                         aw.qmc.l_annotations = self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
                     else:
                         TP_index = aw.findTP()
@@ -8333,10 +8392,10 @@ class tgraphcanvas(FigureCanvas):
             
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            res = aw.qmc.reset(False,False,sampling=True,keepProperties=True)
-            if not res: # reset canceled
-                self.OffMonitor()
-                return
+#            res = aw.qmc.reset(False,False,sampling=True,keepProperties=True)
+#            if not res: # reset canceled
+#                self.OffMonitor()
+#                return
 
             if not bool(aw.simulator) and aw.qmc.device == 53:
                 from artisanlib.hottop import startHottop
@@ -8345,6 +8404,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
             except Exception:
                 pass
+                
+            aw.initializedMonitoringExtraDeviceStructures()
             
             #reset alarms
             self.temporaryalarmflag = -3
@@ -8370,7 +8431,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setText(QApplication.translate("Button", "OFF",None)) # text means click to turn OFF (it is ON)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None))
             aw.button_2.setEnabled(True) # ensure that the START button is enabled
-            aw.disableEditMenus()
+            aw.disableEditMenus(sampling=True)
             aw.update_extraeventbuttons_visibility()
             aw.updateExtraButtonsVisibility()
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
@@ -8686,11 +8747,11 @@ class tgraphcanvas(FigureCanvas):
             QApplication.processEvents()
             # the sample thread might still run, but should terminate soon. We do nothing and ignore this click on ON
             if not aw.qmc.flagsamplingthreadrunning:
-                if not self.checkSaved():
-                    return False
-                else:
-                    aw.soundpop()
-                    self.OnMonitor()
+#                if not self.checkSaved():
+#                    return False
+#                else:
+                aw.soundpop()
+                self.OnMonitor()
         #turn OFF
         else:
             try:
@@ -8719,6 +8780,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventactionx(aw.qmc.xextrabuttonactions[1],aw.qmc.xextrabuttonactionstrings[1])
             except Exception:
                 pass
+            
+            res = aw.qmc.reset(True,True,sampling=True)
+            if not res: # reset canceled
+                self.OffRecorder()
+                return
 
             # update the roasts start time
             self.roastdate = QDateTime.currentDateTime()
@@ -8735,8 +8801,11 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None))
             aw.button_2.setEnabled(False)
             aw.button_2.setGraphicsEffect(None)
+            QApplication.processEvents()
+            aw.button_1.setText(QApplication.translate("Button", "OFF",None)) # text means click to turn OFF (it is ON)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None))
             aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
+            QApplication.processEvents()
             #disable RESET button:
             aw.button_7.setEnabled(False)
             aw.button_18.setEnabled(True)
@@ -8748,6 +8817,8 @@ class tgraphcanvas(FigureCanvas):
             self.updateLCDtime()
             aw.lowerbuttondialog.setVisible(True)
             aw.applyStandardButtonVisibility()
+            
+            aw.disableEditMenus()
 
             aw.update_extraeventbuttons_visibility()
             aw.updateExtraButtonsVisibility()
@@ -12573,9 +12644,64 @@ class SampleThread(QThread):
                 # duplicate system state flag flagstart locally and only refer to this copy within this function to make it behaving uniquely (either append or overwrite mode)
                 local_flagstart = aw.qmc.flagstart
                 
-                # if we are not yet recording, but sampling we keep on reseting the timer (only if not already a profile was recorded)
-                if not local_flagstart and len(aw.qmc.timex) < 2:
-                    aw.qmc.timeclock.start()
+                # initalize the arrays modified depending on the recording state
+                if local_flagstart:
+                    sample_timex = aw.qmc.timex
+                    sample_temp1 = aw.qmc.temp1
+                    sample_temp2 = aw.qmc.temp2
+                    sample_ctimex1 = aw.qmc.ctimex1
+                    sample_ctemp1 = aw.qmc.ctemp1
+                    sample_ctimex2 = aw.qmc.ctimex2
+                    sample_ctemp2 = aw.qmc.ctemp2
+                    sample_tstemp1 = aw.qmc.tstemp1
+                    sample_tstemp2 = aw.qmc.tstemp2
+                    sample_stemp1 = aw.qmc.stemp1
+                    sample_stemp2 = aw.qmc.stemp2
+                    sample_unfiltereddelta1 = aw.qmc.unfiltereddelta1
+                    sample_unfiltereddelta2 = aw.qmc.unfiltereddelta2
+                    sample_delta1 = aw.qmc.delta1
+                    sample_delta2 = aw.qmc.delta2
+                    # list of lists:
+                    sample_extratimex = aw.qmc.extratimex
+                    sample_extratemp1 = aw.qmc.extratemp1
+                    sample_extratemp2 = aw.qmc.extratemp2
+                    sample_extractimex1 = aw.qmc.extractimex1
+                    sample_extractemp1 = aw.qmc.extractemp1
+                    sample_extractimex2 = aw.qmc.extractimex2
+                    sample_extractemp2 = aw.qmc.extractemp2
+                else:
+                    m_len = aw.qmc.curvefilter*2
+                    sample_timex = aw.qmc.on_timex = aw.qmc.on_timex[-m_len:]
+                    sample_temp1 = aw.qmc.on_temp1 = aw.qmc.on_temp1[-m_len:]
+                    sample_temp2 = aw.qmc.on_temp2 = aw.qmc.on_temp2[-m_len:]
+                    sample_ctimex1 = aw.qmc.on_ctimex1 = aw.qmc.on_ctimex1[-m_len:]
+                    sample_ctemp1 = aw.qmc.on_ctemp1 = aw.qmc.on_ctemp1[-m_len:]
+                    sample_ctimex2 = aw.qmc.on_ctimex2 = aw.qmc.on_ctimex2[-m_len:]
+                    sample_ctemp2 = aw.qmc.on_ctemp2 = aw.qmc.on_ctemp2[-m_len:]
+                    sample_tstemp1 = aw.qmc.on_tstemp1 = aw.qmc.on_tstemp1[-m_len:]
+                    sample_tstemp2 = aw.qmc.on_tstemp2 = aw.qmc.on_tstemp2[-m_len:]
+                    sample_stemp1 = aw.qmc.on_stemp1 = aw.qmc.on_stemp1[-m_len:]
+                    sample_stemp2 = aw.qmc.on_stemp2 = aw.qmc.on_stemp2[-m_len:]
+                    sample_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1 = aw.qmc.on_unfiltereddelta1[-m_len:]
+                    sample_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2 = aw.qmc.on_unfiltereddelta2[-m_len:]
+                    sample_delta1 = aw.qmc.on_delta1 = aw.qmc.on_delta1[-m_len:]
+                    sample_delta2 = aw.qmc.on_delta2 = aw.qmc.on_delta2[-m_len:]
+                    # list of lists:
+                    for i in range(len(aw.qmc.extradevices)):
+                        aw.qmc.on_extratimex[i] = aw.qmc.on_extratimex[i][-m_len:]
+                        aw.qmc.on_extratemp1[i] = aw.qmc.on_extratemp1[i][-m_len:]
+                        aw.qmc.on_extratemp2[i] = aw.qmc.on_extratemp2[i][-m_len:]
+                        aw.qmc.on_extractimex1[i] = aw.qmc.on_extractimex1[i][-m_len:]
+                        aw.qmc.on_extractemp1[i] = aw.qmc.on_extractemp1[i][-m_len:]
+                        aw.qmc.on_extractimex2[i] = aw.qmc.on_extractimex2[i][-m_len:]
+                        aw.qmc.on_extractemp2[i] = aw.qmc.on_extractemp2[i][-m_len:]
+                    sample_extratimex = aw.qmc.on_extratimex
+                    sample_extratemp1 = aw.qmc.on_extratemp1
+                    sample_extratemp2 = aw.qmc.on_extratemp2
+                    sample_extractimex1 = aw.qmc.on_extractimex1
+                    sample_extractemp1 = aw.qmc.on_extractemp1
+                    sample_extractimex2 = aw.qmc.on_extractimex2
+                    sample_extractemp2 = aw.qmc.on_extractemp2
                     
                 # send sampling action if any interval is set to "sync" (extra_event_sampling_delay = 0)
                 try:
@@ -12599,7 +12725,7 @@ class SampleThread(QThread):
                     ##############  if using Extra devices
                     nxdevices = len(aw.qmc.extradevices)
                     if nxdevices:
-                        les,led,let =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1)
+                        les,led,let =  len(aw.extraser),nxdevices,len(sample_extratimex)
                         if les == led == let:
                             xtra_dev_lines1 = 0
                             xtra_dev_lines2 = 0
@@ -12628,40 +12754,25 @@ class SampleThread(QThread):
                                     except:
                                         pass
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
-                                    extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
-                                    extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
-                                if local_flagstart:
-                                    aw.qmc.extratemp1[i].append(float(extrat1))
-                                    aw.qmc.extratemp2[i].append(float(extrat2))
-                                    aw.qmc.extratimex[i].append(extratx)
-                                    if extrat1 != -1:
-                                        aw.qmc.extractimex1[i].append(float(extratx))
-                                        aw.qmc.extractemp1[i].append(float(extrat1))
-                                    if extrat2 != -1:
-                                        aw.qmc.extractimex2[i].append(float(extratx))
-                                        aw.qmc.extractemp2[i].append(float(extrat2))
-                                    # update extra lines
-                                    
-                                    if aw.extraCurveVisibility1[i] and len(aw.qmc.extratemp1lines) > xtra_dev_lines1:
-                                        aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extractimex1[i], aw.qmc.extractemp1[i])
-                                        xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                    if aw.extraCurveVisibility2[i] and len(aw.qmc.extratemp2lines) > xtra_dev_lines2:
-                                        aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extractimex2[i], aw.qmc.extractemp2[i])
-                                        xtra_dev_lines2 = xtra_dev_lines2 + 1
-                                else:
-                                    # we do not record, so we just replace the old last value
-                                    if len(aw.qmc.extratemp1[i]) > 0:
-                                        aw.qmc.extratemp1[i][-1] = float(extrat1)
-                                    else:
-                                        aw.qmc.extratemp1[i].append(float(extrat1))
-                                    if len(aw.qmc.extratemp2[i]) > 0:
-                                        aw.qmc.extratemp2[i][-1] = float(extrat2)
-                                    else:
-                                        aw.qmc.extratemp2[i].append(float(extrat2))
-                                    if len(aw.qmc.extratimex[i]) > 0:
-                                        aw.qmc.extratimex[i][-1] = extratx
-                                    else:
-                                        aw.qmc.extratimex[i].append(extratx)
+                                    extrat1 = self.inputFilter(sample_extratemp2[i],sample_extratimex[i],extratx,extrat1)
+                                    extrat2 = self.inputFilter(sample_extratemp2[i],sample_extratemp1[i],extratx,extrat2)
+                                sample_extratimex[i].append(extratx)
+                                sample_extratemp1[i].append(float(extrat1))
+                                sample_extratemp2[i].append(float(extrat2))
+                                if extrat1 != -1:
+                                    sample_extractimex1[i].append(float(extratx))
+                                    sample_extractemp1[i].append(float(extrat1))
+                                if extrat2 != -1:
+                                    sample_extractimex2[i].append(float(extratx))
+                                    sample_extractemp2[i].append(float(extrat2))
+                                # update extra lines
+                                
+                                if aw.extraCurveVisibility1[i] and len(aw.qmc.extratemp1lines) > xtra_dev_lines1:
+                                    aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(sample_extractimex1[i], aw.qmc.extractemp1[i])
+                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                if aw.extraCurveVisibility2[i] and len(aw.qmc.extratemp2lines) > xtra_dev_lines2:
+                                    aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(sample_extractimex2[i], aw.qmc.extractemp2[i])
+                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
                         #ERROR FOUND
                         else:
                             lengths = [les,led,let]
@@ -12733,120 +12844,88 @@ class SampleThread(QThread):
                             pass
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
-                    t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
-                    t2 = self.inputFilter(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
+                    t1 = self.inputFilter(sample_timex,sample_temp1,tx,t1)
+                    t2 = self.inputFilter(sample_timex,sample_temp2,tx,t2,True)
                     
-                    length_of_qmc_timex = len(aw.qmc.timex)
+                    length_of_qmc_timex = len(sample_timex)
                     t1_final = t1
                     t2_final = t2
-                    if local_flagstart:
-                        aw.qmc.temp2.append(t2_final)
-                        aw.qmc.temp1.append(t1_final)
-                        aw.qmc.timex.append(tx)
-                        length_of_qmc_timex += 1
-                        if t1_final != -1:
-                            aw.qmc.ctimex1.append(tx)
-                            aw.qmc.ctemp1.append(t1_final)
-                        if t2_final != -1:
-                            aw.qmc.ctimex2.append(tx)
-                            aw.qmc.ctemp2.append(t2_final)
-                    else:
-                        if len(aw.qmc.temp2) > 0:
-                            aw.qmc.temp2[-1] = t2_final
-                        else:
-                            aw.qmc.temp2.append(t2_final)
-                        if len(aw.qmc.temp1) > 0:
-                            aw.qmc.temp1[-1] = t1_final
-                        else:
-                            aw.qmc.temp1.append(t1_final)
-                        if length_of_qmc_timex <= 0:
-                            aw.qmc.timex.append(tx)
-                            length_of_qmc_timex += 1
-                        else:
-                            aw.qmc.timex[-1] = tx
-                            
-                        if len(aw.qmc.ctemp2) > 0:
-                            aw.qmc.ctemp2[-1] = t2_final
-                        else:
-                            aw.qmc.ctemp2.append(t2_final)
-                        if len(aw.qmc.ctemp1) > 0:
-                            aw.qmc.ctemp1[-1] = t1_final
-                        else:
-                            aw.qmc.ctemp1.append(t1_final)
-                        if len(aw.qmc.ctimex2) > 0:
-                            aw.qmc.ctimex2[-1] = tx
-                        else:
-                            aw.qmc.ctimex2.append(tx)
-                        if len(aw.qmc.ctimex1) > 0:
-                            aw.qmc.ctimex1[-1] = tx
-                        else:
-                            aw.qmc.ctimex1.append(tx)
+                    sample_temp2.append(t2_final)
+                    sample_temp1.append(t1_final)
+                    sample_timex.append(tx)
+                    length_of_qmc_timex += 1
+                    if t1_final != -1:
+                        sample_ctimex1.append(tx)
+                        sample_ctemp1.append(t1_final)
+                    if t2_final != -1:
+                        sample_ctimex2.append(tx)
+                        sample_ctemp2.append(t2_final)
                             
                     #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
                     cf = aw.qmc.curvefilter*2 - 1 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                     if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
                         self.temp_decay_weights = numpy.arange(1,cf+1)
                     # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
-                    if -1 in aw.qmc.temp1[-(cf+1):]: 
+                    if -1 in sample_temp1[-(cf+1):]: 
                         dw1 = [1]
                     else:
                         dw1 = self.temp_decay_weights
-                    if -1 in aw.qmc.temp2[-(cf+1):]:
+                    if -1 in sample_temp2[-(cf+1):]:
                         dw2 = [1]
                     else:
                         dw2 = self.temp_decay_weights
                     # average smoothing
                     d = aw.qmc.delay / 1000.
-                    if len(aw.qmc.ctemp1) > 0:
-                        st1 = self.decay_average(aw.qmc.ctimex1,aw.qmc.ctemp1,dw1)
+                    if len(sample_ctemp1) > 0:
+                        st1 = self.decay_average(sample_ctimex1,sample_ctemp1,dw1)
                     else:
                         st1 = -1
-                    if len(aw.qmc.ctemp2) > 0:
-                        st2 = self.decay_average(aw.qmc.ctimex2,aw.qmc.ctemp2,dw2)
+                    if len(sample_ctemp2) > 0:
+                        st2 = self.decay_average(sample_ctimex2,sample_ctemp2,dw2)
                     else:
                         st2 = -1
                     # register smoothed values
-                    aw.qmc.tstemp1.append(st1)
-                    aw.qmc.tstemp2.append(st2)
+                    sample_tstemp1.append(st1)
+                    sample_tstemp2.append(st2)
 
                     if aw.qmc.smooth_curves_on_recording:
                         cf = aw.qmc.curvefilter 
                         if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
                             self.temp_decay_weights = numpy.arange(1,cf+1)
                         # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
-                        if -1 in aw.qmc.temp1[-(cf+1):]: 
+                        if -1 in sample_temp1[-(cf+1):]: 
                             dw1 = [1]
                         else:
                             dw1 = self.temp_decay_weights
-                        if -1 in aw.qmc.temp2[-(cf+1):]:
+                        if -1 in sample_temp2[-(cf+1):]:
                             dw2 = [1]
                         else:
                             dw2 = self.temp_decay_weights
                         # average smoothing
                         d = aw.qmc.delay / 1000.
-                        if len(aw.qmc.ctemp1) > 0:
-                            sst1 = self.decay_average(aw.qmc.ctimex1,aw.qmc.ctemp1,dw1)
+                        if len(sample_ctemp1) > 0:
+                            sst1 = self.decay_average(sample_ctimex1,sample_ctemp1,dw1)
                         else:
                             sst1 = -1
-                        if len(aw.qmc.ctemp2) > 0:
-                            sst2 = self.decay_average(aw.qmc.ctimex2,aw.qmc.ctemp2,dw2)
+                        if len(sample_ctemp2) > 0:
+                            sst2 = self.decay_average(sample_ctimex2,sample_ctemp2,dw2)
                         else:
                             sst2 = -1
                         # register smoothed values
-                        aw.qmc.stemp1.append(sst1)
-                        aw.qmc.stemp2.append(sst2)
+                        sample_stemp1.append(sst1)
+                        sample_stemp2.append(sst2)
                     
                     if local_flagstart:
                         if aw.qmc.ETcurve:
                             if aw.qmc.smooth_curves_on_recording:
-                                aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.stemp1)
+                                aw.qmc.l_temp1.set_data(sample_ctimex1, sample_stemp1)
                             else:
-                                aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.ctemp1)
+                                aw.qmc.l_temp1.set_data(sample_ctimex1, sample_ctemp1)
                         if aw.qmc.BTcurve:
                             if aw.qmc.smooth_curves_on_recording:
-                                aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.stemp2)
+                                aw.qmc.l_temp2.set_data(sample_ctimex2, sample_stemp2)
                             else:             
-                                aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.ctemp2)
+                                aw.qmc.l_temp2.set_data(sample_ctimex2, sample_ctemp2)
 
                     if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
                             not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
@@ -12856,18 +12935,19 @@ class SampleThread(QThread):
                             aw.qmc.pid.update(st1) # smoothed ET
                             
                     #we need a minimum of two readings to calculate rate of change
-                    if local_flagstart and length_of_qmc_timex > 1:
+#                    if local_flagstart and length_of_qmc_timex > 1:
+                    if length_of_qmc_timex > 1:
                         # compute T1 RoR
                         if t1_final == -1:  # we repeat the last RoR if underlying temperature dropped
-                            if aw.qmc.unfiltereddelta1:
-                                aw.qmc.rateofchange1 = aw.qmc.unfiltereddelta1[-1]
+                            if sample_unfiltereddelta1:
+                                aw.qmc.rateofchange1 = sample_unfiltereddelta1[-1]
                             else:
                                 aw.qmc.rateofchange1 = 0.
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(aw.qmc.ctimex1),max(2,(aw.qmc.deltaETsamples + 1)))
-                            timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
-                            aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                            left_index = min(len(sample_ctimex1),max(2,(aw.qmc.deltaETsamples + 1)))
+                            timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
+                            aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
                                 try:
                                     aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
@@ -12875,38 +12955,38 @@ class SampleThread(QThread):
                                     pass
                         # compute T2 RoR
                         if t2_final == -1:  # we repeat the last RoR if underlying temperature dropped
-                            if aw.qmc.unfiltereddelta2:
-                                aw.qmc.rateofchange2 = aw.qmc.unfiltereddelta2[-1]
+                            if sample_unfiltereddelta2:
+                                aw.qmc.rateofchange2 = sample_unfiltereddelta2[-1]
                             else:
                                 aw.qmc.rateofchange2 = 0.
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(aw.qmc.ctimex2),max(2,(aw.qmc.deltaBTsamples + 1)))
-                            timed = aw.qmc.ctimex2[-1] - aw.qmc.ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
-                            aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                            left_index = min(len(sample_ctimex2),max(2,(aw.qmc.deltaBTsamples + 1)))
+                            timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
+                            aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
                             if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
                                 try:
                                     aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
                                 except:
                                     pass
 
-                        aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
-                        aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
+                        sample_unfiltereddelta1.append(aw.qmc.rateofchange1)
+                        sample_unfiltereddelta2.append(aw.qmc.rateofchange2)
                         
                         #######   filter deltaBT deltaET
                         # decay smoothing
                         if aw.qmc.deltaETfilter:
                             user_filter = int(round(aw.qmc.deltaETfilter/2.))
-                            if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter):
+                            if user_filter and length_of_qmc_timex > user_filter and (len(sample_unfiltereddelta1) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
                                     self.decay_weights = numpy.arange(1,user_filter+1)
-                                aw.qmc.rateofchange1 = self.decay_average(aw.qmc.timex,aw.qmc.unfiltereddelta1,self.decay_weights)
+                                aw.qmc.rateofchange1 = self.decay_average(sample_timex,sample_unfiltereddelta1,self.decay_weights)
                         if aw.qmc.deltaBTfilter:
                             user_filter = int(round(aw.qmc.deltaBTfilter/2.))
-                            if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta2) > user_filter):
+                            if user_filter and length_of_qmc_timex > user_filter and (len(sample_unfiltereddelta2) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
                                     self.decay_weights = numpy.arange(1,user_filter+1)
-                                aw.qmc.rateofchange2 = self.decay_average(aw.qmc.timex,aw.qmc.unfiltereddelta2,self.decay_weights)
+                                aw.qmc.rateofchange2 = self.decay_average(sample_timex,sample_unfiltereddelta2,self.decay_weights)
                         if aw.qmc.timeindex[6]:
                             rateofchange1plot = None
                             rateofchange2plot = None
@@ -12914,23 +12994,13 @@ class SampleThread(QThread):
                             rateofchange1plot = aw.qmc.rateofchange1
                             rateofchange2plot = aw.qmc.rateofchange2
                     else:
-                        if local_flagstart: # recording started, but not yet enough readings to calc a RoR
-                            aw.qmc.unfiltereddelta1.append(0.)
-                            aw.qmc.unfiltereddelta2.append(0.)
-                        else:
-                            if len(aw.qmc.unfiltereddelta1) > 0:
-                                aw.qmc.unfiltereddelta1[-1] = 0.
-                            else:
-                                aw.qmc.unfiltereddelta1.append(0.)
-                            if len(aw.qmc.unfiltereddelta2) > 0:
-                                aw.qmc.unfiltereddelta2[-1] = 0.
-                            else:
-                                aw.qmc.unfiltereddelta2.append(0.)
+                        sample_unfiltereddelta1.append(0.)
+                        sample_unfiltereddelta2.append(0.)
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
                         
                         
                     # show RoR only 10 readings after CHARGE
-                    if aw.qmc.timeindex[0] == -1 or (aw.qmc.timeindex[0]>-1 and len(aw.qmc.timex) < aw.qmc.timeindex[0] + 10):
+                    if aw.qmc.timeindex[0] == -1 or (aw.qmc.timeindex[0]>-1 and len(sample_timex) < aw.qmc.timeindex[0] + 10):
                         rateofchange1plot = None
                         rateofchange2plot = None
                     # limit displayed RoR (only before TP is recognized) # WHY?
@@ -12941,35 +13011,25 @@ class SampleThread(QThread):
                             rateofchange2plot = None
                             
                     # append new data to the rateofchange arrays
-                    if local_flagstart:
-                        # only after CHARGE and we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
-                        # and only 7 readings after CHARGE
-                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltaETfilter/2.)) + max(2,(aw.qmc.deltaETsamples + 1)):
-                            aw.qmc.delta1.append(rateofchange1plot)
-                        else:
-                            aw.qmc.delta1.append(None)
-                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltaBTfilter/2.)) + max(2,(aw.qmc.deltaBTsamples + 1)):
-                            aw.qmc.delta2.append(rateofchange2plot)
-                        else:
-                            aw.qmc.delta2.append(None)
+                    # only after CHARGE and we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
+                    # and only 7 readings after CHARGE
+                    if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltaETfilter/2.)) + max(2,(aw.qmc.deltaETsamples + 1)):
+                        sample_delta1.append(rateofchange1plot)
                     else:
-                        if len(aw.qmc.delta1) > 0:
-                            aw.qmc.delta1[-1] = rateofchange1plot
-                        else:
-                            aw.qmc.delta1.append(rateofchange1plot)
-                        if len(aw.qmc.delta2) > 0:
-                            aw.qmc.delta2[-1] = rateofchange2plot
-                        else:
-                            aw.qmc.delta2.append(rateofchange2plot)
+                        sample_delta1.append(None)
+                    if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltaBTfilter/2.)) + max(2,(aw.qmc.deltaBTsamples + 1)):
+                        sample_delta2.append(rateofchange2plot)
+                    else:
+                        sample_delta2.append(None)
                     
                     if local_flagstart:
                         if aw.qmc.DeltaETflag:
-                            aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
+                            aw.qmc.l_delta1.set_data(sample_timex, sample_delta1)
                         if aw.qmc.DeltaBTflag:
-                            aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
+                            aw.qmc.l_delta2.set_data(sample_timex, sample_delta2)
                         #readjust xlimit of plot if needed
-                        if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
-                            aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
+                        if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and sample_timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                            aw.qmc.endofx = int(sample_timex[-1] + 180.)         # increase x limit by 3 minutes
                             aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
                             aw.qmc.tempory_sample_trigger_redraw = True # we enfore a full redraw within updategraphics
                         if aw.qmc.projectFlag:
@@ -12978,7 +13038,7 @@ class SampleThread(QThread):
                         # autodetect CHARGE event
                         # only if BT > 77C/170F
                         if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.autoCHARGEenabled and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
-                            ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 77) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 170)):
+                            ((aw.qmc.mode == "C" and sample_temp2[-1] > 77) or (aw.qmc.mode == "F" and sample_temp2[-1] > 170)):
                             if aw.qmc.mode == "C":
                                 o = 0.5
                             else:
@@ -12988,11 +13048,11 @@ class SampleThread(QThread):
                                 # we found a BT break at the current index minus b
                                 aw.qmc.autoChargeIdx = length_of_qmc_timex - b
                         # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
-                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():                            
+                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(sample_temp2) and self.checkTPalarmtime():                            
                             try:
                                 tp = aw.findTP()
-                                if ((aw.qmc.mode == "C" and aw.qmc.temp2[tp] > 50 and aw.qmc.temp2[tp] < 150) or \
-                                    (aw.qmc.mode == "F" and aw.qmc.temp2[tp] > 100 and aw.qmc.temp2[tp] < 300)): # only mark TP if not an error value!
+                                if ((aw.qmc.mode == "C" and sample_temp2[tp] > 50 and sample_temp2[tp] < 150) or \
+                                    (aw.qmc.mode == "F" and sample_temp2[tp] > 100 and sample_temp2[tp] < 300)): # only mark TP if not an error value!
                                     aw.qmc.autoTPIdx = 1
                                     aw.qmc.TPalarmtimeindex = tp
                             except:
@@ -13000,15 +13060,15 @@ class SampleThread(QThread):
                             try:
                                 # if 2:30min into the roast and TPalarmtimeindex alarmindex not yet set,
                                 # we place the TPalarmtimeindex at the current index to enable in airoasters without TP the autoDRY and autoFCs functions and activate the TP Phases LCDs
-                                if aw.qmc.TPalarmtimeindex is None and ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 150):
+                                if aw.qmc.TPalarmtimeindex is None and ((sample_timex[-1] - sample_timex[aw.qmc.timeindex[0]]) > 150):
                                     aw.qmc.TPalarmtimeindex = length_of_qmc_timex - 1
                             except:
                                 pass
                         # autodetect DROP event
                         # only if 8min into roast and BT>160C/320F
                         if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.autoDROPenabled and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
-                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 160) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 320)) and\
-                            ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 420):
+                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and sample_temp2[-1] > 160) or (aw.qmc.mode == "F" and sample_temp2[-1] > 320)) and\
+                            ((sample_timex[-1] - sample_timex[aw.qmc.timeindex[0]]) > 420):
                             if aw.qmc.mode == "C":
                                 o = 0.2
                             else:
@@ -13020,12 +13080,12 @@ class SampleThread(QThread):
                         #check for autoDRY: # only after CHARGE and TP and before FCs if not yet set
                         if aw.qmc.autoDRYflag and aw.qmc.autoDRYenabled and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
                             # if DRY event not yet set check for BT exceeding Dry-max as specified in the phases dialog
-                            if aw.qmc.temp2[-1] >= aw.qmc.phases[1]:
+                            if sample_temp2[-1] >= aw.qmc.phases[1]:
                                 aw.qmc.autoDryIdx = 1
                         #check for autoFCs: # only after CHARGE and TP and before FCe if not yet set
                         if aw.qmc.autoFCsFlag and aw.qmc.autoFCsenabled and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
                             # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
-                            if aw.qmc.temp2[-1] >= aw.qmc.phases[2]:
+                            if sample_temp2[-1] >= aw.qmc.phases[2]:
                                 aw.qmc.autoFCsIdx = 1
 
                     #process active quantifiers
@@ -13068,7 +13128,7 @@ class SampleThread(QThread):
                         try:
                             if aw.qmc.background:
                                 if aw.qmc.timeindex[0] != -1:
-                                    j = aw.qmc.backgroundtime2index(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
+                                    j = aw.qmc.backgroundtime2index(tx - sample_timex[aw.qmc.timeindex[0]])
                                 else:
                                     j = aw.qmc.backgroundtime2index(tx)
                                 ETB = aw.qmc.temp1B[j]
@@ -13077,8 +13137,8 @@ class SampleThread(QThread):
                                 ETB = -1
                                 BTB = -1
                             subprocess.call([aw.ser.externaloutprogram,
-                                '{0:.1f}'.format(aw.qmc.temp1[-1]),
-                                '{0:.1f}'.format(aw.qmc.temp2[-1]),
+                                '{0:.1f}'.format(sample_temp1[-1]),
+                                '{0:.1f}'.format(sample_temp2[-1]),
                                 '{0:.1f}'.format(ETB),
                                 '{0:.1f}'.format(BTB)])
                         except:
@@ -13124,14 +13184,14 @@ class SampleThread(QThread):
                                 if aw.qmc.alarmtime[i] < 0: # time after START
                                     pass # the alarm_time is the clock time
                                 elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
-                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
+                                    alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[0]]
                                 elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
-                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
+                                    alarm_time = alarm_time - sample_timex[aw.qmc.TPalarmtimeindex]
                                 elif aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
-                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
+                                    alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
                                 elif aw.qmc.alarmtime[i] == 10: # time or temp after the trigger of the alarmguard (if one is set)
                                     # we know here that the alarmstate of the guard is valid as it has triggered
-                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.alarmstate[aw.qmc.alarmguard[i]]]
+                                    alarm_time = alarm_time - sample_timex[aw.qmc.alarmstate[aw.qmc.alarmguard[i]]]
                                 
                                 if alarm_time >= aw.qmc.alarmoffset[i]:
                                     aw.qmc.temporaryalarmflag = i
@@ -13142,38 +13202,38 @@ class SampleThread(QThread):
                                 # and this is a conditional alarm with alarm_time set to IF ALARM
                                 if_alarm_state = aw.qmc.alarmstate[aw.qmc.alarmguard[i]] # reading when the IF ALARM triggered
                                 if if_alarm_state != -1:
-                                    if if_alarm_state < len(aw.qmc.timex):
+                                    if if_alarm_state < len(sample_timex):
                                         alarm_idx = if_alarm_state
                                     else:
                                         alarm_idx = -1
                                 # we substract the reading at alarm_idx from the current reading of the channel determined by alarmsource
                             else:
                                 alarm_idx = None
-                            if aw.qmc.alarmsource[i] == -2 and aw.qmc.delta1[-1]:  #check DeltaET (might be None)
-                                alarm_temp = aw.qmc.delta1[-1]
+                            if aw.qmc.alarmsource[i] == -2 and sample_delta1[-1]:  #check DeltaET (might be None)
+                                alarm_temp = sample_delta1[-1]
                                 if alarm_idx != None:
-                                    alarm_temp -= aw.qmc.delta1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                            elif aw.qmc.alarmsource[i] == -1 and aw.qmc.delta2[-1]: #check DeltaBT (might be None
-                                alarm_temp = aw.qmc.delta2[-1]
+                                    alarm_temp -= sample_delta1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                            elif aw.qmc.alarmsource[i] == -1 and sample_delta2[-1]: #check DeltaBT (might be None
+                                alarm_temp = sample_delta2[-1]
                                 if alarm_idx != None:
-                                    alarm_temp -= aw.qmc.delta2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                    alarm_temp -= sample_delta2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                             elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                alarm_temp = aw.qmc.temp1[-1]
+                                alarm_temp = sample_temp1[-1]
                                 if alarm_idx != None:
-                                    alarm_temp -= aw.qmc.temp1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                    alarm_temp -= sample_temp1[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                             elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                alarm_temp = aw.qmc.temp2[-1]
+                                alarm_temp = sample_temp2[-1]
                                 if alarm_idx != None:
-                                    alarm_temp -= aw.qmc.temp2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                    alarm_temp -= sample_temp2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                             elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
                                 if (aw.qmc.alarmsource[i])%2==0:
-                                    alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    alarm_temp = sample_extratimex[(aw.qmc.alarmsource[i] - 2)//2][-1]
                                     if alarm_idx != None:
-                                        alarm_temp -= aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                        alarm_temp -= sample_extratimex[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                                 else:
-                                    alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    alarm_temp = sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
                                     if alarm_idx != None:
-                                        alarm_temp -= aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                                        alarm_temp -= sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                                 
                             alarm_limit = aw.qmc.alarmtemperature[i]
                             if alarm_temp is not None and alarm_temp != -1 and (
@@ -13195,7 +13255,7 @@ class SampleThread(QThread):
                     # also in the manual case we check for TP
                     if local_flagstart:
                         # check for TP event if already CHARGEed and not yet recognized
-                        if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                        if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(sample_temp2) and self.checkTPalarmtime():
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
             except Exception as e:
@@ -20678,7 +20738,7 @@ class ApplicationWindow(QMainWindow):
             self.savestatisticsAction.setEnabled(True)
         self.displayonlymenus()
 
-    def disableEditMenus(self,designer=False,wheel=False,compare=False):
+    def disableEditMenus(self,designer=False,wheel=False,compare=False,sampling=False):
         # FILE menu
         if designer or wheel or compare:
             self.newRoastMenu.setEnabled(False)
@@ -20691,18 +20751,19 @@ class ApplicationWindow(QMainWindow):
             self.fileLoadAction.setEnabled(False) # open
             self.openRecentMenu.setEnabled(False) # open recent
         self.importMenu.setEnabled(False) # import
-        self.fileSaveAction.setEnabled(False)
-        self.fileSaveAsAction.setEnabled(False)
-        self.fileSaveCopyAsAction.setEnabled(False)
-        self.exportMenu.setEnabled(False)
+        if not sampling:
+            self.fileSaveAction.setEnabled(False)
+            self.fileSaveAsAction.setEnabled(False)
+            self.fileSaveCopyAsAction.setEnabled(False)
+            self.exportMenu.setEnabled(False)
         self.convMenu.setEnabled(False)
-        if not wheel and not compare:
+        if not wheel and not compare and not sampling:
             self.saveGraphMenu.setEnabled(False)
         self.htmlAction.setEnabled(False)
         self.reportMenu.setEnabled(False)
         self.productionMenu.setEnabled(False)
         self.rankingMenu.setEnabled(False)
-        if not compare:
+        if not compare and not sampling:
             self.printAction.setEnabled(False)
         self.savestatisticsAction.setEnabled(False)
         # EDIT menu
@@ -20710,9 +20771,9 @@ class ApplicationWindow(QMainWindow):
         if compare or wheel:
             self.editGraphAction.setEnabled(False)
             self.backgroundAction.setEnabled(False)
-            self.switchETBTAction.setEnabled(False)
         self.flavorAction.setEnabled(False)
         self.switchAction.setEnabled(False)
+        self.switchETBTAction.setEnabled(False)
         # CONFIG menu
         if not compare:
             self.machineMenu.setEnabled(False)
@@ -20722,19 +20783,20 @@ class ApplicationWindow(QMainWindow):
             self.hudAction.setEnabled(False) # Curves menu
         else:
             self.hudAction.setEnabled(True)
-        if wheel:
+        if wheel or designer:
             self.eventsAction.setEnabled(False)
             self.phasesGraphAction.setEnabled(False)
             self.StatisticsAction.setEnabled(False)
             self.WindowconfigAction.setEnabled(False)
             self.colorsAction.setEnabled(False)
         self.themeMenu.setEnabled(False)
-        if not compare:
-            self.languageMenu.setEnabled(False)
+        self.languageMenu.setEnabled(False)
         # TOOLS menu
         self.analyzeMenu.setEnabled(False)
         if not compare:
             self.roastCompareAction.setEnabled(False)
+        else:
+            self.roastCompareAction.setEnabled(True)
         if not designer:
             self.designerAction.setEnabled(False)
         else:
@@ -23227,7 +23289,40 @@ class ApplicationWindow(QMainWindow):
         for i in range(len(self.qmc.extradevices)):
             self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
             self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
-
+    
+    def initializedMonitoringExtraDeviceStructures(self):
+        self.qmc.on_timex = []
+        self.qmc.on_temp1 = []
+        self.qmc.on_temp2 = []
+        self.qmc.on_ctimex1 = []
+        self.qmc.on_ctemp1 = []
+        self.qmc.on_ctimex2 = []
+        self.qmc.on_ctemp2 = []
+        self.qmc.on_tstemp1 = []
+        self.qmc.on_tstemp2 = []
+        self.qmc.on_stemp1 = []
+        self.qmc.on_stemp2 = []
+        self.qmc.on_unfiltereddelta1 = []
+        self.qmc.on_unfiltereddelta2 = []
+        self.qmc.on_delta1 = []
+        self.qmc.on_delta2 = []
+        # list of lists:
+        self.qmc.on_extratemp1 = []
+        self.qmc.on_extratemp2 = []
+        self.qmc.on_extratimex = []
+        self.qmc.on_extractimex1 = []
+        self.qmc.on_extractemp1 = []
+        self.qmc.on_extractimex2 = []
+        self.qmc.on_extractemp2 = []
+        for _ in range(len(self.qmc.extradevices)):
+            self.qmc.on_extratemp1.append([])
+            self.qmc.on_extratemp2.append([])
+            self.qmc.on_extratimex.append([])
+            self.qmc.on_extractimex1.append([])
+            self.qmc.on_extractemp1.append([])
+            self.qmc.on_extractimex2.append([])
+            self.qmc.on_extractemp2.append([])
+        
     #called by fileLoad()
     def setProfile(self,filename,profile,quiet=False):
         try:
