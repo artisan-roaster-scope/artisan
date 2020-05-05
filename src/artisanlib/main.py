@@ -21297,7 +21297,6 @@ class ApplicationWindow(QMainWindow):
                 (QApplication.translate("AutosaveField", "volume",None),str(self.qmc.volume[0])),
                 (QApplication.translate("AutosaveField", "densityunits",None),self.qmc.density[1] + '_' + self.qmc.density[3]),
                 (QApplication.translate("AutosaveField", "density",None),str(self.qmc.density[0])),
-                (QApplication.translate("AutosaveField", "moistureunits",None),QApplication.translate("AutosaveField","pct",None)),
                 (QApplication.translate("AutosaveField", "moisture",None),str(self.qmc.moisture_greens)),
                 (QApplication.translate("AutosaveField", "beans_line",None),beansline),
                 (QApplication.translate("AutosaveField", "beans",None),beansline[:30]),

@@ -33,7 +33,6 @@ def content():
     tbl_Autosave.add_row([QApplication.translate('HelpDlg','~density',None),QApplication.translate('HelpDlg','From Roast>Properties>Density Green',None),756.4])
     tbl_Autosave.add_row([QApplication.translate('HelpDlg','~densityunits',None),QApplication.translate('HelpDlg','From Roast>Properties>Density',None),QApplication.translate('HelpDlg','g_l',None)])
     tbl_Autosave.add_row([QApplication.translate('HelpDlg','~moisture',None),QApplication.translate('HelpDlg','From Roast>Properties>Moisture Green',None),11.7])
-    tbl_Autosave.add_row([QApplication.translate('HelpDlg','~moisturetunits',None),QApplication.translate('HelpDlg','From Roast>Properties>Moisture',None),QApplication.translate('HelpDlg','pct',None)])
     tbl_Autosave.add_row([QApplication.translate('HelpDlg','~machine',None),QApplication.translate('HelpDlg','From Roast>Properties>Machine',None),QApplication.translate('HelpDlg','SF-6',None)])
     tbl_Autosave.add_row([QApplication.translate('HelpDlg','~drumspeed',None),QApplication.translate('HelpDlg','From Roast>Properties>Drum Speed',None),64])
     strlist.append(tbl_Autosave.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))

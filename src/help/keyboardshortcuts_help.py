@@ -13,7 +13,7 @@ def content():
     tbl_KeyboardShortcuts = prettytable.PrettyTable()
     tbl_KeyboardShortcuts.field_names = [QApplication.translate('HelpDlg','Keys',None),QApplication.translate('HelpDlg','Description',None)]
     tbl_KeyboardShortcuts.add_row(['ENTER',QApplication.translate('HelpDlg','Turns ON/OFF Keyboard Shortcuts',None)])
-    tbl_KeyboardShortcuts.add_row(['SPACE',QApplication.translate('HelpDlg','Choses current button',None)])
+    tbl_KeyboardShortcuts.add_row(['SPACE',QApplication.translate('HelpDlg','When Keyboard Shortcuts are ON chooses the current button\nWhen Keyboard Shortcuts are OFF adds a custom event',None)])
     tbl_KeyboardShortcuts.add_row(['LEFT,RIGHT,UP,DOWN',QApplication.translate('HelpDlg','Move background or key focus',None)])
     tbl_KeyboardShortcuts.add_row(['a',QApplication.translate('HelpDlg','Autosave',None)])
     tbl_KeyboardShortcuts.add_row(['CRTL+N',QApplication.translate('HelpDlg','Autosave + Reset + START',None)])
