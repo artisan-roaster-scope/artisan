@@ -601,7 +601,7 @@ class tgraphcanvas(FigureCanvas):
                         "deltabt":'#0A5C90',"markers":'#000000',"text":'#000000',"watermarks":'#FFFF00',"timeguide":'#0A5C90',
                         "canvas":'#F8F8F8',"legendbg":'#FFFFFF',"legendborder":'#A9A9A9', 
                         "specialeventbox":'#FF5871',"specialeventtext":'#FFFFFF', 
-                        "bgeventmarker":'#FFFFFF',"bgeventtext":'#000000',
+                        "bgeventmarker":'#7F7F7F',"bgeventtext":'#000000',
                         "mettext":'#FFFFFF',"metbox":'#CC0F50',
                         "aucguide":'#0C6AA6',"messages":'#000000',"aucarea":'#767676',
                         "analysismask":'#BABABA',"statsanalysisbkgnd":"#FFFFFF"}
@@ -1548,7 +1548,7 @@ class tgraphcanvas(FigureCanvas):
         #stores the value for each event
         self.specialeventsvalue = []
         #flag that makes the events location type bars (horizontal bars) appear on the plot. flag read on redraw()
-        # 0 = no event bars; 1 = type bars (4 bars); 2 = value bars; 3 = split (combination of 0 and 2); 4 = merge (as 2, values rendered on lines)
+        # 0 = no event bars (flags); 1 = type bars (4 bars); 2 = step lines; 3 = step+ (combination of 0 and 2); 4 = combo (as 2, but values rendered on lines instead of flags)
         self.eventsGraphflag = 2
         self.clampEvents = False # if True, custom events are drawn w.r.t. the temperature scale
         self.renderEventsDescr = False # if True, descriptions are rendered instead of type/value tags
@@ -5943,7 +5943,7 @@ class tgraphcanvas(FigureCanvas):
                             jump -= 20
 
                 #plot events bars by value
-                elif self.eventsGraphflag in [2,3,4]:
+                elif self.eventsGraphflag in [2,3,4]: # 2: step lines, 3: step+, 4: combo
                     # make blended transformations to help identify EVENT types
                     if self.clampEvents:
                         top = 100
@@ -6082,17 +6082,17 @@ class tgraphcanvas(FigureCanvas):
                                 marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
                     #check backgroundevents flag
                     if self.backgroundeventsflag:
-                        if self.eventsGraphflag not in [2,4]:
-                            if self.mode == "F":
-                                height = 50
-                            else:
-                                height = 20
+                        if self.mode == "F":
+                            height = 50
+                        else:
+                            height = 20
 
-                            for p in range(len(self.backgroundEvents)):
+                        for p in range(len(self.backgroundEvents)):
+                            if self.eventsGraphflag not in [2,4] or self.backgroundEtypes[p] > 3:
                                 if self.backgroundEtypes[p] < 4: 
                                     st1 = self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])
                                 else:
-                                    st1 = self.backgroundEStrings[p].strip()[:4]
+                                    st1 = self.backgroundEStrings[p].strip()[:aw.qmc.eventslabelschars]
                                     if len(st1) == 0:
                                         st1 = "E"
                                 # plot events on BT when showeventsonbt is true
@@ -6115,7 +6115,7 @@ class tgraphcanvas(FigureCanvas):
                                     pass
                                 self.l_background_annotations.append(anno)
                         #background events by value
-                        if self.eventsGraphflag in [2,3,4]:
+                        if self.eventsGraphflag in [2,3,4]: # 2: step lines, step+, combo
                             self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
                             self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
                             E1b_last = E2b_last = E3b_last = E4b_last = 0  #not really necessary but guarantees that Exb_last is defined
@@ -6128,6 +6128,7 @@ class tgraphcanvas(FigureCanvas):
                             eventannotationprop.set_size("x-small")
                             self.overlapList = []
                             for i in range(len(self.backgroundEvents)):
+#                                print("in",i,self.eventsGraphflag,self.backgroundEtypes[i])
                                 pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])

@@ -128,7 +128,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         #table for showing events
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
-        #self.createEventTable()
+        self.createEventTable()
         self.copyeventTableButton = QPushButton(QApplication.translate("Button", "Copy Table",None))
         self.copyeventTableButton.setToolTip(QApplication.translate("Tooltip","Copy table to clipboard, OPTION or ALT click for tabular text",None))
         self.copyeventTableButton.setFocusPolicy(Qt.NoFocus)
