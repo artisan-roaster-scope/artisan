@@ -164,11 +164,11 @@ class RoastProfile():
         else:
             RoR_start = -1
         self.delta1, self.delta2 = self.aw.qmc.recomputeDeltas(self.timex,RoR_start,self.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
-        self.stemp1 = [None if i < self.timeindex[0] or i > self.timeindex[6] else t for i,t in enumerate(self.stemp1)]
-        self.stemp2 = [None if i < self.timeindex[0] or i > self.timeindex[6] else t for i,t in enumerate(self.stemp2)]
         # calculate start/end index
         self.startTimeIdx = (self.timeindex[0] if self.timeindex[0] != -1 else 0)
-        self.endTimeIdx = (self.timeindex[6] if self.timeindex[6] != 0 else -1)
+        self.endTimeIdx = (self.timeindex[6] if self.timeindex[6] != 0 else len(self.timex)-1)
+        self.stemp1 = [None if i < self.startTimeIdx or i > self.endTimeIdx else t for i,t in enumerate(self.stemp1)]
+        self.stemp2 = [None if i < self.startTimeIdx or i > self.endTimeIdx else t for i,t in enumerate(self.stemp2)]
         # calculate max deltas
         if len(self.delta1) > 0:
             self.max_DeltaET = max(filter(None,self.delta1))
@@ -1103,8 +1103,19 @@ class roastCompareDlg(ArtisanDialog):
                 self.l_align.set_xdata(refTime)
                 self.l_align.set_visible(True)
             for p in profiles[1:]:
-                if self.aw.qmc.compareAlignEvent == 0 or p.timeindex[self.aw.qmc.compareAlignEvent] > 0:
+                if (self.aw.qmc.compareAlignEvent == 0 and p.timeindex[0] != -1) or p.timeindex[self.aw.qmc.compareAlignEvent] > 0:
                     eventTime = p.timex[p.timeindex[self.aw.qmc.compareAlignEvent]]
+                    delta = eventTime - refTime
+                    p.setTimeoffset(delta)
+                    p.aligned = True
+                    p.min_time = refTime - eventTime + p.startTime()
+                    p.max_time = p.endTime() - eventTime + refTime
+                elif (self.aw.qmc.compareAlignEvent == 0 or top.timeindex[self.aw.qmc.compareAlignEvent] == 0):
+                    # align to CHARGE or first reading
+                    if p.timeindex[0] != -1:
+                        eventTime = p.timex[p.timeindex[self.aw.qmc.compareAlignEvent]]
+                    else:
+                        eventTime = p.timex[0]
                     delta = eventTime - refTime
                     p.setTimeoffset(delta)
                     p.aligned = True
@@ -1115,7 +1126,7 @@ class roastCompareDlg(ArtisanDialog):
             self.updateVisibilities()
             self.autoTimeLimits()
             self.updateProfileTableItems()
-            self.updateDeltaLimits()
+            self.updateDeltaLimits()            
     
     ### ADD/DELETE table items
     
