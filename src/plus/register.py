@@ -24,6 +24,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import shelve
+import portalocker
 from pathlib import Path
 
 from PyQt5.QtCore import QSemaphore
@@ -32,7 +33,7 @@ from plus import config, util
 
 register_semaphore = QSemaphore(1)
 
-uuid_cache_path = util.getDirectory(config.uuid_cache)
+uuid_cache_path = util.getDirectory(config.uuid_cache,share=True)
 
 
 
@@ -41,8 +42,9 @@ def addPath(uuid,path):
     try:
         config.logger.debug("register:setPath(" + str(uuid) + "," + str(path) + ")")
         register_semaphore.acquire(1)
-        with shelve.open(uuid_cache_path) as db:
-            db[uuid] = str(path)
+        with portalocker.Lock(uuid_cache_path, timeout=1) as _:
+            with shelve.open(uuid_cache_path) as db:
+                db[uuid] = str(path)
     except Exception as e:
         config.logger.error("roast: Exception in addPath() %s",e)
     finally:
@@ -54,11 +56,12 @@ def getPath(uuid):
     try:
         config.logger.debug("register:getPath(" + str(uuid) + ")")
         register_semaphore.acquire(1)
-        with shelve.open(uuid_cache_path) as db:
-            try:
-                return str(db[uuid])
-            except:
-                return None
+        with portalocker.Lock(uuid_cache_path, timeout=1) as _:
+            with shelve.open(uuid_cache_path) as db:
+                try:
+                    return str(db[uuid])
+                except:
+                    return None
     except Exception as e:
         config.logger.error("roast: Exception in getPath() %s",e)
         return None

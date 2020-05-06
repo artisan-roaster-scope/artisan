@@ -29,7 +29,7 @@ import datetime
 import dateutil.parser
 import logging
 
-from PyQt5.QtCore import QStandardPaths,QCoreApplication, QTemporaryFile, QDir, QUrl
+from PyQt5.QtCore import QStandardPaths,QCoreApplication, QDir, QUrl
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtWidgets import QApplication
 
@@ -48,7 +48,7 @@ app.setApplicationName(appName)
 
 # we store data in the user- and app-specific local default data directory for the platform
 # note that the path is based on the ApplicationName and OrganizationName setting of the app
-# eg. /Users/<username>/Library/Application Support/Artisan-Scope/Artisan on MacOS X
+# eg. /Users/<username>/Library/Application Support/Artisan-Scope/Artisan on macOS
 def getDataDirectory():
     try:
         if not os.path.exists(data_dir):

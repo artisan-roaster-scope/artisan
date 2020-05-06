@@ -1648,7 +1648,11 @@ class tgraphcanvas(FigureCanvas):
         self.alarmguard = []   # points to another alarm by index that has to be triggered before; -1 indicates no guard
         self.alarmnegguard = []   # points to another alarm by index that should not has been triggered before; -1 indicates no guard
         self.alarmtime = []    # time event after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
-#                              # -1 equals None
+#                               # -1 : START.
+#                               # 0: CHARGE, 1: DRY END; 2: FCs, 3: FCe, 4: SCs, 5: SCe, 6: DROP, 7: COOL (corrsponding to those timeindex positions)
+#                               # 8: TP
+#                               # 9: ON
+#                               # 10: If Alarm
         self.alarmoffset = []  # for timed alarms, the seconds after alarmtime the alarm is triggered
         self.alarmtime2menuidx = [2,4,5,6,7,8,9,10,3,0,11,1] # maps self.alarmtime index to menu idx (to move TP in menu from index 9 to 3)
         self.menuidx2alarmtime = [9,-1,0,8,1,2,3,4,5,6,7,10] # inverse of above (note that those two are only inverse in one direction!)
@@ -6128,7 +6132,6 @@ class tgraphcanvas(FigureCanvas):
                             eventannotationprop.set_size("x-small")
                             self.overlapList = []
                             for i in range(len(self.backgroundEvents)):
-#                                print("in",i,self.eventsGraphflag,self.backgroundEtypes[i])
                                 pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
@@ -13173,10 +13176,10 @@ class SampleThread(QThread):
                           and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]] != -1)) \
                           and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]] == -1)) \
                           and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
-                            or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
-                            or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                            or (local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
+                            or (local_flagstart and aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
                             or (aw.qmc.alarmtime[i] == 10 and aw.qmc.alarmguard[i] != -1)  \
-                            or (aw.qmc.alarmtime[i] == 8 and aw.qmc.timeindex[0] > -1 \
+                            or (local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.timeindex[0] > -1 \
                                 and aw.qmc.TPalarmtimeindex)):
                             #########
                             # check alarmoffset (time after From event):
@@ -13184,13 +13187,13 @@ class SampleThread(QThread):
                                 alarm_time = aw.qmc.timeclock.elapsed()/1000.
                                 if aw.qmc.alarmtime[i] < 0: # time after START
                                     pass # the alarm_time is the clock time
-                                elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
+                                elif local_flagstart and aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
                                     alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[0]]
-                                elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
+                                elif local_flagstart and aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
                                     alarm_time = alarm_time - sample_timex[aw.qmc.TPalarmtimeindex]
-                                elif aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
+                                elif local_flagstart and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
                                     alarm_time = alarm_time - sample_timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
-                                elif aw.qmc.alarmtime[i] == 10: # time or temp after the trigger of the alarmguard (if one is set)
+                                elif local_flagstart and aw.qmc.alarmtime[i] == 10: # time or temp after the trigger of the alarmguard (if one is set)
                                     # we know here that the alarmstate of the guard is valid as it has triggered
                                     alarm_time = alarm_time - sample_timex[aw.qmc.alarmstate[aw.qmc.alarmguard[i]]]
                                 
@@ -23896,9 +23899,26 @@ class ApplicationWindow(QMainWindow):
             if (not quiet) and "backgroundpath" in profile and d(profile["backgroundpath"]) != "":
                 self.qmc.backgroundpath = d(profile["backgroundpath"])
                 if os.path.isfile(self.qmc.backgroundpath):
-                    aw.loadbackground(self.qmc.backgroundpath)
-                    aw.qmc.background = True
-                    aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
+                    try:
+                        aw.loadbackground(self.qmc.backgroundpath)
+                        aw.qmc.background = True
+                        aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
+                    except:
+                        self.deleteBackground() # delete a loaded background if any
+                elif "backgroundUUID" in profile and aw.qmc.backgroundUUID != profile["backgroundUUID"]: 
+                    # background file path moved, we try to resolve via the UUID cache
+                    background_path = plus.register.getPath(profile["backgroundUUID"])
+                    if background_path is not None and os.path.isfile(background_path):
+                        try:
+                            aw.loadbackground(background_path)
+                            aw.qmc.background = True
+                            aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
+                            self.qmc.backgroundpath = background_path
+                            aw.qmc.fileDirty() # as we updated the background path we force a profile save
+                        except:
+                            self.deleteBackground() # delete a loaded background if any
+                    else:
+                        self.deleteBackground() # delete a loaded background if any
                 else:
                     self.deleteBackground() # delete a loaded background if any
             aw.autoAdjustAxis()
