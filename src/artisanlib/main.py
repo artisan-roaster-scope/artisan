@@ -12765,10 +12765,10 @@ class SampleThread(QThread):
                                 # update extra lines
                                 
                                 if aw.extraCurveVisibility1[i] and len(aw.qmc.extratemp1lines) > xtra_dev_lines1:
-                                    aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(sample_extractimex1[i], aw.qmc.extractemp1[i])
+                                    aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(sample_extractimex1[i], sample_extractemp1[i])
                                     xtra_dev_lines1 = xtra_dev_lines1 + 1
                                 if aw.extraCurveVisibility2[i] and len(aw.qmc.extratemp2lines) > xtra_dev_lines2:
-                                    aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(sample_extractimex2[i], aw.qmc.extractemp2[i])
+                                    aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(sample_extractimex2[i], sample_extractemp2[i])
                                     xtra_dev_lines2 = xtra_dev_lines2 + 1
                         #ERROR FOUND
                         else:
@@ -13090,7 +13090,7 @@ class SampleThread(QThread):
                         aw.process_active_quantifiers()
                     except Exception:
                         pass
-                        
+                    
                     #update SV on Arduino/TC4, Hottop, or MODBUS if in Ramp/Soak or Background Follow mode and PID is active
                     if aw.qmc.flagon: # only during sampling
                         #update SV on FujiPIDs
@@ -13248,7 +13248,6 @@ class SampleThread(QThread):
                         aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
                         aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
                         aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
-                    #aw.qmc.resetlines()
                     # also in the manual case we check for TP
                     if local_flagstart:
                         # check for TP event if already CHARGEed and not yet recognized
@@ -20707,6 +20706,7 @@ class ApplicationWindow(QMainWindow):
         self.switchETBTAction.setEnabled(True)
         self.flavorAction.setEnabled(True)
         self.temperatureMenu.setEnabled(True)
+        self.temperatureConfMenu.setEnabled(True)
         self.languageMenu.setEnabled(True)
         self.deviceAction.setEnabled(True)
         self.commportAction.setEnabled(True)
@@ -20788,6 +20788,7 @@ class ApplicationWindow(QMainWindow):
             self.WindowconfigAction.setEnabled(False)
             self.colorsAction.setEnabled(False)
         self.themeMenu.setEnabled(False)
+        self.temperatureConfMenu.setEnabled(False)
         self.languageMenu.setEnabled(False)
         # TOOLS menu
         self.analyzeMenu.setEnabled(False)

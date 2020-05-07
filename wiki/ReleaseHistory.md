@@ -50,7 +50,8 @@ v2.4.0 (xx.xx.2020)
   - the layout of large LCDs have been optimized to better use the available space
   - removes superfluous configurations relating to the removed evaluation feature from statistics dialog
   - memory usage and performance improvements and updated main libraries (Python, Qt, PyQt, matplotlib,..) providing many fixes
-  - adds delta ET and delta BT readings to the LCDs when the scope is ON 
+  - adds delta ET and delta BT readings to the LCDs when the scope is ON
+  - updates the Besca automatic machines setup
 
 * Fixes
   - fixes raw redraw issues ([Issue #390](../../../issues/390)) caused by an interaction of bitblit redraw triggered by draggable annotations and right-click event re-positioning mechanism
