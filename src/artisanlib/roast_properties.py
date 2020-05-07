@@ -3549,10 +3549,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.l_annotations_dict = {}
         
         # load selected recent roast template in the background
-        if self.template_file:
+        if self.aw.loadbackgroundUUID(self.template_file,self.template_uuid):
             try:
-                self.aw.qmc.resetlinecountcaches()
-                self.aw.loadbackground(self.template_file)
                 self.aw.qmc.background = True
                 self.aw.qmc.timealign(redraw=False)
                 self.aw.qmc.redraw()

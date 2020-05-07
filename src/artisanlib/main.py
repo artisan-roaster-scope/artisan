@@ -8396,10 +8396,10 @@ class tgraphcanvas(FigureCanvas):
             
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-#            res = aw.qmc.reset(False,False,sampling=True,keepProperties=True)
-#            if not res: # reset canceled
-#                self.OffMonitor()
-#                return
+            res = aw.qmc.reset(False,False,sampling=True,keepProperties=True)
+            if not res: # reset canceled
+                self.OffMonitor()
+                return
 
             if not bool(aw.simulator) and aw.qmc.device == 53:
                 from artisanlib.hottop import startHottop
@@ -8435,7 +8435,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setText(QApplication.translate("Button", "OFF",None)) # text means click to turn OFF (it is ON)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None))
             aw.button_2.setEnabled(True) # ensure that the START button is enabled
-            aw.disableEditMenus(sampling=True)
+            aw.disableEditMenus()
             aw.update_extraeventbuttons_visibility()
             aw.updateExtraButtonsVisibility()
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
@@ -8751,11 +8751,11 @@ class tgraphcanvas(FigureCanvas):
             QApplication.processEvents()
             # the sample thread might still run, but should terminate soon. We do nothing and ignore this click on ON
             if not aw.qmc.flagsamplingthreadrunning:
-#                if not self.checkSaved():
-#                    return False
-#                else:
-                aw.soundpop()
-                self.OnMonitor()
+                if not self.checkSaved():
+                    return False
+                else:
+                    aw.soundpop()
+                    self.OnMonitor()
         #turn OFF
         else:
             try:
@@ -8784,11 +8784,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventactionx(aw.qmc.xextrabuttonactions[1],aw.qmc.xextrabuttonactionstrings[1])
             except Exception:
                 pass
-            
-            res = aw.qmc.reset(True,True,sampling=True)
-            if not res: # reset canceled
-                self.OffRecorder()
-                return
 
             # update the roasts start time
             self.roastdate = QDateTime.currentDateTime()
@@ -8805,11 +8800,11 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None))
             aw.button_2.setEnabled(False)
             aw.button_2.setGraphicsEffect(None)
-            QApplication.processEvents()
+#            QApplication.processEvents()
             aw.button_1.setText(QApplication.translate("Button", "OFF",None)) # text means click to turn OFF (it is ON)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None))
             aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
-            QApplication.processEvents()
+#            QApplication.processEvents()
             #disable RESET button:
             aw.button_7.setEnabled(False)
             aw.button_18.setEnabled(True)
@@ -8821,8 +8816,6 @@ class tgraphcanvas(FigureCanvas):
             self.updateLCDtime()
             aw.lowerbuttondialog.setVisible(True)
             aw.applyStandardButtonVisibility()
-            
-            aw.disableEditMenus()
 
             aw.update_extraeventbuttons_visibility()
             aw.updateExtraButtonsVisibility()
@@ -16728,14 +16721,15 @@ class ApplicationWindow(QMainWindow):
             alt_modifier = modifiers == Qt.AltModifier
             rr = action.data()
             if "background" in rr and rr["background"] is not None and rr["background"] != "":
-                try:
-                    aw.qmc.resetlinecountcaches()
-                    self.loadbackground(rr["background"])
-                    aw.qmc.background = True
-                    aw.qmc.timealign(redraw=False)
-                    aw.qmc.redraw()
-                except:
-                    pass
+                background_UUID = (rr["roastUUID"] if "roastUUID" in rr else None)
+                aw.qmc.resetlinecountcaches()
+                if aw.loadbackgroundUUID(rr["background"],background_UUID):
+                    try:
+                        aw.qmc.background = True
+                        aw.qmc.timealign(redraw=False)
+                        aw.qmc.redraw()
+                    except:
+                        pass
             if alt_modifier:
                 if self.qmc.flagon:
                     self.setRecentRoast(rr)
@@ -19115,13 +19109,13 @@ class ApplicationWindow(QMainWindow):
     def eventaction_internal(self,action,cmd):
         if action:
             try:
+                if aw.simulator and not action in [2,3,20]:  # 2 (Call Program) 3 (Multiple Event), 20 (Artisan Command)
+                    # disable all communicating commands in simulation mode
+                    return
+                
                 if action in [8,9,10]:
                     from artisanlib.hottop import setHottop
                 cmd_str = str(cmd)
-                
-                if aw.simulator and action != 16:
-                    # disable all communicating commands in simulation mode
-                    return
                 
                 # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7 command actions
                 if action in [1,2,4,7,15] and len(self.qmc.timex) > 0:
@@ -21896,6 +21890,28 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()  
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " calcVirtualdevices() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    # tries to load background from the given path, if that fails try to deref the given UUID
+    # returns True on succees, Fail otherwise
+    def loadbackgroundUUID(self,filename,UUID):
+        if filename is not None and filename != "" and os.path.isfile(filename):
+            try:
+                self.loadbackground(filename)
+                return True
+            except:
+                return False
+        elif UUID is not None:
+            filepath = plus.register.getPath(UUID)
+            if filepath is not None:
+                try:
+                    self.loadbackground(filepath)
+                    return True
+                except:
+                    return False
+            else:
+                return False
+        else:
+            return False
+
     # Loads background profile
     def loadbackground(self,filename):
         try:
@@ -23905,7 +23921,7 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
                     except:
                         self.deleteBackground() # delete a loaded background if any
-                elif "backgroundUUID" in profile and aw.qmc.backgroundUUID != profile["backgroundUUID"]: 
+                elif "backgroundUUID" in profile and aw.qmc.backgroundUUID != profile["backgroundUUID"]:
                     # background file path moved, we try to resolve via the UUID cache
                     background_path = plus.register.getPath(profile["backgroundUUID"])
                     if background_path is not None and os.path.isfile(background_path):
