@@ -8,6 +8,8 @@ v2.4.0 (xx.xx.2020)
 * New Features
   - adds [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Comparator.html), [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Simulator.html), and [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Transposer.html)
   - adds Cropster XLS, IKAWA CSV and Giesen Software CSV profile import
+  - adds flexible automatic file name generator (Issue #430, see also Saving Artisan Profiles - Naming, Saving, File Location etc)
+  - adds custom special event annotations in step and step+ modes that will show roast data including time, temperature DTR, etc. 
   - adds support for the [Giesen IR sensor](https://artisan-scope.org/machines/giesen/)
   - adds support for [Twino/Ozstar roasting machines](https://artisan-scope.org/machines/twino-ozstar/)
   - adds S7 and MODBUS communciation optimizer
@@ -48,6 +50,7 @@ v2.4.0 (xx.xx.2020)
   - the layout of large LCDs have been optimized to better use the available space
   - removes superfluous configurations relating to the removed evaluation feature from statistics dialog
   - memory usage and performance improvements and updated main libraries (Python, Qt, PyQt, matplotlib,..) providing many fixes
+  - adds delta ET and delta BT readings to the LCDs when the scope is ON 
 
 * Fixes
   - fixes raw redraw issues ([Issue #390](../../../issues/390)) caused by an interaction of bitblit redraw triggered by draggable annotations and right-click event re-positioning mechanism

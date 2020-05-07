@@ -23358,7 +23358,7 @@ class ApplicationWindow(QMainWindow):
                                         str(profile["extramathexpression1"]), str(profile["extramathexpression2"]),
                                         ])
                     if settingdev != profiledev:
-                        string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to modified.\nOverwrite your extra device definitions using the values from the profile?",None)
+                        string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.",None)
                         if quiet:
                             reply = QMessageBox.Yes
                         else:
