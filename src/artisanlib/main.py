@@ -2621,6 +2621,7 @@ class tgraphcanvas(FigureCanvas):
                 del aw.qmc.l_annotations_dict[action.key[0]]
             if action.key[0] == 0: # CHARGE
                 # realign to background
+                aw.autoAdjustAxis(deltas=False)
                 aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             elif action.key[0] == 6: # DROP
                 try:
@@ -8766,6 +8767,7 @@ class tgraphcanvas(FigureCanvas):
 
     def OnRecorder(self):
         try:
+            
             # if on turn mouse crosslines off
             if aw.qmc.crossmarker:
                 aw.qmc.togglecrosslines()
@@ -8776,6 +8778,7 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.delta_ax:
                 aw.qmc.delta_ax.set_ylabel("")
             
+            self.timeclock.start()   #set time to the current computer time, otherwise the recorded timestamps append to the time on START after ON which might be long!
             self.flagstart = True
             # start Monitor if not yet running
             if not self.flagon:
@@ -22863,7 +22866,7 @@ class ApplicationWindow(QMainWindow):
             infile.close()
             if res:
                 aw.autoAdjustAxis()
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading                
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
                 self.qmc.redraw()
 
         if error_msg: 

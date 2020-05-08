@@ -36,17 +36,25 @@ class Simulator():
             self.temp1 = self.temp1[start:]
             self.temp2 = self.temp2[start:]
             self.timex = self.timex[start:]
-            self.extratemp1 = self.extratemp1[start:]
-            self.extratemp2 = self.extratemp2[start:]
-            self.extratimex = self.extratimex[start:]
+            for i in range(len(self.extratimex)):
+                self.extratemp1[i] = self.extratemp1[i][start:]
+                self.extratemp2[i] = self.extratemp2[i][start:]
+                self.extratimex[i] = self.extratimex[i][start:]
         except:
             pass
         self.temp1 = numpy.array(self.temp1)
         self.temp2 = numpy.array(self.temp2)
         self.timex = numpy.array(self.timex)
+        # shift timestamps such that they start with 0
+        if len(self.timex) > 0:
+            self.timex = self.timex - self.timex[0]
         self.extratemp1 = numpy.array(self.extratemp1)
         self.extratemp2 = numpy.array(self.extratemp2)
         self.extratimex = numpy.array(self.extratimex)
+        # shift timestamps such that they start with 0
+        for i in range(len(self.extratimex)):
+            if len(self.extratimex[i]) > 0:
+                self.extratimex[i] = self.extratimex[i] - self.extratimex[i][0]
     
     def read(self,tx):
         et = -1
