@@ -156,41 +156,9 @@ from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a,
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, deltaLabelMathPrefix, stringfromseconds, stringtoseconds,
         fromFtoC, fromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toDouble, toBool, toStringList, toMap, removeAll)
-from artisanlib.s7port import s7port
-from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
-from artisanlib.phidgets import PhidgetManager
-from artisanlib.sliderStyle import *
-from artisanlib.cropster import extractProfileCropsterXLS
-from artisanlib.giesen import extractProfileGiesenCSV
-from artisanlib.ikawa import extractProfileIkawaCSV
-from artisanlib.simulator import Simulator
-from artisanlib.transposer import profileTransformatorDlg
-from artisanlib.comparator import roastCompareDlg
-from artisanlib.dialogs import ArtisanMessageBox, HelpDlg
-from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs)
-from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
-from artisanlib.events import EventsDlg, customEventDlg
-from artisanlib.curves import HUDDlg
-from artisanlib.devices import DeviceAssignmentDlg
-from artisanlib.ports import comportDlg
-from artisanlib.comm import serialport, colorport, scaleport
-from artisanlib.alarms import AlarmDlg
-from artisanlib.background import backgroundDlg
-from artisanlib.cup_profile import flavorDlg
-from artisanlib.pid_dialogs import PXRpidDlgControl, PXG4pidDlgControl, PID_DlgControl, DTApidDlgControl
-from artisanlib.designer import designerconfigDlg, pointDlg
-from artisanlib.sampling import SamplingDlg
-from artisanlib.wheels import WheelDlg
-from artisanlib.colors import graphColorDlg
-from artisanlib.statistics import StatisticsDlg
-from artisanlib.phases import phasesGraphDlg
-from artisanlib.calculator import calculatorDlg
-from artisanlib.axis import WindowsDlg
-from artisanlib.batches import batchDlg
-from artisanlib.autosave import autosaveDlg
-from artisanlib.platform import platformDlg
-from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
+
+
 
 from Phidget22.Phidget import Phidget as PhidgetDriver
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
@@ -204,14 +172,14 @@ platf = str(platform.system())
 #################### Main Application  ################################################
 #######################################################################################
 
-
-global viewerAppGuid
 appGuid = '9068bd2fa8e54945a6be1f1a0a589e92'
 viewerAppGuid = '9068bd2fa8e54945a6be1f1a0a589e93'
 
 class Artisan(QtSingleApplication):
     def __init__(self, args):
         super(Artisan, self).__init__(appGuid,viewerAppGuid,args)
+        self.appGuid = appGuid
+        self.viewerAppGuid = viewerAppGuid
         
         self.focusChanged.connect(self.appRaised)
         self.sentToBackground = None # set to timestamp on putting app to background without any open dialog
@@ -250,7 +218,6 @@ class Artisan(QtSingleApplication):
     # artisan://roast/<UUID> : loads profile from path associated with the given roast <UUID>
     # file://<path>
     def open_url(self, url):
-        self.activateWindow()
         if not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None: # only if not yet monitoring
             if url.scheme() == "artisan" and url.authority() == 'roast':
                 # we try to resolve this one into a file URL and recurse
@@ -262,6 +229,10 @@ class Artisan(QtSingleApplication):
                         aw.sendmessage(QApplication.translate("Message","URL open profile: {0}",None).format(profile_path))
                         self.open_url(QUrl.fromLocalFile(profile_path))
             elif url.scheme() == "file":
+                if not url.hasQuery() or  url.query() != "background":
+                    self.activateWindow()
+                url.setQuery(None) # remove any query to get a valid file path
+                url.setFragment(None) # remove also any potential fragment
                 filename = url.toString(QUrl.PreferLocalFile)
                 qfile = QFileInfo(filename)
                 file_suffix = qfile.suffix()
@@ -279,9 +250,9 @@ class Artisan(QtSingleApplication):
                     # load Artisan palettes on double-click on *.apal file
                     QTimer.singleShot(20,lambda : aw.getPalettes(filename,aw.buttonpalette))
 
-        elif platf == "Windows" and self.applicationName() == "Artisan":
+        elif platf == "Windows" and self.artisanviewerMode:
             msg = url.toString()  #here we don't want a local file, preserve the windows file:///
-            self.sendMessage2ArtisanInstance(msg,viewerAppGuid)
+            self.sendMessage2ArtisanInstance(msg,self.viewerAppGuid)
     
     @pyqtSlot(str)
     def receiveMessage(self,msg):
@@ -294,8 +265,8 @@ class Artisan(QtSingleApplication):
     def sendMessage2ArtisanInstance(self,message,instance_id):
         if platf == "Windows":
             try:
-                if instance_id == viewerAppGuid and not self._sendMessage2ArtisanInstance(message,viewerAppGuid) \
-                        or instance_id == appGuid and not self._sendMessage2ArtisanInstance(message,appGuid):
+                if instance_id == self.viewerAppGuid and not self._sendMessage2ArtisanInstance(message,self.viewerAppGuid) \
+                        or instance_id == self.appGuid and not self._sendMessage2ArtisanInstance(message,self.appGuid):
                     # get the path of the artisan.exe file
                     if getattr(sys, 'frozen', False):
                         application_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
@@ -305,7 +276,7 @@ class Artisan(QtSingleApplication):
                         application_path = sys.argv[0]
                     application_path = re.sub(r"\\",r"/",application_path)
                     # must start viewer without an argv else it thinks it was started from a link and sends back to artisan
-                    os.startfile(application_path)
+                    os.startfile(application_path)  # @UndefinedVariable # only available on Windows!
                     QTimer.singleShot(3000,lambda : self._sendMessage2ArtisanInstance(message,instance_id))
             except:
                 pass
@@ -348,10 +319,10 @@ class Artisan(QtSingleApplication):
                     # we send open file in the other instance if running
                     if self.artisanviewerMode:
                         # this is the Viewer, but we cannot open the file, send an open request to the main app if it is running
-                        self.sendMessage2ArtisanInstance(message,appGuid)
+                        self.sendMessage2ArtisanInstance(message,self.appGuid)
                     else:
                         # try to open the file in Viewer if it is running
-                        self.sendMessage2ArtisanInstance(message,viewerAppGuid)
+                        self.sendMessage2ArtisanInstance(message,self.viewerAppGuid)
             except:
                 pass
             return 1
@@ -556,7 +527,6 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
     app.installTranslator(appTranslator)
 
-
 umlaute_dict = {
    uchr(228): 'ae',  # U+00E4   \xc3\xa4
    uchr(246): 'oe',  # U+00F6   \xc3\xb6
@@ -577,8 +547,42 @@ def toASCII(s):
                 utf8_string = utf8_string.replace(k, umlaute_dict[k])
         return unidecode(utf8_string)
 
-
 from const import UIconst
+from artisanlib.s7port import s7port
+from artisanlib.modbusport import modbusport
+from artisanlib.phidgets import PhidgetManager
+from artisanlib.sliderStyle import *
+from artisanlib.cropster import extractProfileCropsterXLS
+from artisanlib.giesen import extractProfileGiesenCSV
+from artisanlib.ikawa import extractProfileIkawaCSV
+from artisanlib.simulator import Simulator
+from artisanlib.transposer import profileTransformatorDlg
+from artisanlib.comparator import roastCompareDlg
+from artisanlib.dialogs import ArtisanMessageBox, HelpDlg
+from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs)
+from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
+from artisanlib.events import EventsDlg, customEventDlg
+from artisanlib.curves import HUDDlg
+from artisanlib.devices import DeviceAssignmentDlg
+from artisanlib.ports import comportDlg
+from artisanlib.comm import serialport, colorport, scaleport
+from artisanlib.alarms import AlarmDlg
+from artisanlib.background import backgroundDlg
+from artisanlib.cup_profile import flavorDlg
+from artisanlib.pid_dialogs import PXRpidDlgControl, PXG4pidDlgControl, PID_DlgControl, DTApidDlgControl
+from artisanlib.designer import designerconfigDlg, pointDlg
+from artisanlib.sampling import SamplingDlg
+from artisanlib.wheels import WheelDlg
+from artisanlib.colors import graphColorDlg
+from artisanlib.statistics import StatisticsDlg
+from artisanlib.phases import phasesGraphDlg
+from artisanlib.calculator import calculatorDlg
+from artisanlib.axis import WindowsDlg
+from artisanlib.batches import batchDlg
+from artisanlib.autosave import autosaveDlg
+from artisanlib.platform import platformDlg
+from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
+
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 from help import keyboardshortcuts_help
@@ -1199,6 +1203,7 @@ class tgraphcanvas(FigureCanvas):
         self.flagon = False  # Artisan turned on
         self.flagstart = False # Artisan logging
         self.flagKeepON = False # turn Artisan ON again after pressing OFF during recording
+        self.flagOpenCompleted = False # after completing a recording with OFF, send the saved profile to be opened in the ArtisanViewer
         self.flagsampling = False # if True, Artisan is still in the sampling phase and one has to wait for its end to turn OFF
         self.flagsamplingthreadrunning = False
         #log flag that tells to log ET when using device 18 (manual mode)
@@ -4736,6 +4741,16 @@ class tgraphcanvas(FigureCanvas):
         if not self.checkSaved():
             return False
         else:
+            if sampling and self.flagOpenCompleted and aw.curFile is not None:
+                # always if ON is pressed while a profile is loaded, the profile is send to the Viewer
+                # the file URL of the saved profile (if any) is send to the ArtisanViewer app to be openened if already running
+                try:
+                    fileURL = QUrl.fromLocalFile(aw.curFile)
+                    fileURL.setQuery("background") # open the file URL without rasing the app to the foreground
+                    QTimer.singleShot(10,lambda : app.sendMessage2ArtisanInstance(fileURL.toString(),app.viewerAppGuid))
+                except:
+                    pass
+    
             if soundOn:
                 aw.soundpop()
                 
@@ -4794,7 +4809,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.block_quantification_sampling_ticks = [0,0,0,0]
                 aw.extraeventsactionslastvalue = [None,None,None,None] # used by +-% event buttons in ON mode when no event was registered yet
 
-                if self.roastpropertiesflag and not keepProperties:
+                # if we are in KeepON mode, the reset triggered by ON should resepect the roastpropertiesflag ("Delete Properties on Reset")
+                if self.roastpropertiesflag and (self.flagKeepON or not keepProperties): 
                     self.title = QApplication.translate("Scope Title", "Roaster Scope",None)
                     self.roastingnotes = ""
                     self.cuppingnotes = ""
@@ -8416,7 +8432,7 @@ class tgraphcanvas(FigureCanvas):
     def restartPhidgetManager(self):
         self.stopPhidgetManager()
         self.startPhidgetManager()
-            
+    
     def OnMonitor(self):
         try:
             self.startPhidgetManager()
@@ -25131,6 +25147,8 @@ class ApplicationWindow(QMainWindow):
             # restore keepON flag
             if settings.contains("KeepON"):
                 self.qmc.flagKeepON = bool(toBool(settings.value("KeepON",self.qmc.flagKeepON)))
+            if settings.contains("flagOpenCompleted"):
+                self.qmc.flagOpenCompleted = bool(toBool(settings.value("flagOpenCompleted",self.qmc.flagOpenCompleted)))
             # restore extra event sampling interval
             if settings.contains("ExtraEventSamplingDelay"):
                 self.qmc.extra_event_sampling_delay = toInt(settings.value("ExtraEventSamplingDelay",int(self.qmc.extra_event_sampling_delay)))
@@ -26643,6 +26661,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Oversampling",self.qmc.oversampling)
             # save keepON flag
             settings.setValue("KeepON",self.qmc.flagKeepON)
+            settings.setValue("flagOpenCompleted",self.qmc.flagOpenCompleted)
             # save extra event sampling interval
             settings.setValue("ExtraEventSamplingDelay",self.qmc.extra_event_sampling_delay)
             #save colors
@@ -31350,7 +31369,7 @@ class ApplicationWindow(QMainWindow):
                 self.curFile = None
                 #Plot everything
                 self.qmc.redraw()
-                message = QApplication.translate("Message","{0}  imported ", None).format(filename)
+                message = QApplication.translate("Message","{0} imported", None).format(filename)
                 self.sendmessage(message)
 
         except IOError as ex:
@@ -32895,7 +32914,7 @@ def main():
     
     aw = ApplicationWindow()
     
-    app.setActivationWindow(aw) # set the activation window for the QtSingleApplication
+    app.setActivationWindow(aw,activateOnMessage=False) # set the activation window for the QtSingleApplication
     
     
 #    aw.setStyleSheet("QMainWindow {background: 'white';}")

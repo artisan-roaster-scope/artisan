@@ -19,18 +19,26 @@
 from artisanlib.dialogs import ArtisanDialog
 
 from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QVBoxLayout, QCheckBox,
+from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout,
                              QDialogButtonBox, QDoubleSpinBox, QLayout, QMessageBox)
 
 class SamplingDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
         super(SamplingDlg,self).__init__(parent, aw)
-        self.setWindowTitle(QApplication.translate("Message","Sampling Interval", None))
+        self.setWindowTitle(QApplication.translate("Message","Sampling", None))
         self.setModal(True)
+        
+        self.org_delay = self.aw.qmc.delay
+        self.org_flagKeepON = self.aw.qmc.flagKeepON
+        self.org_flagOpenCompleted = self.aw.qmc.flagOpenCompleted
         
         self.keepOnFlag = QCheckBox(QApplication.translate("Label","Keep ON", None))
         self.keepOnFlag.setFocusPolicy(Qt.NoFocus)
         self.keepOnFlag.setChecked(bool(self.aw.qmc.flagKeepON))
+        
+        self.openCompletedFlag = QCheckBox(QApplication.translate("Label","Open Completed Roast in Viewer", None))
+        self.openCompletedFlag.setFocusPolicy(Qt.NoFocus)
+        self.openCompletedFlag.setChecked(bool(self.aw.qmc.flagOpenCompleted))
         
         self.interval = QDoubleSpinBox()
         self.interval.setSingleStep(1)
@@ -40,13 +48,22 @@ class SamplingDlg(ArtisanDialog):
         self.interval.setAlignment(Qt.AlignRight)
         self.interval.setSuffix("s")
         
+        intervalLayout = QHBoxLayout()
+        intervalLayout.addStretch()
+        intervalLayout.addWidget(self.interval)
+        intervalLayout.addStretch()
+        
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.ok)
         self.dialogbuttons.rejected.connect(self.close)
         
+        flagGrid = QGridLayout()
+        flagGrid.addWidget(self.keepOnFlag,0,0)
+        flagGrid.addWidget(self.openCompletedFlag,1,0)
+        
         flagLayout = QHBoxLayout()
         flagLayout.addStretch()
-        flagLayout.addWidget(self.keepOnFlag)
+        flagLayout.addLayout(flagGrid)
         flagLayout.addStretch()
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
@@ -54,7 +71,7 @@ class SamplingDlg(ArtisanDialog):
         
         #incorporate layouts
         layout = QVBoxLayout()
-        layout.addWidget(self.interval)
+        layout.addLayout(intervalLayout)
         layout.addLayout(flagLayout)
         layout.addStretch()
         layout.addLayout(buttonsLayout)
@@ -68,15 +85,16 @@ class SamplingDlg(ArtisanDialog):
     #cancel button
     @pyqtSlot()
     def close(self):
+        self.aw.qmc.delay = self.org_delay
+        self.aw.qmc.flagKeepON = self.org_flagKeepON
+        self.aw.qmc.flagOpenCompleted = self.org_flagOpenCompleted
         self.reject()
     
     #ok button
     @pyqtSlot()
     def ok(self):
-        if self.keepOnFlag.isChecked():
-            self.aw.qmc.flagKeepON = True
-        else:
-            self.aw.qmc.flagKeepON = False
+        self.aw.qmc.flagKeepON = bool(self.keepOnFlag.isChecked())
+        self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
         self.aw.qmc.delay = int(self.interval.value()*1000.)
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
             QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))        

@@ -1,4 +1,5 @@
-# -*- coding: cp1252 -*-
+#!/usr/bin/env python3
+#
 # UI related constants for the Artisan application.
 #
 # LICENSE
@@ -104,7 +105,7 @@ CONF_MENU_MACHINE = QApplication.translate("Menu", "Machine", None)
 CONF_MENU_THEMES = QApplication.translate("Menu", "Themes", None)
 CONF_MENU_DEVICE = QApplication.translate("Menu", "Device...", None)
 CONF_MENU_SERIALPORT = QApplication.translate("Menu", "Port...", None)
-CONF_MENU_SAMPLING = QApplication.translate("Menu", "Sampling Interval...", None)
+CONF_MENU_SAMPLING = QApplication.translate("Menu", "Sampling...", None)
 CONF_MENU_OVERSAMPLING = QApplication.translate("Menu", "Oversampling", None)
 CONF_MENU_OVERSAMPLING = QApplication.translate("Menu", "Oversampling", None)
 CONF_MENU_COLORS = QApplication.translate("Menu", "Colors...", None)
@@ -191,7 +192,7 @@ if platf != 'Darwin':
 HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None).format("Artisan") 
 HELP_MENU_ABOUT_ARTISANVIEWER = QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None).format("ArtisanViewer") 
 HELP_MENU_ABOUTQT = QApplication.translate("Menu", "About Qt", None)
-HELP_MENU_CHECKUPDATE = QApplication.translate("Menu", "Check for updates", None)
+HELP_MENU_CHECKUPDATE = QApplication.translate("Menu", "Check for Updates", None)
 HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None)
 #HELP_MENU_BLOG = QApplication.translate("Menu", "Blog", None)
 HELP_MENU_KEYBOARDSHORTCUTS = QApplication.translate("Menu", "Keyboard Shortcuts", None)

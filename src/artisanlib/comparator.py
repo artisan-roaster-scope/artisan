@@ -32,7 +32,7 @@ from artisanlib.qcheckcombobox import CheckComboBox
 with suppress_stdout_stderr():
     from matplotlib import cm
 
-from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl)
+from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl, QCoreApplication)
 from PyQt5.QtGui import (QColor, QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
     QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox)
@@ -992,11 +992,12 @@ class roastCompareDlg(ArtisanDialog):
     
     @pyqtSlot(int)
     def tableSectionClicked(self,i):
-        if platform.system() == "Windows" and QApplication.applicationName() == "Artisan":
-            viewerAppGuid = '9068bd2fa8e54945a6be1f1a0a589e93'
-            self.aw.app.sendMessage2ArtisanInstance(QUrl.fromLocalFile(self.profiles[i].filepath).toString(),viewerAppGuid)
+        app = QCoreApplication.instance()
+        fileURL = QUrl.fromLocalFile(self.profiles[i].filepath)
+        if platform.system() == "Windows" and app.artisanviewerMode:
+            self.aw.app.sendMessage2ArtisanInstance(fileURL.toString(),app.viewerAppGuid)
         else:
-            QDesktopServices.openUrl(QUrl.fromLocalFile(self.profiles[i].filepath))
+            QDesktopServices.openUrl(fileURL)
 
     @pyqtSlot()
     def deleteSelected(self):

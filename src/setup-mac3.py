@@ -175,7 +175,7 @@ with open('Info.plist', 'r+b') as fp:
     plistlib.dump(plist, fp)
 
 OPTIONS = {
-    'strip': True,
+    'strip': False,
 #    'xref': True,
     'argv_emulation': False, # this would confuses GUI processing
 # this does not work on Python3.4/PyQt5 for unknown reasons (seems only work for Qt4)

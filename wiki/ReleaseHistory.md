@@ -8,7 +8,7 @@ v2.4.0 (xx.xx.2020)
 * New Features
   - adds [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Comparator.html), [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Simulator.html), and [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Transposer.html)
   - adds Cropster XLS, IKAWA CSV and Giesen Software CSV profile import
-  - adds flexible automatic file name generator (Issue #430, see also Saving Artisan Profiles - Naming, Saving, File Location etc)
+  - adds flexible automatic file name generator ([Issue #430](../../../issues/430), see also [Saving Artisan Profiles - Naming, Saving, File Location etc](https://www.home-barista.com/home-roasting/saving-artisan-profiles-naming-saving-file-location-etc-t61713.html))
   - adds custom special event annotations in step and step+ modes that will show roast data including time, temperature DTR, etc. 
   - adds support for the [Giesen IR sensor](https://artisan-scope.org/machines/giesen/)
   - adds support for [Twino/Ozstar roasting machines](https://artisan-scope.org/machines/twino-ozstar/)
@@ -17,7 +17,6 @@ v2.4.0 (xx.xx.2020)
   - adds support for Yoctopuce [Yocto-0-10V-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-tx), [Yocto-4-20mA-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-4-20ma-tx), [Yocto-PWM-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-pwm-tx), [Yocto-4-20mA-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-4-20ma-rx), [Yocto-Servo](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-servo) and Yoctopuce Relays modules ([Yocto-Relay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-relay), [Yocto-LatchedRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-latchedrelay), [Yocto-MaxiCoupler-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxicoupler-v2), [Yocto-PowerRelay-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v2), [Yocto-PowerRelay-V3](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v3), and [Yocto-MaxiPowerRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxipowerrelay))
   - adds support for Phidget VINT DCMotor modules ([DCC1000](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=965), [DCC1002](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1117) and [DCC1003](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1118)), mDNS Phidget server service discovery and support for multiple Phidget IO modules identified by their hub serial number and port
   - better support of hi-resolution displays under Windows
-  - adds flexible automatic file name generator ([Issue #430](../../../issues/430), see also [Saving Artisan Profiles - Naming, Saving, File Location etc](https://www.home-barista.com/home-roasting/saving-artisan-profiles-naming-saving-file-location-etc-t61713.html))
   - adds large phases LCDs
   - adds status flags to the menu entries for all large LCD views
   - adds automatic mode for the upper delta axis limit
@@ -35,6 +34,7 @@ v2.4.0 (xx.xx.2020)
   - adds `{BT}`, `{ET}`, `{t}` substitutions for Serial, Program, MDBUS and S7 command actions
   - adds space key action to create plain events while keyboard short cut event navigation is off
   - adds symbolic variables `RB1` and `RB2` to referring to the rate-of-rise readings of the background profile
+  - adds an option to automatically open completed roasts in the ArtisanViewer on turning Artisan ON for the next roast
 
 * Changes
   - remember the position of draggable annotations and the legend
