@@ -992,7 +992,11 @@ class roastCompareDlg(ArtisanDialog):
     
     @pyqtSlot(int)
     def tableSectionClicked(self,i):
-        QDesktopServices.openUrl(QUrl.fromLocalFile(self.profiles[i].filepath))
+        if platform.system() == "Windows" and QApplication.applicationName() == "Artisan":
+            viewerAppGuid = '9068bd2fa8e54945a6be1f1a0a589e93'
+            self.aw.app.sendMessage2ArtisanInstance(QUrl.fromLocalFile(self.profiles[i].filepath).toString(),viewerAppGuid)
+        else:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(self.profiles[i].filepath))
 
     @pyqtSlot()
     def deleteSelected(self):

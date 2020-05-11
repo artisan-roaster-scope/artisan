@@ -205,6 +205,7 @@ platf = str(platform.system())
 #######################################################################################
 
 
+global viewerAppGuid
 appGuid = '9068bd2fa8e54945a6be1f1a0a589e92'
 viewerAppGuid = '9068bd2fa8e54945a6be1f1a0a589e93'
 
@@ -218,7 +219,7 @@ class Artisan(QtSingleApplication):
         
         if multiprocessing.current_process().name == 'MainProcess' and self.isRunning():
             self.artisanviewerMode = True
-            if self.isRunningViewer(): sys.exit(0) # there is already one ArtisanViewer running, we terminate
+            if not platf=="Windows" and self.isRunningViewer(): sys.exit(0) # there is already one ArtisanViewer running, we terminate
         else:
             self.artisanviewerMode = False
         self.messageReceived.connect(self.receiveMessage)
@@ -249,6 +250,7 @@ class Artisan(QtSingleApplication):
     # artisan://roast/<UUID> : loads profile from path associated with the given roast <UUID>
     # file://<path>
     def open_url(self, url):
+        self.activateWindow()
         if not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None: # only if not yet monitoring
             if url.scheme() == "artisan" and url.authority() == 'roast':
                 # we try to resolve this one into a file URL and recurse
@@ -276,6 +278,10 @@ class Artisan(QtSingleApplication):
                 elif file_suffix == "apal":
                     # load Artisan palettes on double-click on *.apal file
                     QTimer.singleShot(20,lambda : aw.getPalettes(filename,aw.buttonpalette))
+
+        elif platf == "Windows" and self.applicationName() == "Artisan":
+            msg = url.toString()  #here we don't want a local file, preserve the windows file:///
+            self.sendMessage2ArtisanInstance(msg,viewerAppGuid)
     
     @pyqtSlot(str)
     def receiveMessage(self,msg):
@@ -286,6 +292,27 @@ class Artisan(QtSingleApplication):
     # to send message to main Artisan instance: id = appGuid
     # to send message to viewer:                id = viewerAppGuid
     def sendMessage2ArtisanInstance(self,message,instance_id):
+        if platf == "Windows":
+            try:
+                if instance_id == viewerAppGuid and not self._sendMessage2ArtisanInstance(message,viewerAppGuid) \
+                        or instance_id == appGuid and not self._sendMessage2ArtisanInstance(message,appGuid):
+                    # get the path of the artisan.exe file
+                    if getattr(sys, 'frozen', False):
+                        application_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+                        application_path += "\\artisan.exe"
+                    # or the artisan py file if running from source
+                    else:
+                        application_path = sys.argv[0]
+                    application_path = re.sub(r"\\",r"/",application_path)
+                    # must start viewer without an argv else it thinks it was started from a link and sends back to artisan
+                    os.startfile(application_path)
+                    QTimer.singleShot(3000,lambda : self._sendMessage2ArtisanInstance(message,instance_id))
+            except:
+                pass
+        else:
+            self._sendMessage2ArtisanInstance(message,instance_id)
+                
+    def _sendMessage2ArtisanInstance(self,message,instance_id):
         try:
             self._outSocket = QLocalSocket()
             self._outSocket.connectToServer(instance_id)
@@ -7468,7 +7495,10 @@ class tgraphcanvas(FigureCanvas):
             ur_corner_axes = self.ax.transData.inverted().transform_point((corner_pixels[2],corner_pixels[3]))
             extent = [ll_corner_axes[0], ur_corner_axes[0], ll_corner_axes[1], ur_corner_axes[1]]
             if self.ai is not None:
-                self.ai.remove()
+                try:
+                    self.ai.remove()
+                except:
+                    pass
             self.ai = self.ax.imshow(self.logoimg, zorder=0, extent=extent, alpha=aw.logoimgalpha/10, aspect='auto', resample=False)
             
         except Exception as ex:
@@ -13373,7 +13403,7 @@ class EventActionThread(QThread):
 
 
 class ApplicationWindow(QMainWindow):
-    global locale
+    global locale, app
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
     singleShotPhidgetsPulseOFFSerial = pyqtSignal(int,int,str,str)
@@ -13384,7 +13414,8 @@ class ApplicationWindow(QMainWindow):
     openPropertiesSignal = pyqtSignal()
     
     def __init__(self, parent = None):
-    
+
+        self.app = app
         self.superusermode = False
         
 #PLUS
@@ -32896,6 +32927,21 @@ def main():
     try:
         if sys.argv and len(sys.argv) > 1:
             argv_file = str(sys.argv[1])
+
+            if platf == "Windows":
+                # send argv_file to running instance and exit this one
+                if app.isRunning():
+                    # reformat a file path to a url form 
+                    if re.match(r"^.:",argv_file):
+                        argv_file = QUrl.fromLocalFile(argv_file).toString() #here we don't want a local file, preserve the windows file:///
+                    app.sendMessage(argv_file)
+                    sys.exit(0)
+                # otherwise if an artisan://roast url open it in this instance, if not a url do normal file processing
+                elif re.match("artisan\:\/\/roast",argv_file):
+                    url = QUrl()
+                    url.setUrl(argv_file)
+                    app.open_url(url)
+
             qfile = QFileInfo(argv_file)
             file_suffix = qfile.suffix()
             if file_suffix == "alog":
@@ -32913,14 +32959,6 @@ def main():
             elif file_suffix == "athm":
                 # load Artisan setings on double-click on *.athm file
                 aw.loadSettings(fn=argv_file,reset=False)
-            elif platf == 'Windows' and re.match("artisan\:\/\/roast",argv_file):
-                if app.isRunning():
-                    app.sendMessage(argv_file)
-                    sys.exit(0)
-                else:
-                    url = QUrl()
-                    url.setUrl(argv_file)
-                    app.open_url(url)
         else:
             # we try to reload the last loaded profile or background
             if aw.lastLoadedProfile:
