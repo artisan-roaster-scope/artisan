@@ -888,7 +888,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.timetable.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.timetable.horizontalHeader().setHighlightSections(False)
         self.phasestable.setHorizontalHeaderLabels([QApplication.translate("Label","Drying",None),
-                                                         QApplication.translate("Label","Mailard",None),
+                                                         QApplication.translate("Label","Maillard",None),
                                                          QApplication.translate("Label","Finishing",None)])
         self.phasestable.setVerticalHeaderLabels([QApplication.translate("Table","Profile",None),
                                                          QApplication.translate("Table","Target",None),

@@ -178,8 +178,6 @@ viewerAppGuid = '9068bd2fa8e54945a6be1f1a0a589e93'
 class Artisan(QtSingleApplication):
     def __init__(self, args):
         super(Artisan, self).__init__(appGuid,viewerAppGuid,args)
-        self.appGuid = appGuid
-        self.viewerAppGuid = viewerAppGuid
         
         self.focusChanged.connect(self.appRaised)
         self.sentToBackground = None # set to timestamp on putting app to background without any open dialog
@@ -252,7 +250,7 @@ class Artisan(QtSingleApplication):
 
         elif platf == "Windows" and self.artisanviewerMode:
             msg = url.toString()  #here we don't want a local file, preserve the windows file:///
-            self.sendMessage2ArtisanInstance(msg,self.viewerAppGuid)
+            self.sendMessage2ArtisanInstance(msg,self._viewer_id)
     
     @pyqtSlot(str)
     def receiveMessage(self,msg):
@@ -265,8 +263,8 @@ class Artisan(QtSingleApplication):
     def sendMessage2ArtisanInstance(self,message,instance_id):
         if platf == "Windows":
             try:
-                if instance_id == self.viewerAppGuid and not self._sendMessage2ArtisanInstance(message,self.viewerAppGuid) \
-                        or instance_id == self.appGuid and not self._sendMessage2ArtisanInstance(message,self.appGuid):
+                if instance_id == self._viewer_id and not self._sendMessage2ArtisanInstance(message,self._viewer_id) \
+                        or instance_id == self._id and not self._sendMessage2ArtisanInstance(message,self._id):
                     # get the path of the artisan.exe file
                     if getattr(sys, 'frozen', False):
                         application_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
@@ -319,10 +317,10 @@ class Artisan(QtSingleApplication):
                     # we send open file in the other instance if running
                     if self.artisanviewerMode:
                         # this is the Viewer, but we cannot open the file, send an open request to the main app if it is running
-                        self.sendMessage2ArtisanInstance(message,self.appGuid)
+                        self.sendMessage2ArtisanInstance(message,self._id)
                     else:
                         # try to open the file in Viewer if it is running
-                        self.sendMessage2ArtisanInstance(message,self.viewerAppGuid)
+                        self.sendMessage2ArtisanInstance(message,self._viewer_id)
             except:
                 pass
             return 1
@@ -4747,7 +4745,7 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     fileURL = QUrl.fromLocalFile(aw.curFile)
                     fileURL.setQuery("background") # open the file URL without rasing the app to the foreground
-                    QTimer.singleShot(10,lambda : app.sendMessage2ArtisanInstance(fileURL.toString(),app.viewerAppGuid))
+                    QTimer.singleShot(10,lambda : app.sendMessage2ArtisanInstance(fileURL.toString(),app._viewer_id))
                 except:
                     pass
     
@@ -23409,7 +23407,7 @@ class ApplicationWindow(QMainWindow):
                                         str(profile["extramathexpression1"]), str(profile["extramathexpression2"]),
                                         ])
                     if settingdev != profiledev:
-                        string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.",None)
+                        string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.",None)
                         if quiet:
                             reply = QMessageBox.Yes
                         else:
@@ -29005,7 +29003,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.roastbatchnrB == 0:
                     titleB = aw.qmc.titleB
                 else:
-                    titleB = aw.qmc.roastbatchprefixB + aw.qmc.roastbatchnrB + " " + aw.qmc.titleB
+                    titleB = aw.qmc.roastbatchprefixB + str(aw.qmc.roastbatchnrB) + " " + aw.qmc.titleB
                 background_html = titleB
             if aw.qmc.alarmsfile:
                 alarms = str(os.path.basename(aw.qmc.alarmsfile))
@@ -29278,7 +29276,7 @@ class ApplicationWindow(QMainWindow):
                 html += ("<tr>"+
                      "\n<td>" + str(i+1) + "</td><td>" +
                      stringfromseconds(self.qmc.timex[sevents[i][0]] - start) +
-                     "</td><td align='right'>" + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + str(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
+                     "</td><td align='right'>" + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + str(self.qmc.etypesf(seventsType[i])) + " " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
             html += '</table>\n</center>'
         return html
 
@@ -29821,12 +29819,12 @@ class ApplicationWindow(QMainWindow):
                 update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md">'
                 update_str +=  QApplication.translate("About", "Show Change list",None)
                 update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/releases/tag/' + str(tag_name) + '">'
-                update_str +=  QApplication.translate("About", "Download Release",None) + str(' ') + str(tag_name)
+                update_str +=  QApplication.translate("About", "Download Release",None) + ' ' + str(tag_name)
             elif latest == __version__ :
                 update_str = QApplication.translate("About", "You are using the latest release.",None)
             elif latest < __version__:
                 update_str = QApplication.translate("About", "You are using a beta continuous build.",None)
-                update_str += str('<br/>') + QApplication.translate("About", "You will see a notice here once a new official release is available.",None)
+                update_str += '<br/><br/>' + QApplication.translate("About", "You will see a notice here once a new official release is available.",None)
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)

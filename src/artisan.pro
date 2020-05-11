@@ -13,14 +13,57 @@
 # This file is part of Artisan.
 
 SOURCES = \
+    artisanlib/alarms.py \
+    artisanlib/autosave.py \
+    artisanlib/axis.py \
+    artisanlib/background.py \
+    artisanlib/batches.py \
+    artisanlib/calculator.py \
+    artisanlib/colors.py \
+    artisanlib/comm.py \
+    artisanlib/comparator.py \
+    artisanlib/cropster.py \
+    artisanlib/cup_profile.py \
+    artisanlib/curves.py \
+    artisanlib/designer.py \
+    artisanlib/devices.py \
+    artisanlib/dialogs.py \
+    artisanlib/events.py \
+    artisanlib/giesen.py \
+    artisanlib/ikawa.py \
+    artisanlib/large_lcds.py \
+    artisanlib/logs.py \
     artisanlib/main.py \
+    artisanlib/modbusport.py \
+    artisanlib/phases.py \
+    artisanlib/pid_control.py \
+    artisanlib/pid_dialogs.py \
+    artisanlib/platform.py \
+    artisanlib/ports.py \
+    artisanlib/roast_properties.py \
+    artisanlib/s7port.py \
+    artisanlib/sampling.py \
+    artisanlib/statistics.py \
+    artisanlib/transposer.py \
+    artisanlib/wheels.py \
     const/UIconst.py \
+    help/alarms_help.py \
+    help/autosave_help.py \
+    help/eventannotations_help.py \
+    help/eventbuttons_help.py \
+    help/eventsliders_help.py \
+    help/keyboardshortcuts_help.py \
+    help/modbus_help.py \
+    help/programs_help.py \
+    help/symbolic_help.py \
+    help/transposer_help.py \
     plus/controller.py \
+    plus/countries.py \
     plus/login.py \
     plus/queue.py \
     plus/stock.py \
     plus/sync.py \
-    plus/countries.py
+    plus/util.py
     
 TRANSLATIONS = \
 	translations/artisan_de.ts \
