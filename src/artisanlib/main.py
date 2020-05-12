@@ -14591,7 +14591,7 @@ class ApplicationWindow(QMainWindow):
             self.small_button_min_width = "75px"
             self.tiny_button_min_width = "60px"
         else:
-            self.main_button_min_width = "90px"
+            self.main_button_min_width = "100px"
             self.standard_button_min_width = "75px"
             self.small_button_min_width = "60px"
             self.tiny_button_min_width = "50px"
@@ -19358,7 +19358,7 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                             elif cs.startswith("button"):
-                                # cmd has format "button(0)" # 0 or 1 or True or False
+                                # cmd has format "button(<bool>)" # 0 or 1 or True or False
                                 try:
                                     cmds = eval(cs[len('button'):])
                                     last = self.lastbuttonpressed
@@ -19660,6 +19660,13 @@ class ApplicationWindow(QMainWindow):
                     ## pulse(<channel>,<millis>[,<sn>])
                     ## pulsehub(<channel>,<millis>[,<sn>])
                     #
+                    # YOCTOPUCE
+                    #
+                    ## enabled(c,b[,sn])
+                    ## freq(c,f[,sn])
+                    ## duty(c,d[,sn])
+                    ## move(c,d,t[,sn])
+                    ## 
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
@@ -19926,7 +19933,7 @@ class ApplicationWindow(QMainWindow):
                                         aw.sendmessage(QApplication.translate("Message","PID mode background", None))
                                 except Exception:
                                     pass
-                            # playbackmode(<n> 0: off, 1: time, 2: BT, 3: ET
+                            # playbackmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
                             if cs.startswith("playbackmode(") and cs.endswith(")"):
                                 try:
                                     value = int(cs[len("playbackmode("):-1])
@@ -19961,6 +19968,12 @@ class ApplicationWindow(QMainWindow):
                     #
                     # YOCTOPUCE
                     #
+                    ## enabled(c,b[,sn])
+                    ## move(c,p[,t][,sn])
+                    ## neutral(c,n[,sn])
+                    ## range(c,r[,sn])
+                    ##
+    
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
@@ -28486,7 +28499,7 @@ class ApplicationWindow(QMainWindow):
                             continue
                         pd = self.profileProductionData(p)
                         if pd["batchnr"] > 0:
-                            label = pd["batchprefix"] + pd["batchnr"][:8]
+                            label = (pd["batchprefix"] + str(pd["batchnr"]))[:8]
                         elif label_chr_nr < 26:
                             label = str(libstring.ascii_uppercase[label_chr_nr])
                             label_chr_nr = label_chr_nr + 1
