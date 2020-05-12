@@ -263,19 +263,10 @@ class Artisan(QtSingleApplication):
     def sendMessage2ArtisanInstance(self,message,instance_id):
         if platf == "Windows":
             try:
-                if instance_id == self._viewer_id and not self._sendMessage2ArtisanInstance(message,self._viewer_id) \
-                        or instance_id == self._id and not self._sendMessage2ArtisanInstance(message,self._id):
-                    # get the path of the artisan.exe file
-                    if getattr(sys, 'frozen', False):
-                        application_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
-                        application_path += "\\artisan.exe"
-                    # or the artisan py file if running from source
-                    else:
-                        application_path = sys.argv[0]
-                    application_path = re.sub(r"\\",r"/",application_path)
-                    # must start viewer without an argv else it thinks it was started from a link and sends back to artisan
-                    os.startfile(application_path)  # @UndefinedVariable # only available on Windows!
-                    QTimer.singleShot(3000,lambda : self._sendMessage2ArtisanInstance(message,instance_id))
+                if instance_id == self._viewer_id:
+                    self._sendMessage2ArtisanInstance(message,self._viewer_id)
+                elif instance_id == self._id:
+                    self._sendMessage2ArtisanInstance(message,self._id)
             except:
                 pass
         else:
@@ -7334,7 +7325,7 @@ class tgraphcanvas(FigureCanvas):
                 dfcs = 47
                 prefcs = 50
                 dtr = 12
-                fcsWindow = True
+                fcsWindow = True if not postFCs else False
                 #postFCs supplied in the parseSpecialeventannotation() call
 
             # foreground curve values
@@ -7435,10 +7426,10 @@ class tgraphcanvas(FigureCanvas):
             # does the pattern.split always result in the same list pattern?  ex:
             #     ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '|', '100', 'A Point', '']
 #            pattern = re.compile(fr".*{nominalDelimopen}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}")
-            pattern = re.compile(r".*{}(?P<nominalstr>[^{}]+){}".format(nominalDelimopen,nominalDelimclose,nominalDelimclose))
+            pattern = re.compile(r".*{}(?P<nominalstr>[^{}]+){}".format(nominalDelimopen,nominalDelimclose,nominalDelimclose),re.IGNORECASE)
             matched = pattern.match(eventanno)
             if matched != None:
-                pattern = re.compile(r"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)")
+                pattern = re.compile(r"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)",re.IGNORECASE)
                 matches = pattern.split(matched.group('nominalstr'))
                 #example form of the matches list ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '']
                 #print(len(matches),matches) 
@@ -7458,7 +7449,7 @@ class tgraphcanvas(FigureCanvas):
             for i in range(len(fields)):
 #                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9.]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
                 pattern = re.compile(r"(.*{})({})(?P<mathop>[/*+-][0-9.]+)?(({}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?".format(
-                    self.fieldDelim,fields[i][0],nominalstringDelim))
+                    self.fieldDelim,fields[i][0],nominalstringDelim),re.IGNORECASE)
                 matched = pattern.match(eventanno)
                 if matched != None:
 
@@ -7470,7 +7461,7 @@ class tgraphcanvas(FigureCanvas):
                         replacestring = str(aw.float2float(eval(replacestring),1))
 
 #                    pattern = re.compile(fr"{self.fieldDelim}{fields[i][0]}([/*+-][0-9.]+)?")
-                    pattern = re.compile(r"{}{}([/*+-][0-9.]+)?".format(self.fieldDelim,fields[i][0]))
+                    pattern = re.compile(r"{}{}([/*+-][0-9.]+)?".format(self.fieldDelim,fields[i][0]),re.IGNORECASE)
                     eventanno = pattern.sub(replacestring,eventanno)
 
         except Exception as ex:
@@ -21386,29 +21377,29 @@ class ApplicationWindow(QMainWindow):
 
             #note: since fields are delimited only at the start, to avoid ambiguity requires the shortest field string to be last in the list.  Example, "date_time" must come before "date" in the list.
             fields = [
-                (QApplication.translate("AutosaveField", "batch_long",None), self.qmc.roastbatchprefix + str(bnr) + ' (' + str(self.qmc.roastbatchpos) + ')'),
-                (QApplication.translate("AutosaveField", "batchprefix",None),self.qmc.roastbatchprefix),
-                (QApplication.translate("AutosaveField", "batchcounter",None),str(bnr) if bnr!=0 else '**'),
-                (QApplication.translate("AutosaveField", "batchposition",None),str(self.qmc.roastbatchpos)),
-                (QApplication.translate("AutosaveField", "batch",None), self.qmc.roastbatchprefix + str(bnr)),
-                (QApplication.translate("AutosaveField", "title",None),self.qmc.title),
-                (QApplication.translate("AutosaveField", "datetime_long",None),self.qmc.roastdate.toString("yyyy-MM-dd_hhmm")),
-                (QApplication.translate("AutosaveField", "datetime",None),self.qmc.roastdate.toString("yy-MM-dd_hhmm")),
-                (QApplication.translate("AutosaveField", "date_long",None),self.qmc.roastdate.toString("yyyy-MM-dd")),
-                (QApplication.translate("AutosaveField", "date",None),self.qmc.roastdate.toString("yy-MM-dd")),
-                (QApplication.translate("AutosaveField", "time",None),self.qmc.roastdate.toString("hhmm")),
-                (QApplication.translate("AutosaveField", "operator",None),self.qmc.operator),
-                (QApplication.translate("AutosaveField", "machine",None),self.qmc.roastertype),
-                (QApplication.translate("AutosaveField", "drumspeed",None),self.qmc.drumspeed),
-                (QApplication.translate("AutosaveField", "weightunits",None),self.qmc.weight[2]),
-                (QApplication.translate("AutosaveField", "weight",None),str(self.qmc.weight[0])),
-                (QApplication.translate("AutosaveField", "volumeunits",None),self.qmc.volume[2]),
-                (QApplication.translate("AutosaveField", "volume",None),str(self.qmc.volume[0])),
-                (QApplication.translate("AutosaveField", "densityunits",None),self.qmc.density[1] + '_' + self.qmc.density[3]),
-                (QApplication.translate("AutosaveField", "density",None),str(self.qmc.density[0])),
-                (QApplication.translate("AutosaveField", "moisture",None),str(self.qmc.moisture_greens)),
-                (QApplication.translate("AutosaveField", "beans_line",None),beansline),
-                (QApplication.translate("AutosaveField", "beans",None),beansline[:30]),
+                ("batch_long", self.qmc.roastbatchprefix + str(bnr) + ' (' + str(self.qmc.roastbatchpos) + ')'),
+                ("batchprefix",self.qmc.roastbatchprefix),
+                ("batchcounter",str(bnr) if bnr!=0 else '**'),
+                ("batchposition",str(self.qmc.roastbatchpos)),
+                ("batch", self.qmc.roastbatchprefix + str(bnr)),
+                ("title",self.qmc.title),
+                ("datetime_long",self.qmc.roastdate.toString("yyyy-MM-dd_hhmm")),
+                ("datetime",self.qmc.roastdate.toString("yy-MM-dd_hhmm")),
+                ("date_long",self.qmc.roastdate.toString("yyyy-MM-dd")),
+                ("date",self.qmc.roastdate.toString("yy-MM-dd")),
+                ("time",self.qmc.roastdate.toString("hhmm")),
+                ("operator",self.qmc.operator),
+                ("machine",self.qmc.roastertype),
+                ("drumspeed",self.qmc.drumspeed),
+                ("weightunits",self.qmc.weight[2]),
+                ("weight",str(self.qmc.weight[0])),
+                ("volumeunits",self.qmc.volume[2]),
+                ("volume",str(self.qmc.volume[0])),
+                ("densityunits",self.qmc.density[1] + '_' + self.qmc.density[3]),
+                ("density",str(self.qmc.density[0])),
+                ("moisture",str(self.qmc.moisture_greens)),
+                ("beans_line",beansline),
+                ("beans",beansline[:30]),
                 ]
 
             #text between single quotes ' will show only when recording or for preview recording
@@ -21423,7 +21414,8 @@ class ApplicationWindow(QMainWindow):
                     offDelim,offDelim,offDelim),r'',fn)
             #replace the fields with content
             for i in range(len(fields)):
-                fn = fn.replace(self.fieldDelim + fields[i][0], str(fields[i][1]))
+#                fn = fn.replace(self.fieldDelim + fields[i][0], str(fields[i][1]))
+                fn = re.sub(r"{}{}".format(self.fieldDelim, fields[i][0]), r"{}".format(str(fields[i][1])), fn, 0, re.IGNORECASE)
 
             #cleaning is performed in generateFilename()
             #fn = self.removeDisallowedFilenameChars(str(fn))

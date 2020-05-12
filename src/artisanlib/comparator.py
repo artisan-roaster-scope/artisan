@@ -994,7 +994,7 @@ class roastCompareDlg(ArtisanDialog):
     def tableSectionClicked(self,i):
         app = QCoreApplication.instance()
         fileURL = QUrl.fromLocalFile(self.profiles[i].filepath)
-        if platform.system() == "Windows" and app.artisanviewerMode:
+        if platform.system() == "Windows" and not app.artisanviewerMode:
             self.aw.app.sendMessage2ArtisanInstance(fileURL.toString(),app._viewer_id)
         else:
             QDesktopServices.openUrl(fileURL)
