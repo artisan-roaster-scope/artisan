@@ -40,6 +40,19 @@ def content():
     tbl_Autosavebottom.header = False
     tbl_Autosavebottom.add_row([QApplication.translate('HelpDlg','NOTES:\nAnything between single quotes &#39; will show in the file name only when ON.\nExample: &#39;REC ~batch&#39;\n\nAnything between double quotes " will show in the file name only when OFF. \nExample: "~operator"\n\nFor backward compatibility, when the Prefix field is text only the date and time are appended to the file name.\nExample: &#39;Autosave&#39; will result in file name &#39;Autosave_20-01-13_1705&#39;.\nTo show only the text place a single &#39;!&#39; at the start of the Prefix field\nExample: &#39;!Autosave&#39; will result in file name &#39;Autosave&#39;.\n\nTo maintain cross platform compatibility, file names may contain only letters, numbers, spaces, \nand the following special characters:  \n_ - . ( )',None)])
     strlist.append(tbl_Autosavebottom.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    strlist.append("<br/><br/><b>")
+    strlist.append(QApplication.translate('HelpDlg','EXAMPLES',None))
+    strlist.append("</b>")
+    tbl_Examplestop = prettytable.PrettyTable()
+    tbl_Examplestop.header = False
+    tbl_Examplestop.add_row([QApplication.translate('HelpDlg','Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  ',None)])
+    strlist.append(tbl_Examplestop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
+    tbl_Examples = prettytable.PrettyTable()
+    tbl_Examples.field_names = [QApplication.translate('HelpDlg','Autosave Field',None),QApplication.translate('HelpDlg','Example File Name',None)]
+    tbl_Examples.add_row([QApplication.translate('HelpDlg','~batchcounter ~title ~date_long',None),QApplication.translate('HelpDlg','1380 Burundi 2020-04-25_1136.alog',None)])
+    tbl_Examples.add_row([QApplication.translate('HelpDlg','~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)',None),QApplication.translate('HelpDlg','Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog',None)])
+    tbl_Examples.add_row([QApplication.translate('HelpDlg','u\0027Recording ~batchcounter&#39; "~batch" ~title ~datetime_long',None),QApplication.translate('HelpDlg','When OFF:\nProd-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog\nWhile Recording:\nRecording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog',None)])
+    strlist.append(tbl_Examples.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
     strlist.append("</body>")
     helpstr = "".join(strlist)
     helpstr = re.sub(r"&amp;", r"&",helpstr)
