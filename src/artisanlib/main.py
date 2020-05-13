@@ -7391,6 +7391,7 @@ class tgraphcanvas(FigureCanvas):
             nominalDelimopen = '{'
             nominalDelimclose = '}'
             nominalstringDelim = '|'
+            _ignorecase = re.IGNORECASE  # @UndefinedVariable
 
             #newlines can sneak in from cut and paste from help page 
             eventanno = eventanno.replace('\n', '')
@@ -7426,10 +7427,10 @@ class tgraphcanvas(FigureCanvas):
             # does the pattern.split always result in the same list pattern?  ex:
             #     ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '|', '100', 'A Point', '']
 #            pattern = re.compile(fr".*{nominalDelimopen}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}")
-            pattern = re.compile(r".*{}(?P<nominalstr>[^{}]+){}".format(nominalDelimopen,nominalDelimclose,nominalDelimclose),re.IGNORECASE)
+            pattern = re.compile(r".*{}(?P<nominalstr>[^{}]+){}".format(nominalDelimopen,nominalDelimclose,nominalDelimclose),_ignorecase)
             matched = pattern.match(eventanno)
             if matched != None:
-                pattern = re.compile(r"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)",re.IGNORECASE)
+                pattern = re.compile(r"([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)",_ignorecase)
                 matches = pattern.split(matched.group('nominalstr'))
                 #example form of the matches list ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '']
                 #print(len(matches),matches) 
@@ -7449,7 +7450,7 @@ class tgraphcanvas(FigureCanvas):
             for i in range(len(fields)):
 #                pattern = re.compile(fr"(.*{self.fieldDelim})({fields[i][0]})(?P<mathop>[/*+-][0-9.]+)?(({nominalstringDelim}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?")
                 pattern = re.compile(r"(.*{})({})(?P<mathop>[/*+-][0-9.]+)?(({}[0-9]+[A-Za-z]+[A-Za-z 0-9]+)+)?".format(
-                    self.fieldDelim,fields[i][0],nominalstringDelim),re.IGNORECASE)
+                    self.fieldDelim,fields[i][0],nominalstringDelim),_ignorecase)
                 matched = pattern.match(eventanno)
                 if matched != None:
 
@@ -7461,7 +7462,7 @@ class tgraphcanvas(FigureCanvas):
                         replacestring = str(aw.float2float(eval(replacestring),1))
 
 #                    pattern = re.compile(fr"{self.fieldDelim}{fields[i][0]}([/*+-][0-9.]+)?")
-                    pattern = re.compile(r"{}{}([/*+-][0-9.]+)?".format(self.fieldDelim,fields[i][0]),re.IGNORECASE)
+                    pattern = re.compile(r"{}{}([/*+-][0-9.]+)?".format(self.fieldDelim,fields[i][0]),_ignorecase)
                     eventanno = pattern.sub(replacestring,eventanno)
 
         except Exception as ex:
@@ -21415,6 +21416,7 @@ class ApplicationWindow(QMainWindow):
                 ("beans",beansline[:30]),
                 ]
 
+            _ignorecase = re.IGNORECASE  # @UndefinedVariable
             #text between single quotes ' will show only when recording or for preview recording
 #            fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
             fn = re.sub(r"{}([^{}]+){}".format(onDelim,onDelim,onDelim),
@@ -21428,7 +21430,7 @@ class ApplicationWindow(QMainWindow):
             #replace the fields with content
             for i in range(len(fields)):
 #                fn = fn.replace(self.fieldDelim + fields[i][0], str(fields[i][1]))
-                fn = re.sub(r"{}{}".format(self.fieldDelim, fields[i][0]), r"{}".format(str(fields[i][1])), fn, 0, re.IGNORECASE)
+                fn = re.sub(r"{}{}".format(self.fieldDelim, fields[i][0]), r"{}".format(str(fields[i][1])), fn, 0, _ignorecase)
 
             #cleaning is performed in generateFilename()
             #fn = self.removeDisallowedFilenameChars(str(fn))
