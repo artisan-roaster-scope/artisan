@@ -43,6 +43,7 @@ v2.4.0 (xx.xx.2020)
   - extends grid alpha range from 1-5 to 1-10
   - allows to edit batch number in super mode also if the batch counter is deactivated
   - [artisan.plus](https://artisan.plus/): after 3 month of expired subscription stop trying to login automatically!
+  - [artisan.plus](https://artisan.plus/): on changing the batch size the beans field is automatically updated to listing the weight per component of blends
   - on loading profiles with extra device channels Artisan will always ask to update your setup or not. Extra devices settings concerning just the visualization (like color) will always be taken from your current Artisan settings and never modified on loading a profile.
   - replace the generic "Select" label on extra device color buttons by the name of the selected color
   - suppress event quantification for slider changes triggered by the Artisan PID
@@ -52,6 +53,7 @@ v2.4.0 (xx.xx.2020)
   - memory usage and performance improvements and updated main libraries (Python, Qt, PyQt, matplotlib,..) providing many fixes
   - adds delta ET and delta BT readings to the LCDs when the scope is ON
   - updates the Besca automatic machines setup
+  - in "Keep ON" modus (Sampling dialog), Roast Properties are cleared begin of new roasts if "Delete roast properties on RESET" in the Roast Properties dialog is ticked
 
 * Fixes
   - fixes raw redraw issues ([Issue #390](../../../issues/390)) caused by an interaction of bitblit redraw triggered by draggable annotations and right-click event re-positioning mechanism

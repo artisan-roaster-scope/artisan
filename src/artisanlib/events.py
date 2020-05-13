@@ -2464,6 +2464,9 @@ class EventsDlg(ArtisanResizeablDialog):
             self.extraeventslabels.insert(bindex,event_label)
 
             self.createEventbuttonTable()
+            # workaround a table redrawbug in PyQt 5.14.2 on macOS
+            if len(self.extraeventstypes) > 1:
+                self.repaint()
 
     @pyqtSlot(int)
     def eventsbuttonflagChanged(self,_):

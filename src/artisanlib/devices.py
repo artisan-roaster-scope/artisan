@@ -1414,6 +1414,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #addDevice() is located in aw so that the same function can be used in init after dynamically loading settings
             self.aw.addDevice()
             self.createDeviceTable()
+            # workaround a table redrawbug in PyQt 5.14.2 on macOS
+            if len(self.aw.qmc.extradevices)>1:
+                self.repaint()
             self.enableDisableAddDeleteButtons()
             self.aw.qmc.resetlinecountcaches()
             self.aw.qmc.redraw(recomputeAllDeltas=False)

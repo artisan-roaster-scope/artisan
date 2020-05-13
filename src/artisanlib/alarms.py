@@ -212,7 +212,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         alarm_time = -1
         alarm_offset = 0
         alarm_cond = 1
-        alarm_state = 0
+        alarm_state = -1
         alarm_source = 1
         alarm_temperature = 500.
         alarm_action = 0
@@ -220,6 +220,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         alarm_string = QApplication.translate("Label","Enter description",None)
         selected = self.alarmtable.selectedRanges()
         if len(selected) > 0:
+            self.savealarms() # we first "save" the alarmtable to be able to pick up the values of the selected row
             selected_idx = selected[0].topRow()
             selected_idx = int(self.alarmtable.item(selected_idx,0).text()) -1 # we derref the rows number that might be different per sorting order
             try:
@@ -283,6 +284,9 @@ class AlarmDlg(ArtisanResizeablDialog):
             header.setStretchLastSection(True)
             self.markNotEnabledAlarmRows()
             self.alarmtable.setSortingEnabled(True)
+#        self.alarmtable.viewport().update()
+#        self.alarmtable.update()
+#        self.repaint()
 
     @pyqtSlot(bool)
     def insertalarm(self,_):
@@ -304,6 +308,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             # check for selection
             selected = self.alarmtable.selectedRanges()
             if selected and len(selected) > 0:
+                self.savealarms() # we first "save" the alarmtable to be able to pick up the values of the selected row
                 selected_row = selected[0].topRow()
                 selected_row = int(self.alarmtable.item(selected_row,0).text()) -1 # we derref the rows number that might be different per sorting order
                 try:
