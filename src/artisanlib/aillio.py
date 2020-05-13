@@ -50,7 +50,7 @@ class AillioR1:
     AILLIO_STATE_COOLING = 0x08
     AILLIO_STATE_SHUTDOWN = 0x09
 
-    def __init__(self, debug=True):
+    def __init__(self, debug=False):
         self.simulated = False
         self.AILLIO_DEBUG = debug
         self.__dbg('init')

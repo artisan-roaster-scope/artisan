@@ -556,6 +556,7 @@ def getBlends(weight_unit_idx,store=None):
 # returns True if blendSpec of the form
 #   {"label": <blend-name>, "ingredients": [{"coffee": <hr_id>, "ratio": <n>}, .. ,{"coffee":<hr_id>, "ratio": <n>}]}
 # matches the blendDict in the coffee hr_ids and ratios and the blend label
+# note that the ratio_num and ratio_denom attributes of ingredents are ignored in these matches
 def matchBlendDict(blendSpec, blendDict, sameLabel=True):
     if blendSpec is None or blendDict is None:
         return False

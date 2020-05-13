@@ -243,10 +243,19 @@ def applyServerUpdates(data):
         if "blend" in data and data["blend"] is not None and "label" in data["blend"] and "ingredients" in data["blend"] \
                and data["blend"]["ingredients"]:
             try:
-                ingredients = data["blend"]["ingredients"]
+                ingredients = []
+                for i in data["blend"]["ingredients"]:
+                    entry = {}
+                    entry["ratio"] = i["ratio"]
+                    entry["coffee"] = i["coffee"]
+                    if "ratio_num" in i and i["ratio_num"] is not None:
+                        entry["ratio_num"] = i["ratio_num"]
+                    if "ratio_denom" in i and i["ratio_denom"] is not None:
+                        entry["ratio_denom"] = i["ratio_denom"]
+                    ingredients.append(entry)
                 blend_spec = {
                     "label": data["blend"]["label"], 
-                    "ingredients": [{"coffee": i["coffee"]["hr_id"], "ratio": i["ratio"]} for i in ingredients]}
+                    "ingredients": ingredients}
                 blend_spec_labels = [i["coffee"]["label"] for i in ingredients]
                 aw.qmc.plus_blend_spec = blend_spec
                 aw.qmc.plus_blend_spec_labels = blend_spec_labels

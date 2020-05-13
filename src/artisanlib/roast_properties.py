@@ -606,6 +606,9 @@ class RoastsComboBox(QComboBox):
             pass
         self.blockSignals(False)
 
+########################################################################################
+#####################  Roast Properties Dialog  ########################################
+
 class editGraphDlg(ArtisanResizeablDialog):
     scaleWeightUpdated = pyqtSignal(float)
     connectScaleSignal = pyqtSignal()
@@ -2006,17 +2009,20 @@ class editGraphDlg(ArtisanResizeablDialog):
                 default_title = QApplication.translate("Scope Title", "Roaster Scope",None) 
                 self.titleedit.textEdited(default_title)
                 self.titleedit.setEditText(default_title)
-                        
+    
+    def updateBlendLines(self,blend):
+        if self.weightinedit.text() != "":
+            weightIn = float(str(self.weightinedit.text()))
+        else:
+            weightIn = 0.0
+        blend_lines = plus.stock.blend2beans(blend,self.unitsComboBox.currentIndex(),weightIn)
+        self.beansedit.clear()
+        for l in blend_lines:
+            self.beansedit.append(l)
+    
     def fillBlendData(self,blend,prev_coffee_label,prev_blend_label):
         try:
-            if self.weightinedit.text() != "":
-                weightIn = float(str(self.weightinedit.text()))
-            else:
-                weightIn = 0.0
-            blend_lines = plus.stock.blend2beans(blend,self.unitsComboBox.currentIndex(),weightIn)
-            self.beansedit.clear()
-            for l in blend_lines:
-                self.beansedit.append(l)
+            self.updateBlendLines(blend)
             keep_modified_moisture = self.modified_moisture_greens_text
             keep_modified_density = self.modified_density_in_text
             blend_dict = plus.stock.getBlendBlendDict(blend)
@@ -2170,9 +2176,18 @@ class editGraphDlg(ArtisanResizeablDialog):
             # we trim the blend_spec to the external from
             self.plus_blend_selected_spec.pop("hr_id", None) # remove the hr_id
             self.plus_blend_selected_spec_labels = [i["label"] for i in self.plus_blend_selected_spec["ingredients"]]
-            self.plus_blend_selected_spec["ingredients"] = \
-              [{"ratio": i["ratio"],"coffee": i["coffee"]} for i in 
-                 self.plus_blend_selected_spec["ingredients"]]
+            # remove labels from ingredients
+            ingredients = []
+            for i in self.plus_blend_selected_spec["ingredients"]:
+                entry = {}
+                entry["ratio"] = i["ratio"]
+                entry["coffee"] = i["coffee"]
+                if "ratio_num" in i and i["ratio_num"] is not None:
+                    entry["ratio_num"] = i["ratio_num"]
+                if "ratio_denom" in i and i["ratio_denom"] is not None:
+                    entry["ratio_denom"] = i["ratio_denom"]
+                ingredients.append(entry)
+            self.plus_blend_selected_spec["ingredients"] = ingredients
             if "amount" in bsd:
                 self.plus_amount_selected = plus.stock.getBlendMaxAmount(selected_blend)
             else:
@@ -3132,7 +3147,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.weightinedit.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
             else:
                 self.weightinedit.setStyleSheet("""QLineEdit { color: red; }""")
-    
+
     @pyqtSlot()
     def weightineditChanged(self):
         self.weightinedit.setText(self.aw.comma2dot(str(self.weightinedit.text())))
@@ -3144,6 +3159,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.recentRoastEnabled()
         if self.aw.plus_account is not None:
             self.checkWeightIn()
+            if self.plus_blends_combo.currentIndex() > 0:
+                self.updateBlendLines(self.plus_blends[self.plus_blends_combo.currentIndex()-1])
         
     def density_percent(self):
         percent = 0.
