@@ -17178,12 +17178,12 @@ class ApplicationWindow(QMainWindow):
                 c3 = c[3]
                 # if one color is the canvas color set to None (transparent), we try to avoid a false warning
                 if str(c1) == "None" and c[0] == "Canvas":
-                    if sys.platform.startswith("darwin") and darkdetect.isDark():
+                    if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
                         c1 = "black"
                     else:
                         c1 = "white"
                 if str(c3) == "None" and c[2] == "Canvas":
-                    if sys.platform.startswith("darwin") and darkdetect.isDark():
+                    if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
                         c3 = "black"
                     else:
                         c3 = "white"
@@ -17260,7 +17260,7 @@ class ApplicationWindow(QMainWindow):
         canvas_color = aw.qmc.palette["canvas"]
         try:
             if str(canvas_color) == 'None' and sys.platform.startswith("darwin"):
-                if darkdetect.isDark():
+                if darkdetect.isDark() and appFrozen():
                     # in dark mode on macOS, the transparent canvas of the classic Artisan theme leeds to unreadable text, thus we switch to standard gray
                     canvas_color = "#333333" # for light: "#F8F8F8"
                     aw.qmc.palette["title"] = "#e6e6e6"
@@ -17297,7 +17297,7 @@ class ApplicationWindow(QMainWindow):
 
         if str(canvas_color) == 'None':
             if sys.platform.startswith("darwin"):
-                whitep = darkdetect.isDark()
+                whitep = darkdetect.isDark() and appFrozen()
             else:
                 whitep = False
         else:
@@ -28445,7 +28445,7 @@ class ApplicationWindow(QMainWindow):
                     ind = 7            # width of color legend indicator
     
                     # setup the font 
-                    if sys.platform.startswith("darwin") and darkdetect.isDark():
+                    if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
                         headerfontcolor = '#B2B2B2'
                     else:
                         headerfontcolor = '#707070'
@@ -28917,7 +28917,7 @@ class ApplicationWindow(QMainWindow):
                 pass
             
             org_patheffects = aw.qmc.patheffects
-            if sys.platform.startswith("darwin") and darkdetect.isDark():
+            if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
                 aw.qmc.patheffects = 0
             self.qmc.redraw(recomputeAllDeltas=False)
             
@@ -28938,7 +28938,7 @@ class ApplicationWindow(QMainWindow):
             flavor_image = path2url(flavor_image)
             flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
             #return screen to GRAPH profile mode
-            if sys.platform.startswith("darwin") and darkdetect.isDark():
+            if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
                 aw.qmc.patheffects = org_patheffects
             
             self.qmc.fig.clf() # remove the flavorchart artists

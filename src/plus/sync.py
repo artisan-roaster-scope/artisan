@@ -256,7 +256,7 @@ def applyServerUpdates(data):
                 blend_spec = {
                     "label": data["blend"]["label"],
                     "ingredients": ingredients}
-                blend_spec_labels = [i["coffee"]["label"] for i in ingredients]
+                blend_spec_labels = [i["coffee"] for i in ingredients]
                 aw.qmc.plus_blend_spec = blend_spec
                 aw.qmc.plus_blend_spec_labels = blend_spec_labels
                 dirty = True
