@@ -3851,7 +3851,7 @@ class tgraphcanvas(FigureCanvas):
                               "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
                               "sqrt":math.sqrt,"degrees":math.degrees}
             
-            if aw.qmc.flagstart:
+            if aw.qmc.flagstart or not aw.qmc.flagon:
                 sample_timex = self.timex
                 sample_temp1 = self.temp1
                 sample_temp2 = self.temp2
@@ -4465,8 +4465,8 @@ class tgraphcanvas(FigureCanvas):
                     return res
 
             except Exception as e:
-#                import traceback
-#                traceback.print_exc(file=sys.stdout)
+                import traceback
+                traceback.print_exc(file=sys.stdout)
                 
                 #if plotter
                 if equeditnumber:
