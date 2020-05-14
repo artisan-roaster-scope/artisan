@@ -1216,7 +1216,8 @@ class tgraphcanvas(FigureCanvas):
         self.beepedBackgroundEvents = [] # set of BackgroundEvent indicies that have already been beeped for (cleared in ClearMeasurements)
 
         self.roastpropertiesflag = 1  #resets roast properties if not zero
-        self.roastpropertiesAutoOpenFlag = 0  #open roast properties dialog if not zero
+        self.roastpropertiesAutoOpenFlag = 0  #open roast properties dialog on CHARGE if not zero
+        self.roastpropertiesAutoOpenDropFlag = 0  #open roast properties dialog on DROP if not zero
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None)
         self.title_show_always = False
         self.ambientTemp = 0.
@@ -2843,14 +2844,14 @@ class tgraphcanvas(FigureCanvas):
                 self.samplingsemaphore.acquire(1)
                 try:
                     # initalize the arrays depending on the recording state
-                    if self.flagstart and len(self.timex) > 0:
+                    if (self.flagstart and len(self.timex) > 0) or not self.flagon: # on recording or off we use the standard data structures
                         sample_timex = self.timex
                         sample_temp1 = self.temp1
                         sample_temp2 = self.temp2
                         sample_extratimex = self.extratimex
                         sample_extratemp1 = self.extratemp1
                         sample_extratemp2 = self.extratemp2
-                    else:
+                    else: # only on ON we use the temporary sampling datastructures
                         sample_timex = self.on_timex
                         sample_temp1 = self.on_temp1
                         sample_temp2 = self.on_temp2
@@ -9694,6 +9695,8 @@ class tgraphcanvas(FigureCanvas):
                                 aw.fujipid.sv = 0
                             except:
                                 pass
+                    if aw.qmc.roastpropertiesAutoOpenDropFlag:
+                        aw.openPropertiesSignal.emit()
                     aw.onMarkMoveToNext(aw.button_9)
                     if not (self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]):
                         # only if not anyhow markDrop() is triggered from within updategraphic() which guarantees an immedate redraw
@@ -19920,7 +19923,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs == "PIDtoggle":
                                 aw.pidcontrol.togglePID()
                             # pidmode(<n>) : 0: manual, 1: RS, 2: background follow
-                            if cs.startswith("pidmode(") and cs.endswith(")"):
+                            elif cs.startswith("pidmode(") and cs.endswith(")"):
                                 try:
                                     value = int(cs[len("pidmode("):-1])
                                     if value == 0:
@@ -19935,7 +19938,7 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                             # playbackmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
-                            if cs.startswith("playbackmode(") and cs.endswith(")"):
+                            elif cs.startswith("playbackmode(") and cs.endswith(")"):
                                 try:
                                     value = int(cs[len("playbackmode("):-1])
                                     if value == 0:
@@ -19956,6 +19959,9 @@ class ApplicationWindow(QMainWindow):
                                         aw.sendmessage(QApplication.translate("Message","playback by ET", None))
                                 except Exception:
                                     pass
+                            # openProperties : open Roast Properties dialog
+                            elif cs == "openProperties":
+                                aw.openPropertiesSignal.emit()
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds
@@ -25926,6 +25932,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastpropertiesflag = toInt(settings.value("roastpropertiesflag",self.qmc.roastpropertiesflag))
             if settings.contains("roastpropertiesAutoOpenFlag"):
                 self.qmc.roastpropertiesAutoOpenFlag = toInt(settings.value("roastpropertiesAutoOpenFlag",self.qmc.roastpropertiesAutoOpenFlag))
+            if settings.contains("roastpropertiesAutoOpenDropFlag"):
+                self.qmc.roastpropertiesAutoOpenDropFlag = toInt(settings.value("roastpropertiesAutoOpenDropFlag",self.qmc.roastpropertiesAutoOpenDropFlag))
             if settings.contains("customflavorlabels"):
                 self.qmc.customflavorlabels = list(map(str,list(toStringList(settings.value("customflavorlabels",self.qmc.customflavorlabels)))))
             #restore sliders
@@ -27185,6 +27193,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("titleshowalways",self.qmc.title_show_always)
             settings.setValue("roastpropertiesflag",self.qmc.roastpropertiesflag)
             settings.setValue("roastpropertiesAutoOpenFlag",self.qmc.roastpropertiesAutoOpenFlag)
+            settings.setValue("roastpropertiesAutoOpenDropFlag",self.qmc.roastpropertiesAutoOpenDropFlag)
             settings.setValue("customflavorlabels",self.qmc.customflavorlabels)
             settings.beginGroup("Batch")
             settings.setValue("batchcounter",self.qmc.batchcounter)

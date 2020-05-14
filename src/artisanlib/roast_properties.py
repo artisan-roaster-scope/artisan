@@ -662,6 +662,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.org_ambient_humidity = self.aw.qmc.ambient_humidity
         self.org_ambient_pressure = self.aw.qmc.ambient_pressure
         
+        self.org_roastpropertiesAutoOpenFlag = self.aw.qmc.roastpropertiesAutoOpenFlag
+        self.org_roastpropertiesAutoOpenDropFlag = self.aw.qmc.roastpropertiesAutoOpenDropFlag
+        
         # propulated by selecting a recent roast from the popup via recentRoastActivated()
         self.template_file = None
         self.template_name = None
@@ -810,6 +813,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.roastpropertiesAutoOpen = QCheckBox(QApplication.translate("CheckBox","Open on CHARGE", None))
         self.roastpropertiesAutoOpen.setChecked(bool(self.aw.qmc.roastpropertiesAutoOpenFlag))
         self.roastpropertiesAutoOpen.stateChanged.connect(self.roastpropertiesAutoOpenChanged)
+        self.roastpropertiesAutoOpenDROP = QCheckBox(QApplication.translate("CheckBox","Open on DROP", None))
+        self.roastpropertiesAutoOpenDROP.setChecked(bool(self.aw.qmc.roastpropertiesAutoOpenDropFlag))
+        self.roastpropertiesAutoOpenDROP.stateChanged.connect(self.roastpropertiesAutoOpenDROPChanged)
         # EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
@@ -1539,7 +1545,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         okLayout = QHBoxLayout()
         okLayout.addWidget(self.roastproperties)
         okLayout.addStretch()
+        okLayout.addSpacing(3)
         okLayout.addWidget(self.roastpropertiesAutoOpen)
+        okLayout.addStretch()
+        okLayout.addSpacing(3)
+        okLayout.addWidget(self.roastpropertiesAutoOpenDROP)
         okLayout.addStretch()
         okLayout.addWidget(self.dialogbuttons)
         okLayout.setSpacing(10)
@@ -2459,6 +2469,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.ambient_humidity = self.org_ambient_humidity
         self.aw.qmc.ambient_pressure = self.org_ambient_pressure
         
+        self.aw.qmc.roastpropertiesAutoOpenFlag = self.org_roastpropertiesAutoOpenFlag
+        self.aw.qmc.roastpropertiesAutoOpenDropFlag = self.org_roastpropertiesAutoOpenDropFlag
+        
         self.reject()
 
     # calcs volume (in ml) from density (in g/l) and weight (in g)
@@ -2703,6 +2716,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.roastpropertiesAutoOpenFlag = 1
         else:
             self.aw.qmc.roastpropertiesAutoOpenFlag = 0
+            
+    @pyqtSlot(int)
+    def roastpropertiesAutoOpenDROPChanged(self,_=0):
+        if self.roastpropertiesAutoOpenDROP.isChecked():
+            self.aw.qmc.roastpropertiesAutoOpenDropFlag = 1
+        else:
+            self.aw.qmc.roastpropertiesAutoOpenDropFlag = 0
 
     def createDataTable(self):
         self.datatable.clear()

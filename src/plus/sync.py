@@ -220,7 +220,7 @@ def applyServerUpdates(data):
         if "batch_pos" in data and data["batch_pos"] != aw.qmc.roastbatchpos:
             aw.qmc.roastbatchpos = data["batch_pos"]
             dirty = True
-            title_changed = True            
+            title_changed = True
         if "label" in data and data["label"] != aw.qmc.title:
             aw.qmc.title = data["label"]
             dirty = True
@@ -236,10 +236,10 @@ def applyServerUpdates(data):
         if "coffee" in data and data["coffee"] is not None:
             if "hr_id" in data["coffee"] and data["coffee"]["hr_id"] != aw.qmc.plus_coffee:
                 aw.qmc.plus_coffee = data["coffee"]["hr_id"]
-                dirty = True  
+                dirty = True
             if "label" in data["coffee"] and data["coffee"]["label"] != aw.qmc.plus_coffee_label:
                 aw.qmc.plus_coffee_label = data["coffee"]["label"]
-                dirty = True       
+                dirty = True
         if "blend" in data and data["blend"] is not None and "label" in data["blend"] and "ingredients" in data["blend"] \
                and data["blend"]["ingredients"]:
             try:
@@ -247,14 +247,14 @@ def applyServerUpdates(data):
                 for i in data["blend"]["ingredients"]:
                     entry = {}
                     entry["ratio"] = i["ratio"]
-                    entry["coffee"] = i["coffee"]
+                    entry["coffee"] = i["coffee"]  # just the hr_id as a string and not the full object
                     if "ratio_num" in i and i["ratio_num"] is not None:
                         entry["ratio_num"] = i["ratio_num"]
                     if "ratio_denom" in i and i["ratio_denom"] is not None:
                         entry["ratio_denom"] = i["ratio_denom"]
                     ingredients.append(entry)
                 blend_spec = {
-                    "label": data["blend"]["label"], 
+                    "label": data["blend"]["label"],
                     "ingredients": ingredients}
                 blend_spec_labels = [i["coffee"]["label"] for i in ingredients]
                 aw.qmc.plus_blend_spec = blend_spec
@@ -262,8 +262,8 @@ def applyServerUpdates(data):
                 dirty = True
             except:
                 pass
-        if "color_system" in data and data["color_system"] != aw.qmc.color_systems[aw.qmc.color_system_idx]: 
-            try:                   
+        if "color_system" in data and data["color_system"] != aw.qmc.color_systems[aw.qmc.color_system_idx]:
+            try:
                 aw.qmc.color_system_idx = aw.qmc.color_systems.index(data["color_system"])
                 dirty = True
             except: # cloud color system not known by Artisan client
@@ -295,12 +295,12 @@ def applyServerUpdates(data):
 #            v = aw.convertVolume(data["volume_out"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
 #            if w != aw.qmc.volume[1]:
 #                aw.qmc.volume[1] = v
-#                dirty = True            
+#                dirty = True
     except Exception as e:
         config.logger.error("sync: Exception in applyServerUpdates() %s",e)
     finally: 
         if title_changed:
-            aw.setTitleSignal.emit(aw.qmc.title,True) # we force an updatebackground to ensure proper repainting   
+            aw.setTitleSignal.emit(aw.qmc.title,True) # we force an updatebackground to ensure proper repainting
         if dirty:
             aw.qmc.fileDirty()
             aw.sendmessageSignal.emit(QApplication.translate("Plus","Updated data received from artisan.plus", None),True,None)

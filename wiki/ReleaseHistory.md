@@ -35,6 +35,8 @@ v2.4.0 (xx.xx.2020)
   - adds space key action to create plain events while keyboard short cut event navigation is off
   - adds symbolic variables `RB1` and `RB2` to referring to the rate-of-rise readings of the background profile
   - adds an option to automatically open completed roasts in the ArtisanViewer on turning Artisan ON for the next roast
+  - adds Open on DROP to Roast Properties dialog
+  - adds Artisan Command `openProperties` to open the Roast Properties dialog from buttons (potentially invisible and triggered by alarms)
 
 * Changes
   - remember the position of draggable annotations and the legend

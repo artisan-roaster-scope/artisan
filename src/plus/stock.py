@@ -105,7 +105,7 @@ def fetch():
 #        aw.qmc.adderror(str(tr))
         controller.disconnect(remove_credentials = False, stop_queue = False)
         return False
-            
+
 
 ################### 
 # stock cache access
@@ -238,7 +238,7 @@ def renderAmount(amount,default_unit = None,target_unit_idx = 0):
         if w > 9:
             w = int(round(w)) # we truncate all decimals
         else:
-            w = config.app_window.float2float(w,1) # @UndefinedVariable # we keep one decimal 
+            w = config.app_window.float2float(w,1) # @UndefinedVariable # we keep one decimal
         res = "{0:g}{1}".format(w,target_unit)
     return res
 
@@ -456,7 +456,7 @@ def getBlendId(blend):
     return getBlendBlendDict(blend)["hr_id"]
 
 def getBlendLabels(blends):
-    return [getBlendLabel(c) for c in blends]         
+    return [getBlendLabel(c) for c in blends]
   
 def blend2beans(blend,weight_unit_idx,weightIn = 0):
     res = []
@@ -464,7 +464,7 @@ def blend2beans(blend,weight_unit_idx,weightIn = 0):
         blends = getBlendBlendDict(blend)
         sorted_ingredients = sorted(blends["ingredients"], key=lambda x:x["ratio"],reverse=True)
         for i in sorted_ingredients:
-            c = getBlendCoffeeLabelDict(blend)[i["coffee"]]            
+            c = getBlendCoffeeLabelDict(blend)[i["coffee"]]
             if weightIn:
                 w = ", {}{}".format(config.app_window.float2float(i["ratio"]*weightIn,2),config.app_window.qmc.weight_units[weight_unit_idx]) # @UndefinedVariable
             else:
@@ -536,7 +536,7 @@ def getBlends(weight_unit_idx,store=None):
                                     blend["screen_min"] = min_size
                                     if max_size != min_size:
                                         blend["screen_max"] = max_size
-                            if amount and amount > 0: # TODO: check here with machines capacity                    
+                            if amount and amount > 0: # TODO: check here with machines capacity
                                 # add location only if this coffee is available in several locations
                                 if store:
                                     loc = ""
@@ -565,20 +565,19 @@ def matchBlendDict(blendSpec, blendDict, sameLabel=True):
             return all([i1["coffee"]==i2["coffee"] and i1["ratio"]==i2["ratio"] for (i1,i2) in (zip(blendSpec["ingredients"],blendDict["ingredients"]))])
         else:
             return False
-    
-        
+
 # returns the position in blends which matches the given blendId and stockId and None if no match is found
 def getBlendSpecStockPosition(blendSpec,stockId,blends):
     res = [i for i, b in enumerate(blends) if \
-       matchBlendDict(blendSpec,getBlendBlendDict(b)) and \
-       getBlendStockDict(b)["location_hr_id"] == stockId]
+       getBlendStockDict(b)["location_hr_id"] == stockId and \
+       matchBlendDict(blendSpec,getBlendBlendDict(b))]
     if len(res)>0:
         return res[0]
     else:
         # check again, but now ignore label (thus allow renaming of blend names)
         res = [i for i, b in enumerate(blends) if \
-           matchBlendDict(blendSpec,getBlendBlendDict(b),sameLabel=False) and \
-           getBlendStockDict(b)["location_hr_id"] == stockId]
+           getBlendStockDict(b)["location_hr_id"] == stockId and \
+           matchBlendDict(blendSpec,getBlendBlendDict(b),sameLabel=False)]
         if len(res)>0:
             return res[0]
         else:

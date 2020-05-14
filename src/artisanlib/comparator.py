@@ -22,6 +22,9 @@ import numpy
 import matplotlib.ticker as ticker
 import matplotlib.transforms as transforms
 import matplotlib.patheffects as PathEffects
+if sys.platform.startswith("darwin"):
+    # import module to detect if OS X dark mode is active or not
+    import darkdetect # @UnresolvedImport
     
 from artisanlib.util import deltaLabelUTF8, d, stringfromseconds
 from artisanlib.suppress_errors import suppress_stdout_stderr
@@ -1067,7 +1070,10 @@ class roastCompareDlg(ArtisanDialog):
             w = self.profileTable.item(i,2)
             if w is not None:
                 if p.aligned:
-                    w.setForeground(Qt.black)
+                    if sys.platform.startswith("darwin") and darkdetect.isDark():
+                        w.setForeground(Qt.white)
+                    else:
+                        w.setForeground(Qt.black)
                 else:
                     w.setForeground(Qt.lightGray)
     
