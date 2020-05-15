@@ -26,7 +26,7 @@ if sys.platform.startswith("darwin"):
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport
     
-from artisanlib.util import deltaLabelUTF8, d, stringfromseconds, appFrozen
+from artisanlib.util import deltaLabelUTF8, d, stringfromseconds, appFrozen, fromFtoC, fromCtoF
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -42,7 +42,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushB
 
 
 class RoastProfile():
-    def __init__(self,aw, profile,filepath,color):
+    def __init__(self, aw, profile, filepath, color):
         self.aw = aw
         # state:
         self.visible = True
@@ -123,11 +123,11 @@ class RoastProfile():
         else:
             m = self.qmc.mode
         if self.aw.qmc.mode == "C" and m == "F":
-            self.temp1 = [self.aw.qmc.fromFtoC(t) for t in self.temp1]
-            self.temp2 = [self.aw.qmc.fromFtoC(t) for t in self.temp2]
+            self.temp1 = [fromFtoC(t) for t in self.temp1]
+            self.temp2 = [fromFtoC(t) for t in self.temp2]
         elif self.aw.qmc.mode == "F" and m == "C":
-            self.temp1 = [self.aw.qmc.fromCtoF(t) for t in self.temp1]
-            self.temp2 = [self.aw.qmc.fromCtoF(t) for t in self.temp2]
+            self.temp1 = [fromCtoF(t) for t in self.temp1]
+            self.temp2 = [fromCtoF(t) for t in self.temp2]
         if "title" in profile:
             self.title = d(profile["title"])
         if "roastbatchnr" in profile and profile["roastbatchnr"] != 0:
@@ -1168,6 +1168,8 @@ class roastCompareDlg(ArtisanDialog):
                     self.profileTable.setRowCount(len(self.profiles))
                     self.setProfileTableRow(len(self.profiles)-1)
         except:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             pass
     
     def addProfiles(self,filenames):

@@ -35,6 +35,13 @@ else
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python3.8
     export PYTHON_V=3.8
+
+# for Python 3.7 builds:
+#    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.7
+#    export PYTHONBIN=$PYTHON/bin
+#    export PYTHONPATH=$PYTHON/lib/python3.7
+#    export PYTHON_V=3.7
+
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=~/Qt5.14.2/5.14.2/clang_64
     export MACOSX_DEPLOYMENT_TARGET=10.13

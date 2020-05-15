@@ -17,7 +17,13 @@
 # Marko Luther, 2018
 
 from bottle import default_app, request, abort, route, template, static_file, get, TEMPLATE_PATH
-from gevent import Timeout, signal as gsignal, kill
+from gevent import Timeout, kill
+
+# what is the exact difference between the next too?
+#from gevent import signal as gsignal # works only up to gevent v1.4.0
+#from gevent.signal import signal as gsignal # works on gevent v1.4.0 and newer
+from gevent import signal_handler as gsignal # works on gevent v1.4.0 and newer
+
 from gevent.pywsgi import WSGIServer
 #from geventwebsocket import WebSocketError
 from geventwebsocket.handler import WebSocketHandler
@@ -26,7 +32,7 @@ from platform import system as psystem
 if psystem() != 'Windows':
     from signal import SIGQUIT
 
-from multiprocessing import Process as mProcess
+import multiprocessing as mp
 
 from json import dumps as jdumps
 from requests import get as rget
@@ -84,7 +90,23 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
     
     # start the server in a separate process
     # using multiprocessing
-    process = mProcess(name='WebLCDs',target=work,args=(
+    if psystem() == 'Darwin':
+        try:
+        # start method can only be set once!
+#            if "fork" in mp.get_all_start_methods():
+#                mp.set_start_method('fork') # default on Python3.7 for macOS (and Unix), but considered unsafe, 
+                # not available on Windows, on Python3.8 we have to explicitly set this
+                # https://bugs.python.org/issue33725
+            if "forkserver" in mp.get_all_start_methods():
+                mp.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
+#            if "spawn" in mp.get_all_start_methods():
+#                mp.set_start_method('spawn') # default on Python3.8 for macOS (always default on Windows) 
+                # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
+                # https://bugs.python.org/issue32146
+                # https://github.com/pyinstaller/pyinstaller/issues/4865
+        except:
+            pass
+    process = mp.Process(name='WebLCDs',target=work,args=(
         port,
         resourcePath,
         nonesym,
@@ -132,11 +154,17 @@ def send_all(msg):
         try:
             with Timeout(time_to_wait, TooLong):
                 if ws.closed:
-                    wsocks.remove(ws)
+                    try:
+                        wsocks.remove(ws)
+                    except:
+                        pass
                 else:
                     ws.send(msg)
         except Exception:
-            wsocks.remove(ws)
+            try:
+                wsocks.remove(ws)
+            except:
+                pass
 
 # route to push new data to the client
 @route('/send', method='POST')
@@ -153,15 +181,24 @@ def handle_websocket():
     while True:
         try:
             if wsock.closed:
-                wsocks.remove(wsock)
+                try:
+                    wsocks.remove(wsock)
+                except:
+                    pass
                 break
             else:
                 message = wsock.receive()
                 if message is None:
-                    wsocks.remove(wsock)
+                    try:
+                        wsocks.remove(wsock)
+                    except:
+                        pass
                     break
         except Exception:
-            wsocks.remove(wsock)
+            try:
+                wsocks.remove(wsock)
+            except:
+                pass
             break
             
 @route('/status')

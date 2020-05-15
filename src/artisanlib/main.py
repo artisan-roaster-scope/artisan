@@ -428,7 +428,7 @@ def __dependencies_for_freezing():
     import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
     
     # for gevent bundling
-    from gevent import core, resolver_thread, resolver_ares, socket, threadpool, thread, threading, select, subprocess, pywsgi, server, hub # @UnusedImport @Reimport 
+    from gevent import signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading, select, subprocess, pywsgi, server, hub # @UnusedImport @Reimport 
 
 del __dependencies_for_freezing
 
@@ -4466,8 +4466,8 @@ class tgraphcanvas(FigureCanvas):
                     return res
 
             except Exception as e:
-                import traceback
-                traceback.print_exc(file=sys.stdout)
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
                 
                 #if plotter
                 if equeditnumber:
@@ -12793,8 +12793,8 @@ class SampleThread(QThread):
                                     except:
                                         pass
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
-                                    extrat1 = self.inputFilter(sample_extratemp2[i],sample_extratimex[i],extratx,extrat1)
-                                    extrat2 = self.inputFilter(sample_extratemp2[i],sample_extratemp1[i],extratx,extrat2)
+                                    extrat1 = self.inputFilter(sample_extratimex[i],sample_extratemp1[i],extratx,extrat1)
+                                    extrat2 = self.inputFilter(sample_extratimex[i],sample_extratemp2[i],extratx,extrat2)
                                 sample_extratimex[i].append(extratx)
                                 sample_extratemp1[i].append(float(extrat1))
                                 sample_extratemp2[i].append(float(extrat2))
@@ -13266,15 +13266,16 @@ class SampleThread(QThread):
                                     alarm_temp -= sample_temp2[alarm_idx] # substract the reading at alarm_idx for IF ALARMs
                             elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
                                 if (aw.qmc.alarmsource[i])%2==0:
-                                    alarm_temp = sample_extratimex[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                    if alarm_idx != None:
-                                        alarm_temp -= sample_extratimex[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                                else:
                                     alarm_temp = sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
                                     if alarm_idx != None:
                                         alarm_temp -= sample_extratemp1[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
-                                
+                                else:
+                                    alarm_temp = sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    if alarm_idx != None:
+                                        alarm_temp -= sample_extratemp2[(aw.qmc.alarmsource[i] - 2)//2][alarm_idx] # substract the reading at alarm_idx for IF ALARMs
+                            
                             alarm_limit = aw.qmc.alarmtemperature[i]
+                            
                             if alarm_temp is not None and alarm_temp != -1 and (
                                     (aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or 
                                     (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit) or
@@ -21463,7 +21464,7 @@ class ApplicationWindow(QMainWindow):
                     #write
                     self.serialize(filename_path,self.getProfile())
                     self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
-                    self.setCurrentFile(filename,False) # we do not add autosaved files any longer to the recent file menu
+                    self.setCurrentFile(filename_path,False) # we do not add autosaved files any longer to the recent file menu
                     self.qmc.fileClean()
                     
                     if self.qmc.autosavealsopath != "":
@@ -21597,18 +21598,19 @@ class ApplicationWindow(QMainWindow):
     def strippedDir(self, fullFileName):
         return str(QFileInfo(fullFileName).dir().dirName())
 
-    def setCurrentFile(self, fileName,addToRecent=True):
-        self.curFile = fileName
+    # fileNamePath holds the full path to the loaded profile
+    def setCurrentFile(self, fileNamePath,addToRecent=True):
+        self.curFile = fileNamePath
         if self.curFile:
             self.setWindowTitle(("%s - " + self.windowTitle) % self.strippedName(self.curFile))
             if addToRecent:
                 settings = QSettings()
                 files = toStringList(settings.value('recentFileList'))
                 try:
-                    removeAll(files,fileName)
+                    removeAll(files,fileNamePath)
                 except ValueError:
                     pass
-                files.insert(0, fileName)
+                files.insert(0, fileNamePath)
                 del files[self.MaxRecentFiles:]
                 settings.setValue('recentFileList', files)
                 for widget in QApplication.topLevelWidgets():
@@ -26225,7 +26227,7 @@ class ApplicationWindow(QMainWindow):
 
     def startWebLCDs(self,force=False):
         try:
-            if not self.WebLCDs or force:
+            if not app.artisanviewerMode and not self.WebLCDs or force:
                 from artisanlib.weblcds import startWeb
                 res = startWeb(
                     self.WebLCDsPort,
@@ -26249,8 +26251,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 return False
         except Exception as e:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
             self.stopWebLCDs()

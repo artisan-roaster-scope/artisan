@@ -1234,7 +1234,8 @@ class HUDDlg(ArtisanDialog):
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(appearanceGroupWidget)
         tab5Layout.addWidget(resolutionGroupWidget)
-        tab5Layout.addWidget(WebLCDsGroupWidget)
+        if not self.app.artisanviewerMode:
+            tab5Layout.addWidget(WebLCDsGroupWidget)
         tab5Layout.addWidget(renameGroupWidget)
         tab5Layout.addStretch()
         tab5Layout.addWidget(logofileGroupWidget)
