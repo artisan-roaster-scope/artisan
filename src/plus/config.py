@@ -37,12 +37,12 @@ uuid_tag         = "roastUUID"
 # Serivce URLs
 
 ## LOCAL SETUP
-api_base_url         = "https://localhost:62602/api/v1"
-web_base_url         = "https://localhost:8088"
+#api_base_url         = "https://localhost:62602/api/v1"
+#web_base_url         = "https://localhost:8088"
 
 ## CLOUD SETUP
-#api_base_url         = "https://artisan.plus/api/v1"
-#web_base_url         = "https://artisan.plus"
+api_base_url         = "https://artisan.plus/api/v1"
+web_base_url         = "https://artisan.plus"
 
 shop_base_url         = "https://shop.artisan.plus"
 
@@ -54,8 +54,8 @@ roast_url        = api_base_url + "/aroast"
 
 # Connection configurations
 
-verify_ssl       = False
-#verify_ssl       = True
+#verify_ssl       = False
+verify_ssl       = True
 connect_timeout  = 2 # in seconds
 read_timeout     = 4 # in seconds
 min_passwd_len   = 4
@@ -116,12 +116,12 @@ log_file_path = util.getDirectory(log_file,".log")
 
 logger = logging.getLogger("plus")
 #logger.setLevel(logging.NOTSET)
-#logger.setLevel(logging.INFO)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
+#logger.setLevel(logging.DEBUG)
 try:
     handler = RotatingFileHandler(log_file_path, maxBytes=200000, backupCount=1, encoding='utf-8')
-#    handler.setLevel(logging.INFO)
-    handler.setLevel(logging.DEBUG)
+    handler.setLevel(logging.INFO)
+#    handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s') # - %(name)s 
     handler.setFormatter(formatter)
     logger.addHandler(handler)
