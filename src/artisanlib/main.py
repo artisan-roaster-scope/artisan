@@ -5646,7 +5646,7 @@ class tgraphcanvas(FigureCanvas):
             title = toASCII(title)
         title = aw.qmc.abbrevString(title,stl)
         fontprop_xlarge = aw.mpl_fontproperties.copy()
-        fontprop_xlarge.set_size("x-large")
+        fontprop_xlarge.set_size("xx-large")
         t_artist = self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"], loc='left',
                     fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
         try:
@@ -12340,6 +12340,11 @@ class VMToolbar(NavigationToolbar):
 
         NavigationToolbar.__init__(self, plotCanvas, parent)
         
+        # lets make the font of the coordinates QLabel a little larger
+        f = self.locLabel.font()
+        f.setPointSize(self.locLabel.font().pointSize()+4)
+        self.locLabel.setFont(f)
+        
 
 # add green flag menu on matplotlib v2.0 and later
         if len(self.actions()) > 0:
@@ -14571,6 +14576,10 @@ class ApplicationWindow(QMainWindow):
 
         #create a Label object to display program status information
         self.messagelabel = QLabel()
+        f = self.messagelabel.font()
+        f.setPointSize(self.messagelabel.font().pointSize()+1)
+        self.messagelabel.setFont(f)
+        
         self.messagelabel.setIndent(6)
         # set a few broad style parameters
         if False: #locale == "es":
@@ -23904,7 +23913,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.setAnnoPositions(profile["anno_positions"])
             if "flag_positions" in profile and self.qmc.mode == m:
                 self.qmc.setFlagPositions(profile["flag_positions"])
-            if "legendloc_pos" in profile:
+            if "legendloc_pos" in profile and self.qmc.loadaxisfromprofile:
                 try:
                     # if available we transform the custom legend position back from data into axis coordinates
                     legendloc_pos_data = numpy.array(profile["legendloc_pos"])
@@ -23912,6 +23921,7 @@ class ApplicationWindow(QMainWindow):
                     data_to_axis = axis_to_data.inverted()
                     pos = data_to_axis.transform(legendloc_pos_data)
                     self.qmc.legendloc_pos = (pos[0],pos[1])
+                    self.qmc.legend = None
                 except:
                     pass
             
