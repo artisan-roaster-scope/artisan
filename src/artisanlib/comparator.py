@@ -173,14 +173,18 @@ class RoastProfile():
         self.stemp1 = [None if i < self.startTimeIdx or i > self.endTimeIdx else t for i,t in enumerate(self.stemp1)]
         self.stemp2 = [None if i < self.startTimeIdx or i > self.endTimeIdx else t for i,t in enumerate(self.stemp2)]
         # calculate max deltas
+        self.max_DeltaET = 1
         if len(self.delta1) > 0:
-            self.max_DeltaET = max(filter(None,self.delta1))
-        else:
-            self.max_DeltaET = 1
+            try:
+                self.max_DeltaET = max(filter(None,self.delta1))
+            except:
+                pass
+        self.max_DeltaBT = 1
         if len(self.delta2) > 0:
-            self.max_DeltaBT = max(filter(None,self.delta2))
-        else:
-            self.max_DeltaBT = 1
+            try:
+                self.max_DeltaBT = max(filter(None,self.delta2))
+            except:
+                pass
         self.events1 = []
         self.events2 = []
         self.events_timex = []
