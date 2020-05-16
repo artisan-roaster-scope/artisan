@@ -181,7 +181,7 @@ class Artisan(QtSingleApplication):
         
         self.focusChanged.connect(self.appRaised)
         self.sentToBackground = None # set to timestamp on putting app to background without any open dialog
-        self.plus_sync_cache_expiration = 2*60 # how long a plus sync is valid in seconds
+        self.plus_sync_cache_expiration = 1*60 # how long a plus sync is valid in seconds
         
         if multiprocessing.current_process().name == 'MainProcess' and self.isRunning():
             self.artisanviewerMode = True

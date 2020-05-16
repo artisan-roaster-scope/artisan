@@ -247,7 +247,7 @@ def applyServerUpdates(data):
                 for i in data["blend"]["ingredients"]:
                     entry = {}
                     entry["ratio"] = i["ratio"]
-                    entry["coffee"] = i["coffee"]  # just the hr_id as a string and not the full object
+                    entry["coffee"] = i["coffee"]["hr_id"]  # just the hr_id as a string and not the full object
                     if "ratio_num" in i and i["ratio_num"] is not None:
                         entry["ratio_num"] = i["ratio_num"]
                     if "ratio_denom" in i and i["ratio_denom"] is not None:
@@ -256,7 +256,7 @@ def applyServerUpdates(data):
                 blend_spec = {
                     "label": data["blend"]["label"],
                     "ingredients": ingredients}
-                blend_spec_labels = [i["coffee"] for i in ingredients]
+                blend_spec_labels = [i["coffee"]["label"] for i in ingredients]
                 aw.qmc.plus_blend_spec = blend_spec
                 aw.qmc.plus_blend_spec_labels = blend_spec_labels
                 dirty = True
