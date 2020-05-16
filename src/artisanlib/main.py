@@ -248,9 +248,9 @@ class Artisan(QtSingleApplication):
                     # load Artisan palettes on double-click on *.apal file
                     QTimer.singleShot(20,lambda : aw.getPalettes(filename,aw.buttonpalette))
 
-        elif platf == "Windows" and self.artisanviewerMode:
-            msg = url.toString()  #here we don't want a local file, preserve the windows file:///
-            self.sendMessage2ArtisanInstance(msg,self._viewer_id)
+            elif platf == "Windows" and self.artisanviewerMode:
+                msg = url.toString()  #here we don't want a local file, preserve the windows file:///
+                self.sendMessage2ArtisanInstance(msg,self._viewer_id)
     
     @pyqtSlot(str)
     def receiveMessage(self,msg):
