@@ -13,7 +13,7 @@ toc_icon: "cog"
 ---
 Artisan supports a large number of Phidgets that gather temperature and other data. It also supports Phidgets that can generate external output triggered by Artisan actions.
 
-All Phidgets can be connected either directly via USB or remotely via network connection by using a [Phidgets SBC](http://www.phidgets.com/products.php?category=21&product_id=1073_0){:target="_blank"} as gateway. Phidgets don't need any additional power supply.
+All Phidgets can be connected either directly via USB or remotely via network connection by using a [Phidgets SBC](http://www.phidgets.com/products.php?category=21&product_id=1073_0){:target="_blank"} as gateway or a [wireless VINT HUB](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=1143){:target="_blank"} like the HUB5000. Most Phidgets don't need any additional power supply.
 
 There are Phidgets that feature a direct USB connection as well as the more recent [VINT Phidgets](https://www.phidgets.com/docs/What_is_VINT%3F){:target="_blank"}* that are connected via a [VINT USB hub](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} to the USB port. Some are electrically isolated and thus more resistant against electrical noise.
 
@@ -76,11 +76,43 @@ Single channel IR with integrated sensor
 * [Phidget IR 1045](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=34){:target="_blank"} (USB)
 
 
-## 2. Analog/Digital Input & Output
+## 2. Ambient Sensors
 
-Artisan can attach to all Phidgets IO ports. The input ports are configured as (extra) devices and are handled as temperature curves. Phidgets output can be activated via `IO Command`, `PWM Command` or `VOUT Command` button or slider actions configured in the Events tab (menu `Config >> Events`). Note that buttons and sliders themself can be triggered autoamtically via alarm actions.
+Artisan v1.4 adds support for the following ambient sensors that allow to automatically fill the room temperature, relative humidity and barometric pressure data of roast profiles.
 
-* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} (VINT HUB): 6x analog/digital in, 6x digital PWM out
+* [Phidget HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644){:target="_blank"} (VINT): Measure relative humidity from 0 to 100% and temperature from -40°C to +85°C
+* [Phidget PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719){:target="_blank"} (VINT): Measure the absolute air pressures between 50 and 110 kPa
+
+
+## 3. Analog/Digital Input
+
+Artisan can attach to all Phidgets IO ports. The input ports are configured as (extra) devices and are handled as temperature curves. 
+
+* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} (VINT HUB): 6x analog/digital in
+
+	* `Phidget HUB IO 0` : analog input (0-5V); attaches only port 0
+	* `Phidget HUB IO 01` : analog input (0-5V), ports 0 and 1
+	* `Phidget HUB IO 23` : analog input (0-5V), ports 2 and 3
+	* `Phidget HUB IO 45` : analog input (0-5V), ports 4 and 5
+
+	* `Phidget HUB IO Digital 0` : digital input (0 or 1); attaches only port 0
+	* `Phidget HUB IO Digital 01` : digital input (0 or 1), port 0 and 1
+	* `Phidget HUB IO Digital 23` : digital input (0 or 1), port 2 and 3
+	* `Phidget HUB IO Digital 45` : digital input (0 or 1), port 4 and 5
+
+* [Phidget DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961){:target="_blank"} (VINT): 1x versatile input (current, digital , frequency, voltage)
+
+	* `Phidget DAQ1400 Current` : current input (A, 20mA max)
+	* `Phidget DAQ1400 Digital` : digital input (0 or 1, 24V max)
+	* `Phidget DAQ1400 Frequency` : frequency input (hz, 2Mhz max)
+	* `Phidget DAQ1400 Voltage` : voltage (0-5V)
+
+
+## 4. Analog/Digital Output
+
+Artisan can attach to all Phidgets IO ports. Phidgets output can be activated via `IO Command`, `PWM Command` or `VOUT Command` button or slider actions configured in the Events tab (menu `Config >> Events`). Note that buttons and sliders themself can be triggered autoamatically via alarm actions.
+
+* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} (VINT HUB): 6x digital PWM out
 * [Phidget OUT1000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=711){:target="_blank"} (VINT): 1x 12bit voltage out
 * [Phidget OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712){:target="_blank"} (VINT): 1x 12bit isolated voltage out
 * [Phidget OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713){:target="_blank"} (VINT): 1x 16bit isolated voltage out
@@ -88,7 +120,6 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 * [REL1000](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=966){:target="_blank"} (VINT): 4x digital out relays
 * [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720){:target="_blank"} (VINT): 4x digital out 8A SSRs
 * [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721){:target="_blank"} (VINT): 16x PWM-enabled SSRs
-* [Phidget DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961){:target="_blank"} (VINT): 1x versatile input (frequency, current, voltage, digital)
 * [Phidget 1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2){:target="_blank"} (USB): 4x 12bit analog out
 * [Phidget 1011](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=4){:target="_blank"} (USB): 2x analog/digital in, 2x digital out
 * [Phidget 1014](https://www.phidgets.com/?tier=3&prodid=9){:target="_blank"} (USB): 4x digital out
@@ -97,7 +128,108 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 
 Each output action supports a number of different commands specified in the `Documentation` field. See the post [More Phidgets!](https://artisan-roasterscope.blogspot.it/2017/12/more-phidgets.html){:target="_blank"} for details.
 
-## 3. RC Servo Controllers
+
+### 4.1 Voltage Output
+
+* Phidget [OUT1000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=711){:target="_blank"}, [OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712){:target="_blank"} and [OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713){:target="_blank"} (1x VINT)
+* Phidget [1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2){:target="_blank"} (4x USB)
+
+Phidget Voltage Output modules can be controlled via `VOUT Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
+
+* `out(ch,v[,sn])` : sets output voltage
+* `sleep(s)` : delay processing
+
+with
+
+* `ch` : the channel to be addressed (integer)
+* `v` : voltage in V (float), eg. 5.5 for 5.5V
+* `s` : sleep time in seconds (float)
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `out(0,5.5,560282)` or `out(0,5.5,560282:2)`. Using a command actions, like in `out(0,5.5)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+
+
+### 4.2 Digital Output
+
+* [1014](){:target="_blank"} (4x USB)
+* [OUT1100](){:target="_blank"}, [REL1000](){:target="_blank"}, [REL1100](){:target="_blank"}, [REL1101](){:target="_blank"} (4x VINT)
+* [1017](){:target="_blank"} (8x USB)
+* [1010](){:target="_blank"}, [1013](){:target="_blank"}, [1018](){:target="_blank"}, [1019](){:target="_blank"} (8x USB)
+
+Phidget Digital Output modules can be controlled via `IO Command ` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
+
+* `set(ch,b[,sn])` : switches state on/off
+* `toggle(ch[,sn])` : toggles state
+* `pulse(ch,t[,sn])` : sets the output of channel c to on for time t in milliseconds
+* `sleep(s)` : delay processing
+
+with
+
+* `ch` : the channel to be addressed (integer)
+* `b` : bool with off (b=0) and on (b=1)
+* `t` : time in milliseconds (integer)
+* `s` : sleep time in seconds (float)
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `set(0,1,560282)` or `set(0,1,560282:2)`. Using a command actions, like in `set(0,1)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+
+
+### 4.3 HUB PWM Output 
+
+* [HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} (6x VINT HUB)
+
+Phidget HUB PWM modules can be controlled via `PWM Command ` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
+
+* `outhub(p,v[,<sn>])` : sets PWM in percent [0-100]
+* `togglehub(p[,<sn>])` : toggles between last value not 0 and 0
+* `pulsehub(p,t[,<sn>])` : turn on for the given time `t`
+
+with
+
+* `p` : the HUB port to be addressed (integer)
+* `v` : value (integer)
+* `t` : time in milliseconds (integer)
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `outhub(0,8,560282)` or `outhub(0,8,560282:2)`. Using a command actions, like in `outhub(0,8)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+
+
+### 4.4 Module PWM Output
+
+* [OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714){:target="_blank"}, [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720){:target="_blank"} (4x VINT)
+* [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721){:target="_blank"} (16x VINT)
+
+Phidget PWM modules can be controlled via `PWM Command ` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
+
+* `out(ch,v[,<sn>])` : sets PWM in percent [0-100]
+* `toggle(ch[,<sn>])` : toggles between last value not 0 and 0
+* `pulse(ch,t[,<sn>])` : turn on for the given time `t`
+
+with
+
+* `ch` : the channel to be addressed (integer)
+* `v` : value (integer)
+* `t` : time in milliseconds (integer)
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `out(0,8,560282)` or `out(0,8,560282:2)`. Using a command actions, like in `out(0,8)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+
+
+### 4.5 DC Motor Control
+
+Artisan v2.4 adds support for DC motor control.
+
+* [DCC1000](){:target="_blank"} and [DCC1002](){:target="_blank"} (1x VINT)
+* [DCC1003](){:target="_blank"} (2x VINT)
+
+Phidget DC Motor Control modules can be controlled via `IO Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
+
+* `accel(ch,a[,sn])` sets acceleration (duty cycle / second)
+* `vel(ch,v[,sn])`   sets target velocity (duty cycle)
+* `sleep(s)` : delay processing
+
+with
+
+* `ch` : the channel to be addressed (integer)
+* `a` : acceleration (float)
+* `v` : velocity (float)
+* `s` : sleep time in seconds (float)
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `accel(0,0.5,560282)` or `accel(0,0.5,560282:2)`. Using a command actions, like in `accel(0,0.5)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+
+
+### 4.6 RC Servo Control
 
 Artisan v1.6 adds support for RC servo control.
 
@@ -105,11 +237,24 @@ Artisan v1.6 adds support for RC servo control.
 * [Phidget 1061](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1032){:target="_blank"} (8x USB, ext. powered)
 * [Phidget 1066](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1044){:target="_blank"} (1x USB powered) 
 
+Phidget RC Servo modules can be controlled via `RC Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
+
+* `pulse(ch,min,max[,sn])` : sets the min/max pulse width in microseconds
+* `pos(ch,min,max[,sn])` : sets the min/max position
+* `engaged(ch,b[,sn])` : engage (b=1) or disengage (b = 0)
+* `ramp(ch,b[,sn])` : activates or deactivates the speed ramping state
+* `volt(ch,v[,sn])` : set the voltage to one of 5, 6 or 7.4 in Volt
+* `accel(ch,a[,sn])` : set the acceleration
+* `veloc(ch,l[,sn])` : set the velocity
+* `set(ch,pos[,sn])` : set the target position
+
+with
+
+* `ch` : the channel to be addressed (integer)
+* `min, max, l, pos` : values (integer)
+* `b` : bool value given as 0 (false) or 1 (true)
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `volt(0,6,560282)` or `volt(0,6,560282:2)`. Using a command actions, like in `volt(0,6)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+
+
+
 See [Artisan v1.6.1](https://artisan-roasterscope.blogspot.com/2019/03/artisan-v161.html){:target="_blank"} under "RC Servos" for details.
-
-## 4. Ambient Sensors
-
-Artisan v1.4 adds support for the following ambient sensors that allow to automatically fill the room temperature, relative humidity and barometric pressure data of roast profiles.
-
-* [Phidget HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644){:target="_blank"} (VINT): Measure relative humidity from 0 to 100% and temperature from -40°C to +85°C
-* [Phidget PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719){:target="_blank"} (VINT): Measure the absolute air pressures between 50 and 110 kPa

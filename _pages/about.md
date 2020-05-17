@@ -92,7 +92,7 @@ There are also experimental builds for the Raspberry Pi platform.
 ## Notable Features
 
 - seemless integration into the [artisan.plus](https://artisan.plus) inventory management service
-- extensive [machine](/machines/) and [device](/devices/) support
+- extensive [machine](/machines/) and [device](/devices/) support including control
 - unlimited number of curves
 - rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html), [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.de/2017/02/roast-phases-statistics-and-phases-lcds.html) calculations
 - projection lines and head-up-display (HUD)
