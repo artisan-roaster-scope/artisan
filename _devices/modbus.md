@@ -25,13 +25,22 @@ PID mechanism of external devices can be connected via MODBUS to the Artisan PID
 
 Buttons and sliders can send out `MODBUS Command`s via MODBUS function 5, 6, 15, 16 and 22. The following commands in the action description are supported.
 
+Note that MODBUS Command actions can be sequenced by separating them with semicolons like in "read(0,10); mwrite(0,20,255,0,_)"
 
+* `read(slaveId,register)`: reads <register> from slave <slaveID> using MODBUS function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be used in later commands.
+* `writeWord([slaveId,register,value],..,[slaveId,register,value])`:
+write register via MODBUS function 16 (float)
 * `write([slaveId,register,value],..,[slaveId,register,value])`:
 write register via MODBUS function 6 (int) or function 16 (float)
 * `wcoil(slaveId,register,<bool>)`:
 write coil via MODBUS function 5
 * `wcoils(slaveId,register,[<bool>,..,<bool>])`: write coils via MODBUS function 15
 * `mwrite(slaveId,register,andMask,orMask)`: mask write register via MODBUS function 22
+* `mwrite(slaveId,register,andMask,orMask,value)`: fake mask write register which evaluates thes masks on the `value` and writes the result using MODBUS function 6. Together with a previous read to set the temporary variable `_` this can be used to simulate a mask write register (function 22) if the PLC does not support it directly.
 * `writem(slaveId,register,value)` and `writem(slaveId,register,[<int>,..,<int>])`:
 write multiple holding registers via MODBUS function 16
 * `writeBCD([s,r,v],..,[s,r,v])`: write multiple holding registers BCD encoded via MODBUS function 16
+* `sleep(s)` : delay processing by `s` seconds (float)
+* `button(<b>)` : sets the last button pressed to either "pressed" style if `b` is `1` or `True` or "normal"style, otherwise
+
+The placeholders `{BT}`, `{ET}`, `{time}` substituted in MODBUScommand actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float).
