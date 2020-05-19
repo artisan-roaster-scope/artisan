@@ -23791,6 +23791,8 @@ class ApplicationWindow(QMainWindow):
             if "roastdate" in profile:
                 try:
                     date = QDate.fromString(d(profile["roastdate"]))
+                    if not date.isValid():
+                        date = QDate.currentDate()
                     if "roasttime" in profile:
                         try:
                             time = QTime.fromString(d(profile["roasttime"]))
@@ -26308,8 +26310,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 return False
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
             self.stopWebLCDs()
@@ -27522,7 +27524,10 @@ class ApplicationWindow(QMainWindow):
         res["date"] = ""
         if not "roastdate" in data or not data["roastdate"]:
             data["roastdate"] = QDateTime(QDate.currentDate()) # we just take the local time
-        res["datetime"] = data["roastdate"].toPyDateTime() # toMSecsSinceEpoch()
+        try:
+            res["datetime"] = data["roastdate"].toPyDateTime() # toMSecsSinceEpoch()
+        except:
+            data["roastdate"] = QDateTime(QDate.currentDate()) # we just take the local time
         date = data["roastdate"].date()
         time = data["roastdate"].time()
         if date:
@@ -27586,9 +27591,9 @@ class ApplicationWindow(QMainWindow):
         try:
             if "roastUUID" in data and data["roastUUID"] is not None and data["roastUUID"] != "":
                 uuid = data["roastUUID"]
-                if plus.register.getPath(uuid):
-                    #batch_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,batch_html)
-                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
+#                if plus.register.getPath(uuid):
+#                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
+                title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
                 if bool(plus.sync.getSync(uuid)):
                     time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
                 if "plus_coffee" in data and data["plus_coffee"] is not None and data["plus_coffee"] != "":
@@ -28093,9 +28098,9 @@ class ApplicationWindow(QMainWindow):
         try:
             if "roastUUID" in production_data and production_data["roastUUID"] is not None:
                 uuid = production_data["roastUUID"]
-                if plus.register.getPath(uuid):
-                    #batch_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,batch_html)
-                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
+#                if plus.register.getPath(uuid):
+#                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
+                title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(uuid,title_html)
                 if bool(plus.sync.getSync(uuid)):
                     time_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(uuid),time_html)
         except:
@@ -28369,8 +28374,8 @@ class ApplicationWindow(QMainWindow):
                             first_profile = False
 
                         except Exception as e:
-    #                        import traceback
-    #                        traceback.print_exc(file=sys.stdout)
+#                            import traceback
+#                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
 
@@ -28480,10 +28485,9 @@ class ApplicationWindow(QMainWindow):
                         graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
                         graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
 
-
                     except Exception as e:
-    #                    import traceback
-    #                    traceback.print_exc(file=sys.stdout)
+#                        import traceback
+#                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
 
@@ -29092,11 +29096,14 @@ class ApplicationWindow(QMainWindow):
             # add artisan or artisan.plus links to title, background and beans if possible
             title_html = str(htmllib.escape(batch)) + str(htmllib.escape(self.qmc.title))
             if aw.qmc.roastUUID is not None and aw.qmc.roastUUID != "":
-                if plus.register.getPath(aw.qmc.roastUUID):
-                    title_html = '<a href="artisan://roast/' + aw.qmc.roastUUID + '">' + title_html + "</a>"
+#                if plus.register.getPath(aw.qmc.roastUUID):
+#                    title_html = '<a href="artisan://roast/' + aw.qmc.roastUUID + '">' + title_html + "</a>"
+                title_html = '<a href="artisan://roast/' + aw.qmc.roastUUID + '">' + title_html + "</a>"
                 if bool(plus.sync.getSync(aw.qmc.roastUUID)):
                     datetime_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.roastLink(aw.qmc.roastUUID),datetime_html)
-            if aw.qmc.background and aw.qmc.titleB is not None and aw.qmc.titleB != "" and aw.qmc.backgroundUUID is not None and plus.register.getPath(aw.qmc.backgroundUUID):
+#            if aw.qmc.background and aw.qmc.titleB is not None and aw.qmc.titleB != "" and aw.qmc.backgroundUUID is not None and plus.register.getPath(aw.qmc.backgroundUUID):
+#                background_html = '<a href="artisan://roast/' + aw.qmc.backgroundUUID + '">' + background_html + "</a>"
+            if aw.qmc.background and aw.qmc.titleB is not None and aw.qmc.titleB != "" and aw.qmc.backgroundUUID is not None:
                 background_html = '<a href="artisan://roast/' + aw.qmc.backgroundUUID + '">' + background_html + "</a>"
             if beans_html is not None and beans_html != "" and aw.qmc.plus_coffee is not None:
                 beans_html = '<a href="{0}" target="_blank">{1}</a>'.format(plus.util.coffeeLink(aw.qmc.plus_coffee),beans_html)
@@ -29249,7 +29256,7 @@ class ApplicationWindow(QMainWindow):
 
     def volume_weight2html(self,amount,out,unit,change):
         if amount:
-            return str(amount) + unit + "<br>" + str(out) + unit + " (" + "%.1f"%change + "%)"
+            return str("%.1f"%amount) + unit + "<br>" + str(out) + unit + " (" + "%.1f"%change + "%)"
         else:
             return "--"
 
