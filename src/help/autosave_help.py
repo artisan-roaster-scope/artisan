@@ -49,9 +49,10 @@ def content():
     strlist.append(tbl_Examplestop.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
     tbl_Examples = prettytable.PrettyTable()
     tbl_Examples.field_names = [QApplication.translate('HelpDlg','Autosave Field',None),QApplication.translate('HelpDlg','Example File Name',None)]
+    tbl_Examples.add_row([QApplication.translate('HelpDlg','~title Roasted on ~date',None),QApplication.translate('HelpDlg','Burundi Roasted on 20-04-25.alog',None)])
     tbl_Examples.add_row([QApplication.translate('HelpDlg','~batchcounter ~title ~date_long',None),QApplication.translate('HelpDlg','1380 Burundi 2020-04-25_1136.alog',None)])
     tbl_Examples.add_row([QApplication.translate('HelpDlg','~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)',None),QApplication.translate('HelpDlg','Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog',None)])
-    tbl_Examples.add_row([QApplication.translate('HelpDlg','u\0027Recording ~batchcounter&#39; "~batch" ~title ~datetime_long',None),QApplication.translate('HelpDlg','When OFF:\nProd-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog\nWhile Recording:\nRecording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog',None)])
+    tbl_Examples.add_row([QApplication.translate('HelpDlg','\u0027Recording ~batchcounter&#39; "~batch" ~title ~datetime_long',None),QApplication.translate('HelpDlg','When OFF:\nProd-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog\nWhile Recording:\nRecording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog',None)])
     strlist.append(tbl_Examples.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
     strlist.append("</body>")
     helpstr = "".join(strlist)

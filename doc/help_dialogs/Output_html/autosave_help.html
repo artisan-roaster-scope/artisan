@@ -1,0 +1,151 @@
+<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body><b>AUTOSAVE FIELDS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Prefix Field</th>
+        <th>Source</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>~batchprefix</td>
+        <td>The batch prefix set in Config&gt;Batch&gt;Prefix</td>
+        <td>Prod-</td>
+    </tr>
+    <tr>
+        <td>~batchcounter</td>
+        <td>The current batch number</td>
+        <td>653</td>
+    </tr>
+    <tr>
+        <td>~batch</td>
+        <td>Same as &quot;~batchprefix~batchnum&quot;</td>
+        <td>Prod-653</td>
+    </tr>
+    <tr>
+        <td>~batchposition</td>
+        <td>The current batch position, or &quot;Roast of the Day&quot;</td>
+        <td>9</td>
+    </tr>
+    <tr>
+        <td>~batch_long</td>
+        <td>Same as Batch field in Roast Properties<br> &quot;~batchprefix~batchnum (~batchposition)&quot;</td>
+        <td>Prod-653 (9)</td>
+    </tr>
+    <tr>
+        <td>~title</td>
+        <td>From Roast&gt;Properties&gt;Title</td>
+        <td>Ethiopia Guji</td>
+    </tr>
+    <tr>
+        <td>~beans</td>
+        <td>The first 30 characters of the first line <br>From Roast&gt;Properties&gt;Beans</td>
+        <td>Ethiopia Guji purchased from R</td>
+    </tr>
+    <tr>
+        <td>~beans_line</td>
+        <td>The entire first line From Roast&gt;Properties&gt;Beans</td>
+        <td>Ethiopia Guji purchased from Royal</td>
+    </tr>
+    <tr>
+        <td>~date</td>
+        <td>Roast date in format yy-MM-dd</td>
+        <td>20-02-05</td>
+    </tr>
+    <tr>
+        <td>~date_long</td>
+        <td>Roast date in format yyyy-MM-dd</td>
+        <td>2020-02-05</td>
+    </tr>
+    <tr>
+        <td>~time</td>
+        <td>Roast time in format hhmm</td>
+        <td>1742</td>
+    </tr>
+    <tr>
+        <td>~datetime</td>
+        <td>Roast date and time in format yy-MM-dd_hhmm</td>
+        <td>20-02-05_1742</td>
+    </tr>
+    <tr>
+        <td>~datetime_long</td>
+        <td>Roast date and time in format yyyy-MM-dd_hhmm</td>
+        <td>2020-02-05_1742</td>
+    </tr>
+    <tr>
+        <td>~operator</td>
+        <td>From Roast&gt;Properties&gt;Operator</td>
+        <td>Dave</td>
+    </tr>
+    <tr>
+        <td>~weight</td>
+        <td>From Roast&gt;Properties&gt;Weight Green</td>
+        <td>3</td>
+    </tr>
+    <tr>
+        <td>~weightunits</td>
+        <td>From Roast&gt;Properties&gt;Weight</td>
+        <td>Kg</td>
+    </tr>
+    <tr>
+        <td>~volume</td>
+        <td>From Roast&gt;Properties&gt;Volume Green</td>
+        <td>4.1</td>
+    </tr>
+    <tr>
+        <td>~volumeunits</td>
+        <td>From Roast&gt;Properties&gt;Volume</td>
+        <td>l</td>
+    </tr>
+    <tr>
+        <td>~density</td>
+        <td>From Roast&gt;Properties&gt;Density Green</td>
+        <td>756.4</td>
+    </tr>
+    <tr>
+        <td>~densityunits</td>
+        <td>From Roast&gt;Properties&gt;Density</td>
+        <td>g_l</td>
+    </tr>
+    <tr>
+        <td>~moisture</td>
+        <td>From Roast&gt;Properties&gt;Moisture Green</td>
+        <td>11.7</td>
+    </tr>
+    <tr>
+        <td>~machine</td>
+        <td>From Roast&gt;Properties&gt;Machine</td>
+        <td>SF-6</td>
+    </tr>
+    <tr>
+        <td>~drumspeed</td>
+        <td>From Roast&gt;Properties&gt;Drum Speed</td>
+        <td>64</td>
+    </tr>
+</table><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <td>NOTES:<br>Anything between single quotes &#39; will show in the file name only when ON.<br>Example: &#39;REC ~batch&#39;<br><br>Anything between double quotes &quot; will show in the file name only when OFF. <br>Example: &quot;~operator&quot;<br><br>For backward compatibility, when the Prefix field is text only the date and time are appended to the file name.<br>Example: &#39;Autosave&#39; will result in file name &#39;Autosave_20-01-13_1705&#39;.<br>To show only the text place a single &#39;!&#39; at the start of the Prefix field<br>Example: &#39;!Autosave&#39; will result in file name &#39;Autosave&#39;.<br><br>To maintain cross platform compatibility, file names may contain only letters, numbers, spaces, <br>and the following special characters:  <br>_ - . ( )</td>
+    </tr>
+</table><br/><br/><b>EXAMPLES</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <td>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </td>
+    </tr>
+</table><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tr>
+        <th>Autosave Field</th>
+        <th>Example File Name</th>
+    </tr>
+    <tr>
+        <td>~title Roasted on ~date</td>
+        <td>Burundi Roasted on 20-04-25.alog</td>
+    </tr>
+    <tr>
+        <td>~batchcounter ~title ~date_long</td>
+        <td>1380 Burundi 2020-04-25_1136.alog</td>
+    </tr>
+    <tr>
+        <td>~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)</td>
+        <td>Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog</td>
+    </tr>
+    <tr>
+        <td>&#x27;Recording ~batchcounter&#39; &quot;~batch&quot; ~title ~datetime_long</td>
+        <td>When OFF:<br>Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog<br>While Recording:<br>Recording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog</td>
+    </tr>
+</table></body>

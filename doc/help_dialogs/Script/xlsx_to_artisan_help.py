@@ -1,13 +1,14 @@
 '''
 Program to take an Excel input file and generate Artisan help dialog code.
 
-Command line:  xlsx_to_artisan_help.py [<filename>]
-**Note that filename should have no suffix.  File name only.
+Command line:  xlsx_to_artisan_help.py <filename>|all
+**Note that filename should have no suffix, file name only.
+  
+The input file is drawn from ../input_files/<filename>.xlsx
+'all' will convert every .xlsx file in the ../input_files folder
 
-Input file is always drawn from ../input_files/<filename>.xlsx
-If filename is not specified 'test' will be used.
-
-Output is always written to ../output_files/<filename>_help.py
+Output .py files are written to the ../../../src/help folder, aka the artisan/src folder
+Output .html files are written to the ../Output_html folder, for inspection or external linking
 
 Note: This program has no error checking or trapping!  TBA.
 
@@ -60,7 +61,9 @@ Must be replaced with three periods "..." in the Excel file.
  
 '''
 
-from os.path import join, dirname, abspath
+from os.path import join, dirname, abspath, split, splitext
+import os
+import importlib
 import subprocess
 import sys
 import re
@@ -248,19 +251,54 @@ def buildpyCode(fname_in):
 
     return outstr
 
-if __name__ == "__main__":
-    
-    if len(sys.argv) > 1:
-        fname_in =  '../input_files/' + sys.argv[1] + '.xlsx'
-        fname_out = '../../../src/help/' + sys.argv[1] + '_help.py'
-    else:  #for testing
-        print("Requires a filename to convert")
-        sys.exit()
-
+def writepyFile(fname_in, fname_out):
     outstr = buildpyCode(fname_in)
 
     # write outstr (py code) to the specified filename
-    outfile = open(fname_out,'w')
+    outfile = open(fname_out,'w', encoding="utf-8")
     outfile.write(outstr)
     outfile.close()
+
+
+def writehtmlFile(fname_in, fname_htm):
+    importfile = splitext(split(fname_out)[1])[0]
+    importpath = abspath(split(fname_out)[0])
+    sys.path.append(importpath)
+    var = importlib.import_module(importfile)
+
+    htmstr = var.content()
+
+    # write htmlstr (html) to the specified filename
+    outfile = open(fname_htm,'w',encoding="utf-8")
+    outfile.write(htmstr)
+    outfile.close()
+    
+if __name__ == "__main__":
+    
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "all":
+            for filename in os.listdir('../input_files/'):
+                if filename.endswith(".xlsx"): 
+                    fn = filename.replace(".xlsx","")
+                    fname_in =  '../input_files/' + filename
+                    fname_out = '../../../src/help/' + fn + '_help.py'
+                    fname_htm = '../Output_html/' + fn + '_help.html'
+                    print()
+                    print(filename)
+                    writepyFile(fname_in,fname_out)
+                    writehtmlFile(fname_in,fname_htm)
+                    continue
+                else:
+                    continue
+        else:   #only one file
+            fname_in =  '../input_files/' + sys.argv[1] + '.xlsx'
+            fname_out = '../../../src/help/' + sys.argv[1] + '_help.py'
+            fname_htm = '../Output_html/' + sys.argv[1] + '_help.html'
+            print()
+            print(sys.argv[1] + '.xlsx')
+            writepyFile(fname_in,fname_out)
+            writehtmlFile(fname_in,fname_htm)
+    else:
+        print("Requires a <filename> to convert or 'all'")
+        sys.exit()
 

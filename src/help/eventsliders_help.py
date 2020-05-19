@@ -35,7 +35,7 @@ def content():
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Serial Command',None),QApplication.translate('HelpDlg','ASCII serial command or binary a2b_uu(serial command)',None),'&#160;'])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Modbus Command',None),QApplication.translate('HelpDlg','_',None),QApplication.translate('HelpDlg','variable holding the last value read via MODBUS',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','sleep(<float>)',None),QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds',None)])
-    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','button(<bool>)',None),QApplication.translate('HelpDlg','sets calling button to u\0093pressedu\0094 if argument is 1 or True',None)])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','button(<bool>)',None),QApplication.translate('HelpDlg','sets calling button to “pressed” if argument is 1 or True',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','write([slaveId,register,value],..,[slaveId,register,value])',None),QApplication.translate('HelpDlg','write register: MODBUS function 6 (int) or function 16 (float)',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','wcoil(slaveId,register,<bool>)',None),QApplication.translate('HelpDlg','write coil: MODBUS function 5',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','wcoils(slaveId,register,[<bool>,..,<bool>])',None),QApplication.translate('HelpDlg','write coils: MODBUS function 15',None)])
