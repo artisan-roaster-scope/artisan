@@ -7412,18 +7412,15 @@ class tgraphcanvas(FigureCanvas):
             eventanno = eventanno.replace('\n', '')
 
             #text between single quotes ' will show only before FCs
-#            eventanno = re.sub(fr"{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}",r"\1",eventanno) if not postFCs else re.sub(fr"{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}",r"",eventanno)
             eventanno = re.sub(r"{}([^{}]+){}".format(preFCsDelim,preFCsDelim,preFCsDelim),
                 r"\1",eventanno) if not postFCs else re.sub(r"{}([^{}]+){}".format(preFCsDelim,preFCsDelim,preFCsDelim),
                 r"",eventanno)
             #text between double quotes " will show only after FCs
-#            eventanno = re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',r'\1',eventanno) if postFCs else re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',r'',eventanno)
             eventanno = re.sub(r'{}([^{}]+){}'.format(postFCsDelim,postFCsDelim,postFCsDelim),
                 r'\1',eventanno) if postFCs else re.sub(r'{}([^{}]+){}'.format(postFCsDelim,postFCsDelim,postFCsDelim),
                 r'',eventanno)
 
             #text between back ticks ` will show only within 90 seconds before FCs
-#            eventanno = re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'\1',eventanno) if (fcsWindow) else re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',r'',eventanno)
             eventanno = re.sub(r'{}([^{}]+){}'.format(fcsWindowDelim,fcsWindowDelim,fcsWindowDelim),
                 r'\1',eventanno) if (fcsWindow) else re.sub(r'{}([^{}]+){}'.format(fcsWindowDelim,fcsWindowDelim,fcsWindowDelim),
                 r'',eventanno)
@@ -21452,6 +21449,35 @@ class ApplicationWindow(QMainWindow):
             else:
                 beansline = ""
 
+            #grab the first line of the roasting notes field
+            firstline = re.match(r'([^\n]*)',self.qmc.roastingnotes)
+            if firstline:
+                roastingnotesline = firstline.group(0)
+            else:
+                roastingnotesline = ""
+
+            #grab the first line of the cupping notes field
+            firstline = re.match(r'([^\n]*)',self.qmc.cuppingnotes)
+            if firstline:
+                cuppingnotesline = firstline.group(0)
+            else:
+                cuppingnotesline = ""
+
+            cp = aw.computedProfileInformation()
+            if "DROP_time" in cp:
+                m, s = divmod(cp["DROP_time"], 60)
+                droptime_long = '{:02d}_{:02d}'.format(int(m), int(s))
+            else:
+                droptime_long = "00_00"
+            if "DROP_time" in cp and "FCS_time" in cp and cp["DROP_time"] > 0 and cp["DROP_time"] > cp["FCs_time"]:
+                dtr = str(self.float2float(100 * (cp["DROP_time"] - cp["FCs_time"])/cp["DROP_time"],1))
+            else:
+                dtr = "0.0"
+            if "green_density" in cp and "roasted_density" in cp:
+                density_loss = str(aw.float2float(100 *(cp["green_density"] - cp["roasted_density"]) / cp["green_density"],1))
+            else:
+                density_loss = "0.0"
+                
             #note: since fields are delimited only at the start, to avoid ambiguity requires the shortest field string to be last in the list.  Example, "date_time" must come before "date" in the list.
             fields = [
                 ("batch_long", self.qmc.roastbatchprefix + str(bnr) + ' (' + str(self.qmc.roastbatchpos) + ')'),
@@ -21468,6 +21494,10 @@ class ApplicationWindow(QMainWindow):
                 ("operator",self.qmc.operator),
                 ("machine",self.qmc.roastertype),
                 ("drumspeed",self.qmc.drumspeed),
+                ("weightloss",str(cp["weight_loss"]) if "weight_loss" in cp else "0.0"),
+                ("volumegain",str(cp["volume_gain"]) if "volume_gain" in cp else "0.0"),
+                ("densityloss",density_loss),
+                ("moistureloss",str(cp["moisture_loss"]) if "moisture_loss" in cp else "0.0"),
                 ("weightunits",self.qmc.weight[2]),
                 ("weight",str(self.qmc.weight[0])),
                 ("volumeunits",self.qmc.volume[2]),
@@ -21476,23 +21506,63 @@ class ApplicationWindow(QMainWindow):
                 ("density",str(self.qmc.density[0])),
                 ("moisture",str(self.qmc.moisture_greens)),
                 ("beans_line",beansline),
-                ("beans",beansline[:30]),
+                ("beans_10",beansline[:10]),
+                ("beans_15",beansline[:15]),
+                ("beans_20",beansline[:20]),
+                ("beans_25",beansline[:25]),
+                ("beans_30",beansline[:30]),
+                ("beans",beansline[:30]),   #undocumented, remains here for hidden backward compatibility with v2.4RC
+                ("roastweight",str(self.float2float(float(self.qmc.weight[1]),1))),
+                ("roastvolume",str(self.float2float(float(self.qmc.volume[1]),1))),
+                ("roastdensity",str(self.float2float(float(self.qmc.density_roasted[0]),1))),
+                ("roastmoisture",str(self.float2float(float(self.qmc.moisture_roasted)))),
+                ("colorwhole",str(self.qmc.whole_color)),
+                ("colorground",str(self.qmc.ground_color)),
+                ("colorsystem",str(self.qmc.color_systems[self.qmc.color_system_idx])),
+                ("screenmax",str(aw.qmc.beansize_max)),
+                ("screenmin",str(aw.qmc.beansize_min)),
+                ("greenstemp",str(self.float2float(float(aw.qmc.greens_temp)))),
+                ("ambtemp",str(cp["ambient_temperature"]) if "ambient_temperature" in cp else "0.0"),
+                ("ambhumidity",str(cp["ambient_humidity"]) if "ambient_humidity" in cp else "0.0"),
+                ("ambpressure",str(cp["ambient_pressure"]) if "ambient_pressure" in cp else "0.0"),
+                ("aucbase",str(cp["AUCbase"]) if "AUCbase" in cp else "0"),
+                ("auc",str(cp["AUC"]) if "AUC" in cp else "0"),
+                ("chargeet",str(cp["CHARGE_ET"]) if "CHARGE_ET" in cp else "0.0"),                
+                ("chargebt",str(cp["CHARGE_BT"]) if "CHARGE_BT" in cp else "0.0"),                
+                ("fcset",str(cp["FCs_ET"]) if "FCs_ET" in cp else "0.0"),                
+                ("fcsbt",str(cp["FCs_BT"]) if "FCs_BT" in cp else "0.0"),                
+                ("dropet",str(cp["DROP_ET"]) if "DROP_ET" in cp else "0.0"),
+                ("dropbt",str(cp["DROP_BT"]) if "DROP_BT" in cp else "0.0"),
+                ("droptime_long", droptime_long),
+                ("droptime",str(cp["DROP_time"]) if "DROP_time" in cp else "0.0"),                
+                ("dtr", dtr),
+                ("roastingnotes_line",roastingnotesline),
+                ("roastingnotes_10",roastingnotesline[:10]),
+                ("roastingnotes_15",roastingnotesline[:15]),
+                ("roastingnotes_20",roastingnotesline[:20]),
+                ("roastingnotes_25",roastingnotesline[:25]),
+                ("roastingnotes_30",roastingnotesline[:30]),
+#                ("roastingnotes",roastingnotesline[:30]),
+                ("cuppingnotes_line",cuppingnotesline),
+                ("cuppingnotes_10",cuppingnotesline[:10]),
+                ("cuppingnotes_15",cuppingnotesline[:15]),
+                ("cuppingnotes_20",cuppingnotesline[:20]),
+                ("cuppingnotes_25",cuppingnotesline[:25]),
+                ("cuppingnotes_30",cuppingnotesline[:30]),
+#                ("cuppingnotes",cuppingnotesline[:30]),
                 ]
-
+    
             _ignorecase = re.IGNORECASE  # @UndefinedVariable
             #text between single quotes ' will show only when recording or for preview recording
-#            fn = re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(fr"{onDelim}([^{onDelim}]+){onDelim}",r"",fn)
             fn = re.sub(r"{}([^{}]+){}".format(onDelim,onDelim,onDelim),
                 r"\1",fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(r"{}([^{}]+){}".format(
                     onDelim,onDelim,onDelim),r"",fn)
             #text between double quotes " will show only when flagon is False
-#            fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon)) else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
             fn = re.sub(r'{}([^{}]+){}'.format(offDelim,offDelim,offDelim),
                 r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon)) else re.sub(r'{}([^{}]+){}'.format(
                     offDelim,offDelim,offDelim),r'',fn)
             #replace the fields with content
             for i in range(len(fields)):
-#                fn = fn.replace(self.fieldDelim + fields[i][0], str(fields[i][1]))
                 fn = re.sub(r"{}{}".format(self.fieldDelim, fields[i][0]), r"{}".format(str(fields[i][1])), fn, 0, _ignorecase)
 
             #cleaning is performed in generateFilename()
@@ -29133,7 +29203,7 @@ class ApplicationWindow(QMainWindow):
                 charge_label=QApplication.translate("HTML Report Template", "CHARGE:", None),
                 charge=charge,
                 size_label=QApplication.translate("HTML Report Template", "Size:", None),
-                size="--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm",
+                size="--" if aw.qmc.beansize_max == 0.0 else str(aw.qmc.beansize_max) + "mm",
                 density_label=QApplication.translate("HTML Report Template", "Density:", None),
                 density=density,
                 moisture_label=QApplication.translate("HTML Report Template", "Moisture:", None),

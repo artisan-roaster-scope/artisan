@@ -26,7 +26,7 @@
     </tr>
     <tr>
         <td>~batch_long</td>
-        <td>Same as Batch field in Roast Properties<br> &quot;~batchprefix~batchnum (~batchposition)&quot;</td>
+        <td>Same as Batch field in Roast Properties<br>&quot;~batchprefix~batchnum (~batchposition)&quot;</td>
         <td>Prod-653 (9)</td>
     </tr>
     <tr>
@@ -35,9 +35,9 @@
         <td>Ethiopia Guji</td>
     </tr>
     <tr>
-        <td>~beans</td>
-        <td>The first 30 characters of the first line <br>From Roast&gt;Properties&gt;Beans</td>
-        <td>Ethiopia Guji purchased from R</td>
+        <td>~beans_nn</td>
+        <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.<br>From Roast&gt;Properties&gt;Beans</td>
+        <td>Ethiopia G</td>
     </tr>
     <tr>
         <td>~beans_line</td>
@@ -80,9 +80,19 @@
         <td>3</td>
     </tr>
     <tr>
+        <td>~roastweight</td>
+        <td>From Roast&gt;Properties&gt;Weight Roasted</td>
+        <td>2.6</td>
+    </tr>
+    <tr>
         <td>~weightunits</td>
         <td>From Roast&gt;Properties&gt;Weight</td>
         <td>Kg</td>
+    </tr>
+    <tr>
+        <td>~weightloss</td>
+        <td>Calculated weight loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</td>
+        <td>14.1</td>
     </tr>
     <tr>
         <td>~volume</td>
@@ -90,9 +100,19 @@
         <td>4.1</td>
     </tr>
     <tr>
+        <td>~roastvolume</td>
+        <td>From Roast&gt;Properties&gt;Volume Roasted</td>
+        <td>6.8</td>
+    </tr>
+    <tr>
         <td>~volumeunits</td>
         <td>From Roast&gt;Properties&gt;Volume</td>
         <td>l</td>
+    </tr>
+    <tr>
+        <td>~volumegain</td>
+        <td>Calculated volume gain in percent</td>
+        <td>61.5</td>
     </tr>
     <tr>
         <td>~density</td>
@@ -100,14 +120,34 @@
         <td>756.4</td>
     </tr>
     <tr>
+        <td>~roastdensity</td>
+        <td>From Roast&gt;Properties&gt;Density Roasted</td>
+        <td>375.2</td>
+    </tr>
+    <tr>
         <td>~densityunits</td>
         <td>From Roast&gt;Properties&gt;Density</td>
         <td>g_l</td>
     </tr>
     <tr>
+        <td>~densityloss</td>
+        <td>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</td>
+        <td>46.8</td>
+    </tr>
+    <tr>
         <td>~moisture</td>
         <td>From Roast&gt;Properties&gt;Moisture Green</td>
         <td>11.7</td>
+    </tr>
+    <tr>
+        <td>~roastmoisture</td>
+        <td>From Roast&gt;Properties&gt;Moisture Roasted</td>
+        <td>2.8</td>
+    </tr>
+    <tr>
+        <td>~moistureloss</td>
+        <td>Calculated moisture loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</td>
+        <td>8.1</td>
     </tr>
     <tr>
         <td>~machine</td>
@@ -118,6 +158,126 @@
         <td>~drumspeed</td>
         <td>From Roast&gt;Properties&gt;Drum Speed</td>
         <td>64</td>
+    </tr>
+    <tr>
+        <td>~colorwhole</td>
+        <td>From Roast&gt;Properties&gt;Color Whole</td>
+        <td>103</td>
+    </tr>
+    <tr>
+        <td>~colorground</td>
+        <td>From Roast&gt;Properties&gt;Color Ground</td>
+        <td>98</td>
+    </tr>
+    <tr>
+        <td>~colorsystem</td>
+        <td>From Roast&gt;Properties&gt;Color System</td>
+        <td>Tonino</td>
+    </tr>
+    <tr>
+        <td>~screenmin</td>
+        <td>From Roast&gt;Properties&gt;Screen Min</td>
+        <td>16</td>
+    </tr>
+    <tr>
+        <td>~screenmax</td>
+        <td>From Roast&gt;Properties&gt;Screen Max</td>
+        <td>18</td>
+    </tr>
+    <tr>
+        <td>~greenstemp</td>
+        <td>From Roast&gt;Properties&gt;(Green) Beans Temperature</td>
+        <td>68.0</td>
+    </tr>
+    <tr>
+        <td>~ambtemp</td>
+        <td>From Roast&gt;Properties&gt;Ambient Temperature</td>
+        <td>70.0</td>
+    </tr>
+    <tr>
+        <td>~ambhumidity</td>
+        <td>From Roast&gt;Properties&gt;Ambient Humidity</td>
+        <td>35.1</td>
+    </tr>
+    <tr>
+        <td>~ambpressure</td>
+        <td>From Roast&gt;Properties&gt;Ambient Pressure</td>
+        <td>1023.8</td>
+    </tr>
+    <tr>
+        <td>~dtr</td>
+        <td>From Profile Statistics - DTR (in percent)</td>
+        <td>22.1</td>
+    </tr>
+    <tr>
+        <td>~auc</td>
+        <td>From the Profile Statistics - AUC</td>
+        <td>218</td>
+    </tr>
+    <tr>
+        <td>~aucbase</td>
+        <td>From the Profile Statistics - AUC Base</td>
+        <td>300</td>
+    </tr>
+    <tr>
+        <td>~chargeet</td>
+        <td>From the Profile - ET at CHARGE</td>
+        <td>379.4</td>
+    </tr>
+    <tr>
+        <td>~chargebt</td>
+        <td>From the Profile - BT at CHARGE</td>
+        <td>375.2</td>
+    </tr>
+    <tr>
+        <td>~fcset</td>
+        <td>From the Profile - ET at FCs</td>
+        <td>397.4</td>
+    </tr>
+    <tr>
+        <td>~fcsbt</td>
+        <td>From the Profile -BT at FCs</td>
+        <td>386.7</td>
+    </tr>
+    <tr>
+        <td>~dropet</td>
+        <td>From the Profile - ET at DROP</td>
+        <td>378.6</td>
+    </tr>
+    <tr>
+        <td>~dropbt</td>
+        <td>From the Profile - BT at DROP</td>
+        <td>412.5</td>
+    </tr>
+    <tr>
+        <td>~droptime</td>
+        <td>From the Profile - DROP time in seconds</td>
+        <td>617.0</td>
+    </tr>
+    <tr>
+        <td>~droptime_long</td>
+        <td>From the Profile - DROP time in min_secs</td>
+        <td>10_17</td>
+    </tr>
+    <tr>
+        <td>~roastingnotes_nn</td>
+        <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.<br>From Roast&gt;Properties&gt;Roasting Notes</td>
+        <td>No crash, </td>
+    </tr>
+    <tr>
+        <td>~roastingnotes_line</td>
+        <td>The entire first line From Roast&gt;Properties&gt;Roasting Notes</td>
+        <td>No crash, maintained RoR</td>
+    </tr>
+    <tr>
+        <td>~cupptingnotes_nn</td>
+        <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.<br>From Roast&gt;Properties&gt;Cupping Notes</td>
+        <td>Lots of be</td>
+    </tr>
+    <tr>
+        <td>~cupptingnotes_line</td>
+        <td>The entire first line From Roast&gt;Properties&gt;Cupping Notes</td>
+        <td>Lots of berries and chocolate</td>
     </tr>
 </table><table width="100%" border="1" padding="1" border-collapse="collapse">
     <tr>
