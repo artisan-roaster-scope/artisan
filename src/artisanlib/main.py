@@ -21469,7 +21469,7 @@ class ApplicationWindow(QMainWindow):
                 droptime_long = '{:02d}_{:02d}'.format(int(m), int(s))
             else:
                 droptime_long = "00_00"
-            if "DROP_time" in cp and "FCS_time" in cp and cp["DROP_time"] > 0 and cp["DROP_time"] > cp["FCs_time"]:
+            if "DROP_time" in cp and "FCs_time" in cp and cp["DROP_time"] > 0 and cp["DROP_time"] > cp["FCs_time"]:
                 dtr = str(self.float2float(100 * (cp["DROP_time"] - cp["FCs_time"])/cp["DROP_time"],1))
             else:
                 dtr = "0.0"
