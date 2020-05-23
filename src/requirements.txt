@@ -18,3 +18,4 @@ Phidget22==1.6.20200426
 natsort==7.0.1
 xlrd==1.2.0
 requests-file==1.5.1
+lxml==4.5.1
