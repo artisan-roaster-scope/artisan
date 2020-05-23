@@ -48,11 +48,12 @@ def extractProfileCropsterXLS(file):
                 raw_date = general_data['Date'].value
                 date_tuple = xlrd.xldate_as_tuple(raw_date, book.datemode)
                 date = QDateTime(*date_tuple)
-                res["roastdate"] = encodeLocal(date.date().toString())
-                res["roastisodate"] = encodeLocal(date.date().toString(Qt.ISODate))
-                res["roasttime"] = encodeLocal(date.time().toString())
-                res["roastepoch"] = int(date.toTime_t())
-                res["roasttzoffset"] = libtime.timezone
+                if date.isValid():
+                    res["roastdate"] = encodeLocal(date.date().toString())
+                    res["roastisodate"] = encodeLocal(date.date().toString(Qt.ISODate))
+                    res["roasttime"] = encodeLocal(date.time().toString())
+                    res["roastepoch"] = int(date.toTime_t())
+                    res["roasttzoffset"] = libtime.timezone
             except:
                 pass
         if 'Ambient temp.' in general_data:
@@ -188,7 +189,7 @@ def extractProfileCropsterXLS(file):
         specialeventstype = []
         specialeventsvalue = []
         specialeventsStrings = []
-        if COMMENTS_sh.ncols >= 4:        
+        if COMMENTS_sh.ncols >= 4:
             takeClosest = lambda num,collection:min(collection,key=lambda x:abs(x-num))
             for r in range(COMMENTS_sh.nrows):
                 if r>0:
@@ -196,7 +197,7 @@ def extractProfileCropsterXLS(file):
                         time = COMMENTS_sh.cell(r, 0).value
                         comment_type = COMMENTS_sh.cell(r, 2).value
                         if comment_type not in ["Turning point"]: # TP is ignored as it is automatically assigned
-                            comment_value = COMMENTS_sh.cell(r, 3).value                    
+                            comment_value = COMMENTS_sh.cell(r, 3).value
                             c = takeClosest(time,res["timex"])
                             timex_idx = res["timex"].index(c)
                             if comment_type == "Color change":

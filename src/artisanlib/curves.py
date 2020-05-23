@@ -273,10 +273,6 @@ class HUDDlg(ArtisanDialog):
 
         self.helpdialog = None
 
-        settings = QSettings()
-        if settings.contains("HUDDlgGeometry"):
-            self.restoreGeometry(settings.value("HUDDlgGeometry"))
-
         # keep old values to be restored on Cancel
         self.org_DeltaET = self.aw.qmc.DeltaETflag
         self.org_DeltaBT = self.aw.qmc.DeltaBTflag
@@ -520,7 +516,9 @@ class HUDDlg(ArtisanDialog):
         spikesLayout.addWidget(curvefilterlabel)
         spikesLayout.addWidget(self.Filter)
         spikesLayout.addStretch()
-        spikesLayout.addWidget(self.FilterSpikes)
+        spikesLayout2 = QVBoxLayout()
+        spikesLayout2.addLayout(spikesLayout)
+        spikesLayout2.addWidget(self.FilterSpikes)
         rorGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Curves",None))
         rorGroupLayout.setLayout(rorBoxLayout)
         rorLCDGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise LCDs",None))
@@ -576,7 +574,7 @@ class HUDDlg(ArtisanDialog):
         inputFilterGroupLayout.setLayout(inputFilterVBox)
         # Post Roast Group
         postRoastVBox = QVBoxLayout()
-        postRoastVBox.addLayout(spikesLayout)
+        postRoastVBox.addLayout(spikesLayout2)
         postRoastGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curve Filter",None))
         postRoastGroupLayout.setLayout(postRoastVBox)    
         #swapETBT flag
@@ -657,9 +655,11 @@ class HUDDlg(ArtisanDialog):
         tab0Layout.addWidget(rorSymbolicFormulaGroupLayout)
         tab0Layout.addStretch()
         #tab1
+        tab1UpperLayout = QHBoxLayout()
+        tab1UpperLayout.addWidget(inputFilterGroupLayout)
+        tab1UpperLayout.addWidget(postRoastGroupLayout)
         tab1Layout = QVBoxLayout()
-        tab1Layout.addWidget(inputFilterGroupLayout)
-        tab1Layout.addWidget(postRoastGroupLayout)
+        tab1Layout.addLayout(tab1UpperLayout)
         tab1Layout.addWidget(rorFilterGroupLayout)
         tab1Layout.addStretch()
         #tab11
@@ -668,7 +668,7 @@ class HUDDlg(ArtisanDialog):
         tab11Layout.addStretch()
         #tab2
         #Equation plotter
-        self.equlabel = QLabel(QApplication.translate("Label", "Y(x)",None))
+#        self.equlabel = QLabel(QApplication.translate("Label", "Y(x)",None))
         self.equc1label = QLabel(QApplication.translate("Label", "P1",None))
         self.equc2label = QLabel(QApplication.translate("Label", "P2",None))
         self.equc3label = QLabel(QApplication.translate("Label", "P3",None))
@@ -818,7 +818,7 @@ class HUDDlg(ArtisanDialog):
         curvebuttonlayout.addStretch()
         curvebuttonlayout.addWidget(helpcurveDialogButton)
         tab2Layout = QVBoxLayout()
-        tab2Layout.addWidget(self.equlabel)
+#        tab2Layout.addWidget(self.equlabel)
         tab2Layout.addWidget(plot1GroupBox)
         tab2Layout.addLayout(curveLayout)
         tab2Layout.addLayout(curvebuttonlayout)
@@ -993,9 +993,10 @@ class HUDDlg(ArtisanDialog):
         lnVLayout.addStretch()
         lnvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","ln()",None))
         lnvarGroupLayout.setLayout(lnVLayout)
-        expVLayout1 = QVBoxLayout()        
+        expVLayout1 = QHBoxLayout()        
         expVLayout1.addWidget(self.expvarCheck)
-        expVLayout1.addWidget(self.expresult)        
+        expVLayout1.addWidget(self.expresult)
+        expVLayout1.addWidget(self.bkgndButton)      
         expHLayout2 = QHBoxLayout()        
         expHLayout2.addWidget(self.expradiobutton1)
         expHLayout2.addWidget(self.expradiobutton2)
@@ -1005,7 +1006,6 @@ class HUDDlg(ArtisanDialog):
         expLayout = QVBoxLayout()
         expLayout.addLayout(expHLayout2)
         expLayout.addLayout(expVLayout1)
-        expLayout.addWidget(self.bkgndButton)
         expvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","Exponent",None))
         expvarGroupLayout.setLayout(expLayout)
         polytimes = QHBoxLayout()
@@ -1023,13 +1023,20 @@ class HUDDlg(ArtisanDialog):
         polyLayout = QHBoxLayout()
         polyLayout.addWidget(self.polyfitCheck)
         polyLayout.addStretch()
+        polyLayout.addWidget(startlabel)
+        polyLayout.addWidget(self.startEdit)
+        polyLayout.addWidget(self.eventAComboBox)
+        polyLayout.addStretch()
+        polyLayout.addWidget(self.eventBComboBox)
+        polyLayout.addWidget(self.endEdit)
+        polyLayout.addWidget(endlabel)
+        polyLayout.addStretch()
         polyLayout.addWidget(polyfitdeglabel)
         polyLayout.addWidget(self.polyfitdeg)
         polyVLayout = QVBoxLayout()
         polyVLayout.addLayout(polyLayout)
-        polyVLayout.addLayout(polytimes)
+#        polyVLayout.addLayout(polytimes)
         polyVLayout.addLayout(polyCurves)
-#        polyVLayout.addWidget(self.result)
         polyfitGroupLayout = QGroupBox(QApplication.translate("GroupBox","Polyfit",None))
         polyfitGroupLayout.setLayout(polyVLayout)
         interUniLayout = QHBoxLayout()
@@ -1307,7 +1314,6 @@ class HUDDlg(ArtisanDialog):
         Slayout.addWidget(TabWidget,1)
         Slayout.addStretch()
         Slayout.addLayout(buttonsLayout)
-        Slayout.setSizeConstraint(QLayout.SetFixedSize)
         TabWidget.currentChanged.connect(self.tabSwitched)
         self.setLayout(Slayout)
         
@@ -1322,10 +1328,14 @@ class HUDDlg(ArtisanDialog):
         self.polyfitdeg.valueChanged.connect(self.polyfitcurveschanged)
         self.c1ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
         self.c2ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
-        if platform.system() == 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.Ok)
-        else:
+        if platform.system() != 'Windows':
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+            
+        settings = QSettings()
+        if settings.contains("CurvesPosition"):
+            self.move(settings.value("CurvesPosition"))
+        
+        Slayout.setSizeConstraint(QLayout.SetFixedSize)
 
     @pyqtSlot(bool)
     def fittoBackground(self,_):
@@ -2313,11 +2323,12 @@ class HUDDlg(ArtisanDialog):
         self.close()
         
     #cancel button
+    @pyqtSlot()
     def close(self):
         self.closeHelp()
+        #save window position (only; not size!)
         settings = QSettings()
-        #save window geometry
-        settings.setValue("HUDDlgGeometry",self.saveGeometry())
+        settings.setValue("CurvesPosition",self.geometry().topLeft())
 
         #restore settings
         self.aw.qmc.DeltaETflag = self.org_DeltaET
@@ -2349,7 +2360,8 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.resetlinecountcaches()
         self.aw.qmc.resetdeltalines()
         self.aw.qmc.resetlines()
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        self.aw.qmc.updateDeltaSamples()
+        self.aw.qmc.redraw(recomputeAllDeltas=True)
         self.aw.clearMessageLine() #clears plotter possible exceptions if Cancel
         self.accept()
 
@@ -2357,9 +2369,9 @@ class HUDDlg(ArtisanDialog):
     @pyqtSlot()
     def updatetargets(self):
         self.closeHelp()
+        #save window position (only; not size!)
         settings = QSettings()
-        #save window geometry
-        settings.setValue("HUDDlgGeometry",self.saveGeometry())
+        settings.setValue("CurvesPosition",self.geometry().topLeft())
 
         self.aw.qmc.DeltaETfunction = str(self.DeltaETfunctionedit.text())
         self.aw.qmc.DeltaBTfunction = str(self.DeltaBTfunctionedit.text())

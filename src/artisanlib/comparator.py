@@ -35,7 +35,7 @@ from artisanlib.qcheckcombobox import CheckComboBox
 with suppress_stdout_stderr():
     from matplotlib import cm
 
-from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl, QCoreApplication)
+from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl, QCoreApplication, QFileInfo)
 from PyQt5.QtGui import (QColor, QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
     QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox)
@@ -509,6 +509,8 @@ class roastCompareDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, foreground = None, background = None):
         super(roastCompareDlg,self).__init__(parent, aw)
         
+        self.setAcceptDrops(True)
+        
         self.foreground = foreground
         self.background = background
         self.setWindowTitle(QApplication.translate("Form Caption","Comparator",None))
@@ -635,6 +637,26 @@ class roastCompareDlg(ArtisanDialog):
         settings = QSettings()
         if settings.contains("CompareGeometry"):
             self.restoreGeometry(settings.value("CompareGeometry"))
+    
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        urls = event.mimeData().urls()
+        if urls and len(urls)>0:
+            res = []
+            for url in urls:
+                if url.scheme() == "file":
+                    filename = url.toString(QUrl.PreferLocalFile)
+                    qfile = QFileInfo(filename)
+                    file_suffix = qfile.suffix()
+                    if file_suffix == "alog":
+                        res.append(filename)
+            if len(res) > 0:
+                self.addProfiles(res)
     
     def enableButtons(self):
         if not self.button_7_org_state_hidden:

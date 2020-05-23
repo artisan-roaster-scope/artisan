@@ -6,10 +6,10 @@ v2.4.0 (xx.xx.2020)
 ------------------
 
 * New Features
-  - adds [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Comparator.html), [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Simulator.html), and [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/Roast-Transposer.html)
-  - adds Cropster XLS, IKAWA CSV and Giesen Software CSV profile import
-  - adds flexible [automatic file name generator](https://artisan-roasterscope.blogspot.com/2020/05/Autosave-File-Nameing.html) ([Issue #430](../../../issues/430), see also [Saving Artisan Profiles - Naming, Saving, File Location etc](https://www.home-barista.com/home-roasting/saving-artisan-profiles-naming-saving-file-location-etc-t61713.html))
-  - adds custom [special event annotations](https://artisan-roasterscope.blogspot.com/2020/05/Special-Events-Annotations.html) in step and step+ modes that will show roast data including time, temperature DTR, etc. 
+  - adds [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html), [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html), and [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html)
+  - adds Cropster XLS, IKAWA CSV, Giesen Software CSV and RostPATH URL profile import
+  - adds flexible [automatic file name generator](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html) ([Issue #430](../../../issues/430), see also [Saving Artisan Profiles - Naming, Saving, File Location etc](https://www.home-barista.com/home-roasting/saving-artisan-profiles-naming-saving-file-location-etc-t61713.html))
+  - adds custom [special event annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) in step and step+ modes that will show roast data including time, temperature DTR, etc. 
   - adds support for the [Giesen IR sensor](https://artisan-scope.org/machines/giesen/)
   - adds support for [Twino/Ozstar roasting machines](https://artisan-scope.org/machines/twino-ozstar/)
   - adds S7 and MODBUS communciation optimizer
@@ -37,6 +37,8 @@ v2.4.0 (xx.xx.2020)
   - adds an option to automatically open completed roasts in the ArtisanViewer on turning Artisan ON for the next roast
   - adds Open on DROP to Roast Properties dialog
   - adds Artisan Command `openProperties` to open the Roast Properties dialog from buttons (potentially invisible and triggered by alarms)
+  - adds organization field to Roast Properties
+  - adds loading of profiles on drag-and-drop to the main window
 
 * Changes
   - remember the position of draggable annotations and the legend

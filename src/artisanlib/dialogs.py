@@ -18,8 +18,9 @@
 
 import platform
 
-from PyQt5.QtCore import (Qt, QSettings)
-from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, QHBoxLayout, QVBoxLayout)
+from PyQt5.QtCore import Qt, QSettings, pyqtSlot
+from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,
+            QHBoxLayout, QVBoxLayout, QLabel, QLineEdit)
 from PyQt5.QtGui import QKeySequence
 
 class ArtisanDialog(QDialog):
@@ -137,3 +138,41 @@ class HelpDlg(ArtisanDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("HelpGeometry",self.saveGeometry())
+
+class ArtisanInputDialog(ArtisanDialog):
+    def __init__(self, parent = None, aw = None, title="",label=""):
+        super(ArtisanInputDialog,self).__init__(parent, aw)
+        
+        self.url = ""
+        
+        self.setWindowTitle(title) 
+        self.setModal(True)
+        self.setAcceptDrops(True)
+        label = QLabel(label)
+        self.inputLine = QLineEdit(self.url)
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(self.inputLine)
+        layout.addWidget(self.dialogbuttons)
+        self.setLayout(layout)
+        self.setFixedHeight(self.sizeHint().height())
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.rejected.connect(self.reject)
+        self.dialogbuttons.accepted.connect(self.accept)
+        self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+    
+    @pyqtSlot()
+    def accept(self):
+        self.url = self.inputLine.text()
+        QDialog.accept(self)
+    
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        urls = event.mimeData().urls()
+        if urls and len(urls)>0:
+            self.inputLine.setText(urls[0].toString())

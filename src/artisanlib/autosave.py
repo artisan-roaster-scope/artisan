@@ -109,6 +109,7 @@ class autosaveDlg(ArtisanDialog):
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.setFixedHeight(self.sizeHint().height())
 
     @pyqtSlot(bool)
     def showautosavehelp(self,_=False):

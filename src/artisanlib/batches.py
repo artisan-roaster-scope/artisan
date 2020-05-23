@@ -18,9 +18,9 @@
 
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtCore import Qt, pyqtSlot, QSettings
 from PyQt5.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox,
-                             QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox)
+                             QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout)
 
 class batchDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -94,6 +94,12 @@ class batchDlg(ArtisanDialog):
         self.setLayout(mainLayout)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
 
+        settings = QSettings()
+        if settings.contains("BatchPosition"):
+            self.move(settings.value("BatchPosition"))
+        
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+
     @pyqtSlot(int)
     def toggleCounterFlag(self,_):
         if self.batchcheckbox.isChecked():
@@ -115,3 +121,10 @@ class batchDlg(ArtisanDialog):
             self.aw.qmc.batchsequence = 1
         self.aw.qmc.neverUpdateBatchCounter = self.neverOverwriteCheckbox.isChecked()
         self.close()
+    
+    @pyqtSlot()
+    def close(self):
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("BatchPosition",self.geometry().topLeft())
+        super(batchDlg,self).close()

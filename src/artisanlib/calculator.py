@@ -198,6 +198,7 @@ class calculatorDlg(ArtisanDialog):
         mainlayout.addLayout(topLayout)
         mainlayout.addLayout(botLayout)
         self.setLayout(mainlayout)
+        self.setFixedHeight(self.sizeHint().height())
 
     @pyqtSlot(int)
     def calcEventRC(self,_):

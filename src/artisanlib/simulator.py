@@ -19,7 +19,8 @@
 import numpy
 
 class Simulator():
-    def __init__(self, profile = None):
+    def __init__(self, profile = None, speed = 1):
+        self.speed = speed
         self.profile = profile
         self.temp1 = profile["temp1"]
         self.temp2 = profile["temp2"]
@@ -59,6 +60,7 @@ class Simulator():
     def read(self,tx):
         et = -1
         bt = -1
+        tx = tx * self.speed
         try:
             if tx == 0:
                 et = self.temp1[0]

@@ -27,7 +27,7 @@ from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit,
     QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox,
-    QTimeEdit)
+    QTimeEdit, QLayout)
 
 
 ############################################################################
@@ -40,10 +40,6 @@ class PID_DlgControl(ArtisanDialog):
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(QApplication.translate("Form Caption","PID Control",None))
-        
-        settings = QSettings()
-        if settings.contains("PIDGeometry"):
-            self.restoreGeometry(settings.value("PIDGeometry"))
         
         # PID tab
         tab1Layout = QVBoxLayout()
@@ -434,6 +430,12 @@ class PID_DlgControl(ArtisanDialog):
         mainLayout.setContentsMargins(2,10,2,2)
         self.setLayout(mainLayout)
         okButton.setFocus()
+
+        settings = QSettings()
+        if settings.contains("PIDPosition"):
+            self.move(settings.value("PIDPosition"))
+        
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
     
     @pyqtSlot(int)
     def activateSVSlider(self,i):
@@ -572,9 +574,9 @@ class PID_DlgControl(ArtisanDialog):
         self.closeEvent(None)
 
     def closeEvent(self,_):
+        #save window position (only; not size!)
         settings = QSettings()
-        #save window geometry
-        settings.setValue("PIDGeometry",self.saveGeometry()) 
+        settings.setValue("PIDPosition",self.geometry().topLeft())
         self.accept()
 
 ############################################################################

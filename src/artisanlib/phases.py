@@ -188,10 +188,15 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addSpacing(10)
         mainLayout.addLayout(buttonsLayout)
-        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
         self.getphases()
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        
+        settings = QSettings()
+        if settings.contains("PhasesPosition"):
+            self.move(settings.value("PhasesPosition"))
+        
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         
     @pyqtSlot(int)
     def lcdmodeFlagFinChanged(self,value):
@@ -303,6 +308,9 @@ class phasesGraphDlg(ArtisanDialog):
             self.aw.qmc.phasesbuttonflag = False
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         self.savePhasesSettings()
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("PhasesPosition",self.geometry().topLeft())
         self.accept()
 
     @pyqtSlot()
@@ -318,6 +326,9 @@ class phasesGraphDlg(ArtisanDialog):
         self.aw.qmc.phasesLCDmode_all = list(self.org_phasesLCDmode_all)
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         self.savePhasesSettings()
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("PhasesPosition",self.geometry().topLeft())
         self.reject()
 
     def getphases(self):

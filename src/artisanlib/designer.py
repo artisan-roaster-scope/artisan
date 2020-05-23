@@ -19,11 +19,11 @@
 from artisanlib.util import stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot, QRegExp
+from PyQt5.QtCore import Qt, pyqtSlot, QRegExp, QSettings
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import (QApplication, QLabel, 
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QDialogButtonBox, QGridLayout,
-    QGroupBox, QLineEdit, QMessageBox)
+    QGroupBox, QLineEdit, QMessageBox, QLayout)
 
 
 #########################################################################
@@ -291,6 +291,12 @@ class designerconfigDlg(ArtisanDialog):
         self.setLayout(mainLayout)
         self.dialogbuttons.button(QDialogButtonBox.Close).setFocus()
 
+        settings = QSettings()
+        if settings.contains("DesignerPosition"):
+            self.move(settings.value("DesignerPosition"))
+        
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+
     @pyqtSlot(int)
     def redrawcurviness(self,_):
         ETcurviness = int(str(self.ETsplineComboBox.currentText()))
@@ -465,6 +471,13 @@ class designerconfigDlg(ArtisanDialog):
     def create(self):
         self.close()
         self.aw.qmc.convert_designer()
+    
+    @pyqtSlot()
+    def accept(self):
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("DesignerPosition",self.geometry().topLeft())
+        super(designerconfigDlg,self).accept()
 
     #reset
     @pyqtSlot(bool)

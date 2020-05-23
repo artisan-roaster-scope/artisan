@@ -73,7 +73,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel
                          QLCDNumber, QSpinBox, QComboBox, # @Reimport
                          QSlider, QStackedWidget, # @Reimport
                          QColorDialog, QFrame, QProgressDialog, # @Reimport
-                         QStyleFactory, QMenu) # @Reimport
+                         QStyleFactory, QMenu, QLayout) # @Reimport
 from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
                             QKeySequence,
                             QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport
@@ -154,7 +154,7 @@ import unicodedata # @UnresolvedImport
 import artisanlib.arabic_reshaper
 from artisanlib.util import (appFrozen, stringp, uchr, d, encodeLocal, s2a,
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, deltaLabelMathPrefix, stringfromseconds, stringtoseconds,
-        fromFtoC, fromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
+        fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
         toDouble, toBool, toStringList, toMap, removeAll)
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -544,10 +544,11 @@ from artisanlib.sliderStyle import *
 from artisanlib.cropster import extractProfileCropsterXLS
 from artisanlib.giesen import extractProfileGiesenCSV
 from artisanlib.ikawa import extractProfileIkawaCSV
+from artisanlib.roastpath import extractProfileRoastPathHTML
 from artisanlib.simulator import Simulator
 from artisanlib.transposer import profileTransformatorDlg
 from artisanlib.comparator import roastCompareDlg
-from artisanlib.dialogs import ArtisanMessageBox, HelpDlg
+from artisanlib.dialogs import ArtisanMessageBox, HelpDlg, ArtisanInputDialog
 from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
 from artisanlib.events import EventsDlg, customEventDlg
@@ -1398,6 +1399,7 @@ class tgraphcanvas(FigureCanvas):
         self.roastertype = ""
         self.machinesetup = ""
         self.operator = ""
+        self.organization = ""
         self.drumspeed = ""
         self.roastingnotes = ""
         self.cuppingnotes = ""
@@ -11835,7 +11837,6 @@ class tgraphcanvas(FigureCanvas):
     def desconfig(self,_=False):
         dialog = designerconfigDlg(aw,aw)
         dialog.show()
-        dialog.setFixedSize(dialog.size())
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -13525,6 +13526,8 @@ class ApplicationWindow(QMainWindow):
 
         super(ApplicationWindow, self).__init__(parent)
         self.helpdialog = None
+        
+        self.setAcceptDrops(True) # enable drag-and-drop
 
         # a timer that is triggered by resizing the main window
         self.redrawTimer = QTimer()
@@ -13870,6 +13873,10 @@ class ApplicationWindow(QMainWindow):
         fileImportRoastLoggerAction = QAction("RoastLogger...",self)
         fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
         self.importMenu.addAction(fileImportRoastLoggerAction)
+
+        importRoastPathAction = QAction("RoastPATH URL...",self)
+        importRoastPathAction.triggered.connect(self.importRoastPATH)
+        self.importMenu.addAction(importRoastPathAction)
 
 
         self.fileMenu.addSeparator()
@@ -15856,34 +15863,52 @@ class ApplicationWindow(QMainWindow):
         LCDlayout = QVBoxLayout()
         LCDlayout.setSpacing(0)
         LCDlayout.setContentsMargins(0,0,5,0)
+        LCDlayout.setSizeConstraint(QLayout.SetMinimumSize)
 
         #place control buttons + LCDs inside vertical button layout manager
         self.LCD2frame = QFrame()
-        LCDlayout.addWidget(self.makeLCDbox(self.label2,self.lcd2,self.LCD2frame))
+        w = self.makeLCDbox(self.label2,self.lcd2,self.LCD2frame)
+        LCDlayout.addWidget(w)
+        LCDlayout.setAlignment(w,Qt.AlignRight)
 
         self.LCD3frame = QFrame()
-        LCDlayout.addWidget(self.makeLCDbox(self.label3,self.lcd3,self.LCD3frame))
+        w = self.makeLCDbox(self.label3,self.lcd3,self.LCD3frame)
+        LCDlayout.addWidget(w)
+        LCDlayout.setAlignment(w,Qt.AlignRight)
 
         self.LCD6frame = QFrame()
-        LCDlayout.addWidget(self.makeLCDbox(self.label6,self.lcd6,self.LCD6frame))
+        w = self.makeLCDbox(self.label6,self.lcd6,self.LCD6frame)
+        LCDlayout.addWidget(w)
+        LCDlayout.setAlignment(w,Qt.AlignRight)
         self.LCD6frame.setVisible(False)
 
         self.LCD7frame = QFrame()
-        LCDlayout.addWidget(self.makeLCDbox(self.label7,self.lcd7,self.LCD7frame))
+        w = self.makeLCDbox(self.label7,self.lcd7,self.LCD7frame)
+        LCDlayout.addWidget(w)
+        LCDlayout.setAlignment(w,Qt.AlignRight)
         self.LCD7frame.setVisible(False)
 
         self.LCD4frame = QFrame()
-        LCDlayout.addWidget(self.makeLCDbox(self.label4,self.lcd4,self.LCD4frame))
+        w = self.makeLCDbox(self.label4,self.lcd4,self.LCD4frame)
+        LCDlayout.addWidget(w)
+        LCDlayout.setAlignment(w,Qt.AlignRight)
         self.LCD4frame.setVisible(False) # by default this one is not visible
 
         self.LCD5frame = QFrame()
-        LCDlayout.addWidget(self.makeLCDbox(self.label5,self.lcd5,self.LCD5frame))
+        w = self.makeLCDbox(self.label5,self.lcd5,self.LCD5frame)
+        LCDlayout.addWidget(w)
+        LCDlayout.setAlignment(w,Qt.AlignRight)
 
         #add extra LCDs
         for i in range(self.nLCDS):
-            LCDlayout.addWidget(self.makeLCDbox(self.extraLCDlabel1[i],self.extraLCD1[i],self.extraLCDframe1[i]))
-            LCDlayout.addWidget(self.makeLCDbox(self.extraLCDlabel2[i],self.extraLCD2[i],self.extraLCDframe2[i]))
+            w = self.makeLCDbox(self.extraLCDlabel1[i],self.extraLCD1[i],self.extraLCDframe1[i])
+            LCDlayout.addWidget(w)
+            LCDlayout.setAlignment(w,Qt.AlignRight)
+            w = self.makeLCDbox(self.extraLCDlabel2[i],self.extraLCD2[i],self.extraLCDframe2[i])
+            LCDlayout.addWidget(w)
+            LCDlayout.setAlignment(w,Qt.AlignRight)
         LCDlayout.addStretch()
+        del w
 
         #PID Buttons
         pidbuttonLayout.addWidget(self.button_14)
@@ -16248,6 +16273,17 @@ class ApplicationWindow(QMainWindow):
 
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        urls = event.mimeData().urls()
+        if urls and len(urls)>0:
+            app.open_url(urls[0])
 
     def showHelpDialog(self,parent,dialog,title,content):
         try: # sip not supported on older PyQt versions (RPi!)
@@ -17483,7 +17519,7 @@ class ApplicationWindow(QMainWindow):
                     t_min,t_max = aw.calcAutoAxisBackground()
                 else:
                     t_min,t_max = aw.calcAutoAxis()
-
+                
                 if aw.qmc.background:
                     if background:
                         t_max_b = t_max
@@ -17552,10 +17588,14 @@ class ApplicationWindow(QMainWindow):
             t_end = aw.qmc.endofx
             if self.qmc.timeindex[0] > -1: # CHARGE set
                 t_start = aw.qmc.timex[aw.qmc.timeindex[0]] - 60
+            elif self.qmc.timeindex[0] == -1:
+                t_start = aw.qmc.timex[0] - 60
             if self.qmc.timeindex[7] > 0: # COOL set
                 t_end = aw.qmc.timex[aw.qmc.timeindex[7]] + 60
             elif self.qmc.timeindex[6] > 0: # DROP set
                 t_end = aw.qmc.timex[aw.qmc.timeindex[6]] + 90
+            else:
+                t_end = aw.qmc.timex[-1] + 90
             return t_start, t_end
         else:
             return aw.qmc.startofx, aw.qmc.endofx
@@ -18222,10 +18262,8 @@ class ApplicationWindow(QMainWindow):
         for i in range(self.nLCDS):
             self.extraLCD1[i].setDigitCount(n)
             self.extraLCD1[i].setMinimumWidth(n*16)
-            #self.extraLCD1[i].setMaximumWidth(n*16)
             self.extraLCD2[i].setDigitCount(n)
             self.extraLCD2[i].setMinimumWidth(n*16)
-            #self.extraLCD2[i].setMaximumWidth(n*16)
         #
         if not aw.qmc.flagon:
             if self.qmc.LCDdecimalplaces:
@@ -18238,6 +18276,9 @@ class ApplicationWindow(QMainWindow):
             self.lcd5.display(zz)
             self.lcd6.display(zz)
             self.lcd7.display(zz)
+            for i in range(self.nLCDS):
+                self.extraLCD1[i].display(zz)
+                self.extraLCD2[i].display(zz)
         #
         if aw.largeLCDs_dialog:
             aw.largeLCDs_dialog.updateDecimals()
@@ -18847,6 +18888,7 @@ class ApplicationWindow(QMainWindow):
 
     def makeLCDbox(self,label,lcd,lcdframe):
         LCDbox = QVBoxLayout()
+        LCDbox.setSizeConstraint(QLayout.SetFixedSize)
         LCDbox.setSpacing(0)
         LCDbox.addWidget(label)
         LCDhBox = QHBoxLayout()
@@ -21492,6 +21534,7 @@ class ApplicationWindow(QMainWindow):
                 ("date",self.qmc.roastdate.toString("yy-MM-dd")),
                 ("time",self.qmc.roastdate.toString("hhmm")),
                 ("operator",self.qmc.operator),
+                ("organization",self.qmc.organization),
                 ("machine",self.qmc.roastertype),
                 ("drumspeed",self.qmc.drumspeed),
                 ("weightloss",str(cp["weight_loss"]) if "weight_loss" in cp else "0.0"),
@@ -21806,6 +21849,25 @@ class ApplicationWindow(QMainWindow):
             self.setDefaultPath(f)
             return f
 
+    def ArtisanOpenURLDialog(self,msg=QApplication.translate("Message","Open",None)):
+        res = None
+        dlg = ArtisanInputDialog(self,self,msg,QApplication.translate("Message", "URL",None))
+        if dlg.exec_():
+            res = dlg.url
+#        try: # sip not supported on older PyQt versions (RPi!)
+#            sip.delete(dlg)
+#            #print(sip.isdeleted(dlg))
+#        except:
+#            pass
+        if res is None:
+            return None
+        else:
+            url = QUrl(res,QUrl.StrictMode)
+            if url.isValid():
+                return url
+            else:
+                return None
+    
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
@@ -23808,6 +23870,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.operator = d(profile["operator"])
             else:
                 self.qmc.operator = ""
+            if "organization" in profile:
+                self.qmc.organization = d(profile["organization"])
+            else:
+                self.qmc.organization = ""
             if "drumspeed" in profile:
                 self.qmc.drumspeed = d(profile["drumspeed"])
             else:
@@ -23938,7 +24004,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timex = profile["timex"]
 
             # alarms
-            if self.qmc.loadalarmsfromprofile:
+            if self.qmc.loadalarmsfromprofile and filename is not None:
                 self.loadAlarmsFromProfile(filename,profile)
 
             if "extraNoneTempHint1" in profile:
@@ -23969,10 +24035,17 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.temp1 = [fromFtoC(t) for t in self.qmc.temp1]
                 self.qmc.temp2 = [fromFtoC(t) for t in self.qmc.temp2]
                 for e in range(len(self.qmc.extratimex)):
-                    if not (len(aw.qmc.extraNoneTempHint1) > e and aw.qmc.extraNoneTempHint1[e]):
-                        self.qmc.extratemp1[e] = [fromFtoC(t) for t in self.qmc.extratemp1[e]]
-                    if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
-                        self.qmc.extratemp2[e] = [fromFtoC(t) for t in self.qmc.extratemp2[e]]
+                    if aw.extraDelta1[e]:
+                        self.qmc.extratemp1[e] = [RoRfromFtoC(t) for t in self.qmc.extratemp1[e]]
+                    else:
+                        if not (len(aw.qmc.extraNoneTempHint1) > e and aw.qmc.extraNoneTempHint1[e]):
+                            self.qmc.extratemp1[e] = [fromFtoC(t) for t in self.qmc.extratemp1[e]]
+                    if aw.extraDelta2[e]:
+                        self.qmc.extratemp2[e] = [RoRfromFtoC(t) for t in self.qmc.extratemp2[e]]
+                    else:
+                        if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
+                            self.qmc.extratemp2[e] = [fromFtoC(t) for t in self.qmc.extratemp2[e]]
+                aw.calcVirtualdevices(update=True)
                 if self.qmc.ambientTemp != 0:
                     self.qmc.ambientTemp = fromFtoC(self.qmc.ambientTemp)
                 if self.qmc.loadalarmsfromprofile and "alarmtemperature" in profile:
@@ -23984,10 +24057,17 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.temp1 = [fromCtoF(t) for t in self.qmc.temp1]
                 self.qmc.temp2 = [fromCtoF(t) for t in self.qmc.temp2]
                 for e in range(len(self.qmc.extratimex)):
-                    if not (len(aw.qmc.extraNoneTempHint1) > e and aw.qmc.extraNoneTempHint1[e]):
-                        self.qmc.extratemp1[e] = [fromCtoF(t) for t in self.qmc.extratemp1[e]]
-                    if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
-                        self.qmc.extratemp2[e] = [fromCtoF(t) for t in self.qmc.extratemp2[e]]
+                    if aw.extraDelta1[e]:
+                        self.qmc.extratemp1[e] = [RoRfromCtoF(t) for t in self.qmc.extratemp1[e]]
+                    else:
+                        if not (len(aw.qmc.extraNoneTempHint1) > e and aw.qmc.extraNoneTempHint1[e]):
+                            self.qmc.extratemp1[e] = [fromCtoF(t) for t in self.qmc.extratemp1[e]]
+                    if aw.extraDelta2[e]:
+                        self.qmc.extratemp2[e] = [RoRfromCtoF(t) for t in self.qmc.extratemp2[e]]
+                    else:
+                        if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
+                            self.qmc.extratemp2[e] = [fromCtoF(t) for t in self.qmc.extratemp2[e]]
+                aw.calcVirtualdevices(update=True)
                 if self.qmc.ambientTemp != 0:
                     self.qmc.ambientTemp = fromCtoF(self.qmc.ambientTemp)
                 if self.qmc.loadalarmsfromprofile and "alarmtemperature" in profile:
@@ -24444,6 +24524,7 @@ class ApplicationWindow(QMainWindow):
             profile["roastertype"] = encodeLocal(self.qmc.roastertype)
             profile["machinesetup"] = encodeLocal(self.qmc.machinesetup)
             profile["operator"] = encodeLocal(self.qmc.operator)
+            profile["organization"] = encodeLocal(self.qmc.organization)
             profile["drumspeed"] = self.qmc.drumspeed
             profile["heavyFC"] = self.qmc.heavyFC_flag
             profile["lowFC"] = self.qmc.lowFC_flag
@@ -25003,8 +25084,9 @@ class ApplicationWindow(QMainWindow):
                         aw.updateCanvasColors()
                     # remove window geometry settings
                     for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry", "CompareGeometry",
-                        "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","PhasesLCDGeometry","AlarmsGeometry","PIDGeometry","DeviceAssignmentGeometry",
-                        "TransformatorPosition"]:
+                        "BackgroundGeometry","LCDGeometry","DeltaLCDGeometry","ExtraLCDGeometry","PhasesLCDGeometry","AlarmsGeometry","DeviceAssignmentGeometry",
+                        "TransformatorPosition", "CurvesPosition", "StatisticsPosition", "AxisPosition","PhasesPosition", "BatchPosition",
+                        "SamplingPosition", "autosaveGeometry", "PIDPosition", "DesignerPosition"]:
                         settings.remove(s)
                     #
                     aw.setFonts()
@@ -25854,6 +25936,8 @@ class ApplicationWindow(QMainWindow):
 
             settings.beginGroup("RoastProperties")
             self.qmc.operator = toString(settings.value("operator",self.qmc.operator))
+            if settings.contains("organization"):
+                self.qmc.organization = toString(settings.value("organization",self.qmc.organization))
             self.qmc.roastertype = toString(settings.value("roastertype",self.qmc.roastertype))
             if settings.contains("machinesetup"):
                 self.qmc.machinesetup = toString(settings.value("machinesetup",self.qmc.machinesetup))
@@ -27092,6 +27176,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoastProperties")
             settings.setValue("drumspeed",self.qmc.drumspeed)
             settings.setValue("operator",self.qmc.operator)
+            settings.setValue("organization",self.qmc.organization)
             settings.setValue("roastertype",self.qmc.roastertype)
             settings.setValue("machinesetup",self.qmc.machinesetup)
 #            settings.setValue("densitySampleVolume",self.qmc.density[2]) # fixed to 1l now
@@ -29196,6 +29281,8 @@ class ApplicationWindow(QMainWindow):
                 roaster=str(htmllib.escape(self.qmc.roastertype)),
                 operator_label=QApplication.translate("HTML Report Template", "Operator:", None),
                 operator=str(htmllib.escape(self.qmc.operator)),
+                organization_label=QApplication.translate("HTML Report Template", "Organization:", None),
+                organization=str(htmllib.escape(self.qmc.organization)),
                 cup_label=QApplication.translate("HTML Report Template", "Cupping:", None),
                 cup=str(aw.float2float(self.cuppingSum(self.qmc.flavors))),
                 color_label=QApplication.translate("HTML Report Template", "Color:", None),
@@ -30024,7 +30111,6 @@ class ApplicationWindow(QMainWindow):
     def calibratedelay(self,_=False):
         samplingDl = SamplingDlg(self,self)
         samplingDl.show()
-        samplingDl.setFixedSize(samplingDl.size())
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -30198,7 +30284,6 @@ class ApplicationWindow(QMainWindow):
                 dialog = PID_DlgControl(self,self)
                 #modeless style dialog
                 dialog.show()
-                #dialog.setFixedSize(dialog.size()) # this badly interacts with keeping the window gemetry in qsettings
             else:
                 #self.pidcontrol.togglePID()
                 self.toggleHottopControl()
@@ -30224,28 +30309,24 @@ class ApplicationWindow(QMainWindow):
     def showstatistics(self,_=False):
         dialog = StatisticsDlg(self,self)
         dialog.show()
-        dialog.setFixedSize(dialog.size())
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def Windowconfig(self,_=False):
         dialog = WindowsDlg(self,self)
         dialog.show()
-        dialog.setFixedSize(dialog.size())
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def autosaveconf(self,_=False):
         dialog = autosaveDlg(self,self)
         dialog.show()
-#        dialog.setFixedSize(dialog.size())
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def batchconf(self,_=False):
         dialog = batchDlg(self,self)
         dialog.show()
-        dialog.setFixedSize(dialog.size())
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -30253,7 +30334,6 @@ class ApplicationWindow(QMainWindow):
         dialog = calculatorDlg(self,self)
         dialog.setModal(False)
         dialog.show()
-#        dialog.setFixedSize(dialog.size()) # setting this fixed size badly interacts with remembering the screen geometry in app settings
         QApplication.processEvents()
 
     @pyqtSlot()
@@ -30627,7 +30707,6 @@ class ApplicationWindow(QMainWindow):
     def background(self,_=False):
         dialog = backgroundDlg(self,self)
         dialog.show()
-        #dialog.setFixedSize(dialog.size())
 
     def deleteBackground(self):
         self.qmc.background = False
@@ -30757,7 +30836,6 @@ class ApplicationWindow(QMainWindow):
     def editphases(self,_=False):
         dialog = phasesGraphDlg(self,self)
         dialog.show()
-        dialog.setFixedSize(dialog.size())
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -31502,6 +31580,42 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " self.importBullet() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    def importExternalURL(self,extractor,message):
+        try:
+            url = self.ArtisanOpenURLDialog(msg=message)
+            if url is None:
+                return
+            pass
+            
+            res = aw.qmc.reset(redraw=False,soundOn=False)
+            if res:
+                obj = extractor(url)
+                if obj:
+                    res = self.setProfile(None,obj)
+                else:
+                    res = None
+            if res:
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                #update etypes combo box
+                self.etypeComboBox.clear()
+                self.etypeComboBox.addItems(self.qmc.etypes)
+                # profiles was adjusted, ensure that it does not overwrite the original file on saving
+                self.qmc.fileDirty()
+                self.curFile = None
+                # clear annotation cache
+                self.qmc.l_annotations_dict = {}
+                self.qmc.l_event_flags_dict = {}
+                #Plot everything
+                self.qmc.redraw()
+                message = QApplication.translate("Message","{0} imported", None).format(url.toString())
+                self.sendmessage(message)
+
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " {1} {0}").format(str(ex),message),exc_tb.tb_lineno)
+
     def importExternal(self,extractor,message,extension):
         try:
             filename = self.ArtisanOpenFileDialog(msg=message,ext=extension)
@@ -31520,6 +31634,9 @@ class ApplicationWindow(QMainWindow):
                 # profiles was adjusted, ensure that it does not overwrite the original file on saving
                 self.qmc.fileDirty()
                 self.curFile = None
+                # clear annotation cache
+                self.qmc.l_annotations_dict = {}
+                self.qmc.l_event_flags_dict = {}
                 #Plot everything
                 self.qmc.redraw()
                 message = QApplication.translate("Message","{0} imported", None).format(filename)
@@ -31539,6 +31656,11 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importCropster(self,_=False):
         self.importExternal(extractProfileCropsterXLS,QApplication.translate("Message","Import Cropster XLS", None),"*.xls")
+        
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importRoastPATH(self,_=False):
+        self.importExternalURL(extractProfileRoastPathHTML,QApplication.translate("Message","Import RoastPATH URL", None))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -31758,7 +31880,6 @@ class ApplicationWindow(QMainWindow):
     def hudset(self,_=False):
         hudDl = HUDDlg(self,self)
         hudDl.show()
-        hudDl.setFixedSize(hudDl.size())
 
     def showHUDmetrics(self):
         if self.qmc.hudresizeflag:
@@ -32936,6 +33057,7 @@ class ApplicationWindow(QMainWindow):
             self.simulator = None
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
             aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
+            self.sendmessage(QApplication.translate("Message","Simulator stopped", None))
         else:
             try:
                 if aw.curFile is None:
@@ -32950,10 +33072,21 @@ class ApplicationWindow(QMainWindow):
                     firstChar = stream.read(1)
                     if firstChar == "{":
                         f.close()
-                        self.simulator = Simulator(self.deserialize(filename))
+                        modifiers = QApplication.keyboardModifiers()
+                        #control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS
+                        alt_modifier = modifiers == Qt.AltModifier # OPTION on macOS, ALT on Windows
+                        meta_modifier = modifiers == Qt.MetaModifier # Control on macOS, Meta on Windows
+                        if alt_modifier:
+                            speed = 2
+                        elif meta_modifier:
+                            speed = 4
+                        else:
+                            speed = 1
+                        self.simulator = Simulator(self.deserialize(filename),speed)
                         self.simulatorpath = filename
                         aw.button_1.setStyleSheet(aw.pushbuttonstyles_simulator["OFF"])
                         aw.button_2.setStyleSheet(aw.pushbuttonstyles_simulator["STOP"])
+                        self.sendmessage(QApplication.translate("Message","Simulator started @{}x", None).format(speed))
                     else:
                         self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
             except:

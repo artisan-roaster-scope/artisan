@@ -21,10 +21,10 @@ import platform
 from artisanlib.util import deltaLabelUTF8, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot, QRegExp
+from PyQt5.QtCore import Qt, pyqtSlot, QRegExp, QSettings
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, QFrame,
-    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit,
+    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, QLayout,
     QSpinBox)
 
 class WindowsDlg(ArtisanDialog):
@@ -41,7 +41,7 @@ class WindowsDlg(ArtisanDialog):
         step100Label = QLabel(QApplication.translate("Label", "100% Event Step",None))
         self.step100Edit = QLineEdit()
         self.step100Edit.setMaximumWidth(55)
-        self.step100Edit.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, self.aw.qmc.ylimit_max, self.step100Edit))
+        self.step100Edit.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, 999999, self.step100Edit))
         self.step100Edit.setAlignment(Qt.AlignRight)
         self.step100Edit.setToolTip(QApplication.translate("Tooltip", "100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty", None))
         self.xlimitEdit = QLineEdit()
@@ -372,6 +372,12 @@ class WindowsDlg(ArtisanDialog):
             self.disableXAxisControls()
         else:
             self.enableXAxisControls()
+
+        settings = QSettings()
+        if settings.contains("AxisPosition"):
+            self.move(settings.value("AxisPosition"))
+        
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
             
             
     def enableXAxisControls(self):
@@ -501,6 +507,12 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot()
     def updatewindow(self):
         limits_changed = False
+        # trigger auto limits on leaving the dialog if active
+        if self.autotimexFlag.isChecked():
+            self.autoAxis()
+        if self.autodeltaxETFlag.isChecked() or self.autodeltaxBTFlag.isChecked():
+            self.autoDeltaAxis()
+        #
         self.aw.qmc.time_grid = self.timeGridCheckBox.isChecked()
         self.aw.qmc.temp_grid = self.tempGridCheckBox.isChecked()
         self.aw.qmc.loadaxisfromprofile = self.loadAxisFromProfile.isChecked()
@@ -582,6 +594,13 @@ class WindowsDlg(ArtisanDialog):
         string = QApplication.translate("Message","xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})",None).format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))                                   
         self.aw.sendmessage(string)
         self.close()
+    
+    @pyqtSlot()
+    def close(self):
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("AxisPosition",self.geometry().topLeft())
+        super(WindowsDlg,self).close()
 
     @pyqtSlot(bool)
     def reset(self,_):

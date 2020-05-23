@@ -948,11 +948,17 @@ class editGraphDlg(ArtisanResizeablDialog):
                     
         #roaster
         self.roaster = QLineEdit(self.aw.qmc.roastertype)
+        self.roaster.setCursorPosition(0)
         #operator
         self.operator = QLineEdit(self.aw.qmc.operator)
+        self.operator.setCursorPosition(0)
+        #organization
+        self.organization = QLineEdit(self.aw.qmc.organization)
+        self.organization.setCursorPosition(0)
         #drum speed
         self.drumspeed = QLineEdit(self.aw.qmc.drumspeed)
         self.drumspeed.setAlignment(Qt.AlignCenter)
+        self.drumspeed.setCursorPosition(0)
         #weight
         weightlabel = QLabel("<b>" + QApplication.translate("Label", "Weight",None) + "</b>")
         green_label = QLabel("<b>" + QApplication.translate("Label", "Green",None) + "</b>")
@@ -1177,6 +1183,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         roastertypelabel.setText("<b>" + QApplication.translate("Label", "Machine",None) + "</b>")
         operatorlabel = QLabel()
         operatorlabel.setText("<b> " + QApplication.translate("Label", "Operator",None) + "</b>")
+        organizationlabel = QLabel()
+        organizationlabel.setText("<b> " + QApplication.translate("Label", "Organization",None) + "</b>")
         drumspeedlabel = QLabel()
         drumspeedlabel.setText("<b> " + QApplication.translate("Label", "Drum Speed",None) + "</b>")
         roastinglabel = QLabel("<b>" + QApplication.translate("Label", "Roasting Notes",None) + "</b>")
@@ -1400,13 +1408,17 @@ class editGraphDlg(ArtisanResizeablDialog):
             
         roasteroperator = QHBoxLayout()
         roasteroperator.addWidget(self.operator, stretch=3)
-        roasteroperator.addSpacing(10)
+        roasteroperator.addSpacing(8)
+        roasteroperator.addWidget(organizationlabel)
+        roasteroperator.addSpacing(2)
+        roasteroperator.addWidget(self.organization, stretch=3)
+        roasteroperator.addSpacing(8)
         roasteroperator.addWidget(roastertypelabel)
-        roasteroperator.addSpacing(5)
+        roasteroperator.addSpacing(2)
         roasteroperator.addWidget(self.roaster,stretch=3)
-        roasteroperator.addSpacing(10)
+        roasteroperator.addSpacing(8)
         roasteroperator.addWidget(drumspeedlabel)
-        roasteroperator.addSpacing(5)
+        roasteroperator.addSpacing(2)
         roasteroperator.addWidget(self.drumspeed,stretch=1)
         textLayout.addLayout(roasteroperator,5+textLayoutPlusOffset,1)
         
@@ -3570,6 +3582,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         #update notes
         self.aw.qmc.roastertype = self.roaster.text()
         self.aw.qmc.operator = self.operator.text()
+        self.aw.qmc.organization = self.organization.text()
         self.aw.qmc.drumspeed = self.drumspeed.text()
         self.aw.qmc.roastingnotes = self.roastingeditor.toPlainText()
         self.aw.qmc.cuppingnotes = self.cuppingeditor.toPlainText()

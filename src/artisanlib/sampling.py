@@ -18,7 +18,7 @@
 
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtCore import Qt, pyqtSlot, QSettings
 from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout,
                              QDialogButtonBox, QDoubleSpinBox, QLayout, QMessageBox)
 
@@ -75,9 +75,14 @@ class SamplingDlg(ArtisanDialog):
         layout.addLayout(flagLayout)
         layout.addStretch()
         layout.addLayout(buttonsLayout)
-        layout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(layout) 
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        
+        settings = QSettings()
+        if settings.contains("SamplingPosition"):
+            self.move(settings.value("SamplingPosition"))
+        
+        layout.setSizeConstraint(QLayout.SetFixedSize)
         
     def closeEvent(self,_):
         self.close()
@@ -88,6 +93,10 @@ class SamplingDlg(ArtisanDialog):
         self.aw.qmc.delay = self.org_delay
         self.aw.qmc.flagKeepON = self.org_flagKeepON
         self.aw.qmc.flagOpenCompleted = self.org_flagOpenCompleted
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("SamplingPosition",self.geometry().topLeft())
+        self.accept()
         self.reject()
     
     #ok button
@@ -97,6 +106,9 @@ class SamplingDlg(ArtisanDialog):
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
         self.aw.qmc.delay = int(self.interval.value()*1000.)
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
-            QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))        
+            QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))  
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("SamplingPosition",self.geometry().topLeft())      
         self.accept()
 

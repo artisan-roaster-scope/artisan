@@ -18,7 +18,7 @@
 
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtCore import Qt, pyqtSlot, QSettings
 from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, 
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QLayout,
     QSpinBox)
@@ -161,6 +161,12 @@ class StatisticsDlg(ArtisanDialog):
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        
+        settings = QSettings()
+        if settings.contains("StatisticsPosition"):
+            self.move(settings.value("StatisticsPosition"))
+        
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
 
     def AUCLCFflagChanged(self,_):
         self.aw.qmc.AUClcdFlag = not self.aw.qmc.AUClcdFlag
@@ -264,4 +270,7 @@ class StatisticsDlg(ArtisanDialog):
         else:
             self.aw.qmc.statisticsflags[5] = 0
         self.aw.qmc.redraw(recomputeAllDeltas=False)
+        #save window position (only; not size!)
+        settings = QSettings()
+        settings.setValue("StatisticsPosition",self.geometry().topLeft())
         self.close()
