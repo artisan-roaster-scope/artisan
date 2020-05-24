@@ -1141,7 +1141,7 @@ class tgraphcanvas(FigureCanvas):
         # if no entry is available, a temperature curve that needs C<->F translation is assumed
         # note that ET/BT main curves are assumed to always hold temperatures
         self.extraNoneTempHint1 = []                                # list of flags indicating which extra 1 curves are not holding temperature values
-        self.extraNoneTempHint2 = []                                # list of flags indicating which extra 1 curves are not holding temperature values
+        self.extraNoneTempHint2 = []                                # list of flags indicating which extra 2 curves are not holding temperature values
 
         #holds math expressions to plot
         self.plotcurves=[""]*9
@@ -24045,7 +24045,10 @@ class ApplicationWindow(QMainWindow):
                     else:
                         if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
                             self.qmc.extratemp2[e] = [fromFtoC(t) for t in self.qmc.extratemp2[e]]
-                aw.calcVirtualdevices(update=True)
+                try:
+                    aw.calcVirtualdevices(update=True)
+                except:
+                    pass
                 if self.qmc.ambientTemp != 0:
                     self.qmc.ambientTemp = fromFtoC(self.qmc.ambientTemp)
                 if self.qmc.loadalarmsfromprofile and "alarmtemperature" in profile:
@@ -24067,7 +24070,10 @@ class ApplicationWindow(QMainWindow):
                     else:
                         if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
                             self.qmc.extratemp2[e] = [fromCtoF(t) for t in self.qmc.extratemp2[e]]
-                aw.calcVirtualdevices(update=True)
+                try:
+                    aw.calcVirtualdevices(update=True)
+                except:
+                    pass
                 if self.qmc.ambientTemp != 0:
                     self.qmc.ambientTemp = fromCtoF(self.qmc.ambientTemp)
                 if self.qmc.loadalarmsfromprofile and "alarmtemperature" in profile:

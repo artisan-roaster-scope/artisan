@@ -3204,7 +3204,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if percent <= 0:
             self.densitypercentlabel.setText("")
         else:
-            percentstring =  "-%.1f" %(percent) + "%"
+            percentstring =  "-%.1f%%" % percent
             self.densitypercentlabel.setText(percentstring)    #density percent loss
         
     def moisture_percent(self):

@@ -35,7 +35,8 @@ from artisanlib.qcheckcombobox import CheckComboBox
 with suppress_stdout_stderr():
     from matplotlib import cm
 
-from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl, QCoreApplication, QFileInfo)
+from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl, 
+    QCoreApplication, QFileInfo, QDate, QTime, QDateTime)
 from PyQt5.QtGui import (QColor, QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
     QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox)
@@ -118,6 +119,7 @@ class RoastProfile():
         if "temp2" in profile:
             self.temp2 = self.aw.qmc.fill_gaps(profile["temp2"])
         # temperature conversion
+        self.ambientTemp = profile["ambientTemp"]
         if "mode" in profile:
             m = str(profile["mode"])
         else:
@@ -125,9 +127,11 @@ class RoastProfile():
         if self.aw.qmc.mode == "C" and m == "F":
             self.temp1 = [fromFtoC(t) for t in self.temp1]
             self.temp2 = [fromFtoC(t) for t in self.temp2]
+            self.ambientTemp = fromFtoC(self.ambientTemp)
         elif self.aw.qmc.mode == "F" and m == "C":
             self.temp1 = [fromCtoF(t) for t in self.temp1]
             self.temp2 = [fromCtoF(t) for t in self.temp2]
+            self.ambientTemp = fromCtoF(self.ambientTemp)
         if "title" in profile:
             self.title = d(profile["title"])
         if "roastbatchnr" in profile and profile["roastbatchnr"] != 0:
@@ -144,6 +148,67 @@ class RoastProfile():
             self.specialeventstype = profile["specialeventstype"]
         if "specialeventsvalue" in profile:
             self.specialeventsvalue = profile["specialeventsvalue"]
+        # add metadata
+        self.metadata = {}
+        if "roastdate" in profile:
+            try:
+                date = QDate.fromString(d(profile["roastdate"]))
+                if not date.isValid():
+                    date = QDate.currentDate()
+                if "roasttime" in profile:
+                    try:
+                        time = QTime.fromString(d(profile["roasttime"]))
+                        self.metadata["roastdate"] = QDateTime(date,time)
+                    except Exception:
+                        self.metadata["roastdate"] = QDateTime(date)
+                else:
+                    self.metadata["roastdate"] = QDateTime(date)
+            except Exception:
+                pass
+        # the new dates have the locale independent isodate format:
+        if "roastisodate" in profile:
+            try:
+                date = QDate.fromString(d(profile["roastisodate"]),Qt.ISODate)
+                if "roasttime" in profile:
+                    try:
+                        time = QTime.fromString(d(profile["roasttime"]))
+                        self.metadata["roastdate"] = QDateTime(date,time)
+                    except Exception:
+                        self.metadata["roastdate"] = QDateTime(date)
+                else:
+                    self.metadata["roastdate"] = QDateTime(date)
+            except Exception:
+                pass
+        if "roastepoch" in profile:
+            try:
+                self.metadata["roastdate"] = QDateTime.fromTime_t(profile["roastepoch"])
+            except Exception:
+                pass
+        if "beans" in profile:
+            self.metadata["beans"] = d(profile["beans"])
+        if "weight" in profile and profile["weight"][0] != 0.0:
+            weights = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
+            self.metadata["weight"] = "%.1f%s"%(profile["weight"][0],d(profile["weight"][2]))
+        if "moisture_greens" in profile and profile["moisture_greens"] != 0.0:
+            self.metadata["moisture_greens"] = profile["moisture_greens"]
+        if "ambientTemp" in profile:
+            self.metadata["ambientTemp"] = "%g%s" % (self.aw.float2float(self.ambientTemp),self.aw.qmc.mode)          
+        if "ambient_humidity" in profile:
+            self.metadata["ambient_humidity"] = "%g%%" % self.aw.float2float(profile["ambient_humidity"])
+        if "ambient_pressure" in profile:
+            self.metadata["ambient_pressure"] = "%ghPa" % self.aw.float2float(profile["ambient_pressure"])
+        if profile["computed"] is not None and "weight_loss" in profile["computed"] and profile["computed"]["weight_loss"] is not None:
+            self.metadata["weight_loss"] = "-%.1f%%" % profile["computed"]["weight_loss"]
+        if "ground_color" in profile:
+            self.metadata["ground_color"] = "#%s" % profile["ground_color"]
+        if profile["computed"] is not None and "AUC" in profile["computed"] and profile["computed"]["AUC"] is not None and \
+                profile["computed"]["AUC"] != 0:
+            self.metadata["AUC"] = "%sC*min" % profile["computed"]["AUC"]
+        if "roastingnotes" in profile:
+            self.metadata["roastingnotes"] = d(profile["roastingnotes"])
+        if "cuppingnotes" in profile:
+            self.metadata["cuppingnotes"] = d(profile["cuppingnotes"])       
+        #
         self.recompute()
         self.draw()
         self.updateAlpha()
@@ -887,9 +952,79 @@ class roastCompareDlg(ArtisanDialog):
         flagLayout.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
         flagLayout.setContentsMargins(0,0,0,0)
         self.profileTable.setCellWidget(i,1,flagWidget)
-        self.profileTable.setItem(i,2,QTableWidgetItem(profile.title))
+        title_item = QTableWidgetItem(profile.title)
+        tooltip = self.renderToolTip(profile)
+        if tooltip is not None and tooltip != "":
+            title_item.setToolTip(tooltip)
+        self.profileTable.setItem(i,2,title_item)
         header = QTableWidgetItem(profile.label)
         self.profileTable.setVerticalHeaderItem(i,header)
+    
+    def renderToolTip(self,profile):
+        tooltip = ""
+        if profile.metadata is not None:
+            try:
+                if "roastdate" in profile.metadata:
+                    tooltip = profile.metadata["roastdate"].date().toString()
+                    tooltip += ", " + profile.metadata["roastdate"].time().toString()[:-3]
+                if "weight" in profile.metadata:
+                    if tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["weight"]
+                if "beans" in profile.metadata:
+                    if "weight" in profile.metadata:
+                        tooltip += " "
+                    elif tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["beans"].strip()
+                    if "moisture_greens" in profile.metadata:
+                        tooltip += " (%g%%)" % self.aw.float2float(profile.metadata["moisture_greens"])
+                if "ambientTemp" in profile.metadata:
+                    if tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["ambientTemp"]
+                if "ambient_humidity" in profile.metadata:
+                    if "ambientTemp" in profile.metadata:
+                        tooltip += ", "
+                    elif tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["ambient_humidity"]
+                if "ambient_pressure" in profile.metadata:
+                    if "ambientTemp" in profile.metadata or "ambient_humidity" in profile.metadata:
+                        tooltip += ", "
+                    elif tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["ambient_pressure"]
+                if "weight_loss" in profile.metadata:
+                    if tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["weight_loss"]
+                if "ground_color" in profile.metadata:
+                    if "weight_loss" in profile.metadata:
+                        tooltip += ", "
+                    elif tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["ground_color"]
+                if "AUC" in profile.metadata:
+                    if "weight_loss" in profile.metadata or "ground_color" in profile.metadata:
+                        tooltip += ", "
+                    elif tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["AUC"]
+                if "roastingnotes" in profile.metadata:
+                    if tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["roastingnotes"].strip()
+                if "cuppingnotes" in profile.metadata:
+                    if tooltip != "":
+                        tooltip += "\n"
+                    tooltip += profile.metadata["cuppingnotes"].strip()
+            except:
+#                import traceback
+#                import sys
+#                traceback.print_exc(file=sys.stdout)
+                pass
+        return tooltip.strip()
     
     def createProfileTable(self):
         try:

@@ -123,7 +123,8 @@ def extractProfileRoastPathHTML(url):
                     if "EventName" in d and d["EventName"] in marks and "Timestamp" in d:
                         tx = dateutil.parser.parse(d["Timestamp"]).timestamp() - baseTime
                         try:
-                            tx_idx = res["timex"].index(tx)
+#                            tx_idx = res["timex"].index(tx) # does not cope with dropouts as the next line:
+                            tx_idx = next(i for i,item in enumerate(res["timex"]) if item >= tx)
                             timeindex[marks[d["EventName"]]] = tx_idx
                         except:
                             pass
