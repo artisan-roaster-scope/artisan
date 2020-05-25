@@ -106,11 +106,11 @@ cp ../LICENSE dist/LICENSE.txt
 # so it is better to rely on the system installed once
 # see https://github.com/gridsync/gridsync/issues/47 and https://github.com/gridsync/gridsync/issues/43
 #   and https://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error
-rm -f dist/libdrm.so.2
-rm -f dist/libX11.so.6
-rm -f dist/libstdc++.so.6
+rm -f dist/libdrm.so.2 # https://github.com/gridsync/gridsync/issues/47
+rm -f dist/libX11.so.6 # https://github.com/gridsync/gridsync/issues/43
+rm -f dist/libstdc++.so.6 # https://github.com/gridsync/gridsync/issues/189
 rm -f dist/libgio-2.0.so.0
-rm -f dist/libz.so.1
+# rm -f dist/libz.so.1
 rm -f dist/libglib-2.0.so.0 # removed for v1.6 and later
 
 rm -f libusb-1.0.so.0
