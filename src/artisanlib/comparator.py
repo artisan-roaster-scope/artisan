@@ -187,8 +187,10 @@ class RoastProfile():
         if "beans" in profile:
             self.metadata["beans"] = d(profile["beans"])
         if "weight" in profile and profile["weight"][0] != 0.0:
-            weights = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
-            self.metadata["weight"] = "%.1f%s"%(profile["weight"][0],d(profile["weight"][2]))
+            w = profile["weight"][0]
+            if d(profile["weight"][2]) != "g":
+                w = self.aw.float2float(w,1)
+            self.metadata["weight"] = "%g%s"%(w,d(profile["weight"][2]))
         if "moisture_greens" in profile and profile["moisture_greens"] != 0.0:
             self.metadata["moisture_greens"] = profile["moisture_greens"]
         if "ambientTemp" in profile:

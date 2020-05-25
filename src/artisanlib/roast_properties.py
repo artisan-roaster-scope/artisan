@@ -3618,14 +3618,17 @@ class editGraphDlg(ArtisanResizeablDialog):
             # if title changed we at least update that one
             if self.aw.qmc.flagstart and not self.aw.qmc.title_show_always:
                 self.aw.qmc.setProfileTitle("")
-                st_artist = self.aw.qmc.fig.suptitle("")
-                try:
-                    st_artist.set_in_layout(False) # remove suptitle from tight_layout calculation
-                except: # set_in_layout not available in mpl<3.x
-                    pass
+                self.aw.qmc.setProfileBackgroundTitle("")
                 self.aw.qmc.fig.canvas.draw()
             else:
                 self.aw.qmc.setProfileTitle(self.aw.qmc.title)
+                titleB = ""
+                if self.background and not (self.aw.qmc.title is None or self.aw.qmc.title == ""):
+                    if self.aw.qmc.roastbatchnrB == 0:
+                        titleB = self.aw.qmc.titleB
+                    else:
+                        titleB = self.aw.qmc.roastbatchprefixB + str(self.aw.qmc.roastbatchnrB) + " " + self.aw.qmc.titleB
+                    self.aw.qmc.setProfileBackgroundTitle(titleB)
 #                self.aw.qmc.updateBackground()
                 self.aw.qmc.fig.canvas.draw()
         

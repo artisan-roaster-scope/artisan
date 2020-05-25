@@ -2114,6 +2114,15 @@ class tgraphcanvas(FigureCanvas):
         self.segmentsamplesthreshold = 3
 
         self.stats_summary_rect = None
+        
+        # temp vars used to truncate title and statistic line (x_label) to width of MPL canvas
+        self.title_text = None
+        self.title_artist = None
+        self.title_width = None
+        self.background_title_width = 0
+        self.xlabel_text = None
+        self.xlabel_artist = None
+        self.xlabel_width = None
 
         self.updategraphicsSignal.connect(self.updategraphics)
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
@@ -2377,9 +2386,58 @@ class tgraphcanvas(FigureCanvas):
 
     # hook up to mpls event handling framework for draw events
     # this is emitted after the canvas has finished a full redraw
-    def _draw_event(self, _):
+    def _draw_event(self, event):
         #self.fig.canvas.flush_events() # THIS prevents the black border on >Qt5.5, but slows down things (especially resizings) on redraw otherwise!!!
         self.ax_background = None
+        
+        #truncate title and statistic line to width of axis system to avoid that the MPL canvas goes into miser mode
+        try:
+            
+            r = self.fig.canvas.get_renderer()
+            ax_width = self.ax.get_window_extent(renderer=r).width
+            ax_width_for_title = ax_width - self.background_title_width
+            redraw = False
+            if self.title_text is not None and self.title_artist is not None and self.title_width is not None:
+                try:
+                    prev_title_text = self.title_artist.get_text()
+                    if ax_width_for_title <= self.title_width:
+                        chars = int(ax_width_for_title / (self.title_width / len(self.title_text))) - 3
+                        self.title_artist.set_text(self.title_text[:chars].strip() + "...")
+                    else:
+                        self.title_artist.set_text(self.title_text)
+                    if prev_title_text != self.title_artist.get_text():
+                        redraw = True
+                except:
+                    pass
+            if self.xlabel_text is not None and self.xlabel_artist is not None and self.xlabel_width is not None:
+                try:
+                    prev_xlabel_text = self.xlabel_artist.get_text()
+                    if ax_width <= self.xlabel_width:
+                        chars = int(ax_width / (self.xlabel_width / len(self.xlabel_text))) - 2
+                        self.xlabel_artist.set_text(self.xlabel_text[:chars].strip() + "...")
+                    else:
+                        self.xlabel_artist.set_text(self.xlabel_text)
+                    if prev_xlabel_text != self.xlabel_artist.get_text():
+                        redraw = True
+                except:
+                    pass
+                    
+            try:
+                if redraw:
+                    # Temporarily disconnect any callbacks to the draw event...
+                    # (To avoid recursion)
+                    func_handles = self.fig.canvas.callbacks.callbacks[event.name]
+                    self.fig.canvas.callbacks.callbacks[event.name] = {}
+                    # Re-draw the figure..
+                    self.fig.canvas.draw()
+                    # Reset the draw event callbacks
+                    self.fig.canvas.callbacks.callbacks[event.name] = func_handles
+            except:
+                pass
+
+        except:
+            pass
+            
 
     @pyqtSlot()
     def sendeventmessage(self):
@@ -5627,6 +5685,51 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             pass
 
+    def set_xlabel(self,xlabel):
+        fontprop_medium = aw.mpl_fontproperties.copy()
+        fontprop_medium.set_size("medium")
+        self.xlabel_text = xlabel
+        self.xlabel_artist = self.ax.set_xlabel(xlabel,color = self.palette["xlabel"],fontproperties=fontprop_medium)
+        try:
+            self.xlabel_width = self.xlabel_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
+        except:
+            pass
+        try:
+            self.xlabel_artist.set_in_layout(False) # remove x-axis labels from tight_layout calculation
+        except: # set_in_layout not available in mpl<3.x
+            pass
+    
+    def setProfileBackgroundTitle(self,backgroundtitle):
+        suptitleX = 1
+        try:
+            ax_width = self.ax.get_window_extent(renderer=self.fig.canvas.get_renderer()).width # total width of axis in display coordinates
+            ax_begin = self.ax.transAxes.transform((0,0))[0] # left of axis in display coordinates
+            suptitleX = self.fig.transFigure.inverted().transform((ax_width + ax_begin,0))[0]
+        except:
+            pass
+
+        self.background_title_width = 0
+        fontprop_small = aw.mpl_fontproperties.copy()
+        fontprop_small.set_size("xx-small")
+        backgroundtitle = backgroundtitle.strip()
+        if backgroundtitle != "":
+            if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
+                backgroundtitle = toASCII(backgroundtitle)
+            backgroundtitle = "\n" + aw.qmc.abbrevString(backgroundtitle,30)
+        st_artist = self.fig.suptitle(backgroundtitle,
+                horizontalalignment="right",verticalalignment="top",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
+        try:
+            st_artist.set_in_layout(False)  # remove title from tight_layout calculation
+        except:  # set_in_layout not available in mpl<3.x
+            pass
+        try:
+            if len(backgroundtitle)>0:
+                self.background_title_width = st_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
+            else:
+                self.background_title_width = 0
+        except:
+            self.background_title_width = 0
+    
     # if updatebackground is True, the samplingsemaphore is catched and updatebackground() is called
     @pyqtSlot(str,bool)
     def setProfileTitle(self,title,updatebackground=False):
@@ -5638,25 +5741,25 @@ class tgraphcanvas(FigureCanvas):
             bnr = self.roastbatchnr
         if bnr != 0 and title != "":
             title = "{}{} {}".format(bprefix,str(bnr),title)
-        if self.background and self.titleB and len(self.titleB) > 10:
-            stl = 30
-        elif platf == 'Windows':
-            stl = 33
-        else:
-            stl = 35
-        if aw.qmc.graphfont != 1: # Humor font runs very long!!
-            stl = int(stl*1.5)
+            
         if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
             title = toASCII(title)
-        title = aw.qmc.abbrevString(title,stl)
+        
         fontprop_xlarge = aw.mpl_fontproperties.copy()
         fontprop_xlarge.set_size("xx-large")
-        t_artist = self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"], loc='left',
-                    fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
-        try:
-            t_artist.set_in_layout(False) # remove title from tight_layout calculation
+        
+        self.title_text = aw.arabicReshape(title.strip())
+        self.title_artist = self.ax.set_title(self.title_text, color=self.palette["title"], loc='left',
+                    fontproperties=fontprop_xlarge,horizontalalignment="left",verticalalignment="top",x=0)
+        try: # this one seems not to work for titles, subtitles and axis!?
+            self.title_artist.set_in_layout(False) # remove title from tight_layout calculation
         except: # set_in_layout not available in mpl<3.x
             pass
+        try:
+            self.title_width = self.title_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
+        except:
+            pass
+        
         if updatebackground:
             #### lock shared resources #####
             aw.qmc.samplingsemaphore.acquire(1)
@@ -5782,11 +5885,6 @@ class tgraphcanvas(FigureCanvas):
 
                 if aw.qmc.flagstart and not aw.qmc.title_show_always:
                     self.setProfileTitle("")
-                    st_artist = self.fig.suptitle("")
-                    try:
-                        st_artist.set_in_layout(False) # remove suptitle from tight_layout calculation
-                    except: # set_in_layout not available in mpl<3.x
-                        pass
                 else:
                     self.setProfileTitle(self.title)
 
@@ -5804,16 +5902,12 @@ class tgraphcanvas(FigureCanvas):
                         pass
 
                 if aw.qmc.flagstart:
-                    y_label =self.ax.set_ylabel("")
-                    x_label = self.ax.set_xlabel("")
+                    y_label = self.ax.set_ylabel("")
+                    self.set_xlabel("")
                 else:
                     y_label = self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
-                    x_label = self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
+                    self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)))
 
-                try:
-                    x_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-                except: # set_in_layout not available in mpl<3.x
-                    pass
                 try:
                     y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
                 except: # set_in_layout not available in mpl<3.x
@@ -5824,36 +5918,13 @@ class tgraphcanvas(FigureCanvas):
                     any(aw.extraDelta1[:len(self.extratimex)]) or
                     any(aw.extraDelta2[:len(self.extratimex)]))
 
-                if self.background:
-                    if len(self.title) > 20:
-                        stl = 25
+                titleB = ""
+                if self.background and not ((aw.qmc.flagstart and not aw.qmc.title_show_always) or self.title is None or self.title.strip() == ""):
+                    if self.roastbatchnrB == 0:
+                        titleB = self.titleB
                     else:
-                        stl = 30
-                    if two_ax_mode:
-                        suptitleX = 0.93
-                    else:
-                        suptitleX = 1
-                    if aw.qmc.flagstart and not aw.qmc.title_show_always:
-                        st_artist = self.fig.suptitle("")
-                    else:
-                        if self.roastbatchnrB == 0:
-                            titleB = self.titleB
-                        else:
-                            titleB = self.roastbatchprefixB + str(self.roastbatchnrB) + " " + self.titleB
-                        if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
-                            titleB = toASCII(titleB)
-                        if self.title is None or self.title.strip() == "":
-                            st_artist = self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
-                                horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
-                        else:
-                            st_artist = self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
-                                horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
-                    try:
-                        st_artist.set_in_layout(False)  # remove title from tight_layout calculation
-                    except:  # set_in_layout not available in mpl<3.x
-                        pass
-                else:
-                    st_artist = self.fig.suptitle("")
+                        titleB = self.roastbatchprefixB + str(self.roastbatchnrB) + " " + self.titleB
+                self.setProfileBackgroundTitle(titleB)
 
     #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
     #            self.ax.spines['top'].set_color('none')
@@ -8829,7 +8900,7 @@ class tgraphcanvas(FigureCanvas):
             # if on turn mouse crosslines off
             if aw.qmc.crossmarker:
                 aw.qmc.togglecrosslines()
-            aw.qmc.ax.set_xlabel("")
+            aw.qmc.set_xlabel("")
             aw.qmc.ax.set_ylabel("")
             if not aw.qmc.title_show_always:
                 aw.qmc.setProfileTitle("")
@@ -10347,7 +10418,7 @@ class tgraphcanvas(FigureCanvas):
                             strline = strline + "   " + QApplication.translate("Label", "CM", None) + ("=%.1f/%.1f" % (det,dbt)) + self.mode
                         if FCperiod is not None:
                             strline = strline + "   " + QApplication.translate("Label", "FC", None) + "=%smin" % FCperiod
-                    x_label = self.ax.set_xlabel(strline,color = aw.qmc.palette["xlabel"],fontproperties=statsprop)
+                    self.set_xlabel(strline)
                 else:
                     sep = u"   "
                     msg = aw.qmc.roastdate.date().toString(Qt.SystemLocaleShortDate)
@@ -10369,15 +10440,9 @@ class tgraphcanvas(FigureCanvas):
                         msg += sep + u"#" + str(aw.qmc.whole_color) + u"/" +  str(aw.qmc.ground_color)
                     elif aw.qmc.ground_color:
                         msg += sep + u"#" + str(aw.qmc.ground_color)
-                    x_label = self.ax.set_xlabel(msg,color = aw.qmc.palette["xlabel"],fontproperties=statsprop)
+                    self.set_xlabel(msg)
             else:
-                fontprop_medium = aw.mpl_fontproperties.copy()
-                fontprop_medium.set_size("medium")
-                x_label = self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
-            try:
-                x_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-            except: # set_in_layout not available in mpl<3.x
-                pass
+                self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)))
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -11245,11 +11310,7 @@ class tgraphcanvas(FigureCanvas):
 
             fontprop_medium = aw.mpl_fontproperties.copy()
             fontprop_medium.set_size("medium")
-            x_label = self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Designer",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
-            try:
-                x_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-            except: # set_in_layout not available in mpl<3.x
-                pass
+            self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Designer",None)))
 
             #draw background
             if self.background:
@@ -12561,12 +12622,8 @@ class VMToolbar(NavigationToolbar):
                 else:
                     if aw.qmc.flagstart:
                         # temporary set the axis to get proper menu items (same code as in redraw)
-                        x_label = aw.qmc.ax.set_ylabel(aw.qmc.mode)
-                        y_label = aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None)))
-                        try:
-                            x_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-                        except: # set_in_layout not available in mpl<3.x
-                            pass
+                        aw.qmc.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None)))
+                        y_label = aw.qmc.ax.set_ylabel(aw.qmc.mode)
                         try:
                             y_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
                         except: # set_in_layout not available in mpl<3.x
@@ -15835,7 +15892,7 @@ class ApplicationWindow(QMainWindow):
         self.level1frame.setLayout(self.level1layout)
 
         level3layout = QHBoxLayout()   # PID buttons, graph, temperature LCDs
-
+        
         pidbuttonLayout = QVBoxLayout()
 
         EventsLayout = QHBoxLayout()
