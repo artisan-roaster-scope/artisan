@@ -30,7 +30,7 @@ In percentage mode you can see the % time in each phase.  This is good to see th
 
 In temperature mode, you see the bean temperature change relative to the previous phase, so if you want to drop 10 degrees after first crack you can see that.  
 
-For the last phase, one can decide to display all information (time, temp and percentage) across the 3 available PhasesLCDs.  Do this by ticking the flag at the end of the Finishing phase row. This specific mode avoids having to right-click the PhasesLCDs regular to check all this relevant information during that last busy phase. **This is one of the best features of Artisan.**
+For the last phase, one can decide to display all information (time, temp and percentage) across the 3 available PhasesLCDs.  Do this by ticking the flag at the end of the Finishing phase row. This specific mode avoids having to right-click the PhasesLCDs regular to check all this relevant information during that last busy phase. **This is one of the best features of Artisan.**. Much has been spoken about Development Time Ratio and there are a variety of ways to display it as documented in this [Artisan Blog](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html) article.
 
 Here are examples of how the three Phases LCDs work if you check the box to make them visible.  Each of the three small LCDs relate to one of the three roasting phases.
 
