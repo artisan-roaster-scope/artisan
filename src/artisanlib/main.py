@@ -7262,7 +7262,7 @@ class tgraphcanvas(FigureCanvas):
                 self.placelogoimage()
 
                 ############  ready to plot ############
-#                self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
+                self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
                 self.updateBackground() # update bitlblit backgrounds
                 #######################################
 
