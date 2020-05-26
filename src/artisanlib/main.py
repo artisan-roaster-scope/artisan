@@ -2209,7 +2209,9 @@ class tgraphcanvas(FigureCanvas):
             self.resetdeltalines() # just in case
 
             try:
-                self.fig.canvas.draw() # the triggered _draw_event(self,evt) function resets the self.in_draw_event if done
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    self.fig.canvas.draw() # the triggered _draw_event(self,evt) function resets the self.in_draw_event if done
                 #self.fig.canvas.draw_idle() # ask the canvas to kindly draw it self some time in the future when Qt thinks it is convenient
                 # make sure that the GUI framework has a chance to run its event loop
                 # and clear any GUI events.  This needs to be in a try/except block
@@ -2396,6 +2398,7 @@ class tgraphcanvas(FigureCanvas):
     def fit_titles(self):
         #truncate title and statistic line to width of axis system to avoid that the MPL canvas goes into miser mode
         try:
+            self.fig.canvas.updateGeometry()
             r = self.fig.canvas.get_renderer()
             ax_width = self.ax.get_window_extent(renderer=r).width
             ax_width_for_title = ax_width - self.background_title_width
@@ -2431,13 +2434,16 @@ class tgraphcanvas(FigureCanvas):
                     func_handles = self.fig.canvas.callbacks.callbacks["draw_event"]
                     self.fig.canvas.callbacks.callbacks["draw_event"] = {}
                     # Re-draw the figure..
-                    self.fig.canvas.draw()
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        self.fig.canvas.draw()
                     # Reset the draw event callbacks
                     self.fig.canvas.callbacks.callbacks["draw_event"] = func_handles
             except:
                 pass
 
-        except:
+        except Exception as e:
+            print(e)
             pass
     
     # hook up to mpls event handling framework for draw events
@@ -7271,7 +7277,9 @@ class tgraphcanvas(FigureCanvas):
                 self.placelogoimage()
 
                 ############  ready to plot ############
-                self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
                 self.updateBackground() # update bitlblit backgrounds
                 #######################################
 
@@ -8382,7 +8390,9 @@ class tgraphcanvas(FigureCanvas):
         self.flavorchart_total.set_text(txt)
 
         # update canvas
-        self.fig.canvas.draw()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
     def updateFlavorchartLabel(self,i):
@@ -8390,7 +8400,9 @@ class tgraphcanvas(FigureCanvas):
         label_anno.set_text(self.flavorChartLabelText(i))
 
         # update canvas
-        self.fig.canvas.draw()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
     def samplingAction(self):
@@ -10841,7 +10853,9 @@ class tgraphcanvas(FigureCanvas):
                 pad = max(0,len(self.timex) - startindex - len(x))
                 xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
                 self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
-                self.fig.canvas.draw()
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    self.fig.canvas.draw()
                 return z
             except Exception:
                 return None
@@ -10903,7 +10917,9 @@ class tgraphcanvas(FigureCanvas):
                     xxa = xa + charge
                     self.ax.plot(xxb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
                     self.ax.plot(xxa, yn, "ro")
-                    self.fig.canvas.draw()
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        self.fig.canvas.draw()
                 if len(popt)>2:
                     if power == 2:
                         res = "%.8f * t*t %s %.8f * t %s %.8f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
@@ -10941,7 +10957,9 @@ class tgraphcanvas(FigureCanvas):
             self.ax.plot(self.timex, newX, color="black", linestyle = '-.', linewidth=3)
             self.ax.plot(Xpoints, Ypoints, "ro")
 
-            self.fig.canvas.draw()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                self.fig.canvas.draw()
 
         except ValueError:
             aw.qmc.adderror(QApplication.translate("Error Message","Value Error:",None) + " univariate()")
@@ -10963,7 +10981,9 @@ class tgraphcanvas(FigureCanvas):
             self.ax.plot(self.timex, newY, color="black", linestyle = '-.', linewidth=3)
             self.ax.plot(Xpoints, Ypoints, "ro")
 
-            self.fig.canvas.draw()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                self.fig.canvas.draw()
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
@@ -11405,7 +11425,9 @@ class tgraphcanvas(FigureCanvas):
 
 
             #plot
-            self.fig.canvas.draw()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                self.fig.canvas.draw()
 
     #CONTEXT MENU  = Right click
     def on_press(self,event):
@@ -11526,11 +11548,15 @@ class tgraphcanvas(FigureCanvas):
                         if i in self.timeindex:
                             if abs(self.temp2[i] - ydata) < 10:
                                 self.ax.plot(self.timex[i],self.temp2[i],color = "orange",marker = "o",alpha = .3,markersize=30)
-                                self.fig.canvas.draw()
+                                with warnings.catch_warnings():
+                                    warnings.simplefilter("ignore")
+                                    self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
                             elif abs(self.temp1[i] - ydata) < 10:
                                 self.ax.plot(self.timex[i],self.temp1[i],color = "orange",marker = "o",alpha = .3,markersize=30)
-                                self.fig.canvas.draw()
+                                with warnings.catch_warnings():
+                                    warnings.simplefilter("ignore")
+                                    self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
                             index = self.timeindex.index(i)
                             if index == 0:
@@ -11558,11 +11584,15 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             if abs(self.temp2[i] - ydata) < 10:
                                 self.ax.plot(self.timex[i],self.temp2[i],color = "blue",marker = "o",alpha = .3,markersize=30)
-                                self.fig.canvas.draw()
+                                with warnings.catch_warnings():
+                                    warnings.simplefilter("ignore")
+                                    self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
                             elif abs(self.temp1[i] - ydata) < 10:
                                 self.ax.plot(self.timex[i],self.temp1[i],color = "blue",marker = "o",alpha = .3,markersize=30)
-                                self.fig.canvas.draw()
+                                with warnings.catch_warnings():
+                                    warnings.simplefilter("ignore")
+                                    self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
                             timez = stringfromseconds(self.timex[i] - self.timex[self.timeindex[0]])
                             aw.sendmessage(timez,style="background-color:'lightblue';")
@@ -12181,7 +12211,9 @@ class tgraphcanvas(FigureCanvas):
             wheels = len(names)
 
             if not wheels:
-                self.fig.canvas.draw()
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    self.fig.canvas.draw()
                 return
 
             n,textangles,textloc = [],[],[] # nr of names, text angles, text locations
@@ -12254,7 +12286,9 @@ class tgraphcanvas(FigureCanvas):
                     except: # mpl before v3.0 do not have this set_in_layout() function
                         pass
                     count += 1
-            self.fig.canvas.draw()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                self.fig.canvas.draw()
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
@@ -19251,8 +19285,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.fig.set_dpi(dpi*aw.devicePixelRatio())
             #move widget to update display
             if moveWindow:
-                aw.qmc.fig.canvas.draw()
-                aw.qmc.fig.canvas.update()
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    aw.qmc.fig.canvas.draw()
+                    aw.qmc.fig.canvas.update()
                 aw.stack.adjustSize()
                 FigureCanvas.updateGeometry(aw.stack)  #@UndefinedVariable
                 QApplication.processEvents()
@@ -33375,7 +33411,9 @@ def main():
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
-        app.exec_()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            app.exec_()
         # alternative:
         # ret = app.exec()
         # app = None
