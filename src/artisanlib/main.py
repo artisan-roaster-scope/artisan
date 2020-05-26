@@ -2123,6 +2123,10 @@ class tgraphcanvas(FigureCanvas):
         self.xlabel_text = None
         self.xlabel_artist = None
         self.xlabel_width = None
+    
+        self.lazyredraw_on_resize_timer =  QTimer()
+        self.lazyredraw_on_resize_timer.timeout.connect(self.lazyredraw_on_resize)
+        self.lazyredraw_on_resize_timer.setSingleShot(True)
 
         self.updategraphicsSignal.connect(self.updategraphics)
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
@@ -2152,6 +2156,9 @@ class tgraphcanvas(FigureCanvas):
         except:
             pass
         self.safesaveflag = False
+    
+    def lazyredraw_on_resize(self):
+        self.lazyredraw(recomputeAllDeltas=False)
 
     def resizeEvent(self, event):
         super(tgraphcanvas,self).resizeEvent(event)
@@ -2159,11 +2166,14 @@ class tgraphcanvas(FigureCanvas):
         if aw.redrawOnResize and aw.logofilename != "":
             dw = event.size().width() - event.oldSize().width()   # width change
             dh = event.size().height() - event.oldSize().height() # height change
-            t = libtime.time()
-            # ensure that we redraw during resize only once per second
-            if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
-                self.resizeredrawing = t
-                QTimer.singleShot(1, lambda : self.lazyredraw(recomputeAllDeltas=False))
+#            t = libtime.time()
+#            # ensure that we redraw during resize only once per second
+#            if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
+#                self.resizeredrawing = t
+#                QTimer.singleShot(1, lazyredraw_on_resize)
+            if ((dw != 0) or (dh != 0)):
+                self.lazyredraw_on_resize_timer.start(10)
+                
 
     # update the aw.qmc.deltaBTspan and deltaETspan from the given sampling interval, aw.qmc.deltaETsamples and aw.qmc.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
@@ -2197,7 +2207,6 @@ class tgraphcanvas(FigureCanvas):
             self.resetlinecountcaches() # ensure that the line counts are up to date
             self.resetlines() # get rid of HUD, projection, cross lines and AUC line
             self.resetdeltalines() # just in case
-
 
             try:
                 self.fig.canvas.draw() # the triggered _draw_event(self,evt) function resets the self.in_draw_event if done
@@ -2383,16 +2392,10 @@ class tgraphcanvas(FigureCanvas):
             return -1
         else:
             return self.eventsExternal2InternalValue(float(st))
-
-    # hook up to mpls event handling framework for draw events
-    # this is emitted after the canvas has finished a full redraw
-    def _draw_event(self, event):
-        #self.fig.canvas.flush_events() # THIS prevents the black border on >Qt5.5, but slows down things (especially resizings) on redraw otherwise!!!
-        self.ax_background = None
-        
+    
+    def fit_titles(self):
         #truncate title and statistic line to width of axis system to avoid that the MPL canvas goes into miser mode
         try:
-            
             r = self.fig.canvas.get_renderer()
             ax_width = self.ax.get_window_extent(renderer=r).width
             ax_width_for_title = ax_width - self.background_title_width
@@ -2420,24 +2423,30 @@ class tgraphcanvas(FigureCanvas):
                     if prev_xlabel_text != self.xlabel_artist.get_text():
                         redraw = True
                 except:
-                    pass
-                    
+                    pass 
             try:
                 if redraw:
                     # Temporarily disconnect any callbacks to the draw event...
                     # (To avoid recursion)
-                    func_handles = self.fig.canvas.callbacks.callbacks[event.name]
-                    self.fig.canvas.callbacks.callbacks[event.name] = {}
+                    func_handles = self.fig.canvas.callbacks.callbacks["draw_event"]
+                    self.fig.canvas.callbacks.callbacks["draw_event"] = {}
                     # Re-draw the figure..
                     self.fig.canvas.draw()
                     # Reset the draw event callbacks
-                    self.fig.canvas.callbacks.callbacks[event.name] = func_handles
+                    self.fig.canvas.callbacks.callbacks["draw_event"] = func_handles
             except:
                 pass
 
         except:
             pass
-            
+    
+    # hook up to mpls event handling framework for draw events
+    # this is emitted after the canvas has finished a full redraw
+    def _draw_event(self, _):
+        #self.fig.canvas.flush_events() # THIS prevents the black border on >Qt5.5, but slows down things (especially resizings) on redraw otherwise!!!
+        self.ax_background = None
+        # we trigger a re-fit of the titles to fit to the resized MPL canvas
+        self.fit_titles()
 
     @pyqtSlot()
     def sendeventmessage(self):

@@ -3623,7 +3623,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 self.aw.qmc.setProfileTitle(self.aw.qmc.title)
                 titleB = ""
-                if self.background and not (self.aw.qmc.title is None or self.aw.qmc.title == ""):
+                if self.aw.qmc.background and not (self.aw.qmc.title is None or self.aw.qmc.title == ""):
                     if self.aw.qmc.roastbatchnrB == 0:
                         titleB = self.aw.qmc.titleB
                     else:

@@ -7,12 +7,14 @@ if [ -f /etc/os-release ]; then
 	unset XDG_CURRENT_DESKTOP
     fi
 fi
-if [ -f /etc/os-release ]; then
-    grep Fedora /etc/os-release >/dev/null
-    # Workaround for issue #187
-    if [ $? -eq 0 ]; then
-	export GDK_BACKEND=x11
-    fi
-fi
-exec /usr/bin/env PATH=/usr/share/artisan:$PATH QT_PLUGIN_PATH=/usr/share/artisan/PyQt5/Qt/plugins LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/gtk-3.0/modules:/usr/share/artisan:$LD_LIBRARY_PATH LIBOVERLAY_SCROLLBAR=0 GTK2_RC_FILES="$HOME/.gtkrc-2.0" /usr/share/artisan/artisan "$@" 2>/dev/null
+# Fedora 31 and Debian testing crashes on opening the fileselector if GDK_BACKEND=x11 is not set
+# As setting this seem not to harm Ubuntu nor CentOS we set this for all Linux platforms
+#if [ -f /etc/os-release ]; then
+#    grep Fedora /etc/os-release >/dev/null
+#    # Workaround for issue #187
+#    if [ $? -eq 0 ]; then
+#	export GDK_BACKEND=x11
+#    fi
+#fi
+exec /usr/bin/env GDK_BACKEND=x11 PATH=/usr/share/artisan:$PATH QT_PLUGIN_PATH=/usr/share/artisan/PyQt5/Qt/plugins LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/gtk-3.0/modules:/usr/share/artisan:$LD_LIBRARY_PATH LIBOVERLAY_SCROLLBAR=0 GTK2_RC_FILES="$HOME/.gtkrc-2.0" /usr/share/artisan/artisan "$@" 2>/dev/null
 
