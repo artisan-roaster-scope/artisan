@@ -199,7 +199,8 @@ class RoastProfile():
             self.metadata["ambient_humidity"] = "%g%%" % self.aw.float2float(profile["ambient_humidity"])
         if "ambient_pressure" in profile:
             self.metadata["ambient_pressure"] = "%ghPa" % self.aw.float2float(profile["ambient_pressure"])
-        if profile["computed"] is not None and "weight_loss" in profile["computed"] and profile["computed"]["weight_loss"] is not None:
+        if "computed" in profile and profile["computed"] is not None and "weight_loss" in profile["computed"] and \
+                profile["computed"]["weight_loss"] is not None:
             self.metadata["weight_loss"] = "-%.1f%%" % profile["computed"]["weight_loss"]
         if "ground_color" in profile:
             self.metadata["ground_color"] = "#%s" % profile["ground_color"]
@@ -210,6 +211,11 @@ class RoastProfile():
             self.metadata["roastingnotes"] = d(profile["roastingnotes"])
         if "cuppingnotes" in profile:
             self.metadata["cuppingnotes"] = d(profile["cuppingnotes"])       
+        # TP time in time since DROP
+        if profile["computed"] is not None and "TP_time" in profile["computed"]:
+            self.TP = profile["computed"]["TP_time"]
+        else:
+            self.TP = 0
         #
         self.recompute()
         self.draw()
@@ -604,6 +610,7 @@ class roastCompareDlg(ArtisanDialog):
         alignLabel = QLabel(QApplication.translate("Label","Align",None))
         self.alignnames = [
             QApplication.translate("Label","CHARGE", None),
+            QApplication.translate("Label","TP", None),
             QApplication.translate("Label","DRY", None),
             QApplication.translate("Label","FCs", None),
             QApplication.translate("Label","FCe", None),
@@ -1223,7 +1230,7 @@ class roastCompareDlg(ArtisanDialog):
         if top:
             model = self.alignComboBox.model()
             for i in range(model.rowCount()):
-                if len(top.timeindex) > i and ((i == 0 and top.timeindex[i] != -1) or top.timeindex[i] > 0):
+                if len(top.timeindex) > i and ((i == 0 and top.timeindex[i] != -1) or (i==1 and top.TP != 0) or (i>1 and top.timeindex[i-1] > 0)):
                     model.item(i).setEnabled(True)
                 else:
                     model.item(i).setEnabled(False)
@@ -1251,7 +1258,7 @@ class roastCompareDlg(ArtisanDialog):
                 w.setBackground(c)
     
     # align all profiles to the first one w.r.t. to the event self.aw.qmc.compareAlignEvent
-    #   0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP
+    #   0:CHARGE, 1:TP, 2:DRY, 3:FCs, 4:FCe, 5:SCs, 6:SCe, 7:DROP
     def realign(self,updateDeltaAxis=True):
         if len(self.profiles) > 0:
             profiles = self.getProfilesVisualOrder()
@@ -1266,8 +1273,10 @@ class roastCompareDlg(ArtisanDialog):
             # align all other profiles to the top profile w.r.t. self.aw.qmc.compareAlignEvent
             if self.aw.qmc.compareAlignEvent == 0:
                 refTime = 0
-            elif top.timeindex[self.aw.qmc.compareAlignEvent] > 0:
-                refTime = top.timex[top.timeindex[self.aw.qmc.compareAlignEvent]] - delta
+            elif self.aw.qmc.compareAlignEvent == 1: # TP
+                refTime = top.TP
+            elif self.aw.qmc.compareAlignEvent>1 and top.timeindex[self.aw.qmc.compareAlignEvent-1] > 0:
+                refTime = top.timex[top.timeindex[self.aw.qmc.compareAlignEvent-1]] - delta
             else:
                 # no reference point to align the other profiles too!
                 if self.l_align is not None:
@@ -1277,17 +1286,35 @@ class roastCompareDlg(ArtisanDialog):
                 self.l_align.set_xdata(refTime)
                 self.l_align.set_visible(True)
             for p in profiles[1:]:
-                if (self.aw.qmc.compareAlignEvent == 0 and p.timeindex[0] != -1) or p.timeindex[self.aw.qmc.compareAlignEvent] > 0:
+                if (self.aw.qmc.compareAlignEvent == 0 and p.timeindex[0] != -1):
                     eventTime = p.timex[p.timeindex[self.aw.qmc.compareAlignEvent]]
                     delta = eventTime - refTime
                     p.setTimeoffset(delta)
                     p.aligned = True
                     p.min_time = refTime - eventTime + p.startTime()
                     p.max_time = p.endTime() - eventTime + refTime
-                elif (self.aw.qmc.compareAlignEvent == 0 or top.timeindex[self.aw.qmc.compareAlignEvent] == 0):
+                elif self.aw.qmc.compareAlignEvent==1 and p.TP > 0:
+                    p_offset = 0
+                    if p.timeindex[0]>-1:
+                        p_offset = p.timex[p.timeindex[0]]
+                    eventTime = p.TP + p_offset
+                    delta = eventTime - refTime
+                    p.setTimeoffset(delta)
+                    p.aligned = True
+                    p.min_time = refTime - eventTime + p.startTime()
+                    p.max_time = p.endTime() - eventTime + refTime
+                elif self.aw.qmc.compareAlignEvent>1 and p.timeindex[self.aw.qmc.compareAlignEvent-1] > 0:
+                    eventTime = p.timex[p.timeindex[self.aw.qmc.compareAlignEvent-1]]
+                    delta = eventTime - refTime
+                    p.setTimeoffset(delta)
+                    p.aligned = True
+                    p.min_time = refTime - eventTime + p.startTime()
+                    p.max_time = p.endTime() - eventTime + refTime
+                elif (self.aw.qmc.compareAlignEvent == 0 or (self.aw.qmc.compareAlignEvent == 1 and top.TP == 0) or \
+                        (self.aw.qmc.compareAlignEvent>1 and top.timeindex[self.aw.qmc.compareAlignEvent-1] == 0)):
                     # align to CHARGE or first reading
                     if p.timeindex[0] != -1:
-                        eventTime = p.timex[p.timeindex[self.aw.qmc.compareAlignEvent]]
+                        eventTime = p.timex[p.timeindex[0]]
                     else:
                         eventTime = p.timex[0]
                     delta = eventTime - refTime

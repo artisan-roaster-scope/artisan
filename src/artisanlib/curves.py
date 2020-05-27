@@ -1515,7 +1515,7 @@ class HUDDlg(ArtisanDialog):
         try:
             value = self.resolutionSpinBox.value()
             self.aw.setdpi(value)
-            QApplication.processEvents()
+            self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changedpi(): {0}").format(str(e)),exc_tb.tb_lineno)

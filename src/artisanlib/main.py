@@ -2398,7 +2398,6 @@ class tgraphcanvas(FigureCanvas):
     def fit_titles(self):
         #truncate title and statistic line to width of axis system to avoid that the MPL canvas goes into miser mode
         try:
-            self.fig.canvas.updateGeometry()
             r = self.fig.canvas.get_renderer()
             ax_width = self.ax.get_window_extent(renderer=r).width
             ax_width_for_title = ax_width - self.background_title_width
@@ -2407,7 +2406,7 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     prev_title_text = self.title_artist.get_text()
                     if ax_width_for_title <= self.title_width:
-                        chars = int(ax_width_for_title / (self.title_width / len(self.title_text))) - 3
+                        chars = max(3,int(ax_width_for_title / (self.title_width / len(self.title_text))) - 2)
                         self.title_artist.set_text(self.title_text[:chars].strip() + "...")
                     else:
                         self.title_artist.set_text(self.title_text)
@@ -2419,7 +2418,7 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     prev_xlabel_text = self.xlabel_artist.get_text()
                     if ax_width <= self.xlabel_width:
-                        chars = int(ax_width / (self.xlabel_width / len(self.xlabel_text))) - 2
+                        chars = max(3,int(ax_width / (self.xlabel_width / len(self.xlabel_text))) - 2)
                         self.xlabel_artist.set_text(self.xlabel_text[:chars].strip() + "...")
                     else:
                         self.xlabel_artist.set_text(self.xlabel_text)
@@ -2442,8 +2441,7 @@ class tgraphcanvas(FigureCanvas):
             except:
                 pass
 
-        except Exception as e:
-            print(e)
+        except:
             pass
     
     # hook up to mpls event handling framework for draw events
@@ -7277,9 +7275,9 @@ class tgraphcanvas(FigureCanvas):
                 self.placelogoimage()
 
                 ############  ready to plot ############
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")
-                    self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
+#                with warnings.catch_warnings():
+#                    warnings.simplefilter("ignore")
+#                    self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
                 self.updateBackground() # update bitlblit backgrounds
                 #######################################
 
@@ -7331,6 +7329,12 @@ class tgraphcanvas(FigureCanvas):
                 self.legendloc_pos = None
                 if takelock and aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
+                
+                # to allow the fit_title to work on the proper value we ping the redraw explicitly again after a processEvent
+                QApplication.processEvents() # allow for relayouting/resizing if needed
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
 
     def checkOverlap(self, anno, eventno, annotext):
         overlapallowed = max(0,min(aw.qmc.overlappct,100))/100  #the input is validated but this here to prevent any escapes
@@ -24384,6 +24388,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     TP_time_idx = None
             if TP_time_idx:
+                computedProfile["TP_idx"] = TP_time_idx
                 computedProfile["TP_time"] = self.float2float(self.qmc.timex[TP_time_idx] - start)
                 computedProfile["TP_ET"] = self.float2float(self.qmc.temp1[TP_time_idx])
                 computedProfile["TP_BT"] = self.float2float(self.qmc.temp2[TP_time_idx])
@@ -33198,6 +33203,8 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
             except:
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
                 pass
             self.simulatorAction.setChecked(bool(self.simulator))
 

@@ -34,28 +34,22 @@ class Simulator():
         try:
             # select the first BT index not an error value to start with
             start = list(map(lambda i: i != -1, self.temp2)).index(True) 
-            self.temp1 = self.temp1[start:]
-            self.temp2 = self.temp2[start:]
-            self.timex = self.timex[start:]
+            self.temp1 = numpy.array(self.temp1[start:])
+            self.temp2 = numpy.array(self.temp2[start:])
+            self.timex = numpy.array(self.timex[start:])
             for i in range(len(self.extratimex)):
-                self.extratemp1[i] = self.extratemp1[i][start:]
-                self.extratemp2[i] = self.extratemp2[i][start:]
-                self.extratimex[i] = self.extratimex[i][start:]
+                self.extratemp1[i] = numpy.array(self.extratemp1[i][start:])
+                self.extratemp2[i] = numpy.array(self.extratemp2[i][start:])
+                self.extratimex[i] = numpy.array(self.extratimex[i][start:])
+            # shift timestamps such that they start with 0
+            if len(self.timex) > 0:
+                self.timex = self.timex - self.timex[0]
+            # shift timestamps such that they start with 0
+            for i in range(len(self.extratimex)):
+                if len(self.extratimex[i]) > 0:
+                    self.extratimex[i] = self.extratimex[i] - self.extratimex[i][0]
         except:
             pass
-        self.temp1 = numpy.array(self.temp1)
-        self.temp2 = numpy.array(self.temp2)
-        self.timex = numpy.array(self.timex)
-        # shift timestamps such that they start with 0
-        if len(self.timex) > 0:
-            self.timex = self.timex - self.timex[0]
-        self.extratemp1 = numpy.array(self.extratemp1)
-        self.extratemp2 = numpy.array(self.extratemp2)
-        self.extratimex = numpy.array(self.extratimex)
-        # shift timestamps such that they start with 0
-        for i in range(len(self.extratimex)):
-            if len(self.extratimex[i]) > 0:
-                self.extratimex[i] = self.extratimex[i] - self.extratimex[i][0]
     
     def read(self,tx):
         et = -1
