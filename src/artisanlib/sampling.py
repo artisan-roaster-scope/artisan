@@ -95,7 +95,7 @@ class SamplingDlg(ArtisanDialog):
         self.aw.qmc.flagOpenCompleted = self.org_flagOpenCompleted
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("SamplingPosition",self.geometry().topLeft())
+        settings.setValue("SamplingPosition",self.frameGeometry().topLeft())
         self.accept()
         self.reject()
     
@@ -109,6 +109,6 @@ class SamplingDlg(ArtisanDialog):
             QMessageBox.warning(self.aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))  
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("SamplingPosition",self.geometry().topLeft())      
+        settings.setValue("SamplingPosition",self.frameGeometry().topLeft())      
         self.accept()
 

@@ -126,5 +126,5 @@ class batchDlg(ArtisanDialog):
     def close(self):
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("BatchPosition",self.geometry().topLeft())
+        settings.setValue("BatchPosition",self.frameGeometry().topLeft())
         super(batchDlg,self).close()

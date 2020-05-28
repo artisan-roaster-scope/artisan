@@ -476,7 +476,7 @@ class designerconfigDlg(ArtisanDialog):
     def accept(self):
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("DesignerPosition",self.geometry().topLeft())
+        settings.setValue("DesignerPosition",self.frameGeometry().topLeft())
         super(designerconfigDlg,self).accept()
 
     #reset

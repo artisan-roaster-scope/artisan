@@ -272,5 +272,5 @@ class StatisticsDlg(ArtisanDialog):
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("StatisticsPosition",self.geometry().topLeft())
+        settings.setValue("StatisticsPosition",self.frameGeometry().topLeft())
         self.close()

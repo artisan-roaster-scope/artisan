@@ -525,7 +525,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.apply()
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("TransformatorPosition",self.geometry().topLeft())
+        settings.setValue("TransformatorPosition",self.frameGeometry().topLeft())
         self.accept()
 
     #called from Cancel button

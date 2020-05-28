@@ -576,7 +576,7 @@ class PID_DlgControl(ArtisanDialog):
     def closeEvent(self,_):
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("PIDPosition",self.geometry().topLeft())
+        settings.setValue("PIDPosition",self.frameGeometry().topLeft())
         self.accept()
 
 ############################################################################

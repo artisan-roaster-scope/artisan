@@ -2330,7 +2330,7 @@ class HUDDlg(ArtisanDialog):
         self.closeHelp()
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("CurvesPosition",self.geometry().topLeft())
+        settings.setValue("CurvesPosition",self.frameGeometry().topLeft())
 
         #restore settings
         self.aw.qmc.DeltaETflag = self.org_DeltaET
@@ -2373,7 +2373,7 @@ class HUDDlg(ArtisanDialog):
         self.closeHelp()
         #save window position (only; not size!)
         settings = QSettings()
-        settings.setValue("CurvesPosition",self.geometry().topLeft())
+        settings.setValue("CurvesPosition",self.frameGeometry().topLeft())
 
         self.aw.qmc.DeltaETfunction = str(self.DeltaETfunctionedit.text())
         self.aw.qmc.DeltaBTfunction = str(self.DeltaBTfunctionedit.text())
