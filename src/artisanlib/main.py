@@ -7330,11 +7330,13 @@ class tgraphcanvas(FigureCanvas):
                 if takelock and aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
                 
-                # to allow the fit_title to work on the proper value we ping the redraw explicitly again after a processEvent
-                QApplication.processEvents() # allow for relayouting/resizing if needed
+                # to allow the fit_title to work on the proper value we ping the redraw explicitly again after processing events
+                # we need to use draw_idle here to allow Qt for relayout event processing
+                # calling QApplication.processEvents() is not an option here as the event loop might not have been started yet
+                # alternatively one could call canvas.draw() using a QTimer.singleShot(self.fig.canvas.draw())
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    self.fig.canvas.draw() # done also by updateBackground(), but the title on ON is not update if not called here too (might be a MPL bug in v3.1.2)!
+                    self.fig.canvas.draw_idle()
 
     def checkOverlap(self, anno, eventno, annotext):
         overlapallowed = max(0,min(aw.qmc.overlappct,100))/100  #the input is validated but this here to prevent any escapes
@@ -33431,7 +33433,6 @@ def main():
 #            pass
 
     aw.qmc.startPhidgetManager()
-
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
