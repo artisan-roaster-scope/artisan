@@ -11384,12 +11384,17 @@ class tgraphcanvas(FigureCanvas):
                 self.ETsplinedegree = len(self.timex)-1
 
             timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
-            func = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
-            btvals = func(timez).tolist()
-            func2 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
-            etvals = func2(timez).tolist()
-            #convert all time values to temperature
+            try:
+                func = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
+                btvals = func(timez).tolist()
+                func2 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
+                etvals = func2(timez).tolist()
+            except:
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception: redrawdesigner() Roast events may be out of order. Restting Designer.",None)))
+                self.reset_designer()
+                return
 
+            #convert all time values to temperature
 
             rcParams['path.sketch'] = (0,0,0)
 
@@ -21618,8 +21623,14 @@ class ApplicationWindow(QMainWindow):
             else:
                 droptime_long = "00_00"
             if "DROP_time" in cp and "FCs_time" in cp and cp["DROP_time"] > 0 and cp["DROP_time"] > cp["FCs_time"]:
+                devtime_int = int(cp["DROP_time"] - cp["FCs_time"])
+                devtime = str(devtime_int)
+                m, s = divmod(devtime_int, 60)
+                devtime_long = '{:02d}_{:02d}'.format(int(m), int(s))
                 dtr = str(self.float2float(100 * (cp["DROP_time"] - cp["FCs_time"])/cp["DROP_time"],1))
             else:
+                devtime = "0"
+                devtime_long = "00_00"
                 dtr = "0.0"
             if "green_density" in cp and "roasted_density" in cp:
                 density_loss = str(aw.float2float(100 *(cp["green_density"] - cp["roasted_density"]) / cp["green_density"],1))
@@ -21661,10 +21672,10 @@ class ApplicationWindow(QMainWindow):
                 ("beans_25",beansline[:25]),
                 ("beans_30",beansline[:30]),
                 ("beans",beansline[:30]),   #undocumented, remains here for hidden backward compatibility with v2.4RC
-                ("roastweight",str(self.float2float(float(self.qmc.weight[1]),1))),
-                ("roastvolume",str(self.float2float(float(self.qmc.volume[1]),1))),
-                ("roastdensity",str(self.float2float(float(self.qmc.density_roasted[0]),1))),
-                ("roastmoisture",str(self.float2float(float(self.qmc.moisture_roasted)))),
+                ("roastedweight",str(self.float2float(float(self.qmc.weight[1]),1))),
+                ("roastedvolume",str(self.float2float(float(self.qmc.volume[1]),1))),
+                ("roasteddensity",str(self.float2float(float(self.qmc.density_roasted[0]),1))),
+                ("roastedmoisture",str(self.float2float(float(self.qmc.moisture_roasted)))),
                 ("colorwhole",str(self.qmc.whole_color)),
                 ("colorground",str(self.qmc.ground_color)),
                 ("colorsystem",str(self.qmc.color_systems[self.qmc.color_system_idx])),
@@ -21683,7 +21694,9 @@ class ApplicationWindow(QMainWindow):
                 ("dropet",str(cp["DROP_ET"]) if "DROP_ET" in cp else "0.0"),
                 ("dropbt",str(cp["DROP_BT"]) if "DROP_BT" in cp else "0.0"),
                 ("droptime_long", droptime_long),
-                ("droptime",str(cp["DROP_time"]) if "DROP_time" in cp else "0.0"),                
+                ("droptime",str(int(cp["DROP_time"])) if "DROP_time" in cp else "0"),                
+                ("devtime_long", devtime_long),
+                ("devtime", devtime),                
                 ("dtr", dtr),
                 ("roastingnotes_line",roastingnotesline),
                 ("roastingnotes_10",roastingnotesline[:10]),
@@ -21699,6 +21712,10 @@ class ApplicationWindow(QMainWindow):
                 ("cuppingnotes_25",cuppingnotesline[:25]),
                 ("cuppingnotes_30",cuppingnotesline[:30]),
 #                ("cuppingnotes",cuppingnotesline[:30]),
+                ("roastweight",str(self.float2float(float(self.qmc.weight[1]),1))),            #depricated
+                ("roastvolume",str(self.float2float(float(self.qmc.volume[1]),1))),            #depricated
+                ("roastdensity",str(self.float2float(float(self.qmc.density_roasted[0]),1))),  #depricated
+                ("roastmoisture",str(self.float2float(float(self.qmc.moisture_roasted)))),     #depricated
                 ]
     
             _ignorecase = re.IGNORECASE  # @UndefinedVariable
