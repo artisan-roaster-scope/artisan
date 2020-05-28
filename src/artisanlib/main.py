@@ -277,7 +277,7 @@ class Artisan(QtSingleApplication):
                         application_path = sys.argv[0]
                     application_path = re.sub(r"\\",r"/",application_path)
                     # must start viewer without an argv else it thinks it was started from a link and sends back to artisan
-                    os.startfile(application_path)
+                    os.startfile(application_path)  # @UndefinedVariable
                     QTimer.singleShot(3000,lambda : self._sendMessage2ArtisanInstance(message,instance_id))
             except:
                 pass

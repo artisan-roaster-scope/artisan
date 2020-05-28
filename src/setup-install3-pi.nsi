@@ -281,6 +281,9 @@ Section Uninstall
   RMDir /r "$INSTDIR\Wheels"
 
   RMDir /r "$INSTDIR\gevent-1.4.0-py3.7.egg-info"
+  RMDir /r "$INSTDIR\gevent-1.4.0-py3.8.egg-info"
+  RMDir /r "$INSTDIR\gevent-1.5.0-py3.8.egg-info"
+  RMDir /r "$INSTDIR\lxml"
 
   RMDir /r "$INSTDIR\gevent"
   RMDir /r "$INSTDIR\matplotlib"

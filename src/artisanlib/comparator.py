@@ -582,6 +582,9 @@ class roastCompareDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, foreground = None, background = None):
         super(roastCompareDlg,self).__init__(parent, aw)
         
+        if platform.system() == 'Darwin':
+            self.setAttribute(Qt.WA_MacAlwaysShowToolWindow)
+        
         self.setAcceptDrops(True)
         
         self.foreground = foreground
@@ -761,7 +764,11 @@ class roastCompareDlg(ArtisanDialog):
             if p.timeindex[0] != -1:
                 time -= p.timex[p.timeindex[0]]
             temp = self.aw.float2float(p.temp2[p.timeindex[ind]])
-            event_name = self.alignnames[ind]
+            if ind > 0:
+                name_idx = ind + 1
+            else:
+                name_idx = ind
+            event_name = self.alignnames[name_idx]
             event_name = self.aw.arabicReshape(event_name)
             self.aw.sendmessage("{}: {} @ {}, {}{}".format(p.label,event_name,stringfromseconds(time,leadingzero=False),temp,self.aw.qmc.mode))
         

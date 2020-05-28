@@ -6,17 +6,24 @@ Original Author: user763305
 Notes: Modified for PyQt5; further modified to remove blocking sockets remaining from died server
 '''
 
+import sys
+import multiprocessing as mp
+
 from PyQt5.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer
 
 
-import multiprocessing as mp
 
 class QtSingleApplication(QApplication):
     messageReceived = pyqtSignal(str)
 
     def __init__(self, _id,_viewer_id, *argv):
+    
+        if sys.platform.startswith("darwin") and mp.current_process().name == "WebLCDs":
+            import AppKit
+            info = AppKit.NSBundle.mainBundle().infoDictionary()  # @UndefinedVariable
+            info["LSBackgroundOnly"] = "1"
 
         super(QtSingleApplication, self).__init__(*argv)
         
