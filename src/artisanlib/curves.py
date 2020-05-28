@@ -1186,10 +1186,12 @@ class HUDDlg(ArtisanDialog):
         WebLCDsLayout.addWidget(self.WebLCDsPortLabel)
         WebLCDsLayout.addWidget(self.WebLCDsPort)
         WebLCDsLayout.addStretch()
+        WebLCDsAlertsLayout = QHBoxLayout()
+        WebLCDsAlertsLayout.addWidget(self.WebLCDsAlerts)
         WebLCDsVLayout = QVBoxLayout()
         if not self.app.artisanviewerMode:
             WebLCDsVLayout.addLayout(WebLCDsLayout)
-            WebLCDsVLayout.addWidget(self.WebLCDsAlerts)
+            WebLCDsVLayout.addLayout(WebLCDsAlertsLayout)
             WebLCDsVLayout.addWidget(self.WebLCDsURL)
             WebLCDsVLayout.addWidget(self.QRpic)
         else:
