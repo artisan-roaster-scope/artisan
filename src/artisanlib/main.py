@@ -228,7 +228,7 @@ class Artisan(QtSingleApplication):
                         self.open_url(QUrl.fromLocalFile(profile_path))
             elif url.scheme() == "file":
                 if not url.hasQuery() or  url.query() != "background":
-                    self.activateWindow()
+                    QTimer.singleShot(20,lambda: self.activateWindow())
                 url.setQuery(None) # remove any query to get a valid file path
                 url.setFragment(None) # remove also any potential fragment
                 filename = url.toString(QUrl.PreferLocalFile)
@@ -264,9 +264,21 @@ class Artisan(QtSingleApplication):
         if platf == "Windows":
             try:
                 if instance_id == self._viewer_id:
-                    self._sendMessage2ArtisanInstance(message,self._viewer_id)
+                    res = self._sendMessage2ArtisanInstance(message,self._viewer_id)
                 elif instance_id == self._id:
-                    self._sendMessage2ArtisanInstance(message,self._id)
+                    res = self._sendMessage2ArtisanInstance(message,self._id)
+                if not res:
+                    # get the path of the artisan.exe file
+                    if getattr(sys, 'frozen', False):
+                        application_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+                        application_path += "\\artisan.exe"
+                    # or the artisan py file if running from source
+                    else:
+                        application_path = sys.argv[0]
+                    application_path = re.sub(r"\\",r"/",application_path)
+                    # must start viewer without an argv else it thinks it was started from a link and sends back to artisan
+                    os.startfile(application_path)
+                    QTimer.singleShot(3000,lambda : self._sendMessage2ArtisanInstance(message,instance_id))
             except:
                 pass
         else:
