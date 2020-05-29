@@ -90,11 +90,16 @@ class graphColorDlg(ArtisanDialog):
         self.bgdeltabtButton.setFocusPolicy(Qt.NoFocus)
         self.bgdeltabtButton.clicked.connect(self.setbgColorSlot)
 
-        self.bgextraLabel = QLabel(QApplication.translate("Button","Extra", None))
+        self.bgextraLabel = QLabel(QApplication.translate("Button","Extra 1", None))
         self.bgextraLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.bgextra2Label = QLabel(QApplication.translate("Button","Extra 2", None))
+        self.bgextra2Label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.bgextraButton = QPushButton()
         self.bgextraButton.setFocusPolicy(Qt.NoFocus)
         self.bgextraButton.clicked.connect(self.setbgColorSlot)
+        self.bgextra2Button = QPushButton()
+        self.bgextra2Button.setFocusPolicy(Qt.NoFocus)
+        self.bgextra2Button.clicked.connect(self.setbgColorSlot)
             
         opaqbgLabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
         opaqbgLabel.setAlignment(Qt.AlignRight)
@@ -378,8 +383,9 @@ class graphColorDlg(ArtisanDialog):
         lines.addWidget(self.bgdeltabtLabel,4,2)
         lines.addWidget(self.bgextraButton,5,3)
         lines.addWidget(self.bgextraLabel,5,2)
-#        lines.addWidget(opaqbgLabel,6,2)
-        lines.addLayout(self.opaqbgLayout,6,3)
+        lines.addWidget(self.bgextra2Button,6,3)
+        lines.addWidget(self.bgextra2Label,6,2)
+        lines.addLayout(self.opaqbgLayout,7,3)
 
         graphlinesLayout = QVBoxLayout()
         graphlinesLayout.addLayout(lines)
@@ -722,11 +728,13 @@ class graphColorDlg(ArtisanDialog):
         self.bgdeltametButton.setText(self.aw.qmc.backgrounddeltaetcolor)
         self.bgdeltabtButton.setText(self.aw.qmc.backgrounddeltabtcolor)
         self.bgextraButton.setText(self.aw.qmc.backgroundxtcolor)
+        self.bgextra2Button.setText(self.aw.qmc.backgroundytcolor)
         self.bgmetButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgroundmetcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgroundmetcolor) + ";" + self.commonstyle + "}")
         self.bgbtButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgroundbtcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgroundbtcolor) + ";" + self.commonstyle + "}")
         self.bgdeltametButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgrounddeltaetcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgrounddeltaetcolor) + ";" + self.commonstyle + "}")
         self.bgdeltabtButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgrounddeltabtcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgrounddeltabtcolor) + ";" + self.commonstyle + "}")
         self.bgextraButton.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgroundxtcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgroundxtcolor) + ";" + self.commonstyle + "}")
+        self.bgextra2Button.setStyleSheet("QPushButton { background-color: " + self.aw.qmc.backgroundytcolor + "; color: " + self.aw.labelBorW(self.aw.qmc.backgroundytcolor) + ";" + self.commonstyle + "}")
         self.opaqbgSpinBox.setValue(self.aw.qmc.backgroundalpha * 10)
 
         # LEDs
@@ -797,7 +805,9 @@ class graphColorDlg(ArtisanDialog):
         elif widget == self.bgdeltabtButton:
             self.setbgColor("DeltaBT",self.bgdeltabtButton,self.aw.qmc.backgrounddeltabtcolor)
         elif widget == self.bgextraButton:
-            self.setbgColor("Extra",self.bgextraButton,self.aw.qmc.backgroundxtcolor)
+            self.setbgColor("Extra1",self.bgextraButton,self.aw.qmc.backgroundxtcolor)
+        elif widget == self.bgextra2Button:
+            self.setbgColor("Extra2",self.bgextra2Button,self.aw.qmc.backgroundytcolor)
 
     def setbgColor(self,title,var,color):
         labelcolor = QColor(color)
@@ -818,8 +828,10 @@ class graphColorDlg(ArtisanDialog):
                 self.aw.qmc.backgrounddeltaetcolor = color
             elif title == "DeltaBT":
                 self.aw.qmc.backgrounddeltabtcolor = color
-            elif title == "Extra":
+            elif title == "Extra1":
                 self.aw.qmc.backgroundxtcolor = color
+            elif title == "Extra2":
+                self.aw.qmc.backgroundytcolor = color
             self.aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(color)))
 
     def setlcdColor(self,palette,disj_palette,select):

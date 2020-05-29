@@ -39,6 +39,7 @@ v2.4.0 (xx.xx.2020)
   - adds Artisan Command `openProperties` to open the Roast Properties dialog from buttons (potentially invisible and triggered by alarms)
   - adds organization field to Roast Properties
   - adds loading of profiles on drag-and-drop to the main window
+  - adds second extra device background curve
 
 * Changes
   - remember the position of draggable annotations and the legend

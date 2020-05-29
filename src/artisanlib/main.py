@@ -630,7 +630,7 @@ class tgraphcanvas(FigureCanvas):
         self.alpha = {"analysismask":0.4,"statsanalysisbkgnd":1.0,"legendbg":0.4}
         self.palette = {"background":'#FFFFFF',"grid":'#E5E5E5',"ylabel":'#808080',"xlabel":'#808080',"title":'#0C6AA6',
                         "rect1":'#E5E5E5',"rect2":'#B2B2B2',"rect3":'#E5E5E5',"rect4":'#BDE0EE',"rect5":'#D3D3D3',
-                        "et":'#cc0f50',"bt":'#0A5C90',"xt":'#404040',"deltaet":'#cc0f50',
+                        "et":'#cc0f50',"bt":'#0A5C90',"xt":'#404040',"yt":'#404040',"deltaet":'#cc0f50',
                         "deltabt":'#0A5C90',"markers":'#000000',"text":'#000000',"watermarks":'#FFFF00',"timeguide":'#0A5C90',
                         "canvas":'#F8F8F8',"legendbg":'#FFFFFF',"legendborder":'#A9A9A9',
                         "specialeventbox":'#FF5871',"specialeventtext":'#FFFFFF',
@@ -1353,11 +1353,12 @@ class tgraphcanvas(FigureCanvas):
         self.roastbatchnrB = 0
         self.roastbatchprefixB = ""
         self.roastbatchposB = 1
-        self.temp1B,self.temp2B,self.temp1BX,self.temp2BX,self.timeB = [],[],[],[],[]
+        self.temp1B,self.temp2B,self.temp1BX,self.temp2BX,self.timeB,self.temp1Bdelta,self.temp1Bdelta = [],[],[],[],[],[],[]
         self.stemp1B,self.stemp2B,self.stemp1BX,self.stemp2BX = [],[],[],[] # smoothed versions of the background curves
         self.extraname1B,self.extraname2B = [],[]
         self.extratimexB = []
-        self.xtcurveidx = 0 # the selected extra background courve to be displayed
+        self.xtcurveidx = 0 # the selected first extra background courve to be displayed
+        self.ytcurveidx = 0 # the selected second extra background courve to be displayed
         self.delta1B,self.delta2B = [],[]
         self.timeindexB = [-1,0,0,0,0,0,0,0]
         self.TP_time_B = -1 # the time in seconds the backgrounds TP should be placed (originally retrieved from file, see TP_time_B_loaded)
@@ -1370,6 +1371,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundmetcolor = self.palette["et"]
         self.backgroundbtcolor = self.palette["bt"]
         self.backgroundxtcolor = self.palette["xt"]
+        self.backgroundytcolor = self.palette["yt"]
         self.backgrounddeltaetcolor = self.palette["deltaet"]
         self.backgrounddeltabtcolor = self.palette["deltabt"]
         self.backmoveflag = 1 # aligns background on redraw if 1
@@ -1658,6 +1660,11 @@ class tgraphcanvas(FigureCanvas):
         self.XTbacklinewidth = self.extra_linewidth_default
         self.XTbackmarker = self.marker_default
         self.XTbackmarkersize = self.markersize_default
+        self.YTbacklinestyle = self.linestyle_default
+        self.YTbackdrawstyle = self.drawstyle_default
+        self.YTbacklinewidth = self.extra_linewidth_default
+        self.YTbackmarker = self.marker_default
+        self.YTbackmarkersize = self.markersize_default
         self.BTBdeltalinestyle = self.linestyle_default
         self.BTBdeltadrawstyle = self.drawstyle_default
         self.BTBdeltalinewidth = self.back_delta_linewidth_default
@@ -1849,7 +1856,8 @@ class tgraphcanvas(FigureCanvas):
         self.l_delta2 = None
         self.l_back1 = None
         self.l_back2 = None
-        self.l_back3 = None # one extra background curve
+        self.l_back3 = None # first extra background curve
+        self.l_back4 = None # second extra background curve
         self.l_delta1B = None
         self.l_delta2B = None
 
@@ -3434,6 +3442,11 @@ class tgraphcanvas(FigureCanvas):
                 idx3 = aw.qmc.xtcurveidx - 1
                 n3 = idx3 // 2
                 if len(self.stemp1BX) > n3 and len(self.stemp2BX) > n3 and len(self.extratimexB) > n3:
+                    c += 1
+            if aw.qmc.ytcurveidx > 0: # 4th background curve set?
+                idx4 = aw.qmc.xtcurveidx - 1
+                n4 = idx4 // 2
+                if len(self.stemp1BX) > n4 and len(self.stemp2BX) > n4 and len(self.extratimexB) > n4:
                     c += 1
             if aw.qmc.backgroundeventsflag and aw.qmc.eventsGraphflag in [2,3,4]:
                 unique_etypes = set(aw.qmc.backgroundEtypes)
@@ -6161,19 +6174,61 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     tx_lin = None
                             if aw.qmc.xtcurveidx % 2:
+                                if aw.qmc.temp1Bdelta[n3]:
+                                    trans = self.delta_ax.transData
+                                else:
+                                    trans = self.ax.transData
                                 if smooth:
                                     stemp3B = self.smooth_list(tx,self.fill_gaps(self.temp1BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp3B = self.stemp1BX[n3]
                             else:
+                                if aw.qmc.temp2Bdelta[n3]:
+                                    trans = self.delta_ax.transData
+                                else:
+                                    trans = self.ax.transData
                                 if smooth:
                                     stemp3B = self.smooth_list(tx,self.fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp3B = self.stemp2BX[n3]
                             self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
-                                                        sketch_params=None,path_effects=[],
+                                                        sketch_params=None,path_effects=[],transform=trans,
                                                         linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
                                                         alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None)))
+                    if aw.qmc.ytcurveidx > 0:
+                        idx4 = aw.qmc.ytcurveidx - 1
+                        n4 = idx4 // 2
+                        if len(self.stemp1BX) > n4 and len(self.stemp2BX) > n4 and len(self.extratimexB) > n4:
+                            if smooth:
+                                # re-smooth the extra background curve
+                                tx = self.extratimexB[n4]
+                                if tx is not None and tx:
+                                    tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
+                                else:
+                                    tx_lin = None
+                            if aw.qmc.ytcurveidx % 2:
+                                if aw.qmc.temp1Bdelta[n4]:
+                                    trans = self.delta_ax.transData
+                                else:
+                                    trans = self.ax.transData
+                                if smooth:
+                                    stemp4B = self.smooth_list(tx,self.fill_gaps(self.temp1BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                else:
+                                    stemp4B = self.stemp1BX[n4]
+                            else:
+                                if aw.qmc.temp2Bdelta[n4]:
+                                    trans = self.delta_ax.transData
+                                else:
+                                    trans = self.ax.transData
+                                if smooth:
+                                    stemp4B = self.smooth_list(tx,self.fill_gaps(self.temp2BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                else:
+                                    stemp4B = self.stemp2BX[n4]
+                            self.l_back4, = self.ax.plot(self.extratimexB[n4], stemp4B, markersize=self.YTbackmarkersize,marker=self.YTbackmarker,
+                                                        sketch_params=None,path_effects=[],transform=trans,
+                                                        linewidth=self.YTbacklinewidth,linestyle=self.YTbacklinestyle,drawstyle=self.YTbackdrawstyle,color=self.backgroundytcolor,
+                                                        alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundYT", None)))
+
                     #draw background
                     if aw.qmc.backgroundETcurve:
                         temp_etb = self.stemp1B
@@ -8155,6 +8210,7 @@ class tgraphcanvas(FigureCanvas):
                 self.backgrounddeltaetcolor = self.palette["deltaet"]
                 self.backgrounddeltabtcolor = self.palette["deltabt"]
                 self.backgroundxtcolor      = self.palette["xt"]
+                self.backgroundytcolor      = self.palette["yt"]
                 self.EvalueColor = self.EvalueColor_default.copy()
                 self.EvalueTextColor = self.EvalueTextColor_default.copy()
                 aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
@@ -8179,6 +8235,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.backgrounddeltaetcolor = aw.convertToGreyscale(aw.qmc.backgrounddeltaetcolor)
             aw.qmc.backgrounddeltabtcolor = aw.convertToGreyscale(aw.qmc.backgrounddeltabtcolor)
             aw.qmc.backgroundxtcolor      = aw.convertToGreyscale(aw.qmc.backgroundxtcolor)
+            aw.qmc.backgroundytcolor      = aw.convertToGreyscale(aw.qmc.backgroundytcolor)
             aw.setLCDsBW()
 
         if color == 3:
@@ -8219,6 +8276,7 @@ class tgraphcanvas(FigureCanvas):
                 self.backgrounddeltaetcolor = str(dialog.bgdeltametButton.text())
                 self.backgrounddeltabtcolor = str(dialog.bgdeltabtButton.text())
                 self.backgroundxtcolor = str(dialog.bgextraButton.text())
+                self.backgroundytcolor = str(dialog.bgextra2Button.text())
                 #deleteLater() will not work here as the dialog is still bound via the parent
                 #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
                 # the following will immedately release the memory dispite this parent link
@@ -22366,6 +22424,15 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.extratimexB = timex
 
+                if "extraDelta1" in profile:
+                    self.qmc.temp1Bdelta = profile["extraDelta1"]
+                else:
+                    self.qmc.temp1Bdelta = [False]*len(names1x)
+                if "extraDelta2" in profile:
+                    self.qmc.temp2Bdelta = profile["extraDelta2"]
+                else:
+                    self.qmc.temp2Bdelta = [False]*len(names2x)
+
                 # we resample the temperatures to regular interval timestamps
                 if tb is not None and tb:
                     tb_lin = numpy.linspace(tb[0],tb[-1],len(tb))
@@ -22379,16 +22446,18 @@ class ApplicationWindow(QMainWindow):
                 b1x = []
                 b2x = []
                 idx3 = aw.qmc.xtcurveidx - 1
+                idx4 = aw.qmc.ytcurveidx - 1
                 n3 = idx3 // 2
+                n4 = idx4 // 2
                 for i in range(min(len(t1x),len(t2x))):
-# we smooth also that 3rd background courve only on redraw with the actual smoothing parameters
-                    if aw.qmc.xtcurveidx > 0 and n3 == 1: # this is the 3rd background curve to be drawn, we smooth it
+# we smooth also that 3rd and 4th background courve only on redraw with the actual smoothing parameters
+                    if (aw.qmc.xtcurveidx > 0 and n3 == i) or (aw.qmc.ytcurveidx > 0 and n4 == i): # this is the 3rd or 4th background curve to be drawn, we smooth it
                         tx=timex[i]
                         if tx is not None and tx:
                             tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
                         else:
                             tx_lin = None
-                        if aw.qmc.xtcurveidx % 2:
+                        if (aw.qmc.xtcurveidx > 0 and n3 == i and aw.qmc.xtcurveidx % 2) or (aw.qmc.ytcurveidx > 0 and n4 == i and aw.qmc.ytcurveidx % 2):
                             b1x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
                             b2x.append(self.qmc.fill_gaps(t2x[i]))
                         else:
@@ -25598,8 +25667,12 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("XT")
             if settings.contains("color"):
                 self.qmc.backgroundxtcolor = s2a(toString(settings.value("color",self.qmc.backgroundxtcolor)))
+            if settings.contains("color2"):
+                self.qmc.backgroundytcolor = s2a(toString(settings.value("color2",self.qmc.backgroundytcolor)))
             if settings.contains("index"):
                 self.qmc.xtcurveidx = toInt(settings.value("index",int(self.qmc.xtcurveidx)))
+            if settings.contains("index2"):
+                self.qmc.ytcurveidx = toInt(settings.value("index2",int(self.qmc.ytcurveidx)))
             settings.endGroup()
             #restore units
             settings.beginGroup("Units")
@@ -26209,13 +26282,21 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ETbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETbacklinewidth",self.qmc.ETbacklinewidth))))
                     self.qmc.ETbackmarker = s2a(toString(settings.value("ETbackmarker",self.qmc.ETbackmarker)))
                     self.qmc.ETbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETbackmarkersize",self.qmc.ETbackmarkersize))))
+                    
                     self.qmc.XTbacklinestyle = s2a(toString(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle)))
                     self.qmc.XTbackdrawstyle = s2a(toString(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle)))
                     if self.qmc.XTbackdrawstyle == '-':
                         self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
                     self.qmc.XTbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("XTbacklinewidth",self.qmc.XTbacklinewidth))))
                     self.qmc.XTbackmarker = s2a(toString(settings.value("XTbackmarker",self.qmc.XTbackmarker)))
-                    self.qmc.XTbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("XTbackmarkersize",self.qmc.ETbackmarkersize))))
+                    self.qmc.XTbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("XTbackmarkersize",self.qmc.XTbackmarkersize))))
+                    self.qmc.YTbacklinestyle = s2a(toString(settings.value("YTbacklinestyle",self.qmc.XTbacklinestyle)))
+                    self.qmc.YTbackdrawstyle = s2a(toString(settings.value("YTbackdrawstyle",self.qmc.YTbackdrawstyle)))
+                    if self.qmc.YTbackdrawstyle == '-':
+                        self.qmc.YTbackdrawstyle = self.qmc.drawstyle_default
+                    self.qmc.YTbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("YTbacklinewidth",self.qmc.YTbacklinewidth))))
+                    self.qmc.YTbackmarker = s2a(toString(settings.value("YTbackmarker",self.qmc.YTbackmarker)))
+                    self.qmc.YTbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("YTbackmarkersize",self.qmc.YTbackmarkersize))))
                     self.qmc.extralinestyles1 = list(map(str,list(toStringList(settings.value("extralinestyles1",self.qmc.extralinestyles1)))))
                     self.qmc.extralinestyles2 = list(map(str,list(toStringList(settings.value("extralinestyles2",self.qmc.extralinestyles2)))))
                     self.qmc.extradrawstyles1 = list(map(str,list(toStringList(settings.value("extradrawstyles1",self.qmc.extradrawstyles1)))))
@@ -26756,6 +26837,19 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.XTbackmarker = m
                 self.qmc.XTbackmarkersize = aw.qmc.l_back3.get_markersize()
                 self.qmc.backgroundxtcolor = self.getColor(aw.qmc.l_back3)
+            if aw.qmc.l_back4:
+                self.qmc.YTbacklinestyle = aw.qmc.l_back4.get_linestyle()
+                #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
+                if self.qmc.YTbacklinestyle == self.qmc.linestyle_default:
+                    self.qmc.YTbackdrawstyle = aw.qmc.l_back4.get_drawstyle()
+                else:
+                    self.qmc.YTbackdrawstyle = self.qmc.drawstyle_default
+                self.qmc.YTbacklinewidth = aw.qmc.l_back4.get_linewidth()
+                m = aw.qmc.l_back4.get_marker()
+                if not isinstance(m, (int)):
+                    self.qmc.YTbackmarker = m
+                self.qmc.YTbackmarkersize = aw.qmc.l_back4.get_markersize()
+                self.qmc.backgroundytcolor = self.getColor(aw.qmc.l_back4)
             if aw.qmc.l_delta1B:
                 self.qmc.ETBdeltalinestyle = aw.qmc.l_delta1B.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -27350,7 +27444,9 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("XT")
             settings.setValue("color",self.qmc.backgroundxtcolor)
+            settings.setValue("color2",self.qmc.backgroundytcolor)
             settings.setValue("index",self.qmc.xtcurveidx)
+            settings.setValue("index2",self.qmc.ytcurveidx)
             settings.endGroup()
             settings.beginGroup("Units")
             settings.setValue("weight",self.qmc.weight[2])
@@ -27459,6 +27555,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("XTbacklinewidth",self.qmc.XTbacklinewidth)
             settings.setValue("XTbackmarker",self.qmc.XTbackmarker)
             settings.setValue("XTbackmarkersize",self.qmc.XTbackmarkersize)
+            settings.setValue("YTbacklinestyle",self.qmc.YTbacklinestyle)
+            settings.setValue("YTbackdrawstyle",self.qmc.YTbackdrawstyle)
+            settings.setValue("YTbacklinewidth",self.qmc.YTbacklinewidth)
+            settings.setValue("YTbackmarker",self.qmc.YTbackmarker)
+            settings.setValue("YTbackmarkersize",self.qmc.YTbackmarkersize)
             settings.setValue("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle)
             settings.setValue("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle)
             settings.setValue("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth)
@@ -27639,7 +27740,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("BackgroundAlpha",self.qmc.backgroundalpha)
             settings.beginGroup("XT")
             settings.setValue("color",self.qmc.backgroundxtcolor)
+            settings.setValue("color2",self.qmc.backgroundytcolor)
             settings.setValue("index",self.qmc.xtcurveidx)
+            settings.setValue("index2",self.qmc.ytcurveidx)
             settings.endGroup()
             settings.beginGroup("grid")
             settings.setValue("gridalpha",self.qmc.gridalpha)
@@ -27649,7 +27752,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEvent()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEventSettings_theme()  @line " + str(exc_tb.tb_lineno))
 
     def updateExtraLCDvisibility(self):
         n = len(self.qmc.extradevices)
@@ -28733,6 +28836,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.l_back1,
                                     aw.qmc.l_back2,
                                     aw.qmc.l_back3,
+                                    aw.qmc.l_back4,
                                     aw.qmc.l_delta1B,
                                     aw.qmc.l_delta2B
                                     ]:

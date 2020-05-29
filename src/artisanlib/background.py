@@ -92,18 +92,30 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
         self.speedSpinBox.setValue(self.aw.qmc.backgroundmovespeed)
-        self.xtcurvelabel = QLabel(QApplication.translate("Label", "Extra",None))
-        self.xtcurveComboBox = QComboBox()
-        self.xtcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
-        self.xtcurveComboBox.setMinimumWidth(120)
+        
         curvenames = [""] # first entry is the empty one, no extra curve displayed
         for i in range(min(len(self.aw.qmc.extraname1B),len(self.aw.qmc.extraname2B),len(self.aw.qmc.extratimexB))):
             curvenames.append("B" + str(2*i+3) + ": " + self.aw.qmc.extraname1B[i])
             curvenames.append("B" + str(2*i+4) + ": " + self.aw.qmc.extraname2B[i])
+
+        self.xtcurvelabel = QLabel(QApplication.translate("Label", "Extra 1",None))
+        self.xtcurveComboBox = QComboBox()
+        self.xtcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
+        self.xtcurveComboBox.setMinimumWidth(120)
         self.xtcurveComboBox.addItems(curvenames)
         if self.aw.qmc.xtcurveidx < len(curvenames):
             self.xtcurveComboBox.setCurrentIndex(self.aw.qmc.xtcurveidx)
         self.xtcurveComboBox.currentIndexChanged.connect(self.changeXTcurveidx)
+
+        self.ytcurvelabel = QLabel(QApplication.translate("Label", "Extra 2",None))
+        self.ytcurveComboBox = QComboBox()
+        self.ytcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
+        self.ytcurveComboBox.setMinimumWidth(120)
+        self.ytcurveComboBox.addItems(curvenames)
+        if self.aw.qmc.ytcurveidx < len(curvenames):
+            self.ytcurveComboBox.setCurrentIndex(self.aw.qmc.ytcurveidx)
+        self.ytcurveComboBox.currentIndexChanged.connect(self.changeYTcurveidx)
+        
         self.upButton = QPushButton(QApplication.translate("Button","Up",None))
         self.upButton.setFocusPolicy(Qt.NoFocus)
         self.downButton = QPushButton(QApplication.translate("Button","Down",None))
@@ -221,6 +233,9 @@ class backgroundDlg(ArtisanResizeablDialog):
         alignButtonBoxed = QHBoxLayout()
         alignButtonBoxed.addWidget(self.xtcurvelabel)
         alignButtonBoxed.addWidget(self.xtcurveComboBox)
+        alignButtonBoxed.addSpacing(10)
+        alignButtonBoxed.addWidget(self.ytcurvelabel)
+        alignButtonBoxed.addWidget(self.ytcurveComboBox)
         alignButtonBoxed.addStretch()
         alignButtonBoxed.addWidget(alignButton)
         alignButtonBoxed.addWidget(self.alignComboBox)
@@ -477,6 +492,12 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.createDataTable()
         self.aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
 
+    @pyqtSlot(int)
+    def changeYTcurveidx(self,i):
+        self.aw.qmc.ytcurveidx = i
+        self.createDataTable()
+        self.aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
+
     @pyqtSlot(bool)
     def load(self,_):
         self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext_alt=".alog")
@@ -485,17 +506,27 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.sendmessage(QApplication.translate("Message","Reading background profile...",None))
         self.aw.qmc.resetlinecountcaches()
         self.aw.loadbackground(self.filename)
-        self.xtcurveComboBox.blockSignals(True)
+        
         # reset XT curve popup
-        self.xtcurveComboBox.clear()
         curvenames = [""] # first entry is the empty one (no extra curve displayed)
         for i in range(min(len(self.aw.qmc.extraname1B),len(self.aw.qmc.extraname2B),len(self.aw.qmc.extratimexB))):
             curvenames.append("B" + str(2*i+3) + ": " + self.aw.qmc.extraname1B[i])
             curvenames.append("B" + str(2*i+4) + ": " + self.aw.qmc.extraname2B[i])
+            
+        self.xtcurveComboBox.blockSignals(True)
+        self.xtcurveComboBox.clear()
         self.xtcurveComboBox.addItems(curvenames)
         if self.aw.qmc.xtcurveidx < len(curvenames):
             self.xtcurveComboBox.setCurrentIndex(self.aw.qmc.xtcurveidx)
         self.xtcurveComboBox.blockSignals(False)
+
+        self.ytcurveComboBox.blockSignals(True)
+        self.ytcurveComboBox.clear()
+        self.ytcurveComboBox.addItems(curvenames)
+        if self.aw.qmc.ytcurveidx < len(curvenames):
+            self.ytcurveComboBox.setCurrentIndex(self.aw.qmc.ytcurveidx)
+        self.ytcurveComboBox.blockSignals(False)
+
         self.pathedit.setText(self.filename)
         self.backgroundCheck.setChecked(True)
         self.aw.qmc.timealign(redraw=False)
@@ -575,7 +606,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             
             ndata = len(self.aw.qmc.timeB)
             
-            # self.datatable.clear() # this crashes Ubuntu 16.04
+            self.datatable.clear() # this crashes Ubuntu 16.04
     #        if ndata != 0:
     #            self.datatable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
             self.datatable.clearSelection() # this seems to work also for Ubuntu 16.04
@@ -600,6 +631,18 @@ class backgroundDlg(ArtisanResizeablDialog):
                         headers.append(self.aw.qmc.extraname1B[n3])
                     else:
                         headers.append(self.aw.qmc.extraname2B[n3])
+
+            ytcurve = False # no YT curve
+            if self.aw.qmc.ytcurveidx > 0: # 4th background curve set?
+                idx4 = self.aw.qmc.ytcurveidx - 1
+                n4 = idx4 // 2
+                if len(self.aw.qmc.temp1BX) > n4 and len(self.aw.qmc.extratimexB) > n4:
+                    ytcurve = True
+                    if self.aw.qmc.ytcurveidx % 2:
+                        headers.append(self.aw.qmc.extraname1B[n4])
+                    else:
+                        headers.append(self.aw.qmc.extraname2B[n4])
+            
             headers.append("") # dummy column that stretches
             self.datatable.setColumnCount(len(headers))
             self.datatable.setHorizontalHeaderLabels(headers)
@@ -682,6 +725,17 @@ class backgroundDlg(ArtisanResizeablDialog):
                         XT = QTableWidgetItem("%.0f"%self.aw.qmc.temp2BX[n3][i])
                     XT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                     self.datatable.setItem(i,5,XT)
+                
+                if ytcurve and len(self.aw.qmc.temp1BX[n4]) > i: # an YT column is availble, fill it with data
+                    if self.aw.qmc.ytcurveidx % 2:
+                        YT = QTableWidgetItem("%.0f"%self.aw.qmc.temp1BX[n4][i])
+                    else:
+                        YT = QTableWidgetItem("%.0f"%self.aw.qmc.temp2BX[n4][i])
+                    YT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                    if xtcurve:
+                        self.datatable.setItem(i,6,YT)
+                    else:
+                        self.datatable.setItem(i,5,YT)
                     
             header = self.datatable.horizontalHeader()
             header.setSectionResizeMode(0, QHeaderView.Fixed)
@@ -689,9 +743,13 @@ class backgroundDlg(ArtisanResizeablDialog):
             header.setSectionResizeMode(2, QHeaderView.Fixed)
             header.setSectionResizeMode(3, QHeaderView.Fixed)
             header.setSectionResizeMode(4, QHeaderView.Fixed)
-            if xtcurve:
+            if (xtcurve and not ytcurve) or (ytcurve and not xtcurve):
                 header.setSectionResizeMode(5, QHeaderView.Fixed)
                 header.setSectionResizeMode(6, QHeaderView.Stretch)
+            elif xtcurve and ytcurve:
+                header.setSectionResizeMode(5, QHeaderView.Fixed)
+                header.setSectionResizeMode(6, QHeaderView.Fixed)
+                header.setSectionResizeMode(7, QHeaderView.Stretch)
             else:
                 header.setSectionResizeMode(5, QHeaderView.Stretch)
             self.datatable.resizeColumnsToContents()
