@@ -16640,16 +16640,28 @@ class ApplicationWindow(QMainWindow):
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
     def setTare(self,n):
         if self.qmc.flagon: # we set the tare value
-            if n == 0 and len(self.qmc.temp1)>0: # ET
-                self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp1[-1]
-            elif n == 1 and len(self.qmc.temp2)>0: # BT
-                self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp2[-1]
+            if n == 0:
+                if self.qmc.flagstart and len(self.qmc.temp1)>0: # ET
+                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp1[-1]
+                elif len(self.qmc.on_temp1)>0: # ET during ON
+                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_temp1[-1]
+            elif n == 1:
+                if self.qmc.flagstart and len(self.qmc.temp2)>0: # BT
+                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp2[-1]
+                elif  len(self.qmc.on_temp2)>0: # BT during ON
+                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_temp2[-1]
             else:
                 i = (n - 2) // 2
-                if n % 2 == 0 and len(self.qmc.extratemp1)>i and len(self.qmc.extratemp1[i])>0: # even
-                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp1[i][-1]
-                elif len(self.qmc.extratemp2)>i and len(self.qmc.extratemp2[i])>0:
-                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp2[i][-1]
+                if n % 2 == 0: # even
+                    if self.qmc.flagstart and len(self.qmc.extratemp1)>i and len(self.qmc.extratemp1[i])>0:
+                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp1[i][-1]
+                    elif len(self.qmc.on_extratemp1)>i and len(self.qmc.on_extratemp1[i])>0:
+                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_extratemp1[i][-1]
+                else:
+                    if self.qmc.flagstart and len(self.qmc.extratemp2)>i and len(self.qmc.extratemp2[i])>0:
+                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp2[i][-1]
+                    elif len(self.qmc.on_extratemp2)>i and len(self.qmc.on_extratemp2[i])>0:
+                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_extratemp2[i][-1]
         else: # we reset the tare value
             self.channel_tare_values[n] = 0
 
@@ -19381,12 +19393,18 @@ class ApplicationWindow(QMainWindow):
                 cmd_str = str(cmd)
 
                 # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7 command actions
-                if action in [1,2,4,7,15] and len(self.qmc.timex) > 0:
+                if action in [1,2,4,7,15] and (self.qmc.flagstart and len(self.qmc.timex) > 0 or (self.qmc.flagon and len(self.qmc.on_timex) > 0)):
                     try:
-                        timex = self.qmc.timex[-1]
-                        if self.qmc.timeindex[0] != -1:
-                            timex -= self.qmc.timex[self.qmc.timeindex[0]]
-                        cmd_str = cmd_str.format(BT=self.qmc.temp2[-1],ET=self.qmc.temp1[-1],t=timex)
+                        if self.qmc.flagstart:
+                            timex = self.qmc.timex[-1]
+                            if self.qmc.timeindex[0] != -1:
+                                timex -= self.qmc.timex[self.qmc.timeindex[0]]
+                            cmd_str = cmd_str.format(BT=self.qmc.temp2[-1],ET=self.qmc.temp1[-1],t=timex)
+                        elif self.qmc.flagon:
+                            timex = self.qmc.on_timex[-1]
+                            if self.qmc.timeindex[0] != -1:
+                                timex -= self.qmc.on_timex[self.qmc.timeindex[0]]
+                            cmd_str = cmd_str.format(BT=self.qmc.on_temp2[-1],ET=self.qmc.on_temp1[-1],t=timex)
                     except:
                         cmd_str = cmd_str.format(BT=0,ET=0,t=0)
 
