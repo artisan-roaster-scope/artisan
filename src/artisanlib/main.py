@@ -16700,26 +16700,50 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.flagon: # we set the tare value
             if n == 0:
                 if self.qmc.flagstart and len(self.qmc.temp1)>0: # ET
-                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp1[-1]
+                    if self.qmc.ETfunction.strip() == "":
+                        self.channel_tare_values[n] = self.qmc.temp1[-1]
+                    else: # we reconstruct the last raw value with out the "- Tx" part from the last stored reading
+                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp1[-1]
                 elif len(self.qmc.on_temp1)>0: # ET during ON
-                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_temp1[-1]
+                    if  self.qmc.ETfunction.strip() == "":
+                        self.channel_tare_values[n] = self.qmc.on_temp1[-1]
+                    else:
+                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_temp1[-1]
             elif n == 1:
                 if self.qmc.flagstart and len(self.qmc.temp2)>0: # BT
-                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp2[-1]
+                    if  self.qmc.BTfunction.strip() == "":
+                        self.channel_tare_values[n] = self.qmc.temp2[-1]
+                    else:
+                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp2[-1]
                 elif  len(self.qmc.on_temp2)>0: # BT during ON
-                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_temp2[-1]
+                    if  self.qmc.BTfunction.strip() == "":
+                        self.channel_tare_values[n] = self.qmc.on_temp2[-1]
+                    else:
+                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_temp2[-1]
             else:
                 i = (n - 2) // 2
                 if n % 2 == 0: # even
                     if self.qmc.flagstart and len(self.qmc.extratemp1)>i and len(self.qmc.extratemp1[i])>0:
-                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp1[i][-1]
+                        if self.qmc.extramathexpression1[i].strip() == "":
+                            self.channel_tare_values[n] = self.qmc.extratemp1[i][-1]
+                        else:
+                            self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp1[i][-1]
                     elif len(self.qmc.on_extratemp1)>i and len(self.qmc.on_extratemp1[i])>0:
-                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_extratemp1[i][-1]
+                        if self.qmc.extramathexpression1[i].strip() == "":
+                            self.channel_tare_values[n] = self.qmc.on_extratemp1[i][-1]
+                        else:
+                            self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_extratemp1[i][-1]
                 else:
                     if self.qmc.flagstart and len(self.qmc.extratemp2)>i and len(self.qmc.extratemp2[i])>0:
-                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp2[i][-1]
+                        if self.qmc.extramathexpression2[i].strip() == "":
+                            self.channel_tare_values[n] = self.qmc.extratemp2[i][-1]
+                        else:
+                            self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp2[i][-1]
                     elif len(self.qmc.on_extratemp2)>i and len(self.qmc.on_extratemp2[i])>0:
-                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_extratemp2[i][-1]
+                        if self.qmc.extramathexpression2[i].strip() == "":
+                            self.channel_tare_values[n] = self.qmc.on_extratemp2[i][-1]
+                        else:
+                            self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_extratemp2[i][-1]
         else: # we reset the tare value
             self.channel_tare_values[n] = 0
 
@@ -33339,12 +33363,12 @@ class ApplicationWindow(QMainWindow):
                     if firstChar == "{":
                         f.close()
                         modifiers = QApplication.keyboardModifiers()
-                        #control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS
+                        control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS, Control key on Windows
                         alt_modifier = modifiers == Qt.AltModifier # OPTION on macOS, ALT on Windows
-                        meta_modifier = modifiers == Qt.MetaModifier # Control on macOS, Meta on Windows
+                        #meta_modifier = modifiers == Qt.MetaModifier # Control on macOS, Meta/Windows on Windows
                         if alt_modifier:
                             speed = 2
-                        elif meta_modifier:
+                        elif control_modifier:
                             speed = 4
                         else:
                             speed = 1

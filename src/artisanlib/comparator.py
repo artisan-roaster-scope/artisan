@@ -22,6 +22,7 @@ import numpy
 import matplotlib.ticker as ticker
 import matplotlib.transforms as transforms
 import matplotlib.patheffects as PathEffects
+from matplotlib import rcParams
 if sys.platform.startswith("darwin"):
     # import module to detect if OS X dark mode is active or not
     import darkdetect # @UnresolvedImport
@@ -773,6 +774,16 @@ class roastCompareDlg(ArtisanDialog):
             self.aw.sendmessage("{}: {} @ {}, {}{}".format(p.label,event_name,stringfromseconds(time,leadingzero=False),temp,self.aw.qmc.mode))
         
     def clearCanvas(self):
+    
+        rcParams['path.effects'] = []
+        if self.aw.qmc.graphstyle == 1:
+            scale = 1
+        else:
+            scale = 0
+        length = 700 # 100 (128 the default)
+        randomness = 12 # 2 (16 default)
+        rcParams['path.sketch'] = (scale, length, randomness)
+                
         if self.aw.qmc.ax is None:
             self.aw.qmc.ax = self.aw.qmc.fig.add_subplot(111,facecolor=self.aw.qmc.palette["background"])
         if self.aw.qmc.delta_ax is None:
