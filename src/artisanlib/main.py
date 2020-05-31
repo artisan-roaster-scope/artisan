@@ -20171,11 +20171,11 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                 elif action == 16: # Aillio Heater
-                    self.ser.R1.set_heater(int(eval(cmd))/10)
+                    self.ser.R1.set_heater(int(cmd)/10)
                 elif action == 17: # Aillio Fan
-                    self.ser.R1.set_fan(int(eval(cmd))/10)
+                    self.ser.R1.set_fan(int(cmd)/10)
                 elif action == 18: # Aillio Drum
-                    self.ser.R1.set_drum(int(eval(cmd))/10)
+                    self.ser.R1.set_drum(int(cmd)/10)
                 elif action == 19:
                     if cmd_str == "PRS":
                         self.ser.R1.prs()
@@ -33345,6 +33345,7 @@ class ApplicationWindow(QMainWindow):
     def simulate(self,_=False):
         if bool(self.simulator):
             self.simulator = None
+            self.qmc.timeclock.setBase(1000)
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
             aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
             self.sendmessage(QApplication.translate("Message","Simulator stopped", None))
@@ -33366,13 +33367,13 @@ class ApplicationWindow(QMainWindow):
                         control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS, Control key on Windows
                         alt_modifier = modifiers == Qt.AltModifier # OPTION on macOS, ALT on Windows
                         #meta_modifier = modifiers == Qt.MetaModifier # Control on macOS, Meta/Windows on Windows
+                        speed = 1
                         if alt_modifier:
                             speed = 2
                         elif control_modifier:
                             speed = 4
-                        else:
-                            speed = 1
-                        self.simulator = Simulator(self.deserialize(filename),speed)
+                        self.qmc.timeclock.setBase(1000*speed)
+                        self.simulator = Simulator(self.deserialize(filename))
                         self.simulatorpath = filename
                         aw.button_1.setStyleSheet(aw.pushbuttonstyles_simulator["OFF"])
                         aw.button_2.setStyleSheet(aw.pushbuttonstyles_simulator["STOP"])
