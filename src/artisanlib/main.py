@@ -12732,7 +12732,7 @@ class VMToolbar(NavigationToolbar):
         # n days left <= rot if <=3
         #  3 days, 2 days, 1 day, 0 days left
         #
-        subscription_message_box = ArtisanMessageBox(aw,aw,QApplication.translate("Message", "Subscription",None),message)
+        subscription_message_box = ArtisanMessageBox(aw,QApplication.translate("Message", "Subscription",None),message)
         subscription_message_box.show()
 
     @pyqtSlot()
@@ -16699,51 +16699,26 @@ class ApplicationWindow(QMainWindow):
     def setTare(self,n):
         if self.qmc.flagon: # we set the tare value
             if n == 0:
-                if self.qmc.flagstart and len(self.qmc.temp1)>0: # ET
-                    if self.qmc.ETfunction.strip() == "":
-                        self.channel_tare_values[n] = self.qmc.temp1[-1]
-                    else: # we reconstruct the last raw value with out the "- Tx" part from the last stored reading
-                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp1[-1]
-                elif len(self.qmc.on_temp1)>0: # ET during ON
-                    if  self.qmc.ETfunction.strip() == "":
-                        self.channel_tare_values[n] = self.qmc.on_temp1[-1]
-                    else:
-                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_temp1[-1]
+                temp = (self.qmc.temp1 if self.qmc.flagstart else self.qmc.on_temp1)
+                symb_formula = self.qmc.ETfunction.strip()
             elif n == 1:
-                if self.qmc.flagstart and len(self.qmc.temp2)>0: # BT
-                    if  self.qmc.BTfunction.strip() == "":
-                        self.channel_tare_values[n] = self.qmc.temp2[-1]
-                    else:
-                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp2[-1]
-                elif  len(self.qmc.on_temp2)>0: # BT during ON
-                    if  self.qmc.BTfunction.strip() == "":
-                        self.channel_tare_values[n] = self.qmc.on_temp2[-1]
-                    else:
-                        self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_temp2[-1]
+                temp = (self.qmc.temp2 if self.qmc.flagstart else self.qmc.on_temp2)
+                symb_formula = self.qmc.BTfunction.strip()
             else:
                 i = (n - 2) // 2
                 if n % 2 == 0: # even
-                    if self.qmc.flagstart and len(self.qmc.extratemp1)>i and len(self.qmc.extratemp1[i])>0:
-                        if self.qmc.extramathexpression1[i].strip() == "":
-                            self.channel_tare_values[n] = self.qmc.extratemp1[i][-1]
-                        else:
-                            self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp1[i][-1]
-                    elif len(self.qmc.on_extratemp1)>i and len(self.qmc.on_extratemp1[i])>0:
-                        if self.qmc.extramathexpression1[i].strip() == "":
-                            self.channel_tare_values[n] = self.qmc.on_extratemp1[i][-1]
-                        else:
-                            self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_extratemp1[i][-1]
+                    temp = (self.qmc.extratemp1[i] if self.qmc.flagstart else self.qmc.on_extratemp1[i])
+                    symb_formula = self.qmc.extramathexpression1[i].strip()
                 else:
-                    if self.qmc.flagstart and len(self.qmc.extratemp2)>i and len(self.qmc.extratemp2[i])>0:
-                        if self.qmc.extramathexpression2[i].strip() == "":
-                            self.channel_tare_values[n] = self.qmc.extratemp2[i][-1]
-                        else:
-                            self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp2[i][-1]
-                    elif len(self.qmc.on_extratemp2)>i and len(self.qmc.on_extratemp2[i])>0:
-                        if self.qmc.extramathexpression2[i].strip() == "":
-                            self.channel_tare_values[n] = self.qmc.on_extratemp2[i][-1]
-                        else:
-                            self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.on_extratemp2[i][-1]
+                    temp = (self.qmc.extratemp2[i] if self.qmc.flagstart else self.qmc.on_extratemp2[i])
+                    symb_formula = self.qmc.extramathexpression2[i].strip()
+            postfix = temp[-3:]
+            if len(postfix) > 0:
+                stable_reading = numpy.median(postfix)
+                if symb_formula == "":
+                    self.channel_tare_values[n] = stable_reading
+                else:
+                    self.channel_tare_values[n] = self.channel_tare_values[n] + stable_reading
         else: # we reset the tare value
             self.channel_tare_values[n] = 0
 
