@@ -21223,7 +21223,7 @@ class ApplicationWindow(QMainWindow):
 
                 elif key == 72:                       #H
                     if not aw.qmc.designerflag:
-                        if alt_modifier:
+                        if alt_modifier and platf != 'Windows' or control_alt_modifier and platf == 'Windows':
                             aw.deleteBackground()
                             aw.qmc.redraw()
                         else:

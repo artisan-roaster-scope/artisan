@@ -78,7 +78,7 @@ def content():
     strlist.append(tbl_AxisMapping.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
     tbl_AxisMappingbottom = prettytable.PrettyTable()
     tbl_AxisMappingbottom.header = False
-    tbl_AxisMappingbottom.add_row([QApplication.translate('HelpDlg','Note: RoR values r can be scaled to the temperature axis using a linear approximation of the form "r*k + o". As the variables k and o depend on the actual axis settings which can be changed by the user without triggering a recomputation, those variable are less useful for use in a recording, but useful in the Plotter to plot w.r.t. the RoR x-axis instead of the temperature x-axis.',None)])
+    tbl_AxisMappingbottom.add_row([QApplication.translate('HelpDlg','Note: RoR values r can be scaled to the temperature axis using a linear approximation of the form "r*k + o". As the variables k and o depend on the actual axis settings which can be changed by the user without triggering a recomputation, those variable are less useful for use in a recording, but useful in the Plotter to plot w.r.t. the RoR y-axis instead of the temperature y-axis.',None)])
     strlist.append(tbl_AxisMappingbottom.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
     strlist.append("<br/><br/><b>")
     strlist.append(QApplication.translate('HelpDlg','EVENT INDEX and TIME DELTA',None))
