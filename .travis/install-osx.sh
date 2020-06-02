@@ -39,6 +39,9 @@ brew install p7zip
 python3 -m pip install --upgrade pip
 # to allow the installation of numpy >v1.15.4, avoiding the Permission denied: '/usr/local/bin/f2py' error, we run the following pip3 installs under sudo:
 # (an alternative could be to use pip install --user ..)
+# the lxml binaries are compiled with an SDK older than the 10.9 SDK which breaks the notarization
+# thus we force the compilation from source
+sudo -H python3 -m pip install --no-binary lxml lxml==4.5.1
 sudo -H python3 -m pip install -r src/requirements.txt
 # use a custom py2app v0.21 (Python3.8) with apptemplate main-x86_64 build for 
 # target 10.13 using MacOSX10.15.sdk build on macOS 10.15 to add dark-mode support to builds
