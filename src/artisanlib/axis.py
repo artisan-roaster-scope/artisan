@@ -508,9 +508,9 @@ class WindowsDlg(ArtisanDialog):
     def updatewindow(self):
         limits_changed = False
         # trigger auto limits on leaving the dialog if active
-        if self.autotimexFlag.isChecked():
+        if self.aw.qmc.flagon and self.autotimexFlag.isChecked():
             self.autoAxis()
-        if self.autodeltaxETFlag.isChecked() or self.autodeltaxBTFlag.isChecked():
+        if self.aw.qmc.flagon and (self.autodeltaxETFlag.isChecked() or self.autodeltaxBTFlag.isChecked()):
             self.autoDeltaAxis()
         #
         self.aw.qmc.time_grid = self.timeGridCheckBox.isChecked()

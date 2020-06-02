@@ -260,7 +260,7 @@ def writepyFile(fname_in, fname_out):
     outfile.close()
 
 
-def writehtmlFile(fname_in, fname_htm):
+def writehtmlFile(fname_in, fname_out, fname_htm):
     importfile = splitext(split(fname_out)[1])[0]
     importpath = abspath(split(fname_out)[0])
     sys.path.append(importpath)
@@ -286,7 +286,7 @@ if __name__ == "__main__":
                     print()
                     print(filename)
                     writepyFile(fname_in,fname_out)
-                    writehtmlFile(fname_in,fname_htm)
+                    writehtmlFile(fname_in,fname_out,fname_htm)
                     continue
                 else:
                     continue
@@ -297,7 +297,7 @@ if __name__ == "__main__":
             print()
             print(sys.argv[1] + '.xlsx')
             writepyFile(fname_in,fname_out)
-            writehtmlFile(fname_in,fname_htm)
+            writehtmlFile(fname_in,fname_out,fname_htm)
     else:
         print("Requires a <filename> to convert or 'all'")
         sys.exit()
