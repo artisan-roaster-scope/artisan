@@ -15,19 +15,6 @@ matrix:
   allow_failures:
     - env: ARTISAN_OS=rpi
   include:
-  - os: linux
-    python: 3.8
-    dist: xenial
-    cache:
-      - pip
-      - bundler
-    env:
-      - ARTISAN_OS=linux
-  - os: linux
-    language: generic
-    dist: xenial
-    env:
-      ARTISAN_OS=rpi
   - os: osx
     osx_image: xcode10.1 # Xcode 10.1, macOS 10.13
     python: 3.8
@@ -45,6 +32,20 @@ matrix:
       - ARTISAN_OS=osx
       - HOMEBREW_NO_INSTALL_CLEANUP=1
       - HOMEBREW_NO_ANALYTICS=1
+      - MACOSX_DEPLOYMENT_TARGET=10.13
+  - os: linux
+    python: 3.8
+    dist: xenial
+    cache:
+      - pip
+      - bundler
+    env:
+      - ARTISAN_OS=linux
+  - os: linux
+    language: generic
+    dist: xenial
+    env:
+      ARTISAN_OS=rpi
 
 install:
   - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
