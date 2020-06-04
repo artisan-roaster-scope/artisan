@@ -8,7 +8,7 @@ header:
   image: /assets/images/loring.jpg
   teaser: assets/images/loring.jpg
 ---
-* __Producer:__ [Loring Smart Roast Inc](https://loring.com), USA
+* __Producer:__ [Loring Smart Roast Inc](https://loring.com){:target="_blank"}, USA
 * __Machines:__ S7/S15/S35/S70
 * __Connection:__ MODBUS TCP via the network
 * __Features:__ 

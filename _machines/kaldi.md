@@ -8,7 +8,7 @@ header:
   image: /assets/images/Fortis-small.jpg
   teaser: assets/images/Fortis-small.jpg
 ---
-* __Producer:__ [KALDI Coffee Roaster](http://www.kaldi.co.kr), Republic of Korea
+* __Producer:__ [KALDI Coffee Roaster](http://www.kaldi.co.kr){:target="_blank"}, Republic of Korea
 * __Machine:__ Kaldi Fortis (Tron setup in preparation)
 * __Connection:__ MODBUS RTU via USB
 * __Features:__ 

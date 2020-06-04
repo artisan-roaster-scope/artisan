@@ -8,7 +8,7 @@ header:
   image: /assets/images/phoenix.jpg
   teaser: assets/images/phoenix.jpg
 ---
-* __Producer:__ [Buckeye Coffee Roasters Co. LCC](http://www.buckeyecoffee.com), USA
+* __Producer:__ [Buckeye Coffee Roasters Co. LCC](http://www.buckeyecoffee.com){:target="_blank"}, USA
 * __Machines:__ all models with Fuji PIDs
 * __Connection:__ MODBUS RTU; requires the installation of a serial driver
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves

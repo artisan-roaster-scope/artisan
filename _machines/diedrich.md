@@ -8,7 +8,7 @@ header:
   image: /assets/images/diedrich1.jpg
   teaser: assets/images/diedrich1.jpg
 ---
-* __Producer:__ [Diedrich](https://www.diedrichroasters.com/), USA
+* __Producer:__ [Diedrich](https://www.diedrichroasters.com/){:target="_blank"}, USA
 * __Machines:__ All machines equipped with the 4 or 6 Sensor Data Logging option
 * __Connection:__ USB
 * __Features 4 Sensor Data Logging Package:__
@@ -22,5 +22,5 @@ header:
   - logging of air dampener (Roast Air)
 
 **Watch out!**
-The datalogging on Diedrich maschines is build around [Phidgets](https://www.phidgets.com/). Ensure you have the latest Phidgets driver v22 for your platform (e.g. [Windows](https://www.phidgets.com/docs/OS_-_Windows), [macOS](https://www.phidgets.com/docs/OS_-_macOS) or [Linux](https://www.phidgets.com/docs/OS_-_Linux)) installed.
+The datalogging on Diedrich maschines is build around [Phidgets](https://www.phidgets.com/){:target="_blank"}. Ensure you have the latest Phidgets driver v22 for your platform (e.g. [Windows](https://www.phidgets.com/docs/OS_-_Windows){:target="_blank"}, [macOS](https://www.phidgets.com/docs/OS_-_macOS){:target="_blank"} or [Linux](https://www.phidgets.com/docs/OS_-_Linux){:target="_blank"}) installed.
 {: .notice--primary}

@@ -9,7 +9,7 @@ toc: true
 toc_label: "On this page"
 toc_icon: "cog"
 featurerequest:
-  - excerpt: '[Request a Feature](https://github.com/artisan-roaster-scope/artisan/issues){: .btn .btn--success .btn--large}'
+  - excerpt: '[Request a Feature](https://github.com/artisan-roaster-scope/artisan/issues){: .btn .btn--success .btn--large}{:target="_blank"}'
 gallery_main:
   - url: https://artisan.plus/
     image_path: /assets/images/artisan-plus.jpg
@@ -72,11 +72,11 @@ gallery:
 Artisan is an open-source software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
 
 [Donate](/donate/){: .btn .btn--success .btn--large} &emsp;
-[Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large}
+[Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large}{:target="_blank"}
 &emsp; [Documentation](/docs/quick-start-guide/){: .btn .btn--success .btn--large}
-&emsp; [Blog](https://artisan-roasterscope.blogspot.com/){: .btn .btn--success .btn--large}
+&emsp; [Blog](https://artisan-roasterscope.blogspot.com/){: .btn .btn--success .btn--large}{:target="_blank"}
 
-[All Releases](https://github.com/artisan-roaster-scope/artisan/releases)
+[All Releases](https://github.com/artisan-roaster-scope/artisan/releases){:target="_blank"}
 
 
 ## Platforms
@@ -87,21 +87,22 @@ Artisan supports the following 64bit operating systems:
 * Windows 8 and newer
 * Linux glibc 2.18
 
-There are also experimental builds for the Raspberry Pi platform.
+There are also experimental builds for the Raspberry Pi platform (stretch & buster).
 
 ## Notable Features
 
-- seemless integration into the [artisan.plus](https://artisan.plus) inventory management service
+- seemless integration into the [artisan.plus](https://artisan.plus){:target="_blank"} inventory management service
 - extensive [machine](/machines/) and [device](/devices/) support including control
 - unlimited number of curves
-- rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html), [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.de/2017/02/roast-phases-statistics-and-phases-lcds.html) calculations
+- rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html){:target="_blank"}, [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html){:target="_blank"} calculations
 - projection lines and head-up-display (HUD)
 - roast profile evaluation and statistics
-- [roast-, production- and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html)
-- automated reproduction of roasts via [alarm programs](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html), [replay of events](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html) or [PID control](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html)
-- [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html)
-- profile designer, cupping editor, spider- and wheel graph
-- [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html) with programable actions
+- [Profile Analyzer](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html){:target="_blank"}, [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html){:target="_blank"}, [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html){:target="_blank"} and [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html){:target="_blank"}
+- [roast-, production- and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html){:target="_blank"}
+- automated reproduction of roasts via [alarm programs](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html){:target="_blank"}, [replay of events](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html){:target="_blank"} or [PID control](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html){:target="_blank"}
+- [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html){:target="_blank"}
+- [profile designer](https://artisan-roasterscope.blogspot.com/2019/05/using-artisan-designer.html){:target="_blank"}, cupping editor, spider- and wheel graph
+- [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"} with programable actions
 - many import and export formats
 
 {% include feature_row id="featurerequest" type="center" %}
@@ -122,37 +123,37 @@ __Dario Ernst__ –– mailing list hosting
 
 We are always looking for people that support us here and there. Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
 
-Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.it/p/contact-me.html) on the [Artisan blog](https://artisan-roasterscope.blogspot.it).
+Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [Artisan blog](https://artisan-roasterscope.blogspot.com){:target="_blank"}.
 
 ## Supporters
 
 The development of Artisan is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors.
 
-Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther)!
+Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther){:target="_blank"}!
 
 {% include gallery id="gallery_main" %}
 
 {% include gallery id="gallery" %}
 
 <sub><sup>
-Arnoud Aalbersberg, Jasper Abbing, Marc Assinck, [Santa Fara Caffe](http://www.santafaracaffe.it), Paul Battle, Harald Baumgärtner, Jorge Barraza, [Beautiful Bean](https://thebeautifulbean.com/), [Bethells Beanz](http://bethellsbeanz.co.nz), David Bergman, Nicolas Bigler, Minos ([Bitter & Real](https://www.bitterandreal.nl/)), Patrizio ([Black & Blaze](https://www.blackandblaze.com)), Bruce Bowman, Ian Bradshaw ([Stas Coffee](http://www.stashcoffee.com.au)), Michel ([The Beautiful Bean](http://www.TheBeautifulBean.com)), Manfred ([Werksbrandt](http://www.werksbrandt.de/)), William Buchmann, Phil ([Dusty Ape](https://dustyape.com/)), James Calderone, Joseph Carlisle, Matías Carzalo, [Casual Coffee Roasters](https://casualcoffeeroasters.com), Jacob Catt, Tom Chips, Jennifer Chrisman, Szymon Ciszek, Alan ([Skylands Roastery](http://www.skylandsroastery.com)), Dan ([Fat Rabbit Coffee](http://fatrabbitcoffee.com)), Marco Cremonese, Tolga ([onetake coffee](http://onetake.coffee)), Ulrich Dauscher, Jaroslav ([doubleshot](https://www.doubleshot.cz/)), Peter de Goede, Tije De Jong, Erik De Kluiver, Allen Derusha, Mikel ([Mikels Kaffeverksted](https://m.facebook.com/MikelsKaffeverksted)), Stephen Egge, [Encore Coffee Company](https://www.encorecoffeeco.com/), Ram ([COFFEE-TECH ENGINEERING](https://www.coffee-tech.com/)), Roman Farber, Dmitry Fedotov, Hermann-Josef Fensky, Tadej Feregotto, Uwe Flommersfeld, Ed Gaida, Josef ([Kuntrawant](http://www.kuntrawant.com)), Robert Gardner, Bono ([Bono Coffee Roastery](https://www.facebook.com/bcroastery/)), Frans ([kostverlorenvaart.nl](http://kostverlorenvaart.nl/)), Jeff ([El Jefe Coffee Roasters](https://www.el-jefecoffee.com/)), Michael Groß, Rick Groszkiewicz, Reiss ([Londinium](https://londiniumespresso.com/)), Hans-Peter Hamp, Randy ([Buckeye Coffee Roasters](http://www.buckeyecoffee.com)), Joshua Hayman, Nicolas Heide, Jae Kyoung Heo, Michael Herbert, Wolfgang Höbel, Valerian Hrala, Peter Hudecek, Jui-Huang Hung, Tom Husband, Gurtekin Ilker, Robert Jagt, Tomáš Jeníček, Owen Jones, Elvio Dos Santos Junior ([Mestre Cafeeiro](http://mestrecafeeiro.com.br)), Jeeraphan Kanchanaveera, Bill ([San Franciscan Roaster](https://www.sanfranroaster.com/)), Kerry Kopp, [Lebenshilfe Heinsberg](https://www.lebenshilfe-heinsberg.de/), Assaf Litai, Morgan Love, Barry Lubin, Stuart McKnight, Charles Martin, Nicolas ([Marvell Street Coffee Roasters](http://marvellstreet.com/)), John Masiello, Susan Matthewman, Steve Mayeur, Joshua McWilliam, Robert Merriam, Timo ([Chocolatier Meyer](https://www.chocolatier-meyer.com/)), Brian ([Batdorf & Bronson Coffee Roasters](https://www.batdorfcoffee.com/)), [Casino Mocca](http://www.casinomocca.hu/), Roy Mongiovi, [Moon Doggie Farm](https://moondoggiefarm.com/), Paul Motulewicz, Steffen Müller, Thomas Müller, Azis Muslim, Chow Hiu Nam, Benedikt ([Neues Schwarz](http://www.neuesschwarz.de)), Bo ([Holy Bean Coffeeroasters](http://holybean.dk/)), Björn Nilsson, Maurice Nunas, Gary Ocampo, steven olock, Randall ([Limestone Coffee Co.](https://www.limestonecoffee.com/)), Flint Orr, Vladimir Pal, Quinn ([Peritus Coffee Roasters](http://www.perituscoffee.com)), Anton Petryakov, Radu ([Madison Coffee](http://www.madisoncoffee.ro)), Thomas Pröbstl, Vitaliy Prymakov, Christian Rad, Joshua Raimond, Barry ([Randall Coffee](http://www.randallcoffee.com/)), Kenneth Reid, Lutz ([Lensing & van Gülpen](http://www.royalcoffee.de/)), Javier Reto, [Ironside Roasting](http://www.ironsideroasting.com/), Barry Rodstein, Waroros Rojana, Ingo Rompelberg, Ismael Morales Ronden, Julian Rose, Mitchell Rosenbaum, Greg Rothschild, Ulrich ([Kaffeerösterei Grandoro](http://www.cafegrandoro.com)), Jörg Schaible, Eric Schlukebir, Sebastian Schnitzler, Uwe Schuschnig, Paolo ([His Majesty the Coffee](https://hismajestythecoffee.com/)), Gary Seeman, Aaron Skeen, Adam Smith, Paul Songer, Tim Stevens, Claus Stoeger, Manuel Terzi, Suchaw Thavornwongs, [The 25 Group](http://coffee.the25groupllc.com/), The Coffee Alchemist, Matthias Theobald, Suksit Thep-Aree, Dave & Tim ([Trebilcock Coffee Roasters](https://www.trebilcockcoffee.ca/)), Kelsang Tsangpa, Jan van der Weel, Kasper Vissing, Nick Watson, Robert Werby, [Kristian Wind](http://www.kristianwind.dk), Michael Wong, Spencer ([Roastorium](https://www.roastorium.com)), Frans Yayang, Назар Гаджиев, 将 山根, 嘉仁 鄭, Dondi, Lenny, Ahamad, Sandit, Satria, William, Yudhan, Tsai Chung-Che, Timothy Pellizzer ([Sebastian Joe's](http://sebastianjoesicecream.com)), Joe Ornato ([O-JOE Coffee & Food](https://ojoecoffee.com/)), Dan Massicotte ([Espanola Coffee Roasters](http://www.espanolacoffeeroasters.com)), Zoltán Kis ([holistikcoffee](https://www.instagram.com/holistikcoffee/)), Marcel Speek, Andreas Draeger, Yassine Boughmamar, Darren Addy, ASinc ([Red Devil Roast](http://reddevilroast.com)), Houston Miller ([Quills Coffee](https://quillscoffee.com)), Margaret Gillespie, Dave Stanton ([Crankhouse Coffee](https://www.crankhousecoffee.co.uk/)), Richard Green, Thomas Pröbstl, [Atlas Coffee Importers](https://www.atlascoffee.com), Doak Procter, Tony Owens, Javier Reto, Michael King ([Encore Coffee](https://www.encorecoffeeco.com/)), Wemerson Bruno Henriques, Federico Osorio, William Feeney, Uriel Sonderegger ([Maillardos](https://www.maillardos.ch/)), Jordan ([Maldives Coffee Academy](http://maldivescoffeeacademy.com)), Michael Fajdiga, Cafe Balcony, Dieter Hoenigmann ([22 Beans](https://www.22beans.at/)), [Big E Bearded Coffee](https://bigebeardedcoffee.com/), Arnoud Kruiver ([Het Hoofdkwartierm](http://www.vintage-espresso-machines.nl/het-hoofdkwartier-koffiebranderij-private-label-koffie-koffiebonen-eigen-label-koffiemerk-merk)), Ken Schweikert, Matthias Theobald, John Uriate, Alan Cohen ([SkyRoast Coffee](http://www.skylandsroastery.com)), Manuel Terzi ([Caffè Terzi](http://www.caffeterzi.it)), Tim Piazza, Craig Seko, Chris YI-HSIEN CHAN, Paul Battle, [No6 Coffee Co](https://no6coffee.co/), Dan Metcalf, Tsai​Chung-Che, Erhard Dinges, Vitaliy Prymakov, Brent Kennedy, Ayman Al Bassam, Michael Stoeger, Albert Richheimer, Jeremy Meiring, Jim Dykstra ([Renascent Coffee](https://renascentcoffee.com)), Sylvain Ouellette</sup></sub>
+Arnoud Aalbersberg, Jasper Abbing, Marc Assinck, [Santa Fara Caffe](http://www.santafaracaffe.it), Paul Battle, Harald Baumgärtner, Jorge Barraza, [Beautiful Bean](https://thebeautifulbean.com/), [Bethells Beanz](http://bethellsbeanz.co.nz), David Bergman, Nicolas Bigler, Minos ([Bitter & Real](https://www.bitterandreal.nl/)), Patrizio ([Black & Blaze](https://www.blackandblaze.com)), Bruce Bowman, Ian Bradshaw ([Stas Coffee](http://www.stashcoffee.com.au)), Michel ([The Beautiful Bean](http://www.TheBeautifulBean.com)), Manfred ([Werksbrandt](http://www.werksbrandt.de/)), William Buchmann, Phil ([Dusty Ape](https://dustyape.com/)), James Calderone, Joseph Carlisle, Matías Carzalo, [Casual Coffee Roasters](https://casualcoffeeroasters.com), Jacob Catt, Tom Chips, Jennifer Chrisman, Szymon Ciszek, Alan ([Skylands Roastery](http://www.skylandsroastery.com)), Dan ([Fat Rabbit Coffee](http://fatrabbitcoffee.com)), Marco Cremonese, Tolga ([onetake coffee](http://onetake.coffee)), Ulrich Dauscher, Jaroslav ([doubleshot](https://www.doubleshot.cz/)), Peter de Goede, Tije De Jong, Erik De Kluiver, Allen Derusha, Mikel ([Mikels Kaffeverksted](https://m.facebook.com/MikelsKaffeverksted)), Stephen Egge, [Encore Coffee Company](https://www.encorecoffeeco.com/), Ram ([COFFEE-TECH ENGINEERING](https://www.coffee-tech.com/)), Roman Farber, Dmitry Fedotov, Hermann-Josef Fensky, Tadej Feregotto, Uwe Flommersfeld, Ed Gaida, Josef ([Kuntrawant](http://www.kuntrawant.com)), Robert Gardner, Bono ([Bono Coffee Roastery](https://www.facebook.com/bcroastery/)), Frans ([kostverlorenvaart.nl](http://kostverlorenvaart.nl/)), Jeff ([El Jefe Coffee Roasters](https://www.el-jefecoffee.com/)), Michael Groß, Rick Groszkiewicz, Reiss ([Londinium](https://londiniumespresso.com/)), Hans-Peter Hamp, Randy ([Buckeye Coffee Roasters](http://www.buckeyecoffee.com)), Joshua Hayman, Nicolas Heide, Jae Kyoung Heo, Michael Herbert, Wolfgang Höbel, Valerian Hrala, Peter Hudecek, Jui-Huang Hung, Tom Husband, Gurtekin Ilker, Robert Jagt, Tomáš Jeníček, Owen Jones, Elvio Dos Santos Junior ([Mestre Cafeeiro](http://mestrecafeeiro.com.br)), Jeeraphan Kanchanaveera, Bill ([San Franciscan Roaster](https://www.sanfranroaster.com/)), Kerry Kopp, [Lebenshilfe Heinsberg](https://www.lebenshilfe-heinsberg.de/), Assaf Litai, Morgan Love, Barry Lubin, Stuart McKnight, Charles Martin, Nicolas ([Marvell Street Coffee Roasters](http://marvellstreet.com/)), John Masiello, Susan Matthewman, Steve Mayeur, Joshua McWilliam, Robert Merriam, Timo ([Chocolatier Meyer](https://www.chocolatier-meyer.com/)), Brian ([Batdorf & Bronson Coffee Roasters](https://www.batdorfcoffee.com/)), [Casino Mocca](http://www.casinomocca.hu/), Roy Mongiovi, [Moon Doggie Farm](https://moondoggiefarm.com/), Paul Motulewicz, Steffen Müller, Thomas Müller, Azis Muslim, Chow Hiu Nam, Benedikt ([Neues Schwarz](http://www.neuesschwarz.de)), Bo ([Holy Bean Coffeeroasters](http://holybean.dk/)), Björn Nilsson, Maurice Nunas, Gary Ocampo, steven olock, Randall ([Limestone Coffee Co.](https://www.limestonecoffee.com/)), Flint Orr, Vladimir Pal, Quinn ([Peritus Coffee Roasters](http://www.perituscoffee.com)), Anton Petryakov, Radu ([Madison Coffee](http://www.madisoncoffee.ro)), Thomas Pröbstl, Vitaliy Prymakov, Christian Rad, Joshua Raimond, Barry ([Randall Coffee](http://www.randallcoffee.com/)), Kenneth Reid, Lutz ([Lensing & van Gülpen](http://www.royalcoffee.de/)), Javier Reto, [Ironside Roasting](http://www.ironsideroasting.com/), Barry Rodstein, Waroros Rojana, Ingo Rompelberg, Ismael Morales Ronden, Julian Rose, Mitchell Rosenbaum, Greg Rothschild, Ulrich ([Kaffeerösterei Grandoro](http://www.cafegrandoro.com)), Jörg Schaible, Eric Schlukebir, Sebastian Schnitzler, Uwe Schuschnig, Paolo ([His Majesty the Coffee](https://hismajestythecoffee.com/)), Gary Seeman, Aaron Skeen, Adam Smith, Paul Songer, Tim Stevens, Claus Stoeger, Manuel Terzi, Suchaw Thavornwongs, [The 25 Group](http://coffee.the25groupllc.com/), The Coffee Alchemist, Matthias Theobald, Suksit Thep-Aree, Dave & Tim ([Trebilcock Coffee Roasters](https://www.trebilcockcoffee.ca/)), Kelsang Tsangpa, Jan van der Weel, Kasper Vissing, Nick Watson, Robert Werby, [Kristian Wind](http://www.kristianwind.dk), Michael Wong, Spencer ([Roastorium](https://www.roastorium.com)), Frans Yayang, Назар Гаджиев, 将 山根, 嘉仁 鄭, Dondi, Lenny, Ahamad, Sandit, Satria, William, Yudhan, Tsai Chung-Che, Timothy Pellizzer ([Sebastian Joe's](http://sebastianjoesicecream.com)), Joe Ornato ([O-JOE Coffee & Food](https://ojoecoffee.com/)), Dan Massicotte ([Espanola Coffee Roasters](http://www.espanolacoffeeroasters.com)), Zoltán Kis ([holistikcoffee](https://www.instagram.com/holistikcoffee/)), Marcel Speek, Andreas Draeger, Yassine Boughmamar, Darren Addy, ASinc ([Red Devil Roast](http://reddevilroast.com)), Houston Miller ([Quills Coffee](https://quillscoffee.com)), Margaret Gillespie, Dave Stanton ([Crankhouse Coffee](https://www.crankhousecoffee.co.uk/)), Richard Green, Thomas Pröbstl, [Atlas Coffee Importers](https://www.atlascoffee.com), Doak Procter, Tony Owens, Javier Reto, Michael King ([Encore Coffee](https://www.encorecoffeeco.com/)), Wemerson Bruno Henriques, Federico Osorio, William Feeney, Uriel Sonderegger ([Maillardos](https://www.maillardos.ch/)), Jordan ([Maldives Coffee Academy](http://maldivescoffeeacademy.com)), Michael Fajdiga, Cafe Balcony, Dieter Hoenigmann ([22 Beans](https://www.22beans.at/)), [Big E Bearded Coffee](https://bigebeardedcoffee.com/), Arnoud Kruiver ([Het Hoofdkwartierm](http://www.vintage-espresso-machines.nl/het-hoofdkwartier-koffiebranderij-private-label-koffie-koffiebonen-eigen-label-koffiemerk-merk)), Ken Schweikert, Matthias Theobald, John Uriate, Alan Cohen ([SkyRoast Coffee](http://www.skylandsroastery.com)), Manuel Terzi ([Caffè Terzi](http://www.caffeterzi.it)), Tim Piazza, Craig Seko, Chris YI-HSIEN CHAN, Paul Battle, [No6 Coffee Co](https://no6coffee.co/), Dan Metcalf, Tsai​Chung-Che, Erhard Dinges, Vitaliy Prymakov, Brent Kennedy, Ayman Al Bassam, Michael Stoeger, Albert Richheimer, Jeremy Meiring, Jim Dykstra ([Renascent Coffee](https://renascentcoffee.com)), Sylvain Ouellette, Martin Copper, Dave (the Chambers), Richard ([Rustic Roastery](http://www.rusticroastery.net/)), Mark Clavell, Carlos Fernandez,  Ben ([Potomac Chocolate](http://www.potomacchocolate.com/)), Michael Stimets, Philip Sowels, Keith Poole, Bruno Henriques, Sander de Bie, Lou Arminio, Jim ([Salvation Coffee Company](http://www.salvationcoffeecompany.com/)), Federico Osorio, Norm and Martin ([Banff Roasting Company](http://banffroastingcompany.com/)), Chris Kolber, JunShin, Andreas Wurtinger, Koby Funderburg, Uwe Schuschnig, Craig ([River Bottom Roasters](https://riverbottomroasters.com/)), Douglas Sharp, Vitaly Tarasenko, Chris Moore, Chang Hui, Peter Sloan, Randy and Deacon ([Xanadu Coffee](http://www.xanaducoffee.com/)), Rosewood Fun, Ohnishi-san ([株式会社　さくら](http://www.coffeesakura.jp/)), Jordan Nickell, Danette Adams, Raymond ([Really Really Fresh Coffee](https://www.facebook.com/reallyreallyfreshcoffee)), William Johnson, Suksit Thep-Aree, Oliver Prosperi, Andy Russell, Knud Buck, Samuel Malanowski, Grant Spence ([Speyside Coffee Roasting](https://speysidecoffee.co.uk/)), Wilker Silva, Dane Paster, Aaron Rupp, Engin Arcan, Leo Shrock, David Manning, Joseph Ferreri, Martin Kral, John Castle, Mugurel-Ovidiu Sodolea, Michele ([Caffè Gentili](http://caffegentili.com/)), Phil Dawes, Jürgen Wagner, Kenneth ([Coffee Review](https://www.coffeereview.com/)), Chris Dunavan and Michael Gallagher.</sup></sub>
 
 
 ## Enablers
 
 Artisan builds on a large number of excellent open-source software.
 
-* [matplotlib](https://matplotlib.org)
-* [numpy/scipy](https://www.scipy.org)
-* [PyQt](https://riverbankcomputing.com)
-* [py2app](https://bitbucket.org/ronaldoussoren/py2app)
-* [pyinstaller](https://www.pyinstaller.org)
-* [pymodbus](https://github.com/riptideio/pymodbus)
-* [pyserial](https://github.com/pyserial/pyserial)
-* [Python](https://www.python.org)
-* [python-snap7](https://github.com/gijzelaerr/python-snap7)
-* [pyusb](https://github.com/pyusb/pyusb)
-* [Qt](https://www.qt.io)
+* [matplotlib](https://matplotlib.org){:target="_blank"}
+* [numpy/scipy](https://www.scipy.org){:target="_blank"}
+* [PyQt](https://riverbankcomputing.com){:target="_blank"}
+* [py2app](https://bitbucket.org/ronaldoussoren/py2app){:target="_blank"}
+* [pyinstaller](https://www.pyinstaller.org){:target="_blank"}
+* [pymodbus](https://github.com/riptideio/pymodbus){:target="_blank"}
+* [pyserial](https://github.com/pyserial/pyserial){:target="_blank"}
+* [Python](https://www.python.org){:target="_blank"}
+* [python-snap7](https://github.com/gijzelaerr/python-snap7){:target="_blank"}
+* [pyusb](https://github.com/pyusb/pyusb){:target="_blank"}
+* [Qt](https://www.qt.io){:target="_blank"}
 
 ..and many other packages. Thanks for releasing your work as open-source!
 

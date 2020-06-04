@@ -8,7 +8,7 @@ header:
   image: /assets/images/hasgaranti-small.jpg
   teaser: assets/images/hasgaranti-small.jpg
 ---
-* __Producer:__ [Has Garanti](http://www.hasgaranti.com.tr), Turkey
+* __Producer:__ [Has Garanti](http://www.hasgaranti.com.tr){:target="_blank"}, Turkey
 * __Machine:__ Has Garanti HGS and HSR series
 * __Connection:__ MODBUS RTU via USB
 * __Features:__ 

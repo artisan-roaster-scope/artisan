@@ -8,7 +8,7 @@ header:
   image: /assets/images/coffed.jpg
   teaser: assets/images/coffed.jpg
 ---
-* __Producer:__ [Coffed](http://coffed.pl), Poland
+* __Producer:__ [Coffed](http://coffed.pl){:target="_blank"}, Poland
 * __Machine:__ SR3, SR5, SR15, SR25, SR60 (manual, manual delta, and automatic variants)
 * __Connection:__ 
   - manual variants: MODBUS RTU via USB-2-RS485 interface; requires the installation of a serial driver

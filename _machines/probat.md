@@ -8,7 +8,7 @@ header:
   image: /assets/images/probat.jpg
   teaser: assets/images/probat.jpg
 ---
-* __Producer:__ [Probat](http://www.probat-shoproaster.com/en/home/), Germany
+* __Producer:__ [Probat](http://www.probat-shoproaster.com/en/home/){:target="_blank"}, Germany
 * __Machines:__ Probatone II 5Kg/12Kg/25Kg with software option
   - small touch display (Wago PLC)
   - 7" touch display (Beckhof PLC)
@@ -29,7 +29,7 @@ header:
   * CMD-3: adds a third slider for fan speed control
 - the air pressure LCD & Curve are hidden by default, but can be made visible by ticking the Curve2/LCD2 flags of the first extra device entry (menu `Config` >> `Device`, tab `Extra Devices`)
 - you might need to update your Probatones firmware to the lastest version via Probat to enjoy all features
-- version v1.6.1 of Artisan add support for the [Probat Roaster Middleware](https://www.probat.com/en/products/shoproaster/produkte/roasters/probatone-series/) and allows to read data from all its supported roasting machines
+- version v1.6.1 of Artisan add support for the [Probat Roaster Middleware](https://www.probat.com/en/products/shoproaster/produkte/roasters/probatone-series/){:target="_blank"} and allows to read data from all its supported roasting machines
 
 
 **Watch out!** Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.

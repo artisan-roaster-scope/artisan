@@ -9,7 +9,7 @@ header:
   teaser: assets/images/sf.jpg
 ---
 
-* __Producer:__ [The San Franciscan Roaster Company](http://www.sanfranroaster.com), USA
+* __Producer:__ [The San Franciscan Roaster Company](http://www.sanfranroaster.com){:target="_blank"}, USA
 * __Machines:__ all roasters with a Watlow PM6 (requires the _EIA 485 Modbus RTU_ option)
 * __Connection:__ MODBUS RTU via USB-2-RS485 interface; requires the installation of a serial driver
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves

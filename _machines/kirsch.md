@@ -8,7 +8,7 @@ header:
   image: /assets/images/kirsch.jpg
   teaser: assets/images/kirsch.jpg
 ---
-* __Producer:__ [KIRSCH + MAUSER](https://www.kirschundmausser.de), Germany
+* __Producer:__ [KIRSCH + MAUSER](https://www.kirschundmausser.de){:target="_blank"}, Germany
 * __Machines:__ UG15 and UG22 retro with networked PLC
 * __Connection:__ Siemens S7 network via the network
 * __Features:__

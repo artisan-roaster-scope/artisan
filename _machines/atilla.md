@@ -8,7 +8,7 @@ header:
   image: /assets/images/atilla3.jpg
   teaser: assets/images/atilla3.jpg
 ---
-* __Producer:__ [Atilla Roasters](http://www.atilla.com.br/), Brazil
+* __Producer:__ [Atilla Roasters](http://www.atilla.com.br/){:target="_blank"}, Brazil
 * __Machine:__ all Atilla Gold plus roasters with 7" touch display (2/5/10/15/30 kg)
 * __Connection:__ MODBUS TCP via the network
 * __Features:__ 

@@ -8,7 +8,7 @@ header:
   image: /assets/images/usroaster.jpg
   teaser: assets/images/usroaster.jpg
 ---
-* __Producer:__ [US Roaster Corp](http://www.usroastercorp.com), USA
+* __Producer:__ [US Roaster Corp](http://www.usroastercorp.com){:target="_blank"}, USA
 * __Machines:__ all with USB connection
 * __Connection:__ MODBUS RTU; requires the installation of a serial driver
 * __Features:__ logging of bean temperature (BT) and related rate-of-rise curve

@@ -8,7 +8,7 @@ header:
   image: /assets/images/coffeetool.jpg
   teaser: assets/images/coffeetool.jpg
 ---
-* __Producer:__ [Coffeetool](http://coffeetool.gr), Greece
+* __Producer:__ [Coffeetool](http://coffeetool.gr){:target="_blank"}, Greece
 * __Machines:__ R500/R3/R5/R15 with networked PLC
 * __Connection:__ MODBUS TCP via the network
 * __Features:__

@@ -9,7 +9,7 @@ header:
   teaser: assets/images/hottop.jpg
 ---
 
-* __Producer:__ [Hottop](https://www.hottopusa.com), USA/Taiwan
+* __Producer:__ [Hottop](https://www.hottopusa.com){:target="_blank"}, USA/Taiwan
 * __Machine:__ KN-8828B-2K+
 * __Connection:__ vendor specific serial protocol
 * __Features:__ 
@@ -23,9 +23,9 @@ header:
 {: .notice--primary}
 
 **Watch out!**
-The Artisan blog contains a [detailed post](https://artisan-roasterscope.blogspot.com/2015/05/hottop-kn-8828b-2k.html) on this setup.
+The Artisan blog contains a [detailed post](https://artisan-roasterscope.blogspot.com/2015/05/hottop-kn-8828b-2k.html){:target="_blank"} on this setup.
 {: .notice--primary}
 
 **Watch out!**
-There is also setup supporting Hottop machines modified with an [Arduino/TC4/HTC combination](http://blog.oilslickcoffee.com/2016/03/15/how-to-install-hottop-htri-control-board/).
+There is also setup supporting Hottop machines modified with an [Arduino/TC4/HTC combination](http://blog.oilslickcoffee.com/2016/03/15/how-to-install-hottop-htri-control-board/){:target="_blank"}.
 {: .notice--primary}

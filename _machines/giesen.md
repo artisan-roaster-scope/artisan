@@ -8,7 +8,7 @@ header:
   image: /assets/images/giesen.jpg
   teaser: assets/images/giesen.jpg
 ---
-* __Producer:__ [GIESEN coffee-roasters](http://www.giesencoffeeroasters.eu), The Netherlands
+* __Producer:__ [GIESEN coffee-roasters](http://www.giesencoffeeroasters.eu){:target="_blank"}, The Netherlands
 * __Machines:__ WPG1/W1A/W6A/W15A with networked PLC (6/2014 and later)
 * __Connection:__ Siemens S7 network
 * __Features:__

@@ -8,7 +8,7 @@ header:
   image: /assets/images/buhler.jpg
   teaser: assets/images/buhler.jpg
 ---
-* __Producer:__ [Bühler GmbH](http://www.buhlergroup.com/), Germany
+* __Producer:__ [Bühler GmbH](http://www.buhlergroup.com/){:target="_blank"}, Germany
 * __Machines:__ Roastmaster
 * __Connection:__ Siemens S7 network
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT), afterburner temperature (AT) and drum pressure

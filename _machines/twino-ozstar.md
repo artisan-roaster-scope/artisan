@@ -8,7 +8,7 @@ header:
   image: /assets/images/twino-ozstar1.jpg
   teaser: assets/images/twino-ozstar1.jpg
 ---
-* __Producer:__ [Özstar](https://www.ozstarmakina.com/), Turkey
+* __Producer:__ [Özstar](https://www.ozstarmakina.com/){:target="_blank"}, Turkey
 * __Machines:__ all Twino/Ozstar machines with networked PLC
 * __Connection:__ MODBUS TCP via the network
 * __Features:__
