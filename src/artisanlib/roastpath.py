@@ -23,7 +23,7 @@ def extractProfileRoastPathHTML(url):
     try:
         s = requests.Session()
         s.mount('file://', FileAdapter())
-        page = s.get(url.toString())
+        page = s.get(url.toString(), timeout=(4, 15), headers={"Accept-Encoding" : "gzip"})
         tree = html.fromstring(page.content)
         
         title = ""

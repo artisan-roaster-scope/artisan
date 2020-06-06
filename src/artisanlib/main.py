@@ -557,6 +557,7 @@ from artisanlib.cropster import extractProfileCropsterXLS
 from artisanlib.giesen import extractProfileGiesenCSV
 from artisanlib.ikawa import extractProfileIkawaCSV
 from artisanlib.roastpath import extractProfileRoastPathHTML
+from artisanlib.roastlog import extractProfileRoastLog
 from artisanlib.simulator import Simulator
 from artisanlib.transposer import profileTransformatorDlg
 from artisanlib.comparator import roastCompareDlg
@@ -14054,6 +14055,10 @@ class ApplicationWindow(QMainWindow):
         fileImportRoastLoggerAction = QAction("RoastLogger...",self)
         fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
         self.importMenu.addAction(fileImportRoastLoggerAction)
+
+        importRoastLogAction = QAction("RoastLog URL...",self)
+        importRoastLogAction.triggered.connect(self.importRoastLog)
+        self.importMenu.addAction(importRoastLogAction)
 
         importRoastPathAction = QAction("RoastPATH URL...",self)
         importRoastPathAction.triggered.connect(self.importRoastPATH)
@@ -31921,6 +31926,11 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importCropster(self,_=False):
         self.importExternal(extractProfileCropsterXLS,QApplication.translate("Message","Import Cropster XLS", None),"*.xls")
+        
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importRoastLog(self,_=False):
+        self.importExternalURL(extractProfileRoastLog,QApplication.translate("Message","Import RoastLog URL", None))
         
     @pyqtSlot()
     @pyqtSlot(bool)

@@ -82,7 +82,7 @@ def stringfromseconds(seconds_raw, leadingzero=True):
         return "-%02d:%02d"% divmod(negtime, 60)
 
 #Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
-#acepted formats: "00:00","-00:00"
+#accepted formats: "00:00","-00:00"
 def stringtoseconds(string):
     timeparts = string.split(":")
     if len(timeparts) != 2:
