@@ -69,7 +69,7 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - 9V Battery only
   - Internal memory
   - Software included
-* [Omega HH506RA](http://www.omega.com/pptst/HH506A_HH506RA.html) / [EXTECH 421509](http://www.extech.com/instruments/product.asp?catid=64&prodid=410)
+* [Omega HH506RA](http://www.omega.com/pptst/HH506A_HH506RA.html) / [EXTECH 421509](http://www.extech.com/products/421509)
   - Dual K/J/T/E/R/S/N-Type
   - RS232 Interface (2400-7E1)
   - Internal memory
