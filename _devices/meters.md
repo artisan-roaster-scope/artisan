@@ -75,7 +75,7 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - Internal memory
   - 9V Battery only
   - Optional optical-isolated serial2USB converter
-* [Amprobe TMD-56](http://www.amprobe.com/amprobe/usen/HVAC-Tools/Thermocouple-Thermometers/TMD-56.htm) / [Omega HH806AU](http://www.omega.com/ppt/pptsc.asp?ref=hh806) / [Mastech MS6514](http://www.mastech-group.com/products.php?PNo=89)
+* [Amprobe TMD-56](https://www.amprobe.com/product/tmd-56/) / [Omega HH806AU](http://www.omega.com/ppt/pptsc.asp?ref=hh806) / [Mastech MS6514](http://www.mastech-group.com/products.php?PNo=89)
   - Dual K/J/T/E/R/S/N-Type
   - Built in USB to serial converter (19200-8E1)
   - Internal memory
