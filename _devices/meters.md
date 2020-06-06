@@ -18,7 +18,7 @@ Some of these devices come with an internal serial-2-USB interface, while others
 Any of these meters require a serial device driver installed that allows the computer to communicate with the serial-2-USB chip implemented by the hardware interface. Most common are
 
 + [VCP from FTDI](http://www.ftdichip.com/Drivers/VCP.htm)
-+ [CP210x from Silicon Labs](http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx)
++ [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 + [PL2303 from Prolific](http://prolificusa.com/pl-2303hx-drivers/)
 
 **Watch out!** The FTDI driver is preinstalled on virtually all Linux distributions as well as all OS X versions supported by Artisan. Installing an additional FTDI driver on those operating system might lead to instabilities!
