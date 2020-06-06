@@ -94,12 +94,12 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
 
 Those 4 channel meters in the list below are all basically identical. Just that the CENTER 304 (and one of the two VOLTCRAFT K204, no typo here!, does not include any data logging capability. However, that does not matter for its use with Artisan. Therefore, selecting the CENTER 304 over the CENTER309 makes sense as it is usually the cheaper device (so take care, there are two different devices labeled VOLTCRAFT K204, but they can easily be distinguished by price). 
 
-* [CENTER 304](http://www.centertek.com/products_con.aspx?cid=C_00000011&cpid=C_00000002&pid=P_00000037&pn=proT) / VOLTCRAFT K204
+* [CENTER 304](http://www.centertek.com/product_d.php?lang=en&tb=1&id=76&cid=67) / VOLTCRAFT K204
   - Four K-Type
   - RS232 Interface (9600-8N1)
   - Software optional
   - 9V Battery or external power
-* [CENTER 309](http://www.centertek.com/products_con.aspx?cid=C_00000011&cpid=C_00000002&pid=P_00000042&pn) / VOLTCRAFT K204 / [Omega HH309](http://www.omega.com/pptst/HH309.html) / [General Tools DT309DL](http://www.tequipment.net/GeneralDT309DL.html)
+* [CENTER 309](http://www.centertek.com/product_d.php?lang=en&tb=1&id=79&cid=67) / VOLTCRAFT K204 / [Omega HH309](http://www.omega.com/pptst/HH309.html) / [General Tools DT309DL](http://www.tequipment.net/GeneralDT309DL.html)
   - Four K-Type
   - RS232 Interface (9600-8N1)
   - Internal memory
