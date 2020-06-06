@@ -53,17 +53,17 @@ The single temperature meters listed above are rather simple and cost-efficient.
 
 The dual temperature meters are perfect for the standard use of Artisan to log the BT and ET temperature curves. If your probe is a K-Type, which is the standard for measuring BT/ET in a coffee roaster, you can choose from any of the above meters. The Amprobe is especially interesting due to its competitive price tag (see [this post](http://artisan-roasterscope.blogspot.de/2013/06/artisan-monitoring-londinium.html) to learn how the Amprobe and Artisan helped to investigate the Londinium group temperature stability). The Omega HH506RA (or its EXTECH variant) is interesting for its optical-isolated serial2USB converter. However, this converter is an add-one that has to be purchased separately and the fixed serial speed of that device is quite low (although it works well with Artisan). All of the devices listed here exclusively run from battery, but for the last one which does not need any external power but for the USB connection
 
-* [CENTER 301](http://www.centertek.com/products_con.aspx?cid=C_00000011&cpid=C_00000002&pid=P_00000034&pn=proT)
+* [CENTER 301](http://www.centertek.com/product_d.php?lang=en&tb=1&id=67&cid=67)
   - Dual K-Type
   - RS232 Interface (9600-8N1)
   - 9V Battery only
   - Software optional
-* [CENTER 303](http://www.centertek.com/products_con.aspx?cid=C_00000011&cpid=C_00000002&pid=P_00000036&pn=proT) / VOLTCRAFT 302KJ / VOLTCRAFT KJ202
+* [CENTER 303](http://www.centertek.com/product_d.php?lang=en&tb=1&id=73&cid=67) / VOLTCRAFT 302KJ / VOLTCRAFT KJ202
   - Dual K/J-Type
   - RS232 Interface (9600-8N1)
   - 9V Battery only
   - Software optional
-* [CENTER 306](http://www.centertek.com/products_con.aspx?cid=C_00000011&cpid=C_00000002&pid=P_00000039&pn=proT) / VOLTCRAFT K202
+* [CENTER 306](http://www.centertek.com/product_d.php?lang=en&tb=1&id=85&cid=67) / VOLTCRAFT K202
   - Dual K-Type
   - RS232 Interface (9600-8N1), cable included
   - 9V Battery only
