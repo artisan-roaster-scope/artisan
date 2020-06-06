@@ -75,7 +75,7 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - Internal memory
   - 9V Battery only
   - Optional optical-isolated serial2USB converter
-* [Amprobe TMD-56](https://www.amprobe.com/product/tmd-56/) / [Omega HH806AU](http://www.omega.com/ppt/pptsc.asp?ref=hh806) / [Mastech MS6514](http://www.mastech-group.com/products.php?PNo=89)
+* [Amprobe TMD-56](https://www.amprobe.com/product/tmd-56/) / [Omega HH806AU](https://www.omega.com/en-us/sensors-and-sensing-equipment/temperature/thermometers/p/HH806) / [Mastech MS6514](http://www.mastech-group.com/products.php?PNo=89)
   - Dual K/J/T/E/R/S/N-Type
   - Built in USB to serial converter (19200-8E1)
   - Internal memory
@@ -99,7 +99,7 @@ Those 4 channel meters in the list below are all basically identical. Just that 
   - RS232 Interface (9600-8N1)
   - Software optional
   - 9V Battery or external power
-* [CENTER 309](http://www.centertek.com/product_d.php?lang=en&tb=1&id=79&cid=67) / VOLTCRAFT K204 / [Omega HH309](http://www.omega.com/pptst/HH309.html) / [General Tools DT309DL](http://www.tequipment.net/GeneralDT309DL.html)
+* [CENTER 309](http://www.centertek.com/product_d.php?lang=en&tb=1&id=79&cid=67) / VOLTCRAFT K204 / [Omega HH309](https://www.omega.com/en-us/control-and-monitoring-devices/data-loggers/p/HH309A-Series) / [General Tools DT309DL](http://www.tequipment.net/GeneralDT309DL.html)
   - Four K-Type
   - RS232 Interface (9600-8N1)
   - Internal memory
