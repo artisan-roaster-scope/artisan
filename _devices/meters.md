@@ -132,7 +132,7 @@ Multi-meters allow to read different types of sensors by measuring a voltage or 
 
 ## Others
 
-* [Extech 755](http://www.extech.com/display/?id=14489) 
+* [Extech 755](http://www.extech.com/products/HD755) 
   - Differential Pressure Manometer (0.5psi)
   - USB Interface
   - 9V battery only
