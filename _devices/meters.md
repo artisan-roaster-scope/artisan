@@ -30,17 +30,17 @@ Any of these meters require a serial device driver installed that allows the com
 
 The single temperature meters listed above are rather simple and cost-efficient. If it is only the BT curve you are interested and don't want to spent too much money they are a good option. Note that the CENTER 300 is also on the market under the label VOLTCRAFT K201 and 300K with minor differences.
 
-* [CENTER 300](http://www.centertek.com/products_con.aspx?cid=C_00000011&cpid=C_00000002&pid=P_00000033&pn=proT) / VOLTCRAFT K201 / VOLTCRAFT 300K
+* [CENTER 300](http://www.centertek.com/product_d.php?lang=en&tb=1&id=64&cid=67) / VOLTCRAFT K201 / VOLTCRAFT 300K
   - Single K-Type
   - RS232 Interface (9600-8N1)
   - 9V Battery only
   - Software optional
-* [CENTER 302](http://www.centertek.com/products_con.aspx?cid=C_00000011&cpid=C_00000002&pid=P_00000035&pn=proT)
+* [CENTER 302](http://www.centertek.com/product_d.php?lang=en&tb=1&id=70&cid=67)
   - Single K/J-Type
   - RS232 Interface (9600-8N1)
   - 9V Battery only
   - Software optional
-* [CENTER 305](http://www.centertek.com/products_con.aspx?cid=C_00000011&cpid=C_00000002&pid=P_00000038&pn=proT)
+* [CENTER 305](http://www.centertek.com/product_d.php?lang=en&tb=1&id=82&cid=67)
   - Single K-Type
   - RS232 Interface (9600-8N1), cable included
   - 9V Battery only
