@@ -60,7 +60,7 @@ and this image compares the Transposed profile with the original in the backgrou
 **Sample Roasting to Production Roaster – creating a symbolic offset value.**  
 If your sample roasters hits FCs at a lower temp than your production roaster you would enter a value in the FCs for BT and at the bottom of the dialog it will suggest a symbolic offset you can use your sample roaster to produce similar temps on your production roaster.  
 
-For additional technical explanations see the Artistan Blog post on Profile Transformer – coming.  
+For additional technical explanations see the [Artistan Blog post](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html).  
 
 
 
