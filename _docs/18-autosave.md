@@ -14,8 +14,6 @@ Pick and prefix and directory and choose to include a PDF or not.  You might wan
 
 ![autosave](/assets/images/gsg/autosave configuration.png)
 
-[COMING IN RELEASE 2.4](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md)
-
 The Autosave function has been greatly enhanced.  You now have the option of saving the .alog file and a .pdf or other file formats to separate directories.  Please read the [Artisan Blog story](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html) for details. With the new features, you have a great abiltiy to customize the name of your files using various strings which are documented in under Help in the dialog box.  As you enter the strings, the dialog box returns an example of the file save name.  Some examples from the strings are below.  
 
 ![autosave in 2.4](/assets/images/gsg/Autosave Configuration 2.jpg)
@@ -43,7 +41,7 @@ Production roaster interested in roaster’s name (in this case intials), machin
 
 MDH NC-500 72  540.0 g Hama O Rama Espresso 2020-04-27
 
-Other date format options are available, and some other fields from Roast Properties.  See Help in the dialog box for more information and notes on specific cases. The string choices are:
+Other date format options are available, and some other fields from Roast Properties.  The string choices include the following, but the list has expanded so see Help in the dialog box for all the choices.
 
 ![autosave fields](/assets/images/gsg/autosave fields.jpg)
 
