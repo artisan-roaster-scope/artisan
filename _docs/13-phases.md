@@ -46,7 +46,7 @@ A little bit further into that roast the LCDs are in temp mode per the choice ma
 ![time between tip and dry](/assets/images/gsg/phases2 in 14.png)
 
 
-Finally, 1:21 ago we reached FCs, and the temp has changed 7.9C since then.  Development time ratio is 11%.  Many people are focused on a 20%-25% development ratio.
+Finally, 1:21 ago we reached FCs, and the temp has changed 7.9C since then.  Development time ratio is 11%.  Many people are focused on a 20%-25% development ratio.  [Displaying the development time ratio](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html) can be done in a variety of ways.  
 
 ![time past FC](/assets/images/gsg/phases3 in 14.png)
 
