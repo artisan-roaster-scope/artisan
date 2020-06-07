@@ -16,5 +16,7 @@ Simulator allows you test features such as Extra Devices, LCD settings, talking 
 
 When you choose Menu>Tools>Simulator a dialog will open to choose a roast.  Hit Start and off you go.  
 
+Read more in the [Artisan Blog post](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html).
+
 
 
