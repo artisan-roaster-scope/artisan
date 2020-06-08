@@ -2,16 +2,16 @@
 layout: single
 permalink: /devices/yoctopuce/
 title: "Yoctopuce"
-excerpt: "PT100/Thermocouple/IR/Meteo"
+excerpt: "PT100/Thermocouple/IR/Meteo/.."
 header:
   overlay_image: /assets/images/yoctopuce-logo.png
   image: /assets/images/yoctopuce-logo.png
   teaser: assets/images/yoctopuce-logo.png
 ---
 
-Artisan supports both, the Yocto Thermocouple and the Yocto PT100. Both connect directly via USB and do not need the installation of any additional driver.
+Artisan supports by now many Yoctopuce devices. Most prominently the Yocto Thermocouple and the Yocto PT100. Both connect directly via USB and do not need the installation of any additional driver. 
 
-Artisan can access Yoctopuce devices connected to a [VirtualHub](https://www.yoctopuce.com/EN/virtualhub.php) from remote via a network connection. Just enter the IP address of the virtual hub under menu `Config >> Device, Yoctopuce tab`.
+Artisan can access Yoctopuce devices connected to a [VirtualHub](https://www.yoctopuce.com/EN/virtualhub.php) from remote via a network connection, via the [YoctoHub-Ethernet](https://www.yoctopuce.com/EN/products/extensions-and-networking/yoctohub-ethernet), a [YoctoHub-Wireless](https://www.yoctopuce.com/EN/products/extensions-and-networking/yoctohub-wireless-n) hub or any other [Yoctopuce networking extension](http://www.yoctopuce.com/EN/products/category/extensions-and-networking). Just enter the IP address of the virtual hub under menu `Config >> Device, Yoctopuce tab`. 
 
 Yoctopuce devices can be configured and tested using the [VirtualHub](https://www.yoctopuce.com/EN/virtualhub.php).
 
