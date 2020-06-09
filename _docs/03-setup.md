@@ -41,26 +41,12 @@ Under Config>Machine, Artisan 2.0 has direct support for:
 
 You will need to configure the hardware device taking the readings from the roaster if its not a listed roaster above. 
 
-The various devices supported can be found [here](https://artisan-roasterscope.blogspot.com/2013/06/device-selection.html). Information on PID control can be found [here](https://artisan-roasterscope.blogspot.com/2016/11/pid-control.html).  Additional devices can be configured on the Extra Devices tab of Config>Devices.   A discussion of virtual devices and symbolic assignments is [here](https://artisan-roasterscope.blogspot.com/2014/04/virtual-devices-and-symbolic-assignments.html). The most critical symbolic assignment is for your bean temp and that is explained below.
+Artisan supports various [devices](https://artisan-scope.org/devices/index) for reading temperatures and other inputs such as air pressure and ambient conditions. Information on PID control can be found [here](https://artisan-roasterscope.blogspot.com/2016/11/pid-control.html).  Additional devices can be configured on the Extra Devices tab of Config>Devices.   A discussion of virtual devices and symbolic assignments is [here](https://artisan-roasterscope.blogspot.com/2014/04/virtual-devices-and-symbolic-assignments.html). One potential symbolic assignment is for your bean temp, explained below, or the use of certain devices like an RTD Phidget.
 Port settings are found under Config>Port IF they are needed.
 
 Artisan can now configure certain Phidgets much like a Machine. Machine setups for popular [VINT Phidget sets](https://artisan-scope.org/devices/phidget-sets/), available as ready-to-use packages from the Artisan shop, have been added that allow a one click configuration. There is a [2xTC setup based on the TMP1101](https://artisan-scope.org/phidgets/2x-tc-set/), a [2xRTD low-noise setup based on two TMP1200](https://artisan-scope.org/phidgets/2x-rtd-set/) as featured in [On Idle Noise](https://artisan-roasterscope.blogspot.com/2019/03/on-idle-noise.html) using a [one-in-two configuration](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html#one-in-two), and an [ambient extension based on the PRE1000 & HUM1000](https://artisan-scope.org/phidgets/ambient-extension/). There is also a setup for the older Phidget 1048 "databridge".
 
 ![Phidget Setup](/assets/images/gsg/phidget config.png)
-
-*Example* - Here is one example of physically connecting a Phidget 1048:
-
-![Phidget Connections](/assets/images/gsg/phidget wiring1.jpg) As thermocouples differ your wiring colors may vary.  And different devices will connect differently.
-The correct wiring colors for the thermocouples used were as follows:
-
-1. BT G – white
-2. BT 0 – Red
-3. ET G – white with blue stripe
-4. ET 0 – white with red stripe
-
-
-![Phidget Wiring](/assets/images/gsg/ET0 white with red stripe.jpg)
-
 
 Want to know more?
 
@@ -98,17 +84,16 @@ If you go below a 3s interval you will get a popup warning ![interval warning](/
 You can try it lower and see if your equipment can handle it.  There have been reports that if you go down to 1s sampling, do NOT check oversampling as it causes very jumpy lines.  
 
 
-
 NOTE *Unplug Your Laptop Before You Roast*
 Note that for most people unless you have a USB isolator you need to unplug your computer when using Artisan or will get feedback loops that will create all sorts of crazy spikes in the graph.  If you are using a desktop I guess you need to get an isolator.  
 
 ### Settings- Load, Load Recent, Save
 
-Menu>Help> is where you go to load and save settings.  Load Recent is a shortcut to settings you have recently used. You can use Artisan with more than roaster by saving two sets of settings and then using Load Recent to change between roasters.   
+Menu>Help> is where you go to load and save settings.  Load Recent is a shortcut to settings you have recently used. You can use Artisan with more than roaster by saving two sets of settings and then using Load Recent to change between roasters.   **Please save your settings on a regular basis with backups, especially if you use extra devices.**
 
 ### Information for Troubleshooting
 
-Menu>Help is a place you can find information on Errors, Messages from the program, a Serial log, search your settings, and information on the platform you are using.  
+Menu>Help is a place you can find information on Errors, Messages from the program, a Serial log, search your settings, and information on the platform you are using.  a
 
 ### Factory Reset
 
