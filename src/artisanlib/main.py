@@ -2059,7 +2059,7 @@ class tgraphcanvas(FigureCanvas):
         self.currentpidsv = 0.
 
         self.linecount = None # linecount cache for resetlines(); has to be reseted if visibility of ET/BT or extra lines or background ET/BT changes
-        self.deltalinecount = None # deltalinecoutn cache for resetdeltalines(); has to be reseted if visibility of deltaET/deltaBT or background deltaET/deltaBT
+        self.deltalinecount = None # deltalinecounn cache for resetdeltalines(); has to be reseted if visibility of deltaET/deltaBT or background deltaET/deltaBT
 
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
@@ -12466,18 +12466,16 @@ class tgraphcanvas(FigureCanvas):
         else:
             #turn OFF
             self.crossmarker = False
-            if (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag:
-                self.resetdeltalines()
-            else:
-                self.resetlines()
-            message = QApplication.translate("Message", "Mouse cross OFF",None)
-            aw.sendmessage(message)
             self.fig.canvas.mpl_disconnect(self.crossmouseid)
             self.fig.canvas.mpl_disconnect(self.onreleaseid)  #mouse cross lines measurement
             aw.qmc.ax.lines.remove(self.l_horizontalcrossline)
             self.l_horizontalcrossline = None
             aw.qmc.ax.lines.remove(self.l_verticalcrossline)
             self.l_verticalcrossline = None
+            self.resetdeltalines()
+            self.resetlines()
+            message = QApplication.translate("Message", "Mouse cross OFF",None)
+            aw.sendmessage(message)
             self.updateBackground() # update bitlblit backgrounds
 
     def drawcross(self,event):
