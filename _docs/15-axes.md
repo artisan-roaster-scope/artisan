@@ -19,3 +19,5 @@ Lock is helpful if you plan to print out some profiles which should be scaled th
 In this dialog you can change the style and appearance of your grid.  More importantly, focus on the lower part of this dialog and define the temp and delta ranges of your grid along with the steps to be shown.  Note that in order to show your Events at the bottom of the graph you may need to set your Temp Min to 75 or below.  
 
 The legend location is where the box with the white background and the legend for your graph line colors will appear.  The ideal location will depend on your other settings.  
+
+The Event Step field is a new setting in Artisan.  It sets the temperature on the Y-axis that corresponds to a step value of 100.  By setting 100% Event Step to a relevant value, you can lower the special event lines below the bottom of the bean temperature (BT) curve.  You will have to experiment to find the best value for your setup.  
