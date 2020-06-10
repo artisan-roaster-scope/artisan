@@ -47,7 +47,7 @@ from Phidget22.Devices.VoltageRatioInput import VoltageRatioInput  # @UnusedWild
 from Phidget22.Devices.VoltageInput import VoltageInput # @UnusedWildImport
 from Phidget22.Devices.DigitalInput import DigitalInput # @UnusedWildImport
 from Phidget22.Devices.DigitalOutput import DigitalOutput # @UnusedWildImport 
-from Phidget22.Devices.VoltageOutput import VoltageOutput # @UnusedWildImport
+from Phidget22.Devices.VoltageOutput import VoltageOutput, VoltageOutputRange # @UnusedWildImport
 from Phidget22.Devices.RCServo import RCServo # @UnusedWildImport
 from Phidget22.Devices.CurrentInput import CurrentInput # @UnusedWildImport
 from Phidget22.Devices.FrequencyCounter import FrequencyCounter # @UnusedWildImport
@@ -3599,7 +3599,9 @@ class serialport(object):
 #  only supporting 
 #     1 channel Phidget OUT1000, OUT1001 and OUT1002
 #     4 channel USB Phidget 1002
-#  commands: out(n,v[,serial]) with n channel number and value v voltage in V as a float, and serial the optional serial/port number of the addressed module
+#  commands:
+#    out(n,v[,serial]) with n channel number and value v voltage in V as a float, and serial the optional serial/port number of the addressed module
+#    range(n,r[,serial]) with n channel number and value r either 5 or 10 for voltage range 0-5V or -10 to 10V voltage range, and serial the optional serial/port number of the addressed module
 
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetVOUTattach(self,channel,serial):
@@ -3676,6 +3678,25 @@ class serialport(object):
                         out[channel].setEnabled(True)
                     res = True
             except Exception:
+                res = False
+        return res
+        
+    # value: int (either 5 or 10)
+    # returns True or False indicating set status
+    def phidgetVOUTsetRange(self,channel,value,serial=None):
+        res = False
+        self.phidgetVOUTattach(channel,serial)
+        if serial in self.aw.ser.PhidgetAnalogOut:
+            out = self.aw.ser.PhidgetAnalogOut[serial]
+            # set voltage output
+            try:
+                if len(out) > channel and out[channel].getAttached():
+                    if value == 5:
+                        out[channel].setVoltageOutputRange(VoltageOutputRange.VOLTAGE_OUTPUT_RANGE_5V)
+                    else:
+                        out[channel].setVoltageOutputRange(VoltageOutputRange.VOLTAGE_OUTPUT_RANGE_10V)
+                    res = True
+            except:
                 res = False
         return res
 

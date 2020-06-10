@@ -20129,6 +20129,15 @@ class ApplicationWindow(QMainWindow):
                                         aw.ser.phidgetVOUTsetVOUT(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2])
                                 except Exception:
                                     pass
+                            elif cs.startswith('range(') and len(cs)>7:
+                                try:
+                                    cs_split = cs[6:-1].split(',')
+                                    if len(cs_split) == 2:
+                                        aw.ser.phidgetVOUTsetRange(int(cs_split[0]),int(cs_split[1]))
+                                    elif len(cs_split) == 3:
+                                        aw.ser.phidgetVOUTsetRange(int(cs_split[0]),int(cs_split[1]),cs_split[2])
+                                except:
+                                    pass
                             # for YOCTOPUCE VOLTAGE OUT modules "vout(c,v[,sn])" with c the channel (1 or 2),v the voltage as float [0.0-10.0] and the optional sn either the modules serial number or its name
                             elif cs.startswith('vout(') and len(cs)>8:
                                 try:

@@ -1,4 +1,4 @@
-version: '2.4.0.{build}'
+version: '2.4.1.{build}'
 
 branches:
   only:
@@ -12,7 +12,7 @@ environment:
   matrix:
     - PYTHON: "C:\\Python38-x64"
       PYTHON_VERSION: 3.8.x
-      ARTISAN_VERSION: 2.4.0
+      ARTISAN_VERSION: 2.4.1
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
