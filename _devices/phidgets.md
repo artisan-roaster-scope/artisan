@@ -137,6 +137,7 @@ Each output action supports a number of different commands specified in the `Doc
 Phidget Voltage Output modules can be controlled via `VOUT Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
 
 * `out(ch,v[,sn])` : sets output voltage
+* `range(ch,r[,sn])` : sets voltage voltage range (available for Artisan v2.4.2 and later)
 * `sleep(s)` : delay processing
 
 with
@@ -144,7 +145,23 @@ with
 * `ch` : the channel to be addressed (integer)
 * `v` : voltage in V (float), eg. 5.5 for 5.5V
 * `s` : sleep time in seconds (float)
+*  `r` : voltage range with `r=5` to `[0-5V]` and `r=10` to `[-10,10V]` 
 * `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `out(0,5.5,560282)` or `out(0,5.5,560282:2)`. Using a command actions, like in `out(0,5.5)`, without specifying a hub serial number will attach to the first unattached module with the lowest serial number instead.
+
+The default voltage range is `[-10,10V]` (`r=10`). The following table summarizes the interplay of `r` and `v`.
+
+| r |  v  | 5V Output | +-10V Output |
+|--:|----:|----------:|-------------:|
+| 5 | -10 |     --    |     --       |
+| 5 |  -5 |     --    |     --       |
+| 5 |   0 |     0V    |   -10V       |
+| 5 | 2.5 |   2.5V    |     0V       |
+| 5 |   5 |     5V    |    10V       |
+| 10 | -10 |    0V    |   -10V       |
+| 10 |  -5 | 1.25V    |    -5V       |
+| 10 |   0 |  2.5V    |     0V       |
+| 10 |   5 | 3.75V    |     5V       |
+| 10 |  10 |    5V    |    10V       |
 
 
 ### 4.2 Digital Output
