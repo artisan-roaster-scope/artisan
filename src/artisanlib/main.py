@@ -2059,7 +2059,7 @@ class tgraphcanvas(FigureCanvas):
         self.currentpidsv = 0.
 
         self.linecount = None # linecount cache for resetlines(); has to be reseted if visibility of ET/BT or extra lines or background ET/BT changes
-        self.deltalinecount = None # deltalinecounn cache for resetdeltalines(); has to be reseted if visibility of deltaET/deltaBT or background deltaET/deltaBT
+        self.deltalinecount = None # deltalinecount cache for resetdeltalines(); has to be reseted if visibility of deltaET/deltaBT or background deltaET/deltaBT
 
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
@@ -8458,7 +8458,10 @@ class tgraphcanvas(FigureCanvas):
         self.flavorchart_plot.set_ydata(self.flavorchart_plotf)
 
         # collections need to be redrawn completely
-        self.flavorchart_fill.remove()
+        try:
+            self.flavorchart_fill.remove()
+        except:
+            pass
         self.flavorchart_fill = self.ax1.fill_between(self.flavorchart_angles,0,self.flavorchart_plotf, facecolor='#1985ba', alpha=0.1, interpolate=True)
 
         # total score
@@ -9302,8 +9305,14 @@ class tgraphcanvas(FigureCanvas):
                         st = stringfromseconds(self.timex[self.timeindex[1]]-start,False)
                         DE_str = aw.arabicReshape(QApplication.translate("Scope Annotation","DE {0}", None).format(st))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == DE_str:
-                            self.l_annotations[-1].remove()
-                            self.l_annotations[-2].remove()
+                            try:
+                                self.l_annotations[-1].remove()
+                            except:
+                                pass
+                            try:
+                                self.l_annotations[-2].remove()
+                            except:
+                                pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 1 in self.l_annotations_dict:
                                 del self.l_annotations_dict[1]
@@ -9397,8 +9406,14 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.autoFCsenabled = False
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(stringfromseconds(self.timex[self.timeindex[2]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
-                            self.l_annotations[-1].remove()
-                            self.l_annotations[-2].remove()
+                            try:
+                                self.l_annotations[-1].remove()
+                            except:
+                                pass
+                            try:
+                                self.l_annotations[-2].remove()
+                            except:
+                                pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 2 in self.l_annotations_dict:
                                 del self.l_annotations_dict[2]
@@ -9490,8 +9505,14 @@ class tgraphcanvas(FigureCanvas):
                         # undo wrongly set FCe
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(stringfromseconds(self.timex[self.timeindex[3]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
-                            self.l_annotations[-1].remove()
-                            self.l_annotations[-2].remove()
+                            try:
+                                self.l_annotations[-1].remove()
+                            except:
+                                pass
+                            try:
+                                self.l_annotations[-2].remove()
+                            except:
+                                pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 3 in self.l_annotations_dict:
                                 del self.l_annotations_dict[3]
@@ -9578,8 +9599,14 @@ class tgraphcanvas(FigureCanvas):
                         # undo wrongly set FCs
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(stringfromseconds(self.timex[self.timeindex[4]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
-                            self.l_annotations[-1].remove()
-                            self.l_annotations[-2].remove()
+                            try:
+                                self.l_annotations[-1].remove()
+                            except:
+                                pass
+                            try:
+                                self.l_annotations[-2].remove()
+                            except:
+                                pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 4 in self.l_annotations_dict:
                                 del self.l_annotations_dict[4]
@@ -9670,8 +9697,14 @@ class tgraphcanvas(FigureCanvas):
                         # undo wrongly set FCs
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
-                            self.l_annotations[-1].remove()
-                            self.l_annotations[-2].remove()
+                            try:
+                                self.l_annotations[-1].remove()
+                            except:
+                                pass
+                            try:
+                                self.l_annotations[-2].remove()
+                            except:
+                                pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 5 in self.l_annotations_dict:
                                 del self.l_annotations_dict[5]
@@ -9766,8 +9799,14 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.autoDROPenabled = False
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
-                            self.l_annotations[-1].remove()
-                            self.l_annotations[-2].remove()
+                            try:
+                                self.l_annotations[-1].remove()
+                            except:
+                                pass
+                            try:
+                                self.l_annotations[-2].remove()
+                            except:
+                                pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 6 in self.l_annotations_dict:
                                 del self.l_annotations_dict[6]
@@ -9981,8 +10020,14 @@ class tgraphcanvas(FigureCanvas):
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE {0}", None).format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
 
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
-                            self.l_annotations[-1].remove()
-                            self.l_annotations[-2].remove()
+                            try:
+                                self.l_annotations[-1].remove()
+                            except:
+                                pass
+                            try:
+                                self.l_annotations[-2].remove()
+                            except:
+                                pass
                             self.l_annotations = self.l_annotations[:-2]
                             if 7 in self.l_annotations_dict:
                                 del self.l_annotations_dict[7]
@@ -12468,9 +12513,15 @@ class tgraphcanvas(FigureCanvas):
             self.crossmarker = False
             self.fig.canvas.mpl_disconnect(self.crossmouseid)
             self.fig.canvas.mpl_disconnect(self.onreleaseid)  #mouse cross lines measurement
-            aw.qmc.ax.lines.remove(self.l_horizontalcrossline)
+            try:
+                aw.qmc.ax.lines.remove(self.l_horizontalcrossline)
+            except:
+                pass
             self.l_horizontalcrossline = None
-            aw.qmc.ax.lines.remove(self.l_verticalcrossline)
+            try:
+                aw.qmc.ax.lines.remove(self.l_verticalcrossline)
+            except:
+                pass
             self.l_verticalcrossline = None
             self.resetdeltalines()
             self.resetlines()
@@ -28866,8 +28917,10 @@ class ApplicationWindow(QMainWindow):
                             if aw.qmc.eventsGraphflag == 4:
                                 for child in aw.qmc.ax.get_children():
                                     if isinstance(child, matplotlib.text.Annotation):
-                                        aw.qmc.ax.texts.remove(child)
-
+                                        try:
+                                            aw.qmc.ax.texts.remove(child)
+                                        except:
+                                            pass
                         except:
                             pass
 
@@ -28887,6 +28940,9 @@ class ApplicationWindow(QMainWindow):
                         # Remove and update the logo image
                         try:
                             aw.qmc.ai.remove()
+                        except:
+                            pass
+                        try:
                             self.qmc.placelogoimage()
                         except:
                             pass
@@ -31081,7 +31137,10 @@ class ApplicationWindow(QMainWindow):
             self.stopdesigner()
         else:
             if aw.qmc.ai:
-                aw.qmc.ai.remove()
+                try:
+                    aw.qmc.ai.remove()
+                except:
+                    pass
             self.startdesigner()
 
     def startdesigner(self):

@@ -4,7 +4,7 @@ numpy==1.18.4
 colorspacious==1.1.2
 scipy==1.4.1
 matplotlib==3.2.1
-PyQt5==5.14.2
+PyQt5==5.15.0
 openpyxl==3.0.3
 pyinstaller==3.6
 pywin32==227
