@@ -2499,6 +2499,8 @@ class EventsDlg(ArtisanResizeablDialog):
             self.aw.qmc.annotationsflag = 1
         else:
             self.aw.qmc.annotationsflag = 0
+            # we clear the custom annotation positions on deactivation
+            self.aw.qmc.l_annotations_dict = {}
         self.aw.qmc.redraw(recomputeAllDeltas=False)
         
     @pyqtSlot(int)
@@ -2544,6 +2546,8 @@ class EventsDlg(ArtisanResizeablDialog):
         else:
             self.eventsclampflag.setEnabled(False)
         if self.aw.qmc.eventsGraphflag == -1:
+            # we clear the custom annotation positions on deactivation
+            self.aw.qmc.l_event_flags_dict = {}
             self.aw.qmc.eventsGraphflag = 0
             self.aw.qmc.eventsshowflag = 0
         else:

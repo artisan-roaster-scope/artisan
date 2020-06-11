@@ -5052,7 +5052,8 @@ class tgraphcanvas(FigureCanvas):
                 self.autoFCsIdx = 0
 
                 self.l_annotations = [] # initiate the event annotations
-                self.l_annotations_dict = {} # initiate the event id to temp/time annotation dict
+                self.l_annotations_dict = {} # initiate the event id to temp/time annotation dict for annotations
+                self.l_event_flags_dict = {} # initiate the event id to temp/time annotation dict for flags
                 self.l_background_annotations = [] # initiate the event annotations
 
                 if not sampling:
@@ -24399,11 +24400,16 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.moisture_roasted = profile["moisture_roasted"]
             else:
                 self.qmc.moisture_roasted = 0.
+            
             # only load annotations position if the temperature mode did not change
             if "anno_positions" in profile and self.qmc.mode == m:
                 self.qmc.setAnnoPositions(profile["anno_positions"])
+            else:
+                self.qmc.l_annotations_pos_dict = {}
             if "flag_positions" in profile and self.qmc.mode == m:
                 self.qmc.setFlagPositions(profile["flag_positions"])
+            else:
+                self.qmc.l_event_flags_pos_dict = {}
             if "legendloc_pos" in profile and self.qmc.loadaxisfromprofile:
                 try:
                     # if available we transform the custom legend position back from data into axis coordinates
