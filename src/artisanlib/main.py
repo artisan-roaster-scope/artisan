@@ -2737,7 +2737,8 @@ class tgraphcanvas(FigureCanvas):
                 del aw.qmc.l_annotations_dict[action.key[0]]
             if action.key[0] == 0: # CHARGE
                 # realign to background
-                aw.autoAdjustAxis(deltas=False)
+                if not self.flagon:
+                    aw.autoAdjustAxis(deltas=False)
                 aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             elif action.key[0] == 6: # DROP
                 try:
@@ -4540,11 +4541,19 @@ class tgraphcanvas(FigureCanvas):
                     # the special case of a variable Y1 overlapping with a variable Y11,..,Y12 in this simple test has to be excluded to avoid
                     # that if mathexpression="Y11" and mathdictionary contains {"Y1":-1} -1 is returned instead of the correct value of Y11
                     # "x" occurs in "max" and has also to be excluded, as "t" and "b"
-                    if any([((k in mathexpression) if k not in (["Y1","x","t","b"] if ("max" in mathexpression) else ["Y1","t","b"]) else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
+                    me = mathexpression.strip()
+                    propagate_error = True # if any variable occuring in me is bound to -1 the whole me evals to -1
+                    try:
+                        if me[0] == "(" and me[-1] == ")":
+                            # only if the whole expression is in brackets, errors bound to variables are not propagated
+                            propagate_error = False
+                    except:
+                        pass
+                    if propagate_error and any([((k in me) if k not in (["Y1","x","t","b"] if ("max" in me) else ["Y1","t","b"]) else False) for k,v in mathdictionary.items() if (v == -1 and not (k in main_events))]):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
                         return -1
                     else:
-                        res = float(eval(mathexpression,{"__builtins__":None},mathdictionary))
+                        res = float(eval(me,{"__builtins__":None},mathdictionary))
                 except TypeError:
                     res = -1
                 except ValueError:
