@@ -8637,7 +8637,7 @@ class tgraphcanvas(FigureCanvas):
 
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            res = aw.qmc.reset(False,False,sampling=True,keepProperties=True)
+            res = aw.qmc.reset(False,False,sampling=True,keepProperties=(not aw.qmc.roastpropertiesflag))
             if not res: # reset canceled
                 self.OffMonitor()
                 return
