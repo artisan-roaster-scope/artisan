@@ -3284,7 +3284,7 @@ class serialport(object):
 
     def phidgetBinaryOUTpulse(self,channel,millis,serial=None):
         self.phidgetBinaryOUTset(channel,1,serial)
-#        QTimer.singleShot(millis,lambda : self.phidgetBinaryOUTset(channel,0))
+#        QTimer.singleShot(int(round(millis)),lambda : self.phidgetBinaryOUTset(channel,0))
         # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
         # the following solution has the drawback to block the eventaction thread
 #        libtime.sleep(millis/1000.)
@@ -3434,7 +3434,7 @@ class serialport(object):
     
     def phidgetOUTpulsePWM(self,channel,millis,serial=None):
         self.phidgetOUTsetPWM(channel,100,serial)
-#        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWM(channel,0))
+#        QTimer.singleShot(int(round(millis)),lambda : self.phidgetOUTsetPWM(channel,0))
 #        # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
         # the following solution has the drawback to block the eventaction thread
 #        libtime.sleep(millis/1000.)
@@ -3548,7 +3548,7 @@ class serialport(object):
 
     def phidgetOUTpulsePWMhub(self,channel,millis,serial=None):
         self.phidgetOUTsetPWMhub(channel,100,serial)
-#        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWMhub(channel,0))
+#        QTimer.singleShot(int(round(millis)),lambda : self.phidgetOUTsetPWMhub(channel,0))
         # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
         # the following solution has the drawback to block the eventaction thread
 #        libtime.sleep(millis/1000.)

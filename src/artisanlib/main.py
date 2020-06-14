@@ -330,6 +330,24 @@ class Artisan(QtSingleApplication):
         else:
             return super(Artisan, self).event(event)
 
+# configure multiprocessing
+if sys.platform.startswith("darwin"):
+    try:
+        # start method can only be set once!
+        if "forkserver" in multiprocessing.get_all_start_methods():
+            multiprocessing.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
+        elif "fork" in multiprocessing.get_all_start_methods():
+            multiprocessing.set_start_method('fork') # default on Python3.7 for macOS (and on Unix also under Python3.8), but considered unsafe, 
+            # not available on Windows, on Python3.8 we have to explicitly set this
+            # https://bugs.python.org/issue33725
+#        if "spawn" in multiprocessing.get_all_start_methods():
+#            multiprocessing.set_start_method('spawn') # default on Python3.8 for macOS (always default on Windows) 
+#            # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
+#            # https://bugs.python.org/issue32146
+#            # https://github.com/pyinstaller/pyinstaller/issues/4865
+    except:
+        pass
+            
 args = sys.argv
 if sys.platform.startswith("linux"):
     # avoid a GTK bug in Ubuntu Unity
@@ -3340,7 +3358,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.largeLCDs_dialog:
                         self.updateLargeLCDsTimeSignal.emit(timestr)
             finally:
-                QTimer.singleShot(nextreading,self.updateLCDtime)
+                QTimer.singleShot(int(round(nextreading)),self.updateLCDtime)
 
     @pyqtSlot(bool)
     def toggleHUD(self,_=False):
@@ -8508,7 +8526,7 @@ class tgraphcanvas(FigureCanvas):
     def AsyncSamplingActionTrigger(self):
         if aw.AsyncSamplingAction and aw.qmc.extra_event_sampling_delay and aw.qmc.extrabuttonactions[2]:
             self.samplingAction()
-            QTimer.singleShot(aw.qmc.extra_event_sampling_delay,self.AsyncSamplingActionTrigger)
+            QTimer.singleShot(int(round(aw.qmc.extra_event_sampling_delay)),self.AsyncSamplingActionTrigger)
 
     def StartAsyncSamplingAction(self):
         if aw.qmc.flagon and aw.qmc.extra_event_sampling_delay != 0:
@@ -16864,11 +16882,11 @@ class ApplicationWindow(QMainWindow):
     # turns channel off after millis
     def processSingleShotPhidgetsPulse(self,channel,millis,fct,serial=None):
         if fct == "OUTsetPWM":
-            QTimer.singleShot(millis,lambda : self.ser.phidgetOUTsetPWM(channel,0,serial))
+            QTimer.singleShot(int(round(millis)),lambda : self.ser.phidgetOUTsetPWM(channel,0,serial))
         elif fct == "OUTsetPWMhub":
-            QTimer.singleShot(millis,lambda : self.ser.phidgetOUTsetPWMhub(channel,0,serial))
+            QTimer.singleShot(int(round(millis)),lambda : self.ser.phidgetOUTsetPWMhub(channel,0,serial))
         elif fct == "BinaryOUTset":
-            QTimer.singleShot(millis,lambda : self.ser.phidgetBinaryOUTset(channel,0,serial))
+            QTimer.singleShot(int(round(millis)),lambda : self.ser.phidgetBinaryOUTset(channel,0,serial))
 
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################

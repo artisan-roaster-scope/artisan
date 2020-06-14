@@ -87,25 +87,7 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
     showbt = showbtflag
     if psystem() != 'Windows':
         gsignal(SIGQUIT, kill)
-    
-    # start the server in a separate process
-    # using multiprocessing
-    if psystem() == 'Darwin':
-        try:
-        # start method can only be set once!
-#            if "fork" in mp.get_all_start_methods():
-#                mp.set_start_method('fork') # default on Python3.7 for macOS (and Unix), but considered unsafe, 
-                # not available on Windows, on Python3.8 we have to explicitly set this
-                # https://bugs.python.org/issue33725
-            if "forkserver" in mp.get_all_start_methods():
-                mp.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
-#            if "spawn" in mp.get_all_start_methods():
-#                mp.set_start_method('spawn') # default on Python3.8 for macOS (always default on Windows) 
-                # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
-                # https://bugs.python.org/issue32146
-                # https://github.com/pyinstaller/pyinstaller/issues/4865
-        except:
-            pass
+
     process = mp.Process(name='WebLCDs',target=work,args=(
         port,
         resourcePath,

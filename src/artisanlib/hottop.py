@@ -16,7 +16,7 @@
 # AUTHOR
 # Marko Luther, 2019
 
-from multiprocessing import Process, Lock
+import multiprocessing as mp
 from multiprocessing.sharedctypes import Value
 from ctypes import c_bool, c_double
 import serial
@@ -292,7 +292,7 @@ def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',
             return False
         else:
             stopHottop() # we stop an already running process to ensure that only one is running
-            lock = Lock()
+            lock = mp.Lock()
             xCONTROL = Value(c_bool, False, lock=lock)
             # variables to read from the Hottop
             xBT = Value(c_double, -1.0, lock=lock)
@@ -313,12 +313,12 @@ def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',
             xSET_COOLING_MOTOR = Value('i', -1, lock=lock)
             # variables to write to the Hottop
             
-            process = Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
+            process = mp.Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
                 xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
                 xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))
             process.start()
             return True
-    except Exception:
+    except:
         return False
 
 def stopHottop():
