@@ -119,6 +119,8 @@ __Rui Paulo__ –– Aillio master & CI
 
 __Michael Herbert__ –– documentation & testing
 
+__Brett Pound__ –– support
+
 __Dario Ernst__ –– mailing list hosting
 
 We are always looking for people that support us here and there. Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
