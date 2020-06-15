@@ -572,7 +572,7 @@ END</source>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="800"/>
         <source>Read Ra/So values</source>
-        <translation type="unfinished">Αναγνωση Τιμων  Ra/So </translation>
+        <translation>Αναγνωση Τιμων  Ra/So</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1667"/>
@@ -1431,7 +1431,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/phases.py" line="96"/>
         <source>Phases LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Φάσεις LCDs</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="98"/>
@@ -3656,7 +3656,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/comm.py" line="2060"/>
         <source>HH506RAtemperature(): Unable to get id from HH506RA device </source>
-        <translation type="unfinished">HH506RAθερμο():Αδυνατη ληψη id απο συσκευη</translation>
+        <translation>HH506RAθερμο():Αδυνατη ληψη id απο συσκευη </translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2081"/>
@@ -4092,7 +4092,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/comparator.py" line="593"/>
         <source>Comparator</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Συγκριơƞ</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="50"/>
@@ -7539,12 +7539,6 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
 </source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
-        <location filename="../help/eventsliders_help.py" line="31"/>
-        <source>Note: commands can be sequenced, separated by semicolons like in “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
-</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="31"/>
         <source>Note: in PHIDGET commands, the optional parameter &lt;sn&gt; has the form &lt;hub_serial&gt;[:&lt;hub_port&gt;] allows to refer to a specific Phidget HUB by given its serial number, and optionally specifying the port number the addressed module is connected to.
@@ -7633,20 +7627,9 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
 &quot;~batchprefix~batchnum (~batchposition)&quot;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
-        <location filename="../help/autosave_help.py" line="21"/>
-        <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
-From Roast&gt;Properties&gt;Beans</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../help/autosave_help.py" line="32"/>
         <source>From Roast&gt;Properties&gt;Weight Roasted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../help/autosave_help.py" line="34"/>
-        <source>Calculated weight loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7664,19 +7647,9 @@ From Roast&gt;Properties&gt;Beans</source>
         <source>From Roast&gt;Properties&gt;Density Roasted</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
-        <location filename="../help/autosave_help.py" line="42"/>
-        <source>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../help/autosave_help.py" line="44"/>
         <source>From Roast&gt;Properties&gt;Moisture Roasted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../help/autosave_help.py" line="45"/>
-        <source>Calculated moisture loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7779,21 +7752,9 @@ From Roast&gt;Properties&gt;Beans</source>
         <source>From the Profile - DROP time in min_secs</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
-        <location filename="../help/autosave_help.py" line="69"/>
-        <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.
-From Roast&gt;Properties&gt;Roasting Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../help/autosave_help.py" line="70"/>
         <source>The entire first line From Roast&gt;Properties&gt;Roasting Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../help/autosave_help.py" line="71"/>
-        <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.
-From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7816,11 +7777,6 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <source>u0027Recording ~batchcounter&amp;#39; &quot;~batch&quot; ~title ~datetime_long</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
-        <location filename="../help/eventsliders_help.py" line="38"/>
-        <source>sets calling button to “pressed” if argument is 1 or True</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../help/autosave_help.py" line="29"/>
         <source>From Roast&gt;Properties&gt;Organization</source>
@@ -7839,6 +7795,50 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../help/symbolic_help.py" line="81"/>
         <source>Note: RoR values r can be scaled to the temperature axis using a linear approximation of the form &quot;r*k + o&quot;. As the variables k and o depend on the actual axis settings which can be changed by the user without triggering a recomputation, those variable are less useful for use in a recording, but useful in the Plotter to plot w.r.t. the RoR y-axis instead of the temperature y-axis.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../help/autosave_help.py" line="21"/>
+        <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
+From Roast&gt;Properties&gt;Beans</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../help/autosave_help.py" line="34"/>
+        <source>Calculated weight loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../help/autosave_help.py" line="42"/>
+        <source>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../help/autosave_help.py" line="45"/>
+        <source>Calculated moisture loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../help/autosave_help.py" line="69"/>
+        <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.
+From Roast&gt;Properties&gt;Roasting Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../help/autosave_help.py" line="71"/>
+        <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.
+From Roast&gt;Properties&gt;Cupping Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../help/eventsliders_help.py" line="31"/>
+        <source>Note: commands can be sequenced, separated by semicolons like in “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../help/eventsliders_help.py" line="38"/>
+        <source>sets calling button to “pressed” if argument is 1 or True</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7972,7 +7972,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../artisanlib/main.py" line="21992"/>
         <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
-        <translation type="unfinished">Event#&lt;b&gt;{0}&lt;/b&gt;</translation>
+        <translation>Event#&lt;b&gt;{0}&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31441"/>
@@ -8132,7 +8132,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1008"/>
         <source> %</source>
-        <translation type="unfinished">%</translation>
+        <translation> %</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="995"/>
@@ -8582,7 +8582,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../artisanlib/wheels.py" line="435"/>
         <source> dg</source>
-        <translation type="unfinished">dg</translation>
+        <translation> dg</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="307"/>
@@ -8772,7 +8772,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../artisanlib/ports.py" line="747"/>
         <source>Port</source>
-        <translation type="unfinished">Σειριακη Θυρα...</translation>
+        <translation>Σειριακη Θυρα</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10582"/>
@@ -10328,7 +10328,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="62"/>
         <source>Report</source>
-        <translation>Aναφορ</translation>
+        <translation>Αναφoρές</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="64"/>
@@ -10458,12 +10458,12 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="14233"/>
         <source>JPEG...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14237"/>
         <source>BMP...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="56"/>
@@ -10473,27 +10473,27 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="167"/>
         <source>Main LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Κύρια LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="168"/>
         <source>Delta LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Δέλτα LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="169"/>
         <source>PID LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="170"/>
         <source>Extra LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Επιπλέον LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="163"/>
         <source>Convert Profile Temperature</source>
-        <translation type="unfinished">Μετατροπη Θερμοκρασιων Προφιλ</translation>
+        <translation>Μετατροπη Θερμοκρασιων Προφιλ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14683"/>
@@ -10528,37 +10528,37 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="158"/>
         <source>Analyzer</source>
-        <translation type="unfinished"></translation>
+        <translation>Αναλυτής</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="160"/>
         <source>Simulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Προσομοιωτής</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="171"/>
         <source>Phases LCDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Φάσεις LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="164"/>
         <source>Transposer</source>
-        <translation type="unfinished"></translation>
+        <translation>Μεταθέτƞς</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="161"/>
         <source>Comparator</source>
-        <translation type="unfinished"></translation>
+        <translation>Συγκριơƞ</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="108"/>
         <source>Sampling...</source>
-        <translation type="unfinished"></translation>
+        <translation>Δειγματοληψία...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="195"/>
         <source>Check for Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Ελεγχος για ενημερώσεις</translation>
     </message>
 </context>
 <context>
@@ -11891,7 +11891,9 @@ Repeat Operation at the end: {0}</source>
         <source>Use the Parameter Loader Software by Fuji if you need to
 
 </source>
-        <translation type="unfinished">Χρησιμοποιηστε προγραμμα φορτωσης παραμετρων της Fuji</translation>
+        <translation>Χρησιμοποιηστε προγραμμα φορτωσης παραμετρων της Fuji
+
+</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1359"/>
@@ -11941,7 +11943,7 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3346"/>
         <source>Ramp/Soak was found in Hold! Turn it off before changing the pattern</source>
-        <translation type="unfinished"> Ραμπα σε αναμονη!Απενεργοποιηστε πριν την αλλαγη προτυπου</translation>
+        <translation>Ραμπα σε αναμονη!Απενεργοποιηστε πριν την αλλαγη προτυπου</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="53038"/>
