@@ -7,7 +7,7 @@ gevent-websocket==0.10.1
 numpy==1.18.4 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
 colorspacious==1.1.2
 scipy==1.4.1
-matplotlib==3.2.1
+matplotlib==3.2.2
 PyQt5==5.15.0 #5.14.2
 openpyxl==3.0.3
 keyring==19.2.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller

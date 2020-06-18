@@ -25046,18 +25046,27 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.fileClean()
 
                     if self.qmc.autosaveimage:
-                        if ".alog" in filename:
-                            filename = filename[0:-5]
-                        if self.qmc.autosaveimageformat == "PDF":
-                            self.saveVectorGraph(extension=".pdf",fname=filename)
-                        elif self.qmc.autosaveimageformat == "SVG":
-                            self.saveVectorGraph(extension=".svg",fname=filename)
-                        elif self.qmc.autosaveimageformat == "CSV":
-                            self.exportCSV(filename + ".csv")
-                        elif self.qmc.autosaveimageformat == "JSON":
-                            self.exportJSON(filename + ".json")
+                        #
+                        if QFileInfo(filename).suffix() == "alog":
+                            name_also = QFileInfo(filename).baseName()
                         else:
-                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename)
+                            name_also = QFileInfo(filename).fileName()
+                        path_also = QDir()
+                        if self.qmc.autosavealsopath != "":
+                            path_also.setPath(self.qmc.autosavealsopath)
+                        else:
+                            path_also.setPath(QFileInfo(filename).path())
+                        filename_also = path_also.absoluteFilePath(name_also)
+                        if self.qmc.autosaveimageformat == "PDF":
+                            self.saveVectorGraph(extension=".pdf",fname=filename_also)
+                        elif self.qmc.autosaveimageformat == "SVG":
+                            self.saveVectorGraph(extension=".svg",fname=filename_also)
+                        elif self.qmc.autosaveimageformat == "CSV":
+                            self.exportCSV(filename_also + ".csv")
+                        elif self.qmc.autosaveimageformat == "JSON":
+                            self.exportJSON(filename_also + ".json")
+                        else:
+                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=filename_also)
                     return True
                 else:
                     self.sendmessage(QApplication.translate("Message","Cancelled", None))
@@ -25704,7 +25713,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extra_event_sampling_delay = toInt(settings.value("ExtraEventSamplingDelay",int(self.qmc.extra_event_sampling_delay)))
             #restore colors
             if settings.contains("Colors"):
-                self.qmc.palette["canvas"] = 'None'  #revert the canvas element to default if it does not exist in the settings.
+#                self.qmc.palette["canvas"] = 'None'  #revert the canvas element to default if it does not exist in the settings.
+                self.qmc.palette["canvas"] = '#F8F8F8'  #revert the canvas element to default if it does not exist in the settings.
                 for (k, v) in list(toMap(settings.value("Colors")).items()):
                     self.qmc.palette[str(k)] = s2a(toString(v))
                 if "messages" in self.qmc.palette:
