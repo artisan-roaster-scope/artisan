@@ -603,6 +603,7 @@ from artisanlib.batches import batchDlg
 from artisanlib.autosave import autosaveDlg
 from artisanlib.platform import platformDlg
 from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
+from artisanlib.widgets import MyQLCDNumber
 
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
@@ -15829,14 +15830,15 @@ class ApplicationWindow(QMainWindow):
 
         #create LCD displays
         #RIGHT COLUMN
-        self.lcd1 = QLCDNumber() # time
+        self.lcd1 = MyQLCDNumber() # time
         self.lcd1.setSegmentStyle(2)
         self.lcd1.setMinimumHeight(40)
         self.lcd1.setMinimumWidth(100)
         self.lcd1.setFrameStyle(QFrame.Plain)
         # switch superusermode action:
         self.lcd1.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.lcd1.customContextMenuRequested.connect(self.superusermodeClicked)
+#        self.lcd1.customContextMenuRequested.connect(self.superusermodeClicked)
+        self.lcd1.clicked.connect(self.superusermodeLeftClicked)
         self.lcd1.setVisible(False)
 
 
@@ -18078,8 +18080,16 @@ class ApplicationWindow(QMainWindow):
                     ]
         return v*convtable[i][o]
 
-    @pyqtSlot("QPoint")
-    def superusermodeClicked(self,_):
+#    @pyqtSlot("QPoint")
+#    def superusermodeClicked(self,_):
+#        self.superusermode = not self.superusermode
+#        if self.superusermode:
+#            aw.sendmessage(QApplication.translate("Message","super on",None))
+#        else:
+#            aw.sendmessage(QApplication.translate("Message","super off",None))
+            
+    @pyqtSlot()
+    def superusermodeLeftClicked(self):
         self.superusermode = not self.superusermode
         if self.superusermode:
             aw.sendmessage(QApplication.translate("Message","super on",None))

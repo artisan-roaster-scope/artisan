@@ -19,7 +19,7 @@
 from artisanlib.util import stringtoseconds
 
 from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot)
-from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QTableWidgetItem, QSizePolicy)
+from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QTableWidgetItem, QSizePolicy, QLCDNumber)
 from PyQt5.QtGui import QFontMetrics
 
 class MyQComboBox(QComboBox):
@@ -164,6 +164,16 @@ class ClickableQLabel(QLabel):
             self.left_clicked.emit()
         elif event.button() == Qt.RightButton:
             self.right_clicked.emit()
+
+
+class MyQLCDNumber(QLCDNumber):
+    clicked = pyqtSignal()
+    
+    def __init__(self, *args, **kwargs):
+        super(MyQLCDNumber, self).__init__(*args, **kwargs)
+
+    def mousePressEvent(self, event):
+        self.clicked.emit()
 
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
