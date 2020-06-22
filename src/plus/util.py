@@ -113,9 +113,15 @@ def getGMToffset():
 
 ## Prepare Temperatures for sending
 
+def fromFtoC(Ffloat):
+    if Ffloat in [-1,None]:
+        return Ffloat
+    else:
+        return (Ffloat-32.0)*(5.0/9.0)
+
 def temp2C(temp):
     if temp is not None and config.app_window.qmc.mode == "F": # @UndefinedVariable
-        return config.app_window.qmc.fromFtoC(temp) # @UndefinedVariable
+        return fromFtoC(temp) # @UndefinedVariable
     else:
         return temp
         
