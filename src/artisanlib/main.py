@@ -21338,9 +21338,12 @@ class ApplicationWindow(QMainWindow):
                 self.processingKeyEvent = True
                 key = int(event.key())
                 modifiers = event.modifiers()
+                #Note: Windows only - PyQt will sometimes, but not always, interpret a shortcut key as a menu key.  For that 
+                #    reason only CTRL and CTRL+SHIFT modifier should be used with shortcut keys f,e,r,c,t,v, and h.
                 control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS
                 alt_modifier = modifiers == Qt.AltModifier
                 control_alt_modifier = modifiers == (Qt.ControlModifier | Qt.AltModifier)
+                control_shift_modifier = modifiers == (Qt.ControlModifier | Qt.ShiftModifier)
                 #meta_modifier = modifiers == Qt.MetaModifier # Control on macOS, Meta on Windows
                 #uncomment next line to find the integer value of a key
                 #print(key)
@@ -21354,7 +21357,7 @@ class ApplicationWindow(QMainWindow):
 
                 elif key == 72:                       #H
                     if not aw.qmc.designerflag:
-                        if alt_modifier and platf != 'Windows' or control_alt_modifier and platf == 'Windows':
+                        if alt_modifier and platf != 'Windows' or ((control_shift_modifier or control_alt_modifier) and platf == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             aw.deleteBackground()
                             aw.qmc.redraw()
                         else:
@@ -21554,7 +21557,7 @@ class ApplicationWindow(QMainWindow):
                                     # keep on looking for digits
                                     self.quickEventShortCut = (eventNr,eventValueStr)
                             else:
-                                if len(eventValueStr) == 2:
+                                if (len(eventValueStr) == 2 and aw.eventslidermax[eventNr]<=100) or (len(eventValueStr) == 3 and aw.eventslidermax[eventNr]>100):
                                     # both digits entered, create the event
                                     self.quickEventShortCut = None
                                     value = max(aw.eventslidermin[eventNr],min(aw.eventslidermax[eventNr],int(eventValueStr)))
