@@ -92,10 +92,10 @@ def delSync(uuid):
         with shelve.open(getSyncPath()) as db:
             del db[uuid]
     except Exception as e:
-        config.logger.error("sync: Exception in delSync() %s",e)
+        config.logger.debug("sync: Exception in delSync() %s",e)
     finally:
         if sync_cache_semaphore.available() < 1:
-            sync_cache_semaphore.release(1)              
+            sync_cache_semaphore.release(1)
 
 
 #### Sync Record Cache (tracking of changes to partial attributes synced bidirectional)

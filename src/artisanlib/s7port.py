@@ -90,6 +90,35 @@ class s7port(object):
 ################
 # conversion methods copied from s7:util.py
 
+    def get_bool(self, _bytearray, byte_index, bool_index):
+        """
+        Get the boolean value from location in bytearray
+        """
+        index_value = 1 << bool_index
+        byte_value = _bytearray[byte_index]
+        current_value = byte_value & index_value
+        return current_value == index_value
+    
+    
+    def set_bool(self, _bytearray, byte_index, bool_index, value):
+        """
+        Set boolean value on location in bytearray
+        """
+        assert value in [0, 1, True, False]
+        current_value = self.get_bool(_bytearray, byte_index, bool_index)
+        index_value = 1 << bool_index
+    
+        # check if bool already has correct value
+        if current_value == value:
+            return
+    
+        if value:
+            # make sure index_v is IN current byte
+            _bytearray[byte_index] += index_value
+        else:
+            # make sure index_v is NOT in current byte
+            _bytearray[byte_index] -= index_value
+
     def set_int(self,_bytearray, byte_index, _int):
         """
         Set value in bytearray to int
@@ -234,10 +263,14 @@ class s7port(object):
             if area != -1:
                 db_nr = self.db_nr[c]
                 register = self.start[c]
-                registers = [register,register+1]
-                if self.type[c]:
+                registers = [register] # BOOL
+                if self.type[c] == 1: # FLOAT
+                    registers.append(register+1)
                     registers.append(register+2)
                     registers.append(register+3)
+                elif self.type[c] == 0: # INT
+                    registers.append(register+1)
+                    registers.append(register+2)
                 if not (area in self.activeRegisters):
                     self.activeRegisters[area] = {}
                 if db_nr in self.activeRegisters[area]:
@@ -322,10 +355,10 @@ class s7port(object):
             self.COMsemaphore.acquire(1)
             self.connect()
             if self.isConnected():
-#                with suppress_stdout_stderr():
-                ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                self.set_real(ba, 0, float(value))
-                self.plc.write_area(self.areas[area],dbnumber,start,ba)
+                with suppress_stdout_stderr():
+                    ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                    self.set_real(ba, 0, float(value))
+                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
 
             else:
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
@@ -343,10 +376,10 @@ class s7port(object):
             self.COMsemaphore.acquire(1)
             self.connect()
             if self.isConnected():           
-#                with suppress_stdout_stderr():
-                ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                self.set_int(ba, 0, int(value))
-                self.plc.write_area(self.areas[area],dbnumber,start,ba)
+                with suppress_stdout_stderr():
+                    ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                    self.set_int(ba, 0, int(value))
+                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
 
             else:
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
@@ -357,6 +390,27 @@ class s7port(object):
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
                 self.addserial("S7 writeInt({},{},{},{})".format(area,dbnumber,start,value))
+
+    def writeBool(self,area,dbnumber,start,index,value): 
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            if self.isConnected():           
+                with suppress_stdout_stderr():
+                    ba = self.plc.read_area(self.areas[area],dbnumber,start,1)
+                    self.set_bool(ba, 0, int(index), bool(value))
+                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+
+            else:
+                self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
+        except Exception as e:
+            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeBool: " + str(e))
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+            if self.aw.seriallogflag:
+                self.addserial("S7 writeBool({},{},{},{},{})".format(area,dbnumber,start,index,value))
                     
     def readFloat(self,area,dbnumber,start):
         try:
@@ -379,8 +433,8 @@ class s7port(object):
                     res = None             
                     while True:
                         try:
-#                            with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                            with suppress_stdout_stderr():
+                                res = self.plc.read_area(self.areas[area],dbnumber,start,4)
                                 
                         except:
                             res = None
@@ -430,8 +484,8 @@ class s7port(object):
                     res = None             
                     while True:
                         try:
-#                            with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                            with suppress_stdout_stderr():
+                                res = self.plc.read_area(self.areas[area],dbnumber,start,2)
                             
                         except Exception:
                             res = None
@@ -462,3 +516,52 @@ class s7port(object):
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
                 self.addserial("S7 readInt({},{},{})".format(area,dbnumber,start))
+
+    def readBool(self,area,dbnumber,start,index):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            if area in self.readingsCache and dbnumber in self.readingsCache[area] and start in self.readingsCache[area][dbnumber]:
+                # cache hit
+                res = bytearray([
+                    self.readingsCache[area][dbnumber][start]])
+                return self.get_bool(res,0,0)
+            else:     
+                if self.isConnected():
+                    retry = self.readRetries   
+                    res = None             
+                    while True:
+                        try:
+                            with suppress_stdout_stderr():
+                                res = self.plc.read_area(self.areas[area],dbnumber,start,1)
+                            
+                        except Exception:
+                            res = None
+                        if res is None:
+                            if retry > 0:
+                                retry = retry - 1
+                            else:
+                                raise Exception("Communication error")
+                        else:
+                            break
+                    if res is None:
+                        return -1
+                    else:
+                        if self.commError: # we clear the previous error and send a message
+                            self.commError = False
+                            self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
+                        return self.get_bool(res,0,index)
+                else:
+                    self.commError = True  
+                    self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
+                    return -1
+        except Exception as e:
+            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readBool: " + str(e))
+            self.commError = True
+            return -1
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+            if self.aw.seriallogflag:
+                self.addserial("S7 readBool({},{},{},{})".format(area,dbnumber,start,index))

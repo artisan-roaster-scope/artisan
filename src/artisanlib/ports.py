@@ -778,7 +778,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.s7_divCombos = []
         
         s7_areas = [" ","PE","PA","MK","CT","TM","DB"]
-        s7_types = ["Int", "Float"]
+        s7_types = ["Int", "Float", "Bool"]
         
         s7_grid = QGridLayout()
         

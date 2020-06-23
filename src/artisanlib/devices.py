@@ -179,8 +179,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception:
                 pass
             self.devicetypeComboBox.setCurrentIndex(selected_device_index)
-        self.arduinoETComboBox.setCurrentIndex(arduinoChannels.index(self.aw.ser.arduinoETChannel))
-        self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(self.aw.ser.arduinoBTChannel))
+        try:
+            self.arduinoETComboBox.setCurrentIndex(arduinoChannels.index(self.aw.ser.arduinoETChannel))
+        except:
+            pass
+        try:
+            self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(self.aw.ser.arduinoBTChannel))
+        except:
+            pass
         arduinoATLabel =QLabel(QApplication.translate("Label", "AT Channel",None))
         
         arduinoTemperatures = ["None","T1","T2","T3","T4","T5","T6"]

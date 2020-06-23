@@ -1934,8 +1934,10 @@ class serialport(object):
         res = []
         for i in range(mode*2,mode*2+2):
             if self.aw.s7.area[i]:
-                if self.aw.s7.type[i]:
+                if self.aw.s7.type[i] == 1:
                     v = self.aw.s7.readFloat(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i])
+                elif self.aw.s7.type[i] == 2:
+                    v = self.aw.s7.readBool(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],0) # we always read bit 0
                 else:
                     v = self.aw.s7.readInt(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i])
                 v = self.processChannelData(v,self.aw.s7.div[i],("C" if self.aw.s7.mode[i]==1 else ("F" if self.aw.s7.mode[i]==2 else "")))

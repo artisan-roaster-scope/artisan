@@ -4847,7 +4847,7 @@ class tgraphcanvas(FigureCanvas):
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
-    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):
+    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False,fireResetAction=True):
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget:
@@ -4871,11 +4871,12 @@ class tgraphcanvas(FigureCanvas):
             if soundOn:
                 aw.soundpop()
 
-            try:
-                # the RESET button action needs to be fired outside of the sempaphore to avoid lockups
-                aw.eventactionx(aw.qmc.xextrabuttonactions[0],aw.qmc.xextrabuttonactionstrings[0])
-            except:
-                pass
+            if fireResetAction:
+                try:
+                    # the RESET button action needs to be fired outside of the sempaphore to avoid lockups
+                    aw.eventactionx(aw.qmc.xextrabuttonactions[0],aw.qmc.xextrabuttonactionstrings[0])
+                except:
+                    pass
             try:
                 #### lock shared resources #####
                 aw.qmc.samplingsemaphore.acquire(1)
@@ -9379,7 +9380,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart:
+        if self.flagstart and len(self.timex) > 0:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.qmc.alignEvent in [1,7]:
@@ -9481,7 +9482,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart:
+        if self.flagstart and len(self.timex) > 0:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.qmc.alignEvent in [2,7]:
@@ -9573,7 +9574,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart:
+        if self.flagstart and len(self.timex) > 0:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.qmc.alignEvent in [3,7]:
@@ -9669,7 +9670,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart:
+        if self.flagstart and len(self.timex) > 0:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.qmc.alignEvent in [4,7]:
@@ -9694,15 +9695,21 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_19.setFlat(True)
                 aw.button_3.setFlat(True)
                 aw.button_4.setFlat(True)
-                aw.eventactionx(aw.qmc.buttonactions[4],aw.qmc.buttonactionstrings[4])
-                if self.timeindex[0] > -1:
-                    start = self.timex[self.timeindex[0]]
-                else:
-                    start = 0
-                st1 = stringfromseconds(self.timex[self.timeindex[4]]-start)
-                st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
-                message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
-                aw.sendmessage(message)
+                try:
+                    aw.eventactionx(aw.qmc.buttonactions[4],aw.qmc.buttonactionstrings[4])
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
+                    try:
+                        st1 = stringfromseconds(self.timex[self.timeindex[4]]-start)
+                        st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
+                    except:
+                        pass
+                    message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
+                    aw.sendmessage(message)
+                except:
+                    pass
                 aw.onMarkMoveToNext(aw.button_5)
                 self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
@@ -9764,7 +9771,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart:
+        if self.flagstart and len(self.timex) > 0:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.qmc.alignEvent in [5,7]:
@@ -9904,7 +9911,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart:
+        if self.flagstart and len(self.timex) > 0:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.qmc.alignEvent in [6,7]:
@@ -10090,7 +10097,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart:
+        if self.flagstart and len(self.timex) > 0:
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.button_20.isFlat():
                 if removed:
@@ -16325,13 +16332,13 @@ class ApplicationWindow(QMainWindow):
         level3layout.setSpacing(0)
         level3layout.setContentsMargins(0,0,0,0)
 
-        extrabuttonsLayout = QVBoxLayout()
-        extrabuttonsLayout.setContentsMargins(0,0,0,10)
-        extrabuttonsLayout.setSpacing(5)
-        extrabuttonsLayout.addWidget(self.e1buttondialog)
-        extrabuttonsLayout.addWidget(self.e2buttondialog)
-        extrabuttonsLayout.addWidget(self.e3buttondialog)
-        extrabuttonsLayout.addWidget(self.e4buttondialog)
+        self.extrabuttonsLayout = QVBoxLayout()
+        self.extrabuttonsLayout.setContentsMargins(0,0,0,10)
+        self.extrabuttonsLayout.setSpacing(5)
+        self.extrabuttonsLayout.addWidget(self.e1buttondialog)
+        self.extrabuttonsLayout.addWidget(self.e2buttondialog)
+        self.extrabuttonsLayout.addWidget(self.e3buttondialog)
+        self.extrabuttonsLayout.addWidget(self.e4buttondialog)
 
         self.e1buttondialog.setVisible(False)
         self.e2buttondialog.setVisible(False)
@@ -16339,7 +16346,7 @@ class ApplicationWindow(QMainWindow):
         self.e4buttondialog.setVisible(False)
 
         self.extrabuttondialogs = QFrame()
-        self.extrabuttondialogs.setLayout(extrabuttonsLayout)
+        self.extrabuttondialogs.setLayout(self.extrabuttonsLayout)
         self.extrabuttondialogs.setVisible(False)
 
         midleftlayout = QVBoxLayout()
@@ -16349,6 +16356,7 @@ class ApplicationWindow(QMainWindow):
         midleftlayout.addLayout(level3layout)
         midleftlayout.addWidget(self.lowerbuttondialog)
         midleftlayout.addWidget(self.extrabuttondialogs)
+        
         midleftlayout.addWidget(self.EventsGroupLayout)
 
         self.slider1 = self.slider()
@@ -20238,8 +20246,11 @@ class ApplicationWindow(QMainWindow):
                 elif action == 15: # S7 Command
                     # getDBint(<dbnumber>,<start>)
                     # getDBfloat(<dbnumber>,<start>)
+                    # getDBbool(<dbnumber>,<start>,<index>)
                     # setDBint(<dbnumber>,<start>,<value>)
                     # setDBfloat(<dbnumber>,<start>,<value>)
+                    # setDBhool(<dbnumber>,<start>,<index>,<value>)
+                    # sleep(<xx.yy>) xx.yy in seconds
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
@@ -20250,9 +20261,9 @@ class ApplicationWindow(QMainWindow):
                                     aw.s7.writeInt(5,int(dbnr),int(s),eval(v))
                                 except Exception:
                                     pass
-                            elif cs.startswith("getDBint(") and len(cs) > 14:
+                            elif cs.startswith("getDBint(") and len(cs) > 13:
                                 try:
-                                    dbnr,s,v = cs[len("getDBint("):-1].split(',')
+                                    dbnr,s = cs[len("getDBint("):-1].split(',')
                                     aw.s7.lastReadResult = aw.s7.getInt(5,int(dbnr),int(s))
                                 except Exception:
                                     pass
@@ -20262,12 +20273,38 @@ class ApplicationWindow(QMainWindow):
                                     aw.s7.writeFloat(5,int(dbnr),int(s),eval(v))
                                 except Exception:
                                     pass
-                            elif cs.startswith("getDBfloat(") and len(cs) > 16:
+                            elif cs.startswith("getDBfloat(") and len(cs) > 14:
                                 try:
-                                    dbnr,s,v = cs[len("getDBfloat("):-1].split(',')
+                                    dbnr,s = cs[len("getDBfloat("):-1].split(',')
                                     aw.s7.lastReadResult = aw.s7.readFloat(5,int(dbnr),int(s))
                                 except Exception:
                                     pass
+                            elif cs.startswith("setDBbool(") and len(cs) > 17:
+                                try:
+                                    dbnr,s,i,v = cs[len("setDBbool("):-1].split(',')
+                                    aw.s7.writeBool(5,int(dbnr),int(s),int(i),eval(v))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("getDBbool(") and len(cs) > 15:
+                                try:
+                                    dbnr,s,i = cs[len("getDBbool("):-1].split(',')
+                                    aw.s7.lastReadResult = aw.s7.readBool(5,int(dbnr),int(s),int(i))
+                                except Exception:
+                                    pass
+                            elif cs.startswith("button"):
+                                # cmd has format "button(<bool>)" # 0 or 1 or True or False
+                                try:
+                                    cmds = eval(cs[len('button'):])
+                                    last = self.lastbuttonpressed
+                                    if last != -1 and len(self.buttonlist)>last:
+                                        #block resetting style of last button
+                                        self.lastbuttonpressed = -10
+                                        if cmds:
+                                            aw.setExtraEventButtonStyle(last, style="pressed")
+                                        else:
+                                            aw.setExtraEventButtonStyle(last, style="normal")
+                                except Exception:
+                                    pass                                  
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):])
@@ -20762,7 +20799,7 @@ class ApplicationWindow(QMainWindow):
                 # reset lastbuttonpressed
                 self.lastbuttonpressed = ee
 
-            except Exception:
+            except:
                 pass
             finally:
                 if aw.qmc.eventactionsemaphore.available() < 1:
@@ -30773,7 +30810,7 @@ class ApplicationWindow(QMainWindow):
                     if reset:
                         flag_temp = aw.qmc.roastpropertiesflag
                         aw.qmc.roastpropertiesflag = 1 # ensure that all roast properties are reset!
-                        aw.qmc.reset(soundOn=False)
+                        aw.qmc.reset(soundOn=False,fireResetAction=False)
                         aw.qmc.roastpropertiesflag = flag_temp
                     if res and remember:
                         # update recentSettings menu
@@ -32618,7 +32655,7 @@ class ApplicationWindow(QMainWindow):
             p.setText(l)
             p.setFocusPolicy(Qt.NoFocus)
             p.clicked.connect(self.recordextraevent_slot)
-            self.buttonlist.append(p)
+            self.buttonlist.append(p)            
             self.buttonStates.append(0)
             #add button to row
             if row1count < self.buttonlistmaxlen:

@@ -1,6 +1,6 @@
 [General]
-Delay=3000
-Oversampling=true
+Delay=2000
+Oversampling=false
 
 [Device]
 controlETpid=4, 2

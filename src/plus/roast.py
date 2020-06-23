@@ -32,22 +32,28 @@ from plus import config, util
 def getTemplate(bp):
     config.logger.debug("roast:getTemplate()")
     d = {}
-    try: 
+    try:
         aw = config.app_window
         
-        util.addNum2dict(bp,"roastbatchnr",d,"batch_number",0,65534,0)
-        if "batch_number" in d and d["batch_number"]:
-            util.addString2dict(bp,"roastbatchprefix",d,"batch_prefix",50)
-            util.addNum2dict(bp,"roastbatchpos",d,"batch_pos",0,255,0)
-            
-        if "roastepoch" in bp:
-            d["date"] = util.epoch2ISO8601(bp["roastepoch"])
-            try:
-                gmt_offset = util.limitnum(-60000,60000,util.getGMToffset())
-                if gmt_offset is not None:
-                    d["GMT_offset"] = gmt_offset
-            except:
-                pass
+        try:
+            util.addNum2dict(bp,"roastbatchnr",d,"batch_number",0,65534,0)
+            if "batch_number" in d and d["batch_number"]:
+                util.addString2dict(bp,"roastbatchprefix",d,"batch_prefix",50)
+                util.addNum2dict(bp,"roastbatchpos",d,"batch_pos",0,255,0)
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
+        
+        try:
+            if "roastepoch" in bp:
+                d["date"] = util.epoch2ISO8601(bp["roastepoch"])
+                try:
+                    gmt_offset = util.limitnum(-60000,60000,util.getGMToffset())
+                    if gmt_offset is not None:
+                        d["GMT_offset"] = gmt_offset
+                except:
+                    pass
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
 
         if "weight" in bp:
             if bp["weight"][0]:
@@ -56,7 +62,7 @@ def getTemplate(bp):
                     if w is not None:
                         d["start_weight"] = util.float2floatMin(w,3) # in kg
                 except:
-                    pass         
+                    pass
             if bp["weight"][1]:
                 try:
                     w = util.limitnum(0,65534,aw.convertWeight(bp["weight"][1],aw.qmc.weight_units.index(bp["weight"][2]),aw.qmc.weight_units.index("Kg")))
@@ -74,45 +80,61 @@ def getTemplate(bp):
                 except:
                     pass
 
-        util.add2dict(bp,config.uuid_tag,d,"id")            
-        util.addNum2dict(bp,"moisture_roasted",d,"moisture",0,100,1)            
-        util.addString2dict(bp,"title",d,"label",255)
-        util.addString2dict(bp,"roastertype",d,"machine",50)
-        util.addString2dict(bp,"machinesetup",d,"setup",50)
-        util.addNum2dict(bp,"whole_color",d,"whole_color",0,255,0)
-        util.addNum2dict(bp,"ground_color",d,"ground_color",0,255,0)
-                        
-        if ("whole_color" in d or "ground_color" in d):  
-            util.addString2dict(bp,"color_system",d,"color_system",25)
+        util.add2dict(bp,config.uuid_tag,d,"id")
+        
+        try:
+            util.addNum2dict(bp,"moisture_roasted",d,"moisture",0,100,1)
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
+        try:
+            util.addString2dict(bp,"title",d,"label",255)
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
+        try:
+            util.addString2dict(bp,"roastertype",d,"machine",50)
+            util.addString2dict(bp,"machinesetup",d,"setup",50)
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
+        
+        try:
+            util.addNum2dict(bp,"whole_color",d,"whole_color",0,255,0)
+            util.addNum2dict(bp,"ground_color",d,"ground_color",0,255,0)
+            if ("whole_color" in d or "ground_color" in d):
+                util.addString2dict(bp,"color_system",d,"color_system",25)
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
 
-        if "computed" in bp:
-            cp = bp["computed"]
-            
-            util.addAllTemp2dict(cp,d,[
-                ("CHARGE_ET","charge_temp_ET"),
-                ("CHARGE_BT","charge_temp"),
-                ("TP_BT","TP_temp"),
-                ("DRY_BT","DRY_temp"),
-                ("FCs_BT","FCs_temp"),
-                ("FCe_BT","FCe_temp"),
-                ("DROP_BT","drop_temp"),
-                ("DROP_ET","drop_temp_ET")])
-            util.addAllTime2dict(cp,d,[
-                "TP_time",
-                "DRY_time",
-                "FCs_time",
-                "FCe_time",
-                ("DROP_time","drop_time")])
+        try:
+            if "computed" in bp:
+                cp = bp["computed"]
                 
-            if "finishphasetime" in cp:
-                util.addTime2dict(cp,"finishphasetime",d,"DEV_time")
-                if "totaltime" in cp:
-                    v = util.limitnum(0,100,util.float2floatMin(cp["finishphasetime"]/cp["totaltime"]*100,1))
-                    if v is not None:
-                        d["DEV_ratio"] = v
-         
-            util.addNum2dict(cp,"AUC",d,"AUC",0,10000,0)
-            util.addTemp2dict(cp,"AUCbase",d,"AUC_base")
+                util.addAllTemp2dict(cp,d,[
+                    ("CHARGE_ET","charge_temp_ET"),
+                    ("CHARGE_BT","charge_temp"),
+                    ("TP_BT","TP_temp"),
+                    ("DRY_BT","DRY_temp"),
+                    ("FCs_BT","FCs_temp"),
+                    ("FCe_BT","FCe_temp"),
+                    ("DROP_BT","drop_temp"),
+                    ("DROP_ET","drop_temp_ET")])
+                util.addAllTime2dict(cp,d,[
+                    "TP_time",
+                    "DRY_time",
+                    "FCs_time",
+                    "FCe_time",
+                    ("DROP_time","drop_time")])
+                    
+                if "finishphasetime" in cp:
+                    util.addTime2dict(cp,"finishphasetime",d,"DEV_time")
+                    if "totaltime" in cp:
+                        v = util.limitnum(0,100,util.float2floatMin(cp["finishphasetime"]/cp["totaltime"]*100,1))
+                        if v is not None:
+                            d["DEV_ratio"] = v
+             
+                util.addNum2dict(cp,"AUC",d,"AUC",0,10000,0)
+                util.addTemp2dict(cp,"AUCbase",d,"AUC_base")
+        except Exception as e:
+            config.logger.info("roast: Exception in getTemplate() %s",e)
 
     except Exception as e:
         import sys
@@ -140,11 +162,14 @@ def getRoast():
             del d["start_weight"]
         else:
             d["amount"] = 0
-            
-        if "computed" in p:
-            cp = p["computed"]
-            util.addTemp2dict(cp,"det",d,"CM_ETD")
-            util.addTemp2dict(cp,"dbt",d,"CM_BTD")
+        
+        try:
+            if "computed" in p:
+                cp = p["computed"]
+                util.addTemp2dict(cp,"det",d,"CM_ETD")
+                util.addTemp2dict(cp,"dbt",d,"CM_BTD")
+        except Exception as e:
+            config.logger.info("roast: Exception in getRoast() %s",e)
 
         if aw.qmc.plus_store:
             d["location"] = aw.qmc.plus_store
@@ -157,11 +182,17 @@ def getRoast():
         else:
             d["blend"] = None
         
-        util.addTemp2dict(p,"ambientTemp",d,"temperature")        
-        util.addNum2dict(p,"ambient_pressure",d,"pressure",800,1200,1)
-        util.addNum2dict(p,"ambient_humidity",d,"humidity",0,100,1)
+        try:
+            util.addTemp2dict(p,"ambientTemp",d,"temperature")
+            util.addNum2dict(p,"ambient_pressure",d,"pressure",800,1200,1)
+            util.addNum2dict(p,"ambient_humidity",d,"humidity",0,100,1)
+        except Exception as e:
+            config.logger.info("roast: Exception in getRoast() %s",e)
         
-        util.addString2dict(p,"roastingnotes",d,"notes",1023)
+        try:
+            util.addString2dict(p,"roastingnotes",d,"notes",1023)
+        except Exception as e:
+            config.logger.info("roast: Exception in getRoast() %s",e)
             
         if aw.qmc.background and aw.qmc.backgroundprofile:
             bp = aw.qmc.backgroundprofile
@@ -180,7 +211,6 @@ def getRoast():
         return {}
     return d
 
-        
 ################
 ## Sync Record (roast properties synced bidirectional between the client and the server)
 
