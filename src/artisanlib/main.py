@@ -18222,22 +18222,40 @@ class ApplicationWindow(QMainWindow):
     # temp might be None if there is no corresponding curve
     def quantifier2tempandtime(self,i):
         temp = None
-        timex = aw.qmc.timex
+        if aw.qmc.flagstart:
+            timex = aw.qmc.timex
+        else:
+            timex = aw.qmc.on_timex
         if aw.eventquantifiersource[i] == 0:
-            temp = aw.qmc.temp1
+            if aw.qmc.flagstart:
+                temp = aw.qmc.temp1
+            else:
+                temp = aw.qmc.on_temp1
         elif aw.eventquantifiersource[i] == 1:
-            temp = aw.qmc.temp2
+            if aw.qmc.flagstart:
+                temp = aw.qmc.temp2
+            else:
+                temp = aw.qmc.on_temp2
         else:
             x = (aw.eventquantifiersource[i]-2)
-            timex = aw.qmc.extratimex[x // 2]
+            if aw.qmc.flagstart:
+                timex = aw.qmc.extratimex[x // 2]
+            else:
+                timex = aw.qmc.on_extratimex[x // 2]
             if x % 2 == 0:
                 # even
                 if len(aw.qmc.extratemp1) > (x/2):
-                    temp = aw.qmc.extratemp1[x // 2]
+                    if aw.qmc.flagstart:
+                        temp = aw.qmc.extratemp1[x // 2]
+                    else:
+                        temp = aw.qmc.on_extratemp1[x // 2]
             else:
                 # odd
                 if len(aw.qmc.extratemp2) > (x/2):
-                    temp = aw.qmc.extratemp2[x // 2]
+                    if aw.qmc.flagstart:
+                        temp = aw.qmc.extratemp2[x // 2]
+                    else:
+                        temp = aw.qmc.on_extratemp2[x // 2]
         return temp,timex
 
     # returns min/max 0/(aw.eventsMaxValue / 10) for values outside of the given linespace ls defining the interval
@@ -20298,12 +20316,12 @@ class ApplicationWindow(QMainWindow):
                                     last = self.lastbuttonpressed
                                     if last != -1 and len(self.buttonlist)>last:
                                         #block resetting style of last button
-                                        self.lastbuttonpressed = -10
+                                        self.lastbuttonpressed = -1
                                         if cmds:
                                             aw.setExtraEventButtonStyle(last, style="pressed")
                                         else:
                                             aw.setExtraEventButtonStyle(last, style="normal")
-                                except Exception:
+                                except:
                                     pass                                  
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
@@ -22044,6 +22062,11 @@ class ApplicationWindow(QMainWindow):
                             self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=other_filename_path)
                     #restore dirs
                     QDir.setCurrent(oldDir)
+                    # file might be autosaved but not uploaded to plus yet (no DROP registered). This needs to be indicated by a red plus icon
+                    try:
+                        aw.updatePlusStatus()
+                    except:
+                        pass
 
                     return filename
                 else:

@@ -363,7 +363,8 @@ class s7port(object):
             else:
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeFloat: " + str(e))
+            if aw.qmc.flagon:
+                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeFloat: " + str(e))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -384,7 +385,8 @@ class s7port(object):
             else:
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeInt: " + str(e))
+            if aw.qmc.flagon:
+                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeInt: " + str(e))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -405,7 +407,8 @@ class s7port(object):
             else:
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeBool: " + str(e))
+            if aw.qmc.flagon:
+                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeBool: " + str(e))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -457,7 +460,8 @@ class s7port(object):
                     self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))                                 
                     return -1
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readFloat: " + str(e))
+            if aw.qmc.flagon:
+                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readFloat: " + str(e))
             self.commError = True
             return -1
         finally:
@@ -508,7 +512,8 @@ class s7port(object):
                     self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
                     return -1
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt: " + str(e))
+            if aw.qmc.flagon:
+                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt: " + str(e))
             self.commError = True
             return -1
         finally:
@@ -553,11 +558,12 @@ class s7port(object):
                             self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                         return self.get_bool(res,0,index)
                 else:
-                    self.commError = True  
+                    self.commError = True
                     self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
                     return -1
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readBool: " + str(e))
+            if aw.qmc.flagon:
+                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readBool: " + str(e))
             self.commError = True
             return -1
         finally:
