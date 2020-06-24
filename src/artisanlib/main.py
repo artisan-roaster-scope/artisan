@@ -22014,7 +22014,12 @@ class ApplicationWindow(QMainWindow):
                 res = QDir.setCurrent(self.qmc.autosavepath)
                 if res:
                     #write
-                    self.serialize(filename_path,self.getProfile())
+                    pf = self.getProfile()
+                    sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                    if sync_record_hash is not None:
+                        # we add the hash over the sync record to be able to detect offline changes
+                        pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+                    self.serialize(filename_path,pf)
                     self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
                     self.setCurrentFile(filename_path,False) # we do not add autosaved files any longer to the recent file menu
                     self.qmc.fileClean()
