@@ -6396,7 +6396,7 @@ class tgraphcanvas(FigureCanvas):
                                         self.E1backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E1b_last = i
                                     try:
-                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.timeindexB[6] and self.specialeventannovisibilities[0] and self.timeB[self.backgroundEvents[i]] < self.timeB[self.timeindexB[6]]:
+                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.specialeventannovisibilities[0]:
                                             E1b_annotation = self.parseSpecialeventannotation(self.specialeventannotations[0], i, applyto="background")
                                             temp = self.E1backgroundvalues[-1]
                                             anno = self.ax.annotate(E1b_annotation, xy=(hoffset + self.timeB[int(self.backgroundEvents[i])], voffset + temp),
@@ -6433,7 +6433,7 @@ class tgraphcanvas(FigureCanvas):
                                         self.E2backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E2b_last = i
                                     try:
-                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.timeindexB[6] and self.specialeventannovisibilities[0] and self.timeB[self.backgroundEvents[i]] < self.timeB[self.timeindexB[6]]:
+                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.specialeventannovisibilities[1]:
                                             E2b_annotation = self.parseSpecialeventannotation(self.specialeventannotations[1], i, applyto="background")
                                             temp = self.E2backgroundvalues[-1]
                                             anno = self.ax.annotate(E2b_annotation, xy=(hoffset + self.timeB[int(self.backgroundEvents[i])], voffset + temp),
@@ -6470,7 +6470,7 @@ class tgraphcanvas(FigureCanvas):
                                         self.E3backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E3b_last = i
                                     try:
-                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.timeindexB[6] and self.specialeventannovisibilities[0] and self.timeB[self.backgroundEvents[i]] < self.timeB[self.timeindexB[6]]:
+                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.specialeventannovisibilities[2]:
                                             E3b_annotation = self.parseSpecialeventannotation(self.specialeventannotations[2], i, applyto="background")
                                             temp = self.E3backgroundvalues[-1]
                                             anno = self.ax.annotate(E3b_annotation, xy=(hoffset + self.timeB[int(self.backgroundEvents[i])], voffset + temp),
@@ -6507,7 +6507,7 @@ class tgraphcanvas(FigureCanvas):
                                         self.E4backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                     E4b_last = i
                                     try:
-                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.timeindexB[6] and self.specialeventannovisibilities[0] and self.timeB[self.backgroundEvents[i]] < self.timeB[self.timeindexB[6]]:
+                                        if (len(self.timex)==0 or self.flagon) and self.eventsGraphflag!=4 and self.backgroundDetails and self.specialeventannovisibilities[3]:
                                             E4b_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i, applyto="background")
                                             temp = self.E4backgroundvalues[-1]
                                             anno = self.ax.annotate(E4b_annotation, xy=(hoffset + self.timeB[int(self.backgroundEvents[i])], voffset + temp),
@@ -6840,7 +6840,7 @@ class tgraphcanvas(FigureCanvas):
                                 E1_nonempty = True
                                 E1_last = i
                                 try:
-                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.timeindex[6] and self.specialeventannovisibilities[0] and self.timex[self.specialevents[i]] < self.timex[self.timeindex[6]]:
+                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[0]:
                                         E1_annotation = self.parseSpecialeventannotation(self.specialeventannotations[0], i)
                                         temp = self.E1values[-1]
                                         anno = self.ax.annotate(E1_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
@@ -6874,7 +6874,7 @@ class tgraphcanvas(FigureCanvas):
                                 E2_nonempty = True
                                 E2_last = i
                                 try:
-                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.timeindex[6] and self.specialeventannovisibilities[1] and self.timex[self.specialevents[i]] < self.timex[self.timeindex[6]]:
+                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[1]:
                                         E2_annotation = self.parseSpecialeventannotation(self.specialeventannotations[1], i)
                                         temp = self.E2values[-1]
                                         anno = self.ax.annotate(E2_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
@@ -6909,7 +6909,7 @@ class tgraphcanvas(FigureCanvas):
                                 E3_nonempty = True
                                 E3_last = i
                                 try:
-                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.timeindex[6] and self.specialeventannovisibilities[2] and self.timex[self.specialevents[i]] < self.timex[self.timeindex[6]]:
+                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[2]:
                                         E3_annotation = self.parseSpecialeventannotation(self.specialeventannotations[2], i)
                                         temp = self.E3values[-1]
                                         anno = self.ax.annotate(E3_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
@@ -6943,7 +6943,7 @@ class tgraphcanvas(FigureCanvas):
                                 E4_nonempty = True
                                 E4_last = i
                                 try:
-                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.timeindex[6] and self.specialeventannovisibilities[3] and self.timex[self.specialevents[i]] < self.timex[self.timeindex[6]]:
+                                    if not sampling and not self.flagstart and self.eventsGraphflag!=4 and self.specialeventannovisibilities[3]:
                                         E4_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i)
                                         temp = self.E4values[-1]
                                         anno = self.ax.annotate(E4_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
@@ -22048,6 +22048,14 @@ class ApplicationWindow(QMainWindow):
                 ("roastvolume",str(self.float2float(float(self.qmc.volume[1]),1))),            #depricated
                 ("roastdensity",str(self.float2float(float(self.qmc.density_roasted[0]),1))),  #depricated
                 ("roastmoisture",str(self.float2float(float(self.qmc.moisture_roasted)))),     #depricated
+                ("yyyy", self.qmc.roastdate.toString("yyyy")),
+                ("yy", self.qmc.roastdate.toString("yy")),
+                ("mmm", encodeLocal(self.qmc.roastdate.toString("MMM"))),
+                ("mm", self.qmc.roastdate.toString("MM")),
+                ("ddd", encodeLocal(self.qmc.roastdate.toString("ddd"))),
+                ("dd", self.qmc.roastdate.toString("dd")),
+                ("hour", self.qmc.roastdate.toString("hh")),
+                ("minute", self.qmc.roastdate.toString("mm")),
                 ]
     
             _ignorecase = re.IGNORECASE  # @UndefinedVariable
