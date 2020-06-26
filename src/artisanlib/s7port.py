@@ -30,10 +30,7 @@ from PyQt5.QtWidgets import QApplication
 
 
 class s7port(object):
-    def __init__(self,sendmessage,adderror,addserial,aw):
-        self.sendmessage = sendmessage # function to create an Artisan message to the user in the message line
-        self.adderror = adderror # signal an error to the user
-        self.addserial = addserial # add to serial log
+    def __init__(self,aw):
         self.aw = aw
         
         self.readRetries = 1
@@ -233,7 +230,7 @@ class s7port(object):
                     pass
             
             if self.isConnected():
-                self.sendmessage(QApplication.translate("Message","S7 Connected", None))
+                self.aw.sendmessage(QApplication.translate("Message","S7 connected", None))
                 time.sleep(0.4)
             else:
                 time.sleep(0.6)
@@ -248,7 +245,7 @@ class s7port(object):
                     time.sleep(0.4)
                     
                     if self.isConnected():
-                        self.sendmessage(QApplication.translate("Message","S7 Connected", None) + " (2)")
+                        self.aw.sendmessage(QApplication.translate("Message","S7 Connected", None) + " (2)")
                         time.sleep(0.4)
             self.updateActiveRegisters()
 
@@ -327,20 +324,20 @@ class s7port(object):
                         if res is not None:
                             if self.commError: # we clear the previous error and send a message
                                 self.commError = False
-                                self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
+                                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                             self.cacheReadings(area,db_nr,register,res)
 
                         #note: logged chars should be unicode not binary
                         if self.aw.seriallogflag:
-                            self.addserial("S7 read_area({},{},{},{})".format(area,db_nr,register,count))
+                            self.aw.addserial("S7 read_area({},{},{},{})".format(area,db_nr,register,count))
 
         except Exception: # as ex:
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
-#            self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
             self.commError = True
         finally:
             if self.COMsemaphore.available() < 1:
@@ -361,15 +358,15 @@ class s7port(object):
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
 
             else:
-                self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
+                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
         except Exception as e:
-            if aw.qmc.flagon:
-                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeFloat: " + str(e))
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeFloat: " + str(e))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
-                self.addserial("S7 writeFloat({},{},{},{})".format(area,dbnumber,start,value))
+                self.aw.addserial("S7 writeFloat({},{},{},{})".format(area,dbnumber,start,value))
 
     def writeInt(self,area,dbnumber,start,value): 
         try:
@@ -383,15 +380,15 @@ class s7port(object):
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
 
             else:
-                self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
+                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
         except Exception as e:
-            if aw.qmc.flagon:
-                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeInt: " + str(e))
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeInt: " + str(e))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
-                self.addserial("S7 writeInt({},{},{},{})".format(area,dbnumber,start,value))
+                self.aw.addserial("S7 writeInt({},{},{},{})".format(area,dbnumber,start,value))
 
     def writeBool(self,area,dbnumber,start,index,value): 
         try:
@@ -405,15 +402,15 @@ class s7port(object):
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
 
             else:
-                self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
+                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
         except Exception as e:
-            if aw.qmc.flagon:
-                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeBool: " + str(e))
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeBool: " + str(e))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
-                self.addserial("S7 writeBool({},{},{},{},{})".format(area,dbnumber,start,index,value))
+                self.aw.addserial("S7 writeBool({},{},{},{},{})".format(area,dbnumber,start,index,value))
                     
     def readFloat(self,area,dbnumber,start):
         try:
@@ -453,22 +450,22 @@ class s7port(object):
                     else:
                         if self.commError: # we clear the previous error and send a message
                             self.commError = False
-                            self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
+                            self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                         return self.get_real(res,0)
                 else:
                     self.commError = True  
-                    self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))                                 
+                    self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))                                 
                     return -1
         except Exception as e:
-            if aw.qmc.flagon:
-                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readFloat: " + str(e))
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readFloat: " + str(e))
             self.commError = True
             return -1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
-                self.addserial("S7 readFloat({},{},{})".format(area,dbnumber,start))
+                self.aw.addserial("S7 readFloat({},{},{})".format(area,dbnumber,start))
                 
     def readInt(self,area,dbnumber,start):
         try:
@@ -505,22 +502,22 @@ class s7port(object):
                     else:
                         if self.commError: # we clear the previous error and send a message
                             self.commError = False
-                            self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
+                            self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                         return self.get_int(res,0)
                 else:
                     self.commError = True  
-                    self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
+                    self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
                     return -1
         except Exception as e:
-            if aw.qmc.flagon:
-                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt: " + str(e))
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt: " + str(e))
             self.commError = True
             return -1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
-                self.addserial("S7 readInt({},{},{})".format(area,dbnumber,start))
+                self.aw.addserial("S7 readInt({},{},{})".format(area,dbnumber,start))
 
     def readBool(self,area,dbnumber,start,index):
         try:
@@ -555,19 +552,19 @@ class s7port(object):
                     else:
                         if self.commError: # we clear the previous error and send a message
                             self.commError = False
-                            self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
+                            self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                         return self.get_bool(res,0,index)
                 else:
                     self.commError = True
-                    self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
+                    self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
                     return -1
         except Exception as e:
-            if aw.qmc.flagon:
-                self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readBool: " + str(e))
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readBool: " + str(e))
             self.commError = True
             return -1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
-                self.addserial("S7 readBool({},{},{},{})".format(area,dbnumber,start,index))
+                self.aw.addserial("S7 readBool({},{},{},{})".format(area,dbnumber,start,index))

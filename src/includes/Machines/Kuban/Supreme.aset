@@ -105,3 +105,6 @@ slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0
 slideroffsets=0, 0, 0, 0
 slidervisibilities=1, 1, 1, 1
+
+[events]
+etypes=Fan, Drum, Mixer, Burner, --

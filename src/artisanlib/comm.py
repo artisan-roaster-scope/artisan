@@ -443,6 +443,9 @@ class serialport(object):
                                    self.YOCTO_generic,        #108
                                    self.MODBUS_78,            #109
                                    self.S7_910,               #110
+                                   self.probat_sample,        #111
+                                   self.probat_sample_drum_air, #112
+                                   self.probat_sample_heater,   #113
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -1224,10 +1227,10 @@ class serialport(object):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
         t1 = -1
         t2 = -1
-        self.ProbatMiddleware_burner = -1
-        self.ProbatMiddleware_drum = -1
-        self.ProbatMiddleware_fan = -1
-        self.ProbatMiddleware_pressure = -1
+        self.aw.qmc.ProbatMiddleware_pressure = -1
+        self.aw.qmc.ProbatMiddleware_burner = -1
+        self.aw.qmc.ProbatMiddleware_drum = -1
+        self.aw.qmc.ProbatMiddleware_fan = -1
         if self.aw.qmc.probatManager is None:
             from artisanlib.probat import ProbatMiddleware
             self.aw.qmc.probatManager = ProbatMiddleware()
@@ -1274,7 +1277,39 @@ class serialport(object):
         t1 = self.aw.qmc.ProbatMiddleware_fan
         t2 = self.aw.qmc.ProbatMiddleware_pressure
         return tx,t2,t1
+    
+    def probat_sample(self):
+        try:
+            tx = self.aw.qmc.timeclock.elapsed()/1000.
+            # handle here the keepAlive
+            res = self.aw.ws.send({"command": "getCurrentRoastingStep" })
+            if res is not None and "data" in res:
+                if "beanTemp" in res["data"]:
+                    t1 = res["data"]["beanTemp"]
+                if "exhaustAirTemp" in res["data"]:
+                    t2 = res["data"]["exhaustAirTemp"]
+                if "drum" in res["data"]:
+                    self.aw.qmc.ProbatSample_drum = res["data"]["drum"]
+                if "airPressure" in res["data"]:
+                    self.aw.qmc.ProbatSample_air = res["data"]["airPressure"] * 1000
+                if "burner" in res["data"]:
+                    self.aw.qmc.ProbatSample_heater = res["data"]["burner"]
+        except:
+            t1 = -1
+            t2 = -1
+            self.aw.qmc.ProbatSample_drum = -1
+            self.aw.qmc.ProbatSample_air = -1
+            self.aw.qmc.ProbatSample_heater = -1
+        return tx,t2,t1
         
+    def probat_sample_drum_air(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        return tx,self.aw.qmc.ProbatSample_air,self.aw.qmc.ProbatSample_drum
+        
+    def probat_sample_heater(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        return tx,self.aw.qmc.ProbatSample_heater,self.aw.qmc.ProbatSample_heater
+    
     def YOCTO_thermo(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
         v2,v1 = self.YOCTOtemperatures(0)

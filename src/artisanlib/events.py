@@ -603,7 +603,8 @@ class EventsDlg(ArtisanResizeablDialog):
                        QApplication.translate("ComboBox", "Aillio R1 Fan",None),
                        QApplication.translate("ComboBox", "Aillio R1 Drum",None),
                        QApplication.translate("ComboBox", "Artisan Command",None),
-                       QApplication.translate("ComboBox", "RC Command",None)]
+                       QApplication.translate("ComboBox", "RC Command",None),
+                       QApplication.translate("ComboBox", "WebSocket Command",None)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -929,7 +930,8 @@ class EventsDlg(ArtisanResizeablDialog):
                        QApplication.translate("ComboBox", "Aillio R1 Command",None),
                        QApplication.translate("ComboBox", "Artisan Command",None),
                        QApplication.translate("ComboBox", "RC Command",None),
-                       QApplication.translate("ComboBox", "Multiple Event",None)]
+                       QApplication.translate("ComboBox", "Multiple Event",None),
+                       QApplication.translate("ComboBox", "WebSocket Command",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(self.aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -1030,8 +1032,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.SAMPLINGbuttonActionInterval = QComboBox()
         self.SAMPLINGbuttonActionInterval.setToolTip(QApplication.translate("Tooltip", "Interval", None))
         self.SAMPLINGbuttonActionInterval.setFocusPolicy(Qt.NoFocus)
-        buttonActionIntervals = ["sync", "1.0s", "1.5s", "2.0s", "2.5s", "3.0s", "3.5s", "4.0s", "4.5s", "5.0s"]
-        self.sampling_delays = [0,1000,1500,2000,2500,3000,3500,4000,4500,5000]
+        buttonActionIntervals = ["sync", "1.0s", "1.5s", "2.0s", "2.5s", "3.0s", "3.5s", "4.0s", "4.5s", "5.0s", "10s", "20s", "30s", "45s", "1min"]
+        self.sampling_delays = [0,1000,1500,2000,2500,3000,3500,4000,4500,5000,10000,20000,30000,45000,60000]
         self.SAMPLINGbuttonActionInterval.addItems(buttonActionIntervals)
         self.SAMPLINGbuttonActionInterval.setMaximumWidth(70)
         try:
@@ -2095,7 +2097,8 @@ class EventsDlg(ArtisanResizeablDialog):
                                      QApplication.translate("ComboBox","Aillio R1 Drum",None),
                                      QApplication.translate("ComboBox","Aillio R1 Command",None),
                                      QApplication.translate("ComboBox","Artisan Command",None),
-                                     QApplication.translate("ComboBox","RC Command",None)])
+                                     QApplication.translate("ComboBox","RC Command",None),
+                                     QApplication.translate("ComboBox","WebSocket Command",None)])
             act = self.extraeventsactions[i]
             if act > 7:
                 act = act - 1

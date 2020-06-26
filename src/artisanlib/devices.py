@@ -2372,6 +2372,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 110 is +S7_010 but +DEVICE cannot be set as main device
                 ##########################
+                elif meter == "Probat Sample":
+                    self.aw.qmc.device = 111
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ####  DEVICE 112 is +Probat Sample Drum Speed / Air Pressure but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 113 is +Probat Sample Heater but +DEVICE cannot be set as main device
+                ##########################
 
                 # ADD DEVICE:
 
@@ -2498,6 +2507,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 108
                 7, # 109
                 1, # 110
+                1, # 111
+                1, # 112
+                1, # 113
                 ] 
             #init serial settings of extra devices
             for i in range(len(self.aw.qmc.extradevices)):

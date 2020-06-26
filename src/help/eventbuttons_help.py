@@ -125,6 +125,8 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','move(c,p[,t][,sn])',None),QApplication.translate('HelpDlg','for YOCTOPUCE RC modules: with c:int the channel, p:int the target position, the optional t the duration in ms, sn the optional modules serial number or logical name',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','neutral(c,n[,sn])',None),QApplication.translate('HelpDlg','for YOCTOPUCE RC modules: with n an int [0..65000] in us',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','range(c,r[,sn])',None),QApplication.translate('HelpDlg','for YOCTOPUCE RC modules: with r an int in %',None)])
+    tbl_Commands.add_row([QApplication.translate('HelpDlg','WebSocket Command',None),QApplication.translate('HelpDlg','send(<json>)',None),QApplication.translate('HelpDlg','If {} substitutions are used, json brackets need to be duplicated to escape them like in send({{ “value”: {}}})',None)])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','sleep(<float>)',None),QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds',None)])
     strlist.append(tbl_Commands.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
     strlist.append("</body>")
     helpstr = "".join(strlist)

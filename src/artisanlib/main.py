@@ -568,6 +568,7 @@ def toASCII(s):
 
 from const import UIconst
 from artisanlib.s7port import s7port
+from artisanlib.wsport import wsport
 from artisanlib.modbusport import modbusport
 from artisanlib.phidgets import PhidgetManager
 from artisanlib.sliderStyle import *
@@ -939,6 +940,7 @@ class tgraphcanvas(FigureCanvas):
         # device labels (used in Dialog config).
 
         # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:" in the code
+        # (check also the tags in comm.py and devices.py!!)
         # - add to self.devices
         self.devices = [#Fuji PID               #0
                        "Omega HH806AU",         #1
@@ -1051,6 +1053,9 @@ class tgraphcanvas(FigureCanvas):
                        "Yocto 4-20mA Rx",           #108
                        "+MODBUS 78",                #109
                        "+S7 910",                   #110
+                       "Probat Sample",             #111
+                       "+Probat Sample Drum/Air",   #112
+                       "+Probat Sample Heater",     #113
                        ]
 
         # ADD DEVICE:
@@ -1084,7 +1089,8 @@ class tgraphcanvas(FigureCanvas):
             100, # Yocto IR
             106, # Phidget HUB IO 0
             107, # Phidget HUB IO Digital 0
-            108  # Yocto 4-20mA Rx
+            108, # Yocto 4-20mA Rx
+            111  # Probat Sample
         ]
 
         # ADD DEVICE:
@@ -1147,7 +1153,9 @@ class tgraphcanvas(FigureCanvas):
             98, # Phidget DAQ1400 Voltage
             106, # Phidget HUB IO 0
             107, # Phidget HUB IO Digital 0
-            108  # Yocto 4-20mA Rx
+            108, # Yocto 4-20mA Rx
+            112, # Probat Sample Drum/Air
+            113  # Probat Sample Heater
         ]
 
         #extra devices
@@ -2043,8 +2051,6 @@ class tgraphcanvas(FigureCanvas):
         self.R1_FAN_RPM = 0
         self.R1_STATE_STR = ""
 
-
-
         #used by extra device +ArduinoTC4_XX to pass values
         self.extraArduinoT1 = 0.
         self.extraArduinoT2 = 0.
@@ -2060,6 +2066,11 @@ class tgraphcanvas(FigureCanvas):
         self.ProbatMiddleware_drum = -1
         self.ProbatMiddleware_fan = -1
         self.ProbatMiddleware_pressure = -1
+        
+        # used by the Probat Sample extra devices
+        self.ProbatSample_drum = -1
+        self.ProbatSample_air = -1
+        self.ProbatSample_heater = -1
 
 
         #used by extra device +Program_34, +Program_56, +Program_78 and +Program_910 to pass values
@@ -5307,6 +5318,8 @@ class tgraphcanvas(FigureCanvas):
                 y = fp[2]
                 self.l_event_flags_pos_dict[i] = (x,y)
 
+    # e is the x-axis offset, yup/ydown are the y-axis offsets
+    # a is the alpha value
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.,draggable=True,draggable_anno_key=None):
         fontprop_small = aw.mpl_fontproperties.copy()
         fontsize = "x-small"
@@ -5379,13 +5392,15 @@ class tgraphcanvas(FigureCanvas):
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
                     if startB is not None:
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
-                        e = 60
+#                        e = 60
+                        e = 0
                         a = aw.qmc.backgroundalpha
                     else:
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
                         if aw.qmc.graphfont == 1:
                             st1 = toASCII(st1)
-                        e = 15
+#                        e = 15
+                        e = 0
                         a = 1.
                     time_temp_annos = self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable,0)
                     anno_artists += time_temp_annos
@@ -5395,7 +5410,8 @@ class tgraphcanvas(FigureCanvas):
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),stringfromseconds(timex[TP_index]-t0,False))
                     a = 1.
-                    e = -50
+#                    e = -50
+                    e = 0
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a,draggable,-1)
                 elif TP_time > -1:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
@@ -5403,7 +5419,8 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-                    e = -70
+#                    e = -70
+                    e = 0
                     TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
 
                     TP_time = TP_time - t0
@@ -5418,10 +5435,11 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-                    if timeindex2 and timeindex2[1] and timex[timeindex[1]] < time2[timeindex2[1]]:
-                        e = -80
-                    else:
-                        e = 0
+#                    if timeindex2 and timeindex2[1] and timex[timeindex[1]] < time2[timeindex2[1]]:
+#                        e = -80
+#                    else:
+#                        e = 0
+                    e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,1)
 
                 #Add 1Cs markers
@@ -5436,10 +5454,11 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-                    if timeindex2 and timeindex2[2] and timex[timeindex[2]] > time2[timeindex2[2]]:
-                        e = 0
-                    else:
-                        e = -80
+#                    if timeindex2 and timeindex2[2] and timex[timeindex[2]] > time2[timeindex2[2]]:
+#                        e = 0
+#                    else:
+#                        e = -80
+                    e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,2)
                 #Add 1Ce markers
                 if timeindex[3]:
@@ -5450,10 +5469,11 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-                    if timeindex2 and timeindex2[3] and timex[timeindex[3]] < time2[timeindex2[3]]:
-                        e = 0
-                    else:
-                        e = -80
+#                    if timeindex2 and timeindex2[3] and timex[timeindex[3]] < time2[timeindex2[3]]:
+#                        e = 0
+#                    else:
+#                        e = -80
+                    e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,3)
                     #add a water mark if FCs
                     if timeindex[2] and not timeindex2 and self.watermarksflag:
@@ -5470,10 +5490,11 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-                    if timeindex2 and timeindex2[4] and timex[timeindex[4]] < time2[timeindex2[4]]:
-                        e = -80
-                    else:
-                        e = 0
+#                    if timeindex2 and timeindex2[4] and timex[timeindex[4]] < time2[timeindex2[4]]:
+#                        e = -80
+#                    else:
+#                        e = 0
+                    e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,4)
                 #Add 2Ce markers
                 if timeindex[5]:
@@ -5484,10 +5505,11 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-                    if timeindex2 and timeindex2[5] and timex[timeindex[5]] < time2[timeindex2[5]]:
-                        e = -80
-                    else:
-                        e = 0
+#                    if timeindex2 and timeindex2[5] and timex[timeindex[5]] < time2[timeindex2[5]]:
+#                        e = -80
+#                    else:
+#                        e = 0
+                    e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,5)
                     #do water mark if SCs
                     if timeindex[4] and not timeindex2 and self.watermarksflag:
@@ -5516,10 +5538,11 @@ class tgraphcanvas(FigureCanvas):
                         a = aw.qmc.backgroundalpha
                     else:
                         a = 1.
-                    if timeindex2 and timeindex2[6] and timex[timeindex[6]] < time2[timeindex2[6]]:
-                        e = -80
-                    else:
-                        e = 0
+#                    if timeindex2 and timeindex2[6] and timex[timeindex[6]] < time2[timeindex2[6]]:
+#                        e = -80
+#                    else:
+#                        e = 0
+                    e = 0
 
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,6)
 
@@ -9000,6 +9023,8 @@ class tgraphcanvas(FigureCanvas):
         aw.modbus.disconnect()
         # close port of S7 device
         aw.s7.disconnect()
+        # close WebSocket connection
+        aw.ws.disconnect()
         # close ports of extra devices
         for i in range(len(aw.extraser)):
             self.disconnectProbesFromSerialDevice(aw.extraser[i])
@@ -9315,15 +9340,15 @@ class tgraphcanvas(FigureCanvas):
 
     @pyqtSlot(bool)
     def markDryEnd(self,_=False):
-        try:
-            self.samplingsemaphore.acquire(1)
-            if self.flagstart:
-                removed = False
-                if len(self.timex) > 0:
+        if len(self.timex) > 1:
+            try:
+                self.samplingsemaphore.acquire(1)
+                if self.flagstart:
+                    removed = False
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.fileDirty()
-
+    
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -9370,62 +9395,62 @@ class tgraphcanvas(FigureCanvas):
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[1]
-
-            else:
-                message = QApplication.translate("Message","Scope is OFF", None)
-                aw.sendmessage(message)
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDryEnd() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart and len(self.timex) > 0:
-            # redraw (within timealign) should not be called if semaphore is hold!
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.qmc.alignEvent in [1,7]:
-                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.button_19.isFlat():
-                if removed:
-                    self.updateBackground()
-                    aw.button_19.setFlat(False)
-                    if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
-                        aw.button_8.setFlat(False)
-                    self.updategraphicsSignal.emit()
-            else:
-                aw.button_19.setFlat(True) # deactivate DRY button
-                aw.button_8.setFlat(True) # also deactivate CHARGE button
-                try:
-                    aw.eventactionx(aw.qmc.buttonactions[1],aw.qmc.buttonactionstrings[1])
-                    if self.timeindex[0] > -1:
-                        start = self.timex[self.timeindex[0]]
-                    else:
-                        start = 0
-                    st = stringfromseconds(self.timex[self.timeindex[1]]-start)
-                    st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
-                    message = QApplication.translate("Message","[DRY END] recorded at {0} BT = {1}", None).format(st,st2)
-                    #set message at bottom
+    
+                else:
+                    message = QApplication.translate("Message","Scope is OFF", None)
                     aw.sendmessage(message)
-                except Exception:
-                    pass
-                aw.onMarkMoveToNext(aw.button_19)
-                if self.autoDryIdx == 0:
-                    # only if markDryEnd() is not anyhow triggered within updategraphics()
-                    self.updategraphicsSignal.emit()
+            except Exception as ex:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDryEnd() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+            if self.flagstart:
+                # redraw (within timealign) should not be called if semaphore is hold!
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.qmc.alignEvent in [1,7]:
+                    aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.button_19.isFlat():
+                    if removed:
+                        self.updateBackground()
+                        aw.button_19.setFlat(False)
+                        if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
+                            aw.button_8.setFlat(False)
+                        self.updategraphicsSignal.emit()
+                else:
+                    aw.button_19.setFlat(True) # deactivate DRY button
+                    aw.button_8.setFlat(True) # also deactivate CHARGE button
+                    try:
+                        aw.eventactionx(aw.qmc.buttonactions[1],aw.qmc.buttonactionstrings[1])
+                        if self.timeindex[0] > -1:
+                            start = self.timex[self.timeindex[0]]
+                        else:
+                            start = 0
+                        st = stringfromseconds(self.timex[self.timeindex[1]]-start)
+                        st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
+                        message = QApplication.translate("Message","[DRY END] recorded at {0} BT = {1}", None).format(st,st2)
+                        #set message at bottom
+                        aw.sendmessage(message)
+                    except Exception:
+                        pass
+                    aw.onMarkMoveToNext(aw.button_19)
+                    if self.autoDryIdx == 0:
+                        # only if markDryEnd() is not anyhow triggered within updategraphics()
+                        self.updategraphicsSignal.emit()
 
     #record 1C start markers of BT. called from push button_3 of application window
     @pyqtSlot(bool)
     def mark1Cstart(self,_=False):
-        try:
-            aw.qmc.samplingsemaphore.acquire(1)
-            if self.flagstart:
-                removed = False
-                if len(self.timex) > 0:
+        if len(self.timex) > 1:
+            try:
+                aw.qmc.samplingsemaphore.acquire(1)
+                if self.flagstart:
+                    removed = False
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.fileDirty()
-
+    
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -9473,60 +9498,60 @@ class tgraphcanvas(FigureCanvas):
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[2]
-            else:
-                message = QApplication.translate("Message","Scope is OFF", None)
-                aw.sendmessage(message)
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cstart() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart and len(self.timex) > 0:
-            # redraw (within timealign) should not be called if semaphore is hold!
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.qmc.alignEvent in [2,7]:
-                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            # NOTE: the following aw.eventaction might do serial communication that acquires a lock, so release it here
-            if aw.button_3.isFlat():
-                if removed:
-                    self.updateBackground()
-                    aw.button_3.setFlat(False)
-                    if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
-                        aw.button_19.setFlat(False)
-                        if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
-                            aw.button_8.setFlat(False)
-                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
-            else:
-                aw.button_3.setFlat(True)
-                aw.button_8.setFlat(True)
-                aw.button_19.setFlat(True)
-                aw.eventactionx(aw.qmc.buttonactions[2],aw.qmc.buttonactionstrings[2])
-                if self.timeindex[0] > -1:
-                    start = self.timex[self.timeindex[0]]
                 else:
-                    start = 0
-                st1 = stringfromseconds(self.timex[self.timeindex[2]]-start)
-                st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
-                message = QApplication.translate("Message","[FC START] recorded at {0} BT = {1}", None).format(st1,st2)
-                aw.sendmessage(message)
-                aw.onMarkMoveToNext(aw.button_3)
-                if self.autoFCsIdx == 0:
-                    # only if mark1Cstart() is not triggered from within updategraphics() and the canvas is anyhow updated
-                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                    message = QApplication.translate("Message","Scope is OFF", None)
+                    aw.sendmessage(message)
+            except Exception as ex:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cstart() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+            if self.flagstart:
+                # redraw (within timealign) should not be called if semaphore is hold!
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.qmc.alignEvent in [2,7]:
+                    aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+                # NOTE: the following aw.eventaction might do serial communication that acquires a lock, so release it here
+                if aw.button_3.isFlat():
+                    if removed:
+                        self.updateBackground()
+                        aw.button_3.setFlat(False)
+                        if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
+                            aw.button_19.setFlat(False)
+                            if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
+                                aw.button_8.setFlat(False)
+                        self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                else:
+                    aw.button_3.setFlat(True)
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setFlat(True)
+                    aw.eventactionx(aw.qmc.buttonactions[2],aw.qmc.buttonactionstrings[2])
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
+                    st1 = stringfromseconds(self.timex[self.timeindex[2]]-start)
+                    st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
+                    message = QApplication.translate("Message","[FC START] recorded at {0} BT = {1}", None).format(st1,st2)
+                    aw.sendmessage(message)
+                    aw.onMarkMoveToNext(aw.button_3)
+                    if self.autoFCsIdx == 0:
+                        # only if mark1Cstart() is not triggered from within updategraphics() and the canvas is anyhow updated
+                        self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     #record 1C end markers of BT. called from button_4 of application window
     @pyqtSlot(bool)
     def mark1Cend(self,_=False):
-        try:
-            aw.qmc.samplingsemaphore.acquire(1)
-            if self.flagstart:
-                removed = False
-                if len(self.timex) > 0:
+        if len(self.timex) > 1:
+            try:
+                aw.qmc.samplingsemaphore.acquire(1)
+                if self.flagstart:
+                    removed = False
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.fileDirty()
-
+    
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -9565,62 +9590,62 @@ class tgraphcanvas(FigureCanvas):
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down,draggable_anno_key=3)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
-            else:
-                message = QApplication.translate("Message","Scope is OFF", None)
-                aw.sendmessage(message)
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cend() {0}").format(str(e)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart and len(self.timex) > 0:
-            # redraw (within timealign) should not be called if semaphore is hold!
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.qmc.alignEvent in [3,7]:
-                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.button_4.isFlat():
-                if removed:
-                    self.updateBackground()
-                    aw.button_4.setFlat(False)
-                    if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
-                        aw.button_3.setFlat(False)
-                        if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
-                            aw.button_19.setFlat(False)
-                            if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
-                                aw.button_8.setFlat(False)
-                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
-            else:
-                aw.button_4.setFlat(True)
-                aw.button_8.setFlat(True)
-                aw.button_19.setFlat(True)
-                aw.button_3.setFlat(True)
-                aw.eventactionx(aw.qmc.buttonactions[3],aw.qmc.buttonactionstrings[3])
-                if self.timeindex[0] > -1:
-                    start = self.timex[self.timeindex[0]]
                 else:
-                    start = 0
-                st1 = stringfromseconds(self.timex[self.timeindex[3]]-start)
-                st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
-                message = QApplication.translate("Message","[FC END] recorded at {0} BT = {1}", None).format(st1,st2)
-                aw.sendmessage(message)
-                aw.onMarkMoveToNext(aw.button_4)
-                self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                    message = QApplication.translate("Message","Scope is OFF", None)
+                    aw.sendmessage(message)
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cend() {0}").format(str(e)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+            if self.flagstart:
+                # redraw (within timealign) should not be called if semaphore is hold!
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.qmc.alignEvent in [3,7]:
+                    aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.button_4.isFlat():
+                    if removed:
+                        self.updateBackground()
+                        aw.button_4.setFlat(False)
+                        if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
+                            aw.button_3.setFlat(False)
+                            if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
+                                aw.button_19.setFlat(False)
+                                if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
+                                    aw.button_8.setFlat(False)
+                        self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                else:
+                    aw.button_4.setFlat(True)
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setFlat(True)
+                    aw.button_3.setFlat(True)
+                    aw.eventactionx(aw.qmc.buttonactions[3],aw.qmc.buttonactionstrings[3])
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
+                    st1 = stringfromseconds(self.timex[self.timeindex[3]]-start)
+                    st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
+                    message = QApplication.translate("Message","[FC END] recorded at {0} BT = {1}", None).format(st1,st2)
+                    aw.sendmessage(message)
+                    aw.onMarkMoveToNext(aw.button_4)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
 
     #record 2C start markers of BT. Called from button_5 of application window
     @pyqtSlot(bool)
     def mark2Cstart(self,_=False):
-        try:
-            aw.qmc.samplingsemaphore.acquire(1)
-            if self.flagstart:
-                removed = False
-                if len(self.timex) > 0:
+        if len(self.timex) > 1:
+            try:
+                aw.qmc.samplingsemaphore.acquire(1)
+                if self.flagstart:
+                    removed = False
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.fileDirty()
-
+    
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -9661,70 +9686,70 @@ class tgraphcanvas(FigureCanvas):
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down,draggable_anno_key=4)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
-            else:
-                message = QApplication.translate("Message","Scope is OFF", None)
-                aw.sendmessage(message)
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cstart() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart and len(self.timex) > 0:
-            # redraw (within timealign) should not be called if semaphore is hold!
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.qmc.alignEvent in [4,7]:
-                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.button_5.isFlat():
-                if removed:
-                    self.updateBackground()
-                    aw.button_5.setFlat(False)
-                    if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
-                        aw.button_4.setFlat(False)
-                        if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
-                            aw.button_3.setFlat(False)
-                            if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
-                                aw.button_19.setFlat(False)
-                                if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
-                                    aw.button_8.setFlat(False)
-                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
-            else:
-                aw.button_5.setFlat(True)
-                aw.button_8.setFlat(True)
-                aw.button_19.setFlat(True)
-                aw.button_3.setFlat(True)
-                aw.button_4.setFlat(True)
-                try:
-                    aw.eventactionx(aw.qmc.buttonactions[4],aw.qmc.buttonactionstrings[4])
-                    if self.timeindex[0] > -1:
-                        start = self.timex[self.timeindex[0]]
-                    else:
-                        start = 0
+                else:
+                    message = QApplication.translate("Message","Scope is OFF", None)
+                    aw.sendmessage(message)
+            except Exception as ex:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cstart() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+            if self.flagstart:
+                # redraw (within timealign) should not be called if semaphore is hold!
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.qmc.alignEvent in [4,7]:
+                    aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.button_5.isFlat():
+                    if removed:
+                        self.updateBackground()
+                        aw.button_5.setFlat(False)
+                        if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
+                            aw.button_4.setFlat(False)
+                            if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
+                                aw.button_3.setFlat(False)
+                                if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
+                                    aw.button_19.setFlat(False)
+                                    if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
+                                        aw.button_8.setFlat(False)
+                        self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                else:
+                    aw.button_5.setFlat(True)
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setFlat(True)
+                    aw.button_3.setFlat(True)
+                    aw.button_4.setFlat(True)
                     try:
-                        st1 = stringfromseconds(self.timex[self.timeindex[4]]-start)
-                        st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
+                        aw.eventactionx(aw.qmc.buttonactions[4],aw.qmc.buttonactionstrings[4])
+                        if self.timeindex[0] > -1:
+                            start = self.timex[self.timeindex[0]]
+                        else:
+                            start = 0
+                        try:
+                            st1 = stringfromseconds(self.timex[self.timeindex[4]]-start)
+                            st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
+                        except:
+                            pass
+                        message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
+                        aw.sendmessage(message)
                     except:
                         pass
-                    message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
-                    aw.sendmessage(message)
-                except:
-                    pass
-                aw.onMarkMoveToNext(aw.button_5)
-                self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                    aw.onMarkMoveToNext(aw.button_5)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     #record 2C end markers of BT. Called from button_6  of application window
     @pyqtSlot(bool)
     def mark2Cend(self,_=False):
-        try:
-            aw.qmc.samplingsemaphore.acquire(1)
-            if self.flagstart:
-                removed = False
-                if len(self.timex) > 0:
+        if len(self.timex) > 1:
+            try:
+                aw.qmc.samplingsemaphore.acquire(1)
+                if self.flagstart:
+                    removed = False
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.fileDirty()
-
+    
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -9762,67 +9787,67 @@ class tgraphcanvas(FigureCanvas):
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down,draggable_anno_key=5)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
-            else:
-                message = QApplication.translate("Message","Scope is OFF", None)
-                aw.sendmessage(message)
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cend() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart and len(self.timex) > 0:
-            # redraw (within timealign) should not be called if semaphore is hold!
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.qmc.alignEvent in [5,7]:
-                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.button_6.isFlat():
-                if removed:
-                    self.updateBackground()
-                    aw.button_6.setFlat(False)
-                    if self.timeindex[4] == 0: # reactivate the SCs button if not yet set
-                        aw.button_5.setFlat(False)
-                        if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
-                            aw.button_4.setFlat(False)
-                            if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
-                                aw.button_3.setFlat(False)
-                                if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
-                                    aw.button_19.setFlat(False)
-                                    if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
-                                        aw.button_8.setFlat(False)
-                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
-            else:
-                aw.button_6.setFlat(True)
-                aw.button_8.setFlat(True)
-                aw.button_19.setFlat(True)
-                aw.button_3.setFlat(True)
-                aw.button_4.setFlat(True)
-                aw.button_5.setFlat(True)
-                aw.eventactionx(aw.qmc.buttonactions[5],aw.qmc.buttonactionstrings[5])
-                if self.timeindex[0] > -1:
-                    start = self.timex[self.timeindex[0]]
                 else:
-                    start = 0
-                st1 = stringfromseconds(self.timex[self.timeindex[5]]-start)
-                st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
-                message = QApplication.translate("Message","[SC END] recorded at {0} BT = {1}", None).format(st1,st2)
-                aw.sendmessage(message)
-                aw.onMarkMoveToNext(aw.button_6)
-                self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                    message = QApplication.translate("Message","Scope is OFF", None)
+                    aw.sendmessage(message)
+            except Exception as ex:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cend() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+            if self.flagstart and len(self.timex) > 0:
+                # redraw (within timealign) should not be called if semaphore is hold!
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.qmc.alignEvent in [5,7]:
+                    aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.button_6.isFlat():
+                    if removed:
+                        self.updateBackground()
+                        aw.button_6.setFlat(False)
+                        if self.timeindex[4] == 0: # reactivate the SCs button if not yet set
+                            aw.button_5.setFlat(False)
+                            if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
+                                aw.button_4.setFlat(False)
+                                if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
+                                    aw.button_3.setFlat(False)
+                                    if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
+                                        aw.button_19.setFlat(False)
+                                        if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
+                                            aw.button_8.setFlat(False)
+                        self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                else:
+                    aw.button_6.setFlat(True)
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setFlat(True)
+                    aw.button_3.setFlat(True)
+                    aw.button_4.setFlat(True)
+                    aw.button_5.setFlat(True)
+                    aw.eventactionx(aw.qmc.buttonactions[5],aw.qmc.buttonactionstrings[5])
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
+                    st1 = stringfromseconds(self.timex[self.timeindex[5]]-start)
+                    st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
+                    message = QApplication.translate("Message","[SC END] recorded at {0} BT = {1}", None).format(st1,st2)
+                    aw.sendmessage(message)
+                    aw.onMarkMoveToNext(aw.button_6)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     #record end of roast (drop of beans). Called from push button 'Drop'
     @pyqtSlot(bool)
     def markDrop(self,_=False):
-        try:
-            aw.qmc.samplingsemaphore.acquire(1)
-            if self.flagstart:
-                removed = False
-                if len(self.timex) > 0:
+        if len(self.timex) > 1:
+            try:
+                aw.qmc.samplingsemaphore.acquire(1)
+                if self.flagstart:
+                    removed = False
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.fileDirty()
-
+    
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -9882,14 +9907,13 @@ class tgraphcanvas(FigureCanvas):
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down,draggable_anno_key=6)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
-
+    
                         try:
                             # update ambient temperature if a ambient temperature source is configured and no value yet established
                             aw.qmc.updateAmbientTempFromPhidgetModulesOrCurve()
                         except Exception:
                             pass
-
-#PLUS
+    #PLUS
                         # only on first setting the DROP event (not set yet and no previous DROP undone) and if not in simulator modus, we upload to PLUS
                         if firstDROP and aw.qmc.autoDROPenabled and aw.plus_account is not None and not bool(aw.simulator):
                             try:
@@ -9901,77 +9925,180 @@ class tgraphcanvas(FigureCanvas):
                                 plus.queue.addRoast()
                             except:
                                 pass
+                else:
+                    message = QApplication.translate("Message","Scope is OFF", None)
+                    aw.sendmessage(message)
+            except Exception as ex:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDrop() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+            if self.flagstart:
+                # redraw (within timealign) should not be called if semaphore is hold!
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.qmc.alignEvent in [6,7]:
+                    aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                try:
+                    if aw.button_9.isFlat():
+                        if removed:
+                            self.updateBackground()
+                            aw.button_9.setFlat(False)
+                            if self.timeindex[5] == 0: # reactivate the SCe button if not yet set
+                                aw.button_6.setFlat(False)
+                                if self.timeindex[4] == 0: # reactivate the SCs button if not yet set
+                                    aw.button_5.setFlat(False)
+                                    if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
+                                        aw.button_4.setFlat(False)
+                                        if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
+                                            aw.button_3.setFlat(False)
+                                            if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
+                                                aw.button_19.setFlat(False)
+                                                if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
+                                                    aw.button_8.setFlat(False)
+                            self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                    else:
+                        aw.button_9.setFlat(True)
+                        aw.button_8.setFlat(True)
+                        aw.button_19.setFlat(True)
+                        aw.button_3.setFlat(True)
+                        aw.button_4.setFlat(True)
+                        aw.button_5.setFlat(True)
+                        aw.button_6.setFlat(True)
+    
+                        try:
+                            aw.eventactionx(aw.qmc.buttonactions[6],aw.qmc.buttonactionstrings[6])
+                            if self.timeindex[0] > -1:
+                                start = self.timex[self.timeindex[0]]
+                            else:
+                                start = 0
+                            st1 = stringfromseconds(self.timex[self.timeindex[6]]-start)
+                            st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
+                            message = QApplication.translate("Message","Roast ended at {0} BT = {1}", None).format(st1,st2)
+                            aw.sendmessage(message)
+                        except:
+                            pass
+                        # at DROP we stop the follow background on FujiPIDs and set the SV to 0
+                        if aw.qmc.device == 0 and aw.fujipid.followBackground:
+                            if aw.fujipid.sv and aw.fujipid.sv > 0:
+                                try:
+                                    aw.fujipid.setsv(0,silent=True)
+                                    aw.fujipid.sv = 0
+                                except:
+                                    pass
+                        if aw.qmc.roastpropertiesAutoOpenDropFlag:
+                            aw.openPropertiesSignal.emit()
+                        aw.onMarkMoveToNext(aw.button_9)
+                        if not (self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]):
+                            # only if not anyhow markDrop() is triggered from within updategraphic() which guarantees an immedate redraw
+                            self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+                except Exception:
+                    pass
 
-            else:
-                message = QApplication.translate("Message","Scope is OFF", None)
-                aw.sendmessage(message)
-        except Exception as ex:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDrop() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart and len(self.timex) > 0:
-            # redraw (within timealign) should not be called if semaphore is hold!
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.qmc.alignEvent in [6,7]:
-                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+    @pyqtSlot(bool)
+    def markCoolEnd(self,_=False):
+        if len(self.timex) > 1:
             try:
-                if aw.button_9.isFlat():
+                aw.qmc.samplingsemaphore.acquire(1)
+                if self.flagstart:
+                    removed = False
+                    aw.soundpop()
+                    #prevents accidentally deleting a modified profile.
+                    self.fileDirty()
+    
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
+                    if aw.button_20.isFlat() and self.timeindex[7] > 0:
+                        # undo wrongly set COOL
+    
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE {0}", None).format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
+    
+                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                            try:
+                                self.l_annotations[-1].remove()
+                            except:
+                                pass
+                            try:
+                                self.l_annotations[-2].remove()
+                            except:
+                                pass
+                            self.l_annotations = self.l_annotations[:-2]
+                            if 7 in self.l_annotations_dict:
+                                del self.l_annotations_dict[7]
+                            self.timeindex[7] = 0
+                            removed = True
+    
+                    elif not aw.button_20.isFlat():
+                        if self.device != 18 or aw.simulator is not None:
+                            self.timeindex[7] = len(self.timex)-1
+                        else:
+                            tx,et,bt = aw.ser.NONE()
+                            if et != -1 and bt != -1:
+                                self.drawmanual(et,bt,tx)
+                                self.timeindex[7] = len(self.timex)-1
+                            else:
+                                return
+                        #calculate time elapsed since charge time
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE {0}", None).format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
+                        #anotate temperature
+                        d = aw.qmc.ylimit - aw.qmc.ylimit_min
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
+                        self.l_annotations += self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down,draggable_anno_key=7)
+                        #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                        self.updateBackground() # but we need
+                else:
+                    message = QApplication.translate("Message","Scope is OFF", None)
+                    aw.sendmessage(message)
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCoolEnd() {0}").format(str(e)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+            if self.flagstart:
+                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                if aw.button_20.isFlat():
                     if removed:
                         self.updateBackground()
-                        aw.button_9.setFlat(False)
-                        if self.timeindex[5] == 0: # reactivate the SCe button if not yet set
-                            aw.button_6.setFlat(False)
-                            if self.timeindex[4] == 0: # reactivate the SCs button if not yet set
-                                aw.button_5.setFlat(False)
-                                if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
-                                    aw.button_4.setFlat(False)
-                                    if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
-                                        aw.button_3.setFlat(False)
-                                        if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
-                                            aw.button_19.setFlat(False)
-                                            if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
-                                                aw.button_8.setFlat(False)
+                        aw.button_20.setFlat(False)
+                        if self.timeindex[6] == 0: # reactivate the DROP button if not yet set
+                            aw.button_9.setFlat(False)
+                            if self.timeindex[5] == 0: # reactivate the SCe button if not yet set
+                                aw.button_6.setFlat(False)
+                                if self.timeindex[4] == 0: # reactivate the SCs button if not yet set
+                                    aw.button_5.setFlat(False)
+                                    if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
+                                        aw.button_4.setFlat(False)
+                                        if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
+                                            aw.button_3.setFlat(False)
+                                            if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
+                                                aw.button_19.setFlat(False)
+                                                if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
+                                                    aw.button_8.setFlat(False)
                         self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
                 else:
-                    aw.button_9.setFlat(True)
+                    aw.button_20.setFlat(True)
                     aw.button_8.setFlat(True)
                     aw.button_19.setFlat(True)
                     aw.button_3.setFlat(True)
                     aw.button_4.setFlat(True)
                     aw.button_5.setFlat(True)
                     aw.button_6.setFlat(True)
-
-                    try:
-                        aw.eventactionx(aw.qmc.buttonactions[6],aw.qmc.buttonactionstrings[6])
-                        if self.timeindex[0] > -1:
-                            start = self.timex[self.timeindex[0]]
-                        else:
-                            start = 0
-                        st1 = stringfromseconds(self.timex[self.timeindex[6]]-start)
-                        st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
-                        message = QApplication.translate("Message","Roast ended at {0} BT = {1}", None).format(st1,st2)
-                        aw.sendmessage(message)
-                    except:
-                        pass
-                    # at DROP we stop the follow background on FujiPIDs and set the SV to 0
-                    if aw.qmc.device == 0 and aw.fujipid.followBackground:
-                        if aw.fujipid.sv and aw.fujipid.sv > 0:
-                            try:
-                                aw.fujipid.setsv(0,silent=True)
-                                aw.fujipid.sv = 0
-                            except:
-                                pass
-                    if aw.qmc.roastpropertiesAutoOpenDropFlag:
-                        aw.openPropertiesSignal.emit()
-                    aw.onMarkMoveToNext(aw.button_9)
-                    if not (self.autoDropIdx > 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]):
-                        # only if not anyhow markDrop() is triggered from within updategraphic() which guarantees an immedate redraw
-                        self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
-            except Exception:
-                pass
+                    aw.button_9.setFlat(True)
+                    aw.eventactionx(aw.qmc.buttonactions[7],aw.qmc.buttonactionstrings[7])
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
+                    st1 = stringfromseconds(self.timex[self.timeindex[7]]-start)
+                    st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
+                    message = QApplication.translate("Message","[COOL END] recorded at {0} BT = {1}", None).format(st1,st2)
+                    #set message at bottom
+                    aw.sendmessage(message)
+                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     def decBatchCounter(self):
         if aw.qmc.batchcounter > -1 and not bool(aw.simulator):
@@ -10034,110 +10161,6 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.roastbatchpos = 1
         # update lastroastepoch to time of roastdate
         aw.qmc.lastroastepoch = aw.qmc.roastepoch
-
-    @pyqtSlot(bool)
-    def markCoolEnd(self,_=False):
-        try:
-            aw.qmc.samplingsemaphore.acquire(1)
-            if self.flagstart:
-                removed = False
-                if len(self.timex) > 0:
-                    aw.soundpop()
-                    #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
-
-                    if self.timeindex[0] > -1:
-                        start = self.timex[self.timeindex[0]]
-                    else:
-                        start = 0
-                    if aw.button_20.isFlat() and self.timeindex[7] > 0:
-                        # undo wrongly set COOL
-
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE {0}", None).format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
-
-                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
-                            try:
-                                self.l_annotations[-1].remove()
-                            except:
-                                pass
-                            try:
-                                self.l_annotations[-2].remove()
-                            except:
-                                pass
-                            self.l_annotations = self.l_annotations[:-2]
-                            if 7 in self.l_annotations_dict:
-                                del self.l_annotations_dict[7]
-                            self.timeindex[7] = 0
-                            removed = True
-
-                    elif not aw.button_20.isFlat():
-                        if self.device != 18 or aw.simulator is not None:
-                            self.timeindex[7] = len(self.timex)-1
-                        else:
-                            tx,et,bt = aw.ser.NONE()
-                            if et != -1 and bt != -1:
-                                self.drawmanual(et,bt,tx)
-                                self.timeindex[7] = len(self.timex)-1
-                            else:
-                                return
-                        #calculate time elapsed since charge time
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE {0}", None).format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
-                        #anotate temperature
-                        d = aw.qmc.ylimit - aw.qmc.ylimit_min
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
-                        self.l_annotations += self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down,draggable_anno_key=7)
-                        #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                        self.updateBackground() # but we need
-            else:
-                message = QApplication.translate("Message","Scope is OFF", None)
-                aw.sendmessage(message)
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCoolEnd() {0}").format(str(e)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-        if self.flagstart and len(self.timex) > 0:
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.button_20.isFlat():
-                if removed:
-                    self.updateBackground()
-                    aw.button_20.setFlat(False)
-                    if self.timeindex[6] == 0: # reactivate the DROP button if not yet set
-                        aw.button_9.setFlat(False)
-                        if self.timeindex[5] == 0: # reactivate the SCe button if not yet set
-                            aw.button_6.setFlat(False)
-                            if self.timeindex[4] == 0: # reactivate the SCs button if not yet set
-                                aw.button_5.setFlat(False)
-                                if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
-                                    aw.button_4.setFlat(False)
-                                    if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
-                                        aw.button_3.setFlat(False)
-                                        if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
-                                            aw.button_19.setFlat(False)
-                                            if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
-                                                aw.button_8.setFlat(False)
-                    self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
-            else:
-                aw.button_20.setFlat(True)
-                aw.button_8.setFlat(True)
-                aw.button_19.setFlat(True)
-                aw.button_3.setFlat(True)
-                aw.button_4.setFlat(True)
-                aw.button_5.setFlat(True)
-                aw.button_6.setFlat(True)
-                aw.button_9.setFlat(True)
-                aw.eventactionx(aw.qmc.buttonactions[7],aw.qmc.buttonactionstrings[7])
-                if self.timeindex[0] > -1:
-                    start = self.timex[self.timeindex[0]]
-                else:
-                    start = 0
-                st1 = stringfromseconds(self.timex[self.timeindex[7]]-start)
-                st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
-                message = QApplication.translate("Message","[COOL END] recorded at {0} BT = {1}", None).format(st1,st2)
-                #set message at bottom
-                aw.sendmessage(message)
-                self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     # action of the EVENT button
     @pyqtSlot(bool)
@@ -13954,13 +13977,15 @@ class ApplicationWindow(QMainWindow):
         #create a serial port object (main ET BT device)
         self.ser = serialport(self)
         #create a modbus port object (main modbus device)
-        self.modbus = modbusport(self.sendmessage,self.qmc.adderror,self.addserial,self)
+        self.modbus = modbusport(self)
         #temporary storage to pass values. Holds the MODBUS channels T1 and T2 as well as the extra channels T3, T4, T5 and T6 values for MODBUS connected devices
         self.extraMODBUStemps = [-1]*self.modbus.channels
         self.extraMODBUStx = 0.
 
         #create an s7 port object (main s7 device)
-        self.s7 = s7port(self.sendmessage,self.qmc.adderror,self.addserial,self)
+        self.s7 = s7port(self)
+        #create an WebSocket port object (main device eg Probat Sample)
+        self.ws = wsport(self)
         #create scale port object
         self.scale = scaleport(self)
         #create color port object
@@ -17293,7 +17318,7 @@ class ApplicationWindow(QMainWindow):
                 return
             elif reply == QMessageBox.Yes:
                 aw.qmc.etypes = aw.qmc.etypesdefault
-                aw.loadSettings(fn=action.data()[0],remember=False)
+                aw.loadSettings(fn=action.data()[0],remember=False,machine=True)
                 aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(label))
                 if action.data()[1] == "Phidget":
                     if action.text() == "VINT Ambient Modules":
@@ -17326,6 +17351,14 @@ class ApplicationWindow(QMainWindow):
                             QApplication.translate("Message", "Network name or IP address",None),text=aw.s7.host) #"127.0.0.1"
                         if res:
                             aw.s7.host = host
+                        else:
+                            aw.sendmessage(QApplication.translate("Message","Action canceled",None))
+                    elif aw.qmc.device == 111: # WebSocket
+                        host,res = QInputDialog.getText(self,
+                            QApplication.translate("Message", "Machine",None),
+                            QApplication.translate("Message", "Network name or IP address",None),text=aw.ws.host) #"127.0.0.1"
+                        if res:
+                            aw.ws.host = host
                         else:
                             aw.sendmessage(QApplication.translate("Message","Action canceled",None))
                     elif aw.qmc.device in [0,9,19,53,101] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
@@ -19551,14 +19584,14 @@ class ApplicationWindow(QMainWindow):
     def eventactionx(self,a,cmd):
         try:
             # we added "Multiple Events" at position 20 which has to be mapped to action 3
-            self.eventaction((a if (a < 3) else (3 if (a == 20) else ((a + 2) if (a > 5) else (a + 1)))), cmd)
+            self.eventaction((a if (a < 3) else (3 if (a == 20) else ((a + 2) if (a > 5) and (a < 21) else (a + 1)))), cmd)
         except Exception:
             pass
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets/Yocto IO);
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Command; 11= p-i-d; 12= Fuji Command;
     #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command;
-    #         20= Artisan Command; 21= RC Command
+    #         20= Artisan Command; 21= RC Command; 22= WebSocket Command
     def eventaction(self,action,cmd,parallel=True):
         if action:
             if not parallel: # subactions of multiple event actions, may crash if run in parallel, especially if they update the UI like button shape!
@@ -20322,7 +20355,7 @@ class ApplicationWindow(QMainWindow):
                                         else:
                                             aw.setExtraEventButtonStyle(last, style="normal")
                                 except:
-                                    pass                                  
+                                    pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
                                 try:
                                     cmds = eval(cs[len('sleep'):])
@@ -20638,6 +20671,27 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         aw.ser.yoctoSERVOrange(c,r)
                                 except:
+                                    pass
+                elif action == 22: # WebSocket Command
+                    # send(<json>)
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:
+                            cs = c.strip()
+                            # send(<json>) : send <json> request to connected WebSocket
+                            if cs.startswith('send') and cs.endswith(")"):
+                                try:
+                                    request = eval(cs[len('send('):-1])
+                                    self.ws.send(request)
+                                except:
+                                    pass
+                            elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
+                                except Exception:
                                     pass
             except Exception:
                 pass
@@ -25486,12 +25540,18 @@ class ApplicationWindow(QMainWindow):
         self.fileImport(QApplication.translate("Message", "Import RoastLogger",None),self.importRoastLogger,True)
 
     #loads the settings at the start of application. See the oppposite closeEventSettings()
-    def settingsLoad(self, filename=None, theme=False):
+    def settingsLoad(self, filename=None, theme=False, machine=False):
         res = False
         try:
             updateBatchCounter = True
             if filename is not None:
                 settings = QSettings(filename,QSettings.IniFormat)
+                
+                # a proper artisan-settings.aset file needs at least to contain a Mode tag
+                if not (theme or machine) and not settings.contains("Mode"):
+                    aw.qmc.adderror(QApplication.translate("Error Message","Exception: {} not a valid settings file",None).format(str(filename)))
+                    return False
+            
                 if aw.qmc.neverUpdateBatchCounter or app.artisanviewerMode:
                     updateBatchCounter = False
                 else:
@@ -25918,6 +25978,13 @@ class ApplicationWindow(QMainWindow):
             self.ser.parity = s2a(toString(settings.value("parity",self.ser.parity)))
             if settings.contains("timeout"):
                 self.ser.timeout = aw.float2float(toFloat(settings.value("timeout",self.ser.timeout)))
+            settings.endGroup()
+            #restorer WebSocket port
+            settings.beginGroup("WebSocket")
+            self.ws.host = toString(settings.value("host",self.ws.host))
+            self.ws.port = toInt(settings.value("port",self.ws.port))
+            self.ws.path = toString(settings.value("path",self.ws.path))
+            self.ws.machineID = toInt(settings.value("machineID",self.ws.machineID))
             settings.endGroup()
             #restore s7 port
             settings.beginGroup("S7")
@@ -27397,6 +27464,13 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("stopbits",self.ser.stopbits)
             settings.setValue("parity",self.ser.parity)
             settings.setValue("timeout",self.ser.timeout)
+            settings.endGroup()
+            #save WebSocket port
+            settings.beginGroup("WebSocket")
+            settings.setValue("host",self.ws.host)
+            settings.setValue("port",self.ws.port)
+            settings.setValue("path",self.ws.path)
+            settings.setValue("machineID",self.ws.machineID)
             settings.endGroup()
             #save s7 port
             settings.beginGroup("S7")
@@ -30650,6 +30724,11 @@ class ApplicationWindow(QMainWindow):
             except Exception:
                 pass
 
+            # WebSocket Setup
+            self.ws.host = str(dialog.ws_hostEdit.text())
+            self.ws.port = int(str(dialog.ws_portEdit.text()))
+            self.ws.path = str(dialog.ws_pathEdit.text())
+            self.ws.machineID = int(str(dialog.ws_machineIDEdit.text()))
             # S7 Setup
             self.s7.host = str(dialog.s7_hostEdit.text())
             self.s7.port = int(str(dialog.s7_portEdit.text()))
@@ -30825,7 +30904,7 @@ class ApplicationWindow(QMainWindow):
     def loadSettings_triggered(self,_=False):
         self.loadSettings()
 
-    def loadSettings(self,fn=None,remember=True,reset=True):
+    def loadSettings(self,fn=None,remember=True,reset=True,machine=False):
         try:
             if fn:
                 filename = fn
@@ -30834,8 +30913,8 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 try:
                     aw.stopActivities()
-                    res = aw.settingsLoad(filename)
-                    if reset:
+                    res = aw.settingsLoad(filename,machine=machine)
+                    if res and reset:
                         flag_temp = aw.qmc.roastpropertiesflag
                         aw.qmc.roastpropertiesflag = 1 # ensure that all roast properties are reset!
                         aw.qmc.reset(soundOn=False,fireResetAction=False)
