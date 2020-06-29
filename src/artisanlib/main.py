@@ -14063,6 +14063,7 @@ class ApplicationWindow(QMainWindow):
         self.eventsMaxValue = 999
         self.eventslidermax = [100,100,100,100]
         self.eventslidersflags = [0,1,1] # slider visibility per state OFF, ON, START
+        self.eventsliderBernoulli = [0,0,0,0] # if 1, sliders step in multiples of 10, otherwise 1
         self.eventslidercoarse = [0,0,0,0] # if 1, sliders step in multiples of 10, otherwise 1
         self.eventslidertemp = [0,0,0,0] # if 1, slider values are interpreted as temperatures and min/max limit are converted with the temp mode
         self.eventsliderunits = ["","","",""]
@@ -16844,6 +16845,7 @@ class ApplicationWindow(QMainWindow):
 
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
     def setTare(self,n):
+        print("setTare",n)
         if self.qmc.flagon: # we set the tare value
             if n == 0:
                 temp = (self.qmc.temp1 if self.qmc.flagstart else self.qmc.on_temp1)
@@ -16862,6 +16864,7 @@ class ApplicationWindow(QMainWindow):
             postfix = temp[-3:]
             if len(postfix) > 0:
                 stable_reading = numpy.median(postfix)
+                print("stable_reading",stable_reading)
                 if symb_formula == "":
                     self.channel_tare_values[n] = stable_reading
                 else:
@@ -19450,7 +19453,7 @@ class ApplicationWindow(QMainWindow):
                     if action > 18:
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
-                value = (self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]
+                value = self.calcSliderSendValue(n)
                 if not (action in [6,14,21]): # only for IO, VOUT and RC Commands we keep the floats
                     value = int(round(value))
                 if action in [8,9,16,17,18]: # for Hottop/R1 Heater or Fan, we just forward the value
@@ -19463,13 +19466,24 @@ class ApplicationWindow(QMainWindow):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fireslideraction() {0}").format(str(e)),exc_tb.tb_lineno)
 
+    def calcSliderSendValue(self,n):
+        slider_value = self.eventslidervalues[n]
+        if self.eventsliderBernoulli[n]:
+            # if ticked we add the Bernoulli's gas law factor to the computed value
+            # (see https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654)
+            # so we have f(x) = (max-min) * ((x-min)/(max-min))^2 + min
+            slider_delta = self.eventslidermax[n] - self.eventslidermin[n]
+            slider_value = slider_delta * pow((slider_value - self.eventslidermin[n])/slider_delta,2) + self.eventslidermin[n]
+        # f(x) = k*x + o
+        value = (self.eventsliderfactors[n] * slider_value) + self.eventslideroffsets[n]
+        return value
+        
     def recordsliderevent(self,n):
         aw.block_quantification_sampling_ticks[n] = aw.sampling_ticks_to_block_quantifiction
         self.extraeventsactionslastvalue[n] = self.eventslidervalues[n]
         if self.qmc.flagstart:
             value = aw.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
-            description = str(aw.float2float(self.eventslidervalues[n] * self.eventsliderfactors[n] + self.eventslideroffsets[n])).rstrip('0').rstrip('.') + self.eventsliderunits[n]
-            description = str(aw.float2float(self.eventslidervalues[n] * self.eventsliderfactors[n] + self.eventslideroffsets[n])).rstrip('0').rstrip('.') + self.eventsliderunits[n]
+            description = str(aw.float2float(self.calcSliderSendValue(n),2)).rstrip('0').rstrip('.') + self.eventsliderunits[n]
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value,eventdescription=description)
         self.fireslideraction(n)
 
@@ -22019,16 +22033,16 @@ class ApplicationWindow(QMainWindow):
                 ("ambpressure",str(cp["ambient_pressure"]) if "ambient_pressure" in cp else "0.0"),
                 ("aucbase",str(cp["AUCbase"]) if "AUCbase" in cp else "0"),
                 ("auc",str(cp["AUC"]) if "AUC" in cp else "0"),
-                ("chargeet",str(cp["CHARGE_ET"]) if "CHARGE_ET" in cp else "0.0"),                
-                ("chargebt",str(cp["CHARGE_BT"]) if "CHARGE_BT" in cp else "0.0"),                
-                ("fcset",str(cp["FCs_ET"]) if "FCs_ET" in cp else "0.0"),                
-                ("fcsbt",str(cp["FCs_BT"]) if "FCs_BT" in cp else "0.0"),                
+                ("chargeet",str(cp["CHARGE_ET"]) if "CHARGE_ET" in cp else "0.0"),
+                ("chargebt",str(cp["CHARGE_BT"]) if "CHARGE_BT" in cp else "0.0"),
+                ("fcset",str(cp["FCs_ET"]) if "FCs_ET" in cp else "0.0"),
+                ("fcsbt",str(cp["FCs_BT"]) if "FCs_BT" in cp else "0.0"),
                 ("dropet",str(cp["DROP_ET"]) if "DROP_ET" in cp else "0.0"),
                 ("dropbt",str(cp["DROP_BT"]) if "DROP_BT" in cp else "0.0"),
                 ("droptime_long", droptime_long),
-                ("droptime",str(int(cp["DROP_time"])) if "DROP_time" in cp else "0"),                
+                ("droptime",str(int(cp["DROP_time"])) if "DROP_time" in cp else "0"),
                 ("devtime_long", devtime_long),
-                ("devtime", devtime),                
+                ("devtime", devtime),
                 ("dtr", dtr),
                 ("roastingnotes_line",roastingnotesline),
                 ("roastingnotes_10",roastingnotesline[:10]),
@@ -26696,6 +26710,8 @@ class ApplicationWindow(QMainWindow):
                 aw.updateSliderMinMax()
             if settings.contains("eventslidersflags"):
                 self.eventslidersflags = [toInt(x) for x in toList(settings.value("eventslidersflags",self.eventslidersflags))]
+            if settings.contains("eventsliderBernoulli"):
+                self.eventsliderBernoulli = [toInt(x) for x in toList(settings.value("eventsliderBernoulli",self.eventsliderBernoulli))]
             if settings.contains("eventslidercoarse"):
                 self.eventslidercoarse = [toInt(x) for x in toList(settings.value("eventslidercoarse",self.eventslidercoarse))]
             if settings.contains("eventslidertemp"):
@@ -27951,6 +27967,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("slidermin",self.eventslidermin)
             settings.setValue("slidermax",self.eventslidermax)
             settings.setValue("eventslidersflags",self.eventslidersflags)
+            settings.setValue("eventsliderBernoulli",self.eventsliderBernoulli)
             settings.setValue("eventslidercoarse",self.eventslidercoarse)
             settings.setValue("eventslidertemp",self.eventslidertemp)
             settings.setValue("eventsliderunits",self.eventsliderunits)
@@ -32868,6 +32885,8 @@ class ApplicationWindow(QMainWindow):
         # added slider min/max
         copy.append(self.eventslidermin[:])
         copy.append(self.eventslidermax[:])
+        # added slider Bernoulli
+        copy.append(self.eventsliderBernoulli[:])
         # added slider coarse
         copy.append(self.eventslidercoarse[:])
         # added slider temp
@@ -32954,6 +32973,10 @@ class ApplicationWindow(QMainWindow):
                 self.eventsliderunits = copy[23][:]
             else:
                 self.eventsliderunits = ["","","",""]
+            if len(copy)>24 and len(copy[24]) == 4:
+                self.eventsliderBernoulli = copy[24][:]
+            else:
+                self.eventsliderBernoulli = [0,0,0,0]
 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()

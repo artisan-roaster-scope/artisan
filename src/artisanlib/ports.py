@@ -202,6 +202,178 @@ class scanModbusDlg(ArtisanDialog):
         self.stop = True
         self.accept()
 
+
+class scanS7Dlg(ArtisanDialog):
+    def __init__(self, parent = None, aw = None):
+        super(scanS7Dlg,self).__init__(parent, aw)
+        self.setModal(True)
+        # current setup selected in the S7 tab
+        self.shost = "127.0.0.1"
+        self.sport = 502
+        self.srack = 0
+        self.sslot = 0
+        self.shost_aw = self.aw.s7.host
+        self.sport_aw = self.aw.s7.port
+        self.srack_aw = self.aw.s7.rack
+        self.sslot_aw = self.aw.s7.slot
+        self.stop = False # if True stop the processing
+        self.setWindowTitle(QApplication.translate("Form Caption","Scan S7", None))
+
+        s7_areas = ["PE","PA","MK","CT","TM","DB"]
+        self.area = 5
+        self.areaLabel = QLabel(QApplication.translate("Label", "Area",None))
+        self.areaCombo = QComboBox()
+        self.areaCombo.setFocusPolicy(Qt.NoFocus)
+        self.areaCombo.addItems(s7_areas)
+        self.areaCombo.setCurrentIndex(self.area)
+        
+        self.DBnr = 1
+        self.DBnrLabel = QLabel(QApplication.translate("Label", "DB#",None))
+        self.DBnrEdit = QLineEdit(str(self.DBnr))
+        self.DBnrEdit.setValidator(QIntValidator(1,99999,self.DBnrEdit))
+        self.DBnrEdit.setFixedWidth(65)
+        self.DBnrEdit.setAlignment(Qt.AlignRight)
+        
+        self.min_register = 0
+        self.registerLabel = QLabel(QApplication.translate("Label", "Start",None))
+        self.toLabel = QLabel(uchr(8212))
+        self.minRegisterEdit = QLineEdit(str(self.min_register))
+        self.minRegisterEdit.setValidator(QIntValidator(0,65536,self.minRegisterEdit))
+        self.minRegisterEdit.setFixedWidth(65)
+        self.minRegisterEdit.setAlignment(Qt.AlignRight)
+        self.max_register = 65536
+        self.maxRegisterEdit = QLineEdit(str(self.max_register))
+        self.maxRegisterEdit.setValidator(QIntValidator(0,65536,self.maxRegisterEdit))
+        self.maxRegisterEdit.setFixedWidth(65)
+        self.maxRegisterEdit.setAlignment(Qt.AlignRight)
+        self.typeInt = True
+        self.typeFloat = False
+        self.checkbox3 = QCheckBox(QApplication.translate("CheckBox","Int", None))
+        self.checkbox3.setChecked(self.typeInt)
+        self.checkbox3.stateChanged.connect(self.checkbox3Changed)
+        self.checkbox4 = QCheckBox(QApplication.translate("CheckBox","Float", None))
+        self.checkbox4.setChecked(self.typeFloat)
+        self.checkbox4.stateChanged.connect(self.checkbox4Changed)
+        self.S7Edit = QTextEdit()
+        self.S7Edit.setReadOnly(True)
+        startButton = QPushButton(QApplication.translate("Button","Start", None))
+        startButton.setMaximumWidth(150)
+        startButton.clicked.connect(self.start_pressed)
+#        labellayout = QHBoxLayout()
+#        labellayout.addWidget(self.areaLabel)
+#        srlayout.addWidget(self.DBnrLabel)
+#        labellayout.addStretch()
+#        labellayout.addWidget(self.registerLabel)
+#        labellayout.addStretch()
+        gridlayout = QGridLayout()
+        gridlayout.addWidget(self.areaLabel,0,0)
+        gridlayout.addWidget(self.DBnrLabel,0,1)
+        gridlayout.addWidget(self.registerLabel,0,2)
+        gridlayout.addWidget(self.areaCombo,1,0)
+        gridlayout.addWidget(self.DBnrEdit,1,1)
+        gridlayout.addWidget(self.minRegisterEdit,1,2)
+        gridlayout.addWidget(self.toLabel,1,3)
+        gridlayout.addWidget(self.maxRegisterEdit,1,4)
+        
+#        srlayout = QHBoxLayout()
+#        srlayout.addWidget(self.areaCombo)
+#        srlayout.addWidget(self.DBnrEdit)
+#        srlayout.addStretch()
+#        srlayout.addWidget(self.minRegisterEdit)
+#        srlayout.addWidget(self.toLabel)
+#        srlayout.addWidget(self.maxRegisterEdit)
+        cblayout= QHBoxLayout()
+        cblayout.addStretch()
+        cblayout.addWidget(self.checkbox3)
+        cblayout.addStretch()
+        cblayout.addWidget(self.checkbox4)
+        cblayout.addStretch()
+        hlayout = QHBoxLayout()
+        hlayout.addStretch()
+        hlayout.addWidget(startButton)
+        hlayout.addStretch()
+        layout = QVBoxLayout()
+#        layout.addLayout(labellayout)
+#        layout.addLayout(srlayout)
+        layout.addLayout(gridlayout)
+        layout.addLayout(cblayout)
+        layout.addWidget(self.S7Edit)
+        layout.addLayout(hlayout)
+        self.setLayout(layout)
+        
+    def keyPressEvent(self,event):
+        key = int(event.key())
+        if key != 0:
+            self.stop = True
+
+    @pyqtSlot(bool)
+    def start_pressed(self):
+        try:
+            # set S7 host, port and other settings from dialog
+            
+            self.aw.s7.host = self.shost
+            self.aw.s7.port = self.sport
+            self.aw.s7.rack = self.srack
+            self.aw.s7.slot = self.sslot
+
+            self.stop = False
+            
+            # update slave and register limits
+            self.area = int(self.areaCombo.currentIndex())
+            self.DBnr = int(self.DBnrEdit.text())
+            self.min_register = int(self.minRegisterEdit.text())
+            self.max_register = int(self.maxRegisterEdit.text())
+            
+            # scan and report
+            result = "Start,Value<br>"
+            result += "--------------<br>"
+            for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1,(4 if self.typeFloat else 2)):
+                QApplication.processEvents()
+                if self.stop:
+                    result += "<br>stopped<br>"
+                    self.S7Edit.setHtml(result)
+                    break
+                if self.typeFloat:
+                    res = self.aw.s7.peakFloat(self.area,self.DBnr,register)
+                else:
+                    res = self.aw.s7.peekInt(self.area,self.DBnr,register)
+                if res is not None:
+                    result += "{}: {}<br>".format(str(register),str(res))
+                    self.S7Edit.setHtml(result)
+        except:
+            pass
+        # reconstruct S7 setup
+        self.aw.s7.host = self.shost_aw
+        self.aw.s7.port = self.sport_aw
+        self.aw.s7.rack = self.srack_aw
+        self.aw.s7.slot = self.sslot_aw
+            
+    def update(self):
+        if self.aw.seriallogflag:
+            self.S7Edit.setText(self.getstring())
+
+    @pyqtSlot(int)
+    def checkbox3Changed(self,_):
+        if self.checkbox3.isChecked():
+            self.typeInt = True
+            self.checkbox4.setChecked(not self.typeInt)
+        else:
+            self.typeInt = False
+            self.checkbox4.setChecked(not self.typeInt)
+
+    @pyqtSlot(int)
+    def checkbox4Changed(self,_):
+        if self.checkbox4.isChecked():
+            self.typeFloat = True
+            self.checkbox3.setChecked(not self.typeFloat)
+        else:
+            self.typeFloat = False
+            self.checkbox3.setChecked(not self.typeFloat)
+            
+    def closeEvent(self,_):
+        self.stop = True
+        self.accept()
+        
 class PortComboBox(QComboBox):
     __slots__ = ['selection','ports','edited'] # save some memory by using slots
     def __init__(self, parent = None, selection = None):
@@ -761,6 +933,11 @@ class comportDlg(ArtisanResizeablDialog):
         self.s7_slotEdit.setValidator(QIntValidator(0,31,self.s7_slotEdit))
         self.s7_slotEdit.setFixedWidth(60)
         self.s7_slotEdit.setAlignment(Qt.AlignRight)
+        
+        scanButtonS7 = QPushButton(QApplication.translate("Button","Scan",None))
+        scanButtonS7.setToolTip(QApplication.translate("Tooltip","Scan S7",None))
+        scanButtonS7.setFocusPolicy(Qt.NoFocus)
+        scanButtonS7.clicked.connect(self.scanS7)
 
         s7_areaLabel = QLabel(QApplication.translate("Label", "Area",None))
         s7_dbLabel = QLabel(QApplication.translate("Label", "DB#",None))
@@ -969,6 +1146,7 @@ class comportDlg(ArtisanResizeablDialog):
         s7_gridHLayout.addStretch()
         
         s7_setup = QHBoxLayout()
+        s7_setup.addWidget(scanButtonS7)
         s7_setup.addStretch()
         s7_setup.addWidget(s7_hostlabel)
         s7_setup.addWidget(self.s7_hostEdit)
@@ -1136,18 +1314,27 @@ class comportDlg(ArtisanResizeablDialog):
             pass
     
     @pyqtSlot(bool)
+    def scanS7(self,_):
+        scan_S7_dlg = scanS7Dlg(self,self.aw)
+        scan_S7_dlg.shost = str(self.s7_hostEdit.text())
+        scan_S7_dlg.sport = int(str(self.s7_portEdit.text()))
+        scan_S7_dlg.srack = int(str(self.s7_rackEdit.text()))
+        scan_S7_dlg.sslot = int(str(self.s7_slotEdit.text()))
+        scan_S7_dlg.show()
+    
+    @pyqtSlot(bool)
     def scanModbus(self,_):
-        scan_mobuds_dlg = scanModbusDlg(self,self.aw)
-        scan_mobuds_dlg.port = str(self.modbus_comportEdit.getSelection())
-        scan_mobuds_dlg.baudrate = int(str(self.modbus_baudrateComboBox.currentText()))
-        scan_mobuds_dlg.bytesize = int(str(self.modbus_bytesizeComboBox.currentText()))
-        scan_mobuds_dlg.stopbits = int(str(self.modbus_stopbitsComboBox.currentText()))
-        scan_mobuds_dlg.parity = str(self.modbus_parityComboBox.currentText())
-        scan_mobuds_dlg.timeout = self.aw.float2float(toFloat(self.aw.comma2dot(str(self.modbus_timeoutEdit.text()))))
-        scan_mobuds_dlg.mtype = int(self.modbus_type.currentIndex())
-        scan_mobuds_dlg.mhost = str(self.modbus_hostEdit.text())
-        scan_mobuds_dlg.mport = int(str(self.modbus_portEdit.text()))
-        scan_mobuds_dlg.show()
+        scan_modbuds_dlg = scanModbusDlg(self,self.aw)
+        scan_modbuds_dlg.port = str(self.modbus_comportEdit.getSelection())
+        scan_modbuds_dlg.baudrate = int(str(self.modbus_baudrateComboBox.currentText()))
+        scan_modbuds_dlg.bytesize = int(str(self.modbus_bytesizeComboBox.currentText()))
+        scan_modbuds_dlg.stopbits = int(str(self.modbus_stopbitsComboBox.currentText()))
+        scan_modbuds_dlg.parity = str(self.modbus_parityComboBox.currentText())
+        scan_modbuds_dlg.timeout = self.aw.float2float(toFloat(self.aw.comma2dot(str(self.modbus_timeoutEdit.text()))))
+        scan_modbuds_dlg.mtype = int(self.modbus_type.currentIndex())
+        scan_modbuds_dlg.mhost = str(self.modbus_hostEdit.text())
+        scan_modbuds_dlg.mport = int(str(self.modbus_portEdit.text()))
+        scan_modbuds_dlg.show()
             
     @pyqtSlot(int)
     def portComboBoxIndexChanged(self,i):

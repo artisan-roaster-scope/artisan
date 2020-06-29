@@ -568,6 +568,8 @@ class EventsDlg(ArtisanResizeablDialog):
         min_titlelabel.setFont(titlefont)
         max_titlelabel = QLabel(QApplication.translate("Label","Max", None))
         max_titlelabel.setFont(titlefont)
+        sliderBernoullititlelabel = QLabel(QApplication.translate("Label","Bernoulli", None))
+        sliderBernoullititlelabel.setFont(titlefont)
         slidercoarsetitlelabel = QLabel(QApplication.translate("Label","Coarse", None))
         slidercoarsetitlelabel.setFont(titlefont)
         slidertemptitlelabel = QLabel(QApplication.translate("Label","Temp", None))
@@ -705,51 +707,73 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4_max.setAlignment(Qt.AlignRight)
         self.E4_max.setRange(0,self.aw.eventsMaxValue)
         self.E4_max.setValue(self.aw.eventslidermax[3])
+        
+        # https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654
+        bernulli_tooltip_text = QApplication.translate("Tooltip", "Applies the Bernoulli's gas law to the values computed\nby applying the given factor and offset to the slider value\nassuming that the gas pressureand not the gas flow is controlled.\nTo reduce heat (or gas flow) by 50% the gas pressure\nhas to be reduced by 4 times.", None)
+        self.E1slider_bernoulli = QCheckBox()
+        self.E1slider_bernoulli.setFocusPolicy(Qt.NoFocus)
+        self.E1slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[0]))
+        self.E1slider_bernoulli.setToolTip(bernulli_tooltip_text)
+        self.E2slider_bernoulli = QCheckBox()
+        self.E2slider_bernoulli.setFocusPolicy(Qt.NoFocus)
+        self.E2slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[1]))
+        self.E2slider_bernoulli.setToolTip(bernulli_tooltip_text)
+        self.E3slider_bernoulli = QCheckBox()
+        self.E3slider_bernoulli.setFocusPolicy(Qt.NoFocus)
+        self.E3slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[2]))
+        self.E3slider_bernoulli.setToolTip(bernulli_tooltip_text)
+        self.E4slider_bernoulli = QCheckBox()
+        self.E4slider_bernoulli.setFocusPolicy(Qt.NoFocus)
+        self.E4slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[3]))
+        self.E4slider_bernoulli.setToolTip(bernulli_tooltip_text)
+        slider_coarse_tooltip_text = QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None)
         self.E1slider_coarse = QCheckBox()
         self.E1slider_coarse.setFocusPolicy(Qt.NoFocus)
         self.E1slider_coarse.setChecked(bool(self.aw.eventslidercoarse[0]))
-        self.E1slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None))
+        self.E1slider_coarse.setToolTip(slider_coarse_tooltip_text)
         self.E2slider_coarse = QCheckBox()
         self.E2slider_coarse.setFocusPolicy(Qt.NoFocus)
         self.E2slider_coarse.setChecked(bool(self.aw.eventslidercoarse[1]))
-        self.E2slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None))
+        self.E2slider_coarse.setToolTip(slider_coarse_tooltip_text)
         self.E3slider_coarse = QCheckBox()
         self.E3slider_coarse.setFocusPolicy(Qt.NoFocus)
         self.E3slider_coarse.setChecked(bool(self.aw.eventslidercoarse[2]))
-        self.E3slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None))
+        self.E3slider_coarse.setToolTip(slider_coarse_tooltip_text)
         self.E4slider_coarse = QCheckBox()
         self.E4slider_coarse.setFocusPolicy(Qt.NoFocus)
         self.E4slider_coarse.setChecked(bool(self.aw.eventslidercoarse[3]))
-        self.E4slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None))
+        self.E4slider_coarse.setToolTip(slider_coarse_tooltip_text)
+        slider_temp_tooltip_text = QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None)
         self.E1slider_temp = QCheckBox()
         self.E1slider_temp.setFocusPolicy(Qt.NoFocus)
         self.E1slider_temp.setChecked(bool(self.aw.eventslidertemp[0]))
-        self.E1slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None))
+        self.E1slider_temp.setToolTip(slider_temp_tooltip_text)
         self.E2slider_temp = QCheckBox()
         self.E2slider_temp.setFocusPolicy(Qt.NoFocus)
         self.E2slider_temp.setChecked(bool(self.aw.eventslidertemp[1]))
-        self.E2slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None))
+        self.E2slider_temp.setToolTip(slider_temp_tooltip_text)
         self.E3slider_temp = QCheckBox()
         self.E3slider_temp.setFocusPolicy(Qt.NoFocus)
         self.E3slider_temp.setChecked(bool(self.aw.eventslidertemp[2]))
-        self.E3slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None))
+        self.E3slider_temp.setToolTip(slider_temp_tooltip_text)
         self.E4slider_temp = QCheckBox()
         self.E4slider_temp.setFocusPolicy(Qt.NoFocus)
         self.E4slider_temp.setChecked(bool(self.aw.eventslidertemp[3]))
-        self.E4slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None))
+        self.E4slider_temp.setToolTip(slider_temp_tooltip_text)
         maxwidth = 40
+        slider_unit_tooltip_text = QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None)
         self.E1unit = QLineEdit(self.aw.eventsliderunits[0])
         self.E1unit.setMaximumWidth(maxwidth)
-        self.E1unit.setToolTip(QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None))
+        self.E1unit.setToolTip(slider_unit_tooltip_text)
         self.E2unit = QLineEdit(self.aw.eventsliderunits[1])
         self.E2unit.setMaximumWidth(maxwidth)
-        self.E2unit.setToolTip(QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None))
+        self.E2unit.setToolTip(slider_unit_tooltip_text)
         self.E3unit = QLineEdit(self.aw.eventsliderunits[2])
         self.E3unit.setMaximumWidth(maxwidth)
-        self.E3unit.setToolTip(QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None))
+        self.E3unit.setToolTip(slider_unit_tooltip_text)
         self.E4unit = QLineEdit(self.aw.eventsliderunits[3])
         self.E4unit.setMaximumWidth(maxwidth)
-        self.E4unit.setToolTip(QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None))
+        self.E4unit.setToolTip(slider_unit_tooltip_text)
         helpsliderDialogButton = QDialogButtonBox()
         helpsliderbutton = helpsliderDialogButton.addButton(QDialogButtonBox.Help)
         if self.aw.locale not in self.aw.qtbase_locales:
@@ -1221,9 +1245,10 @@ class EventsDlg(ArtisanResizeablDialog):
         tab5Layout.addWidget(factortitlelabel,0,4)
         tab5Layout.addWidget(min_titlelabel,0,5)
         tab5Layout.addWidget(max_titlelabel,0,6)
-        tab5Layout.addWidget(slidercoarsetitlelabel,0,7)
-        tab5Layout.addWidget(slidertemptitlelabel,0,8)
-        tab5Layout.addWidget(sliderunittitlelabel,0,9)
+        tab5Layout.addWidget(sliderBernoullititlelabel,0,7)
+        tab5Layout.addWidget(slidercoarsetitlelabel,0,8)
+        tab5Layout.addWidget(slidertemptitlelabel,0,9)
+        tab5Layout.addWidget(sliderunittitlelabel,0,10)
         tab5Layout.addWidget(self.E1visibility,1,0)
         tab5Layout.addWidget(self.E2visibility,2,0)
         tab5Layout.addWidget(self.E3visibility,3,0)
@@ -1252,18 +1277,22 @@ class EventsDlg(ArtisanResizeablDialog):
         tab5Layout.addWidget(self.E2_max,2,6)
         tab5Layout.addWidget(self.E3_max,3,6)
         tab5Layout.addWidget(self.E4_max,4,6)
-        tab5Layout.addWidget(self.E1slider_coarse,1,7,Qt.AlignCenter)
-        tab5Layout.addWidget(self.E2slider_coarse,2,7,Qt.AlignCenter)
-        tab5Layout.addWidget(self.E3slider_coarse,3,7,Qt.AlignCenter)
-        tab5Layout.addWidget(self.E4slider_coarse,4,7,Qt.AlignCenter)
-        tab5Layout.addWidget(self.E1slider_temp,1,8,Qt.AlignCenter)
-        tab5Layout.addWidget(self.E2slider_temp,2,8,Qt.AlignCenter)
-        tab5Layout.addWidget(self.E3slider_temp,3,8,Qt.AlignCenter)
-        tab5Layout.addWidget(self.E4slider_temp,4,8,Qt.AlignCenter)
-        tab5Layout.addWidget(self.E1unit,1,9)
-        tab5Layout.addWidget(self.E2unit,2,9)
-        tab5Layout.addWidget(self.E3unit,3,9)
-        tab5Layout.addWidget(self.E4unit,4,9)
+        tab5Layout.addWidget(self.E1slider_bernoulli,1,7,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E2slider_bernoulli,2,7,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E3slider_bernoulli,3,7,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E4slider_bernoulli,4,7,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E1slider_coarse,1,8,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E2slider_coarse,2,8,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E3slider_coarse,3,8,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E4slider_coarse,4,8,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E1slider_temp,1,9,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E2slider_temp,2,9,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E3slider_temp,3,9,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E4slider_temp,4,9,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E1unit,1,10)
+        tab5Layout.addWidget(self.E2unit,2,10)
+        tab5Layout.addWidget(self.E3unit,3,10)
+        tab5Layout.addWidget(self.E4unit,4,10)
         SliderHelpHBox = QHBoxLayout()
         SliderHelpHBox.addStretch()
         SliderHelpHBox.addWidget(helpsliderDialogButton)
@@ -1633,6 +1662,11 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E2_max.setValue(self.aw.eventslidermax[1])
         self.E3_max.setValue(self.aw.eventslidermax[2])
         self.E4_max.setValue(self.aw.eventslidermax[3])
+        # set slider Bernoulli
+        self.E1slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[0]))
+        self.E2slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[1]))
+        self.E3slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[2]))
+        self.E4slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[3]))
         # set slider coarse
         self.E1slider_coarse.setChecked(bool(self.aw.eventslidercoarse[0]))
         self.E2slider_coarse.setChecked(bool(self.aw.eventslidercoarse[1]))
@@ -1795,6 +1829,8 @@ class EventsDlg(ArtisanResizeablDialog):
         copy.append(self.eventslidertemp[:])
         # added slider unit
         copy.append(self.eventsliderunits[:])
+        # added slider Bernoulli
+        copy.append(self.eventsliderBernoulli[:])
               
         self.buttonpalette[pindex] = copy
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
@@ -1873,6 +1909,10 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.eventsliderunits = copy[23][:]
             else:
                 self.eventsliderunits = ["","","",""]
+            if len(copy)>24 and len(copy[24]) == 4:
+                self.eventsliderBernoulli = copy[24][:]
+            else:
+                self.eventsliderBernoulli = [0,0,0,0]
                 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             return 1  #success
@@ -2594,6 +2634,10 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.eventslidermax[1] = int(max(self.E2_min.value(),self.E2_max.value()))
         self.aw.eventslidermax[2] = int(max(self.E3_min.value(),self.E3_max.value()))
         self.aw.eventslidermax[3] = int(max(self.E4_min.value(),self.E4_max.value()))
+        self.aw.eventsliderBernoulli[0] = int(self.E1slider_bernoulli.isChecked())
+        self.aw.eventsliderBernoulli[1] = int(self.E2slider_bernoulli.isChecked())
+        self.aw.eventsliderBernoulli[2] = int(self.E3slider_bernoulli.isChecked())
+        self.aw.eventsliderBernoulli[3] = int(self.E4slider_bernoulli.isChecked())
         self.aw.eventslidercoarse[0] = int(self.E1slider_coarse.isChecked())
         self.aw.eventslidercoarse[1] = int(self.E2slider_coarse.isChecked())
         self.aw.eventslidercoarse[2] = int(self.E3slider_coarse.isChecked())
@@ -2685,6 +2729,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventsliderfactors = self.aw.eventsliderfactors[:]
         self.eventslidermin = self.aw.eventslidermin[:]
         self.eventslidermax = self.aw.eventslidermax[:]
+        self.eventsliderBernoulli = self.aw.eventsliderBernoulli[:]
         self.eventslidercoarse = self.aw.eventslidercoarse[:]
         self.eventslidertemp = self.aw.eventslidertemp[:]
         self.eventsliderunits = self.aw.eventsliderunits[:]
@@ -2732,6 +2777,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.eventsliderfactors = self.eventsliderfactors
         self.aw.eventslidermin = self.eventslidermin
         self.aw.eventslidermax = self.eventslidermax
+        self.aw.eventsliderBernoulli = self.eventsliderBernoulli
         self.aw.eventslidercoarse = self.eventslidercoarse
         self.aw.eventslidertemp = self.eventslidertemp
         self.aw.eventsliderunits = self.eventsliderunits
