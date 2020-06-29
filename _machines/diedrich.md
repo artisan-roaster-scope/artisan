@@ -9,7 +9,7 @@ header:
   teaser: assets/images/diedrich1.jpg
 ---
 * __Producer:__ [Diedrich](https://www.diedrichroasters.com/){:target="_blank"}, USA
-* __Machines:__ All machines equipped with the 4 or 6 Sensor Data Logging option
+* __Machines:__ All IR- and CR-series machines equipped with the 4 or 6 Sensor Data Logging option
 * __Connection:__ USB
 * __Features 4 Sensor Data Logging Package:__
   - logging of bean temperature (BT)

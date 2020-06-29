@@ -13,6 +13,7 @@ header:
 * __Connection:__ MODBUS TCP via the network
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
+  - gas pressure (mbar), drum speed, and airflow (only Atilla GOLD plus 7'' II)
 
 ### Setup
 

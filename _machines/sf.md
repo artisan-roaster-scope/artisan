@@ -12,4 +12,8 @@ header:
 * __Producer:__ [The San Franciscan Roaster Company](http://www.sanfranroaster.com){:target="_blank"}, USA
 * __Machines:__ all roasters with a Watlow PM6 (requires the _EIA 485 Modbus RTU_ option)
 * __Connection:__ MODBUS RTU via USB-2-RS485 interface; requires the installation of a serial driver
-* __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
+* __Features:__
+  - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
+  - gas control on machines produced after 8/2019
+
+To activate the gas control, press CMD-2 to switch to the second [palette](https://artisan-roasterscope.blogspot.com/2013/02/events-buttons-and-palettes.html) which defines the slider to set the gas. CMD-1 activates the setup without the gas control slider.

@@ -11,4 +11,4 @@ header:
 * __Producer:__ [Bühler GmbH](http://www.buhlergroup.com/){:target="_blank"}, Germany
 * __Machines:__ Roastmaster
 * __Connection:__ Siemens S7 network
-* __Features:__ logging of environmental temperature (ET), bean temperature (BT), afterburner temperature (AT) and drum pressure
+* __Features:__ logging of burner temperature, bean temperature, afterburner temperature, drum pressure (pa), drum speed (Hz), and airflow (%)

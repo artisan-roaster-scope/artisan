@@ -9,7 +9,7 @@ header:
   teaser: assets/images/giesen.jpg
 ---
 * __Producer:__ [GIESEN coffee-roasters](http://www.giesencoffeeroasters.eu){:target="_blank"}, The Netherlands
-* __Machines:__ WPG1/W1A/W6A/W15A with networked PLC (6/2014 and later)
+* __Machines:__ WPG/WPE/W1/W6/W15/W30/W45/W60 with networked PLC (6/2014 and later)
 * __Connection:__ Siemens S7 network
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
@@ -18,13 +18,50 @@ header:
 
 ### Setup
 
-The computer running Artisan must be on the same IP network as the Giesen roaster which usually is configured to have IP 192.168.2.180. Configure your computer to use a static IP address in the range 192.168.2.x (but with x different from that of the roaster which usually has 180), so for example 192.168.2.10, and set the subnet mask to 255.255.255.0. This can be done on Windows using the Network Sharing Center by adding a TCP/IPv4 Local Area Connection with those properties. On OS X you set your Ethernet port in the Network Control panel to "IPv4: Manually" and fill in the IP and subnet mask accordingly.
+The computer running Artisan must be on the same IP network as the Giesen roaster. Configure your computer to use a static IP address in the range of the roaster (192.168.2.x, 192.168.3.x or 172.30.30.x) but with x different from that of the roaster (see the tables below). Choose 255.255.255.0 as subnet mask.
 
-Other IP addresses of machines different from 192.168.2.180 that have been observed are
+#### Default IP Addresses Giesen Roasters before 2/2018 without touch panel:
 
-* WPG1: 172.30.30.10
-* W1: 172.30.30.30
-* W15: 172.30.30.50
+| Model | IP-Roaster        | IP-PC (ex)       |
+|-------|-------------------|------------------|
+| W1    | 192.168.**2**.199 | 192.168.**2**.42 |
+| W6    | 192.168.**2**.199 | 192.168.**2**.42 |
+| W15   | 192.168.**2**.199 | 192.168.**2**.42 |
+|       |                   |                  |
+| W30   | 192.168.**3**.199 | 192.168.**3**.42 |
+| W45   | 192.168.**3**.199 | 192.168.**3**.42 |
+| W60   | 192.168.**3**.199 | 192.168.**3**.42 |
+
+
+#### Default IP Addresses Giesen Roasters before 2/2018 with touch panel:
+
+| Model | IP-Roaster        | IP-PC (ex)       |
+|-------|-------------------|------------------|
+| W1    | 192.168.**2**.180 | 192.168.**2**.42 |
+| W6    | 192.168.**2**.180 | 192.168.**2**.42 |
+| W15   | 192.168.**2**.180 | 192.168.**2**.42 |
+|       |                   |                  |
+| W30   | 192.168.**3**.180 | 192.168.**3**.42 |
+| W45   | 192.168.**3**.180 | 192.168.**3**.42 |
+| W60   | 192.168.**3**.180 | 192.168.**3**.42 |
+
+
+
+#### Default IP Addresses Giesen Roasters after 2/2018:
+
+| Model   | IP-Roaster   | IP-PC (ex)   |
+|---------|--------------|--------------|
+| WPG/WPE | 172.30.30.10 | 172.30.30.42 |
+| W1      | 172.30.30.30 | 172.30.30.42 |
+| W6      | 172.30.30.50 | 172.30.30.42 |
+| W15     | 172.30.30.50 | 172.30.30.42 |
+| W30     | 172.30.30.70 | 172.30.30.42 |
+| W45     | 172.30.30.90 | 172.30.30.42 |
+| W60     | 172.30.30.90 | 172.30.30.42 |
+| W140    | 172.30.30.110 | 172.30.30.42 |
+
+ 
+This can be done on Windows using the Network Sharing Center by adding a TCP/IPv4 Local Area Connection with those properties. On macOS you set your ethernet port in the Network Control panel to "IPv4: Manually" and fill in the IP and subnet mask accordingly.
 
 {: .notice--primary}
 
