@@ -4,7 +4,7 @@ numpy==1.18.5
 colorspacious==1.1.2
 scipy==1.4.1 # 1.5.0 released already
 matplotlib==3.2.2
-PyQt5==5.14.2 # 5.15.0 seems not to install on Python 3.7.1
+PyQt5==5.15.0 #5.14.2 # 5.15.0 seems not to install on Python 3.7.1
 openpyxl==3.0.3
 pyinstaller==3.6
 #jeepney==0.4
