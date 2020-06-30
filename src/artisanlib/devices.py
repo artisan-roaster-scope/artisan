@@ -518,10 +518,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidget1046HBox.setContentsMargins(0,0,0,0)
         phidget1046VBox.setContentsMargins(0,0,0,0)
         
-        
         # TMP1200 RTD
         phidgetBox1200 = QGridLayout()
         phidgetBox1200.setSpacing(1)
+        phidgetBox1200_2 = QGridLayout()
+        phidgetBox1200_2.setSpacing(1)
 
         self.formulaCombo1200 = QComboBox()
         self.formulaCombo1200.setFocusPolicy(Qt.NoFocus)
@@ -588,12 +589,86 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         width = self.rateCombo1200.minimumSizeHint().width()
         self.rateCombo1200.setMinimumWidth(width)
 #        self.rateCombo1200.setMaximumWidth(width)
+
+#---
+        self.formulaCombo1200_2 = QComboBox()
+        self.formulaCombo1200_2.setFocusPolicy(Qt.NoFocus)
+        model = self.formulaCombo1200_2.model()
+        wireItems = self.createItems(self.aw.qmc.phidget1200_formulaValues)
+        for item in wireItems:
+            model.appendRow(item)
+        try:
+            self.formulaCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_2_formula)
+        except Exception:
+            pass
+        self.formulaCombo1200_2.setMinimumContentsLength(5)
+        width = self.formulaCombo1200_2.minimumSizeHint().width()
+        self.formulaCombo1200_2.setMinimumWidth(width)
+#        self.formulaCombo1200_2.setMaximumWidth(width)
+        
+        self.wireCombo1200_2 = QComboBox()
+        self.wireCombo1200_2.setFocusPolicy(Qt.NoFocus)
+        model = self.wireCombo1200_2.model()
+        wireItems = self.createItems(self.aw.qmc.phidget1200_wireValues)
+        for item in wireItems:
+            model.appendRow(item)
+        try:
+            self.wireCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_2_wire)
+        except Exception:
+            pass
+        self.wireCombo1200_2.setMinimumContentsLength(5)
+        width = self.wireCombo1200_2.minimumSizeHint().width()
+        self.wireCombo1200_2.setMinimumWidth(width)
+#        self.wireCombo1200_2.setMaximumWidth(width)
+
+        self.asyncCheckBoxe1200_2 = QCheckBox()
+        self.asyncCheckBoxe1200_2.setFocusPolicy(Qt.NoFocus)
+        self.asyncCheckBoxe1200_2.setChecked(self.aw.qmc.phidget1200_2_async)
+        self.asyncCheckBoxe1200_2.stateChanged.connect(self.asyncFlagStateChanged1200_2)
+            
+        self.changeTriggerCombo1200_2 = QComboBox()
+        self.changeTriggerCombo1200_2.setFocusPolicy(Qt.NoFocus)
+        model = self.changeTriggerCombo1200_2.model()
+        changeTriggerItems = self.createItems(self.aw.qmc.phidget1200_changeTriggersStrings)
+        for item in changeTriggerItems:
+            model.appendRow(item)
+        try:
+            self.changeTriggerCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_changeTriggersValues.index(self.aw.qmc.phidget1200_2_changeTrigger))
+        except Exception:
+            pass
+        self.changeTriggerCombo1200_2.setMinimumContentsLength(4)
+        width = self.changeTriggerCombo1200_2.minimumSizeHint().width()
+        self.changeTriggerCombo1200_2.setMinimumWidth(width)
+#        self.changeTriggerCombo1200_2.setMaximumWidth(width) 
+        self.changeTriggerCombo1200_2.setEnabled(self.aw.qmc.phidget1200_async)
+        
+        self.rateCombo1200_2 = QComboBox()
+        self.rateCombo1200_2.setFocusPolicy(Qt.NoFocus)
+        model = self.rateCombo1200_2.model()
+        dataRateItems = self.createItems(self.aw.qmc.phidget1200_dataRatesStrings)
+        for item in dataRateItems:
+            model.appendRow(item)
+        try:
+            self.rateCombo1200_2.setCurrentIndex(self.aw.qmc.phidget1200_dataRatesValues.index(self.aw.qmc.phidget1200_2_dataRate))
+        except Exception:
+            pass
+        self.rateCombo1200_2.setMinimumContentsLength(3)
+        width = self.rateCombo1200_2.minimumSizeHint().width()
+        self.rateCombo1200_2.setMinimumWidth(width)
+#        self.rateCombo1200_2.setMaximumWidth(width)
+#---
         
         typeLabel = QLabel(QApplication.translate("Label","Type", None))
         wireLabel = QLabel(QApplication.translate("Label","Wiring", None))
         asyncLabel = QLabel(QApplication.translate("Label","Async", None))
         changeLabel = QLabel(QApplication.translate("Label","Change", None))
         rateLabel = QLabel(QApplication.translate("Label","Rate", None))
+        
+        typeLabel2 = QLabel(QApplication.translate("Label","Type", None))
+        wireLabel2 = QLabel(QApplication.translate("Label","Wiring", None))
+        asyncLabel2 = QLabel(QApplication.translate("Label","Async", None))
+        changeLabel2 = QLabel(QApplication.translate("Label","Change", None))
+        rateLabel2 = QLabel(QApplication.translate("Label","Rate", None))
         
         phidgetBox1200.addWidget(typeLabel,1,0,Qt.AlignRight)
         phidgetBox1200.addWidget(self.formulaCombo1200,1,1)
@@ -605,6 +680,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetBox1200.addWidget(self.changeTriggerCombo1200,4,1)
         phidgetBox1200.addWidget(rateLabel,5,0,Qt.AlignRight)
         phidgetBox1200.addWidget(self.rateCombo1200,5,1)
+        
+        phidgetBox1200_2.addWidget(typeLabel2,1,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(self.formulaCombo1200_2,1,1)
+        phidgetBox1200_2.addWidget(wireLabel2,2,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(self.wireCombo1200_2,2,1)
+        phidgetBox1200_2.addWidget(asyncLabel2,3,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(self.asyncCheckBoxe1200_2,3,1)
+        phidgetBox1200_2.addWidget(changeLabel2,4,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(self.changeTriggerCombo1200_2,4,1)
+        phidgetBox1200_2.addWidget(rateLabel2,5,0,Qt.AlignRight)
+        phidgetBox1200_2.addWidget(self.rateCombo1200_2,5,1)
 
         phidget1200HBox = QHBoxLayout()
         phidget1200HBox.addStretch()
@@ -612,13 +698,37 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidget1200HBox.addStretch()
         phidget1200VBox = QVBoxLayout()
         phidget1200VBox.addLayout(phidget1200HBox)
-        phidget1200VBox.addStretch()
-        
-        phidget1200GroupBox = QGroupBox("TMP1200 RTD")
+        phidget1200VBox.addStretch()        
         phidget1200VBox.setContentsMargins(0,0,0,0)
         phidget1200HBox.setContentsMargins(0,0,0,0)
-        phidget1200GroupBox.setLayout(phidget1200VBox)
+        
+        phidget1200HBox_2 = QHBoxLayout()
+        phidget1200HBox_2.addStretch()
+        phidget1200HBox_2.addLayout(phidgetBox1200_2)
+        phidget1200HBox_2.addStretch()
+        phidget1200VBox_2 = QVBoxLayout()
+        phidget1200VBox_2.addLayout(phidget1200HBox_2)
+        phidget1200VBox_2.addStretch()        
+        phidget1200VBox_2.setContentsMargins(0,0,0,0)
+        phidget1200HBox_2.setContentsMargins(0,0,0,0)
+        
+        phidget1200_tabs = QTabWidget()
+        phidget1200_tab1_widget = QWidget()
+        phidget1200_tab1_widget.setLayout(phidget1200VBox)
+        phidget1200_tabs.addTab(phidget1200_tab1_widget,"A")
+        
+        phidget1200_tab2_widget = QWidget()
+        phidget1200_tab2_widget.setLayout(phidget1200VBox_2)
+        phidget1200_tabs.addTab(phidget1200_tab2_widget,"B")
+        
+        phidgetGroupBoxLayout = QVBoxLayout()
+        phidgetGroupBoxLayout.addWidget(phidget1200_tabs)
+        
+        phidget1200GroupBox = QGroupBox("TMP1200 RTD")
+#        phidget1200GroupBox.setLayout(phidget1200VBox)
+        phidget1200GroupBox.setLayout(phidgetGroupBoxLayout)
         phidget1200GroupBox.setContentsMargins(0,10,0,0)
+        
         
         # DAQ1400 VI
         powerLabel = QLabel(QApplication.translate("Label","Power", None))
@@ -1137,7 +1247,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         else:
             # enable ChangeTrigger selection
             self.changeTriggerCombo1200.setEnabled(True)
-    
+            
+    @pyqtSlot(int)
+    def asyncFlagStateChanged1200_2(self,x):
+        if x == 0:
+            # disable ChangeTrigger selection
+            self.changeTriggerCombo1200_2.setEnabled(False)
+        else:
+            # enable ChangeTrigger selection
+            self.changeTriggerCombo1200_2.setEnabled(True)
+     
     @pyqtSlot(int)
     def asyncFlagStateChanged(self,x):
         try:
@@ -2381,6 +2500,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 113 is +Probat Sample Heater but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 114 is +TMP1200_2 (a second TMP1200 configuration)
+                ##########################
 
                 # ADD DEVICE:
 
@@ -2510,6 +2632,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 111
                 1, # 112
                 1, # 113
+                1, # 114
                 ] 
             #init serial settings of extra devices
             for i in range(len(self.aw.qmc.extradevices)):
@@ -2603,6 +2726,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.phidget1200_async = self.asyncCheckBoxe1200.isChecked()
             self.aw.qmc.phidget1200_changeTrigger = self.aw.qmc.phidget1200_changeTriggersValues[self.changeTriggerCombo1200.currentIndex()]
             self.aw.qmc.phidget1200_dataRate = self.aw.qmc.phidget1200_dataRatesValues[self.rateCombo1200.currentIndex()]
+            
+            self.aw.qmc.phidget1200_2_formula = self.formulaCombo1200_2.currentIndex()
+            self.aw.qmc.phidget1200_2_wire = self.wireCombo1200_2.currentIndex()
+            self.aw.qmc.phidget1200_2_async = self.asyncCheckBoxe1200_2.isChecked()
+            self.aw.qmc.phidget1200_2_changeTrigger = self.aw.qmc.phidget1200_changeTriggersValues[self.changeTriggerCombo1200_2.currentIndex()]
+            self.aw.qmc.phidget1200_2_dataRate = self.aw.qmc.phidget1200_dataRatesValues[self.rateCombo1200_2.currentIndex()]
             
             self.aw.qmc.phidgetDAQ1400_powerSupply = self.powerCombo1400.currentIndex()
             self.aw.qmc.phidgetDAQ1400_inputMode = self.modeCombo1400.currentIndex()

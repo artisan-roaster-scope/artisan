@@ -446,6 +446,7 @@ class serialport(object):
                                    self.probat_sample,        #111
                                    self.probat_sample_drum_air, #112
                                    self.probat_sample_heater,   #113
+                                   self.PHIDGET_TMP1200_2,    #114
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -914,6 +915,11 @@ class serialport(object):
     def PHIDGET_TMP1200(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
         t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
+        return tx,a,t
+
+    def PHIDGET_TMP1200_2(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200,alternative_conf=True)
         return tx,a,t
         
     def PHIDGET_HUB0000(self):
@@ -1969,12 +1975,15 @@ class serialport(object):
         res = []
         for i in range(mode*2,mode*2+2):
             if self.aw.s7.area[i]:
-                if self.aw.s7.type[i] == 1:
-                    v = self.aw.s7.readFloat(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i])
-                elif self.aw.s7.type[i] == 2:
-                    v = self.aw.s7.readBool(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],0) # we always read bit 0
-                else:
+                if self.aw.s7.type[i] == 0:
                     v = self.aw.s7.readInt(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i])
+                elif self.aw.s7.type[i] == 1:
+                    v = self.aw.s7.readFloat(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i])
+                else:
+                    if self.aw.s7.readBool(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],i-2):
+                        v = 1
+                    else:
+                        v = 0
                 v = self.processChannelData(v,self.aw.s7.div[i],("C" if self.aw.s7.mode[i]==1 else ("F" if self.aw.s7.mode[i]==2 else "")))
                 res.append(v)
             else:
@@ -2553,8 +2562,25 @@ class serialport(object):
             self.PhidgetIRSensor.setDataInterval(self.aw.qmc.phidget1200_dataRate)
         except Exception:
             pass
+    
+    def configureOneRTD_2(self):
+        self.Phidget1045values = []
+        self.Phidget1045lastvalue = -1
+        self.PhidgetIRSensor.setRTDType(PHIDGET_RTD_TYPE(self.aw.qmc.phidget1200_2_formula))
+        self.PhidgetIRSensor.setRTDWireSetup(PHIDGET_RTD_WIRE(self.aw.qmc.phidget1200_2_wire))
+        if self.aw.qmc.phidget1200_async:
+            self.PhidgetIRSensor.setTemperatureChangeTrigger(self.aw.qmc.phidget1200_2_changeTrigger)
+            self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
+        else:
+            self.PhidgetIRSensor.setTemperatureChangeTrigger(0)
+            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda *_:None)
+        # set rate
+        try:
+            self.PhidgetIRSensor.setDataInterval(self.aw.qmc.phidget1200_2_dataRate)
+        except Exception:
+            pass
 
-    def phidget1045attached(self,serial,port,deviceType):
+    def phidget1045attached(self,serial,port,deviceType,alternative_conf=False):
         try:
             self.aw.qmc.phidgetManager.reserveSerialPort(serial,port,0,"PhidgetTemperatureSensor",deviceType,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
             if deviceType != DeviceID.PHIDID_TMP1200:
@@ -2569,7 +2595,10 @@ class serialport(object):
                 self.configureOneTC()
                 self.aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input attached",None))
             elif deviceType == DeviceID.PHIDID_TMP1200:
-                self.configureOneRTD()
+                if alternative_conf:
+                    self.configureOneRTD_2()
+                else:
+                    self.configureOneRTD()
                 self.aw.sendmessage(QApplication.translate("Message","Phidget VINT RTD 1-input attached",None))
         except:
             pass
@@ -2591,7 +2620,8 @@ class serialport(object):
             pass
 
     # this one is reused for the 1045 (IR), the 1051 (1xTC), TMP1100 (1xTC), and TMP1200 (1xRTD)
-    def PHIDGET1045temperature(self,deviceType=DeviceID.PHIDID_1045,retry=True):
+    # if alternative_conf is set, the second configuration for the TMP1200 module is used
+    def PHIDGET1045temperature(self,deviceType=DeviceID.PHIDID_1045,retry=True,alternative_conf=False):
         try:
             if not self.PhidgetIRSensor and self.aw.qmc.phidgetManager is not None:
                 ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType,
@@ -2603,7 +2633,7 @@ class serialport(object):
                     else:
                         self.PhidgetIRSensorIC = PhidgetTemperatureSensor()
                     try:
-                        self.PhidgetIRSensor.setOnAttachHandler(lambda _:self.phidget1045attached(ser,port,deviceType))
+                        self.PhidgetIRSensor.setOnAttachHandler(lambda _:self.phidget1045attached(ser,port,deviceType,alternative_conf))
                         self.PhidgetIRSensor.setOnDetachHandler(lambda _:self.phidget1045detached(ser,port,deviceType))
                         if self.aw.qmc.phidgetRemoteFlag:
                             self.addPhidgetServer()
@@ -2656,7 +2686,7 @@ class serialport(object):
                 try:
                     if (deviceType == DeviceID.PHIDID_1045 and self.aw.qmc.phidget1045_async) or \
                         (deviceType in [DeviceID.PHIDID_1051,DeviceID.PHIDID_TMP1100] and self.aw.qmc.phidget1048_async[0]) or \
-                        (deviceType == DeviceID.PHIDID_TMP1200 and self.aw.qmc.phidget1200_async):
+                        (deviceType == DeviceID.PHIDID_TMP1200 and ((alternative_conf and self.aw.qmc.phidget1200_2_async) or self.aw.qmc.phidget1200_async)):
                         async_res = None
                         try:
                             #### lock shared resources #####
@@ -2667,7 +2697,10 @@ class serialport(object):
                                 if deviceType == DeviceID.PHIDID_1045:
                                     rate = self.aw.qmc.phidget1045_dataRate
                                 elif deviceType == DeviceID.PHIDID_TMP1200:
-                                    rate = self.aw.qmc.phidget1200_dataRate
+                                    if alternative_conf:
+                                        rate = self.aw.qmc.phidget1200_2_dataRate
+                                    else:
+                                        rate = self.aw.qmc.phidget1200_dataRate
                                 else:
                                     rate = self.aw.qmc.phidget1048_dataRate
                                 self.Phidget1045values = self.Phidget1045values[-round((self.aw.qmc.delay/rate)):]
@@ -2716,7 +2749,7 @@ class serialport(object):
                         return res,ambient
             elif retry:
                 libtime.sleep(0.1)
-                return self.PHIDGET1045temperature(deviceType,retry=False)
+                return self.PHIDGET1045temperature(deviceType,retry=False,alternative_conf=alternative_conf)
             else:
                 return -1,-1
         except Exception as ex:

@@ -556,7 +556,7 @@ class s7port(object):
                 # cache hit
                 res = bytearray([
                     self.readingsCache[area][dbnumber][start]])
-                return self.get_bool(res,0,0)
+                return self.get_bool(res,0,index)
             else:     
                 if self.isConnected():
                     retry = self.readRetries   

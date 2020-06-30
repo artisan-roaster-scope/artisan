@@ -891,6 +891,12 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_dataRatesStrings = ["250ms","500ms","750ms","1s"]
         self.phidget1200_dataRatesValues = [250,500,700,1024]
 
+        self.phidget1200_2_async = False
+        self.phidget1200_2_formula = 0
+        self.phidget1200_2_wire = 0
+        self.phidget1200_2_changeTrigger = 0.2
+        self.phidget1200_2_dataRate = 250
+
         self.phidget1046_async = [False]*4
         self.phidget1046_gain = [1]*4 # defaults to no gain (values are 0-based)
         self.phidget1046_gainValues = ["1", "8","16","32","64","128"] # 1 for no gain
@@ -1010,7 +1016,7 @@ class tgraphcanvas(FigureCanvas):
                        "+Phidget HUB IO 45",#65
                        "-Omega HH806W",         #66 NOT WORKING
                        "VOLTCRAFT PL-125-T2",   #67
-                       "Phidget TMP1200 1xRTD", #68
+                       "Phidget TMP1200 1xRTD A", #68
                        "Phidget IO Digital 01",         #69
                        "+Phidget IO Digital 23",        #70
                        "+Phidget IO Digital 45",        #71
@@ -1056,6 +1062,7 @@ class tgraphcanvas(FigureCanvas):
                        "Probat Sample",             #111
                        "+Probat Sample Drum/Air",   #112
                        "+Probat Sample Heater",     #113
+                       "+Phidget TMP1200 1xRTD B",  #114
                        ]
 
         # ADD DEVICE:
@@ -16845,7 +16852,6 @@ class ApplicationWindow(QMainWindow):
 
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
     def setTare(self,n):
-        print("setTare",n)
         if self.qmc.flagon: # we set the tare value
             if n == 0:
                 temp = (self.qmc.temp1 if self.qmc.flagstart else self.qmc.on_temp1)
@@ -16864,7 +16870,6 @@ class ApplicationWindow(QMainWindow):
             postfix = temp[-3:]
             if len(postfix) > 0:
                 stable_reading = numpy.median(postfix)
-                print("stable_reading",stable_reading)
                 if symb_formula == "":
                     self.channel_tare_values[n] = stable_reading
                 else:
@@ -25692,6 +25697,12 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidget1200_async = bool(toBool(settings.value("phidget1200_async",self.qmc.phidget1200_async)))
                 self.qmc.phidget1200_changeTrigger = aw.float2float(toFloat(settings.value("phidget1200_changeTrigger",self.qmc.phidget1200_changeTrigger)))
                 self.qmc.phidget1200_dataRate = toInt(settings.value("phidget1200_dataRate",self.qmc.phidget1200_dataRate))
+            if settings.contains("phidget1200_2_formula"):
+                self.qmc.phidget1200_2_formula = toInt(settings.value("phidget1200_2_formula",self.qmc.phidget1200_2_formula))
+                self.qmc.phidget1200_2_wire = toInt(settings.value("phidget1200_2_wire",self.qmc.phidget1200_2_wire))
+                self.qmc.phidget1200_2_async = bool(toBool(settings.value("phidget1200_2_async",self.qmc.phidget1200_2_async)))
+                self.qmc.phidget1200_2_changeTrigger = aw.float2float(toFloat(settings.value("phidget1200_2_changeTrigger",self.qmc.phidget1200_2_changeTrigger)))
+                self.qmc.phidget1200_2_dataRate = toInt(settings.value("phidget1200_2_dataRate",self.qmc.phidget1200_2_dataRate))
             if settings.contains("phidgetDAQ1400_powerSupply"):
                 self.qmc.phidgetDAQ1400_powerSupply = toInt(settings.value("phidgetDAQ1400_powerSupply",self.qmc.phidgetDAQ1400_powerSupply))
                 self.qmc.phidgetDAQ1400_inputMode = toInt(settings.value("phidgetDAQ1400_inputMode",self.qmc.phidgetDAQ1400_inputMode))
@@ -27335,6 +27346,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidget1200_async",self.qmc.phidget1200_async)
             settings.setValue("phidget1200_changeTrigger",self.qmc.phidget1200_changeTrigger)
             settings.setValue("phidget1200_dataRate",self.qmc.phidget1200_dataRate)
+            settings.setValue("phidget1200_2_formula",self.qmc.phidget1200_2_formula)
+            settings.setValue("phidget1200_2_wire",self.qmc.phidget1200_2_wire)
+            settings.setValue("phidget1200_2_async",self.qmc.phidget1200_2_async)
+            settings.setValue("phidget1200_2_changeTrigger",self.qmc.phidget1200_2_changeTrigger)
+            settings.setValue("phidget1200_2_dataRate",self.qmc.phidget1200_2_dataRate)
             settings.setValue("phidgetDAQ1400_powerSupply",self.qmc.phidgetDAQ1400_powerSupply)
             settings.setValue("phidgetDAQ1400_inputMode",self.qmc.phidgetDAQ1400_inputMode)
             settings.setValue("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)
