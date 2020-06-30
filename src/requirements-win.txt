@@ -1,10 +1,10 @@
 gevent==1.5.0
 gevent-websocket==0.10.1
-numpy==1.18.4
+numpy==1.18.5
 colorspacious==1.1.2
-scipy==1.4.1
+scipy==1.3.3 #1.4.1 or 1.5.0
 matplotlib==3.2.2
-PyQt5==5.15.0
+PyQt5==5.14.2 #5.15.0
 openpyxl==3.0.3
 pyinstaller==3.6
 pywin32==227

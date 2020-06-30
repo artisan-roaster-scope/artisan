@@ -4,9 +4,9 @@ pyobjc-framework-Cocoa==6.2
 py2app==0.21
 gevent==1.5.0
 gevent-websocket==0.10.1
-numpy==1.18.4 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
+numpy==1.18.5 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
 colorspacious==1.1.2
-scipy==1.4.1
+scipy==1.4.1 # 1.5.0 released already
 matplotlib==3.2.2
 PyQt5==5.14.2 # 5.15.0 breaks custom event buttons. They only fire after a modal dialog has been opened. Very strange!
 openpyxl==3.0.3

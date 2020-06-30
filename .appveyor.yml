@@ -9,9 +9,9 @@ environment:
     secure: 9UB76Z8mCWYt1u7Ci2fPVNiI3iK3LzTuIPhtNGBbxKP7YOPaUuq2yHxRjIfRPEAx
   UPLOADTOOL_BODY:
     "WARNING: pre-release builds may not work. Use at your own risk."
-  matrix:
-    - PYTHON: "C:\\Python38-x64"
-      PYTHON_VERSION: 3.8.x
+  matrix: # NOTE: on updating Python, update also the PYTHON var in src/artisan-win.spec !!
+    - PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: 3.7.x 
       ARTISAN_VERSION: 2.4.1
 
 install:
