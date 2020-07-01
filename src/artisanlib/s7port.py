@@ -206,7 +206,7 @@ class s7port(object):
                 if platf == 'Linux':
                     snap7dll = os.path.join(libpath,"libsnap7.so")
                 else: # Windows:
-                    snap7dll = os.path.join(libpath,"snap7.dll")                
+                    snap7dll = os.path.join(libpath,"snap7.dll")
                 load_snap7_library(snap7dll) # will ensure to load it only once
             self.libLoaded = True
         
@@ -358,7 +358,7 @@ class s7port(object):
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
 
             else:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
+                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
         except Exception as e:
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeFloat: " + str(e))
@@ -368,19 +368,19 @@ class s7port(object):
             if self.aw.seriallogflag:
                 self.aw.addserial("S7 writeFloat({},{},{},{})".format(area,dbnumber,start,value))
 
-    def writeInt(self,area,dbnumber,start,value): 
+    def writeInt(self,area,dbnumber,start,value):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.isConnected():           
+            if self.isConnected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                     self.set_int(ba, 0, int(value))
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
 
             else:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
+                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
         except Exception as e:
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeInt: " + str(e))
@@ -395,14 +395,13 @@ class s7port(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.isConnected():           
+            if self.isConnected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,1)
                     self.set_bool(ba, 0, int(index), bool(value))
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
-
             else:
-                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
+                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
         except Exception as e:
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeBool: " + str(e))
@@ -429,8 +428,8 @@ class s7port(object):
                 return self.get_real(res,0)
             else:
                 if self.isConnected():
-                    retry = self.readRetries   
-                    res = None             
+                    retry = self.readRetries
+                    res = None
                     while True:
                         try:
                             with suppress_stdout_stderr():
@@ -454,7 +453,7 @@ class s7port(object):
                         return self.get_real(res,0)
                 else:
                     self.commError = True  
-                    self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))                                 
+                    self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
                     return -1
         except Exception as e:
             if self.aw.qmc.flagon:
@@ -475,7 +474,7 @@ class s7port(object):
             if self.isConnected():
                 try:
                     with suppress_stdout_stderr():
-                        res = self.plc.read_area(self.areas[area],dbnumber,start,4)                        
+                        res = self.plc.read_area(self.areas[area],dbnumber,start,4)
                     return self.get_real(res,0)
                 except:
                     return None
@@ -491,8 +490,8 @@ class s7port(object):
             self.COMsemaphore.acquire(1)
             self.connect()
             if self.isConnected():
-                retry = self.readRetries   
-                res = None             
+                retry = self.readRetries
+                res = None
                 while True:
                     try:
                         with suppress_stdout_stderr():
@@ -559,8 +558,8 @@ class s7port(object):
                 return self.get_bool(res,0,index)
             else:     
                 if self.isConnected():
-                    retry = self.readRetries   
-                    res = None             
+                    retry = self.readRetries
+                    res = None
                     while True:
                         try:
                             with suppress_stdout_stderr():

@@ -31,7 +31,7 @@ svValues=110, 161, 179, 193, 198, 202, 204, 205
 
 [DefaultButtons]
 buttonactions=3, 0, 0, 0, 0, 0, 3, 0
-buttonactionstrings="write(15,11,1)", , , , , , "write(15,12,1)", 
+buttonactionstrings="write(15,11,1)", , , , , , "write(15,12,1),write(15,10,0)", 
 buttonvisibility=true, true, true, true, true, false, true, false
 extrabuttonactions=3, 3, 0
 extrabuttonactionstrings="write(15,11,0);write(15,12,0)", "write(15,11,0)", 
@@ -58,7 +58,7 @@ extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
-extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
 extradevicecolor1=#8b0008, #1f83c9, #8b0008
 extradevicecolor2=#8d8b8a, #00aa44, black
 extradevices=33, 55, 109
@@ -88,9 +88,9 @@ extraeventsvalues=-1.5, 1.5, -1.5, 1.5, -1.5, 1.5, 1.1, 1.1, 1, 1
 extraeventsvisibility=1, 1, 1, 1, 1, 1, 0, 1, 1, 1
 
 [Modbus]
-PID_OFF_action=
-PID_ON_action=
-PID_SV_register=2
+PID_OFF_action="write(15,502,0)"
+PID_ON_action="write(15,502,1)"
+PID_SV_register=500
 PID_d_register=57
 PID_i_register=381
 PID_p_register=1083
@@ -134,21 +134,21 @@ input5code=3
 input5div=0
 input5float=false
 input5mode=
-input5register=30
+input5register=504
 input5slave=15
 input6bcd=false
 input6code=3
 input6div=0
 input6float=false
 input6mode=
-input6register=40
+input6register=506
 input6slave=15
 input7bcd=false
 input7code=3
 input7div=0
 input7float=false
 input7mode=
-input7register=50
+input7register=508
 input7slave=15
 input8bcd=false
 input8code=3
@@ -178,6 +178,7 @@ roastertype=IP Xenakis iRm
 
 [Sliders]
 ModeTempSliders=C
+eventsliderBernoulli=0, 0, 0, 0
 eventslidercoarse=0, 0, 0, 0
 eventslidersflags=1, 1, 1
 eventslidertemp=0, 0, 0, 0
