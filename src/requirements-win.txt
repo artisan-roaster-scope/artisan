@@ -7,6 +7,7 @@ matplotlib==3.2.2
 PyQt5==5.15.0 #5.14.2
 openpyxl==3.0.4
 pyinstaller==3.5 # v3.6 on Windows breaks on some machines, v3.5 has a security issue but only in --onefile mode
+# NOTE: pyinstaller 3.5 is NOT compatible with Python3.8
 # pyinstaller 3.6 issue: https://github.com/pyinstaller/pyinstaller/issues/4213
 pywin32==228
 keyring==19.2.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller

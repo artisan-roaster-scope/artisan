@@ -10,16 +10,14 @@ environment:
   UPLOADTOOL_BODY:
     "WARNING: pre-release builds may not work. Use at your own risk."
   matrix:
-    - PYTHON: "C:\\Python38-x64"
-      PYTHON_VERSION: 3.8.x
+    - PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: 3.7.x
       ARTISAN_VERSION: 2.4.1
 # NOTE: on updating Python, update also the PYTHON var in src/artisan-win.spec !!
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  - echo %PATH%
-  - "SET PATH=C:\\Python38-x64\\Scripts;%PATH%"
-  - echo %PATH%
+#  - echo %PATH%
   - "%PYTHON%\\python.exe -m pip install --upgrade pip"
   - pip install -r src\requirements.txt
   - pip install -r src\requirements-win.txt
