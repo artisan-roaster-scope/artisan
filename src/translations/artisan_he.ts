@@ -275,7 +275,7 @@ END</source>
         <translation type="unfinished">שמור תמונה</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="793"/>
+        <location filename="../artisanlib/ports.py" line="795"/>
         <source>Help</source>
         <translation type="unfinished">עזרה</translation>
     </message>
@@ -620,7 +620,7 @@ END</source>
         <translation type="unfinished">נתונים</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="259"/>
+        <location filename="../artisanlib/ports.py" line="260"/>
         <source>Start</source>
         <translation type="unfinished">הקלט</translation>
     </message>
@@ -926,7 +926,7 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="921"/>
+        <location filename="../artisanlib/ports.py" line="923"/>
         <source>Scan</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1419,12 +1419,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="80"/>
+        <location filename="../artisanlib/ports.py" line="81"/>
         <source>Fct. 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="83"/>
+        <location filename="../artisanlib/ports.py" line="84"/>
         <source>Fct. 4</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1479,12 +1479,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="251"/>
+        <location filename="../artisanlib/ports.py" line="252"/>
         <source>Int</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="254"/>
+        <location filename="../artisanlib/ports.py" line="255"/>
         <source>Float</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2187,12 +2187,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="561"/>
+        <location filename="../artisanlib/ports.py" line="563"/>
         <source>bytes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="565"/>
+        <location filename="../artisanlib/ports.py" line="567"/>
         <source>words</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3574,7 +3574,7 @@ Extra Device</source>
         <translation type="unfinished">לא ניתן לפתוח פורט סיראלי</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1477"/>
+        <location filename="../artisanlib/ports.py" line="1479"/>
         <source>Serial Exception: invalid comm port</source>
         <translation type="unfinished">פורט לא זמין</translation>
     </message>
@@ -3779,7 +3779,7 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1482"/>
+        <location filename="../artisanlib/ports.py" line="1484"/>
         <source>Serial Exception: timeout</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3950,7 +3950,7 @@ Extra Device</source>
         <translation type="unfinished">רישום טמפ&apos; ידני</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="426"/>
+        <location filename="../artisanlib/ports.py" line="428"/>
         <source>Ports Configuration</source>
         <translation type="unfinished">קינפוג פורטים</translation>
     </message>
@@ -4080,12 +4080,12 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="59"/>
+        <location filename="../artisanlib/ports.py" line="60"/>
         <source>Scan Modbus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1437"/>
+        <location filename="../artisanlib/ports.py" line="1439"/>
         <source>MODBUS Help</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4110,7 +4110,7 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="220"/>
+        <location filename="../artisanlib/ports.py" line="221"/>
         <source>Scan S7</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4418,7 +4418,7 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1122"/>
+        <location filename="../artisanlib/ports.py" line="1124"/>
         <source>PID</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4458,17 +4458,17 @@ Extra Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1082"/>
+        <location filename="../artisanlib/ports.py" line="1084"/>
         <source>Registers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1099"/>
+        <location filename="../artisanlib/ports.py" line="1101"/>
         <source>Commands</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="856"/>
+        <location filename="../artisanlib/ports.py" line="858"/>
         <source>Input</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8005,7 +8005,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="930"/>
+        <location filename="../artisanlib/ports.py" line="932"/>
         <source>Mode</source>
         <translation type="unfinished">מצב</translation>
     </message>
@@ -8030,7 +8030,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">מקס</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="928"/>
+        <location filename="../artisanlib/ports.py" line="930"/>
         <source>Start</source>
         <translation>הקלט</translation>
     </message>
@@ -8230,7 +8230,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">קיזוז</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="931"/>
+        <location filename="../artisanlib/ports.py" line="933"/>
         <source>Factor</source>
         <translation type="unfinished">פקטור</translation>
     </message>
@@ -8300,7 +8300,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">נגן שלבים</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="742"/>
+        <location filename="../artisanlib/ports.py" line="744"/>
         <source>Device</source>
         <translation type="unfinished">מכשיר</translation>
     </message>
@@ -8315,7 +8315,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">קרא ט.פ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="929"/>
+        <location filename="../artisanlib/ports.py" line="931"/>
         <source>Type</source>
         <translation type="unfinished">סוג</translation>
     </message>
@@ -8435,7 +8435,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">רקע</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1205"/>
+        <location filename="../artisanlib/ports.py" line="1207"/>
         <source>Host</source>
         <translation type="unfinished">רֶשֶׁת</translation>
     </message>
@@ -8515,7 +8515,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="obsolete">אחרי</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1089"/>
+        <location filename="../artisanlib/ports.py" line="1091"/>
         <source>ON</source>
         <translation type="unfinished">הפעל</translation>
     </message>
@@ -9230,7 +9230,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1211"/>
+        <location filename="../artisanlib/ports.py" line="1213"/>
         <source>Port</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9395,7 +9395,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1086"/>
+        <location filename="../artisanlib/ports.py" line="1088"/>
         <source>OFF</source>
         <translation type="unfinished">סיים</translation>
     </message>
@@ -9442,7 +9442,7 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1018"/>
+        <location filename="../artisanlib/ports.py" line="1020"/>
         <source>SV</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9547,17 +9547,17 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1040"/>
+        <location filename="../artisanlib/ports.py" line="1042"/>
         <source>P</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1046"/>
+        <location filename="../artisanlib/ports.py" line="1048"/>
         <source>I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1052"/>
+        <location filename="../artisanlib/ports.py" line="1054"/>
         <source>D</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9572,102 +9572,102 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="590"/>
+        <location filename="../artisanlib/ports.py" line="592"/>
         <source>Slave</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="508"/>
+        <location filename="../artisanlib/ports.py" line="510"/>
         <source>Register</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="753"/>
+        <location filename="../artisanlib/ports.py" line="755"/>
         <source>Comm Port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="757"/>
+        <location filename="../artisanlib/ports.py" line="759"/>
         <source>Baud Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="763"/>
+        <location filename="../artisanlib/ports.py" line="765"/>
         <source>Byte Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="769"/>
+        <location filename="../artisanlib/ports.py" line="771"/>
         <source>Parity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="776"/>
+        <location filename="../artisanlib/ports.py" line="778"/>
         <source>Stopbits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="782"/>
+        <location filename="../artisanlib/ports.py" line="784"/>
         <source>Timeout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="462"/>
+        <location filename="../artisanlib/ports.py" line="464"/>
         <source>Settings for non-Modbus devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="509"/>
+        <location filename="../artisanlib/ports.py" line="511"/>
         <source>Decode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="510"/>
+        <location filename="../artisanlib/ports.py" line="512"/>
         <source>Function</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="511"/>
+        <location filename="../artisanlib/ports.py" line="513"/>
         <source>Divider</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="559"/>
+        <location filename="../artisanlib/ports.py" line="561"/>
         <source>little-endian</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1026"/>
+        <location filename="../artisanlib/ports.py" line="1028"/>
         <source>SV Multiplier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1033"/>
+        <location filename="../artisanlib/ports.py" line="1035"/>
         <source>p-i-d Multiplier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="909"/>
+        <location filename="../artisanlib/ports.py" line="911"/>
         <source>Rack</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="915"/>
+        <location filename="../artisanlib/ports.py" line="917"/>
         <source>Slot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1007"/>
+        <location filename="../artisanlib/ports.py" line="1009"/>
         <source>Area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1013"/>
+        <location filename="../artisanlib/ports.py" line="1015"/>
         <source>DB#</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="955"/>
+        <location filename="../artisanlib/ports.py" line="957"/>
         <source>Input</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9827,12 +9827,12 @@ LCDs All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1218"/>
+        <location filename="../artisanlib/ports.py" line="1220"/>
         <source>Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1224"/>
+        <location filename="../artisanlib/ports.py" line="1226"/>
         <source>Machine ID</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12350,7 +12350,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1475"/>
+        <location filename="../artisanlib/ports.py" line="1477"/>
         <source>Serial Port Settings: {0}, {1}, {2}, {3}, {4}, {5}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13078,17 +13078,17 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">סטייל</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1251"/>
+        <location filename="../artisanlib/ports.py" line="1253"/>
         <source>ET/BT</source>
         <translation type="unfinished">ט.ס\ט.פ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1254"/>
+        <location filename="../artisanlib/ports.py" line="1256"/>
         <source>Extra</source>
         <translation type="unfinished">תוספות</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1263"/>
+        <location filename="../artisanlib/ports.py" line="1265"/>
         <source>Scale</source>
         <translation type="unfinished">משקל</translation>
     </message>
@@ -13103,7 +13103,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">תצוגות</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1266"/>
+        <location filename="../artisanlib/ports.py" line="1268"/>
         <source>Color</source>
         <translation type="unfinished">צבע</translation>
     </message>
@@ -13208,17 +13208,17 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1257"/>
+        <location filename="../artisanlib/ports.py" line="1259"/>
         <source>Modbus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1260"/>
+        <location filename="../artisanlib/ports.py" line="1262"/>
         <source>S7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1269"/>
+        <location filename="../artisanlib/ports.py" line="1271"/>
         <source>WebSocket</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13336,7 +13336,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">צבע טקסט</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1334"/>
+        <location filename="../artisanlib/ports.py" line="1336"/>
         <source>Device</source>
         <translation type="unfinished">מכשיר</translation>
     </message>
@@ -13586,32 +13586,32 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1334"/>
+        <location filename="../artisanlib/ports.py" line="1336"/>
         <source>Comm Port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1334"/>
+        <location filename="../artisanlib/ports.py" line="1336"/>
         <source>Baud Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1334"/>
+        <location filename="../artisanlib/ports.py" line="1336"/>
         <source>Byte Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1334"/>
+        <location filename="../artisanlib/ports.py" line="1336"/>
         <source>Parity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1334"/>
+        <location filename="../artisanlib/ports.py" line="1336"/>
         <source>Stopbits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1334"/>
+        <location filename="../artisanlib/ports.py" line="1336"/>
         <source>Timeout</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14022,7 +14022,7 @@ Pungency</source>
         <translation type="unfinished">מחק לחצן אחרון</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="791"/>
+        <location filename="../artisanlib/ports.py" line="793"/>
         <source>Show help</source>
         <translation type="unfinished">הראה עזרה</translation>
     </message>
@@ -14404,17 +14404,17 @@ Note: Erases all existing background curves.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1088"/>
+        <location filename="../artisanlib/ports.py" line="1090"/>
         <source>OFF Action String</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1091"/>
+        <location filename="../artisanlib/ports.py" line="1093"/>
         <source>ON Action String</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="694"/>
+        <location filename="../artisanlib/ports.py" line="696"/>
         <source>Scan MODBUS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14498,7 +14498,7 @@ has to be reduced by 4 times.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="922"/>
+        <location filename="../artisanlib/ports.py" line="924"/>
         <source>Scan S7</source>
         <translation type="unfinished"></translation>
     </message>

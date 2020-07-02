@@ -23184,7 +23184,7 @@ class ApplicationWindow(QMainWindow):
                 t = self.qmc.timex[self.qmc.timeindex[7]] - self.qmc.timex[self.qmc.timeindex[6]]
                 cooling.text = "%02d:%02d"% divmod(t,60)
             else:
-                cooling.text = "00:00"
+                cooling.text = "00:00" 
 
             switchpoints = ET.SubElement(tree, "switchpoints")
             # take data from 2nd extra event type
