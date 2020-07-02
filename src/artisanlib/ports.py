@@ -17,6 +17,7 @@
 # Marko Luther, 2020
 
 import sys
+import time
 import platform
 
 from artisanlib.util import toFloat, uchr
@@ -324,6 +325,7 @@ class scanS7Dlg(ArtisanDialog):
                 if res is not None:
                     result += "{}: {}<br>".format(str(register),str(res))
                     self.S7Edit.setHtml(result)
+                time.sleep(0.4)
         except:
             pass
         # reconstruct S7 setup

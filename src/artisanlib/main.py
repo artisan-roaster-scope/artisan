@@ -9330,7 +9330,7 @@ class tgraphcanvas(FigureCanvas):
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
-                    self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down,-50,1.,draggable_anno_key=-1)
+                    self.l_annotations += self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down,0,1.,draggable_anno_key=-1)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need to update the background cache with the new annotation
                     st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
@@ -10363,7 +10363,7 @@ class tgraphcanvas(FigureCanvas):
                                         anno = self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                                          color=textcolor,
                                                          va="center", ha="center",
-                                                         arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4,relpos=(0,0)),
+                                                         arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4), #,relpos=(0,0)),
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                                          fontsize=fontsize,
                                                          fontproperties=fontprop_small,
@@ -22823,7 +22823,7 @@ class ApplicationWindow(QMainWindow):
                 except Exception:
                     pass
 
-                if not aw.curFile: # if no foreground is loaded, autoadjustAxis
+                if not aw.curFile and len(self.qmc.timex) < 10: # if no foreground is loaded, autoadjustAxis
                     aw.autoAdjustAxis(True)
 
                 if len(self.qmc.timeB) > backgroundDrop:
