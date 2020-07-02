@@ -16,7 +16,7 @@ portalocker==1.7.0
 prettytable==0.7.2
 Phidget22==1.6.20200426
 natsort==7.0.1
-xlrd==1.2.6
+xlrd==1.2.0
 requests-file==1.5.1
 lxml==4.5.1
 websocket-client==0.57.0
