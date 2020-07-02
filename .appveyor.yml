@@ -18,7 +18,7 @@ environment:
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - echo %PATH%
-  - "SET PATH=C:\Python38-x64\Scripts;%PATH%"
+  - "SET PATH=C:\\Python38-x64\\Scripts;%PATH%"
   - echo %PATH%
   - "%PYTHON%\\python.exe -m pip install --upgrade pip"
   - pip install -r src\requirements.txt
