@@ -34,7 +34,7 @@ matrix:
       - HOMEBREW_NO_ANALYTICS=1
       - MACOSX_DEPLOYMENT_TARGET=10.13
   - os: linux
-    python: 3.7 # NOTE: on update, update also the var PYTHON_PATH in src/build-linux.sh
+    python: 3.8 # NOTE: on update, update also the var PYTHON_PATH in src/build-linux.sh
     dist: xenial
     cache:
       - pip

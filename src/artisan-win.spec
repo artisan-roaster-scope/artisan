@@ -9,7 +9,7 @@ if os.environ.get('APPVEYOR'):
   PYTHON = r'c:\python38-x64'
 else:
   ARTISAN_SRC = r'C:\Users\luther\Desktop\src'
-  PYTHON = r'C:\Program Files\Python37'
+  PYTHON = r'C:\Program Files\Python38'
 NAME = 'artisan'
 
 ##

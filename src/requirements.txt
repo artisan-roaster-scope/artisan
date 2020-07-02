@@ -4,19 +4,19 @@ unidecode==1.1.1
 bottle==0.12.18
 qrcode==6.1
 requests==2.23.0
-yoctopuce==1.10.40411
+yoctopuce==1.10.41115
 pefile==2019.4.18
 altgraph==0.17
 macholib==1.14
 python-snap7==0.11
 pyusb==1.0.2
-setuptools==46.3.0 #44.0.0 # v45.0.0 and later breaks with pyinstaller 3.6 https://github.com/pyinstaller/pyinstaller/issues/4672
+setuptools==47.3.1
 persist-queue==0.5.0
 portalocker==1.7.0
 prettytable==0.7.2
 Phidget22==1.6.20200426
 natsort==7.0.1
-xlrd==1.2.0
+xlrd==1.2.6
 requests-file==1.5.1
 lxml==4.5.1
 websocket-client==0.57.0
