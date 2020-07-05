@@ -238,25 +238,26 @@ class LargeLCDs(ArtisanDialog):
     # in horizontal layouts we add one more digit per LCD than needed as spacer for separation
     # in vertical layouts we add only the exact number of digits that are needed to fully display the number to save space (tight mode)
     def updateDecimals(self):
-        for lcd in self.lcds1 + self.lcds2:
-            if self.aw.qmc.LCDdecimalplaces:
-                if self.tight:
-                    lcd.setDigitCount(5)
-                    if not self.aw.qmc.flagon:
-                        lcd.display("  -.-")
+        for i,(lcd1,lcd2) in enumerate(zip(self.lcds1,self.lcds2)):
+            for j,lcd in enumerate([lcd1,lcd2]):
+                if self.aw.qmc.LCDdecimalplaces and not self.aw.qmc.intChannel(i,j):
+                    if self.tight:
+                        lcd.setDigitCount(5)
+                        if not self.aw.qmc.flagon:
+                            lcd.display("  -.-")
+                    else:
+                        lcd.setDigitCount(6)
+                        if not self.aw.qmc.flagon:
+                            lcd.display("   -.-")
                 else:
-                    lcd.setDigitCount(6)
-                    if not self.aw.qmc.flagon:
-                        lcd.display("   -.-")
-            else:
-                if self.tight:
-                    lcd.setDigitCount(3)
-                    if not self.aw.qmc.flagon:
-                        lcd.display(" --")
-                else:
-                    lcd.setDigitCount(4)
-                    if not self.aw.qmc.flagon:
-                        lcd.display("  --")
+                    if self.tight:
+                        lcd.setDigitCount(5)
+                        if not self.aw.qmc.flagon:
+                            lcd.display("   --")
+                    else:
+                        lcd.setDigitCount(6)
+                        if not self.aw.qmc.flagon:
+                            lcd.display("   --")
 
     # note that values1 and values2 can contain None values indicating that those lcds are not updated in this round
     def updateValues(self,values1,values2, *args, **kwargs):

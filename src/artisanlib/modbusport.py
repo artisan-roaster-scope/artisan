@@ -124,6 +124,7 @@ class modbusport(object):
         self.inputRegisters = [0]*self.channels
         self.inputFloats = [False]*self.channels
         self.inputBCDs = [False]*self.channels
+        self.inputFloatsAsInt = [False]*self.channels
         self.inputCodes = [3]*self.channels
         self.inputDivs = [0]*self.channels # 0: none, 1: 1/10, 2:1/100
         self.inputModes = ["C"]*self.channels

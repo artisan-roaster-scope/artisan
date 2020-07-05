@@ -1977,10 +1977,10 @@ class serialport(object):
             if self.aw.s7.area[i]:
                 if self.aw.s7.type[i] == 0:
                     v = self.aw.s7.readInt(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i])
-                elif self.aw.s7.type[i] == 1:
+                elif self.aw.s7.type[i] in [1,2]: # Type FLOAT and FLOAT2INT are read as floats the later are just displayed without decimals
                     v = self.aw.s7.readFloat(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i])
                 else:
-                    if self.aw.s7.readBool(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],i-2):
+                    if self.aw.s7.readBool(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],self.aw.s7.type[i]-3):
                         v = 1
                     else:
                         v = 0

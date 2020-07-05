@@ -2914,36 +2914,39 @@ class tgraphcanvas(FigureCanvas):
     # returns True if the extra device n, channel c, is of type MODBUS or S7, has no factor defined and is of type int
     # channel c is either 0 or 1
     def intChannel(self,n,c):
-        if aw.qmc.extradevices[n] == 29: # MODBUS
-            if c == 0:
-                return not aw.modbus.inputFloats[0] and aw.modbus.inputDivs[0] == 0 and aw.modbus.inputModes[0] == ""
+        if aw is not None and len(self.extradevices) > n:
+            if self.extradevices[n] == 29: # MODBUS
+                if c == 0:
+                    return aw.modbus.inputFloatsAsInt[0] or (not aw.modbus.inputFloats[0] and aw.modbus.inputDivs[0] == 0 and aw.modbus.inputModes[0] == "")
+                else:
+                    return aw.modbus.inputFloatsAsInt[1] or (not aw.modbus.inputFloats[1] and aw.modbus.inputDivs[1] == 0 and aw.modbus.inputModes[1] == "")
+            elif self.extradevices[n] == 33: # MODBUS_34
+                if c == 0:
+                    return aw.modbus.inputFloatsAsInt[2] or (not aw.modbus.inputFloats[2] and aw.modbus.inputDivs[2] == 0 and aw.modbus.inputModes[2] == "")
+                else:
+                    return aw.modbus.inputFloatsAsInt[3] or (not aw.modbus.inputFloats[3] and aw.modbus.inputDivs[3] == 0 and aw.modbus.inputModes[3] == "")
+            elif self.extradevices[n] == 55: # MODBUS_56
+                if c == 0:
+                    return aw.modbus.inputFloatsAsInt[4] or (not aw.modbus.inputFloats[4] and aw.modbus.inputDivs[4] == 0 and aw.modbus.inputModes[4] == "")
+                else:
+                    return aw.modbus.inputFloatsAsInt[5] or (not aw.modbus.inputFloats[5] and aw.modbus.inputDivs[5] == 0 and aw.modbus.inputModes[5] == "")
+            elif self.extradevices[n] == 109: # MODBUS_78
+                if c == 0:
+                    return aw.modbus.inputFloatsAsInt[6] or (not aw.modbus.inputFloats[6] and aw.modbus.inputDivs[6] == 0 and aw.modbus.inputModes[6] == "")
+                else:
+                    return aw.modbus.inputFloatsAsInt[7] or (not aw.modbus.inputFloats[7] and aw.modbus.inputDivs[7] == 0 and aw.modbus.inputModes[7] == "")
+            elif self.extradevices[n] == 70: # S7
+                return aw.s7.type[0+c] in [0,2] and aw.s7.mode[0+c] == 0 and (aw.s7.div[0+c] == 0 or aw.s7.type[0+c] == 2)
+            elif self.extradevices[n] == 80: # S7_34
+                return aw.s7.type[2+c] in [0,2] and aw.s7.mode[2+c] == 0 and (aw.s7.div[2+c] == 0 or aw.s7.type[2+c] == 2)
+            elif self.extradevices[n] == 81: # S7_56
+                return aw.s7.type[4+c] in [0,2] and aw.s7.mode[4+c] == 0 and (aw.s7.div[4+c] == 0 or aw.s7.type[4+c] == 2)
+            elif self.extradevices[n] == 82: # S7_78
+                return aw.s7.type[6+c] in [0,2] and aw.s7.mode[6+c] == 0 and (aw.s7.div[6+c] == 0 or aw.s7.type[6+c] == 2)
+            elif self.extradevices[n] == 110: # S7_910
+                return aw.s7.type[8+c] in [0,2] and aw.s7.mode[8+c] == 0 and (aw.s7.div[8+c] == 0 or aw.s7.type[8+c] == 2)
             else:
-                return not aw.modbus.inputFloats[1] and aw.modbus.inputDivs[1] == 0 and aw.modbus.inputModes[1] == ""
-        elif aw.qmc.extradevices[n] == 33: # MODBUS_34
-            if c == 0:
-                return not aw.modbus.inputFloats[2] and aw.modbus.inputDivs[2] == 0 and aw.modbus.inputModes[2] == ""
-            else:
-                return not aw.modbus.inputFloats[3] and aw.modbus.inputDivs[3] == 0 and aw.modbus.inputModes[3] == ""
-        elif aw.qmc.extradevices[n] == 55: # MODBUS_56
-            if c == 0:
-                return not aw.modbus.inputFloats[4] and aw.modbus.inputDivs[4] == 0 and aw.modbus.inputModes[4] == ""
-            else:
-                return not aw.modbus.inputFloats[5] and aw.modbus.inputDivs[5] == 0 and aw.modbus.inputModes[5] == ""
-        elif aw.qmc.extradevices[n] == 109: # MODBUS_78
-            if c == 0:
-                return not aw.modbus.inputFloats[6] and aw.modbus.inputDivs[6] == 0 and aw.modbus.inputModes[6] == ""
-            else:
-                return not aw.modbus.inputFloats[7] and aw.modbus.inputDivs[7] == 0 and aw.modbus.inputModes[7] == ""
-        elif aw.qmc.extradevices[n] == 70: # S7
-            return aw.s7.type[0+c] == 0 and aw.s7.mode[0+c] == 0 and aw.s7.div[0+c] == 0
-        elif aw.qmc.extradevices[n] == 80: # S7_34
-            return aw.s7.type[2+c] == 0 and aw.s7.mode[2+c] == 0 and aw.s7.div[2+c] == 0
-        elif aw.qmc.extradevices[n] == 81: # S7_56
-            return aw.s7.type[4+c] == 0 and aw.s7.mode[4+c] == 0 and aw.s7.div[4+c] == 0
-        elif aw.qmc.extradevices[n] == 82: # S7_78
-            return aw.s7.type[6+c] == 0 and aw.s7.mode[6+c] == 0 and aw.s7.div[6+c] == 0
-        elif aw.qmc.extradevices[n] == 110: # S7_910
-            return aw.s7.type[8+c] == 0 and aw.s7.mode[8+c] == 0 and aw.s7.div[8+c] == 0
+                False
         else:
             False
 
@@ -3045,7 +3048,7 @@ class tgraphcanvas(FigureCanvas):
                                     if sample_extratemp1[i]:
                                         fmt = lcdformat
                                         v = float(sample_extratemp1[i][-1])
-                                        if (v.is_integer() and self.intChannel(i,0)):
+                                        if self.intChannel(i,0):
                                             fmt = "%.0f"
                                         if -100 < v < 1000:
                                             extra1_value = fmt%v # everything fits
@@ -3064,7 +3067,7 @@ class tgraphcanvas(FigureCanvas):
                                     if sample_extratemp2[i]:
                                         fmt = lcdformat
                                         v = float(sample_extratemp2[i][-1])
-                                        if (v.is_integer() and self.intChannel(i,1)):
+                                        if self.intChannel(i,1):
                                             fmt = "%.0f"
                                         if -100 < v < 1000:
                                             extra2_value = fmt%v # everything fits
@@ -4805,8 +4808,16 @@ class tgraphcanvas(FigureCanvas):
         aw.lcd6.display(zz)
         aw.lcd7.display(zz)
         for i in range(aw.nLCDS):
-            aw.extraLCD1[i].display(zz)
-            aw.extraLCD2[i].display(zz)
+            if self.intChannel(i,0):
+                zz0 = "--"
+            else:
+                zz0 = zz
+            aw.extraLCD1[i].display(zz0)
+            if self.intChannel(i,1):
+                zz1 = "--"
+            else:
+                zz1 = zz
+            aw.extraLCD2[i].display(zz1)
         if aw.largeLCDs_dialog is not None:
             aw.largeLCDs_dialog.updateDecimals()
         if aw.largeDeltaLCDs_dialog is not None:
@@ -15999,8 +16010,14 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDlabel2.append(QLabel())
             self.extraLCDframe1[i].setVisible(False)
             if self.qmc.LCDdecimalplaces:
-                self.extraLCD1[i].display("-.-")
-                self.extraLCD2[i].display("-.-")
+                if self.qmc.intChannel(i,0):
+                    self.extraLCD1[i].display("--")
+                else:
+                    self.extraLCD1[i].display("-.-")
+                if self.qmc.intChannel(i,1):
+                    self.extraLCD2[i].display("--")
+                else:
+                    self.extraLCD2[i].display("-.-")
             else:
                 self.extraLCD1[i].display("--")
                 self.extraLCD2[i].display("--")
@@ -17438,7 +17455,7 @@ class ApplicationWindow(QMainWindow):
             if reply == QMessageBox.Cancel:
                 return
             elif reply == QMessageBox.Yes:
-                aw.loadSettings(fn=action.data()[0],remember=False,reset=False)
+                aw.loadSettings(fn=action.data()[0],remember=False,reset=False, theme=True)
                 self.sendmessage(QApplication.translate("Message","Loaded theme {0}", None).format(action.text()))
                 libtime.sleep(.8)
                 aw.qmc.redraw(True)
@@ -20314,12 +20331,15 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                 elif action == 15: # S7 Command
+                    # getDBbool(<dbnumber>,<start>,<index>)
                     # getDBint(<dbnumber>,<start>)
                     # getDBfloat(<dbnumber>,<start>)
-                    # getDBbool(<dbnumber>,<start>,<index>)
+                    #-
+                    # setDBbool(<dbnumber>,<start>,<index>,<value>)
                     # setDBint(<dbnumber>,<start>,<value>)
+                    # msetDBint(<dbnumber>,<start>,andMaks,orMask,value)
                     # setDBfloat(<dbnumber>,<start>,<value>)
-                    # setDBhool(<dbnumber>,<start>,<index>,<value>)
+                    #-
                     # sleep(<xx.yy>) xx.yy in seconds
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -20331,10 +20351,16 @@ class ApplicationWindow(QMainWindow):
                                     aw.s7.writeInt(5,int(dbnr),int(s),eval(v))
                                 except Exception:
                                     pass
+                            elif cs.startswith("msetDBint(") and len(cs) > 16:
+                                try:
+                                    dbnr,s,a,o,v = cs[len("msetDBint("):-1].split(',')
+                                    aw.s7.maskWriteInt(5,int(dbnr),int(s),int(a),int(o),eval(v))
+                                except Exception:
+                                    pass
                             elif cs.startswith("getDBint(") and len(cs) > 13:
                                 try:
                                     dbnr,s = cs[len("getDBint("):-1].split(',')
-                                    aw.s7.lastReadResult = aw.s7.getInt(5,int(dbnr),int(s))
+                                    aw.s7.lastReadResult = aw.s7.readInt(5,int(dbnr),int(s))
                                 except Exception:
                                     pass
                             elif cs.startswith("setDBfloat(") and len(cs) > 16:
@@ -20360,7 +20386,8 @@ class ApplicationWindow(QMainWindow):
                                     dbnr,s,i = cs[len("getDBbool("):-1].split(',')
                                     aw.s7.lastReadResult = aw.s7.readBool(5,int(dbnr),int(s),int(i))
                                 except Exception:
-                                    pass
+                                    pass                                   
+                                    
                             elif cs.startswith("button"):
                                 # cmd has format "button(<bool>)" # 0 or 1 or True or False
                                 try:
@@ -26095,6 +26122,7 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.inputSlaves[7] = toInt(settings.value("input8slave",self.modbus.inputSlaves[7]))
             if settings.contains("input8register"):
                 self.modbus.inputRegisters[7] = toInt(settings.value("input8register",self.modbus.inputRegisters[7]))
+            #----
             if settings.contains("input1float"):
                 self.modbus.inputFloats[0] = bool(toBool(settings.value("input1float",self.modbus.inputFloats[0])))
             if settings.contains("input1bcd"):
@@ -26165,6 +26193,15 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.inputDivs[5] = toInt(settings.value("input6div",self.modbus.inputDivs[5]))
                 self.modbus.inputDivs[6] = toInt(settings.value("input7div",self.modbus.inputDivs[6]))
                 self.modbus.inputDivs[7] = toInt(settings.value("input8div",self.modbus.inputDivs[7]))
+            if settings.contains("input1FloatsAsInt"):
+                self.modbus.inputFloatsAsInt[0] = bool(toBool(settings.value("input1FloatsAsInt",self.modbus.inputFloatsAsInt[0])))
+                self.modbus.inputFloatsAsInt[1] = bool(toBool(settings.value("input2FloatsAsInt",self.modbus.inputFloatsAsInt[1])))
+                self.modbus.inputFloatsAsInt[2] = bool(toBool(settings.value("input3FloatsAsInt",self.modbus.inputFloatsAsInt[2])))
+                self.modbus.inputFloatsAsInt[3] = bool(toBool(settings.value("input4FloatsAsInt",self.modbus.inputFloatsAsInt[3])))
+                self.modbus.inputFloatsAsInt[4] = bool(toBool(settings.value("input5FloatsAsInt",self.modbus.inputFloatsAsInt[4])))
+                self.modbus.inputFloatsAsInt[5] = bool(toBool(settings.value("input6FloatsAsInt",self.modbus.inputFloatsAsInt[5])))
+                self.modbus.inputFloatsAsInt[6] = bool(toBool(settings.value("input7FloatsAsInt",self.modbus.inputFloatsAsInt[6])))
+                self.modbus.inputFloatsAsInt[7] = bool(toBool(settings.value("input8FloatsAsInt",self.modbus.inputFloatsAsInt[7])))
             if settings.contains("PIDmultiplier"):
                 self.modbus.PIDmultiplier = toInt(settings.value("PIDmultiplier",self.modbus.PIDmultiplier))
                 self.modbus.SVmultiplier = toInt(settings.value("SVmultiplier",self.modbus.SVmultiplier))
@@ -26969,13 +27006,15 @@ class ApplicationWindow(QMainWindow):
             #update visibility of main event button, extra event buttons and
             self.applyStandardButtonVisibility()
 
-            aw.updateExtraButtonsVisibility()
+            self.updateExtraButtonsVisibility()
 
             #update individual visibility of each buttons
             self.realignbuttons()
+            
+            self.qmc.clearLCDs()
 
-            aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
-            aw.updateReadingsLCDsVisibility() # update visibility of reading LCD based on the users preference
+            self.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            self.updateReadingsLCDsVisibility() # update visibility of reading LCD based on the users preference
 
             if filename is None and self.full_screen_mode_active:
                 self.showFullScreen()
@@ -27557,6 +27596,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input1code",self.modbus.inputCodes[0])
             settings.setValue("input1div",self.modbus.inputDivs[0])
             settings.setValue("input1mode",self.modbus.inputModes[0])
+            settings.setValue("input1FloatsAsInt",self.modbus.inputFloatsAsInt[0])
             settings.setValue("input2slave",self.modbus.inputSlaves[1])
             settings.setValue("input2register",self.modbus.inputRegisters[1])
             settings.setValue("input2float",self.modbus.inputFloats[1])
@@ -27564,6 +27604,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input2code",self.modbus.inputCodes[1])
             settings.setValue("input2div",self.modbus.inputDivs[1])
             settings.setValue("input2mode",self.modbus.inputModes[1])
+            settings.setValue("input2FloatsAsInt",self.modbus.inputFloatsAsInt[1])
             settings.setValue("input3slave",self.modbus.inputSlaves[2])
             settings.setValue("input3register",self.modbus.inputRegisters[2])
             settings.setValue("input3float",self.modbus.inputFloats[2])
@@ -27571,6 +27612,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input3code",self.modbus.inputCodes[2])
             settings.setValue("input3div",self.modbus.inputDivs[2])
             settings.setValue("input3mode",self.modbus.inputModes[2])
+            settings.setValue("input3FloatsAsInt",self.modbus.inputFloatsAsInt[2])
             settings.setValue("input4slave",self.modbus.inputSlaves[3])
             settings.setValue("input4register",self.modbus.inputRegisters[3])
             settings.setValue("input4float",self.modbus.inputFloats[3])
@@ -27578,6 +27620,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input4code",self.modbus.inputCodes[3])
             settings.setValue("input4div",self.modbus.inputDivs[3])
             settings.setValue("input4mode",self.modbus.inputModes[3])
+            settings.setValue("input4FloatsAsInt",self.modbus.inputFloatsAsInt[3])
             settings.setValue("input5slave",self.modbus.inputSlaves[4])
             settings.setValue("input5register",self.modbus.inputRegisters[4])
             settings.setValue("input5float",self.modbus.inputFloats[4])
@@ -27585,6 +27628,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input5code",self.modbus.inputCodes[4])
             settings.setValue("input5div",self.modbus.inputDivs[4])
             settings.setValue("input5mode",self.modbus.inputModes[4])
+            settings.setValue("input5FloatsAsInt",self.modbus.inputFloatsAsInt[4])
             settings.setValue("input6slave",self.modbus.inputSlaves[5])
             settings.setValue("input6register",self.modbus.inputRegisters[5])
             settings.setValue("input6float",self.modbus.inputFloats[5])
@@ -27592,6 +27636,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input6code",self.modbus.inputCodes[5])
             settings.setValue("input6div",self.modbus.inputDivs[5])
             settings.setValue("input6mode",self.modbus.inputModes[5])
+            settings.setValue("input6FloatsAsInt",self.modbus.inputFloatsAsInt[5])
             settings.setValue("input7slave",self.modbus.inputSlaves[6])
             settings.setValue("input7register",self.modbus.inputRegisters[6])
             settings.setValue("input7float",self.modbus.inputFloats[6])
@@ -27599,6 +27644,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input7code",self.modbus.inputCodes[6])
             settings.setValue("input7div",self.modbus.inputDivs[6])
             settings.setValue("input7mode",self.modbus.inputModes[6])
+            settings.setValue("input7FloatsAsInt",self.modbus.inputFloatsAsInt[6])
             settings.setValue("input8slave",self.modbus.inputSlaves[7])
             settings.setValue("input8register",self.modbus.inputRegisters[7])
             settings.setValue("input8float",self.modbus.inputFloats[7])
@@ -27606,6 +27652,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input8code",self.modbus.inputCodes[7])
             settings.setValue("input8div",self.modbus.inputDivs[7])
             settings.setValue("input8mode",self.modbus.inputModes[7])
+            settings.setValue("input8FloatsAsInt",self.modbus.inputFloatsAsInt[7])
 
             settings.setValue("PIDmultiplier",self.modbus.PIDmultiplier)
             settings.setValue("SVmultiplier",self.modbus.SVmultiplier)
@@ -30792,13 +30839,20 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.inputCodes[i] = int(str(dialog.modbus_inputCodes[i].currentText()))
                 self.modbus.inputDivs[i] = dialog.modbus_inputDivs[i].currentIndex()
                 self.modbus.inputModes[i] = str(dialog.modbus_inputModes[i].currentText())
-                if dialog.modbus_inputDecodes[i].currentIndex() == 1:
+                if dialog.modbus_inputDecodes[i].currentIndex() == 3:
+                    self.modbus.inputFloatsAsInt[i] = True
+                    self.modbus.inputFloats[i] = True
+                    self.modbus.inputBCDs[i] = False
+                elif dialog.modbus_inputDecodes[i].currentIndex() == 1:
+                    self.modbus.inputFloatsAsInt[i] = False
                     self.modbus.inputFloats[i] = True
                     self.modbus.inputBCDs[i] = False
                 elif dialog.modbus_inputDecodes[i].currentIndex() == 2:
+                    self.modbus.inputFloatsAsInt[i] = False
                     self.modbus.inputFloats[i] = False
                     self.modbus.inputBCDs[i] = True
                 else:
+                    self.modbus.inputFloatsAsInt[i] = False
                     self.modbus.inputFloats[i] = False
                     self.modbus.inputBCDs[i] = False
 
@@ -30993,7 +31047,7 @@ class ApplicationWindow(QMainWindow):
     def loadSettings_triggered(self,_=False):
         self.loadSettings()
 
-    def loadSettings(self,fn=None,remember=True,reset=True,machine=False):
+    def loadSettings(self,fn=None,remember=True,reset=True,machine=False,theme=False):
         try:
             if fn:
                 filename = fn
@@ -31002,7 +31056,7 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 try:
                     aw.stopActivities()
-                    res = aw.settingsLoad(filename,machine=machine)
+                    res = aw.settingsLoad(filename,machine=machine,theme=theme)
                     if res and reset:
                         flag_temp = aw.qmc.roastpropertiesflag
                         aw.qmc.roastpropertiesflag = 1 # ensure that all roast properties are reset!

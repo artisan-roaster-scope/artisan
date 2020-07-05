@@ -97,6 +97,7 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','getDBfloat(<dbnumber>,<start>)',None),QApplication.translate('HelpDlg','read float from S7 DB',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','setDBbool(<dbnumber>,<start>,<index>,<value>)',None),QApplication.translate('HelpDlg','write bool to S7 DB',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','setDBint(<dbnumber>,<start>,<value>)',None),QApplication.translate('HelpDlg','write int to S7 DB',None)])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','msetDBint(<dbnumber>,<start>,<andMask>,<orMask>,<value>)',None),QApplication.translate('HelpDlg','write value where bits are replaced by those from orMask at positions where andMask bits are not set',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','setDBfloat(<dbnumber>,<start>,<value>)',None),QApplication.translate('HelpDlg','write float to S7 DB',None)])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Aillio R1 Heater',None),'&#160;',QApplication.translate('HelpDlg','sets heater to value',None)])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Aillio R1 Fan',None),'&#160;',QApplication.translate('HelpDlg','sets fan to value',None)])

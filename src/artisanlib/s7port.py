@@ -261,7 +261,7 @@ class s7port(object):
                 db_nr = self.db_nr[c]
                 register = self.start[c]
                 registers = [register] # BOOL
-                if self.type[c] == 1: # FLOAT
+                if self.type[c] in [1,2]: # FLOAT (or FLOAT2INT)
                     registers.append(register+1)
                     registers.append(register+2)
                     registers.append(register+3)
@@ -384,6 +384,28 @@ class s7port(object):
         except Exception as e:
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeInt: " + str(e))
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+            if self.aw.seriallogflag:
+                self.aw.addserial("S7 writeInt({},{},{},{})".format(area,dbnumber,start,value))
+
+    def maskWriteInt(self,area,dbnumber,start,and_mask,or_mask,value):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            if self.isConnected():
+                with suppress_stdout_stderr():
+                    ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                    new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
+                    self.set_int(ba, 0, int(new_val))
+                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+            else:
+                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
+        except Exception as e:
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " maskWriteInt: " + str(e))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)

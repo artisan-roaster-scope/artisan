@@ -25,6 +25,7 @@ from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.comm import serialport
 
 from help import modbus_help
+from help import s7_help
 
 from PyQt5.QtCore import (Qt, pyqtSlot, QEvent)
 from PyQt5.QtGui import QIntValidator
@@ -504,7 +505,7 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_function_codes = ["1","2","3","4"]
         modbus_modes = ["", "C","F"]
         modbus_divs = ["", "1/10","1/100"]
-        modbus_decode = ["", "Float","BCD"]
+        modbus_decode = ["", "Float","BCD", "IntFloat"]
         
         modbus_input1slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
         modbus_input1registerlabel = QLabel(QApplication.translate("Label", "Register",None))
@@ -552,7 +553,9 @@ class comportDlg(ArtisanResizeablDialog):
             self.modbus_inputDecodes[i] = QComboBox()
             self.modbus_inputDecodes[i].setFocusPolicy(Qt.NoFocus)
             self.modbus_inputDecodes[i].addItems(modbus_decode)
-            if self.aw.modbus.inputFloats[i]:
+            if self.aw.modbus.inputFloatsAsInt[i]:
+                self.modbus_inputDecodes[i].setCurrentIndex(3)
+            elif self.aw.modbus.inputFloats[i]:
                 self.modbus_inputDecodes[i].setCurrentIndex(1)
             elif self.aw.modbus.inputBCDs[i]:
                 self.modbus_inputDecodes[i].setCurrentIndex(2)
@@ -941,7 +944,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.s7_divCombos = []
         
         s7_areas = [" ","PE","PA","MK","CT","TM","DB"]
-        s7_types = ["Int", "Float", "Bool(0)", "Bool(1)", "Bool(2)", "Bool(3)", "Bool(4)", "Bool(5)", "Bool(6)", "Bool(7)"]
+        s7_types = ["Int", "Float", "IntFloat","Bool(0)", "Bool(1)", "Bool(2)", "Bool(3)", "Bool(4)", "Bool(5)", "Bool(6)", "Bool(7)"]
         
         s7_grid = QGridLayout()
         
@@ -1247,38 +1250,38 @@ class comportDlg(ArtisanResizeablDialog):
         tab7Layout.addLayout(ws_setup)
         tab7Layout.addStretch()
         #tab widget
-        TabWidget = QTabWidget()
+        self.TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra",None))
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Modbus",None))
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Modbus",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","S7",None))
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","S7",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Scale",None))
+        self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Scale",None))
         C6Widget = QWidget()
         C6Widget.setLayout(tab6Layout)
-        TabWidget.addTab(C6Widget,QApplication.translate("Tab","Color",None))
+        self.TabWidget.addTab(C6Widget,QApplication.translate("Tab","Color",None))
         C7Widget = QWidget()
         C7Widget.setLayout(tab7Layout)
-        TabWidget.addTab(C7Widget,QApplication.translate("Tab","WebSocket",None))
-        TabWidget.currentChanged.connect(self.tabSwitched)
+        self.TabWidget.addTab(C7Widget,QApplication.translate("Tab","WebSocket",None))
+        self.TabWidget.currentChanged.connect(self.tabSwitched)
         
         if devid == 29 or (devid == 0 and self.aw.ser.useModbusPort) : # switch to MODBUS tab if MODBUS device was selected as main device
             # or if PID and "Use ModbusPort" was selected
-            TabWidget.setCurrentIndex(2)
+            self.TabWidget.setCurrentIndex(2)
         elif devid == 79: # switch to S7 tab if S7 device was selected as main device
-            TabWidget.setCurrentIndex(3)
+            self.TabWidget.setCurrentIndex(3)
         #incorporate layouts
         Mlayout = QVBoxLayout()
-        Mlayout.addWidget(TabWidget)
+        Mlayout.addWidget(self.TabWidget)
         Mlayout.addLayout(buttonLayout)
         Mlayout.setContentsMargins(5,15,5,5)
         Mlayout.setSpacing(5)
@@ -1436,11 +1439,18 @@ class comportDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showModbusbuttonhelp(self,_=False):
-        self.helpdialog = self.aw.showHelpDialog(
-                self,            # this dialog as parent
-                self.helpdialog, # the existing help dialog
-                QApplication.translate("Form Caption","MODBUS Help",None),
-                modbus_help.content())
+        if self.TabWidget.currentIndex() == 2:
+            self.helpdialog = self.aw.showHelpDialog(
+                    self,            # this dialog as parent
+                    self.helpdialog, # the existing help dialog
+                    QApplication.translate("Form Caption","MODBUS Help",None),
+                    modbus_help.content())
+        elif self.TabWidget.currentIndex() == 3:
+            self.helpdialog = self.aw.showHelpDialog(
+                    self,            # this dialog as parent
+                    self.helpdialog, # the existing help dialog
+                    QApplication.translate("Form Caption","S7 Help",None),
+                    s7_help.content())
 
     def closeHelp(self):
         self.aw.closeHelpDialog(self.helpdialog)
