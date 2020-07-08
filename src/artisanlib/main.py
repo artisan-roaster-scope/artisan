@@ -26076,6 +26076,8 @@ class ApplicationWindow(QMainWindow):
                 self.s7.PID_ON_action = s2a(toString(settings.value("PID_ON_action",self.s7.PID_ON_action)))
                 self.s7.PIDmultiplier = toInt(settings.value("PIDmultiplier",self.s7.PIDmultiplier))
                 self.s7.SVmultiplier = toInt(settings.value("SVmultiplier",self.s7.SVmultiplier))
+            if settings.contains("SVtype"):
+                self.s7.SVtype = toInt(settings.value("SVtype",self.s7.SVtype))
             settings.endGroup()
             #restore modbus port
             settings.beginGroup("Modbus")
@@ -27572,6 +27574,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("PID_OFF_action",self.s7.PID_OFF_action)
             settings.setValue("PID_ON_action",self.s7.PID_ON_action)
             settings.setValue("PIDmultiplier",self.s7.PIDmultiplier)
+            settings.setValue("SVtype",self.s7.SVtype)
             settings.setValue("SVmultiplier",self.s7.SVmultiplier)
             settings.endGroup()
             #save modbus port
@@ -30888,6 +30891,7 @@ class ApplicationWindow(QMainWindow):
             self.s7.PID_db_nr = int(str(dialog.s7_PIDdb_nr_Edit.text()))
             self.s7.PID_SV_register = int(str(dialog.s7_SVregister_Edit.text()))
             self.s7.SVmultiplier = dialog.s7_SVmultiplier.currentIndex()
+            self.s7.SVtype = dialog.s7_SVtype.currentIndex()
             self.s7.PIDmultiplier = dialog.s7_PIDmultiplier.currentIndex()
             self.s7.PID_p_register = int(str(dialog.s7_Pregister_Edit.text()))
             self.s7.PID_i_register = int(str(dialog.s7_Iregister_Edit.text()))

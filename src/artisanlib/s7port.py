@@ -66,8 +66,9 @@ class s7port(object):
         self.PID_d_register = 0
         self.PID_ON_action = ""
         self.PID_OFF_action = ""
-        self.SVmultiplier = 0
         self.PIDmultiplier = 0
+        self.SVtype = 0
+        self.SVmultiplier = 0
         
         self.COMsemaphore = QSemaphore(1)
         
@@ -178,7 +179,10 @@ class s7port(object):
                 multiplier = 10.
             elif SVmultiplier == 2:
                 multiplier = 100.
-            self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_SV_register,int(round(sv*multiplier)))
+            if self.SVtype == 1:
+                self.writeFloat(self.PID_area-1,self.PID_db_nr,self.PID_SV_register,sv*multiplier)
+            else:
+                self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_SV_register,int(round(sv*multiplier)))
                     
     def isConnected(self):
         # the check on the CPU state is needed as get_connected() still returns True if the connect got terminated from the peer due to a bug in snap7

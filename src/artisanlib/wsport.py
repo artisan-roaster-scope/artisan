@@ -40,15 +40,17 @@ class wsport(object):
     def connect(self):
         if not self.is_connected():
             try:
+                error = ""
                 try:
-                    self.ws = create_connection("ws://{}:{}/{}".format(self.host,self.port,self.path),sslopt={"check_hostname": False})
+                    self.ws = create_connection("ws://{}:{}/{}".format(self.host,self.port,self.path)) # ,sslopt={"check_hostname": False})
                     self.ws.settimeout(self.timeout)
-                except:
+                except Exception as e1:
+                    error = e1
                     # we retry without the port
-                        self.ws = create_connection("ws://{}/{}".format(self.host,self.port,self.path),sslopt={"check_hostname": False})
+                    self.ws = create_connection("ws://{}/{}".format(self.host,self.port,self.path)) # ,sslopt={"check_hostname": False})                    
                 self.aw.sendmessage(QApplication.translate("Message","WebSocket connected", None))
-            except:
-                self.aw.qmc.adderror(QApplication.translate("Error Message","WebSocket connection failed",None))
+            except Exception:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","WebSocket connection failed: {}",None).format(error))
     
     def is_connected(self):
         return self.ws != None and self.ws.connected
