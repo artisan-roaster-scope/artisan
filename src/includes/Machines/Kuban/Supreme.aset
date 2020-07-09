@@ -1,6 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
+BackgroundAlpha=0.1
 
 [ArduinoPID]
 dutyMax=100
@@ -39,6 +40,7 @@ xextrabuttonactionstrings=,
 
 [Device]
 id=79
+Controlbuttonflag=true
 
 [ExtraComm]
 extrabaudrate=19200, 19200
