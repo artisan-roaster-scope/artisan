@@ -25,6 +25,7 @@
 
 import json
 import time
+import copy
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QSemaphore #, QTimer
@@ -310,10 +311,13 @@ def getCoffeesLabels(coffees):
 
 def coffee2beans(coffee):
     c = getCoffeeCoffeeDict(coffee)
-    if "origin" in c:
-        origin = QApplication.translate("Countries", c["origin"],None)
-    else:
-        origin = ""
+    origin = ""
+    try:
+        origin_str = c["origin"].strip()
+        if len(origin_str)>0 and origin_str != 'null':
+            origin = QApplication.translate("Countries", origin_str, None)
+    except:
+        pass
     if "label" in c:
         label = c["label"]
         if origin:
@@ -321,35 +325,51 @@ def coffee2beans(coffee):
     else:
         label = ""
     processing = ""
-    if "processing" in c:
-        processing = ' {}'.format(c["processing"])
+    try:
+        processing_str = c["processing"].strip()
+        if len(processing_str)>0 and processing_str != 'null':
+            processing = ' {}'.format(processing_str)
+    except:
+        pass
     grade = ""
-    if "grade" in c:
+    try:
         grade = ' {}'.format(c["grade"])
+    except:
+        pass
     varietals = ""
-    if "varietals" in c and len(c["varietals"]):
-        varietals = ' ({})'.format(', '.join(c["varietals"]))
+    try:
+        if "varietals" in c and c["varietals"] != None and len(c["varietals"]) > 0:
+            vs = [v.strip() for v in c["varietals"] if v != None and v != 'null' and v != '' ]
+            varietals = ' ({})'.format(', '.join(vs))
+    except:
+        pass
     bean = '{}{}{}'.format(processing,grade,varietals)
     if bean:
         bean = "," + bean
     year = ""
-    if "crop_date" in c:
+    try:
         cy = c["crop_date"]
         picked = None
         landed = None
-        if "picked" in cy and len(cy["picked"]) > 0:
-            picked = cy["picked"][0]
-        if "landed" in cy and len(cy["landed"]) > 0:
-            landed = cy["landed"][0]
-        if picked and not landed:
+        try:
+            picked = int(cy["picked"][0])
+        except:
+            pass
+        try:
+            landed = int(cy["landed"][0])
+        except:
+            pass
+        if picked is not None and not bool(landed):
             year = ', {:d}'.format(picked)
-        elif landed and not picked:
+        elif landed is not None and not bool(picked):
             year = ', {:d}'.format(landed)
-        elif picked and landed:
+        elif picked is not None and landed is not None:
             if picked == landed:
                 year = ', {:d}'.format(picked)
             else:
                 year = ', {:d}/{:d}'.format(picked,landed)
+    except:
+        pass
     return '{}{}{}{}'.format(origin,label,bean,year)
 
 def getCoffees(weight_unit_idx,store=None):
@@ -362,12 +382,20 @@ def getCoffees(weight_unit_idx,store=None):
             for c in stock["coffees"]:
                 try:
                     origin = ""
-                    if "origin" in c and c["origin"] is not None and c["origin"] != "":
-                        origin = QApplication.translate("Countries", c["origin"],None)
-                        if "crop_date" in c:
-                            cy = c["crop_date"]
-                            if "picked" in cy and len(cy["picked"]) > 0 and cy["picked"][0] is not None:
-                                origin += ' {:d}'.format(cy["picked"][0])
+                    try:
+                        origin_str = c["origin"].strip()
+                        if len(origin_str)>0 and origin_str != 'null':
+                            origin = QApplication.translate("Countries", origin_str, None)
+                    except:
+                        pass
+                    if origin != "":
+                        try:
+                            if "crop_date" in c:
+                                cy = c["crop_date"]
+                                if "picked" in cy and len(cy["picked"]) > 0 and cy["picked"][0] is not None:
+                                    origin += ' {:d}'.format(cy["picked"][0])
+                        except:
+                            pass
                         origin += ", "
                     label = c["label"]
                     if "default_unit" in c:
@@ -434,14 +462,146 @@ def getCoffeeStore(coffeeId,storeId,acquire_lock=True):
 #================== 
 # Blends
 #   blend:  <blendLabel,[blendDict,stockDict,maxAmount,coffeeLabelDict]>
-#     with
-#   coffeeLabelDict: {<CoffeeId>:<CoffeeLabel>}
+#        or <blendLabel,[blendDict,stockDict,maxAmount,coffeeLabelDict,replaceMaxAmount,replacementBlends]> for blends with replacement coffees defined
+#   
+#   blendDict: { "label": <blend name>, "hr_id": <BlendID>, "ingredients" : [{"ratio":<r>, "coffee":<CoffeeID>, "replace_coffee":<CoffeeID>}] }
+#        Note: "replace_coffee" can be missing in ingredients element
+#        Note: ingredients have an addtional "label" field with the name of the coffee and can feature density, moisture and screen_min and screen_max fields
+#              density, screen_min and screen_max fields are garanteed to hold valid integer > 0 if available
+#              moisture is guarateed to hold a valid float > 0 if available
+#   stockDict: { "location_hr_id": <StoreID>, "location_label": <locationName>, "amount": <amount of last ingredient in store }
+#   maxAmount: maximal amount in kg of coffee available to roast the original blend
+#   coffeeLabelDict: { <CoffeeId>:<CoffeeLabel> } # with <CoffeeLabel> a longer description like "Brazil Santos, 11.5%"
+#   replacementBlends: [(maxAmount, replacementBlendDict), ..., (maxAmount, replacementBlendDict)]  # list orderd by maxAmount
+#   replacementBlendDict: same format as blendDict, but without any "replace_coffee" entries in ingredients element
 
 def getBlendLabel(blend):
     return blend[0]
 
-def getBlendBlendDict(blend):
-    return blend[1][0]
+# composes a blend for weight in kg taking into account the defined replacement coffees per component
+def getBlendBlendDict(blend,weight=None):
+    if weight is None or (getBlendMaxAmount(blend) != 0 and weight <= getBlendMaxAmount(blend)) or not hasBlendReplace(blend):
+        return blend[1][0]
+    else:
+        if getBlendMaxAmount(blend) > 0:
+            res = copy.deepcopy(blend[1][0]) # we start with the original blend
+            max_amounts_blend_dicts = [(getBlendMaxAmount(blend),blend[1][0])] + \
+                [(getReplacementBlendMaxAmount(rb),getReplacementBlendBlendDict(rb)) for rb in getBlendReplacementBlends(blend)]
+        else:
+            # we ignore the original blend            
+            replacement_blends = getBlendReplacementBlends(blend)
+            res = getReplacementBlendBlendDict(replacement_blends[0])
+            max_amounts_blend_dicts = [(getReplacementBlendMaxAmount(rb),getReplacementBlendBlendDict(rb)) for rb in replacement_blends]
+        if weight > 0:
+            components = {} # associates coffees to the amounts used in the blend
+            components_labels = {} # associates components to their labels
+            components_moisture = {} # associates commponents to their moisture, if the moisture is known
+            components_density = {}  # associates commponents to their density, if the density is known
+            components_screen_min = {}   # associates commponents to their screen_min, if known
+            components_screen_max = {}   # associates commponents to their screen_max, if known
+            amount_spent = 0
+            for (max_amount,blend_dict) in max_amounts_blend_dicts:
+                remaining_amount = min(weight-amount_spent,max_amount)
+                # we consume the remaining_amount per component according to their blend ratio
+                for i in blend_dict["ingredients"]:
+                    c = i["coffee"]
+                    c_amount = 0
+                    if c in components:
+                        c_amount = components[c]
+                    components[c] = i["ratio"] * remaining_amount + c_amount
+                    if "label" in i:
+                        components_labels[c] = i["label"]
+                    if "moisture" in i:
+                        components_moisture[c] = i["moisture"]
+                    if "density" in i:
+                        components_density[c] = i["density"]
+                    if "screen_min" in i:
+                        components_screen_min[c] = i["screen_min"]
+                    if "screen_max" in i:
+                        components_screen_max[c] = i["screen_max"]
+                if weight-amount_spent <= max_amount:
+                    amount_spent = amount_spent + remaining_amount
+                    break
+                else:
+                    amount_spent = amount_spent + max_amount
+            # in case weight is larger than available amounts considering all replacements, the last replacement blend is "extended"
+            missing_amount = weight-amount_spent
+            if missing_amount > 0:
+                for i in max_amounts_blend_dicts[-1][1]["ingredients"]: # we "fill" according to the last replacement blend
+                    c = i["coffee"]
+                    c_amount = 0
+                    if c in components:
+                        c_amount = components[c]
+                    components[c] = i["ratio"] * missing_amount + c_amount
+                    components_labels[c] = i["label"]
+                    if "label" in i:
+                        components_labels[c] = i["label"]
+                    if "moisture" in i:
+                        components_moisture[c] = i["moisture"]
+                    if "density" in i:
+                        components_density[c] = i["density"]
+                    if "screen_min" in i:
+                        components_screen_min[c] = i["screen_min"]
+                    if "screen_max" in i:
+                        components_screen_max[c] = i["screen_max"]
+            
+            # we replace the ingredients with a recomputed set based on the usage per blend replaccement as accumulated in components and the weight
+            ingredients = []
+            moistures = []
+            densities = []
+            screen_mins = []
+            screen_maxs = []
+            for c,a in components.items():
+                ratio = a/weight
+                ingredient = { "coffee": c, "ratio" : ratio, "label": components_labels[c] }
+                if c in components_moisture:
+                    ingredient["moisture"] = components_moisture[c]
+                if c in components_density:
+                    ingredient["density"] = components_density[c]
+                if c in components_screen_min:
+                    ingredient["screen_min"] = components_screen_min[c]
+                if c in components_screen_max:
+                    ingredient["screen_max"] = components_screen_max[c]
+                ingredients.append(ingredient)
+                moistures.append(components_moisture[c]*ratio if c in components_moisture else None)
+                densities.append(components_density[c]*ratio if c in components_density else None)
+                screen_mins.append(components_screen_min[c] if c in components_screen_min else None)
+                screen_maxs.append(components_screen_max[c] if c in components_screen_max else None)
+            res["ingredients"] = ingredients
+            try:
+                if None in moistures:
+                    del res["moisture"]
+                else:
+                    res["moisture"] = config.app_window.float2float(sum(moistures))
+            except:
+                pass
+            try:
+                if None in densities:
+                    del res["density"]
+                else:
+                    res["density"] = int(round(sum(densities)))
+            except:
+                pass
+            try:
+                del res["screen_min"]
+            except:
+                pass
+            try:
+                del res["screen_max"]
+            except:
+                pass
+            try:
+                if None not in screen_mins and None not in screen_maxs:
+                    sizes = screen_mins + screen_maxs
+                    if len(sizes) > 0:
+                        min_size = min(sizes)
+                        max_size = max(sizes)
+                        res["screen_min"] = min_size
+                        if max_size != min_size:
+                            res["screen_max"] = max_size
+            except:
+                pass
+        return res
 
 def getBlendStockDict(blend):
     return blend[1][1]
@@ -451,9 +611,32 @@ def getBlendMaxAmount(blend):
 
 def getBlendCoffeeLabelDict(blend):
     return blend[1][3]
+
+def getBlendReplaceMaxAmount(blend):
+    if hasBlendReplace(blend):
+        return blend[1][4]
+    else:
+        return 0
+
+def getBlendReplacementBlends(blend):
+    if hasBlendReplace(blend):
+        return blend[1][5]
+    else:
+        return []
+
+def getReplacementBlendMaxAmount(replacementBlend):
+    return replacementBlend[0]
+    
+def getReplacementBlendBlendDict(replacementBlend):
+    return replacementBlend[1]
     
 def getBlendId(blend):
     return getBlendBlendDict(blend)["hr_id"]
+
+def hasBlendReplace(blend):
+    return len(blend[1]) > 5
+
+
 
 def getBlendLabels(blends):
     return [getBlendLabel(c) for c in blends]
@@ -461,20 +644,25 @@ def getBlendLabels(blends):
 def blend2beans(blend,weight_unit_idx,weightIn = 0):
     res = []
     try:
-        blends = getBlendBlendDict(blend)
+        # convert weightIn to g
+        v = config.app_window.convertWeight(weightIn,weight_unit_idx,config.app_window.qmc.weight_units.index("Kg")) # v is weightIn converted to kg
+        blends = getBlendBlendDict(blend,v)
         sorted_ingredients = sorted(blends["ingredients"], key=lambda x:x["ratio"],reverse=True)
         for i in sorted_ingredients:
             c = getBlendCoffeeLabelDict(blend)[i["coffee"]]
             if weightIn:
-                w = ", {}{}".format(config.app_window.float2float(i["ratio"]*weightIn,2),config.app_window.qmc.weight_units[weight_unit_idx]) # @UndefinedVariable
+                w = "  {}{}".format(config.app_window.float2float(i["ratio"]*weightIn,2),config.app_window.qmc.weight_units[weight_unit_idx]) # @UndefinedVariable
             else:
                 w = ""
-            res.append('{}%{} {}'.format(int(round(i["ratio"]*100)),w,c))
+            res.append('{}%{}  {}'.format(int(round(i["ratio"]*100)),w,c))
     except:
         pass
     return res
 
-# this one extends the blend dict by moisture, density and screensize min/max, if it can be computed from its components
+
+# returns a dict associating blend labels with blends, with their blend dicts extended by moisture, density and screensize min/max, if it can be computed from its components
+#   blend:  <blendLabel,[blendDict,stockDict,maxAmount,coffeeLabelDict]>
+#        or <blendLabel,[blendDict,stockDict,maxAmount,coffeeLabelDict,replaceMaxAmount,replacementBlends]> for blends with replacement coffees defined
 def getBlends(weight_unit_idx,store=None):
     global stock
     config.logger.debug("stock:getBlends(%s,%s)",weight_unit_idx,store)
@@ -488,70 +676,254 @@ def getBlends(weight_unit_idx,store=None):
                 stores = [store]   
             for s in stores:
                 location_label = ""
-                for blend in stock["blends"]:
-                    try:
-                        coffeeLabels = {}
-                        if "ingredients" in blend: 
-                            amount = None
-                            moisture = [] # for each ingredients we list its moisture*ratio, if the moisture is known
-                            density = []  # for each ingredients we list its density*ratio, if the density is known
-                            screen = []   # for each ingredients we list the screen_size tuple {'min':x,'max':y}
-                            for i in blend["ingredients"]:
-                                coffee = i["coffee"]
-                                ratio = i["ratio"]
-                                cd, sd = getCoffeeStore(coffee,s,acquire_lock=False) # if no stock of this coffee is available this returns None
-                                if ratio > 0:
-                                    if "moisture" in cd and cd["moisture"] is not None and cd["moisture"] > 0:
-                                        moisture.append(cd["moisture"]*ratio)
-                                    if "density" in cd and cd["density"] is not None and cd["density"] > 0:
-                                        density.append(cd["density"]*ratio)
-                                    if "screen_size" in cd and cd["screen_size"] is not None and len(cd["screen_size"]) > 0:
-                                        screen.append(cd["screen_size"])
-                                i["label"] = cd["label"] # add label of coffee to ingredient
-                                stock_amount = sd["amount"]   # if sd is None, this fails
-                                if location_label == "":
-                                    location_label = sd["location_label"]
-                                a = stock_amount / ratio
-                                if amount:
-                                    amount = min(a,amount)
-                                else:
-                                    amount = a
+                store_blends = []
+                if "blends" in stock:
+                    store_blends.extend(stock["blends"])
+                if "replBlends" in stock:
+                    store_blends.extend(stock["replBlends"])
+                for blend in store_blends:
+                    res_sd = None
+                    replacementBlends = [] # list of tuples (maxAmount, replacementBlendDict) with replacementBlendDict the same structure as blend but without replacement_coffees
+                        # replacementBlends are the blends to be roasted in order with their maximal amount until the blend recipe needs to be changed
+                        # the following entry holds the changed blend recipe again indicating the reach
+                        # note that while coffees of the orginal blend have to be distinct, those components can have replacement coffees that are identical to that of other blend components
+                        # the replaccement blends computed join those components according to their ratio. Thus a replacement blend may have less ingredients than the original blend
+                    if "ingredients" in blend: 
+                        coffeeLabels = {} # associates all coffees incl. replacements with their long labels, if known
+                        coffee_stock = {} # associates all coffees incl. replacements with their currrent amount in store s
+                        coffee_data = {}  # associates all coffees incl. replacements with their (cd,sd) tuple from getCoffeeStore(); Note: both cd and sd might be None.
+                        coffee_moisture = {} # associates all coffees incl. replacements with its moisture, if the moisture is known
+                        coffee_density = {}  # associates all coffees incl. replacements with its density, if the density is known
+                        coffee_screen_min = {}   # associates all coffees incl. replacements with its screen_min, if known
+                        coffee_screen_max = {}   # associates all coffees incl. replacements with its screen_max, if known
+                        # first we extract and store the initial amount of all components and replacements of the original blend
+                        for i in blend["ingredients"]:
+                            # register data for original coffees per component
+                            coffee = i["coffee"]
+                            cd, sd = getCoffeeStore(coffee,s,acquire_lock=False) # if no stock of this coffee is available this returns None
+                            if sd is None:
+                                coffee_stock[coffee] = 0
+                            else:
+                                res_sd = sd
+                                coffee_stock[coffee] = sd["amount"]
+                                coffee_data[coffee] = (cd,sd)
                                 coffeeLabels[coffee] = coffee2beans([coffee,[cd,sd]])
+                                if cd is not None:
+                                    if "label" in cd:
+                                        i["label"] = cd["label"] # add label of coffee to ingredient, used in the Roast Properties dialog for links to the coffees
+                                        try:
+                                            i["label"] = "{} {}".format(cd["crop_date"]["picked"][0],i["label"])
+                                        except:
+                                            pass
+                                    try:
+                                        m = float(cd["moisture"])
+                                        if m > 0:
+                                            coffee_moisture[coffee] = m
+                                            i["moisture"] = m
+                                    except:
+                                        pass
+                                    try:
+                                        d = int(cd["density"])
+                                        if d > 0:
+                                            coffee_density[coffee] = d
+                                            i["density"] = d
+                                    except:
+                                        pass
+                                    try:
+                                        screen_size_min = int(cd["screen_size"]["min"])
+                                        if screen_size_min>0:
+                                            coffee_screen_min[coffee] = screen_size_min
+                                            i["screen_min"] = screen_size_min
+                                    except:
+                                        pass
+                                    try:
+                                        screen_size_max = int(cd["screen_size"]["max"])
+                                        if screen_size_max>0:
+                                            coffee_screen_max[coffee] = screen_size_max
+                                            i["screen_max"] = screen_size_max
+                                    except:
+                                        pass
+                            # add data for replacements if any
+                            if "replace_coffee" in i:
+                                replaceCoffee = i["replace_coffee"]
+                                cd, sd = getCoffeeStore(replaceCoffee,s,acquire_lock=False) # if no stock of this coffee is available this returns None
+                                if sd == None:
+                                    coffee_stock[replaceCoffee] = 0
+                                else:
+                                    res_sd = sd
+                                    coffee_stock[replaceCoffee] = sd["amount"]
+                                    coffee_data[replaceCoffee] = (cd,sd)
+                                    coffeeLabels[replaceCoffee] = coffee2beans([replaceCoffee,[cd,sd]])
+                                    if cd is not None:
+                                        if "label" in cd:
+                                            i["replaceLabel"] = cd["label"] # add label of coffee to ingredient, used in the Roast Properties dialog for links to the coffees
+                                            try:
+                                                i["replaceLabel"] = "{} {}".format(cd["crop_date"]["picked"][0],i["replaceLabel"])
+                                            except:
+                                                pass
+                                        try:
+                                            m = float(cd["moisture"])
+                                            if m > 0:
+                                                coffee_moisture[replaceCoffee] = m
+                                        except:
+                                            pass
+                                        try:
+                                            d = int(cd["density"])
+                                            if d > 0:
+                                                coffee_density[replaceCoffee] = d
+                                        except:
+                                            pass
+                                        try:
+                                            screen_size_min = int(cd["screen_size"]["min"])
+                                            if screen_size_min>0:
+                                                coffee_screen_min[replaceCoffee] = screen_size_min
+                                        except:
+                                            pass
+                                        try:
+                                            screen_size_max = int(cd["screen_size"]["max"])
+                                            if screen_size_max>0:
+                                                coffee_screen_max[replaceCoffee] = screen_size_max
+                                        except:
+                                            pass
+                        # next we iterate again over the ingredients and replace coffees by their replacements if needed
+                        ingredients = copy.deepcopy(blend["ingredients"])
+                        while True:
+                            # we first compute the minimum reach over all components
+                            reach_per_ingredients = [coffee_stock[i["coffee"]] / i["ratio"] for i in ingredients]
+                            # if the minimum reach over all ingredients is larger than 0 we add an entry to the result list replacementBlends
+                            reach = min(reach_per_ingredients)
+                            # we also add the initial blend and blends with empty reach to replacementBlends and filter those out later
+                            new_blend = { "label": blend["label"], "hr_id": blend["hr_id"], "ingredients" : ingredients}
+                            moistures = [(coffee_moisture[i["coffee"]]*i["ratio"] if i["coffee"] in coffee_moisture else None) for i in ingredients]
+                            densities = [(coffee_density[i["coffee"]]*i["ratio"] if i["coffee"] in coffee_density else None) for i in ingredients]
+                            screen_mins = [(coffee_screen_min[i["coffee"]] if i["coffee"] in coffee_screen_min else None) for i in ingredients]
+                            screen_maxs = [(coffee_screen_max[i["coffee"]] if i["coffee"] in coffee_screen_max else None) for i in ingredients]
                             # only if the moisture of all components is known, we can estimate the moisture of this blend
-                            if len(blend["ingredients"]) == len(moisture):
-                                blend["moisture"] = config.app_window.float2float(sum(moisture),1)  # @UndefinedVariable
+                            if None not in moistures:
+                                new_blend["moisture"] = config.app_window.float2float(sum(moistures),1)  # @UndefinedVariable
+                                if replacementBlends == []:
+                                    # if we are processing the original blend, we store the computed moisture/density/screen also in blend
+                                    blend["moisture"] = new_blend["moisture"]
                             # only if the density of all components is known, we can estimate the density of this blend
-                            if len(blend["ingredients"]) == len(density):
-                                blend["density"] = config.app_window.float2float(sum(density),1)  # @UndefinedVariable
-                            if len(blend["ingredients"]) == len(screen):
-                                sizes = []
-                                for sc in screen:
-                                    if "min" in sc:
-                                        sizes.append(sc["min"])
-                                    if "max" in sc:
-                                        sizes.append(sc["max"])
+                            if None not in densities:
+                                new_blend["density"] = int(round(sum(densities)))  # @UndefinedVariable
+                                if replacementBlends == []:
+                                    # if we are processing the original blend, we store the computed moisture/density/screen also in blend
+                                    blend["density"] = new_blend["density"]
+                            if None not in screen_mins and None not in screen_maxs:
+                                sizes = screen_mins + screen_maxs
                                 if len(sizes) > 0:
                                     min_size = min(sizes)
                                     max_size = max(sizes)
-                                    blend["screen_min"] = min_size
+                                    new_blend["screen_min"] = min_size
+                                    if replacementBlends == []:
+                                        # if we are processing the original blend, we store the computed moisture/density/screen also in blend
+                                        blend["screen_min"] = new_blend["screen_min"]
                                     if max_size != min_size:
-                                        blend["screen_max"] = max_size
-                            if amount and amount > 0: # TODO: check here with machines capacity
-                                # add location only if this coffee is available in several locations
-                                if store:
-                                    loc = ""
+                                        new_blend["screen_max"] = max_size
+                                        if replacementBlends == []:
+                                            # if we are processing the original blend, we store the computed moisture/density/screen also in blend
+                                            blend["screen_max"] = new_blend["screen_max"]
+                            replacementBlends.append((reach,new_blend))
+                            
+                            # now check for (more) replacement blends
+
+                            if reach > 0:
+                                # and we deduce the relative amounts per components on consuming that reach
+                                for i in ingredients:
+                                    coffee_stock[i["coffee"]] = coffee_stock[i["coffee"]] - reach * i["ratio"]
+                            # now we see if we can get further on activating some replacements
+                            # we compute now a new replacement blend where components without stock get replaced by their replacement coffee if any
+                            ingredients_with_replacements = []
+                            out_of_stock = False
+                            for i in ingredients:
+                                if i["ratio"] > 0:
+                                    if coffee_stock[i["coffee"]] <= 0:
+                                        # this one needs a replacement
+                                        if "replace_coffee" in i:
+                                            # if that coffee is already used as an ingredients we add to its ratio
+                                            idx = next((j for j, e in enumerate(ingredients_with_replacements) if e["coffee"]==i["replace_coffee"]), None)
+                                            if idx is None:
+                                                # coffee is not yet used, we add an ingredients with this replacement coffee as coffee and its ratio, but without a further replacement coffee
+                                                rep_ingredients = {"coffee": i["replace_coffee"], "ratio": i["ratio"]}
+                                                # if copy ratio num/denom if given
+                                                if "ratio_num" in i:
+                                                    rep_ingredients["ratio_num"] = i["ratio_num"]
+                                                if "ratio_denom" in i:
+                                                    rep_ingredients["ratio_denom"] = i["ratio_denom"]
+                                                if "replaceLabel" in i:
+                                                    rep_ingredients["label"] = i["replaceLabel"]
+                                                ingredients_with_replacements.append(rep_ingredients)
+                                            else:
+                                                rep_ingredients = ingredients_with_replacements[idx]
+                                                rep_ingredients["ratio"] = rep_ingredients["ratio"] + i["ratio"]
+                                                # we remove ratio num/denom if given as they do not fit the updated ratio anymore
+                                                if "ratio_num" in rep_ingredients:
+                                                    del rep_ingredients["ratio_num"]
+                                                if "ratio_denom" in rep_ingredients:
+                                                    del rep_ingredients["ratio_denom"]
+                                            if i["replace_coffee"] in coffee_moisture:
+                                                rep_ingredients["moisture"] = coffee_moisture[i["replace_coffee"]]
+                                            if i["replace_coffee"] in coffee_density:
+                                                rep_ingredients["density"] = coffee_density[i["replace_coffee"]]
+                                            if i["replace_coffee"] in coffee_screen_min:
+                                                rep_ingredients["screen_min"] = coffee_screen_min[i["replace_coffee"]]
+                                            if i["replace_coffee"] in coffee_screen_max:
+                                                rep_ingredients["screen_max"] = coffee_screen_max[i["replace_coffee"]]
+                                        else:
+                                            # if a blend component is out of stock and does not feature a replacement component, we stop                            
+                                            out_of_stock = True
+                                    else:
+                                        idx = next((j for j, e in enumerate(ingredients_with_replacements) if e["coffee"]==i["coffee"]), None)
+                                        if idx is None:
+                                            ingredients_with_replacements.append(i)
+                                        else:
+                                            ingredients_with_replacements[idx]["ratio"] = ingredients_with_replacements[idx]["ratio"] + i["ratio"]
+                                            # we remove ratio num/denom if given as they do not fit the updated ratioanymore
+                                            if "ratio_num" in ingredients_with_replacements[idx]:
+                                                del ingredients_with_replacements[idx]["ratio_num"]
+                                            if "ratio_denom" in ingredients_with_replacements[idx]:
+                                                del ingredients_with_replacements[idx]["ratio_denom"]
+                                            
                                 else:
-                                    loc = location_label + ", "
-                                label = blend["label"] + " (" + loc + renderAmount(amount,target_unit_idx=weight_unit_idx) + ")"
-                                res[label] = [blend,sd,amount,coffeeLabels]
-                    except: # we end up here if a coffee is out of stock and thus cd and sd are None
-                        pass
+                                    out_of_stock = True
+                            if out_of_stock:
+                                break
+                            else:
+                                ingredients = ingredients_with_replacements
+                    if len(replacementBlends) > 0:
+                        amount = replacementBlends[0][0] # the first entry of the replacementBlends is the original blend, even if its amount is zero
+                        if len(replacementBlends) > 1: # at least one replacement, we sum up all those amounts
+                            max_replacement_amount = sum([r[0] for r in replacementBlends]) # the total reach using all replacement coffees
+                        else:
+                            max_replacement_amount = 0
+                        if res_sd != None and (amount > 0 or max_replacement_amount>0): # TODO: check here with machines capacity
+                            # add location only if this coffee is available in several locations
+                            if store:
+                                loc = ""
+                            else:
+                                loc = location_label + ", "
+                            if amount == 0:
+                                amount_str = "-"
+                            else:
+                                amount_str = renderAmount(amount,target_unit_idx=weight_unit_idx)
+                            if max_replacement_amount > 0:
+                                amount_str += "/" + renderAmount(max_replacement_amount,target_unit_idx=weight_unit_idx)
+                            label = blend["label"] + " (" + loc + amount_str + ")"
+                            # we filter all items from replacementBlends with empty amount and the first original blend
+                            replacementBlends = [rb for rb in replacementBlends[1:] if rb[0]>0]
+                            res[label] = [blend,res_sd,amount,coffeeLabels,max_replacement_amount,replacementBlends]
             return sorted(res.items(), key=lambda x: x[0])
         else:
             return []
+    except Exception as e:
+        import sys
+        _, _, exc_tb = sys.exc_info()
+        config.logger.error("stock getBlends(): -> failure line %s: %s",exc_tb.tb_lineno,e)
     finally:
         if stock_semaphore.available() < 1:
-            stock_semaphore.release(1)
+            stock_semaphore.release(1)                        
+
 
 # returns True if blendSpec of the form
 #   {"label": <blend-name>, "ingredients": [{"coffee": <hr_id>, "ratio": <n>}, .. ,{"coffee":<hr_id>, "ratio": <n>}]}

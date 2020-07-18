@@ -5540,7 +5540,7 @@ class serialport(object):
             #note: logged chars should not be binary
             if self.aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                self.aw.addserial("Serial Ccommand: " + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
+                self.aw.addserial("Serial Command: " + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
                 
 
 

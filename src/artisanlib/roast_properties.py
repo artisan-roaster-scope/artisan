@@ -24,6 +24,7 @@ import prettytable
 # import artisan.plus module
 import plus.config  # @UnusedImport
 import plus.util
+import plus.stock
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import deltaLabelUTF8,stringfromseconds,stringtoseconds, appFrozen
@@ -942,7 +943,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.beansedit = ClickableTextEdit()
         self.beansedit.editingFinished.connect(self.beansEdited)
         
-        self.beansedit.setMaximumHeight(60)
+#        self.beansedit.setMaximumHeight(60)
         if self.aw.qmc.beans is not None:
             self.beansedit.setNewPlainText(self.aw.qmc.beans)
                     
@@ -1355,7 +1356,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.plus_blend_selected_label = self.aw.qmc.plus_blend_label
                     self.plus_blend_selected_spec = self.aw.qmc.plus_blend_spec
                     self.plus_blend_selected_spec_labels = self.aw.qmc.plus_blend_spec_labels
-            self.plus_amount_selected = None # holds the amount of the selected coffee/blend if known
+            self.plus_amount_selected = None # holds the max amount of the selected coffee/blend if known
+            self.plus_amount_replace_selected = None # holds the max amount of the selected coffee/blend incl. replacements if known
             plusCoffeeslabel = QLabel("<b>" + QApplication.translate("Label", "Stock",None) + "</b>")
             self.plusStoreslabel = QLabel("<b>" + QApplication.translate("Label", "Store",None) + "</b>")
             self.plusBlendslabel = QLabel("<b>" + QApplication.translate("Label", "Blend",None) + "</b>")
@@ -1593,7 +1595,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.tab1aLayout.addLayout(mainLayout)
 #        self.tab1aLayout.addStretch()
         self.tab1aLayout.addLayout(textLayout)
-        self.tab1aLayout.addStretch()
+#        self.tab1aLayout.addStretch()
         self.tab1aLayout.setSpacing(8)
         self.tab1aLayout.addLayout(propGrid)
         self.tab1aLayout.addLayout(ambientGrid)
@@ -1602,7 +1604,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         tab1Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom
         tab1Layout.addLayout(self.tab1aLayout)
         tab1Layout.setSpacing(0)
-        tab1Layout.addStretch()
+#        tab1Layout.addStretch()
         # set volume from density if given
         self.density_in_editing_finished()
         self.density_out_editing_finished()
@@ -1826,13 +1828,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             if self.plus_coffee_selected is not None and self.plus_coffee_selected_label:
                 line = '<a href="{0}"{2}>{1}</a>'.format(plus.util.coffeeLink(self.plus_coffee_selected),self.plus_coffee_selected_label,dark_mode_link_color)
             elif self.plus_blend_selected_spec and self.plus_blend_selected_spec_labels:
-                for i,l in sorted(zip(self.plus_blend_selected_spec["ingredients"],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]["ratio"],reverse = True):
+                # limit to max 4 component links
+                for i,l in sorted(zip(self.plus_blend_selected_spec["ingredients"],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]["ratio"],reverse = True)[:4]:
                     if line:
                         line = line + ", "
-                    c = '<a href="{0}"{2}>{1}</a>'.format(plus.util.coffeeLink(i["coffee"]),l,dark_mode_link_color)
+                    c = '<a href="{0}"{2}>{1}</a>'.format(plus.util.coffeeLink(i["coffee"]),self.aw.qmc.abbrevString(l,18),dark_mode_link_color)
                     line = line + str(int(round(i["ratio"]*100))) + "% " + c
             if line and len(line)>0 and self.plus_store_selected is not None and self.plus_store_selected_label is not None:
-                line = line + ', <a href="{0}"{2}>{1}</a>'.format(plus.util.storeLink(self.plus_store_selected),self.plus_store_selected_label,dark_mode_link_color)
+                line = line + '  (<a href="{0}"{2}>{1}</a>)'.format(plus.util.storeLink(self.plus_store_selected),self.plus_store_selected_label,dark_mode_link_color)
             self.plus_selected_line.setText(line)
         except Exception:
             pass
@@ -2037,7 +2040,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             weightIn = float(str(self.weightinedit.text()))
         else:
             weightIn = 0.0
-        blend_lines = plus.stock.blend2beans(blend,self.unitsComboBox.currentIndex(),weightIn)
+        weight_unit_idx = self.unitsComboBox.currentIndex()
+        blend_lines = plus.stock.blend2beans(blend,weight_unit_idx,weightIn)
         self.beansedit.clear()
         for l in blend_lines:
             self.beansedit.append(l)
@@ -2047,20 +2051,22 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.updateBlendLines(blend)
             keep_modified_moisture = self.modified_moisture_greens_text
             keep_modified_density = self.modified_density_in_text
-            blend_dict = plus.stock.getBlendBlendDict(blend)
-            if "moisture" in blend_dict:
+            
+            blend_dict = self.getBlendDictCurrentWeight(blend)
+            
+            if "moisture" in blend_dict and blend_dict["moisture"] is not None:
                 self.moisture_greens_edit.setText("%g" % blend_dict["moisture"])
             else:
                 self.moisture_greens_edit.setText(str(0))
-            if "density" in blend_dict:
+            if "density" in blend_dict and blend_dict["density"] is not None:
                 self.bean_density_in_edit.setText("%g" % self.aw.float2float(blend_dict["density"]))
             else:
                 self.bean_density_in_edit.setText(str(0))
-            if "screen_min" in blend_dict:
+            if "screen_min" in blend_dict and blend_dict["screen_min"] is not None:
                 self.bean_size_min_edit.setText(str(int(blend_dict["screen_min"])))
             else:
                 self.bean_size_min_edit.setText("0")
-            if "screen_max" in blend_dict:
+            if "screen_max" in blend_dict and blend_dict["screen_max"] is not None:
                 self.bean_size_max_edit.setText(str(int(blend_dict["screen_max"])))
             else:
                 self.bean_size_max_edit.setText("0")
@@ -2081,21 +2087,21 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.beansedit.setPlainText(plus.stock.coffee2beans(coffee))
             keep_modified_moisture = self.modified_moisture_greens_text
             keep_modified_density = self.modified_density_in_text
-            if "moisture" in cd:
+            if "moisture" in cd and cd["moisture"] is not None:
                 self.moisture_greens_edit.setText("%g" % cd["moisture"])
             else:
                 self.moisture_greens_edit.setText(str(0))
-            if "density" in cd:
+            if "density" in cd and cd["density"] is not None:
                 self.bean_density_in_edit.setText("%g" % self.aw.float2float(cd["density"]))
             else:
                 self.bean_density_in_edit.setText(str(0)) 
-            if "screen_size" in cd:
+            if "screen_size" in cd and cd["screen_size"] is not None:
                 screen = cd["screen_size"]
-                if "min" in screen:
+                if "min" in screen and screen["min"] is not None:
                     self.bean_size_min_edit.setText(str(int(screen["min"])))
                 else:
                     self.bean_size_min_edit.setText("0")
-                if "max" in screen:
+                if "max" in screen and screen["max"] is not None:
                     self.bean_size_max_edit.setText(str(int(screen["max"])))
                 else:
                     self.bean_size_max_edit.setText("0")
@@ -2145,6 +2151,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_coffee_selected = None
             self.plus_coffee_selected_label = None
             self.plus_amount_selected = None
+            self.plus_amount_replace_selected = None
             self.updateTitle(prev_coffee_label,prev_blend_label)
         else:
             # reset blend and set new coffee            
@@ -2158,7 +2165,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             origin = ""
             if "origin" in cd:
                 origin = cd["origin"] + " "
-            self.plus_coffee_selected_label = origin + cd["label"]
+            picked = ""
+            if "crop_date" in cd and "picked" in cd["crop_date"] and len(cd["crop_date"]["picked"]) > 0:
+                picked = "{}, ".format(cd["crop_date"]["picked"][0])
+            self.plus_coffee_selected_label = "{}{}{}".format(origin,picked,cd["label"])
             self.plus_blend_selected_label = None
             self.plus_blend_selected_spec = None
             self.plus_blend_selected_spec_labels = None
@@ -2166,9 +2176,20 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.plus_amount_selected = plus.stock.getCoffeeStockDict(selected_coffee)["amount"]
             else:
                 self.pus_amount_selected = None
+            self.plus_amount_replace_selected = None
             self.fillCoffeeData(selected_coffee,prev_coffee_label,prev_blend_label)
         self.checkWeightIn()
         self.updatePlusSelectedLine()
+    
+    def getBlendDictCurrentWeight(self,blend):
+        if self.weightinedit.text() != "":
+            weightIn = float(str(self.weightinedit.text()))
+        else:
+            weightIn = 0.0
+        weight_unit_idx = self.unitsComboBox.currentIndex()
+        v = self.aw.convertWeight(weightIn,weight_unit_idx,self.aw.qmc.weight_units.index("Kg")) # v is weightIn converted to kg
+        res = plus.stock.getBlendBlendDict(blend,v)
+        return res
     
     @pyqtSlot(int)
     def blendSelectionChanged(self,n):
@@ -2191,12 +2212,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             bsd = plus.stock.getBlendStockDict(selected_blend)
             self.plus_store_selected = bsd["location_hr_id"]    
             self.plus_store_selected_label = bsd["location_label"]
-            bd = plus.stock.getBlendBlendDict(selected_blend)
+            
+            bd = self.getBlendDictCurrentWeight(selected_blend)
             self.plus_coffee_selected = None
             self.plus_blend_selected_label = bd["label"]
             self.plus_blend_selected_spec = dict(bd) # make a copy of the blend dict
             # we trim the blend_spec to the external from
             self.plus_blend_selected_spec.pop("hr_id", None) # remove the hr_id
+            
             self.plus_blend_selected_spec_labels = [i["label"] for i in self.plus_blend_selected_spec["ingredients"]]
             # remove labels from ingredients
             ingredients = []
@@ -2212,9 +2235,12 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_blend_selected_spec["ingredients"] = ingredients
             if "amount" in bsd:
                 self.plus_amount_selected = plus.stock.getBlendMaxAmount(selected_blend)
+                self.plus_amount_replace_selected = plus.stock.getBlendReplaceMaxAmount(selected_blend)
             else:
-                self.pus_amount_selected = None
+                self.plus_amount_selected = None
+                self.plus_amount_replace_selected = None
             self.fillBlendData(selected_blend,prev_coffee_label,prev_blend_label)
+            
         self.checkWeightIn()
         self.updatePlusSelectedLine()
 
@@ -2526,9 +2552,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.calculated_density()
 #PLUS
         try:
-            # weight unit changed, we update the coffee/blend lists in plus mode
-            if self.aw.plus_account is not None:
-                self.populatePlusCoffeeBlendCombos(self.plus_stores_combo.currentIndex())
+            # weight unit changed, we update the selected blend in plus mode
+            if self.plus_blends_combo.currentIndex() > 0:
+                self.blendSelectionChanged(self.plus_blends_combo.currentIndex())
         except:
             pass
 
@@ -3162,14 +3188,26 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def checkWeightIn(self):
         enough = True
+        enough_replacement = False
+        weightIn = 0.0
+        try:
+            weightIn = float(self.weightinedit.text())
+        except:
+            pass
         if self.plus_amount_selected is not None:
-            weightIn = 0.0
             try:
-                weightIn = float(str(self.weightinedit.text()))
                 # convert weight to kg
                 wc = self.aw.convertWeight(weightIn,self.aw.qmc.weight_units.index(self.unitsComboBox.currentText()),self.aw.qmc.weight_units.index("Kg"))
                 if wc > self.plus_amount_selected:
-                    enough = False 
+                    enough = False
+            except:
+                pass
+        if self.plus_amount_replace_selected is not None:
+            try:
+                # convert weight to kg
+                wc = self.aw.convertWeight(weightIn,self.aw.qmc.weight_units.index(self.unitsComboBox.currentText()),self.aw.qmc.weight_units.index("Kg"))
+                if wc <= self.plus_amount_replace_selected:
+                    enough_replacement = True
             except:
                 pass
         if enough:
@@ -3178,11 +3216,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             if sys.platform.startswith("darwin") and darkdetect.isDark() and appFrozen():
                 self.weightinedit.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
             else:
-                self.weightinedit.setStyleSheet("""QLineEdit { color: red; }""")
+                if enough_replacement:
+                    self.weightinedit.setStyleSheet("""QLineEdit { color: #0A5C90; }""")
+                else:
+                    self.weightinedit.setStyleSheet("""QLineEdit { color: #CC0F50; }""")
 
     @pyqtSlot()
     def weightineditChanged(self):
         self.weightinedit.setText(self.aw.comma2dot(str(self.weightinedit.text())))
+        self.weightinedit.repaint()
         self.percent()
         self.calculated_density()
         keep_modified_density = self.modified_density_in_text
@@ -3190,9 +3232,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.modified_density_in_text = keep_modified_density
         self.recentRoastEnabled()
         if self.aw.plus_account is not None:
-            self.checkWeightIn()
-            if self.plus_blends_combo.currentIndex() > 0:
-                self.updateBlendLines(self.plus_blends[self.plus_blends_combo.currentIndex()-1])
+            blend_idx = self.plus_blends_combo.currentIndex()
+            if blend_idx > 0:
+                self.blendSelectionChanged(blend_idx)
+            coffee_idx = self.plus_coffees_combo.currentIndex()
+            if coffee_idx > 0:
+                self.coffeeSelectionChanged(coffee_idx)
         
     def density_percent(self):
         percent = 0.
