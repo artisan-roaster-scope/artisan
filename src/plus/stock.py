@@ -704,6 +704,8 @@ def getBlends(weight_unit_idx,store=None):
                             if sd is None:
                                 coffee_stock[coffee] = 0
                             else:
+                                if location_label == "" and "location_label" in sd and sd["location_label"] is not None:
+                                    location_label = sd["location_label"].strip()
                                 res_sd = sd
                                 coffee_stock[coffee] = sd["amount"]
                                 coffee_data[coffee] = (cd,sd)
@@ -899,7 +901,7 @@ def getBlends(weight_unit_idx,store=None):
                             max_replacement_amount = 0
                         if res_sd != None and (amount > 0 or max_replacement_amount>0): # TODO: check here with machines capacity
                             # add location only if this coffee is available in several locations
-                            if store:
+                            if store or location_label == "":
                                 loc = ""
                             else:
                                 loc = location_label + ", "
