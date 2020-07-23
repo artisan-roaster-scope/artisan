@@ -2804,15 +2804,34 @@ class editGraphDlg(ArtisanResizeablDialog):
             ET = QTableWidgetItem(fmtstr%self.aw.qmc.temp1[i])
             BT = QTableWidgetItem(fmtstr%self.aw.qmc.temp2[i])
             ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            if i > 0 and (self.aw.qmc.timex[i]-self.aw.qmc.timex[i-1]) and self.aw.qmc.temp1[i] != -1 and self.aw.qmc.temp1[i-1] != -1:
-                deltaET = QTableWidgetItem("%.1f"%(60*(self.aw.qmc.temp1[i]-self.aw.qmc.temp1[i-1])/(self.aw.qmc.timex[i]-self.aw.qmc.timex[i-1])))
-            else:
-                deltaET = QTableWidgetItem("--")
-            if i > 0 and (self.aw.qmc.timex[i]-self.aw.qmc.timex[i-1]) and self.aw.qmc.temp2[i] != -1 and self.aw.qmc.temp2[i-1] != -1:
-                deltaBT = QTableWidgetItem("%.1f"%(60*(self.aw.qmc.temp2[i]-self.aw.qmc.temp2[i-1])/(self.aw.qmc.timex[i]-self.aw.qmc.timex[i-1])))
-            else:
-                deltaBT = QTableWidgetItem("--")
+            BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)            
+            deltaET_str = "--"
+            try:
+                if i > 0 and (self.aw.qmc.timex[i]-self.aw.qmc.timex[i-1]) and self.aw.qmc.temp1[i] != -1 and self.aw.qmc.temp1[i-1] != -1:
+                    rateofchange1 = 60*(self.aw.qmc.temp1[i]-self.aw.qmc.temp1[i-1])/(self.aw.qmc.timex[i]-self.aw.qmc.timex[i-1])
+                    if self.aw.qmc.DeltaETfunction is not None and len(self.aw.qmc.DeltaETfunction):
+                        try:
+                            rateofchange1 = self.aw.qmc.eval_math_expression(self.aw.qmc.DeltaETfunction,self.aw.qmc.timex[i],RTsname="R1",RTsval=rateofchange1)
+                        except:
+                            pass
+                    deltaET_str = "%.1f"%(rateofchange1)
+            except:
+                pass
+            deltaET = QTableWidgetItem(deltaET_str)
+            deltaBT_str = "--"
+            try:
+                if i > 0 and (self.aw.qmc.timex[i]-self.aw.qmc.timex[i-1]) and self.aw.qmc.temp2[i] != -1 and self.aw.qmc.temp2[i-1] != -1:
+                    rateofchange2 = 60*(self.aw.qmc.temp2[i]-self.aw.qmc.temp2[i-1])/(self.aw.qmc.timex[i]-self.aw.qmc.timex[i-1])
+                    if self.aw.qmc.DeltaBTfunction is not None and len(self.aw.qmc.DeltaBTfunction):
+                        try:
+                            rateofchange2 = self.aw.qmc.eval_math_expression(self.aw.qmc.DeltaBTfunction,self.aw.qmc.timex[i],RTsname="R2",RTsval=rateofchange2)
+                        except:
+                            pass
+                    deltaBT_str = "%.1f"%(rateofchange2)
+            except:
+                pass
+            deltaBT = QTableWidgetItem(deltaBT_str)
+            
             deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             if i in self.aw.qmc.specialevents:

@@ -150,7 +150,7 @@ roastertype=CTE Silon Touch
 [Sliders]
 ModeTempSliders=C
 eventsliderBernoulli=0, 0, 0, 0
-eventslidercoarse=0, 0, 0, 0
+eventslidercoarse=0, 0, 0, 1
 eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=, , , 
