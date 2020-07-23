@@ -69,10 +69,14 @@ Some roasters are just fine with the readings their machines put out from their 
 
 Also don’t expect these to match the PID in the roaster if the probes are in different places.
 
-Do you have to do this? NO.    You will know your roaster best and these data points aren’t absolutes, they are just reference point.  Sight and smell and will tell you best when dry end and first crack happen.  Make sure to use a lower case “x” and an upper case won’t work.  If you see a reading of -1 in the temp LCD’s your formula may be incorrect.
+Do you have to do this? NO.    You will know your roaster best and these data points aren’t absolutes, they are just reference point.  Sight and smell and will tell you best when dry end and first crack happen.  Make sure to use a lower case “x” as an upper case won’t work.  If you see a reading of -1 in the temp LCD’s your formula may be incorrect.
 
-Symbolic formulas are very important and provided advanced features.  They are covered in detail in a story on the Artisan Blog:
-[Symbolic Formulas: Basics, New Variables and Applications](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html)
+Artisan is set up to read ET and BT, two devices.  If you need more devices, you can add them through Extra Devices.  In that dialog box, the Label refers to the Channel of the device.  Each is set up so an Extra Device can read two channels.  So Label 1 is the first channel and Label 2 is the second channel.  If you were for example, using ports 2 and 3 on a VintHub, then Label1 would be for port 2 and Label 2 for port 3.  As explained in the blog post, [Symbolic Formulas: Basics, New Variables and Applications](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html) section One in Two, you would use Extra Devices to add additional RTD's for Phidgets since the TMP1200 only reads one RTD.  In addition, in the example below there is an Extra Device to read a Differential Air Pressure Sensor (Phidget 1136) which is plugged into the VintHub portt0, and to provide a formulaic curve for it.  
+
+![extra device](/assets/images/gsg/Extra%20Devices.png)
+
+Symbolic formulas are very important and provided advanced features as described in the Artisan Blog post.  
+
 
 *Sampling and Oversampling*
 
