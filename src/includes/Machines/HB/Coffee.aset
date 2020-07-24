@@ -1,0 +1,13 @@
+[General]
+Delay=2000
+Oversampling=false
+
+[Device]
+PIDbuttonflag=false
+id=19
+arduinoATChannel=None
+arduinoBTChannel=3
+arduinoETChannel=1
+
+[RoastProperties]
+roastertype=HB
