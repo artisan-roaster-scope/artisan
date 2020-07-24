@@ -231,18 +231,22 @@ class EventsDlg(ArtisanResizeablDialog):
         typelabel2 = QLabel("2")
         typelabel3 = QLabel("3")
         typelabel4 = QLabel("4")
-        self.showEtype1 = QCheckBox(QApplication.translate("CheckBox","",None))
-        self.showEtype2 = QCheckBox(QApplication.translate("CheckBox","",None))
-        self.showEtype3 = QCheckBox(QApplication.translate("CheckBox","",None))
-        self.showEtype4 = QCheckBox(QApplication.translate("CheckBox","",None))
+        typelabel5 = QLabel("5")
+        self.showEtype1 = QCheckBox()
+        self.showEtype2 = QCheckBox()
+        self.showEtype3 = QCheckBox()
+        self.showEtype4 = QCheckBox()
+        self.showEtype5 = QCheckBox()
         self.showEtype1.setChecked(self.aw.qmc.showEtypes[0])
         self.showEtype2.setChecked(self.aw.qmc.showEtypes[1])
         self.showEtype3.setChecked(self.aw.qmc.showEtypes[2])
         self.showEtype4.setChecked(self.aw.qmc.showEtypes[3])
+        self.showEtype5.setChecked(self.aw.qmc.showEtypes[4])
         self.showEtype1.stateChanged.connect(self.changeShowEtypes0)         #toggle
         self.showEtype2.stateChanged.connect(self.changeShowEtypes1)         #toggle
         self.showEtype3.stateChanged.connect(self.changeShowEtypes2)         #toggle
         self.showEtype4.stateChanged.connect(self.changeShowEtypes3)         #toggle
+        self.showEtype5.stateChanged.connect(self.changeShowEtypes4)         #toggle
         self.etype0 = QLineEdit(self.aw.qmc.etypesf(0))
         self.etype0.setCursorPosition(0)
         self.etype1 = QLineEdit(self.aw.qmc.etypesf(1))
@@ -251,6 +255,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.etype2.setCursorPosition(0)
         self.etype3 = QLineEdit(self.aw.qmc.etypesf(3))
         self.etype3.setCursorPosition(0)
+        self.etype4 = QLabel("--      ")
         self.etype0.setMaximumWidth(60)
         self.etype1.setMaximumWidth(60)
         self.etype2.setMaximumWidth(60)
@@ -456,12 +461,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.dialogbuttons.accepted.connect(self.updatetypes)
         self.dialogbuttons.rejected.connect(self.restoreState)
         
-        defaultButtonDialog = QDialogButtonBox()
-        defaultButton = defaultButtonDialog.addButton(QDialogButtonBox.RestoreDefaults)
-        defaultButton.clicked.connect(self.settypedefault)
-        if self.aw.locale not in self.aw.qtbase_locales:
-            defaultButton.setText(QApplication.translate("Button","Defaults", None))
-        
+       
         ###  TAB 2
         #number of buttons per row
         self.nbuttonslabel = QLabel(QApplication.translate("Label","Max buttons per row", None))
@@ -924,6 +924,9 @@ class EventsDlg(ArtisanResizeablDialog):
         typeLayout.addWidget(typelabel4,0,9)
         typeLayout.addWidget(self.showEtype4,0,10)
         typeLayout.addWidget(self.etype3,0,11)
+        typeLayout.addWidget(typelabel5,0,12)
+        typeLayout.addWidget(self.showEtype5,0,13)
+        typeLayout.addWidget(self.etype4,0,14)
         buttonLayout = QHBoxLayout()
         buttonLayout.addLayout(FlagsLayout2)
         buttonLayout.addStretch()
@@ -931,7 +934,6 @@ class EventsDlg(ArtisanResizeablDialog):
         typeHBox = QHBoxLayout()
         typeHBox.addLayout(typeLayout)
         typeHBox.addStretch()
-        typeHBox.addWidget(defaultButtonDialog)
         TypeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Event Types",None))
         TypeGroupLayout.setLayout(typeHBox)
         self.buttonActionTypes = ["",#QApplication.translate("ComboBox", "None",None),
@@ -1442,42 +1444,6 @@ class EventsDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def changeShowTimeguide(self,_):
         self.aw.qmc.showtimeguide = not self.aw.qmc.showtimeguide
-
-    @pyqtSlot(bool)
-    def settypedefault(self,_):
-        self.aw.qmc.etypes = self.aw.qmc.etypesdefault
-        self.showEtypes = [True]*5
-        self.showEtype1.setChecked(self.showEtypes[0])
-        self.showEtype2.setChecked(self.showEtypes[1])
-        self.showEtype3.setChecked(self.showEtypes[2])
-        self.showEtype4.setChecked(self.showEtypes[3])
-        self.etype0.setText(self.aw.qmc.etypesdefault[0])
-        self.etype0.setCursorPosition(0)
-        self.etype0.repaint()
-        self.etype1.setText(self.aw.qmc.etypesdefault[1])
-        self.etype1.setCursorPosition(0)
-        self.etype1.repaint()
-        self.etype2.setText(self.aw.qmc.etypesdefault[2])
-        self.etype2.setCursorPosition(0)
-        self.etype2.repaint()
-        self.etype3.setText(self.aw.qmc.etypesdefault[3])
-        self.etype3.setCursorPosition(0)
-        self.etype3.repaint()
-        # update extra LCD label substitutions
-        for i in range(len(self.aw.qmc.extradevices)):
-            if i < len(self.aw.qmc.extraname1):
-                l1 = "<b>" + self.aw.qmc.extraname1[i] + "</b>"
-                try:
-                    self.aw.extraLCDlabel1[i].setText(l1.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
-                except:
-                    self.aw.extraLCDlabel1[i].setText(l1)
-            if i < len(self.aw.qmc.extraname2):
-                l2 = "<b>" + self.aw.qmc.extraname2[i] + "</b>"
-                try:
-                    self.aw.extraLCDlabel2[i].setText(l2.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
-                except:
-                    self.aw.extraLCDlabel2[i].setText(l2)
-        self.aw.settooltip()
 
     @pyqtSlot(bool)
     def applyQuantifiers(self,_):
@@ -2567,6 +2533,9 @@ class EventsDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def changeShowEtypes3(self,_):
         self.changeShowEtypes(3)
+    @pyqtSlot(int)
+    def changeShowEtypes4(self,_):
+        self.changeShowEtypes(4)
     
     def changeShowEtypes(self,etype):
         self.aw.qmc.showEtypes[etype] = not self.aw.qmc.showEtypes[etype]
