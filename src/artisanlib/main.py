@@ -1,5 +1,5 @@
 ###!/usr/bin/python3
-
+ 
 from artisanlib import __version__
 from artisanlib import __revision__
 from artisanlib import __build__
