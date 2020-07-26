@@ -1,5 +1,5 @@
 ###!/usr/bin/python3
- 
+
 from artisanlib import __version__
 from artisanlib import __revision__
 from artisanlib import __build__
@@ -18803,16 +18803,37 @@ class ApplicationWindow(QMainWindow):
 #                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
             except Exception:
                 pass
-        elif self.qmc.graphfont == 3: # Source Han Sans (TW, CN, KR, JP)
-            # font Source Han Sans selected
-            rcParams['font.size'] = 12.0
-            rcParams['font.family'] = ['Source Han Sans']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSans.ttc")
-        elif self.qmc.graphfont == 4: # WenQuanYi Zen Hei
+        elif self.qmc.graphfont == 3: # WenQuanYi Zen Hei
             # font WenQuanYi selected
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['WenQuanYi Zen Hei']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "wqy-zenhei.ttc")
+#            aw.set_mpl_fontproperties(self.getResourcePath() + "wqy-zenhei.ttc") # .ttc fonts are not supported yet by the PDF backend
+            aw.set_mpl_fontproperties(self.getResourcePath() + "WenQuanYiZenHei-01.ttf")
+        elif self.qmc.graphfont == 4: # Source Han Sans (CN, TW, HK, KR, JP)
+            # font Source Han Sans selected, Simplified Chinese
+            rcParams['font.size'] = 12.0
+            rcParams['font.family'] = ['SourceHanSansCN-Regular']
+            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansCN-Regular.otf")
+        elif self.qmc.graphfont == 5: # Source Han Sans (CN, TW, HK, KR, JP)
+            # font Source Han Sans selected, Traditional Chinese, Taiwan
+            rcParams['font.size'] = 12.0
+            rcParams['font.family'] = ['SourceHanSansTW-Regular']
+            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansTW-Regular.otf")
+        elif self.qmc.graphfont == 6: # Source Han Sans (CN, TW, HK, KR, JP)
+            # font Source Han Sans selected, Traditional Chinese, Hong Kong
+            rcParams['font.size'] = 12.0
+            rcParams['font.family'] = ['SourceHanSansHK-Regular']
+            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansHK-Regular.otf")
+        elif self.qmc.graphfont == 7: # Source Han Sans (CN, TW, HK, KR, JP)
+            # font Source Han Sans selected, Korean
+            rcParams['font.size'] = 12.0
+            rcParams['font.family'] = ['SourceHanSansKR-Regular']
+            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansKR-Regular.otf")
+        elif self.qmc.graphfont == 8: # Source Han Sans (CN, TW, HK, KR, JP)
+            # font Source Han Sans selected, Japanese
+            rcParams['font.size'] = 12.0
+            rcParams['font.family'] = ['SourceHanSansJP-Regular']
+            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansJP-Regular.otf")
         elif self.qmc.graphfont == 1 or platf == "Linux": # no Comic on Linux!
             # font Humor selected
             rcParams['font.size'] = 16.0

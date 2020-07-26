@@ -67,7 +67,12 @@ cp artisan-athm.xml dist
 cp artisan-aset.xml dist
 cp artisan-wg.xml dist
 cp includes/Humor-Sans.ttf dist
-cp includes/SourceHanSans.ttc dist
+cp includes/WenQuanYiZenHei-01.ttf dist
+cp includes/SourceHanSansCN-Regular.otf dist
+cp includes/SourceHanSansHK-Regular.otf dist
+cp includes/SourceHanSansJP-Regular.otf dist
+cp includes/SourceHanSansKR-Regular.otf dist
+cp includes/SourceHanSansTW-Regular.otf dist
 cp includes/alarmclock.eot dist
 cp includes/alarmclock.svg dist
 cp includes/alarmclock.ttf dist

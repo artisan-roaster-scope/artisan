@@ -639,8 +639,12 @@ class HUDDlg(ArtisanDialog):
         self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None),
                                       "Humor",
                                       "Comic",
-                                      "Source Han Sans",
-                                      "WenQuanYi Zen Hei"])
+                                      "WenQuanYi Zen Hei",
+                                      "Source Han Sans CN",
+                                      "Source Han Sans TW",
+                                      "Source Han Sans HK",
+                                      "Source Han Sans JP",
+                                      "Source Han Sans KR"])
         self.GraphFont.setCurrentIndex(self.aw.qmc.graphfont)
         self.GraphFont.currentIndexChanged.connect(self.changeGraphFont)
         graphLayout = QHBoxLayout()
