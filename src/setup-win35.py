@@ -190,6 +190,8 @@ for e in [
 
 for e in [
     'Humor-Sans.ttf',
+    'SourceHanSans.ttc',
+    'wqy-zenhei.ttc',
     'alarmclock.eot',
     'alarmclock.svg',
     'alarmclock.ttf',

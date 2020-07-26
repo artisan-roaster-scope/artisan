@@ -18803,8 +18803,17 @@ class ApplicationWindow(QMainWindow):
 #                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
             except Exception:
                 pass
-        # no Comic on Linux!
-        elif self.qmc.graphfont == 1 or platf == "Linux":
+        elif self.qmc.graphfont == 3: # Source Han Sans (TW, CN, KR, JP)
+            # font Source Han Sans selected
+            rcParams['font.size'] = 12.0
+            rcParams['font.family'] = ['Source Han Sans']
+            aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSans.ttc")
+        elif self.qmc.graphfont == 4: # WenQuanYi Zen Hei
+            # font WenQuanYi selected
+            rcParams['font.size'] = 12.0
+            rcParams['font.family'] = ['WenQuanYi Zen Hei']
+            aw.set_mpl_fontproperties(self.getResourcePath() + "wqy-zenhei.ttc")
+        elif self.qmc.graphfont == 1 or platf == "Linux": # no Comic on Linux!
             # font Humor selected
             rcParams['font.size'] = 16.0
             if platf == 'Linux':

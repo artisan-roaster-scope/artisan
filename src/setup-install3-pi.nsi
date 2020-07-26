@@ -301,6 +301,8 @@ Section Uninstall
   Delete "$INSTDIR\artisanWheel.ico"
   Delete "$INSTDIR\artisanSettings.ico"
   Delete "$INSTDIR\Humor-Sans.ttf"
+  Delete "$INSTDIR\SourceHanSans.ttc"
+  Delete "$INSTDIR\wqy-zenhei.ttc"
   Delete "$INSTDIR\alarmclock.eot"
   Delete "$INSTDIR\alarmclock.svg"
   Delete "$INSTDIR\alarmclock.ttf"

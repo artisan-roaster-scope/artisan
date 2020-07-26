@@ -124,6 +124,8 @@ for fn in [
     'artisanSettings.ico',
     'artisanWheel.ico',
     r'includes\Humor-Sans.ttf',
+    r'includes\SourceHanSans.ttc',
+    r'includes\wqy-zenhei.ttc',
     r'includes\alarmclock.eot',
     r'includes\alarmclock.svg',
     r'includes\alarmclock.ttf',

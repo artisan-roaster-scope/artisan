@@ -104,6 +104,7 @@ cp includes/report-template.htm dist/Artisan.app/Contents/Resources
 cp includes/roast-template.htm dist/Artisan.app/Contents/Resources
 cp includes/ranking-template.htm dist/Artisan.app/Contents/Resources
 cp includes/Humor-Sans.ttf dist/Artisan.app/Contents/Resources
+cp includes/SourceHanSans.ttc dist/Artisan.app/Contents/Resources
 cp includes/jquery-1.11.1.min.js dist/Artisan.app/Contents/Resources
 
 

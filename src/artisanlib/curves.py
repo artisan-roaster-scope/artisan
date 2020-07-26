@@ -636,13 +636,11 @@ class HUDDlg(ArtisanDialog):
         fontlabel = QLabel(QApplication.translate("Label", "Font",None))
         self.GraphFont = QComboBox()
         # no Comic on Linux!
-        if platform.system() == "Linux":
-            self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None),
-                                      QApplication.translate("ComboBox","Humor",None)])
-        else:
-            self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None),
-                                      QApplication.translate("ComboBox","Humor",None),
-                                      QApplication.translate("ComboBox","Comic",None)])
+        self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None),
+                                      "Humor",
+                                      "Comic",
+                                      "Source Han Sans",
+                                      "WenQuanYi Zen Hei"])
         self.GraphFont.setCurrentIndex(self.aw.qmc.graphfont)
         self.GraphFont.currentIndexChanged.connect(self.changeGraphFont)
         graphLayout = QHBoxLayout()

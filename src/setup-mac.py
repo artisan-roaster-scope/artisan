@@ -97,6 +97,8 @@ DATA_FILES = [
     ("../Resources", [r"includes/roast-template.htm"]),
     ("../Resources", [r"includes/ranking-template.htm"]),
     ("../Resources", [r"includes/Humor-Sans.ttf"]),
+    ("../Resources", [r"includes/SourceHanSans.ttc"]),
+    ("../Resources", [r"includes/wqy-zenhei.ttc"]),
     ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
     ("../Resources", [r"includes/Machines"]),
     ("../Resources", [r"includes/Themes"]),

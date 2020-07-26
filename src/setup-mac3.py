@@ -146,6 +146,8 @@ DATA_FILES = [
     ("../Resources", [r"includes/roast-template.htm"]),
     ("../Resources", [r"includes/ranking-template.htm"]),
     ("../Resources", [r"includes/Humor-Sans.ttf"]),
+    ("../Resources", [r"includes/SourceHanSans.ttc"]),
+    ("../Resources", [r"includes/wqy-zenhei.ttc"]),
     ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
     ("../Resources", [r"includes/Machines"]),
     ("../Resources", [r"includes/Themes"]),
@@ -367,4 +369,4 @@ else:
     subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r".dmg",shell = True)
     subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "artisan" -fs HFS+ -srcfolder "dist"',shell = True)
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
-#
+#    ("../Resources", [r"includes/SourceHanSans.ttc"]),
