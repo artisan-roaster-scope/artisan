@@ -205,8 +205,8 @@ def authentify():
                             config.app_window.plus_readonly = False
                         #
                         setToken(res["result"]["user"]["token"],nickname)
-                        if "account_id" in res["result"]["user"] and "_id" in res["result"]["user"]["account_id"]:
-                            account_nr = account.setAccount(res["result"]["user"]["account_id"]["_id"])
+                        if "account" in res["result"]["user"] and "_id" in res["result"]["user"]["account"]:
+                            account_nr = account.setAccount(res["result"]["user"]["account"]["_id"])
                             config.account_nr = account_nr
                             config.logger.debug("connection: -> account: %s",account_nr)
                         return True

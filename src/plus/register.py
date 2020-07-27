@@ -23,6 +23,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+import os
 import shelve
 import portalocker
 from pathlib import Path
@@ -40,13 +42,46 @@ uuid_cache_path = util.getDirectory(config.uuid_cache,share=True)
 # register the path for the given uuid, assuming it points to the .alog profile containing that uuid
 def addPath(uuid,path):
     try:
-        config.logger.debug("register:setPath(" + str(uuid) + "," + str(path) + ")")
+        config.logger.debug("register:addPath(%s,%s)",str(uuid),str(path))
         register_semaphore.acquire(1)
-        with portalocker.Lock(uuid_cache_path, timeout=1) as _:
-            with shelve.open(uuid_cache_path) as db:
-                db[uuid] = str(path)
+        with portalocker.Lock(uuid_cache_path, timeout=0.5) as fh:
+            try:
+                with shelve.open(uuid_cache_path) as db:
+                    db[uuid] = str(path)
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                config.logger.error("register: Exception in addPath(%s,%s) line: %s shelve.open %s",str(uuid),str(path),exc_tb.tb_lineno,e)
+            finally:
+                fh.flush()
+                os.fsync(fh.fileno())
+    except portalocker.exceptions.LockException as e:
+        _, _, exc_tb = sys.exc_info()
+        config.logger.info("register: LockException in addPath(%s,%s) line: %s %s",str(uuid),str(path),exc_tb.tb_lineno,e)
+        # we couldn't fetch this lock. It seems to be blocked forever (from a crash?)
+        # we remove the lock file and retry with a shorter timeout
+        try:
+            config.logger.info("register: clean lock %s",str(uuid_cache_path))
+            Path(uuid_cache_path).unlink()
+            config.logger.debug("retry register:addPath(%s,%s)",str(uuid),str(path))
+            with portalocker.Lock(uuid_cache_path, timeout=0.3) as fh:
+                try:
+                    with shelve.open(uuid_cache_path) as db:
+                        db[uuid] = str(path)
+                except Exception as e:
+                    _, _, exc_tb = sys.exc_info()
+                    config.logger.error("register: Exception in addPath(%s,%s) line: %s shelve.open %s",str(uuid),str(path),exc_tb.tb_lineno,e)
+                finally:
+                    fh.flush()
+                    os.fsync(fh.fileno())
+        except portalocker.exceptions.LockException as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.error("register: LockException in addPath(%s,%s) line: %s %s",str(uuid),str(path),exc_tb.tb_lineno,e)
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.error("register: Exception in addPath(%s,%s) line: %s %s",str(uuid),str(path),exc_tb.tb_lineno,e)
     except Exception as e:
-        config.logger.error("roast: Exception in addPath() %s",e)
+        _, _, exc_tb = sys.exc_info()
+        config.logger.error("register: Exception in addPath(%s,%s) line: %s %s",str(uuid),str(path),exc_tb.tb_lineno,e)
     finally:
         if register_semaphore.available() < 1:
             register_semaphore.release(1)  
@@ -54,20 +89,61 @@ def addPath(uuid,path):
 # returns None if given uuid is not registered, otherwise the registered path
 def getPath(uuid):
     try:
-        config.logger.debug("register:getPath(" + str(uuid) + ")")
+        config.logger.debug("register:getPath(%s)",str(uuid))
         register_semaphore.acquire(1)
-        with portalocker.Lock(uuid_cache_path, timeout=1) as _:
-            with shelve.open(uuid_cache_path) as db:
+        with portalocker.Lock(uuid_cache_path, timeout=0.5) as fh:
+            try:
+                with shelve.open(uuid_cache_path) as db:
+                    try:
+                        return str(db[uuid])
+                    except:
+                        return None
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                config.logger.error("register: Exception in getPath(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
+                return None
+            finally:
+                fh.flush()
+                os.fsync(fh.fileno())
+    except portalocker.exceptions.LockException as e:
+        _, _, exc_tb = sys.exc_info()
+        config.logger.info("register: LockException in getPath(%s) line: %s %s",uuid,exc_tb.tb_lineno,e)
+        # we couldn't fetch this lock. It seems to be blocked forever (from a crash?)
+        # we remove the lock file and retry with a shorter timeout
+        try:
+            config.logger.info("register: clean lock %s",str(uuid_cache_path))
+            Path(uuid_cache_path).unlink()
+            config.logger.debug("retry register:getPath(%s)",str(uuid))
+            with portalocker.Lock(uuid_cache_path, timeout=0.3) as fh:
                 try:
-                    return str(db[uuid])
-                except:
+                    with shelve.open(uuid_cache_path) as db:
+                        try:
+                            return str(db[uuid])
+                        except:
+                            return None
+                except Exception as e:
+                    _, _, exc_tb = sys.exc_info()
+                    config.logger.error("register: Exception in getPath(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
                     return None
+                finally:
+                    fh.flush()
+                    os.fsync(fh.fileno())
+        except portalocker.exceptions.LockException as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.error("register: LockException in getPath(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
+            return None
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.error("register: Exception in getPath(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
+            return None
     except Exception as e:
-        config.logger.error("roast: Exception in getPath() %s",e)
+        _, _, exc_tb = sys.exc_info()
+        config.logger.error("register: Exception in getPath(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
         return None
     finally:
         if register_semaphore.available() < 1:
-            register_semaphore.release(1) 
+            register_semaphore.release(1)
+
 
 # scanns all .alog files for uuids and registers them in the cache
 def scanDir(path=None):
@@ -83,6 +159,6 @@ def scanDir(path=None):
             if config.uuid_tag in d:
                 addPath(d[config.uuid_tag],currentFile) # @UndefinedVariable
     except Exception as e:
-        config.logger.error("roast: Exception in scanDir() %s",e)
+        config.logger.error("register: Exception in scanDir() %s",e)
 
 

@@ -23,8 +23,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+import sys
 import shelve
 import portalocker
+from pathlib import Path
 import requests
 
 from PyQt5.QtCore import QSemaphore, QTimer
@@ -54,13 +57,46 @@ def getSyncPath(lock=False):
 # register the modified_at timestamp (EPOC as float with milliseoncds) for the given uuid, assuming it holds the last timepoint modifications were last synced with the server
 def addSync(uuid,modified_at):
     try:
-        config.logger.debug("sync:addSync(" + str(uuid) + "," + str(modified_at) + ")")
+        config.logger.debug("sync:addSync(%s,%s)", str(uuid), str(modified_at))
         sync_cache_semaphore.acquire(1)
-        with portalocker.Lock(getSyncPath(lock=True), timeout=1) as _:
-            with shelve.open(getSyncPath()) as db:
-                db[uuid] = modified_at
+        with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
+            try:
+                with shelve.open(getSyncPath()) as db:
+                    db[uuid] = modified_at
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                config.logger.error("register: Exception in addSync(%s,%s) line: %s shelve.open %s",str(uuid),str(modified_at),exc_tb.tb_lineno,e)
+            finally:
+                fh.flush()
+                os.fsync(fh.fileno())
+    except portalocker.exceptions.LockException as e:
+        config.logger.info("register: LockException in addSync(%s,%s) line: %s %s",str(uuid), str(modified_at),exc_tb.tb_lineno,e)
+        # we couldn't fetch this lock. It seems to be blocked forever (from a crash?)
+        # we remove the lock file and retry with a shorter timeout
+        try:
+            lock_path = Path(getSyncPath(lock=True))
+            config.logger.info("sync: clean lock %s",str(lock_path))
+            lock_path.unlink()
+            config.logger.debug("retry sync:addSync(%s,%s)",str(uuid), str(modified_at))
+            with portalocker.Lock(lock_path, timeout=0.3) as fh:
+                try:
+                    with shelve.open(getSyncPath()) as db:
+                        db[uuid] = modified_at
+                except Exception as e:
+                    _, _, exc_tb = sys.exc_info()
+                    config.logger.error("register: Exception in addSync(%s,%s) line: %s shelve.open %s",str(uuid),str(modified_at),exc_tb.tb_lineno,e) 
+                finally:
+                    fh.flush()
+                    os.fsync(fh.fileno())
+        except portalocker.exceptions.LockException as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.error("register: LockException in addSync(%s,%s) line: %s %s",str(uuid),str(modified_at),exc_tb.tb_lineno,e)
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.error("sync: Exception in addSync(%s,%s) line: %s %s",str(uuid),uuid(modified_at),exc_tb.tb_lineno,e)
     except Exception as e:
-        config.logger.error("sync: Exception in addSync() %s",e)
+        _, _, exc_tb = sys.exc_info()
+        config.logger.error("sync: Exception in addSync(%s,%s) line: %s %s",str(uuid),uuid(modified_at),exc_tb.tb_lineno,e)
     finally:
         if sync_cache_semaphore.available() < 1:
             sync_cache_semaphore.release(1)  
@@ -68,18 +104,62 @@ def addSync(uuid,modified_at):
 # returns None if given uuid is not registered for syncing, otherwise the last modified_at timestamp in EPOC milliseconds
 def getSync(uuid):
     try:
-        config.logger.debug("sync:getSync(" + str(uuid) + ")")
+        config.logger.debug("sync:getSync(%s)", str(uuid))
         sync_cache_semaphore.acquire(1)
-        with shelve.open(getSyncPath()) as db:
+        with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
             try:
-                ts = db[uuid]
-                config.logger.debug(" -> sync:getSync = " + str(ts))
-                return ts
-            except:
-                config.logger.debug(" -> sync:getSync = None")
+                with shelve.open(getSyncPath()) as db:
+                    try:
+                        ts = db[uuid]
+                        config.logger.debug(" -> sync:getSync = " + str(ts))
+                        return ts
+                    except:
+                        config.logger.debug(" -> sync:getSync = None")
+                        return None
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                config.logger.error("register: Exception in getSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
                 return None
+            finally:
+                fh.flush()
+                os.fsync(fh.fileno())
+    except portalocker.exceptions.LockException as e:
+        config.logger.info("register: LockException in getSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
+        # we couldn't fetch this lock. It seems to be blocked forever (from a crash?)
+        # we remove the lock file and retry with a shorter timeout
+        try:
+            lock_path = Path(getSyncPath(lock=True))
+            config.logger.info("sync: clean lock %s",str(lock_path))
+            lock_path.unlink()
+            config.logger.debug("retry sync:getSync(%s)",str(uuid))
+            with portalocker.Lock(getSyncPath(lock=True), timeout=0.3) as fh:
+                try:
+                    with shelve.open(getSyncPath()) as db:
+                        try:
+                            ts = db[uuid]
+                            config.logger.debug(" -> sync:getSync = " + str(ts))
+                            return ts
+                        except:
+                            config.logger.debug(" -> sync:getSync = None")
+                            return None
+                except Exception as e:
+                    _, _, exc_tb = sys.exc_info()
+                    config.logger.error("register: Exception in getSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
+                    return None
+                finally:
+                    fh.flush()
+                    os.fsync(fh.fileno())
+        except portalocker.exceptions.LockException as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.error("sync: LockException in getSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
+            return None
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.error("sync: Exception in getSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
+            return None
     except Exception as e:
-        config.logger.error("sync: Exception in getSync() %s",e)
+        _, _, exc_tb = sys.exc_info()
+        config.logger.error("sync: Exception in getSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
         return None
     finally:
         if sync_cache_semaphore.available() < 1:
@@ -87,12 +167,46 @@ def getSync(uuid):
             
 def delSync(uuid):
     try:
-        config.logger.debug("sync:delSync(" + str(uuid) + ")")
+        config.logger.debug("sync:delSync(%s)", str(uuid))
         sync_cache_semaphore.acquire(1)
-        with shelve.open(getSyncPath()) as db:
-            del db[uuid]
+        with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
+            try:
+                with shelve.open(getSyncPath()) as db:
+                    del db[uuid]
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                config.logger.error("register: Exception in delSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
+            finally:
+                fh.flush()
+                os.fsync(fh.fileno())
+    except portalocker.exceptions.LockException as e:
+        config.logger.info("register: LockException in delSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
+        # we couldn't fetch this lock. It seems to be blocked forever (from a crash?)
+        # we remove the lock file and retry with a shorter timeout
+        try:
+            lock_path = Path(getSyncPath(lock=True))
+            config.logger.info("sync: clean lock %s",str(lock_path))
+            lock_path.unlink()
+            config.logger.debug("retry sync:delSync(%s)",str(uuid))
+            with portalocker.Lock(getSyncPath(lock=True), timeout=0.3) as fh:
+                try:
+                    with shelve.open(getSyncPath()) as db:
+                        del db[uuid]
+                except Exception as e:
+                    _, _, exc_tb = sys.exc_info()
+                    config.logger.error("register: Exception in delSync(%s) line: %s shelve.open %s",str(uuid),exc_tb.tb_lineno,e)
+                finally:
+                    fh.flush()
+                    os.fsync(fh.fileno())
+        except portalocker.exceptions.LockException as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.error("sync: LockException in delSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            config.logger.debug("sync: Exception in delSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
     except Exception as e:
-        config.logger.debug("sync: Exception in delSync() %s",e)
+        _, _, exc_tb = sys.exc_info()
+        config.logger.debug("sync: Exception in delSync(%s) line: %s %s",str(uuid),exc_tb.tb_lineno,e)
     finally:
         if sync_cache_semaphore.available() < 1:
             sync_cache_semaphore.release(1)
