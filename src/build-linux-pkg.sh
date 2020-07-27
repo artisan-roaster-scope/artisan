@@ -17,8 +17,11 @@ gzip -9 debian/usr/share/doc/artisan/changelog
 
 # build CentOS x86_64 .rpm
 
+tar -cf dist-centos64.tar dist
+rm -rf dist
 rm -rf debian/usr/share/artisan
 tar -xf dist-centos64.tar -C debian/usr/share
+rm dist-centos64.tar
 mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 fakeroot chown -R root:root debian

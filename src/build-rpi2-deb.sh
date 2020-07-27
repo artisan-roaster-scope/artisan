@@ -28,8 +28,10 @@ chmod +x dist/icons
 # buid .deb package (into /usr/share)
 
 tar -cf dist-rpi.tar dist
+rm -rf dist
 rm -rf debian/usr/share/artisan
 tar -xf dist-rpi.tar -C debian/usr/share
+rm dist-rpi.tar
 mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 sudo chown -R root:root debian

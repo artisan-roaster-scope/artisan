@@ -122,5 +122,5 @@ rm -f dist/libglib-2.0.so.0 # removed for v1.6 and later
 
 rm -f libusb-1.0.so.0
 
-tar -cf dist-centos64.tar dist
+
 
