@@ -10253,7 +10253,10 @@ class tgraphcanvas(FigureCanvas):
                         if self.clampEvents: # in clamp mode we render also event values higher than 100:
                             val = int(round((self.specialeventsvalue[-1]-1)*10))
                         else:
-                            val = self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))]
+                            event_pos_offset = (self.eventpositionbars[0])
+                            event_pos_factor = (self.eventpositionbars[1] - self.eventpositionbars[0])
+                            pos = max(0,int(round((self.specialeventsvalue[-1]-1)*10)))
+                            val = int((pos*event_pos_factor)+event_pos_offset)
                         if etype == 0:
                             self.E1timex.append(tx)
                             self.E1values.append(val)
