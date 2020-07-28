@@ -143,7 +143,7 @@
     <message>
         <location filename="../artisanlib/main.py" line="7860"/>
         <source>Batch Size</source>
-        <translation>批次尺寸</translation>
+        <translation>批次大小</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7867"/>
@@ -299,12 +299,12 @@
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1672"/>
         <source>PID OFF</source>
-        <translation>关闭 PID</translation>
+        <translation>PID关闭</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1674"/>
         <source>PID ON</source>
-        <translation>打开 PID</translation>
+        <translation>PID打开</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="52"/>
@@ -454,12 +454,12 @@
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1667"/>
         <source>RampSoak ON</source>
-        <translation>打开RampSoak</translation>
+        <translation>RampSoak打开</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1669"/>
         <source>RampSoak OFF</source>
-        <translation>关闭RampSoak</translation>
+        <translation>RampSoak关闭</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="822"/>
@@ -484,12 +484,12 @@
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1955"/>
         <source>Autotune ON</source>
-        <translation>打开自动调教</translation>
+        <translation>自动调整打开</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1957"/>
         <source>Autotune OFF</source>
-        <translation>关闭自动调教</translation>
+        <translation>自动调整关闭</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3581"/>
@@ -662,7 +662,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="15867"/>
         <source>HUD</source>
-        <translation>平视显示器</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15882"/>
@@ -1129,7 +1129,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/devices.py" line="58"/>
         <source>BT</source>
-        <translation>豆温</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="172"/>
@@ -1324,7 +1324,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="814"/>
         <source>Open on CHARGE</source>
-        <translation>入豆时显示</translation>
+        <translation>入豆时打开</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36509"/>
@@ -1907,22 +1907,22 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/alarms.py" line="692"/>
         <source>RampSoak ON</source>
-        <translation>打开RampSoak</translation>
+        <translation>RampSoak打开</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="692"/>
         <source>RampSoak OFF</source>
-        <translation>关闭RampSoak</translation>
+        <translation>RampSoak关闭</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="692"/>
         <source>PID ON</source>
-        <translation>开启 PID</translation>
+        <translation>PID打开</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="692"/>
         <source>PID OFF</source>
-        <translation>关闭 PID</translation>
+        <translation>PID关闭</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="650"/>
@@ -4168,7 +4168,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/axis.py" line="346"/>
         <source>Grid</source>
-        <translation>坐标方格</translation>
+        <translation>坐标格</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="80"/>
@@ -4691,7 +4691,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="28744"/>
         <source>Beans</source>
-        <translation>豆名</translation>
+        <translation>咖啡豆</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29730"/>
@@ -4984,7 +4984,7 @@ Extra Device</source>
     <message>
         <location filename="../help/alarms_help.py" line="21"/>
         <source>If Alarm</source>
-        <translation>当警报时</translation>
+        <translation>警报响时</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="22"/>
@@ -7916,7 +7916,7 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1101"/>
         <source>Beans</source>
-        <translation>豆子</translation>
+        <translation>咖啡豆</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="964"/>
@@ -7981,7 +7981,7 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
         <location filename="../artisanlib/main.py" line="32031"/>
         <source>BT Color</source>
-        <translation type="obsolete">豆温颜色</translation>
+        <translation type="obsolete">BT颜色</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="761"/>
@@ -8121,7 +8121,7 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
         <location filename="../artisanlib/axis.py" line="183"/>
         <source>Step</source>
-        <translation>步骤</translation>
+        <translation>阶段</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="629"/>
@@ -8666,7 +8666,7 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
         <location filename="../artisanlib/curves.py" line="302"/>
         <source>HUD Button</source>
-        <translation>平视显示器按钮</translation>
+        <translation>HUD按钮</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="36566"/>
@@ -9061,7 +9061,7 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
         <location filename="../artisanlib/events.py" line="336"/>
         <source>Text Color</source>
-        <translation>文本颜色</translation>
+        <translation>文字颜色</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10640"/>
@@ -9136,7 +9136,7 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
         <location filename="../artisanlib/main.py" line="17578"/>
         <source>Legend bkgnd</source>
-        <translation>背景曲线图例.</translation>
+        <translation>背景曲线图例</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17530"/>
@@ -9560,7 +9560,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/autosave.py" line="134"/>
         <source>While recording:</source>
-        <translation>当录制时:</translation>
+        <translation>当记录时:</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="300"/>
@@ -10189,7 +10189,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="159"/>
         <source>Designer</source>
-        <translation>曲线设计</translation>
+        <translation>曲线设计器</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="93"/>
@@ -10539,7 +10539,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="171"/>
         <source>Phases LCDs</source>
-        <translation>阶段信息LCD</translation>
+        <translation>LCD显示阶段</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="164"/>
@@ -10549,7 +10549,7 @@ LCDs All</source>
     <message>
         <location filename="../const/UIconst.py" line="161"/>
         <source>Comparator</source>
-        <translation>曲线比较器</translation>
+        <translation>比较器</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="108"/>
@@ -10577,12 +10577,12 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="3396"/>
         <source>HUD OFF</source>
-        <translation>关闭平视显示器</translation>
+        <translation>HUD关闭</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3408"/>
         <source>HUD ON</source>
-        <translation>打开平视显示器</translation>
+        <translation>HUD打开</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3553"/>
@@ -10697,12 +10697,12 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/main.py" line="9110"/>
         <source>Scope recording...</source>
-        <translation>记录仪录制中...</translation>
+        <translation>记录仪记录中...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9183"/>
         <source>Scope recording stopped</source>
-        <translation>记录仪录制已停止</translation>
+        <translation>记录仪记录已停止</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9322"/>
@@ -12905,7 +12905,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/modbusport.py" line="269"/>
         <source>Connected via MODBUS</source>
-        <translation>通讯协议已连接</translation>
+        <translation>已连接到通信协议</translation>
     </message>
     <message>
         <location filename="../artisanlib/sampling.py" line="28"/>
@@ -13185,12 +13185,12 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1186"/>
         <source>PID OFF</source>
-        <translation>关闭PID</translation>
+        <translation>PID关闭</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1188"/>
         <source>PID ON</source>
-        <translation>开启PID</translation>
+        <translation>PID打开</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="377"/>
@@ -13558,7 +13558,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/curves.py" line="1140"/>
         <source>Graph</source>
-        <translation>缩放</translation>
+        <translation>图形</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1357"/>
@@ -13603,7 +13603,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/ports.py" line="1280"/>
         <source>Modbus</source>
-        <translation>通讯协议</translation>
+        <translation>通信协议</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1286"/>
@@ -13673,7 +13673,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/curves.py" line="1292"/>
         <source>HUD</source>
-        <translation>平视显示器</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1199"/>
@@ -13836,7 +13836,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/events.py" line="2022"/>
         <source>Text Color</source>
-        <translation>文本颜色</translation>
+        <translation>文字颜色</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1305"/>
@@ -14046,7 +14046,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/transposer.py" line="1052"/>
         <source>Target</source>
-        <translation>对象</translation>
+        <translation>目标</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="780"/>
@@ -14372,7 +14372,7 @@ Pungency</source>
     <message>
         <location filename="../artisanlib/main.py" line="15873"/>
         <source>Turns ON/OFF the HUD</source>
-        <translation>打开/关闭 平视显示器</translation>
+        <translation>打开/关闭 HUD</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15957"/>
@@ -14626,12 +14626,12 @@ nearest: y value of the nearest point</source>
     <message>
         <location filename="../artisanlib/main.py" line="9115"/>
         <source>Stop recording</source>
-        <translation>停止录制</translation>
+        <translation>停止记录</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15706"/>
         <source>Start recording</source>
-        <translation>开始录制</translation>
+        <translation>开始记录</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="15766"/>
