@@ -13216,7 +13216,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>barili</translation>
     </message>
     <message>
-        <location filename="../plus/sync.py" line="306"/>
+        <location filename="../plus/sync.py" line="420"/>
         <source>Updated data received from artisan.plus</source>
         <translation>Dati aggiornati ricevuti da artisan.plus</translation>
     </message>

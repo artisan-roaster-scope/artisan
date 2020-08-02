@@ -13031,7 +13031,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation>桶</translation>
     </message>
     <message>
-        <location filename="../plus/sync.py" line="306"/>
+        <location filename="../plus/sync.py" line="420"/>
         <source>Updated data received from artisan.plus</source>
         <translation>来自artisan.plus的更新数据已接收</translation>
     </message>

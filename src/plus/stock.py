@@ -935,8 +935,13 @@ def matchBlendDict(blendSpec, blendDict, sameLabel=True):
     if blendSpec is None or blendDict is None:
         return False
     else:
-        if (not sameLabel or blendSpec["label"] == blendDict["label"]) and len(blendSpec["ingredients"]) == len(blendDict["ingredients"]) and len(blendSpec["ingredients"]) > 0:
-            return all([i1["coffee"]==i2["coffee"] and i1["ratio"]==i2["ratio"] for (i1,i2) in (zip(blendSpec["ingredients"],blendDict["ingredients"]))])
+        if (not sameLabel or blendSpec["label"] == blendDict["label"]):
+            if "hr_id" in blendSpec and "hr_id" in blendDict and blendSpec["hr_id"] == blendDict["hr_id"]:
+                return True
+            elif len(blendSpec["ingredients"]) == len(blendDict["ingredients"]) and len(blendSpec["ingredients"]) > 0:
+                return all([i1["coffee"]==i2["coffee"] and i1["ratio"]==i2["ratio"] for (i1,i2) in (zip(blendSpec["ingredients"],blendDict["ingredients"]))])
+            else:
+                return False
         else:
             return False
 

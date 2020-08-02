@@ -13211,7 +13211,7 @@ Es ist geraten die momentanen Einstellungen zunächst per Menu Hilfe &gt;&gt; Ei
         <translation>Fässer</translation>
     </message>
     <message>
-        <location filename="../plus/sync.py" line="306"/>
+        <location filename="../plus/sync.py" line="420"/>
         <source>Updated data received from artisan.plus</source>
         <translation>Aktualizierte Daten von artisan.plus empfangen</translation>
     </message>

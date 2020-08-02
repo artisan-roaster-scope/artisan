@@ -447,6 +447,8 @@ class serialport(object):
                                    self.probat_sample_drum_air, #112
                                    self.probat_sample_heater,   #113
                                    self.PHIDGET_TMP1200_2,    #114
+                                   self.HB_BTET,              #115
+                                   self.HB_DTIT,              #116
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -1227,6 +1229,17 @@ class serialport(object):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
         t1 = self.aw.qmc.extraArduinoT5
         t2 = self.aw.qmc.extraArduinoT6
+        return tx,t2,t1
+    
+    def HB_BTET(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.ARDUINOTC4temperature("13")
+        return tx,t2,t1
+    
+    def HB_DTIT(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        self.SP = self.aw.ser.SP # we link to the serial port object of the main device
+        t2,t1 = self.ARDUINOTC4temperature("24")
         return tx,t2,t1
 
     def probat_middleware(self):
@@ -5051,7 +5064,9 @@ class serialport(object):
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " YOCTOtemperatures() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
-    def ARDUINOTC4temperature(self):
+    # if chan is given, it is expected to be a string <s> send along the "CHAN;<s>" command on each call 
+    # (not sending the unit or filter commands afterwards) and overwriting the self.arduinoETChannel and self.arduinoBTChannel settings
+    def ARDUINOTC4temperature(self,chan=None):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -5066,30 +5081,33 @@ class serialport(object):
                 self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
                 #INITIALIZE (ONLY ONCE)
-                if not self.ArduinoIsInitialized:
+                if not self.ArduinoIsInitialized or chan is not None:
 #                    self.SP.reset_input_buffer()
 #                    self.SP.reset_output_buffer()
                     #build initialization command
-                    et_channel = self.arduinoETChannel
-                    if et_channel == "None":
-                        et_channel = "0"
-                    bt_channel = self.arduinoBTChannel
-                    if bt_channel == "None":
-                        bt_channel = "0"
-                    #If extra device +ArduinoTC4_XX present. read all 4 Ts
-                    if 28 in self.aw.qmc.extradevices: # +ArduinoTC4_34
-                        vals = ["1","2","3","4"]
-                        try:
-                            if self.arduinoETChannel and self.arduinoETChannel != "None" and self.arduinoETChannel in vals:
-                                vals.pop(vals.index(self.arduinoETChannel))
-                            if self.arduinoBTChannel and self.arduinoBTChannel != "None" and self.arduinoBTChannel in vals:
-                                vals.pop(vals.index(self.arduinoBTChannel))
-                        except:
-                            pass
-                        command = "CHAN;" + et_channel + bt_channel + vals[0] + vals[1]
+                    if chan is None:
+                        et_channel = self.arduinoETChannel
+                        if et_channel == "None":
+                            et_channel = "0"
+                        bt_channel = self.arduinoBTChannel
+                        if bt_channel == "None":
+                            bt_channel = "0"
+                        #If extra device +ArduinoTC4_XX present. read all 4 Ts
+                        if 28 in self.aw.qmc.extradevices: # +ArduinoTC4_34
+                            vals = ["1","2","3","4"]
+                            try:
+                                if self.arduinoETChannel and self.arduinoETChannel != "None" and self.arduinoETChannel in vals:
+                                    vals.pop(vals.index(self.arduinoETChannel))
+                                if self.arduinoBTChannel and self.arduinoBTChannel != "None" and self.arduinoBTChannel in vals:
+                                    vals.pop(vals.index(self.arduinoBTChannel))
+                            except:
+                                pass
+                            command = "CHAN;" + et_channel + bt_channel + vals[0] + vals[1]
+                        else:
+                        #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
+                            command = "CHAN;" + et_channel + bt_channel + "00"
                     else:
-                    #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
-                        command = "CHAN;" + et_channel + bt_channel + "00"
+                        command = "CHAN;{}".format(chan)
                     #libtime.sleep(0.3)
                     self.SP.write(str2cmd(command + "\n"))       #send command
                     #self.SP.flush()
@@ -5097,7 +5115,7 @@ class serialport(object):
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
                         raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None))
-                    elif result.startswith("#"):
+                    elif result.startswith("#") and chan is None:
                         #OK. NOW SET UNITS
 #                        self.SP.reset_input_buffer()
 #                        self.SP.reset_output_buffer()
@@ -5145,7 +5163,7 @@ class serialport(object):
                     except Exception:
                         t2 = -1
                 #if extra device +ArduinoTC4_34
-                if 28 in self.aw.qmc.extradevices:
+                if 28 in self.aw.qmc.extradevices and chan is None:
                     #set the other values to extra temp variables
                     try:
                         self.aw.qmc.extraArduinoT1 = float(res[3])

@@ -13421,7 +13421,7 @@ Repeat Operation at the end: {0}</source>
         <translation>barris</translation>
     </message>
     <message>
-        <location filename="../plus/sync.py" line="306"/>
+        <location filename="../plus/sync.py" line="420"/>
         <source>Updated data received from artisan.plus</source>
         <translation>Atualizados dados recebidos do artisan.plus</translation>
     </message>

@@ -2217,8 +2217,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_coffee_selected = None
             self.plus_blend_selected_label = bd["label"]
             self.plus_blend_selected_spec = dict(bd) # make a copy of the blend dict
-            # we trim the blend_spec to the external from
-            self.plus_blend_selected_spec.pop("hr_id", None) # remove the hr_id
+# UPDATE: we keep the hr_id in to be able to adjust the blend with its replacements if needed
+#            # we trim the blend_spec to the external from
+#            self.plus_blend_selected_spec.pop("hr_id", None) # remove the hr_id
             
             self.plus_blend_selected_spec_labels = [i["label"] for i in self.plus_blend_selected_spec["ingredients"]]
             # remove labels from ingredients
@@ -2326,17 +2327,38 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.plus_store_selected_label = rr["plus_store_label"]
                 if "plus_coffee" in rr:
                     self.plus_coffee_selected = rr["plus_coffee"]
+                else:
+                    self.plus_coffee_selected = None
                 if "plus_coffee_label" in rr:
                     self.plus_coffee_selected_label = rr["plus_coffee_label"]
+                else:
+                    self.plus_coffee_selected_label = None
                 if "plus_blend_spec" in rr:
                     self.plus_blend_selected_label = rr["plus_blend_label"]
                     self.plus_blend_selected_spec = rr["plus_blend_spec"]
                     if "plus_blend_spec_labels":
                         self.plus_blend_selected_spec_labels = rr["plus_blend_spec_labels"]
+                else:
+                    self.plus_blend_selected_label = None
+                    self.plus_blend_selected_spec = None
+                    self.plus_blend_selected_spec_labels = None
                 if self.plus_store_selected is not None and self.plus_default_store is not None and self.plus_default_store != self.plus_store_selected:
                     self.plus_default_store = None # we reset the defaultstore
                 # we now set the actual values from the stock
                 self.populatePlusCoffeeBlendCombos()
+                if False: #self.plus_blend_selected_spec is not None and "hr_id" in self.plus_blend_selected_spec:
+                    # try to apply blend replacement
+                    # search for the position of blend/location hr_id combo in self.plus_blends and call blendSelectionChanged with pos+1
+                    try:
+                        pos_in_blends = next(i for i, b in enumerate(self.plus_blends) if \
+                            plus.stock.getBlendId(b) == self.plus_blend_selected_spec["hr_id"] and
+                            plus.stock.getBlendStockDict(b)["location_hr_id"] == self.plus_store_selected)
+                        self.blendSelectionChanged(pos_in_blends+1)
+                    except:
+                        self.updatePlusSelectedLine()
+                else:
+                    # blend replacements not applied
+                    self.updatePlusSelectedLine()
             
             self.aw.sendmessage(QApplication.translate("Message","Recent roast properties '{0}' set".format(self.aw.recentRoastLabel(rr))))
         self.recentRoastEnabled()

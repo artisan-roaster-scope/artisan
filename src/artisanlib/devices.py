@@ -2503,6 +2503,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 114 is +TMP1200_2 (a second TMP1200 configuration)
                 ##########################
+                elif meter == "HB BT/ET":
+                    self.aw.qmc.device = 115
+                    #self.aw.ser.comport = "COM11"
+                    self.aw.ser.baudrate = 9600
+                    self.aw.ser.bytesize = 8
+                    self.aw.ser.parity= 'N'
+                    self.aw.ser.stopbits = 1
+                    self.aw.ser.timeout = 0.8
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
+                ##########################
+                ####  DEVICE 116 is +HB DT/IT
+                ##########################
 
                 # ADD DEVICE:
 
@@ -2633,6 +2645,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 112
                 1, # 113
                 1, # 114
+                3, # 115
+                3, # 116
                 ] 
             #init serial settings of extra devices
             for i in range(len(self.aw.qmc.extradevices)):

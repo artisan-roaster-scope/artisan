@@ -1063,6 +1063,8 @@ class tgraphcanvas(FigureCanvas):
                        "+Probat Sample Drum/Air",   #112
                        "+Probat Sample Heater",     #113
                        "+Phidget TMP1200 1xRTD B",  #114
+                       "HB BT/ET",                  #115
+                       "+HB DT/IT",                 #116
                        ]
 
         # ADD DEVICE:
@@ -17389,7 +17391,7 @@ class ApplicationWindow(QMainWindow):
                             aw.ws.host = host
                         else:
                             aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                    elif aw.qmc.device in [0,9,19,53,101] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
+                    elif aw.qmc.device in [0,9,19,53,101,115] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial
                         import serial.tools.list_ports
                         comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                         if platf == 'Darwin':
