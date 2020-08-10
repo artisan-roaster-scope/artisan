@@ -1,9 +1,9 @@
-Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
+####Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
 
 Artisan is free for personal and commercial use, but asks for a donation <https://www.paypal.me/MarkoLuther>.
 
 
-HOME
+##HOME
 
 <https://artisan-scope.org>
 
@@ -12,18 +12,18 @@ The home of its development is on GitHub were all source and binary files are av
 <https://github.com/artisan-roaster-scope/artisan>
 
 
-MAILING LIST
+##MAILING LIST
 
 <https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/>
 
 
-ARTISAN BLOG
+##ARTISAN BLOG
 
 https://artisan-roasterscope.blogspot.de
 
 
 
-FEATURES
+##FEATURES
 
 Runs on 64bit Windows 8, macOS 10.13 (legacy builds support 10.10), Redhat/Debian Linux (incl. Raspberry Pi) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/index> for supported Supported Devices and <https://artisan-scope.org/machines/index> for supported machines.
 
@@ -40,13 +40,13 @@ Artisan offers
 - many import and export formats
 
 
-INSTALLATION
+##INSTALLATION
 
 See <https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md>
 
 
 
-LICENCE
+##LICENCE
 
 Artisan is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ distribution in the file `LICENSE.txt`. An online version is available at
 
 
 
-LIBRARIES
+##LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
 
@@ -90,6 +90,6 @@ Artisan uses the following libraries in unmodified forms:
 
 
 
-VERSION HISTORY
+##VERSION HISTORY
 
 See <https://github.com/artisan-roaster-scope/artisan>
