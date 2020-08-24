@@ -11840,7 +11840,7 @@ Continuar?</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1977"/>
-        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation type="unfinished">Dispositivo setado para CENTER 305, que é equivalente a CENTER 306. Agora, escolha porta serial</translation>
     </message>
     <message>
@@ -12131,32 +12131,32 @@ Continue?</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2469"/>
-        <source>Device set to {0}. Now, chose serial port</source>
+        <source>Device set to {0}. Now, choose serial port</source>
         <translation type="unfinished">Dispositivo setado em {0}. Agora, escolha porta serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2031"/>
-        <source>Device set to {0}, which is equivalent to CENTER 309. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port</source>
         <translation type="unfinished">Dispositivo setado em {0}, que é equivalente a CENTER 309. Agora, escolha porta serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2058"/>
-        <source>Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port</source>
         <translation type="unfinished">Dispositivo setado em {0}, que é equivalente a CENTER 303. Agora, escolha porta serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2040"/>
-        <source>Device set to {0}, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation type="unfinished">Dispositivo setado em {0}, que é equivalente a CENTER 306. Agora, escolha porta serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2067"/>
-        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port</source>
         <translation type="unfinished">Dispositivo setado em {0}, que é equivalente a Omega HH506RA. Agora, escolha porta serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2167"/>
-        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port</source>
         <translation type="unfinished">Dispositivo setado em {0}, que é equivalente a Omega HH806AU. Agora, escolha porta serial</translation>
     </message>
     <message>
@@ -12171,7 +12171,7 @@ Continue?</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2158"/>
-        <source>Device set to {0}, which is equivalent to CENTER 302. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port</source>
         <translation type="unfinished">Dispositivo setado em {0}, que é equivalente a CENTER 302. Agora, escolha porta serial</translation>
     </message>
     <message>
@@ -13107,7 +13107,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2149"/>
-        <source>Device set to {0}. Now, chose Modbus serial port or IP address</source>
+        <source>Device set to {0}. Now, choose Modbus serial port or IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

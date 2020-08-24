@@ -11518,7 +11518,7 @@ Profile manquant [CHARGE] ou [VIDAGE]</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1977"/>
-        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation type="unfinished">Le périphérique est réglé sur CENTER 305, ce qui équivaut à CENTER 306. Choisissez maintenant le port série</translation>
     </message>
     <message>
@@ -12757,32 +12757,32 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2469"/>
-        <source>Device set to {0}. Now, chose serial port</source>
+        <source>Device set to {0}. Now, choose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2031"/>
-        <source>Device set to {0}, which is equivalent to CENTER 309. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2058"/>
-        <source>Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2040"/>
-        <source>Device set to {0}, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2067"/>
-        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2167"/>
-        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -12797,12 +12797,12 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2149"/>
-        <source>Device set to {0}. Now, chose Modbus serial port or IP address</source>
+        <source>Device set to {0}. Now, choose Modbus serial port or IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2158"/>
-        <source>Device set to {0}, which is equivalent to CENTER 302. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

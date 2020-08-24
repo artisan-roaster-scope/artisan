@@ -11893,37 +11893,37 @@ Continue?</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2469"/>
-        <source>Device set to {0}. Now, chose serial port</source>
+        <source>Device set to {0}. Now, choose serial port</source>
         <translation type="unfinished">Utstyr satt til {0}. Velg seriell port</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1977"/>
-        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation type="unfinished">Utstyr satt til CENTER 305, som er tilsvarende CENTER 306. Velg seriell port</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2031"/>
-        <source>Device set to {0}, which is equivalent to CENTER 309. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port</source>
         <translation type="unfinished">Utstyr satt til {0}, som er tilsvarende CENTER 309. Velg Seriell port</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2058"/>
-        <source>Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port</source>
         <translation type="unfinished">Utstyr satt til {0}, som er tilsvarende CENTER 303. Velg Seriell port</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2040"/>
-        <source>Device set to {0}, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation type="unfinished">Utstyr satt til {0}, som er tilsvarende CENTER 306. Velg Seriell port</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2067"/>
-        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port</source>
         <translation type="unfinished">Utstyr satt til {0}, som er tilsvarende Omega HH506RA. Velg Seriell port</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2167"/>
-        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port</source>
         <translation type="unfinished">Utstyr satt til {0}, som er tilsvarende Omega HH806AU. Velg Seriell port</translation>
     </message>
     <message>
@@ -11938,7 +11938,7 @@ Continue?</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2158"/>
-        <source>Device set to {0}, which is equivalent to CENTER 302. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port</source>
         <translation type="unfinished">Utstyr satt til {0}, som er tilsvarende CENTER 302. Velg Seriell port</translation>
     </message>
     <message>
@@ -13099,7 +13099,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2149"/>
-        <source>Device set to {0}. Now, chose Modbus serial port or IP address</source>
+        <source>Device set to {0}. Now, choose Modbus serial port or IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -37,7 +37,7 @@ def temperature():
     #PART A: Here we send the command to read temp and read the receive data in to r.
     serPID = None
     try:
-        # chose either a command for unit #1 or or a command for unit #2
+        # choose either a command for unit #1 or or a command for unit #2
         #command for unit id = 1
         #command = "\x01\x04\x03\xE8\x00\x01\xB1\xBA"
         
