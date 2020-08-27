@@ -7529,8 +7529,10 @@ class tgraphcanvas(FigureCanvas):
             #background curve values
             if applyto == "background":
                 e = self.backgroundEvalues[eventnum]
-                y1 = self.temp1B[self.backgroundEvents[eventnum]]
-                y2 = self.temp2B[self.backgroundEvents[eventnum]]
+                y1 = self.temp1Bdelta[self.backgroundEvents[eventnum]]
+                y2 = self.temp2Bdelta[self.backgroundEvents[eventnum]]
+                delta1 = self.delta1[self.backgroundEvents[eventnum]]
+                delta2 = self.delta2[self.backgroundEvents[eventnum]]
                 descr = self.backgroundEStrings[eventnum]
                 etype = self.Betypes[self.backgroundEtypes[eventnum]]
                 sliderunit = aw.eventsliderunits[self.backgroundEtypes[eventnum]]
@@ -7570,6 +7572,8 @@ class tgraphcanvas(FigureCanvas):
                     e = 6.0  #50
                 y1 = 420
                 y2 = 340
+                delta1 = 10
+                delta2 = 12
                 descr = "Full"
                 etype = "Air"
                 sliderunit = "kPa"
@@ -7585,6 +7589,8 @@ class tgraphcanvas(FigureCanvas):
                 e = self.specialeventsvalue[eventnum]
                 y1 = self.temp1[self.specialevents[eventnum]]
                 y2 = self.temp2[self.specialevents[eventnum]]
+                delta1 = self.delta1[self.specialevents[eventnum]]
+                delta2 = self.delta2[self.specialevents[eventnum]]
                 descr = self.specialeventsStrings[eventnum]
                 etype = self.etypes[self.specialeventstype[eventnum]]
                 sliderunit = aw.eventsliderunits[self.specialeventstype[eventnum]]
@@ -7617,6 +7623,8 @@ class tgraphcanvas(FigureCanvas):
                 ("E", str(aw.qmc.eventsInternal2ExternalValue(e))),
                 ("Y1", str(aw.float2float(y1,0))),
                 ("Y2", str(aw.float2float(y2,0))),
+                ("R1", str(aw.float2float(delta1,0))),
+                ("R2", str(aw.float2float(delta2,0))),
                 ("descr", str(descr)),
                 ("type", str(etype)),
                 ("sldrunit", str(sliderunit)),
