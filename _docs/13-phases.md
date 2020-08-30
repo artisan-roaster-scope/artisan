@@ -16,7 +16,7 @@ Often roasters identify distinct roast phases.
 - Maillard: from DRY to the start of first crack (FCs)
 - Finishing: from FCs to the end of the roast (DROP)
 
-Artisan marks the drying phase in green, the Maillard phase in yellow and the finishing phase in brown. You can define two sets of phases limits (called Filter and Espresso) to switch between them.  You can choose to have Artisan automatically mark phases with a watermark on the graph with time and temp.  Checking the Watermarks and Phases LCD is essential.  The Phases are shown at the end of the roast on your graph depending on your choices under [Statistics](https://artisan-scope.org/docs/statistics/).
+Artisan marks the drying phase in green, the Maillard phase in yellow and the finishing phase in brown.  By checking Watermark, you can choose to have Artisan automatically mark phases with a watermark on the graph with time and temp.  Checking the Watermarks and Phases LCD is essential.  The Phases are shown at the end of the roast on your graph depending on your choices under [Statistics](https://artisan-scope.org/docs/statistics/).
 
 In the Phases Dialog (menu Config >> Phases) you can set the temperature limits of each phase.  At the same time it is now possible in the Roast Phases dialog to define the display mode (Time, Percentage or Temperature - explained below) to be used on entering any of the three phases.
 
