@@ -44,7 +44,7 @@ def addPathShelve(uuid,path,fh):
             db[uuid] = str(path)         
     except Exception as e:
         _, _, exc_tb = sys.exc_info()
-        config.logger.error("register: Exception in addPath(%s,%s) line: %s shelve.open (1) %s",str(uuid),str(path),exc_tb.tb_lineno,e)
+        config.logger.error("register: Exception in addPathShelve(%s,%s) line: %s shelve.open (1) %s",str(uuid),str(path),exc_tb.tb_lineno,e)
         try:
             # remove all files name uuid_cache_path with any extension as we do not know which extension is choosen by shelve
             config.logger.info("register: clean uuid cache %s",str(uuid_cache_path))
@@ -55,7 +55,7 @@ def addPathShelve(uuid,path,fh):
             with shelve.open(uuid_cache_path) as db:
                 db[uuid] = str(path)
         except Exception as e:
-            config.logger.error("register: Exception in addPath(%s,%s) line: %s shelve.open (2) %s",str(uuid),str(path),exc_tb.tb_lineno,e)                    
+            config.logger.error("register: Exception in addPathShelve(%s,%s) line: %s shelve.open (2) %s",str(uuid),str(path),exc_tb.tb_lineno,e)                    
     finally:
         fh.flush()
         os.fsync(fh.fileno())
