@@ -56,6 +56,8 @@ machines:
         url: /machines/sedona/
       - title: "Toper"
         url: /machines/toper/
+      - title: "Tostabar"
+        url: /machines/tostabar/
       - title: "Twino/Ozstar"
         url: /machines/twino-ozstar/
       - title: "US Roaster Corp"

@@ -16,5 +16,5 @@ sidebar:
 Artisan supports commercial roasting machines from more than 50 vendors with a simple one click configuration and without any additional hardware setup
 
 **Watch out!**
-Control (incl. heater control) is currently supported for machines of [Aillio](/machines/aillio), [Besca](/machines/besca), [Coffed](/machines/coffed), [Coffee Tech](/machines/coffeetech), [Coffeetool](/machines/coffeetool), [Giesen](/machines/giesen), [Hottop](/machines/hottop), IP XENAKIS, Kuban, [Probat](/machines/probat), [San Franciscan](machines/sf) and [Twino/Ozstar](/machines/twino-ozstar).
+Control (incl. heater control) is currently supported for machines of [Aillio](/machines/aillio), [Besca](/machines/besca), [Coffed](/machines/coffed), [Coffee Tech](/machines/coffeetech), [Coffeetool](/machines/coffeetool), [Giesen](/machines/giesen), [Hottop](/machines/hottop), IP XENAKIS, Kuban, [Probat](/machines/probat), [San Franciscan](/machines/sf) and [Twino/Ozstar](/machines/twino-ozstar).
 {: .notice--info}
