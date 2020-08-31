@@ -1,0 +1,43 @@
+[General]
+AmbientTempSource=3
+Delay=2000
+Oversampling=false
+
+[Device]
+id=115
+
+[ExtraComm]
+extrabaudrate=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0%\x80)
+extrabytesize=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\b)
+extracomport=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0\x43\0O\0M\0\x31)
+extraparity=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x2\0\x45)
+extrastopbits=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
+extratimeout=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x6?\xe0\0\0\0\0\0\0)
+
+[ExtraDev]
+extraCurveVisibility1=false, true, true, true, true, true, true, true, true, true
+extraCurveVisibility2=false, true, true, true, true, true, true, true, true, true
+extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, false, false, false, false, false, false, false
+extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
+extradevicecolor1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k)
+extradevicecolor2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k)
+extradevices=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0u)
+extramathexpression1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
+extramathexpression2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
+extraname1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x4\0\x41\0T)
+extraname2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0\x45\0x\0t\0r\0\x61\0 \0\x32)
+
+[RoastProperties]
+roastertype=Arc S
+
+[SerialPort]
+baudrate=9600
+bytesize=8
+comport=COM4
+parity=N
+stopbits=1
+timeout=0.8
