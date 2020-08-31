@@ -449,6 +449,7 @@ class serialport(object):
                                    self.PHIDGET_TMP1200_2,    #114
                                    self.HB_BTET,              #115
                                    self.HB_DTIT,              #116
+                                   self.HB_AT,                #117
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -1233,14 +1234,19 @@ class serialport(object):
     
     def HB_BTET(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.ARDUINOTC4temperature("13")
+        t2,t1 = self.ARDUINOTC4temperature("1300")
         return tx,t2,t1
     
     def HB_DTIT(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
         self.SP = self.aw.ser.SP # we link to the serial port object of the main device
-        t2,t1 = self.ARDUINOTC4temperature("24")
+        t2,t1 = self.ARDUINOTC4temperature("2400")
         return tx,t2,t1
+
+    def HB_AT(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        t = self.aw.qmc.extraArduinoT6
+        return tx,t,t
 
     def probat_middleware(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
@@ -1300,7 +1306,6 @@ class serialport(object):
     def probat_sample(self):
         try:
             tx = self.aw.qmc.timeclock.elapsed()/1000.
-            # handle here the keepAlive
             res = self.aw.ws.send({"command": "getCurrentRoastingStep" })
             if res is not None and "data" in res:
                 if "beanTemp" in res["data"]:
@@ -5202,7 +5207,7 @@ class serialport(object):
                     else:
                         self.aw.qmc.extraArduinoT3 = -1.
                         self.aw.qmc.extraArduinoT4 = -1.
-                    if 44 in self.aw.qmc.extradevices: # +ArduinoTC4_78
+                    if 44 in self.aw.qmc.extradevices or 117 in self.aw.qmc.extradevices: # +ArduinoTC4_78 or +HB AT
                         # report SV as extraArduinoT5
                         try:
                             self.aw.qmc.extraArduinoT5 = float(res[5])
@@ -5227,6 +5232,10 @@ class serialport(object):
                         self.aw.qmc.extraArduinoT3 = float(res[0])
                     elif (28 in self.aw.qmc.extradevices and 32 in self.aw.qmc.extradevices) and self.aw.ser.arduinoATChannel == "T6":
                         self.aw.qmc.extraArduinoT4 = float(res[0])
+                if chan is not None and len(res) == 4 and res[3] == "F":
+                    # data is given in F, we convert it back to C
+                    t1 = fromFtoC(t1)
+                    t2 = fromFtoC(t2)
                 return t1, t2
         except Exception as e:
             # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!

@@ -100,8 +100,8 @@ class Concur(threading.Thread):
                         try:
                             if controller.is_connected():
                                 config.logger.debug("queue: -> connection error, disconnecting: %s",e)
-                                # we disconnect, but keep the queue running to let it automatically reconnect if possible
-                                controller.disconnect(remove_credentials = False, stop_queue=False)
+                                # we disconnect
+                                controller.disconnect(remove_credentials = False, stop_queue=True)
                         except:
                             pass
                         # we don't change the iter, but retry to connect after a delay in the next iteration

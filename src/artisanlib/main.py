@@ -1,4 +1,4 @@
-###!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
 from artisanlib import __version__
 from artisanlib import __revision__
@@ -1065,6 +1065,7 @@ class tgraphcanvas(FigureCanvas):
                        "+Phidget TMP1200 1xRTD B",  #114
                        "HB BT/ET",                  #115
                        "+HB DT/IT",                 #116
+                       "+HB AT",                    #117
                        ]
 
         # ADD DEVICE:
@@ -2061,12 +2062,12 @@ class tgraphcanvas(FigureCanvas):
         self.R1_STATE_STR = ""
 
         #used by extra device +ArduinoTC4_XX to pass values
-        self.extraArduinoT1 = 0.
-        self.extraArduinoT2 = 0.
-        self.extraArduinoT3 = 0. # heater duty %
-        self.extraArduinoT4 = 0. # fan duty %
-        self.extraArduinoT5 = 0. # SV
-        self.extraArduinoT6 = 0. # TC4 internal ambient temperature
+        self.extraArduinoT1 = 0.  # Arduino T3: chan 3
+        self.extraArduinoT2 = 0.  # Arduino T4: chan 4
+        self.extraArduinoT3 = 0.  # Arduino T5: heater duty %
+        self.extraArduinoT4 = 0.  # Arduino T6: fan duty %
+        self.extraArduinoT5 = 0.  # Arduino T7: SV
+        self.extraArduinoT6 = 0.  # Arduino T8: TC4 internal ambient temperature
 
         # used by the ProbatMiddleware extra devices
         # +ProbatMiddleware_burner_drum and
@@ -4638,7 +4639,16 @@ class tgraphcanvas(FigureCanvas):
 
 
     #format X axis labels
-    def xaxistosm(self,redraw=True):
+    def xaxistosm(self,redraw=True,min_time=None,max_time=None):
+        if min_time is None:
+            startofx = self.startofx
+        else:
+            startofx = min_time
+        if max_time is None:
+            endofx = self.endofx
+        else:
+            endofx = max_time
+            
         if bool(aw.comparator):
             starttime = 0
         else:
@@ -4647,14 +4657,15 @@ class tgraphcanvas(FigureCanvas):
             else:
                 starttime = 0
 
-        endtime = self.endofx + starttime
-        self.ax.set_xlim(self.startofx,endtime)
+        endtime = endofx + starttime
+        
+        self.ax.set_xlim(startofx,endtime)
 
         if not self.xgrid:
             self.xgrid = 60.
 
         mfactor1 =  round(float(2. + int(starttime)/int(self.xgrid)))
-        mfactor2 =  round(float(2. + int(self.endofx)/int(self.xgrid)))
+        mfactor2 =  round(float(2. + int(endofx)/int(self.xgrid)))
 
         majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
         if self.xgrid == 60:
@@ -14459,6 +14470,7 @@ class ApplicationWindow(QMainWindow):
 
         # ROAST menu
         self.editGraphAction = QAction(UIconst.ROAST_MENU_PROPERTIES,self)
+        self.editGraphAction.setMenuRole(QAction.NoRole) # without this, this item is not shown in he
         self.editGraphAction.triggered.connect(self.editgraph)
         self.GraphMenu.addAction(self.editGraphAction)
         self.editGraphAction.setShortcut("Ctrl+T")
@@ -17314,18 +17326,23 @@ class ApplicationWindow(QMainWindow):
                         a = QAction(self, visible=True, triggered=triggered)
                         a.setData((e[1],str(k)))
                         if k == resourceName:
-                            a.setText(str(e[0])) # + "..."
+                            menu_title = tr(e[0]) # + "..."
                         else:
-                            a.setText(str(k) + " " + str(e[0])) # + "..."
-                            menu.addAction(a)
+                            menu_title = str(k) + " " + str(e[0])  # + "..."
+                        menu_title = menu_title.replace('&','&&') # a & in a menu entry is not displayed, but "&&" is displayed as "&"                            
+                        a.setText(menu_title)
+                        menu.addAction(a)
                     one_added = True
                 else:
-                    submenu = menu.addMenu(k)
+                    submenu_title = k.replace('&','&&') # a & in a menu entry is not displayed, but "&&" is displayed as "&"
+                    submenu = menu.addMenu(submenu_title)
                     sorted_subentries = natsort.natsorted(res[k],key=lambda x: x[0])
                     for e in sorted_subentries: #res[k]:
                         a = QAction(self, visible=True, triggered=triggered)
                         a.setData((e[1],str(k)))
-                        a.setText(str(e[0]))
+                        menu_title = str(e[0])
+                        menu_title = menu_title.replace('&','&&') # a & in a menu entry is not displayed, but "&&" is displayed as "&"
+                        a.setText(menu_title)
                         submenu.addAction(a)
                         one_added = True
             else:
@@ -17333,10 +17350,12 @@ class ApplicationWindow(QMainWindow):
                 a = QAction(self, visible=True, triggered=triggered)
                 a.setData((entry[1],""))
                 if k == resourceName:
-                    a.setText(str(entry[0]))
+                    menu_title = str(entry[0])
                 else:
-                    a.setText(str(k) + " " + str(entry[0]))
-                    menu.addAction(a)
+                    menu_title = str(k) + " " + str(entry[0])
+                menu_title = menu_title.replace('&','&&') # a & in a menu entry is not displayed, but "&&" is displayed as "&"
+                a.setText(menu_title)
+                menu.addAction(a)
                 one_added = True
         if one_added and addMenu:
             self.ConfMenu.addMenu(menu)
@@ -17348,6 +17367,7 @@ class ApplicationWindow(QMainWindow):
         action = self.sender()
         if action:
             label = (action.text() if action.data()[1] == "" else "{} {}".format(action.data()[1],action.text()))
+            label = label.replace("&&","&") # we reduce those && again to & that were introduced to have the & rendered in the menu entry
             string = QApplication.translate("Message", "Configure for {0}?<br><br>Your current settings will be overwritten!<br><br>"+
                     "It is advisable to save your current settings beforehand via menu Help >> Save Settings.",None).format(label)
             reply = QMessageBox.question(aw,QApplication.translate("Message", "Adjust Settings",None),string,
@@ -21539,7 +21559,7 @@ class ApplicationWindow(QMainWindow):
                 #Note: Windows only - PyQt will sometimes, but not always, interpret a shortcut key as a menu key.  For that 
                 #    reason only CTRL and CTRL+SHIFT modifier should be used with shortcut keys f,e,r,c,t,v, and h.
                 control_modifier = modifiers == Qt.ControlModifier # command/apple key on macOS
-                alt_modifier = modifiers == Qt.AltModifier
+                alt_modifier = modifiers == Qt.AltModifier # OPTINO on macOS, ALT on Windows
                 control_alt_modifier = modifiers == (Qt.ControlModifier | Qt.AltModifier)
                 control_shift_modifier = modifiers == (Qt.ControlModifier | Qt.ShiftModifier)
                 #meta_modifier = modifiers == Qt.MetaModifier # Control on macOS, Meta on Windows
@@ -24823,13 +24843,14 @@ class ApplicationWindow(QMainWindow):
         if f is None:
             return None
         else:
+            f = float(f)
             if n==0:
                 if math.isnan(f):
                     return 0
                 else:
                     return int(round(f))
             else:
-                res = float(("%." + str(n) + "f")%f)
+                res = float("%.{}f".format(n)%f)
                 if math.isnan(res):
                     return 0.0
                 else:
@@ -25646,7 +25667,7 @@ class ApplicationWindow(QMainWindow):
                 
                 # a proper artisan-settings.aset file needs at least to contain a Mode tag
                 if not (theme or machine) and not settings.contains("Mode"):
-                    aw.qmc.adderror(QApplication.translate("Error Message","Exception: {} not a valid settings file",None).format(str(filename)))
+                    aw.qmc.adderror(QApplication.translate("Error Message","Exception: {} not a valid settings file",None).format(str(filename)))
                     return False
             
                 if aw.qmc.neverUpdateBatchCounter or app.artisanviewerMode:
@@ -30645,6 +30666,7 @@ class ApplicationWindow(QMainWindow):
                 seventsType.append(self.qmc.specialeventstype[sorted_pos])
                 seventsValue.append(self.qmc.specialeventsvalue[sorted_pos])
             for i in range(len(self.qmc.specialevents)):
+                # add BT/ET
                 temps = ""
                 if self.qmc.mode == "F":
                     formatString = "%.1fF"
@@ -30658,10 +30680,29 @@ class ApplicationWindow(QMainWindow):
                     temps += formatString%self.qmc.temp1[sevents[i][0]]
                 else:
                     temps += formatString%self.qmc.temp2[sevents[i][0]] + " / " + formatString%self.qmc.temp1[sevents[i][0]]
+                # add DeltaBT / DeltaET
+                deltas = ""
+                if self.qmc.mode == "F":
+                    formatString = "%.1fF/min"
+                else:
+                    formatString = "%.1f&deg;C/min"
+                try:
+                    if (self.qmc.delta1[sevents[i][0]] is None or self.qmc.delta1[sevents[i][0]] == -1) and \
+                        (self.qmc.delta2[sevents[i][0]] is None or self.qmc.delta2[sevents[i][0]] == -1):
+                        deltas += " -- "
+                    elif self.qmc.delta1[sevents[i][0]] is None or self.qmc.delta1[sevents[i][0]] == -1:
+                        deltas += formatString%self.qmc.delta2[sevents[i][0]]
+                    elif self.qmc.delta2[sevents[i][0]] is None or self.qmc.delta2[sevents[i][0]] == -1:
+                        deltas += formatString%self.qmc.delta1[sevents[i][0]]
+                    else:
+                        deltas += formatString%self.qmc.delta2[sevents[i][0]] + " / " + formatString%self.qmc.delta1[sevents[i][0]]
+                except Exception:
+                    pass
                 html += ("<tr>"+
                      "\n<td>" + str(i+1) + "</td><td>" +
                      stringfromseconds(self.qmc.timex[sevents[i][0]] - start) +
-                     "</td><td align='right'>" + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + str(self.qmc.etypesf(seventsType[i])) + " " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
+                     "</td><td align='right'>" + temps + "</td><td>" + 
+                     "</td><td align='right'>" + deltas + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + str(self.qmc.etypesf(seventsType[i])) + " " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
             html += '</table>\n</center>'
         return html
 

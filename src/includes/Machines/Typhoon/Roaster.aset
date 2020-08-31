@@ -1,34 +1,34 @@
 [General]
-Delay=3000
+Delay=2000
 Oversampling=false
 
 [Device]
 id=29
 
 [ExtraComm]
-extrabaudrate=@Invalid()
-extrabytesize=@Invalid()
-extracomport=@Invalid()
-extraparity=@Invalid()
-extrastopbits=@Invalid()
-extratimeout=@Invalid()
+extrabaudrate=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\x96\0)
+extrabytesize=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\b)
+extracomport=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0\x43\0O\0M\0\x31)
+extraparity=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x2\0\x45)
+extrastopbits=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
+extratimeout=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x6?\xf0\0\0\0\0\0\0)
 
 [ExtraDev]
 extraCurveVisibility1=true, true, true, true, true, true, true, true, true, true
-extraCurveVisibility2=true, true, true, true, true, true, true, true, true, true
+extraCurveVisibility2=false, true, true, true, true, true, true, true, true, true
 extraDelta1=false, false, false, false, false, false, false, false, false, false
 extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraLCDvisibility1=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
 extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
-extradevicecolor1=@Invalid()
-extradevicecolor2=@Invalid()
-extradevices=@Invalid()
-extramathexpression1=@Invalid()
-extramathexpression2=@Invalid()
-extraname1=@Invalid()
-extraname2=@Invalid()
+extradevicecolor1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0#\0\x39\0\x31\0\x30\0\x31\0\x31\0\x33)
+extradevicecolor2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k)
+extradevices=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0!)
+extramathexpression1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
+extramathexpression2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
+extraname1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0H\0\x65\0\x61\0t)
+extraname2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0\x45\0x\0t\0r\0\x61\0 \0\x32)
 
 [Modbus]
 PID_OFF_action=
@@ -40,17 +40,17 @@ PID_p_register=0
 PID_slave_ID=0
 PIDmultiplier=0
 SVmultiplier=0
-baudrate=9600
-bytesize=7
-comport=COM4
-host=127.0.0.1
+baudrate=115200
+bytesize=8
+comport=COM5
+host=192.168.0.210
 input1FloatsAsInt=false
 input1bcd=false
 input1code=3
 input1div=1
 input1float=false
 input1mode=C
-input1register=406
+input1register=53
 input1slave=1
 input2FloatsAsInt=false
 input2bcd=false
@@ -58,7 +58,7 @@ input2code=3
 input2div=1
 input2float=false
 input2mode=C
-input2register=407
+input2register=54
 input2slave=1
 input3FloatsAsInt=false
 input3bcd=false
@@ -66,8 +66,8 @@ input3code=3
 input3div=0
 input3float=false
 input3mode=C
-input3register=0
-input3slave=0
+input3register=45
+input3slave=1
 input4FloatsAsInt=false
 input4bcd=false
 input4code=3
@@ -109,35 +109,12 @@ input8mode=C
 input8register=0
 input8slave=0
 littleEndianFloats=false
-parity=E
+parity=N
 port=502
 stopbits=1
 timeout=1
-type=0
+type=3
 wordorderLittle=true
 
-[Quantifiers]
-clusterEventsFlag=false
-quantifieractive=0, 0, 0, 0
-quantifiercoarse=0, 0, 0, 0
-quantifiermax=100, 100, 100, 100
-quantifiermin=0, 0, 0, 0
-quantifiersource=0, 0, 0, 0
-
 [RoastProperties]
-roastertype=R&R Roaster
-
-[Sliders]
-ModeTempSliders=C
-eventsliderBernoulli=0, 0, 0, 0
-eventslidercoarse=0, 0, 0, 0
-eventslidersflags=0, 1, 1
-eventslidertemp=0, 0, 0, 0
-eventsliderunits=, , , 
-slideractions=0, 0, 0, 0
-slidercommands=, , , 
-sliderfactors=1, 1, 1, 1
-slidermax=100, 100, 100, 100
-slidermin=0, 0, 0, 0
-slideroffsets=0, 0, 0, 0
-slidervisibilities=0, 0, 0, 0
+roastertype=Typhoon

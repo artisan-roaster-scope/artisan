@@ -2515,6 +2515,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 116 is +HB DT/IT
                 ##########################
+                ##########################
+                ####  DEVICE 117 is +HB AT
+                ##########################
 
                 # ADD DEVICE:
 
@@ -2647,6 +2650,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 114
                 3, # 115
                 3, # 116
+                3, # 117
                 ] 
             #init serial settings of extra devices
             for i in range(len(self.aw.qmc.extradevices)):

@@ -111,14 +111,49 @@ class RoastProfile():
         # fill profile data:
         if "roastUUID" in profile:
             self.UUID = d(profile["roastUUID"])
-        if "timeindex" in profile:
-            self.timeindex = profile["timeindex"]
         if "timex" in profile:
             self.timex = profile["timex"]
         if "temp1" in profile:
             self.temp1 = self.aw.qmc.fill_gaps(profile["temp1"])
         if "temp2" in profile:
             self.temp2 = self.aw.qmc.fill_gaps(profile["temp2"])
+        if "timeindex" in profile:
+            for i,ti in enumerate(profile["timeindex"]):
+                if i < len(self.timeindex):
+                    self.timeindex[i] = ti
+        elif len(profile) > 0 and ("startend" in profile or "dryend" in profile or "cracks" in profile):
+            try:
+                ###########      OLD PROFILE FORMAT
+                if "startend" in profile:
+                    startend = [float(fl) for fl in profile["startend"]]
+                else:
+                    startend = [0.,0.,0.,0.]
+                if "dryend" in profile:
+                    dryend = profile["dryend"]
+                else:
+                    dryend = [0.,0.]
+                if "cracks" in profile:
+                    varC = [float(fl) for fl in profile["cracks"]]
+                else:
+                    varC = [0.,0.,0.,0.,0.,0.,0.,0.]
+                times = []
+                times.append(startend[0])
+                times.append(dryend[0])
+                times.append(varC[0])
+                times.append(varC[2])
+                times.append(varC[4])
+                times.append(varC[6])
+                times.append(startend[2])
+                #convert to new profile
+                for i in range(len(times)):
+                    if times[i]:
+                        self.timeindex[i] = self.aw.qmc.timearray2index(self.timex,times[i])
+                    else:
+                        self.timeindex[i] = 0
+            except:
+                pass
+            ###########      END OLD PROFILE FORMAT
+            
         # temperature conversion
         self.ambientTemp = profile["ambientTemp"]
         if "mode" in profile:
@@ -205,7 +240,7 @@ class RoastProfile():
             self.metadata["weight_loss"] = "-%.1f%%" % profile["computed"]["weight_loss"]
         if "ground_color" in profile:
             self.metadata["ground_color"] = "#%s" % profile["ground_color"]
-        if profile["computed"] is not None and "AUC" in profile["computed"] and profile["computed"]["AUC"] is not None and \
+        if "computed" in profile and profile["computed"] is not None and "AUC" in profile["computed"] and profile["computed"]["AUC"] is not None and \
                 profile["computed"]["AUC"] != 0:
             self.metadata["AUC"] = "%sC*min" % profile["computed"]["AUC"]
         if "roastingnotes" in profile:
@@ -213,7 +248,7 @@ class RoastProfile():
         if "cuppingnotes" in profile:
             self.metadata["cuppingnotes"] = d(profile["cuppingnotes"])       
         # TP time in time since DROP
-        if profile["computed"] is not None and "TP_time" in profile["computed"]:
+        if "computed" in profile and profile["computed"] is not None and "TP_time" in profile["computed"]:
             self.TP = profile["computed"]["TP_time"]
         else:
             self.TP = 0
@@ -412,12 +447,42 @@ class RoastProfile():
     
     def setTimeoffset(self,offset):
         self.timeoffset = offset
-        for l in [self.l_temp1,self.l_temp2,self.l_mainEvents1,self.l_mainEvents2,self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
+        tempTrans = self.getTempTrans()
+        for l in [self.l_temp1,self.l_temp2,
+                self.l_mainEvents1,self.l_mainEvents2,self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
             if l is not None:
-                l.set_transform(self.getTempTrans())
+                l.set_transform(tempTrans)
+                
+#        self.l_temp2.set_xdata([x-offset if x is not None else None for x in self.timex])
+#        self.l_temp2.draw()
+#        self.aw.qmc.fig.canvas.draw()
+                
+#        self.l_temp2.set_clip_on(False)
+#        self.l_temp2.set_clip_box(self.aw.qmc.ax.bbox)
+                
+#        cp = self.l_temp2.get_clip_path()
+#        print("cp",cp)
+#        self.l_temp2.set_clip_path(cp,transform=tempTrans)
+
+#        # overwrites the clipbox of the axis!
+#        from matplotlib.transforms import Bbox, TransformedBbox
+#        box = TransformedBbox(Bbox.from_extents(120,90, 20*60,250), self.aw.qmc.ax.transData)
+#        self.l_temp2.set_clip_path(None)
+#        self.l_temp2.set_clip_box(box)
+
+#        print("self.aw.qmc.ax.get_xlim()",self.aw.qmc.ax.get_xlim())
+#        print("self.aw.qmc.ax.get_xbound()",self.aw.qmc.ax.get_xbound())
+        
+#        self.l_temp2.get_datalim()
+        
+#        self.aw.qmc.ax.ignore_existing_data_limits = True
+#                self.aw.qmc.ax.update_datalim(l.get_datalim(self.aw.qmc.ax.transData))       
+#        self.aw.qmc.ax.update_datalim([(0,9),(1200,0)],updatey=False)
+        
+        deltaTrans = self.getDeltaTrans()
         for l in [self.l_delta1,self.l_delta2]:
             if l is not None:
-                l.set_transform(self.getDeltaTrans())
+                l.set_transform(deltaTrans)
 #        # update RoR clippings
 #        self.l_delta1_clipping.set_transform(self.getDeltaTrans())
 #        self.l_delta1.set_clip_path(self.l_delta1_clipping)
@@ -425,6 +490,10 @@ class RoastProfile():
 #        self.l_delta2.set_clip_path(self.l_delta2_clipping)
 
     def getTempTrans(self):
+        # transformation pipelines are processed from left to right so in "A + B" first transformation A then tranformation B is applied (on the result of A)
+        # an artist transformation is supplied with data in data coordinates and should return data in display coordinates
+        # ax.transData : transforms from data to display coordinates
+        # transforms.Affine2D().translate() : applies its transformation
         return transforms.Affine2D().translate(-self.timeoffset,0) + self.aw.qmc.ax.transData
     
     def getDeltaTrans(self):
@@ -577,7 +646,17 @@ class CompareTableWidget(QTableWidget):
         for item in self.selectedItems():
             if item.row() not in selectedRows:
                 selectedRows.append(item.row())
-        return selectedRows
+        if selectedRows == []:
+            return self.getLastRow()
+        else:
+            return selectedRows
+    
+    def getLastRow(self):
+        rows = self.rowCount()
+        if rows > 0:
+            return [rows-1]
+        else:
+            return []
 
 class roastCompareDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None, foreground = None, background = None):
@@ -665,18 +744,15 @@ class roastCompareDlg(ArtisanDialog):
         settings1Layout.addSpacing(5)
         settings1Layout.addWidget(self.alignComboBox)
         settings1Layout.addStretch()
-#        settings1Layout.setContentsMargins(1, 2, 1, 1) # left, top, right, bottom
         
         settings2Layout = QHBoxLayout()
         settings2Layout.addWidget(self.cb)
         settings1Layout.addSpacing(2)
         settings2Layout.addWidget(self.eventsComboBox)
-#        settings2Layout.setContentsMargins(1, 1, 1, 2) # left, top, right, bottom
         
         settingsLayout = QVBoxLayout()
         settingsLayout.addLayout(settings2Layout)
         settingsLayout.addLayout(settings1Layout)
-#        settingsLayout.setContentsMargins(0, 2, 0, 0) # left, top, right, bottom
         
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -684,7 +760,6 @@ class roastCompareDlg(ArtisanDialog):
         buttonLayout.addSpacing(10)
         buttonLayout.addWidget(self.deleteButton)
         buttonLayout.addStretch()
-#        buttonLayout.setContentsMargins(0, 2, 2, 0)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(settingsLayout)
         mainLayout.addWidget(self.profileTable)
@@ -844,7 +919,7 @@ class roastCompareDlg(ArtisanDialog):
         self.aw.qmc.ax.set_zorder(self.aw.qmc.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
         #create a second set of axes in the same position as self.ax
         self.aw.qmc.delta_ax.tick_params(\
-            axis='y',           # changes apply to the x-axis
+            axis='y',           # changes apply to the y-axis
             which='both',       # both major and minor ticks are affected
             left=False,         # ticks along the left edge are off
             bottom=False,       # ticks along the bottom edge are off
@@ -1345,7 +1420,7 @@ class roastCompareDlg(ArtisanDialog):
             self.updateVisibilities()
             self.autoTimeLimits()
             self.updateProfileTableItems()
-            self.updateDeltaLimits()            
+            self.updateDeltaLimits()
     
     ### ADD/DELETE table items
     
@@ -1435,7 +1510,9 @@ class roastCompareDlg(ArtisanDialog):
                     else:
                         max_timex = max(max_timex,p.max_time)
             if min_timex is not None and max_timex is not None:
-                self.aw.qmc.ax.set_xlim(min_timex - 30, max_timex + 30)
+                min_timex = min_timex - 30
+                max_timex = max_timex + 30
+                self.aw.qmc.xaxistosm(min_time=min_timex, max_time=max_timex)
 
     def closeEvent(self, _):
         #disconnect pick handler

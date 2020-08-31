@@ -1,34 +1,9 @@
 [General]
-Delay=3000
+Delay=2000
 Oversampling=false
 
 [Device]
 id=29
-
-[ExtraComm]
-extrabaudrate=9600, 9600
-extrabytesize=8, 8
-extracomport=COM1, COM1
-extraparity=N, N
-extrastopbits=1, 1
-extratimeout=1, 1
-
-[ExtraDev]
-extraCurveVisibility1=false, false, true, true, true, true, true, true, true, true
-extraCurveVisibility2=false, false, true, true, true, true, true, true, true, true
-extraDelta1=false, false, false, false, false, false, false, false, false, false
-extraDelta2=false, false, false, false, false, false, false, false, false, false
-extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraLCDvisibility1=true, true, false, false, false, false, false, false, false, false
-extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
-extradevicecolor1=#49b160, black
-extradevicecolor2=#3a81c3, black
-extradevices=25, 25
-extramathexpression1=, 
-extramathexpression2=, 
-extraname1=Drum, SV
-extraname2=Fan, Extra 2
 
 [Modbus]
 PID_OFF_action=
@@ -40,9 +15,9 @@ PID_p_register=0
 PID_slave_ID=0
 PIDmultiplier=0
 SVmultiplier=0
-baudrate=19200
-bytesize=8
-comport=COM5
+baudrate=9600
+bytesize=7
+comport=COM4
 host=127.0.0.1
 input1FloatsAsInt=false
 input1bcd=false
@@ -50,7 +25,7 @@ input1code=3
 input1div=1
 input1float=false
 input1mode=C
-input1register=250
+input1register=406
 input1slave=1
 input2FloatsAsInt=false
 input2bcd=false
@@ -58,32 +33,32 @@ input2code=3
 input2div=1
 input2float=false
 input2mode=C
-input2register=260
+input2register=407
 input2slave=1
 input3FloatsAsInt=false
 input3bcd=false
 input3code=3
 input3div=0
 input3float=false
-input3mode=
-input3register=200
-input3slave=1
+input3mode=C
+input3register=0
+input3slave=0
 input4FloatsAsInt=false
 input4bcd=false
 input4code=3
 input4div=0
 input4float=false
-input4mode=
-input4register=220
-input4slave=1
+input4mode=C
+input4register=0
+input4slave=0
 input5FloatsAsInt=false
 input5bcd=false
 input5code=3
-input5div=1
+input5div=0
 input5float=false
 input5mode=C
-input5register=240
-input5slave=1
+input5register=0
+input5slave=0
 input6FloatsAsInt=false
 input6bcd=false
 input6code=3
@@ -109,7 +84,7 @@ input8mode=C
 input8register=0
 input8slave=0
 littleEndianFloats=false
-parity=N
+parity=E
 port=502
 stopbits=1
 timeout=1
@@ -117,4 +92,4 @@ type=0
 wordorderLittle=true
 
 [RoastProperties]
-roastertype=Kuban Base
+roastertype=R&R R Touch
