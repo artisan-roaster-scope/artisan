@@ -6754,6 +6754,36 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
 
+                #populate delta ET (self.delta1) and delta BT (self.delta2)
+                # calculated here to be available for parsepecialeventannotations(). the curve are plotted later.
+                if self.DeltaETflag or self.DeltaBTflag:
+                    if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
+                        cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                        decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
+                        t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+                        t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+                        # we start RoR computation 10 readings after CHARGE to avoid this initial peak
+                        if aw.qmc.timeindex[0]>-1:
+                            RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
+                        else:
+                            RoR_start = -1
+                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
+
+## Output Idle Noise StdDev of BT RoR
+#                        try:
+#                            start = aw.qmc.timeindex[0]
+#                            end = aw.qmc.timeindex[6]
+#                            if start == -1:
+#                                start = 0
+#                            start = start + 30 # avoiding the empty begin of heavy smoothed data
+#                            if end == 0:
+#                                end = min(len(self.delta2) -1,100)
+#                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
+#                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
+#                            print("BT RoR std (new):",numpy.std(self.delta2))
+#                        except Exception as e:
+#                            print(e)
+
                 if self.eventsshowflag:
                     Nevents = len(self.specialevents)
                     #three modes of drawing events.
@@ -7191,34 +7221,8 @@ class tgraphcanvas(FigureCanvas):
                                         except: # mpl before v3.0 do not have this set_in_layout() function
                                             pass
 
-                #populate delta ET (self.delta1) and delta BT (self.delta2)
+                #plot delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:
-                    if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
-                        cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                        decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
-                        t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                        t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                        # we start RoR computation 10 readings after CHARGE to avoid this initial peak
-                        if aw.qmc.timeindex[0]>-1:
-                            RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
-                        else:
-                            RoR_start = -1
-                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
-
-## Output Idle Noise StdDev of BT RoR
-#                        try:
-#                            start = aw.qmc.timeindex[0]
-#                            end = aw.qmc.timeindex[6]
-#                            if start == -1:
-#                                start = 0
-#                            start = start + 30 # avoiding the empty begin of heavy smoothed data
-#                            if end == 0:
-#                                end = min(len(self.delta2) -1,100)
-#                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
-#                            print("BT RoR std (old):",numpy.std([x for x in self.delta2[start:end] if x is not None]))
-#                            print("BT RoR std (new):",numpy.std(self.delta2))
-#                        except Exception as e:
-#                            print(e)
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
                         if len(self.timex) == len(self.delta1) and len(self.timex)  == len(self.delta2):
@@ -7540,10 +7544,10 @@ class tgraphcanvas(FigureCanvas):
             #background curve values
             if applyto == "background":
                 e = self.backgroundEvalues[eventnum]
-                y1 = self.temp1Bdelta[self.backgroundEvents[eventnum]]
-                y2 = self.temp2Bdelta[self.backgroundEvents[eventnum]]
-                delta1 = self.delta1[self.backgroundEvents[eventnum]]
-                delta2 = self.delta2[self.backgroundEvents[eventnum]]
+                y1 = self.temp1B[self.backgroundEvents[eventnum]]
+                y2 = self.temp2B[self.backgroundEvents[eventnum]]
+                delta1 = self.delta1B[self.backgroundEvents[eventnum]]
+                delta2 = self.delta2B[self.backgroundEvents[eventnum]]
                 descr = self.backgroundEStrings[eventnum]
                 etype = self.Betypes[self.backgroundEtypes[eventnum]]
                 sliderunit = aw.eventsliderunits[self.backgroundEtypes[eventnum]]
@@ -7581,14 +7585,14 @@ class tgraphcanvas(FigureCanvas):
                     e = 7.0  #60
                 else:
                     e = 6.0  #50
-                y1 = 420
-                y2 = 340
-                delta1 = 10
-                delta2 = 12
+                y1 = 420 if self.mode=='F' else 210
+                y2 = 340 if self.mode=='F' else 170
+                delta1 = 18 if self.mode=='F' else 9
+                delta2 = 33 if self.mode=='F' else 16
                 descr = "Full"
                 etype = "Air"
                 sliderunit = "kPa"
-                dcharge = 340
+                dcharge = 340 if self.mode=='F' else 170
                 dfcs = 47
                 prefcs = 50
                 dtr = 12
@@ -7634,8 +7638,6 @@ class tgraphcanvas(FigureCanvas):
                 ("E", str(aw.qmc.eventsInternal2ExternalValue(e))),
                 ("Y1", str(aw.float2float(y1,0))),
                 ("Y2", str(aw.float2float(y2,0))),
-                ("R1", str(aw.float2float(delta1,0))),
-                ("R2", str(aw.float2float(delta2,0))),
                 ("descr", str(descr)),
                 ("type", str(etype)),
                 ("sldrunit", str(sliderunit)),
@@ -7645,7 +7647,12 @@ class tgraphcanvas(FigureCanvas):
                 ("DTR", str(dtr)),
                 ("mode", self.mode),
                 ("degmode", '\u00b0' + self.mode),
+                ("degmin", '\u00b0' + self.mode + '/min'),
                 ("deg", '\u00b0'),
+                ("R1degmin", str(aw.float2float(delta1,1)) + '\u00b0' + self.mode + '/min' if delta1 is not None else ''),
+                ("R2degmin", str(aw.float2float(delta2,1)) + '\u00b0' + self.mode + '/min' if delta2 is not None else ''),
+                ("R1", str(aw.float2float(delta1,1)) if delta1 is not None else '--'),
+                ("R2", str(aw.float2float(delta2,1)) if delta1 is not None else '--'),
                 ("squot", "'"),
                 ("quot", '"'),
                 ]
