@@ -29066,6 +29066,7 @@ class ApplicationWindow(QMainWindow):
     def extendedRankingData2List(self,dsd,units=False,header=False):
         res = []
         hdr = []
+        data = [] #dave passify pydev
         extended_profile_fields, extended_computed_fields = self.extendedRankingdatadef()
         if header:
             for i in range(len(extended_profile_fields)):
@@ -29098,16 +29099,16 @@ class ApplicationWindow(QMainWindow):
                         elif typ == "float4":
                             res.append('{0:.4f}'.format(dsd[fld]))
                         elif typ == "text2float1":
-                            ws[cr] = res.append('{0:.1f}'.format(toFloat(dsd[fld])))
+                            res.append('{0:.1f}'.format(toFloat(dsd[fld])))
                         elif typ == "text2float2":
-                            ws[cr] = res.append('{0:.2f}'.format(toFloat(dsd[fld])))
+                            res.append('{0:.2f}'.format(toFloat(dsd[fld])))
                         elif typ == "text2int":
                             res.append('{:d}'.format(toInt(dsd[fld])))
                         elif typ == "percent":
                             res.append('{0:.1f}%'.format(dsd[fld]/100.))
                         elif typ == "time":
                             h,m = divmod(dsd[fld],60)
-                            dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
+                            #dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
                             res.append('{:d}:{:d}'.format(int(h),int(m)))
                         elif typ == "bool":
                             res.append(str(dsd[fld]))
@@ -29140,16 +29141,16 @@ class ApplicationWindow(QMainWindow):
                         elif typ == "float4":
                             res.append('{0:.4f}'.format(dsd["computed"][fld]))
                         elif typ == "text2float1":
-                            ws[cr] = res.append('{0:.1f}'.format(toFloat(dsd["computed"][fld])))
+                            res.append('{0:.1f}'.format(toFloat(dsd["computed"][fld])))
                         elif typ == "text2float2":
-                            ws[cr] = res.append('{0:.2f}'.format(toFloat(dsd["computed"][fld])))
+                            res.append('{0:.2f}'.format(toFloat(dsd["computed"][fld])))
                         elif typ == "text2int":
                             res.append('{:d}'.format(toInt(dsd["computed"][fld])))
                         elif typ == "percent":
                             res.append('{0:.1f}%'.format(dsd["computed"][fld]/100.))
                         elif typ == "time":
                             h,m = divmod(dsd["computed"][fld],60)
-                            dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
+                            #dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
                             res.append('{:d}:{:d}'.format(int(h),int(m)))
                         elif typ == "bool":
                             res.append(str(dsd["computed"][fld]))
@@ -30024,7 +30025,7 @@ class ApplicationWindow(QMainWindow):
                             # extended ranking data
                             cnum = col_
                             for i in range(len(extended_profile_fields)):
-                                name = extended_profile_fields[i][0]
+                                #name = extended_profile_fields[i][0]
                                 fld = extended_profile_fields[i][1]
                                 typ = extended_profile_fields[i][2]
                                 test0 = extended_profile_fields[i][3]
@@ -30065,7 +30066,7 @@ class ApplicationWindow(QMainWindow):
                                             ws[cr] = str(dsd[fld])
                                 cnum += 1
                             for i in range(len(extended_computed_fields)):
-                                name = extended_computed_fields[i][0]
+                                #name = extended_computed_fields[i][0]
                                 fld = extended_computed_fields[i][1]
                                 typ = extended_computed_fields[i][2]
                                 test0 = extended_computed_fields[i][3]
@@ -30163,7 +30164,7 @@ class ApplicationWindow(QMainWindow):
                         # extended ranking data
                         cnum = col_
                         for i in range(len(extended_profile_fields)):
-                            name = extended_profile_fields[i][0]
+                            #name = extended_profile_fields[i][0]
                             fld = extended_profile_fields[i][1]
                             typ = extended_profile_fields[i][2]
                             test0 = extended_profile_fields[i][3]
@@ -30212,7 +30213,7 @@ class ApplicationWindow(QMainWindow):
                                     pass
                             cnum += 1
                         for i in range(len(extended_computed_fields)):
-                            name = extended_computed_fields[i][0]
+                            #name = extended_computed_fields[i][0]
                             fld = extended_computed_fields[i][1]
                             typ = extended_computed_fields[i][2]
                             test0 = extended_computed_fields[i][3]
