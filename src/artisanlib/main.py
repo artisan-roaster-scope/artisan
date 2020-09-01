@@ -25515,7 +25515,7 @@ class ApplicationWindow(QMainWindow):
                             self.setProfile(f,self.deserialize(f),quiet=True)
                             self.qmc.redraw()
                             self.image = aw.qmc.grab()
-                            if filetype in ["JPEG","BMP"]:
+                            if filetype in ["JPEG","BMP","PNG"]:
                                 # transparences are not supported by those file types and are rendered in black by default.
                                 white_img = QPixmap(self.image.size())
                                 white_img.fill() # fills by default with Qt.white
@@ -33053,7 +33053,7 @@ class ApplicationWindow(QMainWindow):
                 if not filename.endswith(fileext):
                     filename += fileext
 
-                if filetype in ["JPEG","BMP"]:
+                if filetype in ["JPEG","BMP","PNG"]:
                     # transparences are not supported by those file types and are rendered in black by default.
                     white_img = QPixmap(self.image.size())
                     white_img.fill() # fills by default with Qt.white
