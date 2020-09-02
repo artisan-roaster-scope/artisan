@@ -46,6 +46,7 @@ def addPathShelve(uuid,path,fh):
         _, _, exc_tb = sys.exc_info()
         config.logger.error("register: Exception in addPathShelve(%s,%s) line: %s shelve.open (1) %s",str(uuid),str(path),exc_tb.tb_lineno,e)
         try:
+            # in case we couldn't open the shelve file as  "shelve.open db type could not be determined"
             # remove all files name uuid_cache_path with any extension as we do not know which extension is choosen by shelve
             config.logger.info("register: clean uuid cache %s",str(uuid_cache_path))
             # note that this deletes all "uuid" files including those for the Viewer and other files of that name prefix like uuid.db.org!!

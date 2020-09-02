@@ -10,7 +10,7 @@ altgraph==0.17
 macholib==1.14
 python-snap7==0.11
 pyusb==1.0.2
-setuptools==47.3.1
+setuptools==50.0.3
 persist-queue==0.5.0
 portalocker==1.7.0
 prettytable==0.7.2

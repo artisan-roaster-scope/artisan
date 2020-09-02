@@ -1,6 +1,6 @@
 [General]
-Delay=2000
-Oversampling=false
+Delay=3000
+Oversampling=true
 
 [Device]
 id=29
@@ -92,4 +92,4 @@ type=0
 wordorderLittle=false
 
 [RoastProperties]
-roastertype=Proaster
+roastertype=Easyster

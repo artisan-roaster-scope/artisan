@@ -1,0 +1,20 @@
+[General]
+Delay=2000
+Oversampling=false
+
+[Device]
+controlETpid=4, 2
+id=0
+readBTpid=4, 1
+showFujiLCDs=false
+
+[RoastProperties]
+roastertype=Santoker 2xPXF
+
+[SerialPort]
+baudrate=9600
+bytesize=8
+comport=COM4
+parity=O
+stopbits=1
+timeout=1
