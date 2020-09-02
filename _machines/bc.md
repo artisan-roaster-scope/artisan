@@ -6,8 +6,10 @@ excerpt: ""
 header:
   overlay_image: /assets/images/BC-2000 BT.jpg
   image: /assets/images/BC-2000 BT.jpg
-  teaser: assets/images/BC-2000 BT.jpg
+  teaser: assets/images/BC-2000 BT-supporter.jpg
 ---
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
 * __Producer:__ [Buckeye Coffee Roasters Co. LCC](http://www.buckeyecoffee.com){:target="_blank"}, USA
 * __Machines:__ all with USB or Bluetooth connection

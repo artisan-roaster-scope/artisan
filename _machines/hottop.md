@@ -6,8 +6,10 @@ excerpt: "KN-8828B-2K+, Arduino/TC4/HTC"
 header:
   overlay_image: /assets/images/hottop2.jpg
   image: /assets/images/hottop.jpg
-  teaser: assets/images/hottop.jpg
+  teaser: assets/images/hottop-supporter.jpg
 ---
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
 * __Producer:__ [Hottop](https://www.hottopusa.com){:target="_blank"}, USA/Taiwan
 * __Machine:__ KN-8828B-2K+

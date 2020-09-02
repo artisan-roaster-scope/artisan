@@ -6,8 +6,11 @@ excerpt: "Elite"
 header:
   overlay_image: /assets/images/sedona.jpg
   image: /assets/images/sedona.jpg
-  teaser: assets/images/sedona.jpg
+  teaser: assets/images/sedona-supporter.jpg
 ---
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+
 * __Producer:__ [Buckeye Coffee Roasters Co. LCC](http://www.buckeyecoffee.com){:target="_blank"}, USA
 * __Machines:__ all models with Fuji PIDs or the 2in1 system (via Bluetooth or USB)
 * __Connection:__ MODBUS RTU; requires the installation of a serial driver

@@ -20,8 +20,6 @@ The computer running Artisan must be on the same IP network as the roaster. The 
  
 This can be done on Windows using the Network Sharing Center by adding a TCP/IPv4 Local Area Connection with those properties. On macOS you set your ethernet port in the Network Control panel to "IPv4: Manually" and fill in the IP and subnet mask accordingly.
 
-{: .notice--primary}
-
 **Watch out!** Artisan comes with two machine setups. The one named _RM legacy_ works with older machines that return data without decimals while the one named _RM_ works with the newer machines that return data with decimals.
 {: .notice--primary}
 

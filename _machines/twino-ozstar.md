@@ -2,12 +2,15 @@
 layout: single
 permalink: /machines/twino-ozstar/
 title: "Twino/Ozstar"
-excerpt: "Os-2K/5K/10K/30K/60K/120K"
+excerpt: "Os-2/5/10/30/60/120K"
 header:
   overlay_image: /assets/images/twino-ozstar.jpg
   image: /assets/images/twino-ozstar1.jpg
-  teaser: assets/images/twino-ozstar1.jpg
+  teaser: assets/images/twino-ozstar1-supporter.jpg
 ---
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+
 * __Producer:__ [Özstar](https://www.ozstarmakina.com/){:target="_blank"}, Turkey
 * __Machines:__ all Twino/Ozstar machines with networked PLC
 * __Connection:__ MODBUS TCP via the network

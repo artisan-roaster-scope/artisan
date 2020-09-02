@@ -6,8 +6,11 @@ excerpt: "Probatone 5/12/25"
 header:
   overlay_image: /assets/images/probat.jpg
   image: /assets/images/probat.jpg
-  teaser: assets/images/probat.jpg
+  teaser: assets/images/probat-supporter.jpg
 ---
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+
 * __Producer:__ [Probat](http://www.probat-shoproaster.com/en/home/){:target="_blank"}, Germany
 * __Machines:__ Probatone II 5Kg/12Kg/25Kg with software option
   - small touch display (Wago PLC)

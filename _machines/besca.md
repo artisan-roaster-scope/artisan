@@ -6,8 +6,11 @@ excerpt: "BSC & Bee"
 header:
   overlay_image: /assets/images/besca2.jpg
   image: /assets/images/BescaRoast.jpg
-  teaser: assets/images/BescaRoast.jpg
+  teaser: assets/images/BescaRoast-supporter.jpg
 ---
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+
 * __Producer:__ [Besca](https://www.bescaroasters.com){:target="_blank"}, Turkey
 * __Machine:__ all Shop and Industrial BSC Roasters as well as the Bee sample roasters
 * __Connection:__ MODBUS TCP via the network (BSC automatic); MODBUS RTU via USB (BSC manual & Bee)

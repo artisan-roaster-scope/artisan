@@ -6,8 +6,11 @@ excerpt: "4 & 6 Sensor Data Logging"
 header:
   overlay_image: /assets/images/diedrich.jpg
   image: /assets/images/diedrich1.jpg
-  teaser: assets/images/diedrich1.jpg
+  teaser: assets/images/diedrich1-supporter.jpg
 ---
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+
 * __Producer:__ [Diedrich](https://www.diedrichroasters.com/){:target="_blank"}, USA
 * __Machines:__ All IR- and CR-series machines equipped with the 4 or 6 Sensor Data Logging option
 * __Connection:__ USB
