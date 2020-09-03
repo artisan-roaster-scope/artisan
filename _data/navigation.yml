@@ -20,8 +20,14 @@ machines:
         url: /machines/atilla/
       - title: "BC Roasters"
         url: /machines/bc/
+      - title: "BellaTW"
+        url: /machines/bellatw/
       - title: "Besca"
         url: /machines/besca/
+      - title: "BlueKing"
+        url: /machines/blueking/
+      - title: "Brambati"
+        url: /machines/brambati/
       - title: "Bühler"
         url: /machines/buhler/
       - title: "Coffeed"
@@ -30,8 +36,18 @@ machines:
         url: /machines/coffeetech/
       - title: "Coffeetool"
         url: /machines/coffeetool/
+      - title: "Dätgen"
+        url: /machines/datgen/
       - title: "Diedrich"
         url: /machines/diedrich/
+      - title: "Dongyi"
+        url: /machines/dongyi/
+      - title: "Easyster"
+        url: /machines/easyster/
+      - title: "Froco"
+        url: /machines/froco/
+      - title: "Garanti"
+        url: /machines/garanti/
       - title: "Giesen"
         url: /machines/giesen/
       - title: "Golden Roasters"
@@ -56,8 +72,18 @@ machines:
         url: /machines/kirsch/
       - title: "Kuban"
         url: /machines/kuban/
+      - title: "Lilla"
+        url: /machines/lilla/
       - title: "Loring"
         url: /machines/loring/
+      - title: "Mill City Roasters"
+        url: /machines/mcr/
+      - title: "NOR Coffee Roaster"
+        url: /machines/nor/
+      - title: "Opp Roaster"
+        url: /machines/opp/
+      - title: "Ozturk"
+        url: /machines/ozturk/
       - title: "Petroncini"
         url: /machines/peteroncini/
       - title: "Phoenix"
@@ -66,10 +92,14 @@ machines:
         url: /machines/proaster/
       - title: "Probat"
         url: /machines/probat/
+      - title: "Rasco Mac"
+        url: /machines/rascomac/
       - title: "Roaster & Roaster"
         url: /machines/roasterandroaster/
       - title: "Rolltech"
         url: /machines/rolltech/
+      - title: "Santoker"
+        url: /machines/santoker/
       - title: "San Franciscan"
         url: /machines/sf/
       - title: "Sedona"
@@ -80,6 +110,8 @@ machines:
         url: /machines/tostabar/
       - title: "Trinitas"
         url: /machines/trinitas/
+      - title: "Trobrat"
+        url: /machines/trobrat/
       - title: "Twino/Ozstar"
         url: /machines/twino-ozstar/
       - title: "Typhoon"
