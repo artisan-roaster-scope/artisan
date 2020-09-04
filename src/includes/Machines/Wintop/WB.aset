@@ -9,7 +9,7 @@ readBTpid=4, 1
 showFujiLCDs=false
 
 [RoastProperties]
-roastertype=Phoenix Roaster
+roastertype=Wintop WB
 
 [SerialPort]
 baudrate=9600

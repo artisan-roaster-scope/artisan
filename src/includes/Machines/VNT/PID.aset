@@ -1,6 +1,8 @@
 [General]
 Delay=2000
 Oversampling=false
+ETcurve=false
+ETlcd=false
 
 [Device]
 id=29
@@ -17,14 +19,14 @@ PIDmultiplier=0
 SVmultiplier=0
 baudrate=9600
 bytesize=8
-comport=/dev/slave
+comport=COM5
 host=127.0.0.1
 input1bcd=false
 input1code=3
 input1div=0
 input1float=true
 input1FloatsAsInt=false
-input1mode=C
+input1mode=F
 input1register=0
 input1slave=1
 input2bcd=false
@@ -32,9 +34,9 @@ input2code=3
 input2div=0
 input2float=true
 input2FloatsAsInt=false
-input2mode=C
-input2register=2
-input2slave=1
+input2mode=F
+input2register=0
+input2slave=0
 input3bcd=false
 input3code=3
 input3div=0
@@ -92,4 +94,4 @@ type=0
 wordorderLittle=false
 
 [RoastProperties]
-roastertype=Dongyi DY
+roastertype=VNT PID
