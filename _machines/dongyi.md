@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/dongyi/
 title: "Dongyi"
-excerpt: "DY"
+excerpt: "BR/BY/DY"
 header:
   overlay_image: /assets/images/dongyi.jpg
   image: /assets/images/dongyi.jpg
