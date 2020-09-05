@@ -34504,10 +34504,10 @@ def main():
                 # load Artisan palettes on double-click on *.apal file
                 aw.getPalettes(argv_file,aw.buttonpalette)
             elif file_suffix == "aset":
-                # load Artisan setings on double-click on *.aset file
+                # load Artisan settings on double-click on *.aset file
                 aw.loadSettings(fn=argv_file)
             elif file_suffix == "athm":
-                # load Artisan setings on double-click on *.athm file
+                # load Artisan settings on double-click on *.athm file
                 aw.loadSettings(fn=argv_file,reset=False)
         else:
             # we try to reload the last loaded profile or background

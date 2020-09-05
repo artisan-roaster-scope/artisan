@@ -201,7 +201,8 @@ OPTIONS = {
 #                    'QtHelp','QtMultimedia',
 #                    'QtOpenGL','QtScript','QtScriptTools',
 #                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
-    'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi'],
+    'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi', 
+        'matplotlib','PIL'], # MPL and PIL added for mpl v3.3.x
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
@@ -258,9 +259,10 @@ except:
     PYTHON_V = '3.7'
     
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
-subprocess.check_call(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs',shell = True)
-subprocess.check_call(r'cp -R ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs',shell = True)
-subprocess.check_call(r'cp ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks',shell = True)
+# UPDATE 9/2020: pip install of MPL v3.3.x does not come with a .dylibs directory any longer
+#subprocess.check_call(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs',shell = True)
+#subprocess.check_call(r'cp -R ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/#matplotlib/.dylibs',shell = True)
+#subprocess.check_call(r'cp ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks',shell = True)
 
 # copy snap7 dylib (we try both directories)
 try:

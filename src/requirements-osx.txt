@@ -7,7 +7,7 @@ gevent-websocket==0.10.1
 numpy==1.19.0 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
 colorspacious==1.1.2
 scipy==1.5.0
-matplotlib==3.2.2
+matplotlib==3.3.1 #3.2.2
 PyQt5==5.14.2 # 5.15.0 breaks custom event buttons. They only fire after a modal dialog has been opened. Very strange!
 openpyxl==3.0.4
 keyring==21.2.1 #19.2.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller, 21.21 seems to have fixed this
