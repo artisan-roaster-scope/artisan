@@ -11497,37 +11497,37 @@ Profile missing [CHARGE] or [DROP]</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2469"/>
-        <source>Device set to {0}. Now, chose serial port</source>
+        <source>Device set to {0}. Now, choose serial port</source>
         <translation>Gerät {0} ausgewählt. Serielleeinstellungen vornehmen</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1977"/>
-        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation>Gerät CENTER 305 ausgewählt, equivalent zum CENTER 306 ist. Serielleeinstellungen vornehmen</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2031"/>
-        <source>Device set to {0}, which is equivalent to CENTER 309. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port</source>
         <translation>Gerät {0} ausgewählt, equivalent zum CENTER 309. Serielleeinstellungen vornehmen</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2058"/>
-        <source>Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port</source>
         <translation>Gerät {0} ausgewählt, equivalent zum CENTER 303. Serielleeinstellungen vornehmen</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2040"/>
-        <source>Device set to {0}, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation>Gerät {0} ausgewählt, equivalent zum CENTER 306. Serielleeinstellungen vornehmen</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2067"/>
-        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port</source>
         <translation>Gerät {0} ausgewählt, equivalent zum Omega HH506RA. Serielleeinstellungen vornehmen</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2167"/>
-        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port</source>
         <translation>Gerät {0} ausgewählt, equivalent zum Omega HH806AU. Serielleeinstellungen vornehmen</translation>
     </message>
     <message>
@@ -11542,7 +11542,7 @@ Profile missing [CHARGE] or [DROP]</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2158"/>
-        <source>Device set to {0}, which is equivalent to CENTER 302. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port</source>
         <translation>Gerät {0} ausgewählt, equivalent zum CENTER 302. Serielleeinstellungen vornehmen</translation>
     </message>
     <message>
@@ -11869,7 +11869,7 @@ Continue?</source>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43384"/>
-        <source>Device set to {0}. Now, chose Modbus serial port</source>
+        <source>Device set to {0}. Now, choose Modbus serial port</source>
         <translation type="obsolete">Gerät {0} ausgewählt. Modbus Seriellenanschluss auswählen</translation>
     </message>
     <message>
@@ -13061,7 +13061,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2149"/>
-        <source>Device set to {0}. Now, chose Modbus serial port or IP address</source>
+        <source>Device set to {0}. Now, choose Modbus serial port or IP address</source>
         <translation>Gerät {0} ausgewählt. Modbus Seriellenanschluss auswählen</translation>
     </message>
     <message>

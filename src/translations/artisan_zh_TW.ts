@@ -11397,37 +11397,37 @@ Profile missing [CHARGE] or [DROP]</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2469"/>
-        <source>Device set to {0}. Now, chose serial port</source>
+        <source>Device set to {0}. Now, choose serial port</source>
         <translation>設備設置為 {0}.請先選擇串行端口</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1977"/>
-        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation>設備設置為CENTER 305, 與CENTER 306相同.請先選擇串行端口</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2031"/>
-        <source>Device set to {0}, which is equivalent to CENTER 309. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port</source>
         <translation>設備設置為{0},與CENTER 309相同.請先選擇串行端口</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2058"/>
-        <source>Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port</source>
         <translation>設備設置為{0},與CENTER 303相同.請先選擇串行端口</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2040"/>
-        <source>Device set to {0}, which is equivalent to CENTER 306. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port</source>
         <translation>設備設置為{0},與CENTER 306相同.請先選擇串行端口</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2067"/>
-        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port</source>
         <translation>設備設置為{0},與Omega HH506RA相同.請先選擇串行端口</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2167"/>
-        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port</source>
         <translation>設備設置為{0},與Omega HH806AU相同.請先選擇串行端口</translation>
     </message>
     <message>
@@ -11442,7 +11442,7 @@ Profile missing [CHARGE] or [DROP]</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2158"/>
-        <source>Device set to {0}, which is equivalent to CENTER 302. Now, chose serial port</source>
+        <source>Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port</source>
         <translation>設備設置為{0},與CENTER 302相同.請先選擇串行端口</translation>
     </message>
     <message>
@@ -11769,7 +11769,7 @@ Continue?</source>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43384"/>
-        <source>Device set to {0}. Now, chose Modbus serial port</source>
+        <source>Device set to {0}. Now, choose Modbus serial port</source>
         <translation type="obsolete">设备设置为 {0}.请选择通讯协议串行端口</translation>
     </message>
     <message>
@@ -12881,7 +12881,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2149"/>
-        <source>Device set to {0}. Now, chose Modbus serial port or IP address</source>
+        <source>Device set to {0}. Now, choose Modbus serial port or IP address</source>
         <translation>設備設置為 {0}.請選擇通訊協議串行端口或IP地址</translation>
     </message>
     <message>
