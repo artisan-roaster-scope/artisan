@@ -580,7 +580,8 @@ class RoastProfile():
                 linewidth=0,linestyle='',
                 alpha=(self.alpha[1] if self.active else self.alpha[1]*self.alpha_dim_factor),
                 color=(self.color if self.active else self.gray),
-                picker=5,
+#                picker=5, # deprecated in MPL 3.3.x
+                pickradius=5,
                 label="{} {}".format(self.label,self.aw.arabicReshape(QApplication.translate("Label", "Events", None))))
             if self.aw.qmc.graphstyle == 1:
                 self.l_mainEvents1.set_sketch_params(1,700,12)
@@ -594,7 +595,8 @@ class RoastProfile():
                 linewidth=0,linestyle='',
                 alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
                 color=(self.color if self.active else self.gray),
-                picker=5,
+#                picker=5, # deprecated in MPL 3.3.x
+                pickradius=5,
                 label="{} {}".format(self.label,self.aw.arabicReshape(QApplication.translate("Label", "Events", None))))
             if self.aw.qmc.graphstyle == 1:
                 self.l_mainEvents2.set_sketch_params(4,800,20)

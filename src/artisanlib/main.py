@@ -94,6 +94,11 @@ from artisanlib.suppress_errors import suppress_stdout_stderr
 with suppress_stdout_stderr():
     import matplotlib as mpl
     from matplotlib import cm
+mpl_version = [int(i) for i in mpl.__version__.split(".")]
+
+if mpl_version[0] > 2 and mpl_version[1] > 2:
+    from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatioF # @UnresolvedImport
+    from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport
 
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
@@ -6578,7 +6583,8 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0],
                                                                             marker=(self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[0],
-                                                                            picker=2,
+#                                                                            picker=2, # deprecated in MPL 3.3.x
+                                                                            pickradius=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(0,True))
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
@@ -6591,7 +6597,8 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1],
                                                                             marker=(self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[1],
-                                                                            picker=2,
+#                                                                            picker=2, # deprecated in MPL 3.3.x
+                                                                            pickradius=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(1,True))
                             if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
@@ -6604,7 +6611,8 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2],
                                                                             marker=(self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[2],
-                                                                            picker=2,
+#                                                                            picker=2, # deprecated in MPL 3.3.x
+                                                                            pickradius=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(2,True))
                             if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
@@ -6617,7 +6625,8 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3],
                                                                             marker=(self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[3],
-                                                                            picker=2,
+#                                                                            picker=2, # deprecated in MPL 3.3.x
+                                                                            pickradius=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(3,True))
 
@@ -7049,8 +7058,8 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0],
                                                             marker = (self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[0],
-                                                            picker=2,
-                                                            #markevery=every,
+#                                                            picker=2, # deprecated in MPL 3.3.x
+                                                            pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
@@ -7069,8 +7078,8 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1],
                                                             marker = (self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[1],
-                                                            picker=2,
-                                                            #markevery=every,
+#                                                            picker=2, # deprecated in MPL 3.3.x
+                                                            pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
@@ -7089,8 +7098,8 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2],
                                                             marker = (self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[2],
-                                                            picker=2,
-                                                            #markevery=every,
+#                                                            picker=2, # deprecated in MPL 3.3.x
+                                                            pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
@@ -7109,7 +7118,8 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3],
                                                             marker = (self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[3],
-                                                            picker=2,#markevery=every,
+#                                                            picker=2, # deprecated in MPL 3.3.x
+                                                            pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                     if Nevents:
                         if self.eventsGraphflag == 4:
@@ -12853,7 +12863,10 @@ class VMToolbar(NavigationToolbar):
             else:
                 pm = self.recolorIcon(pm,QColor("#424242"))
         if hasattr(pm, 'setDevicePixelRatio'):
-            pm.setDevicePixelRatio(self.canvas._dpi_ratio)
+            if mpl_version[0] > 2 and mpl_version[1] > 2:
+                _setDevicePixelRatioF(pm, _devicePixelRatioF(self))
+            else:
+                pm.setDevicePixelRatio(self.canvas._dpi_ratio)
         return QIcon(pm)
 
     def recolorIcon(self, pixmap, color):
@@ -17813,10 +17826,17 @@ class ApplicationWindow(QMainWindow):
         if current_background_color is None or current_background_color != str(canvas_color) or (whitep and aw.qmc.palette["messages"] != 'white'): # canvas color did not change, we do not need to redo the navigation bar
             # update navigationbar
             aw.level1layout.removeWidget(aw.ntb) # remove current bar
-            if aw.ntb._active == 'PAN':
-                aw.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
-            if aw.ntb._active == 'ZOOM':
-                aw.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
+            
+            if mpl_version[0] > 2 and mpl_version[1] > 2:
+                if aw.ntb.mode == MPL_Mode.PAN:
+                    aw.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
+                if aw.ntb.mode == MPL_Mode.ZOOM:
+                    aw.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
+            else:
+                if aw.ntb._active == 'PAN':
+                    aw.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
+                if aw.ntb._active == 'ZOOM':
+                    aw.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
             aw.removeToolBar(aw.ntb)
 #            aw.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
             aw.ntb.destroy()
