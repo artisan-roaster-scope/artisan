@@ -13479,7 +13479,7 @@ class SampleThread(QThread):
 #                            aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             # ****** Instead of basing the estimate on the window extremal points,
                             #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                            time_vec = sample_ctimex1[-left_index:]  
+                            time_vec = sample_ctimex1[-left_index:]
                             temp_samples = sample_tstemp1[-left_index:]
                             with warnings.catch_warnings():
                                 warnings.simplefilter('ignore', numpy.RankWarning)
