@@ -13416,8 +13416,15 @@ class SampleThread(QThread):
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             left_index = min(len(sample_ctimex1),max(2,(aw.qmc.deltaETsamples + 1)))
-                            timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
-                            aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                            #timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
+                            #aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                            # ****** Instead of basing the estimate on the window extremal points,
+                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR                        
+                            time_vec = sample_ctimex1[-left_index:]  
+                            temp_samples = sample_tstemp1[-left_index:]
+
+                            LS_fit = numpy.polyfit(time_vec, temp_samples, 1)
+                            aw.qmc.rateofchange1 = LS_fit[0]*60. #And it would be nice to use temp1 = A0 +m*dT for a filtered temp....
                             if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
                                 try:
                                     aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
@@ -13433,7 +13440,14 @@ class SampleThread(QThread):
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             left_index = min(len(sample_ctimex2),max(2,(aw.qmc.deltaBTsamples + 1)))
                             timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
-                            aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                            #aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                            time_vec = sample_ctimex2[-left_index:]  
+                            temp_samples = sample_tstemp2[-left_index:]
+                            
+                            LS_fit = numpy.polyfit(time_vec, temp_samples, 1)
+                            aw.qmc.rateofchange2 = LS_fit[0]*60. #And it would be nice to use temp1 = A0 +m*dT for a filtered temp....
+
+
                             if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
                                 try:
                                     aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
