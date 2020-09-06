@@ -251,12 +251,12 @@ os.chdir('./dist')
 try:
     PYTHONPATH = os.environ["PYTHONPATH"] + r'/'
 except:
-    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/'
+    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/'
 
 try:
     PYTHON_V = os.environ["PYTHON_V"]
 except:
-    PYTHON_V = '3.7'
+    PYTHON_V = '3.8'
     
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 # UPDATE 9/2020: pip install of MPL v3.3.x does not come with a .dylibs directory any longer

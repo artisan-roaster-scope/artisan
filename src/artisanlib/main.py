@@ -32,6 +32,7 @@ import warnings
 import string as libstring
 import html as htmllib
 import numpy
+from scipy.signal import savgol_filter
 import subprocess
 import binascii
 import codecs
@@ -3231,25 +3232,25 @@ class tgraphcanvas(FigureCanvas):
                                         # draw delta lines
 
                                         if self.swapdeltalcds:
-                                            if self.DeltaBTflag and self.l_delta2 is not None:
-                                                try:
-                                                    self.ax.draw_artist(self.l_delta2)
-                                                except:
-                                                    pass
                                             if self.DeltaETflag and self.l_delta1 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta1)
+                                                except:
+                                                    pass
+                                            if self.DeltaBTflag and self.l_delta2 is not None:
+                                                try:
+                                                    self.ax.draw_artist(self.l_delta2)
                                                 except:
                                                     pass
                                         else:
-                                            if self.DeltaETflag and self.l_delta1 is not None:
-                                                try:
-                                                    self.ax.draw_artist(self.l_delta1)
-                                                except:
-                                                    pass
                                             if self.DeltaBTflag and self.l_delta2 is not None:
                                                 try:
                                                     self.ax.draw_artist(self.l_delta2)
+                                                except:
+                                                    pass
+                                            if self.DeltaETflag and self.l_delta1 is not None:
+                                                try:
+                                                    self.ax.draw_artist(self.l_delta1)
                                                 except:
                                                     pass
 
@@ -5623,6 +5624,16 @@ class tgraphcanvas(FigureCanvas):
                 return deltas
         except:
             return deltas
+    
+    # computes the RoR over the time and temperature arrays tx and temp via polynoms of degree 1 at index i using a window of wsize
+    def polyRoR(self,tx,temp,wsize,i):
+        if i < 2:
+            return 0
+        else:
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', numpy.RankWarning)
+                LS_fit = numpy.polynomial.polynomial.polyfit(tx[max(0,i-wsize):i],temp[max(0,i-wsize):i], 1)
+            return LS_fit[1]*60.
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
@@ -5640,11 +5651,13 @@ class tgraphcanvas(FigureCanvas):
             else:
                 roast_end_idx = lt
             if deltaBTsamples is None:
-                dsBT = aw.qmc.deltaBTsamples
+#                dsBT = aw.qmc.deltaBTsamples
+                dsBT = max(2,(aw.qmc.deltaBTsamples + 1)) # now as in sample()
             else:
                 dsBT = deltaBTsamples
             if deltaETsamples is None:
-                dsET = aw.qmc.deltaETsamples
+#                dsET = aw.qmc.deltaETsamples
+                dsET = max(2,(aw.qmc.deltaETsamples + 1)) # now as in sample()
             else:
                 dsET = deltaETsamples
             if timex_lin is not None:
@@ -5655,8 +5668,31 @@ class tgraphcanvas(FigureCanvas):
             if t1 is not None:
                 with numpy.errstate(divide='ignore'):
                     nt1 = numpy.array([0 if x is None else x for x in t1]) # ERROR None Type object not scriptable! t==None on ON
-                    z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
-                    ld1 = len(z1)
+                    
+                    if optimalSmoothing:
+                        # optimal RoR computation using polynoms with out timeshift
+                        if dsET % 2 == 0:
+                            dsET = dsET+1 # the savgol_filter expectes odd window length
+                        if len(nt1) > dsET:
+                            # nt1 is not linearized yet:
+                            if timex_lin is None or len(timex_lin) != len(nt1):
+                                lin1 = numpy.linspace(nt1[0],nt1[-1],len(nt1))
+                            else:
+                                lin1 = timex_lin
+                            nt1_lin = numpy.interp(lin1, tx_roast, nt1) # resample data in nt2 to linear spaced time
+                            dist = (lin1[-1] - lin1[0]) / len(lin1)
+                            z1 = savgol_filter(nt1_lin, dsET, 1, deriv=1,delta=dsET)
+                            z1 = z1 * (60./dist) * dsET
+                        else:
+                            # in this case we use the standard algo
+                            z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
+                    else:
+                        # original code:
+#                        z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
+                        # variant using incremental polyfit RoR computation
+                        z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
+
+                ld1 = len(z1)
                 # make lists equal in length
                 if lt > ld1:
                     z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
@@ -5683,8 +5719,31 @@ class tgraphcanvas(FigureCanvas):
             if t2 is not None:
                 with numpy.errstate(divide='ignore'):
                     nt2 = numpy.array([0 if x is None else x for x in t2])
-                    z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
-                    ld2 = len(z2)
+                    if optimalSmoothing:
+                        # optimal RoR computation using polynoms with out timeshift
+                        if dsBT % 2 == 0:
+                            dsBT = dsBT+1 # the savgol_filter expectes odd window length
+                        if len(nt2) > dsBT:
+                            # nt2 is not linearized yet:
+                            if timex_lin is None or len(timex_lin) != len(nt2):
+                                lin2 = numpy.linspace(nt2[0],nt2[-1],len(nt2))
+                            else:
+                                lin2 = timex_lin
+                            nt2_lin = numpy.interp(lin2, tx_roast, nt2) # resample data in nt2 to linear spaced time
+                            dist = (lin2[-1] - lin2[0]) / len(lin2)
+                            z2 = savgol_filter(nt2_lin, dsBT, 1, deriv=1,delta=dsBT)
+                            z2 = z2 * (60./dist) * dsBT
+                        else:
+                            # in this case we use the standard algo
+                            z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
+                    else:
+                        # original code:
+#                        z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
+                        # variant using incremental polyfit RoR computation
+                        z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
+
+                ld2 = len(z2)
+                
                 # make lists equal in length
                 if lt > ld2:
                     z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
@@ -9374,7 +9433,7 @@ class tgraphcanvas(FigureCanvas):
             self.samplingsemaphore.acquire(1)
             if self.flagstart and self.markTPflag:
                 if aw.qmc.TPalarmtimeindex and self.timeindex[0] != -1 and len(self.timex) > aw.qmc.TPalarmtimeindex:
-                    st = stringfromseconds(self.timex[aw.qmc.TPalarmtimeindex]-self.timex[self.timeindex[0]])
+                    st = stringfromseconds(self.timex[aw.qmc.TPalarmtimeindex]-self.timex[self.timeindex[0]],False)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None).format(st))
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
@@ -13416,15 +13475,18 @@ class SampleThread(QThread):
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             left_index = min(len(sample_ctimex1),max(2,(aw.qmc.deltaETsamples + 1)))
-                            #timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
-                            #aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+#                            timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
+#                            aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             # ****** Instead of basing the estimate on the window extremal points,
-                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR                        
+                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
                             time_vec = sample_ctimex1[-left_index:]  
                             temp_samples = sample_tstemp1[-left_index:]
-
-                            LS_fit = numpy.polyfit(time_vec, temp_samples, 1)
-                            aw.qmc.rateofchange1 = LS_fit[0]*60. #And it would be nice to use temp1 = A0 +m*dT for a filtered temp....
+                            with warnings.catch_warnings():
+                                warnings.simplefilter('ignore', numpy.RankWarning)
+                                # using stable polyfit from numpy polyfit module
+                                LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
+                                aw.qmc.rateofchange1 = LS_fit[1]*60.
+                            
                             if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
                                 try:
                                     aw.qmc.rateofchange1 = aw.qmc.eval_math_expression(aw.qmc.DeltaETfunction,tx,RTsname="R1",RTsval=aw.qmc.rateofchange1)
@@ -13439,15 +13501,17 @@ class SampleThread(QThread):
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             left_index = min(len(sample_ctimex2),max(2,(aw.qmc.deltaBTsamples + 1)))
-                            timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
-                            #aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
-                            time_vec = sample_ctimex2[-left_index:]  
+#                            timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
+#                            aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                            # ****** Instead of basing the estimate on the window extremal points,
+                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
+                            time_vec = sample_ctimex2[-left_index:]
                             temp_samples = sample_tstemp2[-left_index:]
+                            with warnings.catch_warnings():
+                                warnings.simplefilter('ignore', numpy.RankWarning)
+                                LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
+                                aw.qmc.rateofchange2 = LS_fit[1]*60.
                             
-                            LS_fit = numpy.polyfit(time_vec, temp_samples, 1)
-                            aw.qmc.rateofchange2 = LS_fit[0]*60. #And it would be nice to use temp1 = A0 +m*dT for a filtered temp....
-
-
                             if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
                                 try:
                                     aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
