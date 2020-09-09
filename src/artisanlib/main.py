@@ -1985,6 +1985,8 @@ class tgraphcanvas(FigureCanvas):
         self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
         self.minmaxLimits = False
         self.dropSpikes = False
+        self.dropDuplicates = False
+        self.dropDuplicatesLimit = 0.3
 
         self.swapETBT = False
 
@@ -13064,13 +13066,17 @@ class SampleThread(QThread):
     # note that here we assume that the actual measured temperature time/temp was not already added to the list of previous measurements timex/tempx
     def inputFilter(self,timex,tempx,time,temp,BT=False):
         try:
-            #########################
-            # a) detect overflows
             wrong_reading = 0
+            #########################
+            # a) detect duplicates: remove a reading if it is equal to the previous or if that is -1 to the one before
+            if aw.qmc.dropDuplicates and ((len(tempx)>1 and tempx[-1] == -1 and abs(temp - tempx[-2]) <= aw.qmc.dropDuplicatesLimit) or (len(tempx)>0 and abs(temp - tempx[-1]) <= aw.qmc.dropDuplicatesLimit)):
+                wrong_reading = 2 # replace by previous reading not by -1
+            #########################
+            # b) detect overflows
             if aw.qmc.minmaxLimits and (temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax):
                 wrong_reading = 1
             #########################
-            # b) detect spikes (on BT only after CHARGE if autoChargeFlag=True not to have a conflict here)
+            # c) detect spikes (on BT only after CHARGE if autoChargeFlag=True not to have a conflict here)
             n = aw.qmc.filterDropOut_spikeRoR_period
             dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
             if aw.qmc.dropSpikes and ((not aw.qmc.autoChargeFlag) or (not BT) or (aw.qmc.timeindex[0] != -1 and (aw.qmc.timeindex[0] + n) < len(timex))) and not wrong_reading and len(tempx) >= n:
@@ -13108,8 +13114,13 @@ class SampleThread(QThread):
                         return temp
             else:
                 # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)
-                if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes) and len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
-                    tempx[-1] = (tempx[-2] + temp) / 2.0
+                if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                    if len(tempx) > 3 and tempx[-1] == tempx[-2] == tempx[-3] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2] and same for rthe one before
+                        delta = (tempx[-3] - temp) / 3.0
+                        tempx[-1] = tempx[-3] - 2*delta
+                        tempx[-2] = tempx[-3] - delta
+                    elif len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
+                        tempx[-1] = (tempx[-2] + temp) / 2.0
                 return temp
         except Exception as e:
 #            import traceback
@@ -13282,12 +13293,42 @@ class SampleThread(QThread):
                                         aw.qmc.RTextratemp2[i] = extrat2
                                     except:
                                         pass
+                                        
+                                et1_prev = et2_prev = None
+                                et1_prevprev = et2_prevprev = None
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
+                                
+                                    ## Apply InputFilters. As those might modify destructively up to two older readings in temp1/2 via interpolation for drop outs we try to dectect this and copy those
+                                    # changes back to the ctemp lines that are rendered.
+                                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                                        if len(sample_extratemp1[i])>0:
+                                            et1_prev = sample_extratemp1[i][-1]
+                                            if len(sample_extratemp1[i])>1:
+                                                et1_prevprev = sample_extratemp1[i][-2]
+                                        if len(sample_extratemp2[i])>0:
+                                            et2_prev = sample_extratemp2[i][-1]
+                                            if len(sample_extratemp2[i])>1:
+                                                et2_prevprev = sample_extratemp2[i][-2]
                                     extrat1 = self.inputFilter(sample_extratimex[i],sample_extratemp1[i],extratx,extrat1)
                                     extrat2 = self.inputFilter(sample_extratimex[i],sample_extratemp2[i],extratx,extrat2)
+
+                                    # now copy the destructively modified values from temp1/2 to ctemp1/2 if any (to ensure to pick the right elements we compare the timestamps at those indicees)
+                                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                                        if len(sample_extractimex1[i])>0:
+                                            if et1_prev is not None and sample_extractimex1[i][-1] == sample_extratimex[i][-1] and et1_prev != sample_extratemp1[i][-1]:
+                                                sample_extractemp1[i][-1] = sample_extratemp1[i][-1]
+                                            if et1_prevprev is not None and sample_extractimex1[i][-2] == sample_extratimex[i][-2] and et1_prevprev != sample_extratemp1[i][-2]:
+                                                sample_extractemp1[i][-2] = sample_extratemp1[i][-2]
+                                        if len(sample_extractimex2[i])>0:
+                                            if et2_prev is not None and sample_extractimex2[i][-1] == sample_extratimex[i][-1] and et2_prev != sample_extratemp2[i][-1]:
+                                                sample_extractemp2[i][-1] = sample_extratemp2[i][-1]
+                                            if et2_prevprev is not None and sample_extractimex2[i][-2] == sample_extratimex[i][-2] and et2_prevprev != sample_extratemp2[i][-2]:
+                                                sample_extractemp2[i][-2] = sample_extratemp2[i][-2]
+
                                 sample_extratimex[i].append(extratx)
                                 sample_extratemp1[i].append(float(extrat1))
                                 sample_extratemp2[i].append(float(extrat2))
+                                
                                 if extrat1 != -1:
                                     sample_extractimex1[i].append(float(extratx))
                                     sample_extractemp1[i].append(float(extrat1))
@@ -13373,8 +13414,35 @@ class SampleThread(QThread):
                             pass
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
+                    
+                    ## Apply InputFilters. As those might modify destructively up to two older readings in temp1/2 via interpolation for drop outs we try to dectect this and copy those
+                    # changes back to the ctemp lines that are rendered.
+                    t1_prev = t2_prev = None
+                    t1_prevprev = t2_prevprev = None
+                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                        if len(sample_temp1)>0:
+                            t1_prev = sample_temp1[-1]
+                            if len(sample_temp1)>1:
+                                t1_prevprev = sample_temp1[-2]
+                        if len(sample_temp2)>0:
+                            t2_prev = sample_temp2[-1]
+                            if len(sample_temp2)>1:
+                                t2_prevprev = sample_temp2[-2]
                     t1 = self.inputFilter(sample_timex,sample_temp1,tx,t1)
                     t2 = self.inputFilter(sample_timex,sample_temp2,tx,t2,True)
+                    
+                    # now copy the destructively modified values from temp1/2 to ctemp1/2 if any (to ensure to pick the right elements we compare the timestamps at those indicees)                    
+                    if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes or aw.qmc.dropDuplicates):
+                        if len(sample_ctimex1)>0:
+                            if t1_prev is not None and sample_ctimex1[-1] == sample_timex[-1] and t1_prev != sample_temp1[-1]:
+                                sample_ctemp1[-1] = sample_temp1[-1]
+                            if t1_prevprev is not None and sample_ctimex1[-2] == sample_timex[-2] and t1_prevprev != sample_temp1[-2]:
+                                sample_ctemp1[-2] = sample_temp1[-2]
+                        if len(sample_ctimex2)>0:
+                            if t2_prev is not None and sample_ctimex2[-1] == sample_timex[-1] and t2_prev != sample_temp2[-1]:
+                                sample_ctemp2[-1] = sample_temp2[-1]
+                            if t2_prevprev is not None and sample_ctimex2[-2] == sample_timex[-2] and t2_prevprev != sample_temp2[-2]:
+                                sample_ctemp2[-2] = sample_temp2[-2]
 
                     length_of_qmc_timex = len(sample_timex)
                     t1_final = t1
@@ -26540,8 +26608,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.filterDropOuts = bool(toBool(settings.value("filterDropOuts",self.qmc.filterDropOuts)))
             if settings.contains("dropSpikes"):
                 self.qmc.dropSpikes = bool(toBool(settings.value("dropSpikes",self.qmc.dropSpikes)))
-#            if settings.contains("altSmoothing"):
-#                self.qmc.altsmoothing = bool(toBool(settings.value("altSmoothing",self.qmc.altsmoothing)))
+            if settings.contains("dropDuplicates"):
+                self.qmc.dropDuplicates = bool(toBool(settings.value("dropDuplicates",self.qmc.dropDuplicates)))
+            if settings.contains("dropDuplicatesLimit"):
+                self.qmc.dropDuplicatesLimit = toDouble(settings.value("dropDuplicatesLimit",self.qmc.dropDuplicatesLimit))
             if settings.contains("optimalSmoothing"):
                 self.qmc.optimalSmoothing = bool(toBool(settings.value("optimalSmoothing",self.qmc.optimalSmoothing)))
             if settings.contains("swapETBT"):
@@ -27897,6 +27967,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("filterDropOuts",self.qmc.filterDropOuts)
             settings.setValue("dropSpikes",self.qmc.dropSpikes)
+            settings.setValue("dropDuplicates",self.qmc.dropDuplicates)
+            settings.setValue("dropDuplicatesLimit",self.qmc.dropDuplicatesLimit)
 #            settings.setValue("altSmoothing",self.qmc.altsmoothing)
             settings.setValue("optimalSmoothing",self.qmc.optimalSmoothing)
             settings.setValue("swapETBT",self.qmc.swapETBT)

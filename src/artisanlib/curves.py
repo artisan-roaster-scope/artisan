@@ -285,6 +285,8 @@ class HUDDlg(ArtisanDialog):
         self.org_HUDbuttonflag = self.aw.qmc.HUDbuttonflag
         self.org_filterDropOuts = self.aw.qmc.filterDropOuts
         self.org_dropSpikes = self.aw.qmc.dropSpikes
+        self.org_dropDuplicates = self.aw.qmc.dropDuplicates
+        self.org_dropDuplicatesLimit = self.aw.qmc.dropDuplicatesLimit
         self.org_swapETBT = self.aw.qmc.swapETBT
         self.org_optimalSmoothing = self.aw.qmc.optimalSmoothing
         self.org_soundflag = self.aw.soundflag
@@ -355,6 +357,23 @@ class HUDDlg(ArtisanDialog):
         self.FilterSpikes.setChecked(self.aw.qmc.filterDropOuts)
         self.FilterSpikes.stateChanged.connect(self.changeDropFilter)
         self.FilterSpikes.setFocusPolicy(Qt.NoFocus)
+        #dropduplicates
+        self.DropDuplicates = QCheckBox(QApplication.translate("CheckBox", "Interpolate Duplicates",None))
+        self.DropDuplicates.setChecked(self.aw.qmc.dropDuplicates)
+        self.DropDuplicates.stateChanged.connect(self.changeDuplicatesFilter)
+        self.DropDuplicates.setFocusPolicy(Qt.NoFocus)
+        self.DropDuplicatesLimit = MyQDoubleSpinBox()
+        self.DropDuplicatesLimit.setDecimals(2)
+        self.DropDuplicatesLimit.setSingleStep(0.1)
+        self.DropDuplicatesLimit.setRange(0.,1.)
+        self.DropDuplicatesLimit.setAlignment(Qt.AlignRight)
+        self.DropDuplicatesLimit.setMinimumWidth(30)
+        self.DropDuplicatesLimit.setValue(self.aw.qmc.dropDuplicatesLimit)
+        if self.aw.qmc.mode == "F":
+            self.DropDuplicatesLimit.setSuffix(" F")
+        elif self.aw.qmc.mode == "C":
+            self.DropDuplicatesLimit.setSuffix(" C")
+        
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None))
         self.DropSpikes.setChecked(self.aw.qmc.dropSpikes)
@@ -553,7 +572,11 @@ class HUDDlg(ArtisanDialog):
             hudGroupLayout.setEnabled(False)
         rorRoRAlgo = QHBoxLayout()
         rorRoRAlgo.addWidget(self.OptimalSmoothingFlag) 
-        rorRoRAlgo.addStretch()     
+        rorRoRAlgo.addStretch()   
+        inputFilter0 = QHBoxLayout()
+        inputFilter0.addWidget(self.DropDuplicates)
+        inputFilter0.addWidget(self.DropDuplicatesLimit)
+        inputFilter0.addStretch()
         inputFilter1 = QHBoxLayout()
         inputFilter1.addWidget(self.DropSpikes)
         inputFilter1.addStretch()
@@ -568,6 +591,7 @@ class HUDDlg(ArtisanDialog):
         inputFilter2.addWidget(self.maxLimit)
         
         inputFilterVBox = QVBoxLayout()
+        inputFilterVBox.addLayout(inputFilter0)
         inputFilterVBox.addLayout(inputFilter1)
         inputFilterVBox.addLayout(inputFilter2) 
         inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filter",None))
@@ -2272,6 +2296,10 @@ class HUDDlg(ArtisanDialog):
     @pyqtSlot(int) 
     def changeSpikeFilter(self,_=0):
         self.aw.qmc.dropSpikes = not self.aw.qmc.dropSpikes
+    
+    @pyqtSlot(int) 
+    def changeDuplicatesFilter(self,_=0):
+        self.aw.qmc.dropDuplicates = not self.aw.qmc.dropDuplicates
 
     @pyqtSlot(int) 
     def changeMinMaxLimits(self,_=0):
@@ -2346,6 +2374,8 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.HUDbuttonflag = self.org_HUDbuttonflag
         self.aw.qmc.filterDropOuts = self.org_filterDropOuts
         self.aw.qmc.dropSpikes = self.org_dropSpikes
+        self.aw.qmc.dropDuplicates = self.org_dropDuplicates
+        self.aw.qmc.dropDuplicatesLimit = self.org_dropDuplicatesLimit
         self.aw.qmc.swapETBT = self.org_swapETBT
         self.aw.qmc.optimalSmoothing = self.org_optimalSmoothing
         self.aw.soundflag = self.org_soundflag
@@ -2403,6 +2433,8 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.RoRlimit = int(self.rormaxLimit.value())
         self.aw.qmc.filterDropOuts = self.FilterSpikes.isChecked()
         self.aw.qmc.dropSpikes = self.DropSpikes.isChecked()
+        self.aw.qmc.dropDuplicates = self.DropDuplicates.isChecked()
+        self.aw.qmc.dropDuplicatesLimit = self.DropDuplicatesLimit.value()
         self.aw.qmc.minmaxLimits = self.MinMaxLimits.isChecked()
         self.aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
         self.aw.qmc.filterDropOut_tmax = int(self.maxLimit.value())

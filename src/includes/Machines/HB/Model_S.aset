@@ -2,6 +2,8 @@
 AmbientTempSource=5
 Delay=2000
 Oversampling=false
+dropDuplicates=true
+dropDuplicatesLimit=0.3
 
 [Device]
 id=115
@@ -40,4 +42,4 @@ bytesize=8
 comport=COM4
 parity=N
 stopbits=1
-timeout=0.8
+timeout=0.4

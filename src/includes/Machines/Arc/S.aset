@@ -2,6 +2,8 @@
 AmbientTempSource=3
 Delay=2000
 Oversampling=false
+dropDuplicates=true
+dropDuplicatesLimit=0.3
 
 [Device]
 id=115
