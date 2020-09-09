@@ -75,7 +75,7 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - Internal memory
   - 9V Battery only
   - Optional optical-isolated serial2USB converter
-* [Amprobe TMD-56](https://www.amprobe.com/product/tmd-56/) / [Omega HH806AU](https://www.omega.com/en-us/sensors-and-sensing-equipment/temperature/thermometers/p/HH806) / [Mastech MS6514](http://www.mastech-group.com/products.php?PNo=89)
+* [Amprobe TMD-56](https://www.amprobe.com/product/tmd-56/) / [Omega HH806AU](https://www.omega.com/en-us/sensors-and-sensing-equipment/temperature/thermometers/p/HH806) / [Mastech MS6514](http://www.mastech-group.com/products.php?PNo=89) / [PerfectPrime TC2100GN TC2100, 2-Channel](https://www.amazon.com/dp/B0776SD6JC/ref=cm_sw_r_cp_api_i_DkbwFb7YX283X)
   - Dual K/J/T/E/R/S/N-Type
   - Built in USB to serial converter (19200-8E1)
   - Internal memory
