@@ -5633,7 +5633,7 @@ class tgraphcanvas(FigureCanvas):
             return 0
         else:
             with warnings.catch_warnings():
-                warnings.simplefilter('ignore', numpy.RankWarning)
+                warnings.simplefilter('ignore')
                 LS_fit = numpy.polynomial.polynomial.polyfit(tx[max(0,i-wsize):i],temp[max(0,i-wsize):i], 1)
             return LS_fit[1]*60.
 
@@ -13535,7 +13535,7 @@ class SampleThread(QThread):
 #                    if local_flagstart and length_of_qmc_timex > 1:
                     if length_of_qmc_timex > 1:
                         # compute T1 RoR
-                        if t1_final == -1:  # we repeat the last RoR if underlying temperature dropped
+                        if t1_final == -1 or len(sample_ctimex1)<2:  # we repeat the last RoR if underlying temperature dropped
                             if sample_unfiltereddelta1:
                                 aw.qmc.rateofchange1 = sample_unfiltereddelta1[-1]
                             else:
@@ -13550,7 +13550,7 @@ class SampleThread(QThread):
                             time_vec = sample_ctimex1[-left_index:]
                             temp_samples = sample_tstemp1[-left_index:]
                             with warnings.catch_warnings():
-                                warnings.simplefilter('ignore', numpy.RankWarning)
+                                warnings.simplefilter('ignore')
                                 # using stable polyfit from numpy polyfit module
                                 LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
                                 aw.qmc.rateofchange1 = LS_fit[1]*60.
@@ -13561,7 +13561,7 @@ class SampleThread(QThread):
                                 except:
                                     pass
                         # compute T2 RoR
-                        if t2_final == -1:  # we repeat the last RoR if underlying temperature dropped
+                        if t2_final == -1 or len(sample_ctimex2)<2:  # we repeat the last RoR if underlying temperature dropped
                             if sample_unfiltereddelta2:
                                 aw.qmc.rateofchange2 = sample_unfiltereddelta2[-1]
                             else:
@@ -13576,7 +13576,7 @@ class SampleThread(QThread):
                             time_vec = sample_ctimex2[-left_index:]
                             temp_samples = sample_tstemp2[-left_index:]
                             with warnings.catch_warnings():
-                                warnings.simplefilter('ignore', numpy.RankWarning)
+                                warnings.simplefilter('ignore')
                                 LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
                                 aw.qmc.rateofchange2 = LS_fit[1]*60.
                             
@@ -23242,7 +23242,7 @@ class ApplicationWindow(QMainWindow):
         self.extrastopbits = self.extrastopbits[:n]
         self.extrastopbits.append(1)
         self.extratimeout = self.extratimeout[:n]
-        self.extratimeout.append(0.5)
+        self.extratimeout.append(0.4)
 
     def addDevice(self):
         try:
@@ -33196,12 +33196,12 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def saveVectorGraph_SVG(self,_=False):
-        self.saveVectorGraph(extension=".svg")
+        self.saveVectorGraph(extension="*.svg")
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def saveVectorGraph_PDF(self,_=False):
-        self.saveVectorGraph(extension=".pdf")
+        self.saveVectorGraph(extension="*.pdf")
 
     #resizes and saves graph to a new width w
     def resizeImg(self,w,transformationmode,filetype="PNG",fname=""):
@@ -33241,13 +33241,13 @@ class ApplicationWindow(QMainWindow):
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() {0}").format(str(ex)))
 
-    def saveVectorGraph(self,extension=".pdf",fname=""):
+    def saveVectorGraph(self,extension="*.pdf",fname=""):
         try:
             if fname == "" or fname is None:
-                if extension == ".pdf":
-                    filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PDF", None),ext=extension, path=fname)
+                if extension == "*.pdf":
+                    filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PDF", None),ext=extension)
                 else:
-                    filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as SVG", None),ext=extension, path=fname)
+                    filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as SVG", None),ext=extension)
             else:
                 filename = fname
             if filename:

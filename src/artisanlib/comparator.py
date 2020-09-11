@@ -155,11 +155,17 @@ class RoastProfile():
             ###########      END OLD PROFILE FORMAT
             
         # temperature conversion
-        self.ambientTemp = profile["ambientTemp"]
         if "mode" in profile:
             m = str(profile["mode"])
         else:
             m = self.qmc.mode
+        if "ambientTemp" in profile:
+            self.ambientTemp = profile["ambientTemp"]
+        else:
+            if m == "C":
+                self.ambientTemp = 20
+            else:
+                self.ambientTemp = 68
         if self.aw.qmc.mode == "C" and m == "F":
             self.temp1 = [fromFtoC(t) for t in self.temp1]
             self.temp2 = [fromFtoC(t) for t in self.temp2]
@@ -364,7 +370,7 @@ class RoastProfile():
         try:
             return self.timex[self.endTimeIdx]
         except:
-            return 0
+            return self.timex[-1]
     
     def setVisible(self,b):
         self.visible = b
@@ -448,47 +454,36 @@ class RoastProfile():
     def setTimeoffset(self,offset):
         self.timeoffset = offset
         tempTrans = self.getTempTrans()
-        for l in [self.l_temp1,self.l_temp2,
-                self.l_mainEvents1,self.l_mainEvents2,self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
+        for l in [
+            # shifting the temperature curves does not work for some curves that hold many points resulting some at the end being not displayed
+            # thus we update the xdata explicitly below
+            #self.l_temp1,self.l_temp2,
+            self.l_mainEvents1,self.l_mainEvents2,self.l_events1,self.l_events2,self.l_events3,self.l_events4]:
             if l is not None:
                 l.set_transform(tempTrans)
-                
-#        self.l_temp2.set_xdata([x-offset if x is not None else None for x in self.timex])
-#        self.l_temp2.draw()
-#        self.aw.qmc.fig.canvas.draw()
-                
-#        self.l_temp2.set_clip_on(False)
-#        self.l_temp2.set_clip_box(self.aw.qmc.ax.bbox)
-                
-#        cp = self.l_temp2.get_clip_path()
-#        print("cp",cp)
-#        self.l_temp2.set_clip_path(cp,transform=tempTrans)
 
-#        # overwrites the clipbox of the axis!
-#        from matplotlib.transforms import Bbox, TransformedBbox
-#        box = TransformedBbox(Bbox.from_extents(120,90, 20*60,250), self.aw.qmc.ax.transData)
-#        self.l_temp2.set_clip_path(None)
-#        self.l_temp2.set_clip_box(box)
+        for l in [self.l_temp1,self.l_temp2]:
+            if l is not None:
+                l.set_xdata([x-offset if x is not None else None for x in self.timex])
 
-#        print("self.aw.qmc.ax.get_xlim()",self.aw.qmc.ax.get_xlim())
-#        print("self.aw.qmc.ax.get_xbound()",self.aw.qmc.ax.get_xbound())
-        
-#        self.l_temp2.get_datalim()
-        
-#        self.aw.qmc.ax.ignore_existing_data_limits = True
-#                self.aw.qmc.ax.update_datalim(l.get_datalim(self.aw.qmc.ax.transData))       
-#        self.aw.qmc.ax.update_datalim([(0,9),(1200,0)],updatey=False)
-        
-        deltaTrans = self.getDeltaTrans()
+
+        # shifting the delta curves does not work for some curves that hold many points resulting some at the end being not displayed
+        # thus we update the xdata explicitly below        
+#        deltaTrans = self.getDeltaTrans()
+#        for l in [self.l_delta1,self.l_delta2]:
+#            if l is not None:
+#                l.set_transform(deltaTrans)
         for l in [self.l_delta1,self.l_delta2]:
             if l is not None:
-                l.set_transform(deltaTrans)
+                l.set_xdata([x-offset if x is not None else None for x in self.timex])
+        
 #        # update RoR clippings
 #        self.l_delta1_clipping.set_transform(self.getDeltaTrans())
 #        self.l_delta1.set_clip_path(self.l_delta1_clipping)
 #        self.l_delta2_clipping.set_transform(self.getDeltaTrans())
 #        self.l_delta2.set_clip_path(self.l_delta2_clipping)
 
+    # returns the time transformation for the temperature curves
     def getTempTrans(self):
         # transformation pipelines are processed from left to right so in "A + B" first transformation A then tranformation B is applied (on the result of A)
         # an artist transformation is supplied with data in data coordinates and should return data in display coordinates
@@ -496,6 +491,7 @@ class RoastProfile():
         # transforms.Affine2D().translate() : applies its transformation
         return transforms.Affine2D().translate(-self.timeoffset,0) + self.aw.qmc.ax.transData
     
+    # returns the time transformation for the delta curves
     def getDeltaTrans(self):
         return transforms.Affine2D().translate(-self.timeoffset,0) + self.aw.qmc.delta_ax.transData
     
@@ -643,6 +639,7 @@ class CompareTableWidget(QTableWidget):
         else:
             super().keyPressEvent(event)
         
+    # fails in selectionChanged() if the first row header is clicked repeatedly and reports [0], [1],.. instead of [0],[],..
     def getselectedRowsFast(self):
         selectedRows = []
         for item in self.selectedItems():
@@ -1248,8 +1245,8 @@ class roastCompareDlg(ArtisanDialog):
     
     @pyqtSlot()
     def selectionChanged(self):
-        #selected = [self.aw.findWidgetsRow(self.profileTable,si,2) for si in self.profileTable.selectedItems()]
-        selected = self.profileTable.getselectedRowsFast()
+        selected = [self.aw.findWidgetsRow(self.profileTable,si,2) for si in self.profileTable.selectedItems()]
+#        selected = self.profileTable.getselectedRowsFast() # does return [1],[2],[1],.. on repeated clicks on the row header of the first entry insteadd of [1],[0],[1],..
         for i,p in enumerate(self.profiles):
             if selected and not i in selected:
                 p.setActive(False)

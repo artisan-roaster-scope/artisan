@@ -233,7 +233,7 @@ class serialport(object):
         self.bytesize = 8
         self.parity= 'O'
         self.stopbits = 1
-        self.timeout=1.0
+        self.timeout=0.4
         #serial port for ET/BT
         import serial  # @UnusedImport
         self.SP = serial.Serial()
@@ -2097,6 +2097,8 @@ class serialport(object):
                     sync = self.SP.read(5)
                     libtime.sleep(1)
                 self.SP.write(b"%000R")
+                self.SP.flush()
+                libtime.sleep(.1)
                 ID = self.SP.read(5)
                 if len(ID) == 5:
                     self.HH506RAid = ID[0:3]               # Assign new id to self.HH506RAid
@@ -2132,7 +2134,13 @@ class serialport(object):
                 self.SP.reset_input_buffer()
                 self.SP.reset_output_buffer()
                 self.SP.write(command)
+                self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(14)
+                if len(r) != 14:
+                    # we did not receive all data yet, let's wait a little longer and try to fetch the missing part
+                    libtime.sleep(0.05)
+                    r = r + self.SP.read(14 - len(r))
                 if len(r) == 14:
                     #we convert the hex strings to integers. Divide by 10.0 (decimal position)
                     r = r.replace(str2cmd(' '),str2cmd('0'))
@@ -2167,7 +2175,13 @@ class serialport(object):
                 self.SP.reset_input_buffer()
                 self.SP.reset_output_buffer()
                 self.SP.write(command)
+                self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(7)                                   #NOTE: different
+                if len(r) != 7:
+                    # we did not receive all data yet, let's wait a little longer and try to fetch the missing part
+                    libtime.sleep(0.05)
+                    r = r + self.SP.read(7 - len(r))                
                 if len(r) == 7:
                     #DECIMAL POINT
                     #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
@@ -2217,7 +2231,13 @@ class serialport(object):
                 self.SP.reset_input_buffer()
                 self.SP.reset_output_buffer()
                 self.SP.write(command)
+                self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(8) #NOTE: different to CENTER306
+                if len(r) != 8:
+                    # we did not receive all data yet, let's wait a little longer and try to fetch the missing part
+                    libtime.sleep(0.05)
+                    r = r + self.SP.read(8 - len(r))                
                 if len(r) == 8:
                     #DECIMAL POINT
                     #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
@@ -2279,7 +2299,13 @@ class serialport(object):
                 self.SP.reset_input_buffer()
                 self.SP.reset_output_buffer()
                 self.SP.write(command)
+                self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(26)
+                if len(r) != 26:
+                    # we did not receive all data yet, let's wait a little longer and try to fetch the missing part
+                    libtime.sleep(0.05)
+                    r = r + self.SP.read(26 - len(r))                
                 if len(r) == 26 and hex2int(r[0],r[1]) == 43605: # filter out bad/strange data
                     #extract T1
                     T1 = hex2int(r[19],r[18])/10. # select byte 19 and 18
@@ -2320,7 +2346,13 @@ class serialport(object):
                 self.SP.reset_input_buffer()
                 self.SP.reset_output_buffer()
                 self.SP.write(command)
+                self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(26)
+                if len(r) != 26:
+                    # we did not receive all data yet, let's wait a little longer and try to fetch the missing part
+                    libtime.sleep(0.05)
+                    r = r + self.SP.read(26 - len(r))                
                 if len(r) == 26 and hex2int(r[0],r[1]) == 43605: # filter out bad/strange data
                     self.aw.qmc.extraPL125T4TX = self.aw.qmc.timeclock.elapsed()/1000.
                     #extract T1
@@ -2365,7 +2397,13 @@ class serialport(object):
                 self.SP.reset_input_buffer()
                 self.SP.reset_output_buffer()
                 self.SP.write(command)
+                self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(10) #NOTE: different to CENTER303
+                if len(r) != 10:
+                    # we did not receive all data yet, let's wait a little longer and try to fetch the missing part
+                    libtime.sleep(0.05)
+                    r = r + self.SP.read(10 - len(r))                
                 if len(r) == 10:
                     #DECIMAL POINT
                     #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
@@ -2447,10 +2485,19 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
-                self.SP.reset_input_buffer()
                 self.SP.reset_output_buffer()
+                self.SP.reset_input_buffer()
                 self.SP.write(command)
+                self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(45)
+                # the device needs 0.1 too answer a request for temperature data
+                # and delivers a new reading maximally every 0.4sec, however,
+                # readings are internally updated within the instrument only at a rate of about every 3sec thus Artisan should not sample faster than every 3sec                
+                if len(r) != 45:
+                    # we did not receive all data yet, let's wait a little longer and try to fetch the missing part
+                    libtime.sleep(0.05)
+                    r = r + self.SP.read(45 - len(r))
                 if len(r) == 45:
                     T1 = T2 = T3 = T3 = -1
                     try:
@@ -2493,6 +2540,8 @@ class serialport(object):
             if self.aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 self.aw.addserial("CENTER309: " + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+
+#---
 
     def addPhidgetServer(self):
         if not self.aw.qmc.phidgetServerAdded:
@@ -5585,7 +5634,7 @@ class extraserialport(object):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 1.0
+        self.timeout = 0.4
         self.devicefunctionlist = {}
         self.device = None
         self.SP = None
@@ -5614,7 +5663,7 @@ class extraserialport(object):
     def closeport(self):
         if self.SP is not None:
             self.SP.close()
-            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
+            libtime.sleep(0.3) # on OS X opening a serial port too fast after closing the port get's disabled
 
     # this one is called from scale and color meter code
     def connect(self,error=True):
