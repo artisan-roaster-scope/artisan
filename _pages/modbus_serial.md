@@ -35,11 +35,11 @@ Machine                         | Driver | Remarks
 ------------------------------- | ------ | -----
 [Ambex](/machines/ambex/) | FTDI
 [Arc](/machines/arc/) | CP210x
-[Besca](/machines/besca/) | FTDI | CH34x on some older machines
-[BellaTW](/machines/bellatw/) | PL2303 | CH34x on some machines
-[BlueKing](/machines/blueking/)  | CP210x | on some older machines FTDI, on others CH34x
-[BC Roasters](/machines/bc/)  | CP210x | on some older machines FTDI, on others CH34x
-[Coffeed](/machines/coffed/) | CH34x
+[Besca](/machines/besca/) | FTDI | CH34x on some older machines
+[BellaTW](/machines/bellatw/) | PL2303 | CH34x on some machines
+[BlueKing](/machines/blueking/) | CP210x | on some older machines FTDI, on others CH34x
+[BC Roasters](/machines/bc/) | CP210x | on some older machines FTDI, on others CH34x
+[Coffeed](/machines/coffed/) | CH34x
 [Coffee Tech](/machines/coffeetech/) | FTDI
 [Dätgen](/machines/datgen/) | CH34x
 [Dongyi](/machines/dongyi/) | CP210x | FTDI on some older machines
@@ -56,4 +56,3 @@ Machine                         | Driver | Remarks
 [Santoker](/machines/santoker/) | CP210x
 [Sedona](/machines/sedona/) | CP210x
 [Toper](/machines/toper/) | CP210x | CH34x on some machines
-[Opp](/machines/opp/) | 
