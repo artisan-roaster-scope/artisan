@@ -11,8 +11,12 @@ header:
 
 * __Producer:__ [Berto Coffee Roaster](https://berto-online.com/){:target="_blank"}, Indonesia
 * __Machines:__ One and D models with Autonics TX4S PIDs and R models with touch panel
-* __Connection:__ USB (One/D) or Network (R)
+* __Connection:__ MODBUS RTU via USB (One/D models) or MODBUS TCP via Network (R models)
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves. On the R model the roast is started and stopped also from Artisan.
+
+### Setup One/D Models
+
+The communication via MODBUS RTU requires to install a [serial driver](/modbus_serial/).
 
 ### Setup R Model
 

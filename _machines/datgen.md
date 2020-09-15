@@ -11,5 +11,5 @@ header:
 
 * __Distributor:__ [Dätgen Roasters](https://datgenroasters.com/){:target="_blank"}, Germany/Turkey
 * __Machines:__ DR and DW models
-* __Connection:__ USB
+* __Connection:__ MODBUS ASCII via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of bean temperature (BT) and environmental temperature (ET).

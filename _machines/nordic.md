@@ -11,5 +11,5 @@ header:
 
 * __Distributor:__ [Sudi Jaya Group](https://sjglobal.id/roaster/){:target="_blank"}, Indonesia
 * __Machines:__ models with Delta DTA or DTK PIDs
-* __Connection:__ USB
+* __Connection:__ MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves

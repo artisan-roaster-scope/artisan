@@ -11,5 +11,5 @@ header:
 
 * __Producer:__ [Yoshan](https://www.ysroaster.com/){:target="_blank"}, China
 * __Machines:__ Machines with Omron PIDs
-* __Connection:__ USB
+* __Connection:__ MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of bean temperature (BT) and environmental temperature (ET)

@@ -13,7 +13,7 @@ header:
 
 * __Producer:__ [Buckeye Coffee Roasters Co. LCC](http://www.buckeyecoffee.com){:target="_blank"}, USA
 * __Machines:__ all models with Fuji PIDs or the 2in1 system (via Bluetooth or USB)
-* __Connection:__ MODBUS RTU; requires the installation of a serial driver
+* __Connection:__ MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
 
 **Watch out!** The new models are equipped with Fuji PXF PIDs instead of the Fuji PXR PIDs that were build-in before. For those new models choose `Sedona Elite Roaster PXF` from the machine menu.

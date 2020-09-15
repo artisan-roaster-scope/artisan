@@ -11,5 +11,5 @@ header:
 
 * __Producer:__ [Zhengzhou Blueking Mechanical Equipment Co. Ltd.](https://lanjingmachine.en.alibaba.com/){:target="_blank"}, China
 * __Machines:__ BK Series
-* __Connection:__ USB
+* __Connection:__ MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of bean temperature (BT) and environmental temperature (ET). 

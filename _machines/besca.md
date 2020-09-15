@@ -23,3 +23,8 @@ header:
 **Watch out!** 
 for manual machines produced after 15.09.2019, those with the touch screen, the Artisan machine setup _"Besca BSC manual v2"_ included in Artisan v2.1 and later should be used. For all other manual machines the _"Besca BSC manual v1"_ (or _"Besca BSC manual"_ in Artisan v2.0 and earlier)
 {: .notice--primary}
+
+
+**Watch out!**
+The communication via MODBUS RTU requires to install a [serial driver](/modbus_serial/).
+{: .notice--primary}

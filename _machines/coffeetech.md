@@ -14,7 +14,7 @@ header:
 * __Producer:__ [Coffee-Tech Engineering Ltd.](https://www.coffee-tech.com){:target="_blank"}, Israel
 * __Machine:__ FZ-94 Lab Roaster, Ghibli 15/30/45/60/90, and Ghibli Firewood, Silon ZR7
 * __Connection:__ 
-   * FZ-94, Ghibli (USB), Silon (USB): MODBUS RTU via USB-2-RS485 interface; requires the installation of a serial driver
+   * FZ-94, Ghibli (USB), Silon (USB): MODBUS RTU via USB-2-RS485 interface; requires the installation of a [serial driver](/modbus_serial/)
    * Ghibli (touch), Silon ZR7 (touch): MODBUS TCP via network connection
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT), drum temperature (DT)

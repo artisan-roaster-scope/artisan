@@ -11,5 +11,5 @@ header:
 
 * __Distributor:__ [NOR Coffee Roaster](https://norcofeeroaster.com/){:target="_blank"}, Indonesia
 * __Machines:__ N1000i, N2000i, N3000i, N5000i, and N3 PRIME machines with Autonics TX4S PIDs
-* __Connection:__ USB
+* __Connection:__ MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of bean temperature (BT) and environmental temperature (ET)

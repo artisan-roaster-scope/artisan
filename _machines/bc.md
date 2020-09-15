@@ -13,7 +13,7 @@ header:
 
 * __Producer:__ [Buckeye Coffee Roasters Co. LCC](http://www.buckeyecoffee.com){:target="_blank"}, USA
 * __Machines:__ all with USB or Bluetooth connection
-* __Connection:__ MODBUS RTU; requires the installation of a serial driver
+* __Connection:__ MODBUS RTU; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
 
 {% capture notice-text %}

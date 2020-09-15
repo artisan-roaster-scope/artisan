@@ -11,5 +11,9 @@ header:
 
 * __Distributor:__ [Ambex Coffee Roasters and Grinders Inc.](https://www.ambexroaster.com/){:target="_blank"}, USA
 * __Machines:__ YM-2, YM-5, YM-10, and YM-15
-* __Connection:__ USB
+* __Connection:__ MODBUS RTU via USB
 * __Features:__ logging of bean temperature (BT) and environmental temperature (ET)
+
+**Watch out!**
+The communication via MODBUS RTU requires to install a [serial driver](/modbus_serial/).
+{: .notice--primary}

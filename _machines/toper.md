@@ -10,7 +10,7 @@ header:
 ---
 * __Producer:__ [Toper](http://www.toper.com){:target="_blank"}, Turkey
 * __Machines:__ the "Toper PLC" setup works via a network connection with machines featuring an Omron PLC (Toper TKM-SX) or the Schneider Modicon PLC (Cafemino). The "Toper USB" setup works with some other Toper roasters that feature an USB connector.
-* __Connection:__ MODBUS TCP via the network or USB
+* __Connection:__ MODBUS TCP via network or MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
 
 ### Setup

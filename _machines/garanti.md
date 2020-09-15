@@ -11,5 +11,5 @@ header:
 
 * __Producer:__ [Garanti](https://www.garantiroaster.com/){:target="_blank"}, Turkey
 * __Machines:__ GKPX models
-* __Connection:__ USB
+* __Connection:__ MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of bean temperature (BT) and environmental temperature (ET)

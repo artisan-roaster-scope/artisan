@@ -19,7 +19,7 @@ Any of these meters require a serial device driver installed that allows the com
 
 + [VCP from FTDI](http://www.ftdichip.com/Drivers/VCP.htm)
 + [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
-+ [PL2303 from Prolific](http://prolificusa.com/pl-2303hx-drivers/)
++ [PL2303 from Prolific](http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=225&pcid=41)
 
 **Watch out!** The FTDI driver is preinstalled on virtually all Linux distributions as well as all OS X versions supported by Artisan. Installing an additional FTDI driver on those operating system might lead to instabilities!
 {: .notice--primary}
@@ -35,16 +35,19 @@ The single temperature meters listed above are rather simple and cost-efficient.
   - RS232 Interface (9600-8N1)
   - 9V Battery only
   - Software optional
+  - Minimal stable sampling rate in Artisan: 4sec
 * [CENTER 302](http://www.centertek.com/product_d.php?lang=en&tb=1&id=70&cid=67)
   - Single K/J-Type
   - RS232 Interface (9600-8N1)
   - 9V Battery only
   - Software optional
+  - Minimal stable sampling rate in Artisan: 4sec
 * [CENTER 305](http://www.centertek.com/product_d.php?lang=en&tb=1&id=82&cid=67)
   - Single K-Type
   - RS232 Interface (9600-8N1), cable included
   - 9V Battery only
   - Software included
+  - Minimal stable sampling rate in Artisan: 4sec
 * [Apollo I DT301](http://www.ueitest.com/products/temperature-humidity/dt301) (discontinued)
   - Single K/J-Type
   - Built in USB to serial converter (9600-8N1)
@@ -58,23 +61,27 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - RS232 Interface (9600-8N1)
   - 9V Battery only
   - Software optional
+  - Minimal stable sampling rate in Artisan: 4sec
 * [CENTER 303](http://www.centertek.com/product_d.php?lang=en&tb=1&id=73&cid=67) / VOLTCRAFT 302KJ / VOLTCRAFT KJ202
   - Dual K/J-Type
   - RS232 Interface (9600-8N1)
   - 9V Battery only
   - Software optional
+  - Minimal stable sampling rate in Artisan: 4sec
 * [CENTER 306](http://www.centertek.com/product_d.php?lang=en&tb=1&id=85&cid=67) / VOLTCRAFT K202
   - Dual K-Type
   - RS232 Interface (9600-8N1), cable included
   - 9V Battery only
   - Internal memory
   - Software included
+  - Minimal stable sampling rate in Artisan: 4sec
 * [Omega HH506RA](http://www.omega.com/pptst/HH506A_HH506RA.html) / [EXTECH 421509](http://www.extech.com/products/421509)
   - Dual K/J/T/E/R/S/N-Type
   - RS232 Interface (2400-7E1)
   - Internal memory
   - 9V Battery only
   - Optional optical-isolated serial2USB converter
+  - Minimal stable sampling rate in Artisan: 5sec
 * [Amprobe TMD-56](https://www.amprobe.com/product/tmd-56/) / [Omega HH806AU](https://www.omega.com/en-us/sensors-and-sensing-equipment/temperature/thermometers/p/HH806) / [Mastech MS6514](http://www.mastech-group.com/products.php?PNo=89) / [PerfectPrime TC2100GN TC2100, 2-Channel](https://www.amazon.com/dp/B0776SD6JC/ref=cm_sw_r_cp_api_i_DkbwFb7YX283X)
   - Dual K/J/T/E/R/S/N-Type
   - Built in USB to serial converter (19200-8E1)
@@ -99,12 +106,14 @@ Those 4 channel meters in the list below are all basically identical. Just that 
   - RS232 Interface (9600-8N1)
   - Software optional
   - 9V Battery or external power
+  - Minimal stable sampling rate in Artisan: 4sec
 * [CENTER 309](http://www.centertek.com/product_d.php?lang=en&tb=1&id=79&cid=67) / VOLTCRAFT K204 / [Omega HH309](https://www.omega.com/en-us/control-and-monitoring-devices/data-loggers/p/HH309A-Series) / [General Tools DT309DL](http://www.tequipment.net/GeneralDT309DL.html)
   - Four K-Type
   - RS232 Interface (9600-8N1)
   - Internal memory
   - Software included
   - 9V Battery or external power
+  - Minimal stable sampling rate in Artisan: 4sec
 * [VOLTCRAFT PL-125-T4](https://www.conrad.de/de/temperatur-messgeraet-voltcraft-pl-125-t4-200-bis-1372-c-fuehler-typ-k-j-kalibriert-nach-werksstandard-ohne-zertifi-1013036.html)
   - Four K/J-Type
   - Built in USB to serial converter (9600-8N1)

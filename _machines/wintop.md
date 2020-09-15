@@ -11,5 +11,5 @@ header:
 
 * __Producer:__ [Wintop](http://wintopmachinery.com/){:target="_blank"}, China
 * __Machines:__ WB, WK, WS series
-* __Connection:__ serial via USB
+* __Connection:__ serial via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves

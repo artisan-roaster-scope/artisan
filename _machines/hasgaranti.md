@@ -13,6 +13,6 @@ header:
 
 * __Producer:__ [Has Garanti](http://www.hasgaranti.com.tr){:target="_blank"}, Turkey
 * __Machine:__ Has Garanti HGS and HSR series
-* __Connection:__ MODBUS RTU via USB
+* __Connection:__ MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves

@@ -14,5 +14,5 @@ header:
 * __Distributor:__ [Novustec](http://novustec.co.kr/){:target="_blank"}, South Korea
 
 * __Machines:__ T2 and T7
-* __Connection:__ USB
+* __Connection:__ MODBUS ASCII via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of bean temperature and environmental temperature. The T7 provides additionally the airflow.
