@@ -7,8 +7,6 @@ main:
     url: /donate/
   - title: "About"
     url: /about/
-  - title: "MODBUS Serial"
-    url: /modbus_serial/
 
 machines:
   - title: "Machines"
