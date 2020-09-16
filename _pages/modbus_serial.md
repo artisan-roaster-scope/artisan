@@ -20,7 +20,7 @@ You need to install the corresponding serial driver for the chipset of this conv
 + __PL2303__: [Prolific](http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=225&pcid=41)
 + __CH34x__:
   - Windows: [http://www.wch.cn/download/CH341SER_EXE.html](http://www.wch.cn/download/CH341SER_EXE.html)
-  - Mac: [http://www.wch.cn/downloads/file/178.html](http://www.wch.cn/downloads/file/178.html)
+  - macOS: [http://www.wch.cn/downloads/file/178.html](http://www.wch.cn/downloads/file/178.html)
   - Linux: [http://www.wch.cn/download/CH341SER_LINUX_ZIP.html](http://www.wch.cn/download/CH341SER_LINUX_ZIP.html)
 
 **Watch out!** The FTDI driver is preinstalled on virtually all Linux distributions as well as all OS X versions supported by Artisan. Installing an additional FTDI driver on those operating system might lead to instabilities!
@@ -46,6 +46,7 @@ Machine                         | Driver | Remarks
 [Easyster](/machines/easyster/) | FTDI
 [Garanti](/machines/garanti/) | CP210x
 [Golden Roasters](/machines/goldenroasters/) | CH34x
+[HARTANZAH](/machines/hartanzah/) | FTDI
 [HB](/machines/hb/) | CP210x
 [KapoK](/machines/kapok/) | CH34x
 [NOR](/machines/nor/) | CH34x

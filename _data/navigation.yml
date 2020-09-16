@@ -58,6 +58,8 @@ machines:
         url: /machines/giesen/
       - title: "Golden Roasters"
         url: /machines/goldenroasters/
+      - title: "Hartanzah"
+        url: /machines/hartanzah/
       - title: "Has Garanti"
         url: /machines/hasgaranti/
       - title: "HB-Roasters"
@@ -112,6 +114,8 @@ machines:
         url: /machines/sf/
       - title: "Sedona"
         url: /machines/sedona/
+      - title: "Tesla"
+        url: /machines/tesla/
       - title: "Toper"
         url: /machines/toper/
       - title: "Tostabar"
