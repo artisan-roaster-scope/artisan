@@ -5,15 +5,15 @@ Delay=2000
 id=29
 
 [ExtraComm]
-extrabaudrate=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\x96\0)
-extrabytesize=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\b)
-extracomport=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0\x43\0O\0M\0\x31)
-extraparity=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x2\0\x45)
-extrastopbits=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
-extratimeout=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
+extrabaudrate=@Invalid()
+extrabytesize=@Invalid()
+extracomport=@Invalid()
+extraparity=@Invalid()
+extrastopbits=@Invalid()
+extratimeout=@Invalid()
 
 [ExtraDev]
-extraCurveVisibility1=true, true, true, true, true, true, true, true, true, true
+extraCurveVisibility1=false, true, true, true, true, true, true, true, true, true
 extraCurveVisibility2=false, true, true, true, true, true, true, true, true, true
 extraDelta1=false, false, false, false, false, false, false, false, false, false
 extraDelta2=false, false, false, false, false, false, false, false, false, false
@@ -21,13 +21,12 @@ extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
 extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
-extradevicecolor1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x35\0\x64\0\x30\0\x30)
-extradevicecolor2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k)
-extradevices=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0!)
-extramathexpression1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
-extramathexpression2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
-extraname1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x4\0I\0T)
-extraname2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0\x45\0x\0t\0r\0\x61\0 \0\x32)
+extradevicecolor1=@Invalid()
+extradevicecolor2=@Invalid()
+extradevices=@Invalid()
+extramathexpression1=@Invalid()
+extramathexpression2=@Invalid()
+extraname1=@Invalid()
 
 [Modbus]
 PID_OFF_action=
@@ -66,7 +65,7 @@ input3div=1
 input3float=false
 input3mode=C
 input3register=1000
-input3slave=3
+input3slave=0
 input4FloatsAsInt=false
 input4bcd=false
 input4code=3
@@ -116,4 +115,4 @@ type=0
 wordorderLittle=true
 
 [RoastProperties]
-roastertype=Froco PLC
+roastertype=Froco Improved

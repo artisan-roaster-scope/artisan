@@ -1291,6 +1291,7 @@ class tgraphcanvas(FigureCanvas):
             "",                #0
             "Phidget HUM1000", #1
             "Yocto Meteo",     #2
+            "Phidget TMP1000", #3
         ]
         self.humiditydevicefunctionlist = [
             "",                #0
@@ -8954,6 +8955,8 @@ class tgraphcanvas(FigureCanvas):
                 temp = aw.ser.PhidgetHUM1000temperature()
             elif self.ambient_temperature_device == 2: # Yocto Meteo
                 temp = aw.ser.YoctoMeteoTEMP()
+            elif self.ambient_temperature_device == 3: # Phidget TMP1000
+                temp = aw.ser.PhidgetTMP1000temperature()
 
             #--- pressure
             if self.ambient_pressure_device == 1: # Phidget PRE1000
@@ -12906,7 +12909,8 @@ class VMToolbar(NavigationToolbar):
         if aw is not None and name.startswith("plus"):
             basedir = os.path.join(aw.getResourcePath(),"Icons")
         else:
-            basedir = self.basedir
+#            basedir = self.basedir # depricated
+            basedir = os.path.join(mpl.get_data_path(), 'images')
         if name.startswith("plus") and not self.white_icons:
             name = 'white_' + name
         #dirty hack to prefer .svg over .png Toolbar icons
@@ -13163,15 +13167,18 @@ class SampleThread(QThread):
         if len(tx) != len(temp):
             return temp
         else:
-            # we take one more reading, if availble, for the re-sampling to make it more likely to have all readings re-sampled
-            l = min(len(decay_weights)+1,len(temp))
+            l = min(len(decay_weights),len(temp))
             d = aw.qmc.delay / 1000.
             tx_org = tx[-l:] # as len(tx)=len(temp) here, it is guranteed that len(tx_org)=l
             # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
             tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by contruction, len(tx_lin)=len(tx_org)=l
             temp_trail = temp[-l:] # by construction, len(temp_trail)=len(tx_lin)=len(tx_org)=l
             temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
-            return numpy.average(temp_trail_re[-len(decay_weights):],weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
+            try:
+                return numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
+            except:
+                # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
+                return numpy.average(tx,temp)
 
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample() that flagon=True
@@ -13542,7 +13549,7 @@ class SampleThread(QThread):
                                 aw.qmc.rateofchange1 = 0.
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(sample_ctimex1),max(2,(aw.qmc.deltaETsamples + 1)))
+                            left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2,(aw.qmc.deltaETsamples + 1)))
 #                            timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
 #                            aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             # ****** Instead of basing the estimate on the window extremal points,
@@ -13568,7 +13575,7 @@ class SampleThread(QThread):
                                 aw.qmc.rateofchange2 = 0.
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            left_index = min(len(sample_ctimex2),max(2,(aw.qmc.deltaBTsamples + 1)))
+                            left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2,(aw.qmc.deltaBTsamples + 1)))
 #                            timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
 #                            aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
                             # ****** Instead of basing the estimate on the window extremal points,
@@ -19651,7 +19658,8 @@ class ApplicationWindow(QMainWindow):
     def sliderReleased(self,n,force=False,updateLCD=False):
         if n == 0:
             sv1 = self.slider1.value()
-            if force or (self.eventslidermoved[0] and sv1 != self.eventslidervalues[0]) or abs(sv1-self.eventslidervalues[0]) > 3:
+            if force or (self.eventslidermoved[0] and sv1 != self.eventslidervalues[0]) or abs(sv1-self.eventslidervalues[0]) > 1:
+                print("moved")
                 self.eventslidermoved[0] = 0
                 if aw.eventslidercoarse[0]:
                     sv1 = int(round(sv1 / 10.))*10
@@ -19661,7 +19669,7 @@ class ApplicationWindow(QMainWindow):
                 self.recordsliderevent(n)
         elif n == 1:
             sv2 = self.slider2.value()
-            if force or (self.eventslidermoved[1] and sv2 != self.eventslidervalues[1]) or abs(sv2-self.eventslidervalues[1]) > 3:
+            if force or (self.eventslidermoved[1] and sv2 != self.eventslidervalues[1]) or abs(sv2-self.eventslidervalues[1]) > 1:
                 self.eventslidermoved[1] = 0
                 if aw.eventslidercoarse[1]:
                     sv2 = int(round(sv2 / 10.))*10
@@ -19671,7 +19679,7 @@ class ApplicationWindow(QMainWindow):
                 self.recordsliderevent(n)
         elif n == 2:
             sv3 = self.slider3.value()
-            if force or (self.eventslidermoved[2] and sv3 != self.eventslidervalues[2]) or abs(sv3-self.eventslidervalues[2]) > 3:
+            if force or (self.eventslidermoved[2] and sv3 != self.eventslidervalues[2]) or abs(sv3-self.eventslidervalues[2]) > 1:
                 self.eventslidermoved[2] = 0
                 if aw.eventslidercoarse[2]:
                     sv3 = int(round(sv3 / 10.))*10
@@ -19681,7 +19689,7 @@ class ApplicationWindow(QMainWindow):
                 self.recordsliderevent(n)
         elif n == 3:
             sv4 = self.slider4.value()
-            if force or (self.eventslidermoved[3] and sv4 != self.eventslidervalues[3]) or abs(sv4-self.eventslidervalues[3]) > 3:
+            if force or (self.eventslidermoved[3] and sv4 != self.eventslidervalues[3]) or abs(sv4-self.eventslidervalues[3]) > 1:
                 self.eventslidermoved[3] = 0
                 if aw.eventslidercoarse[3]:
                     sv4 = int(round(sv4 / 10.))*10
@@ -19960,7 +19968,7 @@ class ApplicationWindow(QMainWindow):
                         else:
                             buttonnumber = int(cs)-1
                             if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
-                                self.recordextraevent(buttonnumber,updateButtons=False)
+                                self.recordextraevent(buttonnumber,updateButtons=False,paralllel=False)
                 elif action == 4: # MODBUS Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"

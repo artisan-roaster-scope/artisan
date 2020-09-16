@@ -1522,6 +1522,33 @@ class serialport(object):
                 return None
         except Exception:
             return None
+
+    # connects to a Phidgets TMP1000, returns current temperature value and disconnects
+    def PhidgetTMP1000temperature(self):
+        try:
+            # Temperature
+            tempSensor = PhidgetTemperatureSensor()
+            ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',DeviceID.PHIDID_TMP1000,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
+            if ser:
+                tempSensor.setDeviceSerialNumber(ser)
+                tempSensor.setHubPort(port)   #explicitly set the port to where the HUM is attached
+                if self.aw.qmc.phidgetRemoteFlag:
+                    self.addPhidgetServer() 
+                if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
+                    tempSensor.setIsRemote(True)
+                    tempSensor.setIsLocal(False)
+                tempSensor.openWaitForAttachment(1500)
+                if tempSensor.getAttached():
+                    libtime.sleep(0.3)
+                    res = tempSensor.getTemperature()
+                    tempSensor.close()
+                    return res
+                else:
+                    return None
+            else:
+                return None
+        except Exception:
+            return None
             
     # connects to a Phidgets HUM1000, returns current humidity value and disconnects
     def PhidgetHUM1000humidity(self):
@@ -2492,7 +2519,7 @@ class serialport(object):
                 libtime.sleep(.1)
                 r = self.SP.read(45)
                 # the device needs 0.1 too answer a request for temperature data
-                # and delivers a new reading maximally every 0.4sec, however,
+                # and delivers a reading maximally every 0.4sec, however,
                 # readings are internally updated within the instrument only at a rate of about every 3sec thus Artisan should not sample faster than every 3sec                
                 if len(r) != 45:
                     # we did not receive all data yet, let's wait a little longer and try to fetch the missing part
@@ -5136,8 +5163,8 @@ class serialport(object):
             if self.SP.isOpen():
                 #INITIALIZE (ONLY ONCE)
                 if not self.ArduinoIsInitialized or chan is not None:
-#                    self.SP.reset_input_buffer()
-#                    self.SP.reset_output_buffer()
+                    self.SP.reset_input_buffer()
+                    self.SP.reset_output_buffer()
                     #build initialization command
                     if chan is None:
                         et_channel = self.arduinoETChannel
@@ -5164,24 +5191,26 @@ class serialport(object):
                         command = "CHAN;{}".format(chan)
                     #libtime.sleep(0.3)
                     self.SP.write(str2cmd(command + "\n"))       #send command
-                    #self.SP.flush()
-                    #libtime.sleep(.1)
+                    self.SP.flush()
+                    libtime.sleep(.1)
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
                         raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None))
                     elif result.startswith("#") and chan is None:
                         #OK. NOW SET UNITS
-#                        self.SP.reset_input_buffer()
-#                        self.SP.reset_output_buffer()
+                        self.SP.reset_input_buffer()
+                        self.SP.reset_output_buffer()
                         command = "UNITS;" + self.aw.qmc.mode + "\n"   #Set units
                         self.SP.write(str2cmd(command))
+                        self.SP.flush()
+                        libtime.sleep(.1)
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
                             raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None))
                         else:
                             #OK. NOW SET FILTER
-#                            self.SP.reset_input_buffer()
-#                            self.SP.reset_output_buffer()
+                            self.SP.reset_input_buffer()
+                            self.SP.reset_output_buffer()
                             filt =  ",".join(map(str,self.aw.ser.ArduinoFILT))
                             command = "FILT;" + filt + "\n"   #Set filters
                             self.SP.write(str2cmd(command))
@@ -5197,6 +5226,8 @@ class serialport(object):
                 self.SP.reset_input_buffer()
                 self.SP.reset_output_buffer()
                 self.SP.write(str2cmd(command))
+                self.SP.flush()
+                libtime.sleep(.1)
                 rl = self.SP.readline().decode('utf-8', 'ignore')[:-2]
                 res = rl.rsplit(',')
                 #response: list ["t0","t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT on "CHAN;1200" 
