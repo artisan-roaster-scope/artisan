@@ -2240,7 +2240,7 @@ class HUDDlg(ArtisanDialog):
     @pyqtSlot(int)
     def changeGraphStyle(self,n):
         self.aw.qmc.graphstyle = n
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        self.aw.qmc.redraw(recomputeAllDeltas=False,forceRenewAxis=True)
 
     @pyqtSlot(int)
     def changeGraphFont(self,n):

@@ -2985,6 +2985,7 @@ class tgraphcanvas(FigureCanvas):
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
     @pyqtSlot()
     def updategraphics(self):
+        QApplication.processEvents() # without this we see some flickers (canvas redraws) on using multiple button event actions on macOS!?
         try:
             if self.flagon:
                 #### lock shared resources #####
@@ -6003,7 +6004,7 @@ class tgraphcanvas(FigureCanvas):
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
-    def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False, takelock=True):
+    def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False, takelock=True, forceRenewAxis=False):
         if aw.qmc.designerflag:
             aw.qmc.redrawdesigner()
         elif bool(aw.comparator):
@@ -6039,9 +6040,11 @@ class tgraphcanvas(FigureCanvas):
                 rcParams['xtick.color'] = self.palette["xlabel"]
                 rcParams['ytick.color'] = self.palette["ylabel"]
 
-                if self.ax is None:
+                if forceRenewAxis:
+                    self.fig.clf()
+                if self.ax is None or forceRenewAxis:
                     self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
-                if self.delta_ax is None:
+                if self.delta_ax is None or forceRenewAxis:
                     self.delta_ax = self.ax.twinx()
 
                 # instead to remove and regenerate the axis object (we just clear and reuse it)
@@ -19659,7 +19662,6 @@ class ApplicationWindow(QMainWindow):
         if n == 0:
             sv1 = self.slider1.value()
             if force or (self.eventslidermoved[0] and sv1 != self.eventslidervalues[0]) or abs(sv1-self.eventslidervalues[0]) > 1:
-                print("moved")
                 self.eventslidermoved[0] = 0
                 if aw.eventslidercoarse[0]:
                     sv1 = int(round(sv1 / 10.))*10
@@ -19968,7 +19970,7 @@ class ApplicationWindow(QMainWindow):
                         else:
                             buttonnumber = int(cs)-1
                             if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
-                                self.recordextraevent(buttonnumber,updateButtons=False,paralllel=False)
+                                self.recordextraevent(buttonnumber,updateButtons=False,parallel=False)
                 elif action == 4: # MODBUS Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -20983,7 +20985,7 @@ class ApplicationWindow(QMainWindow):
                                         libtime.sleep(cmds)
                                 except Exception:
                                     pass
-            except Exception:
+            except:
                 pass
 
     def calc_env(self):
