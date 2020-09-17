@@ -7,12 +7,13 @@ import warnings
 warnings.simplefilter("ignore", DeprecationWarning)
 
 import sys
-#import imp # deprecated favour of importlib
 import os
 from platform import system
 
 # highDPI support must be set before creating the Application instance
 try:
+    if system() == 'Darwin':
+        os.environ["QT_MAC_WANTS_LAYER"] = "1" # some widgets under PyQt 5.15.1 on macOS seem not to update properly without this (see the discussion on the pyqt mailing list from 15.6.2020 "Widgets are not updated - is this a bug?")
     from PyQt5.QtWidgets import QApplication
     from PyQt5.QtCore import Qt
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)

@@ -3,7 +3,7 @@ gevent-websocket==0.10.1
 numpy==1.19.2
 colorspacious==1.1.2
 scipy==1.5.2 # released already
-matplotlib==3.3.2
+matplotlib==3.2.2. # MPL 3.3.x is not compatible with pyinstaller up to 4.0
 PyQt5==5.15.1 #5.14.2 # 5.15.0 seems not to install on Python 3.7.1
 openpyxl==3.0.5
 pyinstaller==3.6
