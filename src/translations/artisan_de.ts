@@ -10589,7 +10589,7 @@ LCDs Ale</translation>
     <message>
         <location filename="../const/UIconst.py" line="167"/>
         <source>Main LCDs</source>
-        <translation>Zentralen LCDs</translation>
+        <translation>LCDs</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="168"/>
