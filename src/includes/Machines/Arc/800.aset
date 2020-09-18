@@ -1,6 +1,6 @@
 [General]
 AmbientTempSource=5
-Delay=4000
+Delay=5000
 Oversampling=false
 dropDuplicates=true
 dropDuplicatesLimit=0.3

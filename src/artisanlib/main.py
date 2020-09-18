@@ -650,6 +650,8 @@ class tgraphcanvas(FigureCanvas):
     updateLargeLCDsTimeSignal = pyqtSignal(str)
     updateLargeLCDsReadingsSignal = pyqtSignal(str,str)
     updateLargeLCDsSignal = pyqtSignal(str,str,str)
+    fileDirtySignal = pyqtSignal()
+    fileCleanSignal = pyqtSignal()
 
     def __init__(self,parent,dpi):
 
@@ -2202,11 +2204,14 @@ class tgraphcanvas(FigureCanvas):
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
         self.updateLargeLCDsReadingsSignal.connect(self.updateLargeLCDsReadings)
         self.updateLargeLCDsTimeSignal.connect(self.updateLargeLCDsTime)
+        self.fileDirtySignal.connect(self.fileDirty)
+        self.fileCleanSignal.connect(self.fileClean)
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
 
+    @pyqtSlot()
     def fileDirty(self):
         try:
             if aw.curFile:
@@ -2217,6 +2222,7 @@ class tgraphcanvas(FigureCanvas):
             pass
         self.safesaveflag = True
 
+    @pyqtSlot()
     def fileClean(self):
         try:
             if aw.curFile:
@@ -2814,7 +2820,7 @@ class tgraphcanvas(FigureCanvas):
             elif action.key[0] == 2 and self.phasesbuttonflag: # FCs
                 self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
 
-            aw.qmc.fileDirty()
+            aw.qmc.fileDirtySignal.emit()
             self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
         else:
             # add a special event at the current timepoint
@@ -2836,7 +2842,7 @@ class tgraphcanvas(FigureCanvas):
                         pass
                 except:
                     pass
-                aw.qmc.fileDirty()
+                aw.qmc.fileDirtySignal.emit()
                 self.redraw(recomputeAllDeltas=(action.key[0] in [0,6])) # on moving CHARGE or DROP, we have to recompute the Deltas
             else:
                 try:
@@ -3397,7 +3403,7 @@ class tgraphcanvas(FigureCanvas):
 
     @pyqtSlot(bool)
     def toggleHUD(self,_=False):
-        aw.soundpop()
+        aw.soundpopSignal.emit()
         #OFF
         if self.HUDflag:
             self.HUDflag = False
@@ -4810,7 +4816,7 @@ class tgraphcanvas(FigureCanvas):
             if reply == QMessageBox.Save:
                 return aw.fileSave(aw.curFile)  #if accepted, calls fileClean() and thus turns safesaveflag = False
             elif reply == QMessageBox.Discard:
-                self.fileClean()
+                self.fileCleanSignal.emit()
                 return True
             elif reply == QMessageBox.Cancel:
                 aw.sendmessage(QApplication.translate("Message","Action canceled",None))
@@ -4856,7 +4862,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             #### lock shared resources #####
             aw.qmc.samplingsemaphore.acquire(1)
-            self.fileClean()
+            self.fileCleanSignal.emit()
             self.rateofchange1 = 0.0
             self.rateofchange2 = 0.0
             self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2, self.ctimex1, self.ctimex2, self.ctemp1, self.ctemp2 = [],[],[],[],[],[],[],[],[],[],[]
@@ -4921,7 +4927,7 @@ class tgraphcanvas(FigureCanvas):
                     pass
 
             if soundOn:
-                aw.soundpop()
+                aw.soundpopSignal.emit()
 
             if fireResetAction:
                 try:
@@ -5328,7 +5334,9 @@ class tgraphcanvas(FigureCanvas):
         for k,v in self.l_annotations_dict.items():
             temp_anno = v[0].xyann
             time_anno = v[1].xyann
-            res.append([k,temp_anno[0],temp_anno[1],time_anno[0],time_anno[1]])
+            if all([not numpy.isnan(e) for e in temp_anno + time_anno]):
+                # we add the entry only if all of the coordinates are proper numpers and not nan
+                res.append([k,temp_anno[0],temp_anno[1],time_anno[0],time_anno[1]])
         return res
 
     def setAnnoPositions(self,anno_positions):
@@ -5348,7 +5356,8 @@ class tgraphcanvas(FigureCanvas):
         res = []
         for k,v in self.l_event_flags_dict.items():
             flag_anno = v.xyann
-            res.append([k,flag_anno[0],flag_anno[1]])
+            if all([not numpy.isnan(e) for e in flag_anno]):
+                res.append([k,flag_anno[0],flag_anno[1]])
         return res
 
     def setFlagPositions(self,flag_positions):
@@ -8277,7 +8286,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ambientTemp = fromCtoF(self.ambientTemp)  #ambient temperature
 
                         #prevents accidentally deleting a modified profile.
-                        self.fileDirty()
+                        self.fileDirtySignal.emit()
 
                         #background
                         for i in range(len(self.timeB)):
@@ -8337,7 +8346,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ambientTemp = fromFtoC(self.ambientTemp)  #ambient temperature
 
                         #prevents accidentally deleting a modified profile.
-                        self.fileDirty()
+                        self.fileDirtySignal.emit()
 
                         #background
                         for i in range(len(self.timeB)):
@@ -9163,12 +9172,12 @@ class tgraphcanvas(FigureCanvas):
                 if not self.checkSaved():
                     return False
                 else:
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     self.OnMonitor()
         #turn OFF
         else:
             try:
-                aw.soundpop()
+                aw.soundpopSignal.emit()
             except:
                 pass
             self.OffMonitor()
@@ -9273,7 +9282,7 @@ class tgraphcanvas(FigureCanvas):
             self.updateLCDtime()
             #prevents accidentally deleting a modified profile:
             if len(self.timex) > 2:
-                self.fileDirty()
+                self.fileDirtySignal.emit()
                 aw.autoAdjustAxis() # automatic adjust axis after roast if auto axis is enabled
             try:
                 if aw.clusterEventsFlag:
@@ -9304,7 +9313,7 @@ class tgraphcanvas(FigureCanvas):
             if not self.checkSaved():
                 return False
             else:
-                aw.soundpop()
+                aw.soundpopSignal.emit()
                 if self.flagon and len(self.timex) == 1:
                     # we are already in monitoring mode, we just clear this first measurement and go
                     aw.qmc.clearMeasurements(andLCDs=False)
@@ -9313,7 +9322,7 @@ class tgraphcanvas(FigureCanvas):
                 self.OnRecorder()
         #turn STOP
         else:
-            aw.soundpop()
+            aw.soundpopSignal.emit()
             self.OffRecorder()
 
     #Records charge (put beans in) marker. called from push button 'Charge'
@@ -9324,9 +9333,9 @@ class tgraphcanvas(FigureCanvas):
             if self.flagstart:
                 removed = False
                 try:
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
+                    self.fileDirtySignal.emit()
                     if aw.button_8.isFlat() and self.timeindex[0] > -1:
                         # undo wrongly set CHARGE
                         # deactivate autoCHARGE
@@ -9468,9 +9477,9 @@ class tgraphcanvas(FigureCanvas):
                 self.samplingsemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
+                    self.fileDirtySignal.emit()
     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -9570,9 +9579,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
+                    self.fileDirtySignal.emit()
     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -9671,9 +9680,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
+                    self.fileDirtySignal.emit()
     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -9765,9 +9774,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
+                    self.fileDirtySignal.emit()
     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -9869,9 +9878,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
+                    self.fileDirtySignal.emit()
     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -9967,9 +9976,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
+                    self.fileDirtySignal.emit()
     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -10126,9 +10135,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagstart:
                     removed = False
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
+                    self.fileDirtySignal.emit()
     
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
@@ -10290,7 +10299,7 @@ class tgraphcanvas(FigureCanvas):
     def EventRecord_action(self,_=False):
         self.EventRecord()
 
-    def EventRecord(self,extraevent=None,takeLock=True):
+    def EventRecord(self,extraevent=None,takeLock=True,doupdategraphics=True,doupdatebackground=True):
         try:
             if extraevent!=None:
                 if aw.extraeventstypes[extraevent] <= 4:
@@ -10298,21 +10307,25 @@ class tgraphcanvas(FigureCanvas):
                         extraevent=extraevent,
                         eventtype=aw.extraeventstypes[extraevent],
                         eventvalue=aw.extraeventsvalues[extraevent],
-                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock)
+                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock,
+                        doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
                 elif aw.extraeventstypes[extraevent] == 9:
                     self.EventRecordAction(
                         extraevent=extraevent,
                         eventtype=4,  # we map back to the untyped event type
                         eventvalue=aw.extraeventsvalues[extraevent],
-                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock)
+                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock,
+                        doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
                 else: # on "relative" event values, we take the last value set per event via the recordextraevent call before
                     self.EventRecordAction(
                         extraevent=extraevent,
                         eventtype=aw.extraeventstypes[extraevent]-5,
                         eventvalue=aw.qmc.eventsExternal2InternalValue(aw.extraeventsactionslastvalue[aw.extraeventstypes[extraevent]-5]),
-                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock)
+                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock,
+                        doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
             else:
-                self.EventRecordAction(extraevent=extraevent,takeLock=takeLock)
+                self.EventRecordAction(extraevent=extraevent,takeLock=takeLock,
+                doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " EventRecord() {0}").format(str(e)),exc_tb.tb_lineno)
@@ -10320,19 +10333,22 @@ class tgraphcanvas(FigureCanvas):
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
     # extraevent is given when called from aw.recordextraevent() from an extra Event Button
-    def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription="",takeLock=True,doupdategraphics=True):
+    def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription="",takeLock=True,doupdategraphics=True,doupdatebackground=True):
         try:
             if takeLock:
                 aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0 or (self.device == 18 and aw.simulator is None):
-                    aw.soundpop()
+                    aw.soundpopSignal.emit()
                     #prevents accidentally deleting a modified profile.
-                    self.fileDirty()
+                    self.fileDirtySignal.emit()
                     Nevents = len(self.specialevents)
                     #if in manual mode record first the last point in self.timex[]
                     if self.device == 18 and aw.simulator is None:
-                        tx,et,bt = aw.ser.NONE()
+                        if not doupdategraphics and not doupdatebackground: # a call from a multiple event action
+                            tx,et,bt = self.timeclock.elapsed()/1000.,-1,-1
+                        else:
+                            tx,et,bt = aw.ser.NONE()
                         if bt != -1 or et != -1:
                             self.drawmanual(et,bt,tx)
                         else:
@@ -10504,8 +10520,8 @@ class tgraphcanvas(FigureCanvas):
                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                     except: # mpl before v3.0 do not have this set_in_layout() function
                                         pass
-
-                        self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBacground() needed
+                        if doupdatebackground:
+                            self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBackground() is needed
                         temp = "%.1f "%self.temp2[i]
                         if aw.qmc.timeindex[0] != -1:
                             start = aw.qmc.timex[aw.qmc.timeindex[0]]
@@ -10548,7 +10564,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 #prevents accidentally deleting a modified profile.
-                self.fileDirty()
+                self.fileDirtySignal.emit()
                 #number of events
                 Nevents = len(self.specialevents)
                 #index number
@@ -10990,7 +11006,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_11.setDisabled(False)
         aw.button_11.setFlat(False)
 
-    #called from markdryen(), markcharge(), mark1Cstart(), etc when using device 18 (manual mode)
+    #called from markdryend(), markcharge(), mark1Cstart(),  etc when using device 18 (manual mode)
     def drawmanual(self,et,bt,tx):
         self.timex.append(tx)
         self.temp1.append(et)
@@ -12144,7 +12160,7 @@ class tgraphcanvas(FigureCanvas):
             #pylint: disable=E0611
             from scipy.interpolate import UnivariateSpline
             #prevents accidentally deleting a modified profile.
-            self.fileDirty()
+            self.fileDirtySignal.emit()
             #create functions
             funcBT = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
             funcET = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
@@ -14009,6 +14025,7 @@ class ApplicationWindow(QMainWindow):
     setTitleSignal = pyqtSignal(str,bool) # can be called from another thread or a QTimer to set the profile title in the main GUI thread
     sendmessageSignal = pyqtSignal(str,bool,str)
     openPropertiesSignal = pyqtSignal()
+    soundpopSignal = pyqtSignal()
 
     def __init__(self, parent = None):
 
@@ -16819,6 +16836,7 @@ class ApplicationWindow(QMainWindow):
         self.setTitleSignal.connect(self.qmc.setProfileTitle)
         self.sendmessageSignal.connect(self.sendmessage)
         self.openPropertiesSignal.connect(self.editgraph)
+        self.soundpopSignal.connect(self.soundpop)
 
 
         if sys.platform.startswith("darwin"):
@@ -19970,7 +19988,7 @@ class ApplicationWindow(QMainWindow):
                         else:
                             buttonnumber = int(cs)-1
                             if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
-                                self.recordextraevent(buttonnumber,updateButtons=False,parallel=False)
+                                self.recordextraevent(buttonnumber,parallel=False,updateButtons=False,doupdategraphics=True,doupdatebackground=True)
                 elif action == 4: # MODBUS Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -21145,7 +21163,7 @@ class ApplicationWindow(QMainWindow):
 
     #called from user configured event buttons
     #by default actions are processed in a parallel thread, but components of multiple button actions not to avoid crashes
-    def recordextraevent(self,ee,parallel=True,updateButtons=True):
+    def recordextraevent(self,ee,parallel=True,updateButtons=True,doupdategraphics=True,doupdatebackground=True):
         eventtype = self.extraeventstypes[ee]
         if updateButtons: # not if triggered from mutliplebutton actions:
             try:
@@ -21177,7 +21195,7 @@ class ApplicationWindow(QMainWindow):
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
                 if self.qmc.flagstart:
-                    self.qmc.EventRecord(extraevent = ee)
+                    self.qmc.EventRecord(extraevent = ee,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
             else:
                 if eventtype < 4: # absolute values
                     etype = eventtype
@@ -21189,7 +21207,6 @@ class ApplicationWindow(QMainWindow):
                         new_value = cmdvalue
                     else:
                         new_value = p + cmdvalue
-
                 # limit value w.r.t. the event slider min/max specification
                 new_value = min(aw.eventslidermax[etype],max(aw.eventslidermin[etype],new_value))
 
@@ -21209,7 +21226,7 @@ class ApplicationWindow(QMainWindow):
                 # move corresponding slider to new value:
                 self.moveslider(etype,new_value)
                 if self.qmc.flagstart:
-                    self.qmc.EventRecord(extraevent = ee)
+                    self.qmc.EventRecord(extraevent = ee,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
         else:
             # just issue the eventaction (no cmd substitution here)
             cmd = self.extraeventsactionstrings[ee]
@@ -22159,6 +22176,7 @@ class ApplicationWindow(QMainWindow):
         # we enable keyboard event processing again
 
     #sound feedback when pressing a push button
+    @pyqtSlot()
     def soundpop(self):
         if self.soundflag:
             QApplication.beep()
@@ -22394,7 +22412,7 @@ class ApplicationWindow(QMainWindow):
                     self.serialize(filename_path,pf)
                     self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
                     self.setCurrentFile(filename_path,False) # we do not add autosaved files any longer to the recent file menu
-                    self.qmc.fileClean()
+                    self.qmc.fileCleanSignal.emit()
 
                     if self.qmc.autosavealsopath != "":
                         other_filename_path = os.path.join(self.qmc.autosavealsopath,filename)
@@ -22759,10 +22777,10 @@ class ApplicationWindow(QMainWindow):
                 self.setCurrentFile(filename) #update recent file list
                 if profile_changed:
                     # profiles was adjusted, ensure that it does not overwrite the original file on saving
-                    self.qmc.fileDirty()
+                    self.qmc.fileDirtySignal.emit()
                     self.curFile = None
                 else:
-                    self.qmc.fileClean()
+                    self.qmc.fileCleanSignal.emit()
                 #Plot everything
                 self.qmc.redraw()
                 self.updatePhasesLCDs()
@@ -22896,7 +22914,7 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.extratemp2[j] = y_range2[:]
 
             if dirty:
-                self.qmc.fileDirty()
+                self.qmc.fileDirtySignal.emit()
                 return True
             else:
                 return False
@@ -23228,7 +23246,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timeindex[7] = self.time2index(COOL)
             self.qmc.endofx = self.qmc.timex[-1]
             self.sendmessage(QApplication.translate("Message","Artisan CSV file loaded successfully", None))
-            self.qmc.fileDirty()
+            self.qmc.fileDirtySignal.emit()
             aw.autoAdjustAxis()
             self.qmc.redraw()
         except Exception as ex:
@@ -23604,7 +23622,7 @@ class ApplicationWindow(QMainWindow):
                 self.importRoastLoggerEnc(filename,'utf-8')
             except Exception:
                 self.importRoastLoggerEnc(filename,'latin1')
-            aw.qmc.fileDirty()
+            aw.qmc.fileDirtySignal.emit()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -24738,7 +24756,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastUUID = d(profile["roastUUID"])
             else:
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
-                self.qmc.fileDirty()
+                self.qmc.fileDirtySignal.emit()
             if "roastbatchnr" in profile:
                 try:
                     self.qmc.roastbatchnr = int(profile["roastbatchnr"])
@@ -24831,7 +24849,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmtemperature = [(fromFtoC(t) if t != 500 else t) for t in self.qmc.alarmtemperature]
                 if self.qmc.greens_temp != 0.:
                     self.qmc.greens_temp = fromFtoC(self.qmc.greens_temp)
-                self.qmc.fileDirty()
+                self.qmc.fileDirtySignal.emit()
             elif self.qmc.mode == "F" and m == "C":
                 self.qmc.temp1 = [fromCtoF(t) for t in self.qmc.temp1]
                 self.qmc.temp2 = [fromCtoF(t) for t in self.qmc.temp2]
@@ -24856,7 +24874,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmtemperature = [fromCtoF(t) for t in self.qmc.alarmtemperature]
                 if self.qmc.greens_temp != 0.:
                     self.qmc.greens_temp = fromCtoF(self.qmc.greens_temp)
-                self.qmc.fileDirty()
+                self.qmc.fileDirtySignal.emit()
             elif self.qmc.loadaxisfromprofile:
                 # only if the temperature mode of the profile equals to our current mode, and loadfromprofile is ticked, we respect the temp/RoR axis limits
                 if "zmax" in profile:
@@ -24990,7 +25008,7 @@ class ApplicationWindow(QMainWindow):
                             aw.qmc.background = True
                             aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
                             self.qmc.backgroundpath = background_path
-                            aw.qmc.fileDirty() # as we updated the background path we force a profile save
+                            aw.qmc.fileDirtySignal.emit() # as we updated the background path we force a profile save
                         except:
                             self.deleteBackground() # delete a loaded background if any
                     else:
@@ -25506,7 +25524,7 @@ class ApplicationWindow(QMainWindow):
                     if not copy:
                         self.setCurrentFile(filename)
                         aw.curFile = filename
-                        self.qmc.fileClean()
+                        self.qmc.fileCleanSignal.emit()
 
                     if self.qmc.autosaveimage:
                         #
@@ -25611,7 +25629,7 @@ class ApplicationWindow(QMainWindow):
                     except Exception:
                         pass
                     i += 1
-                    aw.qmc.fileClean()
+                    aw.qmc.fileCleanSignal.emit()
                     aw.qmc.reset(soundOn=False)
                     self.restoreExtradeviceSettings()
                 if loaded_profile:
@@ -25706,7 +25724,7 @@ class ApplicationWindow(QMainWindow):
                     except:
                         pass
                     i += 1
-                    aw.qmc.fileClean()
+                    aw.qmc.fileCleanSignal.emit()
                     aw.qmc.reset(soundOn=False)
                     self.restoreExtradeviceSettings()
                 if loaded_profile:
@@ -25752,7 +25770,7 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass
                 i += 1
-                aw.qmc.fileClean()
+                aw.qmc.fileCleanSignal.emit()
                 aw.qmc.reset(soundOn=False)
                 self.restoreExtradeviceSettings()
             if loaded_profile:
@@ -25802,7 +25820,7 @@ class ApplicationWindow(QMainWindow):
                     except:
                         pass
                     i += 1
-                    aw.qmc.fileClean()
+                    aw.qmc.fileCleanSignal.emit()
                     aw.qmc.reset(soundOn=False)
                     self.restoreExtradeviceSettings()
                 if loaded_profile:
@@ -32125,7 +32143,7 @@ class ApplicationWindow(QMainWindow):
         aw.qmc.temp2 = aw.qmc.temp1
         aw.qmc.temp1 = t2
         aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
-        aw.qmc.fileDirty()
+        aw.qmc.fileDirtySignal.emit()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -32163,7 +32181,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.timeindex = _timeindex[:]
                 if not foreground_profile_path:
                     aw.qmc.redraw(recomputeAllDeltas=True)
-                aw.qmc.fileDirty()
+                aw.qmc.fileDirtySignal.emit()
             else:
                 # reset
                 aw.qmc.reset(soundOn=False)
@@ -32805,7 +32823,7 @@ class ApplicationWindow(QMainWindow):
 
                 self.sendmessage(QApplication.translate("Message","Probat Pilot data imported successfully", None))
                 self.qmc.redraw()
-                aw.qmc.fileDirty()
+                aw.qmc.fileDirtySignal.emit()
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importPilot(): {0}").format(str(ex)))
         except ValueError as ex:
@@ -32991,7 +33009,7 @@ class ApplicationWindow(QMainWindow):
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
                 # profiles was adjusted, ensure that it does not overwrite the original file on saving
-                self.qmc.fileDirty()
+                self.qmc.fileDirtySignal.emit()
                 self.curFile = None
                 # clear annotation cache
                 self.qmc.l_annotations_dict = {}
@@ -33023,7 +33041,7 @@ class ApplicationWindow(QMainWindow):
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
                 # profiles was adjusted, ensure that it does not overwrite the original file on saving
-                self.qmc.fileDirty()
+                self.qmc.fileDirtySignal.emit()
                 self.curFile = None
                 # clear annotation cache
                 self.qmc.l_annotations_dict = {}
@@ -33961,7 +33979,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.backgroundDetails = False
 
         #prevent accidental overwrite of the original file
-        self.qmc.fileDirty()
+        self.qmc.fileDirtySignal.emit()
         self.curFile = None
 
         # initialize progress dialog
