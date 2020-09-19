@@ -243,7 +243,7 @@ class profileTransformatorDlg(ArtisanDialog):
         res = []
         for i in [0,1,2,4,6]:
             idx = self.aw.qmc.timeindex[i]
-            if idx in [-1,0] or len(self.aw.qmc.timex) < idx:
+            if (i == 0 and idx == -1) or (i != 0 and idx == 0) or len(self.aw.qmc.timex) < idx:
                 res.append(None)
             elif len(self.aw.qmc.temp2) > idx:
                 res.append(self.aw.qmc.temp2[idx])
@@ -758,7 +758,7 @@ class profileTransformatorDlg(ArtisanDialog):
     def applyDiscreteTimeMapping(self,timex,fits):
         offset = self.forgroundOffset()
         res_timex = []
-        if offset == 0:
+        if offset == 0 or fits[0] is None:
             new_offset = 0
         else:
             new_offset = numpy.poly1d(fits[0])(offset)
@@ -774,8 +774,11 @@ class profileTransformatorDlg(ArtisanDialog):
                 j = 2 # after FCs
             elif self.aw.qmc.timeindex[1] > 0 and i >= self.aw.qmc.timeindex[1]:
                 j = 1 # after DRY
-            fit = numpy.poly1d(fits[j]) # fit to be applied
-            res_timex.append(fit(timex[i] - offset)+new_offset)
+            if fits[j] is None:
+                res_timex.append(timex[i] - offset + new_offset)
+            else:
+                fit = numpy.poly1d(fits[j]) # fit to be applied
+                res_timex.append(fit(timex[i] - offset)+new_offset)
         return res_timex
     
     # returns False if no transformation was applied
@@ -855,12 +858,12 @@ class profileTransformatorDlg(ArtisanDialog):
                     j = 2 # after FCs
                 elif self.aw.qmc.timeindex[1] > 0 and i >= self.aw.qmc.timeindex[1]:
                     j = 1 # after DRY
-                fit = numpy.poly1d(fits[j]) # fit to be applied
                 
                 tp = self.org_temp2[i]
-                if tp is None or tp == -1:
+                if tp is None or tp == -1 or fits[j] is None:
                     self.aw.qmc.temp2.append(tp)
                 else:
+                    fit = numpy.poly1d(fits[j]) # fit to be applied
                     self.aw.qmc.temp2.append(fit(tp))
             return True
         else:

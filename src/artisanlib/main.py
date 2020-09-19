@@ -7563,7 +7563,7 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
             finally:
-                # we initialize at the end of the redraw the event and flag annotation custom position loaded from a profile as it should have been consumed
+                # we initialize at the end of the redraw the event and flag annotation custom position loaded from a profile as those should have been consumed by now
                 self.l_annotations_pos_dict = {}
                 self.l_event_flags_pos_dict = {}
                 self.legendloc_pos = None
