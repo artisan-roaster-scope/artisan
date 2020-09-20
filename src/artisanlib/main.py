@@ -22874,6 +22874,42 @@ class ApplicationWindow(QMainWindow):
         self.qmc.alarmstate = [-1]*len(self.qmc.alarmflag)  #-1 = not triggered; otherwise idx = triggered
 
     # returns True if data got updated, False otherwise
+    def updateSymbolicETBT(self):
+        try:
+            if len(aw.qmc.timex)<=0:
+                self.sendmessage(QApplication.translate("Message", "No profile data.  ET/BT not recalculated",None))
+            if not(len(self.qmc.temp1)==len(aw.qmc.temp2)==len(aw.qmc.timex)):
+                self.sendmessage(QApplication.translate("Message", "Problem with the profile data.  ET/BT not recalculated",None))
+
+            # be sure there is an equation to process (already checked in devices.py, repeated here in case this is called from elsewhere)
+            nonempty_ETfunction = bool(self.qmc.ETfunction is not None and len(self.qmc.ETfunction.strip()))
+            nonempty_BTfunction = bool(self.qmc.BTfunction is not None and len(self.qmc.BTfunction.strip()))
+            if (nonempty_ETfunction or nonempty_BTfunction):
+                # set dirty
+                self.qmc.fileDirtySignal.emit()
+
+                # update ET and BT
+                newTemp1 = self.qmc.temp1.copy()
+                newTemp2 = self.qmc.temp2.copy()
+                for i in range(len(self.qmc.timex)):
+                    if nonempty_ETfunction:
+                        newTemp1[i] = self.qmc.eval_math_expression(self.qmc.ETfunction,self.qmc.timex[i])
+                    if nonempty_BTfunction:
+                        newTemp2[i] = self.qmc.eval_math_expression(self.qmc.BTfunction,self.qmc.timex[i])
+                self.qmc.temp1 = newTemp1.copy()
+                self.qmc.temp2 = newTemp2.copy()
+
+                # reset the annotation flage
+                aw.qmc.l_annotations_dict = {}
+                aw.qmc.l_event_flags_dict = {}
+                return True
+            else:
+                return False
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateSymbolicETBT(): {0}").format(str(ex)),exc_tb.tb_lineno)
+
+    # returns True if data got updated, False otherwise
     def calcVirtualdevices(self,update=False):
         try:
             dirty = False

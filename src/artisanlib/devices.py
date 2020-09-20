@@ -34,7 +34,7 @@ from PyQt5.QtGui import (QStandardItem, QColor)
 from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
                              QGroupBox, QRadioButton, QDoubleSpinBox, QSizePolicy,
-                             QTableWidget)
+                             QTableWidget, QMessageBox)
 
 class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None):
@@ -252,7 +252,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.recalcButton.setFocusPolicy(Qt.NoFocus)
         self.recalcButton.setMinimumWidth(100)
         self.recalcButton.setToolTip(QApplication.translate("Tooltip","Recaclulates all Virtual Devices and updates their values in the profile",None))
-        self.recalcButton.clicked.connect(self.updateVirtualdevicesinprofile)
+        self.recalcButton.clicked.connect(self.updateVirtualdevicesinprofile_clicked)
         self.enableDisableAddDeleteButtons()
         ##########     LAYOUTS
         # create Phidget box
@@ -1099,7 +1099,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         programlayout.setContentsMargins(5,10,5,5)
         programGroupBox.setContentsMargins(0,12,0,0)
         #ET BT symbolic adjustments/assignments Box
+        self.updateETBTButton = QPushButton(QApplication.translate("Button","Update ET/BT in Profile",None))
+        self.updateETBTButton.setFocusPolicy(Qt.NoFocus)
+        self.updateETBTButton.setToolTip(QApplication.translate("Tooltip","Recaclulates ET and BT and updates their values in the profile",None))
+        self.updateETBTButton.clicked.connect(self.updateETBTinprofile)
+        
         adjustmentHelp = QHBoxLayout()
+        adjustmentHelp.addWidget(self.updateETBTButton)
         adjustmentHelp.addStretch()
         adjustmentHelp.addWidget(symbolicHelpButton)
         adjustmentGroupBox = QGroupBox(QApplication.translate("GroupBox","Symbolic Assignments",None))
@@ -1109,6 +1115,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         adjustmentsLayout.addWidget(labelBTadvanced)
         adjustmentsLayout.addWidget(self.BTfunctionedit)
         adjustmentsLayout.addStretch()
+
         adjustmentsLayout.addLayout(adjustmentHelp)
         adjustmentGroupBox.setLayout(adjustmentsLayout)
         #LAYOUT TAB 1
@@ -1118,7 +1125,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         deviceSubSelector.addWidget(self.curves)
         deviceSubSelector.addSpacing(15)
         deviceSubSelector.addWidget(self.lcds)
-        
+
         deviceSelector = QHBoxLayout()
         deviceSelector.addWidget(self.devicetypeComboBox)
         deviceSelector.addStretch()
@@ -1717,14 +1724,63 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "savedevicetable(): {0}").format(str(ex)),exc_tb.tb_lineno)
 
     @pyqtSlot(bool)
-    def updateVirtualdevicesinprofile(self,_):
+    def updateVirtualdevicesinprofile_clicked(self,_):
+        self.updateVirtualdevicesinprofile(redraw=True)
+        
+    def updateVirtualdevicesinprofile(self,redraw=True):
         try:
             self.savedevicetable(redraw=False)
             if self.aw.calcVirtualdevices(update=True):
-                self.aw.qmc.redraw(recomputeAllDeltas=False)
+                if redraw:
+                    self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateVirtualdevicesinprofile(): {0}").format(str(ex)),exc_tb.tb_lineno)
+
+    @pyqtSlot(bool)
+    def updateETBTinprofile(self,_):
+        try:
+            # be sure there is an equation to process
+            nonempty_ETfunction = bool(self.ETfunctionedit.text() is not None and len(self.ETfunctionedit.text().strip()))
+            nonempty_BTfunction = bool(self.BTfunctionedit.text() is not None and len(self.BTfunctionedit.text().strip()))
+            if (nonempty_ETfunction or nonempty_BTfunction):
+
+                # confirm the action
+                string = QApplication.translate("Message", "Clicking YES will overwrite the existing ET and BT values in this profile with the symbolic values defined here.  Click CANCEL to abort.",None)
+                reply = QMessageBox.warning(self.aw,QApplication.translate("Message", "Caution - About to overwrite profile data",None),string,
+                            QMessageBox.Yes|QMessageBox.Cancel)
+                if reply == QMessageBox.Cancel:
+                    return
+
+                # confirm updating the dependent Virtual Extra Devices?
+                updatevirtualextradevices = False
+                etorbt = re.compile('Y1|Y2|T1|T2|R1|R2')
+                for j in range(len(self.aw.qmc.extradevices)):
+                    if (re.search(etorbt,self.aw.qmc.extramathexpression1[j]) or re.search(etorbt,self.aw.qmc.extramathexpression2[j])):
+                        string = QApplication.translate("Message", "At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?",None)
+                        reply = QMessageBox.warning(self.aw,QApplication.translate("Message", "Caution - About to overwrite profile data",None),string,
+                                    QMessageBox.Yes|QMessageBox.No)
+                        if reply == QMessageBox.Yes:
+                            updatevirtualextradevices = True
+                        break
+
+                # grab the latest symbolic equations as they may have changed without being saved by an OK
+                self.aw.qmc.ETfunction = str(self.ETfunctionedit.text())
+                self.aw.qmc.BTfunction = str(self.BTfunctionedit.text())
+
+                # make the updates to ET.BT and Virtual Extra Devices if needed
+                if self.aw.updateSymbolicETBT():
+                    if updatevirtualextradevices:
+                        self.updateVirtualdevicesinprofile(redraw=False)
+                    self.aw.qmc.redraw(recomputeAllDeltas=True)
+                    self.aw.sendmessage(QApplication.translate("Message", "Symbolic values updated.",None))
+                else:
+                    self.aw.sendmessage(QApplication.translate("Message", "Symbolic values were not updated.",None))
+            else:
+                self.aw.sendmessage(QApplication.translate("Message", "Nothing here to process.",None))
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateETBTinprofile(): {0}").format(str(ex)),exc_tb.tb_lineno)
 
     @pyqtSlot(int)
     def updateLCDvisibility1(self,x):
