@@ -16,9 +16,14 @@
 # AUTHOR
 # Marko Luther, 2020
 
-from websocket import create_connection
+import sys
+import time
+import threading
+import websocket
+
 import json
 import random
+
 
 from PyQt5.QtWidgets import QApplication
 
@@ -29,50 +34,248 @@ class wsport(object):
         
         # connects to "ws://<host>:<port>/<path>"
         self.host = '127.0.0.1' # the TCP host
-        self.port = 8090 # the TCP port
-        self.path = "WebSocket"
+        self.port = 80          # the TCP port
+        self.path = "WebSocket" # the ws path
         self.machineID = 0
         
-        self.timeout = 0.4
+        self.channels = 10 # maximal number of WebSocket channels
         
+        # WebSocket data
+        self.readings = [-1]*self.channels
+        
+        self.channel_requests = [""]*self.channels
+        self.channel_nodes = [""]*self.channels
+        self.channel_modes = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F
+        
+        # configurable via the UI:
+        self.connect_timeout = 4    # in seconds
+        self.request_timeout = 0.5  # in seconds
+        self.reconnect_interval = 2 # in seconds
+        # not configurable via the UI:
+        self.ping_interval = 0      # in seconds; if 0 pings are not send automatically
+        self.ping_timeout = None    # in seconds
+        
+        # JSON nodes
+        self.id_node = "id"
+        self.machine_node = "roasterID"
+        self.command_node = "command"
+        self.data_node = "data"
+        self.pushMessage_node = "pushMessage"
+#        self.parameters_node = "params"
+
+        # commands
+        self.request_data_command = "getData"
+        
+        # push messages
+        self.charge_message = "startRoasting"
+        self.drop_message = "endRoasting"
+        
+        # flags
+        self.STARTonCHARGE = False
+        self.OFFonDROP = False
+        
+        self.open_event = None # an event set on connecting
+        self.pending_events = {}
+        
+        self.active = False
+        self.ws = None  # the WebService client object
+        self.wst = None # the WebService thread
+
+    def onMessage(self, message):
+        if message is not None:
+            j = json.loads(message)
+            if self.aw.seriallogflag:
+                self.aw.addserial("wsport onMessage(): {}".format(j))
+            if self.id_node in j:
+                self.setRequestResponse(j[self.id_node],j)
+            elif self.pushMessage_node != ""  and self.pushMessage_node in j:
+                pushMessage = j[self.pushMessage_node]
+                if self.aw.seriallogflag:
+                    self.aw.addserial("wsport push message {} received".format(pushMessage))
+                if self.charge_message != "" and pushMessage == self.charge_message:
+                    if self.aw.seriallogflag:
+                        self.aw.addserial("wsport CHARGE message received")
+                    delay = 0 # in ms
+                    if self.STARTonCHARGE and not self.aw.qmc.flagstart:
+                        # turn recording on
+                        self.aw.qmc.toggleRecorderSignal.emit()
+                        if self.aw.seriallogflag:
+                            self.aw.addserial("wsport toggleRecorder signal sent")
+                    if self.aw.qmc.timeindex[0] == -1:
+                        if self.aw.qmc.flagstart:
+                            # markCHARGE without delay
+                            delay = 1
+                        else:
+                            # markCharge with a delay waiting for the recorder to be started up
+                            delay = self.aw.qmc.delay * 2 # we delay the markCharge action by 2 sampling periods
+                        self.aw.qmc.markChargeSignal.emit(delay)
+                        if self.aw.seriallogflag:
+                            self.aw.addserial("wsport markCHARGE() signal sent".format(delay))
+                elif self.drop_message != "" and pushMessage == self.drop_message:
+                    if self.aw.seriallogflag:
+                        self.aw.addserial("wsport message: DROP")
+                    if self.aw.qmc.flagstart and self.aw.qmc.timeindex[6] == 0:
+                        # markDROP
+                        self.aw.qmc.markDropSignal.emit()
+                        if self.aw.seriallogflag:
+                            self.aw.addserial("wsport markDROP signal sent")
+                    if self.OFFonDROP and self.aw.qmc.flagstart:
+                        # turn Recorder off after two sampling periods
+                        delay = self.aw.qmc.delay * 2 # we delay the turning OFF action by 2 sampling periods
+                        time.sleep(delay)
+                        self.aw.qmc.toggleMonitorSignal.emit()
+                        if self.aw.seriallogflag:
+                            self.aw.addserial("wsport toggleMonitor signal sent")
+                
+                # set burner: { "pushMessage": "setBurnerCapacity", "data": { "burnercapacity": 51 } }
+                # name of current roast set: {"pushMessage": "setRoastingProcessName", "data": { "name": "Test roast 123" }}
+                # note of current roast set: {"pushMessage": "setRoastingProcessNote", "data": { "note": "A test comment" }}
+                # fill weight of current roast set: {"pushMessage": "setRoastingProcessFillWeight", "data": { "fillWeight": 12 }}
+
+    def onError(self, err):
+        self.aw.qmc.adderror(QApplication.translate("Error Message","WebSocket connection failed: {}",None).format(err))
+        if self.aw.seriallogflag:
+            self.aw.addserial("wsport onError(): {}".format(err))
+
+    def onClose(self):
+        self.aw.sendmessage(QApplication.translate("Message","WebSocket disconnected", None))
+        if self.aw.seriallogflag:
+            self.aw.addserial("wsport onClose()")
+    
+    def onOpen(self):
+        self.open_event.set() # unblock the connect action
+        self.aw.sendmessage(QApplication.translate("Message","WebSocket connected", None))
+        if self.aw.seriallogflag:
+            self.aw.addserial("wsport onOpen()")
+    
+    def onPing(self):
+        if self.aw.seriallogflag:
+            self.aw.addserial("wsport onPing()")
+    
+    def onPong(self):
+        if self.aw.seriallogflag:
+            self.aw.addserial("wsport onPong()")
+    
+    def create(self):
+        while self.active:
+            try:
+                if self.aw.seriallogflag:
+                    self.aw.addserial("wsport create()")
+                websocket.setdefaulttimeout(self.connect_timeout)
+                #websocket.enableTrace(True)
+                self.ws = websocket.WebSocketApp("ws://{}:{}/{}".format(self.host,self.port,self.path),
+                                on_message=self.onMessage,
+                                on_error=self.onError, 
+                                on_ping=self.onPing, 
+                                on_pong=self.onPong,
+                                on_close=self.onClose,
+                                on_open=self.onOpen
+                                )
+                self.ws.run_forever(
+                    skip_utf8_validation=True,
+                    ping_interval=self.ping_interval,
+                    ping_timeout=self.ping_timeout)
+            except Exception as e:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","WebSocket connection failed: {}",None).format(e))
+                if self.aw.seriallogflag:
+                    self.aw.addserial("wsport create() error: {}".format(e))
+            time.sleep(self.reconnect_interval)
+            if self.active:
+                self.aw.sendmessage(QApplication.translate("Error Message","Reconnecting WebSocket",None))
         self.ws = None
 
     def connect(self):
         if not self.is_connected():
-            try:
-                error = ""
-                try:
-                    self.ws = create_connection("ws://{}:{}/{}".format(self.host,self.port,self.path)) # ,sslopt={"check_hostname": False})
-                    self.ws.settimeout(self.timeout)
-                except Exception as e1:
-                    error = e1
-                    # we retry without the port
-                    self.ws = create_connection("ws://{}/{}".format(self.host,self.port,self.path)) # ,sslopt={"check_hostname": False})                    
-                self.aw.sendmessage(QApplication.translate("Message","WebSocket connected", None))
-            except Exception:
-                self.aw.qmc.adderror(QApplication.translate("Error Message","WebSocket connection failed: {}",None).format(error))
-    
+            if self.aw.seriallogflag:
+                self.aw.addserial("wsport connect()")
+            self.active = True
+            self.wst = threading.Thread(target=self.create)
+            self.open_event = threading.Event()
+            self.wst.start()
+            success = self.open_event.wait(timeout=self.connect_timeout + 0.3)
+            self.open_event = None
+            return success
+        return True
+        
     def is_connected(self):
-        return self.ws != None and self.ws.connected
+        return self.ws != None and self.ws.sock
             
     def disconnect(self):
         if self.is_connected():
+            if self.aw.seriallogflag:
+                self.aw.addserial("wsport disconnect()")
+            self.active = False
             self.ws.close()
             self.ws = None
+            self.wst.join()
+            self.wst = None
+    
+    
+    # request event handling
+    
+    def registerRequest(self,message_id):
+        e = threading.Event()
+        self.pending_events[message_id] = e
+        return e
+    
+    def removeRequestResponse(self,message_id):
+        del self.pending_events[message_id]
+    
+    # replace the request event by its result
+    def setRequestResponse(self,message_id,v):
+        if message_id in self.pending_events:
+            pe = self.pending_events[message_id]
+            if isinstance(pe,threading.Event):
+                pe.set() # unblock
+                self.removeRequestResponse(message_id)
+                self.pending_events[message_id] = v
+    
+    # returns the response received for request with id or None 
+    def getRequestResponse(self,message_id):
+        res = None
+        if message_id in self.pending_events:
+            v = self.pending_events[message_id]
+            del self.pending_events[message_id]
+            if not isinstance(v,threading.Event):
+                return v
+            else:
+                return None
+        return res
     
     # takes a request as dict to be send as JSON
     # and returns a dict generated from the JSON response
-    # or None on exception
-    def send(self,request):
-        self.connect()
-        id = random.randint(1,99999)
-        request["id"] = id
-        request["roasterID"] = self.machineID
-        self.ws.send(json.dumps(request))
-        response = json.loads(self.ws.recv())
-        if response is not None and "id" in response:
-            if response["id"] == id:
-                return response
+    # or None on exception or if block=False
+    def send(self,request,block=True):
+        try:
+            connected = self.connect()
+            if connected:
+                message_id = random.randint(1,99999)
+                request[self.id_node] = message_id
+                request[self.machine_node] = self.machineID
+                json_req = json.dumps(request)
+                if block:
+                    e = self.registerRequest(message_id)
+                    self.ws.send(json_req)
+                    if self.aw.seriallogflag:
+                        self.aw.addserial("wsport send() blocking: {}".format(json_req))
+                    success = e.wait(timeout=self.request_timeout)
+                    if success:
+                        if self.aw.seriallogflag:
+                            self.aw.addserial("wsport send() received: {}".format(message_id))
+                        return self.getRequestResponse(message_id)
+                    else:
+                        if self.aw.seriallogflag:
+                            self.aw.addserial("wsport send() timeout: {}".format(message_id))
+                        self.removeRequestResponse(message_id)
+                        return None # timeout
+                else:
+                    self.ws.send(json_req)
+                    if self.aw.seriallogflag:
+                        self.aw.addserial("wsport send() non-blocking: {}".format(json_req))
+                    return None
             else:
                 return None
-    
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " wsport:send() {0}").format(str(e)),exc_tb.tb_lineno)
+            return None

@@ -2547,14 +2547,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 110 is +S7_010 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Probat Sample":
+                elif meter == "WebSocket":
                     self.aw.qmc.device = 111
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                ####  DEVICE 112 is +Probat Sample Drum Speed / Air Pressure but +DEVICE cannot be set as main device
+                ####  DEVICE 112 is +WebSocket 34 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 113 is +Probat Sample Heater but +DEVICE cannot be set as main device
+                ####  DEVICE 113 is +WebSocket 56 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 114 is +TMP1200_2 (a second TMP1200 configuration)
@@ -2573,6 +2573,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ##########################
                 ####  DEVICE 117 is +HB AT
+                ##########################
+                ##########################
+                ####  DEVICE 118 is +WebSocket 78 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 119 is +WebSocket 910 but +DEVICE cannot be set as main device
                 ##########################
 
                 # ADD DEVICE:
@@ -2707,6 +2713,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 3, # 115
                 3, # 116
                 3, # 117
+                1, # 118
+                1, # 119
                 ] 
             #init serial settings of extra devices
             for i in range(len(self.aw.qmc.extradevices)):

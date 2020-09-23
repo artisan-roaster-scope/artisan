@@ -443,13 +443,15 @@ class serialport(object):
                                    self.YOCTO_generic,        #108
                                    self.MODBUS_78,            #109
                                    self.S7_910,               #110
-                                   self.probat_sample,        #111
-                                   self.probat_sample_drum_air, #112
-                                   self.probat_sample_heater,   #113
+                                   self.WS,     # self.probat_sample,        #111
+                                   self.WS_34,  # self.probat_sample_heater_air,    #112
+                                   self.WS_56,  # self.probat_sample_drum_pressure, #113
                                    self.PHIDGET_TMP1200_2,    #114
                                    self.HB_BTET,              #115
                                    self.HB_DTIT,              #116
                                    self.HB_AT,                #117
+                                   self.WS_78,  # self.probat_sample_inlet_ambient, # 118
+                                   self.WS_910  # self.probat_sample_cooling # 119
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -1303,36 +1305,81 @@ class serialport(object):
         t2 = self.aw.qmc.ProbatMiddleware_pressure
         return tx,t2,t1
     
-    def probat_sample(self):
-        try:
-            tx = self.aw.qmc.timeclock.elapsed()/1000.
-            res = self.aw.ws.send({"command": "getCurrentRoastingStep" })
-            if res is not None and "data" in res:
-                if "beanTemp" in res["data"]:
-                    t1 = res["data"]["beanTemp"]
-                if "exhaustAirTemp" in res["data"]:
-                    t2 = res["data"]["exhaustAirTemp"]
-                if "drum" in res["data"]:
-                    self.aw.qmc.ProbatSample_drum = res["data"]["drum"]
-                if "airPressure" in res["data"]:
-                    self.aw.qmc.ProbatSample_air = res["data"]["airPressure"] * 1000
-                if "burner" in res["data"]:
-                    self.aw.qmc.ProbatSample_heater = res["data"]["burner"]
-        except:
-            t1 = -1
-            t2 = -1
-            self.aw.qmc.ProbatSample_drum = -1
-            self.aw.qmc.ProbatSample_air = -1
-            self.aw.qmc.ProbatSample_heater = -1
+    def WSextractData(self,channel,data):
+        if self.aw.ws.channel_nodes[channel] != "" and self.aw.ws.channel_nodes[channel] in data:
+            # channel active and data availabel
+            res = data[self.aw.ws.channel_nodes[channel]]
+            # convert temperature scale
+            m = self.aw.ws.channel_modes[channel]
+            if m == 1 and self.aw.qmc.mode == "F":
+                res = fromCtoF(res)
+            elif m == 2 and self.aw.qmc.mode == "C":
+                res = fromFtoC(res) 
+            return res
+        else:
+            return -1
+        
+    #returns v1,v2 from a connected WebService device
+    # mode=0 to read ch1+2
+    # mode=1 to read ch3+4
+    # mode=2 to read ch5+6
+    # mode=3 to read ch7+8
+    # mode=4 to read ch9+10
+    def WSread(self,mode):
+        # update data
+        if mode == 0 and self.aw.ws.request_data_command != "":
+            # if device is the main WebSocket device and the request data command is set we request a full set of data using the request data command
+            try:
+                res = self.aw.ws.send({self.aw.ws.command_node: self.aw.ws.request_data_command})
+                if res is not None and self.aw.ws.data_node in res:
+                    data = res[self.aw.ws.data_node]
+                    for c in range(self.aw.ws.channels):
+                        self.aw.ws.readings[c] = self.WSextractData(c,data)
+                    
+            except:
+                self.aw.ws.readings = [-1]*self.aw.ws.channels 
+        else:
+            for i in [0,1]:
+                c = mode*2+i
+                if self.aw.ws.channel_requests[c] != "":
+                    self.aw.ws.readings[c] = -1
+                    try:
+                        res = self.aw.ws.send({self.aw.ws.command_node: self.aw.ws.channel_requests[c]})
+                        if res is not None and self.aw.ws.data_node in res:
+                            data = res[self.aw.ws.data_node]
+                            self.aw.ws.readings[c] = self.WSextractData(c,data)
+                        else:
+                            self.aw.ws.readings[c] = -1
+                    except:
+                        pass
+        
+        # return requested data            
+        return self.aw.ws.readings[mode*2+1],self.aw.ws.readings[mode*2]
+    
+    def WS(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.WSread(0)
+        return tx,t2,t1
+    
+    def WS_34(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.WSread(1)
         return tx,t2,t1
         
-    def probat_sample_drum_air(self):
+    def WS_56(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
-        return tx,self.aw.qmc.ProbatSample_air,self.aw.qmc.ProbatSample_drum
-        
-    def probat_sample_heater(self):
+        t2,t1 = self.WSread(2)
+        return tx,t2,t1
+
+    def WS_78(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
-        return tx,self.aw.qmc.ProbatSample_heater,self.aw.qmc.ProbatSample_heater
+        t2,t1 = self.WSread(3)
+        return tx,t2,t1
+
+    def WS_910(self):
+        tx = self.aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.WSread(4)
+        return tx,t2,t1
     
     def YOCTO_thermo(self):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
@@ -1370,6 +1417,7 @@ class serialport(object):
         try:
             r = ''
             if not self.SP.isOpen():
+            
                 self.openport()
             if self.SP.isOpen():
                 self.SP.reset_input_buffer()

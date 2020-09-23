@@ -30,8 +30,9 @@ from help import s7_help
 from PyQt5.QtCore import (Qt, pyqtSlot, QEvent)
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
-                             QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit)
+                             QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy,
+                             QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox,
+                             QHeaderView)
 
 class scanModbusDlg(ArtisanDialog):
     def __init__(self, parent = None, aw = None):
@@ -466,6 +467,9 @@ class comportDlg(ArtisanResizeablDialog):
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
         self.serialtable = QTableWidget()
         self.serialtable.setTabKeyNavigation(True)
+        self.serialtable.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
+        self.serialtable.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.serialtable.horizontalHeader().setStretchLastSection(True)
         self.createserialTable()
         ##########################    TAB 3 WIDGETS   MODBUS
         modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None))
@@ -938,7 +942,6 @@ class comportDlg(ArtisanResizeablDialog):
         s7_modeLabel = QLabel(QApplication.translate("Label", "Mode",None))
         s7_divLabel = QLabel(QApplication.translate("Label", "Factor",None))
         
-        self.s7_channelLabels = []
         self.s7_areaCombos = []
         self.s7_dbEdits = []
         self.s7_startEdits = []
@@ -961,7 +964,6 @@ class comportDlg(ArtisanResizeablDialog):
         for i in range(self.aw.s7.channels):
             # channel label
             label = QLabel(QApplication.translate("Label", "Input",None) + " " + str(i+1))
-            self.s7_channelLabels.append(label)
             s7_grid.addWidget(label,0,i+1,Qt.AlignRight)
             # area combo
             area = QComboBox()
@@ -1226,29 +1228,26 @@ class comportDlg(ArtisanResizeablDialog):
         #
         # host (IP or hostname)
         ws_hostlabel = QLabel(QApplication.translate("Label", "Host",None))
-        self.ws_hostEdit = QLineEdit()
         self.ws_hostEdit = QLineEdit(str(self.aw.ws.host))
-        self.ws_hostEdit.setFixedWidth(120)
+        self.ws_hostEdit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
         self.ws_hostEdit.setAlignment(Qt.AlignRight)
         # port (default 102)
         ws_portlabel = QLabel(QApplication.translate("Label", "Port",None))
-        self.ws_portEdit = QLineEdit()
         self.ws_portEdit = QLineEdit(str(self.aw.ws.port))
         self.ws_portEdit.setValidator(QIntValidator(1,65535,self.ws_portEdit))
-        self.ws_portEdit.setFixedWidth(60)
+        self.ws_portEdit.setFixedWidth(40)
         self.ws_portEdit.setAlignment(Qt.AlignRight)
         # rack (default 0)
         ws_pathlabel = QLabel(QApplication.translate("Label", "Path",None))
-        self.ws_pathEdit = QLineEdit()
         self.ws_pathEdit = QLineEdit(str(self.aw.ws.path))
-        self.ws_pathEdit.setFixedWidth(120)
-        self.ws_pathEdit.setAlignment(Qt.AlignRight)
+        self.ws_pathEdit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_pathEdit.setAlignment(Qt.AlignLeft)
+        self.ws_pathEdit.setCursorPosition(0)
         # slot (default 0)
-        ws_machineIDlabel = QLabel(QApplication.translate("Label", "Machine ID",None))
-        self.ws_machineIDEdit = QLineEdit()
+        ws_machineIDlabel = QLabel(QApplication.translate("Label", "ID",None))
         self.ws_machineIDEdit = QLineEdit(str(self.aw.ws.machineID))
         self.ws_machineIDEdit.setValidator(QIntValidator(0,99999,self.ws_machineIDEdit))
-        self.ws_machineIDEdit.setFixedWidth(60)
+        self.ws_machineIDEdit.setFixedWidth(25)
         self.ws_machineIDEdit.setAlignment(Qt.AlignRight)
                 
         ws_setup = QHBoxLayout()
@@ -1263,9 +1262,178 @@ class comportDlg(ArtisanResizeablDialog):
         ws_setup.addSpacing(7)
         ws_setup.addWidget(ws_machineIDlabel)
         ws_setup.addWidget(self.ws_machineIDEdit)
-        ws_setup.addStretch()
+        
+        ws_setup_box = QGroupBox(QApplication.translate("GroupBox","Machine",None))
+        ws_setup_box.setLayout(ws_setup)
+        
+        self.ws_connect_timeout = QDoubleSpinBox()
+        self.ws_connect_timeout.setSingleStep(1)
+        self.ws_connect_timeout.setValue(self.aw.ws.connect_timeout)
+        self.ws_connect_timeout.setRange(0,5)
+        self.ws_connect_timeout.setDecimals(1)
+        self.ws_connect_timeout.setAlignment(Qt.AlignRight)
+        self.ws_connect_timeout.setSuffix("s")
+        
+        self.ws_reconnect_timeout = QDoubleSpinBox()
+        self.ws_reconnect_timeout.setSingleStep(1)
+        self.ws_reconnect_timeout.setValue(self.aw.ws.reconnect_interval)
+        self.ws_reconnect_timeout.setRange(0,5)
+        self.ws_reconnect_timeout.setDecimals(1)
+        self.ws_reconnect_timeout.setAlignment(Qt.AlignRight)
+        self.ws_reconnect_timeout.setSuffix("s")
+        
+        self.ws_request_timeout = QDoubleSpinBox()
+        self.ws_request_timeout.setSingleStep(1)
+        self.ws_request_timeout.setValue(self.aw.ws.request_timeout)
+        self.ws_request_timeout.setRange(0,5)
+        self.ws_request_timeout.setDecimals(1)
+        self.ws_request_timeout.setAlignment(Qt.AlignRight)
+        self.ws_request_timeout.setSuffix("s")
+        
+        ws_timeouts = QHBoxLayout()
+        ws_timeouts.addWidget(QLabel(QApplication.translate("Label","Connect",None)))
+        ws_timeouts.addWidget(self.ws_connect_timeout)
+        ws_timeouts.addSpacing(7)
+        ws_timeouts.addWidget(QLabel(QApplication.translate("Label","Reconnect",None)))
+        ws_timeouts.addWidget(self.ws_reconnect_timeout)
+        ws_timeouts.addSpacing(7)
+        ws_timeouts.addWidget(QLabel(QApplication.translate("Label","Request",None)))
+        ws_timeouts.addWidget(self.ws_request_timeout)
+        
+        ws_timeouts_box = QGroupBox(QApplication.translate("GroupBox","Timeout",None))
+        ws_timeouts_box.setLayout(ws_timeouts)
+        
+        ws_line1 = QHBoxLayout()
+        ws_line1.addWidget(ws_setup_box)
+        ws_line1.addWidget(ws_timeouts_box)
+        
+        self.ws_messageID = QLineEdit(str(self.aw.ws.id_node))
+        self.ws_messageID.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_messageID.setCursorPosition(0)
+        self.ws_machineID = QLineEdit(str(self.aw.ws.machine_node))
+        self.ws_machineID.setMinimumWidth(70)
+        self.ws_messageID.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_machineID.setCursorPosition(0)
+        self.ws_message = QLineEdit(str(self.aw.ws.pushMessage_node))
+        self.ws_message.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_message.setCursorPosition(0)
+        self.ws_command = QLineEdit(str(self.aw.ws.command_node))
+        self.ws_command.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_command.setCursorPosition(0)
+        self.ws_data = QLineEdit(str(self.aw.ws.data_node))
+        self.ws_data.setCursorPosition(0)
+        ws_nodes = QGridLayout()
+        ws_nodes.addWidget(QLabel(QApplication.translate("Label","Message ID",None)),0,0)
+        ws_nodes.addWidget(self.ws_messageID,1,0)
+        ws_nodes.addWidget(QLabel(QApplication.translate("Label","Machine ID",None)),0,1)
+        ws_nodes.addWidget(self.ws_machineID,1,1)
+        ws_nodes.addWidget(QLabel(QApplication.translate("Label","Command",None)),0,2)
+        ws_nodes.addWidget(self.ws_command,1,2)
+        ws_nodes.addWidget(QLabel(QApplication.translate("Label","Data",None)),0,3)
+        ws_nodes.addWidget(self.ws_data,1,3)
+        ws_nodes.addWidget(QLabel(QApplication.translate("Label","Message",None)),0,4)
+        ws_nodes.addWidget(self.ws_message,1,4)
+
+        ws_nodes_box = QGroupBox(QApplication.translate("GroupBox","Nodes",None))
+        ws_nodes_box.setLayout(ws_nodes)
+        
+        self.ws_data_request = QLineEdit(str(self.aw.ws.request_data_command))
+        self.ws_data_request.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_data_request.setCursorPosition(0)
+        ws_commands = QGridLayout()
+        ws_commands.addWidget(QLabel(QApplication.translate("Label","Data Request",None)),0,0)
+        ws_commands.addWidget(self.ws_data_request,1,0)
+        
+        ws_commands_box = QGroupBox(QApplication.translate("GroupBox","Commands",None))
+        ws_commands_box.setLayout(ws_commands)
+
+
+        self.ws_charge = QLineEdit(str(self.aw.ws.charge_message))
+        self.ws_charge.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_charge.setCursorPosition(0)
+        self.ws_drop = QLineEdit(str(self.aw.ws.drop_message))
+        self.ws_drop.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_drop.setCursorPosition(0)
+        ws_messages = QGridLayout()
+        ws_messages.addWidget(QLabel(QApplication.translate("Label","CHARGE",None)),0,0)
+        ws_messages.addWidget(self.ws_charge,1,0)
+        ws_messages.addWidget(QLabel(QApplication.translate("Label","DROP",None)),0,1)
+        ws_messages.addWidget(self.ws_drop,1,1)
+        
+        ws_messages_box = QGroupBox(QApplication.translate("GroupBox","Messages",None))
+        ws_messages_box.setLayout(ws_messages)
+        
+        self.ws_STARTonCHARGE = QCheckBox(QApplication.translate("CheckBox","START on CHARGE",None))
+        self.ws_STARTonCHARGE.setChecked(self.aw.ws.STARTonCHARGE)
+        self.ws_OFFonDROP = QCheckBox(QApplication.translate("CheckBox","OFF on DROP",None))
+        self.ws_OFFonDROP.setChecked(self.aw.ws.OFFonDROP)
+        ws_flags = QGridLayout()
+        ws_flags.addWidget(self.ws_STARTonCHARGE,0,0)
+        ws_flags.addWidget(self.ws_OFFonDROP,1,0)
+        
+        ws_flags_box = QGroupBox(QApplication.translate("GroupBox","Flags",None))
+        ws_flags_box.setLayout(ws_flags)
+        
+        ws_line2 = QHBoxLayout()
+        ws_line2.addWidget(ws_nodes_box,35)
+        ws_line2.addWidget(ws_commands_box,20)
+        ws_line2.addWidget(ws_messages_box,30)
+        ws_line2.addWidget(ws_flags_box,15)
+        
+        
+        self.ws_requestEdits = []
+        self.ws_nodeEdits = []
+        self.ws_modeCombos = []
+        
+        ws_grid = QGridLayout()
+        
+        ws_requestLabel = QLabel(QApplication.translate("Label", "Request",None))
+        ws_nodeLabel = QLabel(QApplication.translate("Label", "Node",None))
+        ws_modeLabel = QLabel(QApplication.translate("Label", "Mode",None))
+        
+        ws_grid.addWidget(ws_requestLabel,1,0,Qt.AlignRight)
+        ws_grid.addWidget(ws_nodeLabel,2,0,Qt.AlignRight)
+        ws_grid.addWidget(ws_modeLabel,3,0,Qt.AlignRight)
+        
+        
+        for i in range(self.aw.ws.channels):
+            # channel label
+            label = QLabel(QApplication.translate("Label", "Input",None) + " " + str(i+1))
+            ws_grid.addWidget(label,0,i+1,Qt.AlignRight)
+            
+            # request edit
+            request_edit = QLineEdit(str(self.aw.ws.channel_requests[i]))
+            request_edit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+            request_edit.setCursorPosition(0)
+            self.ws_requestEdits.append(request_edit)
+            ws_grid.addWidget(request_edit,1,i+1,Qt.AlignRight)
+            
+            # node edit
+            node_edit = QLineEdit(str(self.aw.ws.channel_nodes[i]))
+            node_edit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+            node_edit.setCursorPosition(0)
+            self.ws_nodeEdits.append(node_edit)
+            ws_grid.addWidget(node_edit,2,i+1,Qt.AlignRight)
+            
+            # mode combo: -,C,F
+            mode = QComboBox()
+            mode.setFocusPolicy(Qt.NoFocus)
+            mode.addItems(modbus_modes)
+            mode.setCurrentIndex(self.aw.ws.channel_modes[i])
+            self.ws_modeCombos.append(mode)
+            ws_grid.addWidget(mode,3,i+1,1,1) #Qt.AlignRight)
+            
+            
+        ws_line3 = QHBoxLayout()
+        ws_line3.addStretch()
+        ws_line3.addLayout(ws_grid)
+        ws_line3.addStretch()
+        
+        
         tab7Layout = QVBoxLayout()
-        tab7Layout.addLayout(ws_setup)
+        tab7Layout.addLayout(ws_line1)
+        tab7Layout.addLayout(ws_line2)
+        tab7Layout.addLayout(ws_line3)
         tab7Layout.addStretch()
         #tab widget
         self.TabWidget = QTabWidget()
@@ -1380,7 +1548,8 @@ class comportDlg(ArtisanResizeablDialog):
                         if not (devid in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = self.aw.extracomport[i])
                             comportComboBox.activated.connect(self.portComboBoxIndexChanged)
-                            comportComboBox.setFixedWidth(200)
+#                            comportComboBox.setFixedWidth(200)
+                            comportComboBox.setMiniumWidth(200)
                             baudComboBox =  QComboBox()
                             baudComboBox.addItems(self.bauds)
                             if str(self.aw.extrabaudrate[i]) in self.bauds:
@@ -1399,7 +1568,8 @@ class comportDlg(ArtisanResizeablDialog):
                                 stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(self.aw.extrastopbits[i])))
                             timeoutEdit = QLineEdit(str(self.aw.extratimeout[i]))
                             timeoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,5,1,timeoutEdit))
-                            timeoutEdit.setFixedWidth(65)
+#                            timeoutEdit.setFixedWidth(65)
+                            timeoutEdit.setMinimumWidth(65)
                             timeoutEdit.setAlignment(Qt.AlignRight)
                             #add widgets to the table
                             self.serialtable.setCellWidget(i,1,comportComboBox)

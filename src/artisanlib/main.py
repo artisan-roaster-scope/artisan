@@ -652,6 +652,10 @@ class tgraphcanvas(FigureCanvas):
     updateLargeLCDsSignal = pyqtSignal(str,str,str)
     fileDirtySignal = pyqtSignal()
     fileCleanSignal = pyqtSignal()
+    markChargeSignal = pyqtSignal(int)
+    markDropSignal = pyqtSignal()
+    toggleMonitorSignal = pyqtSignal()
+    toggleRecorderSignal = pyqtSignal()
 
     def __init__(self,parent,dpi):
 
@@ -1067,13 +1071,15 @@ class tgraphcanvas(FigureCanvas):
                        "Yocto 4-20mA Rx",           #108
                        "+MODBUS 78",                #109
                        "+S7 910",                   #110
-                       "Probat Sample",             #111
-                       "+Probat Sample Drum/Air",   #112
-                       "+Probat Sample Heater",     #113
+                       "WebSocket",                 #111
+                       "+WebSocket 34",             #112
+                       "+WebSocket 56",             #113
                        "+Phidget TMP1200 1xRTD B",  #114
                        "HB BT/ET",                  #115
                        "+HB DT/IT",                 #116
                        "+HB AT",                    #117
+                       "+WebSocket 78",             #118
+                       "+WebSocket 910",            #119
                        ]
 
         # ADD DEVICE:
@@ -1108,7 +1114,7 @@ class tgraphcanvas(FigureCanvas):
             106, # Phidget HUB IO 0
             107, # Phidget HUB IO Digital 0
             108, # Yocto 4-20mA Rx
-            111  # Probat Sample
+            111  # WebSocket
         ]
 
         # ADD DEVICE:
@@ -1172,8 +1178,6 @@ class tgraphcanvas(FigureCanvas):
             106, # Phidget HUB IO 0
             107, # Phidget HUB IO Digital 0
             108, # Yocto 4-20mA Rx
-            112, # Probat Sample Drum/Air
-            113  # Probat Sample Heater
         ]
 
         #extra devices
@@ -2087,12 +2091,6 @@ class tgraphcanvas(FigureCanvas):
         self.ProbatMiddleware_drum = -1
         self.ProbatMiddleware_fan = -1
         self.ProbatMiddleware_pressure = -1
-        
-        # used by the Probat Sample extra devices
-        self.ProbatSample_drum = -1
-        self.ProbatSample_air = -1
-        self.ProbatSample_heater = -1
-
 
         #used by extra device +Program_34, +Program_56, +Program_78 and +Program_910 to pass values
         self.program_t3 = -1
@@ -2206,6 +2204,10 @@ class tgraphcanvas(FigureCanvas):
         self.updateLargeLCDsTimeSignal.connect(self.updateLargeLCDsTime)
         self.fileDirtySignal.connect(self.fileDirty)
         self.fileCleanSignal.connect(self.fileClean)
+        self.markChargeSignal.connect(self.markChargeDelay)
+        self.markDropSignal.connect(self.markDropTrigger)
+        self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
+        self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -8727,10 +8729,24 @@ class tgraphcanvas(FigureCanvas):
             elif d == 110: # +S7 910
                 self.extraNoneTempHint1.append(not bool(aw.s7.mode[8]))
                 self.extraNoneTempHint2.append(not bool(aw.s7.mode[9]))
+            elif d == 111: # WebSocket
+                self.extraNoneTempHint1.append(not bool(aw.ws.channel_modes[0]))
+                self.extraNoneTempHint2.append(not bool(aw.ws.channel_modes[1]))
+            elif d == 112: # +S7 34
+                self.extraNoneTempHint1.append(not bool(aw.ws.channel_modes[2]))
+                self.extraNoneTempHint2.append(not bool(aw.ws.channel_modes[3]))
+            elif d == 113: # +S7 56
+                self.extraNoneTempHint1.append(not bool(aw.ws.channel_modes[4]))
+                self.extraNoneTempHint2.append(not bool(aw.ws.channel_modes[5]))
+            elif d == 118: # +S7 78
+                self.extraNoneTempHint1.append(not bool(aw.ws.channel_modes[6]))
+                self.extraNoneTempHint2.append(not bool(aw.ws.channel_modes[7]))
+            elif d == 119: # +S7 910
+                self.extraNoneTempHint1.append(not bool(aw.ws.channel_modes[8]))
+                self.extraNoneTempHint2.append(not bool(aw.ws.channel_modes[9]))
             else:
                 self.extraNoneTempHint1.append(False)
                 self.extraNoneTempHint2.append(False)
-
 
     def addPhidgetServer(self):
         if not self.phidgetServerAdded:
@@ -9161,6 +9177,9 @@ class tgraphcanvas(FigureCanvas):
         for i in range(len(aw.extraser)):
             self.disconnectProbesFromSerialDevice(aw.extraser[i])
 
+    def toggleMonitorTigger(self):
+        self.ToggleMonitor()
+    
     #Turns ON/OFF flag self.flagon to read and print values. Called from push button_1.
     @pyqtSlot(bool)
     def ToggleMonitor(self,_=False):
@@ -9184,7 +9203,6 @@ class tgraphcanvas(FigureCanvas):
 
     def OnRecorder(self):
         try:
-
             # if on turn mouse crosslines off
             if aw.qmc.crossmarker:
                 aw.qmc.togglecrosslines()
@@ -9305,6 +9323,9 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffRecorder() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    def toggleRecorderTigger(self):
+        self.ToggleRecorder()
+
     #Turns START/STOP flag self.flagon to read and plot. Called from push button_2.
     @pyqtSlot(bool)
     def ToggleRecorder(self,_=False):
@@ -9325,6 +9346,17 @@ class tgraphcanvas(FigureCanvas):
             aw.soundpopSignal.emit()
             self.OffRecorder()
 
+    # trigger to be called by the markChargeSignal
+    # if delay is not 0, the markCharge is issues after n milliseconds
+    def markChargeDelay(self,delay):
+        if delay == 0:
+            self.markCharge()
+        else:
+            QTimer.singleShot(delay,self.markChargeTrigger)
+        
+    def markChargeTrigger(self):
+        self.markCharge()
+    
     #Records charge (put beans in) marker. called from push button 'Charge'
     @pyqtSlot(bool)
     def markCharge(self,_=False):
@@ -9408,7 +9440,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception:
                     pass
             else:
-                message = QApplication.translate("Message","Scope is OFF", None)
+                message = QApplication.translate("Message","CHARGE: Scope is not recording", None)
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -9418,7 +9450,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
             # redraw (within timealign) should not be called if semaphore is hold!
-            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
             aw.qmc.timealign(redraw=True,recompute=False,force=True) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             if aw.button_8.isFlat():
                 if removed:
@@ -9529,7 +9561,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[1]
     
                 else:
-                    message = QApplication.translate("Message","Scope is OFF", None)
+                    message = QApplication.translate("Message","DRY END: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
@@ -9539,10 +9571,10 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.samplingsemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.qmc.alignEvent in [1,7]:
                     aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.button_19.isFlat():
                     if removed:
                         self.updateBackground()
@@ -9631,7 +9663,7 @@ class tgraphcanvas(FigureCanvas):
                         self.updateBackground() # but we need
                         aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[2]
                 else:
-                    message = QApplication.translate("Message","Scope is OFF", None)
+                    message = QApplication.translate("Message","FC START: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
@@ -9641,7 +9673,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.samplingsemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.qmc.alignEvent in [2,7]:
                     aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
                 # NOTE: the following aw.eventaction might do serial communication that acquires a lock, so release it here
@@ -9723,7 +9755,7 @@ class tgraphcanvas(FigureCanvas):
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                 else:
-                    message = QApplication.translate("Message","Scope is OFF", None)
+                    message = QApplication.translate("Message","FC END: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
@@ -9733,10 +9765,10 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.samplingsemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.qmc.alignEvent in [3,7]:
                     aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.button_4.isFlat():
                     if removed:
                         self.updateBackground()
@@ -9819,7 +9851,7 @@ class tgraphcanvas(FigureCanvas):
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                 else:
-                    message = QApplication.translate("Message","Scope is OFF", None)
+                    message = QApplication.translate("Message","SC START: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
@@ -9829,10 +9861,10 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.samplingsemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.qmc.alignEvent in [4,7]:
                     aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.button_5.isFlat():
                     if removed:
                         self.updateBackground()
@@ -9920,7 +9952,7 @@ class tgraphcanvas(FigureCanvas):
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                 else:
-                    message = QApplication.translate("Message","Scope is OFF", None)
+                    message = QApplication.translate("Message","SC END: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
@@ -9930,10 +9962,10 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.samplingsemaphore.release(1)
             if self.flagstart and len(self.timex) > 0:
                 # redraw (within timealign) should not be called if semaphore is hold!
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.qmc.alignEvent in [5,7]:
                     aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.button_6.isFlat():
                     if removed:
                         self.updateBackground()
@@ -9967,6 +9999,10 @@ class tgraphcanvas(FigureCanvas):
                     aw.sendmessage(message)
                     aw.onMarkMoveToNext(aw.button_6)
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+
+    # trigger to be called by the markChargeSignal
+    def markDropTrigger(self):
+        self.markDrop()
 
     #record end of roast (drop of beans). Called from push button 'Drop'
     @pyqtSlot(bool)
@@ -10058,7 +10094,7 @@ class tgraphcanvas(FigureCanvas):
                             except:
                                 pass
                 else:
-                    message = QApplication.translate("Message","Scope is OFF", None)
+                    message = QApplication.translate("Message","DROP: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
@@ -10068,10 +10104,10 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.samplingsemaphore.release(1)
             if self.flagstart:
                 # redraw (within timealign) should not be called if semaphore is hold!
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.qmc.alignEvent in [6,7]:
                     aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 try:
                     if aw.button_9.isFlat():
                         if removed:
@@ -10182,7 +10218,7 @@ class tgraphcanvas(FigureCanvas):
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
                 else:
-                    message = QApplication.translate("Message","Scope is OFF", None)
+                    message = QApplication.translate("Message","COOL: Scope is not recording", None)
                     aw.sendmessage(message)
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
@@ -10191,7 +10227,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
             if self.flagstart:
-                # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+                # NOTE: the following aw.eventaction might do serial communication that aquires a lock, so release it here
                 if aw.button_20.isFlat():
                     if removed:
                         self.updateBackground()
@@ -20992,7 +21028,7 @@ class ApplicationWindow(QMainWindow):
                             if cs.startswith('send') and cs.endswith(")"):
                                 try:
                                     request = eval(cs[len('send('):-1])
-                                    self.ws.send(request)
+                                    self.ws.send(request,block=False)
                                 except:
                                     pass
                             elif cs.startswith('sleep') and cs.endswith(")"): # in seconds
@@ -26346,6 +26382,25 @@ class ApplicationWindow(QMainWindow):
             self.ws.port = toInt(settings.value("port",self.ws.port))
             self.ws.path = toString(settings.value("path",self.ws.path))
             self.ws.machineID = toInt(settings.value("machineID",self.ws.machineID))
+            self.ws.connect_timeout = toFloat(settings.value("connect_timeout",self.ws.connect_timeout))
+            self.ws.request_timeout = toFloat(settings.value("request_timeout",self.ws.request_timeout))
+            self.ws.reconnect_interval = toFloat(settings.value("reconnect_interval",self.ws.reconnect_interval))
+            self.ws.id_node = toString(settings.value("id_node",self.ws.id_node))
+            self.ws.machine_node = toString(settings.value("machine_node",self.ws.machine_node))
+            self.ws.command_node = toString(settings.value("command_node",self.ws.command_node))
+            self.ws.data_node = toString(settings.value("data_node",self.ws.data_node))
+            self.ws.pushMessage_node = toString(settings.value("pushMessage_node",self.ws.pushMessage_node))
+            self.ws.request_data_command = toString(settings.value("request_data_command",self.ws.request_data_command))
+            self.ws.charge_message = toString(settings.value("charge_message",self.ws.charge_message))
+            self.ws.drop_message = toString(settings.value("drop_message",self.ws.drop_message))
+            self.ws.STARTonCHARGE = bool(toBool(settings.value("STARTonCHARGE",self.ws.STARTonCHARGE)))
+            self.ws.OFFonDROP = bool(toBool(settings.value("OFFonDROP",self.ws.OFFonDROP)))
+            self.ws.channel_requests = [toString(x) for x in toList(settings.value("channel_requests",self.ws.channel_requests))]
+            self.ws.channel_requests = self.ws.channel_requests + [""]*(max(0,aw.ws.channels - len(self.ws.channel_requests)))
+            self.ws.channel_nodes = [toString(x) for x in toList(settings.value("channel_nodes",self.ws.channel_nodes))]
+            self.ws.channel_nodes = self.ws.channel_nodes + [""]*(max(0,aw.ws.channels - len(self.ws.channel_nodes)))
+            self.ws.channel_modes = [toInt(x) for x in toList(settings.value("channel_modes",self.ws.channel_modes))]
+            self.ws.channel_modes = self.ws.channel_modes + [0]*(max(0,aw.ws.channels - len(self.ws.channel_modes)))
             settings.endGroup()
             #restore s7 port
             settings.beginGroup("S7")
@@ -27855,6 +27910,22 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("port",self.ws.port)
             settings.setValue("path",self.ws.path)
             settings.setValue("machineID",self.ws.machineID)
+            settings.setValue("connect_timeout",self.ws.connect_timeout)
+            settings.setValue("request_timeout",self.ws.request_timeout)
+            settings.setValue("reconnect_interval",self.ws.reconnect_interval)
+            settings.setValue("id_node",self.ws.id_node)
+            settings.setValue("machine_node",self.ws.machine_node)
+            settings.setValue("command_node",self.ws.command_node)
+            settings.setValue("data_node",self.ws.data_node)
+            settings.setValue("pushMessage_node",self.ws.pushMessage_node)
+            settings.setValue("request_data_command",self.ws.request_data_command)
+            settings.setValue("charge_message",self.ws.charge_message)
+            settings.setValue("drop_message",self.ws.drop_message)
+            settings.setValue("STARTonCHARGE",self.ws.STARTonCHARGE)
+            settings.setValue("OFFonDROP",self.ws.OFFonDROP)
+            settings.setValue("channel_requests",self.ws.channel_requests)
+            settings.setValue("channel_nodes",self.ws.channel_nodes)
+            settings.setValue("channel_modes",self.ws.channel_modes)
             settings.endGroup()
             #save s7 port
             settings.beginGroup("S7")
@@ -31603,10 +31674,28 @@ class ApplicationWindow(QMainWindow):
                 pass
 
             # WebSocket Setup
-            self.ws.host = str(dialog.ws_hostEdit.text())
+            self.ws.host = str(dialog.ws_hostEdit.text()).strip()
             self.ws.port = int(str(dialog.ws_portEdit.text()))
-            self.ws.path = str(dialog.ws_pathEdit.text())
+            self.ws.path = str(dialog.ws_pathEdit.text()).strip()
             self.ws.machineID = int(str(dialog.ws_machineIDEdit.text()))
+            self.ws.connect_timeout = float(dialog.ws_connect_timeout.value())
+            self.ws.reconnect_interval = float(dialog.ws_reconnect_timeout.value())
+            self.ws.request_timeout = float(dialog.ws_request_timeout.value())
+            self.ws.id_node = str(dialog.ws_messageID.text()).strip()
+            self.ws.machine_node = str(dialog.ws_machineID.text()).strip()
+            self.ws.command_node = str(dialog.ws_command.text()).strip()
+            self.ws.data_node = str(dialog.ws_data.text()).strip()
+            self.ws.pushMessage_node = str(dialog.ws_message.text())
+            self.ws.request_data_command = str(dialog.ws_data_request.text()).strip()
+            self.ws.charge_message = str(dialog.ws_charge.text()).strip()
+            self.ws.drop_message = str(dialog.ws_drop.text()).strip()
+            self.ws.STARTonCHARGE = bool(dialog.ws_STARTonCHARGE.isChecked())
+            self.ws.OFFonDROP = bool(dialog.ws_OFFonDROP.isChecked())
+            for i in range(self.ws.channels):
+                self.ws.channel_requests[i] = str(dialog.ws_requestEdits[i].text()).strip()
+                self.ws.channel_nodes[i] = str(dialog.ws_nodeEdits[i].text()).strip()
+                self.ws.channel_modes[i] = int(dialog.ws_modeCombos[i].currentIndex())
+            
             # S7 Setup
             self.s7.host = str(dialog.s7_hostEdit.text())
             self.s7.port = int(str(dialog.s7_portEdit.text()))
