@@ -25,7 +25,7 @@ PID mechanism of external devices can be connected via MODBUS to the Artisan PID
 
 Buttons and sliders can send out `MODBUS Command`s via functions 5, 6, 15, 16 and 22. The following commands in the action description are supported.
 
-Note that MODBUS Command actions can be sequenced by separating them with semicolons like in "read(0,10); mwrite(0,20,255,0,_)"
+Note that MODBUS Command actions can be sequenced by separating them with semicolons like in `read(0,10); mwrite(0,20,255,0,_)`
 
 * `read(slaveId,register)`:  
 reads <register> from slave <slaveID> using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be used in later commands.
@@ -51,4 +51,4 @@ delay processing by `s` seconds (float)
 * `button(<b>)` :  
 sets the last button pressed to either "pressed" style if `b` is `1` or `True` or "normal"style, otherwise
 
-The placeholders `{BT}`, `{ET}`, `{time}` substituted in MODBUScommand actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float).
+The placeholders `{BT}`, `{ET}`, `{time}` substituted in MODBUS Command actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float).

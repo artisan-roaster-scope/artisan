@@ -159,6 +159,8 @@ devices:
         url: /devices/phidget-sets/
       - title: "S7"
         url: /devices/s7/
+      - title: "WebSockets"
+        url: /devices/websockets/
       - title: "Yoctopuce"
         url: /devices/yoctopuce/
 

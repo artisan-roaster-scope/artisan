@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/probat/
 title: "Probat"
-excerpt: "Probatone 5/12/25"
+excerpt: "Probatone 5/12/25, P Series"
 header:
   overlay_image: /assets/images/probat.jpg
   image: /assets/images/probat.jpg
@@ -12,9 +12,11 @@ header:
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
 * __Producer:__ [Probat](http://www.probat-shoproaster.com/en/home/){:target="_blank"}, Germany
-* __Machines:__ Probatone II 5Kg/12Kg/25Kg with software option
-  - small touch display (Wago PLC)
-  - 7" touch display (Beckhof PLC)
+* __Machines:__ 
+  - Probatone Series II 5Kg/12Kg/25Kg with software option
+     - small touch display (Wago PLC)
+     - 7" touch display (Beckhof PLC)
+  - P Series (Sample Roaster, 1kg/5kg/12kg/25kg) 
 * __Connection:__ MODBUS TCP via the network
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT), air pressure and related rate-of-rise curves
