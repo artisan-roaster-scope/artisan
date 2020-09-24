@@ -105,7 +105,7 @@ def content():
     tbl_Predictions = prettytable.PrettyTable()
     tbl_Predictions.field_names = [QApplication.translate('HelpDlg','Symbol',None),QApplication.translate('HelpDlg','Description',None)]
     tbl_Predictions.add_row(['pDRY',QApplication.translate('HelpDlg','Prediction of the time distance to the DRY event based on the current RoR. Evaluates to -1 on negative RoR and to 0 if the DRY event is already set.',None)])
-    tbl_Predictions.add_row(['pFCS',QApplication.translate('HelpDlg','Same as pDRY, just for the FCs event.',None)])
+    tbl_Predictions.add_row(['pFCs',QApplication.translate('HelpDlg','Same as pDRY, just for the FCs event.',None)])
     strlist.append(tbl_Predictions.get_html_string(attributes={"width":"100%","border":"1","padding":"1","border-collapse":"collapse"}))
     tbl_Predictionsbottom = prettytable.PrettyTable()
     tbl_Predictionsbottom.header = False

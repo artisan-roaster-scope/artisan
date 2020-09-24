@@ -468,7 +468,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.serialtable = QTableWidget()
         self.serialtable.setTabKeyNavigation(True)
         self.serialtable.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
-        self.serialtable.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.serialtable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.serialtable.horizontalHeader().setStretchLastSection(True)
         self.createserialTable()
         ##########################    TAB 3 WIDGETS   MODBUS
@@ -1548,8 +1548,7 @@ class comportDlg(ArtisanResizeablDialog):
                         if not (devid in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = self.aw.extracomport[i])
                             comportComboBox.activated.connect(self.portComboBoxIndexChanged)
-#                            comportComboBox.setFixedWidth(200)
-                            comportComboBox.setMiniumWidth(200)
+                            comportComboBox.setMinimumContentsLength(15)
                             baudComboBox =  QComboBox()
                             baudComboBox.addItems(self.bauds)
                             if str(self.aw.extrabaudrate[i]) in self.bauds:

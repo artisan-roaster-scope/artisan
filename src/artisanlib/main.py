@@ -33403,6 +33403,7 @@ class ApplicationWindow(QMainWindow):
                     filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as SVG", None),ext=extension)
             else:
                 filename = fname
+            extension = extension.replace('*','')
             if filename:
                 if extension not in filename:
                     filename += extension
