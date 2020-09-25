@@ -1099,7 +1099,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         programlayout.setContentsMargins(5,10,5,5)
         programGroupBox.setContentsMargins(0,12,0,0)
         #ET BT symbolic adjustments/assignments Box
-        self.updateETBTButton = QPushButton(QApplication.translate("Button","Update ET/BT in Profile",None))
+        self.updateETBTButton = QPushButton(QApplication.translate("Button","Update Profile",None))
         self.updateETBTButton.setFocusPolicy(Qt.NoFocus)
         self.updateETBTButton.setToolTip(QApplication.translate("Tooltip","Recaclulates ET and BT and updates their values in the profile",None))
         self.updateETBTButton.clicked.connect(self.updateETBTinprofile)

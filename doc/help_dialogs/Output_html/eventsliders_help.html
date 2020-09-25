@@ -71,7 +71,12 @@
     <tr>
         <td>&#160;</td>
         <td>button(&lt;bool&gt;)</td>
-        <td>sets calling button to “pressed” if argument is 1 or True</td>
+        <td>sets calling button to “pressed” if argument evaluates to 1 or True</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>read(slaveID,register)</td>
+        <td>reads register from slave slaveID using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
     </tr>
     <tr>
         <td>&#160;</td>
@@ -285,6 +290,11 @@
     </tr>
     <tr>
         <td>&#160;</td>
+        <td>button(&lt;bool&gt;)</td>
+        <td>sets calling button to “pressed” if argument evaluates to 1 or True</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
         <td>getDBbool(&lt;dbnumber&gt;,&lt;start&gt;,&lt;index&gt;)</td>
         <td>read bool from S7 DB</td>
     </tr>
@@ -452,5 +462,15 @@
         <td>&#160;</td>
         <td>sleep(&lt;float&gt;)</td>
         <td>sleep: add a delay of &lt;float&gt; seconds</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>button(&lt;bool&gt;)</td>
+        <td>sets calling button to “pressed” if argument evaluates to 1 or True</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>read(&lt;json&gt;)</td>
+        <td>if the `&lt;json&gt;` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`</td>
     </tr>
 </table></body>

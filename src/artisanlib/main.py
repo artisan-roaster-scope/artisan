@@ -19966,8 +19966,8 @@ class ApplicationWindow(QMainWindow):
                     from artisanlib.hottop import setHottop
                 cmd_str = str(cmd)
 
-                # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7 command actions
-                if action in [1,2,4,7,15] and (self.qmc.flagstart and len(self.qmc.timex) > 0 or (self.qmc.flagon and len(self.qmc.on_timex) > 0)):
+                # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7/WebSocket command actions
+                if action in [1,2,4,7,15,22] and (self.qmc.flagstart and len(self.qmc.timex) > 0 or (self.qmc.flagon and len(self.qmc.on_timex) > 0)):
                     try:
                         if self.qmc.flagstart:
                             timex = self.qmc.timex[-1]
@@ -20640,6 +20640,7 @@ class ApplicationWindow(QMainWindow):
                     # msetDBint(<dbnumber>,<start>,andMaks,orMask,value)
                     # setDBfloat(<dbnumber>,<start>,<value>)
                     #-
+                    # button(<b>)
                     # sleep(<xx.yy>) xx.yy in seconds
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -21020,10 +21021,12 @@ class ApplicationWindow(QMainWindow):
                                     pass
                 elif action == 22: # WebSocket Command
                     # send(<json>)
+                    # sleep(xx.yy)  with xx.yy sleep time in seconds
+                    # read(request) request is a JSON request in brackets; full JSON response is bound to _
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
-                            cs = c.strip()
+                            cs = c.strip().replace("_",str(aw.ws.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             # send(<json>) : send <json> request to connected WebSocket
                             if cs.startswith('send') and cs.endswith(")"):
                                 try:
@@ -21037,6 +21040,28 @@ class ApplicationWindow(QMainWindow):
                                     if isinstance(cmds,float) or isinstance(cmds,int):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
+                                except Exception:
+                                    pass
+                            elif cs.startswith("read"):
+                                try:
+                                    request = eval(cs[len('read'):])
+                                    if isinstance(request,dict):
+                                        # cmd has format "read(<requestJSON>)"
+                                        aw.ws.lastReadResult = aw.ws.send(request)
+                                except Exception:
+                                    pass
+                            elif cs.startswith("button"):
+                                # cmd has format "button(<bool>)" # 0 or 1 or True or False
+                                try:
+                                    cmds = eval(cs[len('button'):])
+                                    last = self.lastbuttonpressed
+                                    if last != -1 and len(self.buttonlist)>last:
+                                        #block resetting style of last button
+                                        self.lastbuttonpressed = -1
+                                        if cmds:
+                                            aw.setExtraEventButtonStyle(last, style="pressed")
+                                        else:
+                                            aw.setExtraEventButtonStyle(last, style="normal")
                                 except Exception:
                                     pass
             except:

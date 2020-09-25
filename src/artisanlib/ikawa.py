@@ -64,11 +64,15 @@ def extractProfileIkawaCSV(file):
         timex.append(i)
         if 'inlet temp' in item:
             temp1.append(float(item['inlet temp']))
+        elif 'temp below' in item:
+            temp1.append(float(item['temp below']))
         else:
             temp1.append(-1)
         # we map IKAWA Exhaust to BT as main events like CHARGE and DROP are marked on BT in Artisan
         if 'exaust temp' in item:
             temp2.append(float(item['exaust temp']))
+        elif 'temp above' in item:
+            temp2.append(float(item['temp above']))
         else:
             temp2.append(-1)
         # mark CHARGE
@@ -80,17 +84,25 @@ def extractProfileIkawaCSV(file):
         # add SET and RPM
         if 'temp set' in item:
             extra1.append(float(item['temp set']))
+        elif 'setpoint' in item:
+            extra1.append(float(item['setpoint']))
         else:
             extra1.append(-1)
         if 'fan speed (RPM)' in item:
             rpm = float(item['fan speed (RPM)'])
             extra2.append(rpm/100)
+        elif 'fan speed' in item:
+            rpm = float(item['fan speed'])
+            extra2.append(rpm/100)
         else:
             extra2.append(-1)
         
-        if "fan set (%)" in item:
+        if "fan set (%)" in item or "fan set" in item:
             try:
-                v = float(item["fan set (%)"])
+                if "fan set (%)" in item:
+                    v = float(item["fan set (%)"])
+                elif "fan set" in item:
+                    v = float(item["fan set"])
                 if v != fan:
                     # fan value changed
                     if v == fan_last:
@@ -115,9 +127,12 @@ def extractProfileIkawaCSV(file):
                     fan_last = None
             except:
                 pass
-        if "heater power (%)" in item:
+        if "heater power (%)" in item or "heater" in item:
             try:
-                v = float(item["heater power (%)"])
+                if "heater power (%)" in item:
+                    v = float(item["heater power (%)"])
+                elif "heater" in item:
+                    v = float(item["heater"])
                 if v != heater:
                     # heater value changed
                     if v == heater_last:

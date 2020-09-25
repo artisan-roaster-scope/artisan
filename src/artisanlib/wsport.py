@@ -38,6 +38,8 @@ class wsport(object):
         self.path = "WebSocket" # the ws path
         self.machineID = 0
         
+        self.lastReadResult = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
+        
         self.channels = 10 # maximal number of WebSocket channels
         
         # WebSocket data
