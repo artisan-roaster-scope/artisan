@@ -49,6 +49,6 @@ write multiple holding registers BCD encoded via function 16
 * `sleep(s)` :  
 delay processing by `s` seconds (float)
 * `button(<b>)` :  
-sets the last button pressed to either "pressed" style if `b` is `1` or `True` or "normal"style, otherwise
+sets the last button pressed to either "pressed" if `b` is `1` or `True`, and "normal", otherwise
 
 The placeholders `{BT}`, `{ET}`, `{time}` substituted in MODBUS Command actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float).

@@ -81,8 +81,18 @@ Note that WebSocket Command actions can be sequenced by separating them with sem
 if the `<json>` text respects the JSON format it is send to the connected WebSocket server
 * `sleep(s)` :  
 delay processing by `s` seconds (float)
+* `read(<json>)`: 
+if the `<json>` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`
+* `button(<expr>) :
+sets the last button state to either "pressed" if <expr> evalutes to 1 or True and "normal", otherwise
 
-The placeholder `{}` is substituded by the event value in button and slider acctions.  However, if such a placceholder is used, all JSON elements have to be wrapped in an extra set of brackets like in the following example
+Example Button Action:
+{% raw %}````
+read({{"command": "getRoasterState"}});button(_["data"]["state"] == "ready")
+```{% endraw %}
+Send `getRoasterState` request on button perss and sets the button in "pressed" state if response indicate `ready').
+
+The placeholder `{}` is substituted by the event value in button and slider actions.  However, if the WebSocket Command is used as button or  slider actinon where this substition takes place all regular brackets have to be escaped by duplicating them like in the following example
 
 {% raw %}```
 send(

@@ -103,7 +103,7 @@ There are also experimental builds for the Raspberry Pi platform (stretch & bust
 - [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html){:target="_blank"}
 - [profile designer](https://artisan-roasterscope.blogspot.com/2019/05/using-artisan-designer.html){:target="_blank"}, cupping editor, spider- and wheel graph
 - [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"} with programable actions
-- many import and export formats
+- many import and export formats like Aillio Roastime, Cropster XLS, Giesen CSV, IKAWA CSV, Probat Pilot, RoastLogger, RoastLog, RoastPath,..
 
 {% include feature_row id="featurerequest" type="center" %}
 
