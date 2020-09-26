@@ -16,8 +16,8 @@ header:
   - Probatone Series II 5Kg/12Kg/25Kg with software option
      - small touch display (Wago PLC)
      - 7" touch display (Beckhof PLC)
-  - P Series (Sample Roaster, 1kg/5kg/12kg/25kg) 
-* __Connection:__ MODBUS TCP via the network
+  - P Series ([Sample Roaster](https://www.probat.com/en/products/shoproaster/produkte/roasters/sample-roaster/), [1kg/5kg/12kg/25kg](https://www.probat.com/en/products/shoproaster/produkte/roasters/p-series-probatino/)) 
+* __Connection:__ MODBUS TCP or WebSocckets via the network
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT), air pressure and related rate-of-rise curves
   - control of burner level, drum- and fan speed
