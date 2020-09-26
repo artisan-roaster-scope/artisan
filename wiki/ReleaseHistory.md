@@ -2,6 +2,71 @@ Detailed Release History
 ========================
 
 ----
+v2.4.2 (xx.09.2020)
+------------------
+
+* New Features
+  - extendded machine support
+     - adds [CTE Ghibli touch](https://artisan-scope.org/machines/coffeetech/) setup incl. control of burner, fan and drum speed
+     - adds updated [IMF RM](https://artisan-scope.org/machines/imf/) setups
+     - adds burner control to [San Franciscan](https://www.sanfranroaster.com/) setup
+     - adds Toper USB setup next to the network MODBUS/TCP variant to connect to  [Toper TKM-SX](https://artisan-scope.org/machines/toper/) roasters
+     - adds support for the new [Probat Sample Roaster and P Series III roasters](https://artisan-scope.org/machines/probat/)
+     - adds [support for machines of more than 40 additional brands](https://artisan-scope.org/machines/index): [Ambex](https://artisan-scope.org/machines/ambex/), [ARC S/800](https://artisan-scope.org/machines/arc/), [Bella TW](https://artisan-scope.org/machines/bellatw/), [Berto One and D](https://artisan-scope.org/machines/berto/), [Bideli](https://artisan-scope.org/machines/bideli/), [Blueking BK](https://artisan-scope.org/machines/blueking/), [Brambati PLC](https://artisan-scope.org/machines/brambati/), [Dätgen DR/DW](https://artisan-scope.org/machines/datgen/), [Dongyi BR/BY/DY](https://artisan-scope.org/machines/dongyi/), [Easyster](https://artisan-scope.org/machines/easyster/), [Froco PLC](https://artisan-scope.org/machines/froco/), [Garanti GKPX](https://artisan-scope.org/machines/garanti/), [Golden Roasters GR](https://artisan-scope.org/machines/goldenroasters/), [Hartanzah Roaster](https://artisan-scope.org/machines/hartanzah/), [HB-Roaster](https://artisan-scope.org/machines/hb/), [Hive Roaster](https://artisan-scope.org/machines/hive/), [IP Xenakis iRm_Series incl. full control](https://artisan-scope.org/machines/ipxenakis/), [KapoK](https://artisan-scope.org/machines/kapok/), [Kuban Supreme setup incl. full control](https://artisan-scope.org/machines/kuban/), [Lilla PLC](https://artisan-scope.org/machines/lilla/), [Mill City Roasters MCR Series](https://artisan-scope.org/machines/mcr/), [NOR Coffee Roaster](https://artisan-scope.org/machines/nor/), [Nordic](https://artisan-scope.org/machines/nordic/), [Opp Roaster](https://artisan-scope.org/machines/opp/), [Öztürk](https://artisan-scope.org/machines/ozturk/), [Petroncini](https://artisan-scope.org/machines/petroncini/), [Roaster & Roaster](https://artisan-scope.org/machines/roasterandroaster/), [Rasco Mac](https://artisan-scope.org/machines/rascomac/), [Rolltech EL](https://artisan-scope.org/machines/rolltech/), [Santoker](https://artisan-scope.org/machines/santoker/), [Tesla](https://artisan-scope.org/machines/tesla/), [Tostabar Genius](https://artisan-scope.org/machines/tostabar/), [TRINITAS T2 and T7](https://artisan-scope.org/machines/trinitas/), [Trobrat](https://artisan-scope.org/machines/trobrat/), [Typhoon](https://artisan-scope.org/machines/typhoon/), [VNT](https://artisan-scope.org/machines/vnt/), [Vortecs](https://artisan-scope.org/machines/vortecs/), [Wintop](https://artisan-scope.org/machines/wintop/), [Yang-Chia Feima](https://artisan-scope.org/machines/yangchia/), and [Yoshan](https://artisan-scope.org/machines/yoshan/)
+  - adds RoastLog profile importer ([Issue #471](../../../issues/441))
+  - adds IKAWA v3 CSV file importer
+  - adds font options "Source Han Sans" offering CN, TW, KR, JP character sets and "WenQuanYi Zen Hei" offering CN and TW character sets ([Issue #493](../../../issues/493))
+  - adds sliders Bernoulli mode to emit values respecting Bernoulli's gas law translating non-linear between gas flow (slider values) and gas pressure (gas valve). See [the corresponding discussion on home-barista.com](https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654).
+  - adds input filter to interpolate duplicate readings that may disturb the RoR computation
+  - adds support for [artisan.plus](https://artisan.plus/) dynamic blend replacements
+  - adds additional date and time fields to [autosave](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html)
+  - adds ET and BT rate-of-rise to [special events annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html)
+  - adds post roast update for symbolic ET and BT values in the profile
+  - adds option to hide '--' untyped special events
+  - adds second set of settings for Phidget TMP1200 RTD modules allowing to run different types of RTDs (eg. PT100 and PT1000) in parallel
+  - adds support for the Phidget TMP1000 Ambient Temperature sensor
+  - adds VOUT Command "range" to set the voltage range of the Phidget voltage output modules ([Issue #472](../../../issues/472))
+  - adds support for [WebSocket communication](https://artisan-scope.org/devices/websockets/)
+  - adds S7 support to read booleans and the S7 Commands actions `setDBbool(<dbnumber>,<start>,<index>,<value>)` and `getDBbool(<dbnumber>,<start>,<index>)`
+  - adds S7 Command `msetDBint` to write Integers to S7 registers using masks
+  - adds S7 help page
+  - adds S7 scanner
+  - adds MODBUS and S7 decoding of Floats as Integers
+
+* Changes
+  - new RoR computation method based on linear polyfits ([PR #503](../../../pull/503) by [PDWest](https://github.com/PDWest)) and "optimized" variant based on the [Savitzky-Golay filter](https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter) for display after recording
+  - do not propagate error values -1 to the full formula if the full formula is enclosed in parentheses
+  - allows three digits following [q,w,e,r] special event shortcut when the corresponding slider max value is greater than 100.  Be aware that when this is true three digits must be entered so a leading zero is required for values less than 100. 
+  - changes Windows keyboard shortcut to remove background curve to CTRL+SHIFT+h
+  - updates GUI libs (Qt/PyQt/Matplotlib)
+  - updates Brazilian and Greek translations
+  - updated Chinese translations ([PR #491](../../../pull/491) & [PR #494](../../../pull/494) by [wuyi-ligux](https://github.com/wuyi-levard))
+  - extends CSV batch reports by some additional fields
+  - respects Delta ET/BT symbolic formulas in Roast Properties data table
+  - aligns z-order of RoR curves to their LCD order
+  - images are saved with opaque borders when the canvas color is not set
+  - save image for Home-Barista increased to 1200px wide
+
+* Fixes
+  - ensures that Roasted Density value (in Roast Properties) does reset on new roasts if "Delete roast properties on RESET" is ticked ([Issue #470](../../../issues/470))
+  - prevents removal of line artists that have already been deleted on switching the crosslines off ([Issue #473](../../../issues/473))
+  - ensure that flags position cache is cleared on reset before loading a new profile ([Issue #474](../../../issues/474))
+  - fixes Hottop 2k+ communication boken in the macOS build of Artisan v2.4 ([Issue #475](../../../issues/475))
+  - fixes regression that calculated axis limits automatically on incomplete profiles while recording on leaving the Axis dialog ([Issue #476](../../../issues/476))
+  - ensures that normal saves respect the autosave path for extra files (JSON, PDF,..) ([Issue #480](../../../issues/480))
+  - allow to enter super-user mode with a simple left-click on the timer LCD as right-clicks are not available on touch screens ([Issue #481](../../../issues/481))
+  - fixes a regression that prevented some roasts not to be successfully uploaded to artisan.plus in rare cases related to Fahrenheit conversion
+  - ensures that autosave profiles get synced to artisan.plus in any case
+  - fixes special event annotations will show when there is no DROP event
+  - fixes plotting specialevents>100 while recording in step modes
+  - makes the Comparator compatible to profiles created by legacy versions of Artisan
+  - fixes a rare redraw problem in Comparator mode which result in curves being only partially visible
+  - improves stability of serial communication with serial meters like the Center304/309/..
+  - fixes crash on multiple event button actions ([Issue #504](../../../issues/504))
+  - prevents saving NaN annotation and flag coordinates in profiles ([Issue #505](../../../issues/505))
+  - fixes Transposer crash ([Issue #506](../../../issues/506))
+
+----
 v2.4.0 (03.06.2020)
 ------------------
 

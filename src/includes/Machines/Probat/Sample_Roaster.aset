@@ -110,4 +110,4 @@ request_data_command=getCurrentRoastingStep
 request_timeout=0.5
 
 [events]
-etypes=Air, Drum, Cooling, Burner, --
+etypes=Air, Drum, Dumper, Burner, --
