@@ -5641,13 +5641,21 @@ class tgraphcanvas(FigureCanvas):
             return deltas
     
     # computes the RoR over the time and temperature arrays tx and temp via polynoms of degree 1 at index i using a window of wsize
+    # the window size wsize needs to be at least 2
     def polyRoR(self,tx,temp,wsize,i):
-        if i < 2:
+        if wsize < 2:
             return 0
         else:
+            if i < 2:
+                if len(tx) > 1:
+                    # at the left border we duplicate the next RoR value if any
+                    i = 2
+                else:
+                    return 0
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')
-                LS_fit = numpy.polynomial.polynomial.polyfit(tx[max(0,i-wsize):i],temp[max(0,i-wsize):i], 1)
+                left_index = max(0,i-wsize)
+                LS_fit = numpy.polynomial.polynomial.polyfit(tx[left_index:i],temp[left_index:i], 1)
             return LS_fit[1]*60.
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
@@ -5666,13 +5674,11 @@ class tgraphcanvas(FigureCanvas):
             else:
                 roast_end_idx = lt
             if deltaBTsamples is None:
-#                dsBT = aw.qmc.deltaBTsamples
-                dsBT = max(2,(aw.qmc.deltaBTsamples + 1)) # now as in sample()
+                dsBT = max(2,(aw.qmc.deltaBTsamples)) # now as in sample()
             else:
                 dsBT = deltaBTsamples
             if deltaETsamples is None:
-#                dsET = aw.qmc.deltaETsamples
-                dsET = max(2,(aw.qmc.deltaETsamples + 1)) # now as in sample()
+                dsET = max(2,(aw.qmc.deltaETsamples)) # now as in sample()
             else:
                 dsET = deltaETsamples
             if timex_lin is not None:
@@ -6434,11 +6440,11 @@ class tgraphcanvas(FigureCanvas):
                             if aw.qmc.background_profile_sampling_interval is None:
                                 dsET = None
                             else:
-                                dsET = int(max(1,aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
+                                dsET = int(max(2,aw.qmc.deltaETspan / aw.qmc.background_profile_sampling_interval))
                             if aw.qmc.background_profile_sampling_interval is None:
                                 dsBT = None
                             else:
-                                dsBT = int(max(1,aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
+                                dsBT = int(max(2,aw.qmc.deltaBTspan / aw.qmc.background_profile_sampling_interval))
                             self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltaETsamples=dsET,deltaBTsamples=dsBT)
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
