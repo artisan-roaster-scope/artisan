@@ -49,16 +49,16 @@ buttonpalette_shortcuts=true
 buttonpalettemaxlen=11, 11, 11, 11, 11, 11, 14, 14, 14, 14
 buttonsize=1
 eventbuttontablecolumnwidths=70, 80, 100, 50, 150, 384, 80, 80, 80, 168
-extraeventbuttoncolor=#b64c4e, #b6181a, #808080, #7fb4cb, #45a6cf, #808080, #70b780, #49b260, #808080, #875087, #800080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080
-extraeventbuttontextcolor=white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white
-extraeventsactions=22, 22, 0, 22, 22, 0, 22, 22, 0, 22, 22, 22, 22, 0, 22, 22, 0, 22, 22, 0, 22, 22
-extraeventsactionstrings="send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"roastingFan\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"roastingFan\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"coolingFan\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"coolingFan\": {} }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"drivesState\": \"ON\" }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"drivesState\": \"OFF\" }}}})", , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"burnerState\": \"on\" }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"burnerState\": \"off\" }}}})", , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"coolingFanState\": True }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"coolingFanState\": False }}}})", , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"stirrerState\": \"ON\" }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"stirrerState\": \"OFF\" }}}})"
-extraeventsbuttonsflags=0, 1, 1
-extraeventsdescriptions=, , , , , , , , , , , , , , , , , , , , , 
-extraeventslabels=-10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, ON\nDrives, OFF\nDrives, , ON\nBurner, OFF\nBurner, , ON\nCooling, OFF\nCooling, , ON\nStirrer, OFF\nStirrer
-extraeventstypes=8, 8, 4, 5, 5, 4, 6, 6, 4, 7, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
-extraeventsvalues=-2, 2, 0, -2, 2, 0, -2, 2, 0, -2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraeventsvisibility=1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1
+extraeventbuttoncolor=#b64c4e, #b6181a, #808080, #7fb4cb, #45a6cf, #808080, #70b780, #49b260, #808080, #875087, #800080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #800080
+extraeventbuttontextcolor=white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white
+extraeventsactions=22, 22, 0, 22, 22, 0, 22, 22, 0, 22, 22, 22, 22, 0, 22, 22, 0, 22, 22, 0, 22, 22, 22
+extraeventsactionstrings="send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"roastingFan\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"roastingFan\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"coolingFan\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"coolingFan\": {} }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"drivesState\": True }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"drivesState\": False }}}})", , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"burnerState\": True }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"burnerState\": False }}}})", , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"coolingFanState\": True }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"coolingFanState\": False }}}})", , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"stirrerState\": True }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"stirrerState\": False }}}})", send({{ \"command\": \"getRoasterState\"}})
+extraeventsbuttonsflags=1, 1, 1
+extraeventsdescriptions=, , , , , , , , , , , , , , , , , , , , , , 
+extraeventslabels=-10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, ON\nDrives, OFF\nDrives, , ON\nBurner, OFF\nBurner, , ON\nCooling, OFF\nCooling, , ON\nStirrer, OFF\nStirrer, TEST
+extraeventstypes=8, 8, 4, 5, 5, 4, 6, 6, 4, 7, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+extraeventsvalues=-2, 2, 0, -2, 2, 0, -2, 2, 0, -2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraeventsvisibility=1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1
 
 [Quantifiers]
 clusterEventsFlag=false
