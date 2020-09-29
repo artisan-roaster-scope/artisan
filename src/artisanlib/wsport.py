@@ -71,6 +71,14 @@ class wsport(object):
         # push messages
         self.charge_message = "startRoasting"
         self.drop_message = "endRoasting"
+        self.addEvent_message = "addEvent"
+        
+        self.event_node = "event"
+        self.DRY_node = "colorChangeEvent"
+        self.FCs_node = "firstCrackBeginningEvent"
+        self.FCe_node = "firstCrackEndEvent"
+        self.SCs_node = "secondCrackBeginningEvent"
+        self.SCe_node = "secondCrackEndEvent"
         
         # flags
         self.STARTonCHARGE = False
@@ -93,7 +101,7 @@ class wsport(object):
             elif self.pushMessage_node != ""  and self.pushMessage_node in j:
                 pushMessage = j[self.pushMessage_node]
                 if self.aw.seriallogflag:
-                    self.aw.addserial("wsport push message {} received".format(pushMessage))
+                    self.aw.addserial("wsport pushMessage {} received".format(pushMessage))
                 if self.charge_message != "" and pushMessage == self.charge_message:
                     if self.aw.seriallogflag:
                         self.aw.addserial("wsport CHARGE message received")
@@ -128,6 +136,41 @@ class wsport(object):
                         self.aw.qmc.toggleMonitorSignal.emit()
                         if self.aw.seriallogflag:
                             self.aw.addserial("wsport toggleMonitor signal sent")
+                elif self.addEvent_message != "" and pushMessage == self.addEvent_message:
+                    if self.aw.qmc.flagstart and self.data_node in j:
+                        data = j[self.data_node]
+                        if self.event_node in data:
+                            if self.aw.seriallogflag:
+                                self.aw.addserial("wsport message: addEvent({}) received".format(data[self.event_node]))
+                            if self.aw.qmc.timeindex[1] == 0 and data[self.event_node] == self.DRY_node:
+                                # addEvent(DRY) received
+                                if self.aw.seriallogflag:
+                                    self.aw.addserial("wsport message: addEvent(DRY) processed")
+                                self.aw.qmc.markDRYSignal.emit()
+                            elif self.aw.qmc.timeindex[2] == 0 and data[self.event_node] == self.FCs_node:
+                                # addEvent(FCs) received
+                                if self.aw.seriallogflag:
+                                    self.aw.addserial("wsport message: addEvent(FCs) processed")
+                                self.aw.qmc.markFCsSignal.emit()
+                            elif self.aw.qmc.timeindex[3] == 0 and data[self.event_node] == self.FCe_node:
+                                # addEvent(FCe) received
+                                if self.aw.seriallogflag:
+                                    self.aw.addserial("wsport message: addEvent(FCe) processed")
+                                self.aw.qmc.markFCeSignal.emit()
+                            elif self.aw.qmc.timeindex[4] == 0 and data[self.event_node] == self.SCs_node:
+                                # addEvent(SCs) received
+                                if self.aw.seriallogflag:
+                                    self.aw.addserial("wsport message: addEvent(SCs) processed")
+                                self.aw.qmc.markSCsSignal.emit()
+                            elif self.aw.qmc.timeindex[5] == 0 and data[self.event_node] == self.SCe_node:
+                                # addEvent(SCe) received
+                                if self.aw.seriallogflag:
+                                    self.aw.addserial("wsport message: addEvent(SCe) processed")
+                                self.aw.qmc.markSCeSignal.emit()
+                        elif self.aw.seriallogflag:
+                            self.aw.addserial("wsport message: addEvent({})".format(data))
+                    elif self.aw.seriallogflag:
+                        self.aw.addserial("wsport message: addEvent() received and ignored. Not recording.")
                 
                 # set burner: { "pushMessage": "setBurnerCapacity", "data": { "burnercapacity": 51 } }
                 # name of current roast set: {"pushMessage": "setRoastingProcessName", "data": { "name": "Test roast 123" }}

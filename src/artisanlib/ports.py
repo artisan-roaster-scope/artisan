@@ -1262,6 +1262,8 @@ class comportDlg(ArtisanResizeablDialog):
         ws_setup.addSpacing(7)
         ws_setup.addWidget(ws_machineIDlabel)
         ws_setup.addWidget(self.ws_machineIDEdit)
+        ws_setup.setSpacing(5)
+        ws_setup.setContentsMargins(5,5,5,5)
         
         ws_setup_box = QGroupBox(QApplication.translate("GroupBox","Machine",None))
         ws_setup_box.setLayout(ws_setup)
@@ -1299,6 +1301,8 @@ class comportDlg(ArtisanResizeablDialog):
         ws_timeouts.addSpacing(7)
         ws_timeouts.addWidget(QLabel(QApplication.translate("Label","Request",None)))
         ws_timeouts.addWidget(self.ws_request_timeout)
+        ws_timeouts.setSpacing(5)
+        ws_timeouts.setContentsMargins(5,5,5,5)
         
         ws_timeouts_box = QGroupBox(QApplication.translate("GroupBox","Timeout",None))
         ws_timeouts_box.setLayout(ws_timeouts)
@@ -1322,6 +1326,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.ws_command.setCursorPosition(0)
         self.ws_data = QLineEdit(str(self.aw.ws.data_node))
         self.ws_data.setCursorPosition(0)
+        
         ws_nodes = QGridLayout()
         ws_nodes.addWidget(QLabel(QApplication.translate("Label","Message ID",None)),0,0)
         ws_nodes.addWidget(self.ws_messageID,1,0)
@@ -1333,6 +1338,8 @@ class comportDlg(ArtisanResizeablDialog):
         ws_nodes.addWidget(self.ws_data,1,3)
         ws_nodes.addWidget(QLabel(QApplication.translate("Label","Message",None)),0,4)
         ws_nodes.addWidget(self.ws_message,1,4)
+        ws_nodes.setSpacing(5)
+        ws_nodes.setContentsMargins(5,5,5,5)
 
         ws_nodes_box = QGroupBox(QApplication.translate("GroupBox","Nodes",None))
         ws_nodes_box.setLayout(ws_nodes)
@@ -1343,6 +1350,8 @@ class comportDlg(ArtisanResizeablDialog):
         ws_commands = QGridLayout()
         ws_commands.addWidget(QLabel(QApplication.translate("Label","Data Request",None)),0,0)
         ws_commands.addWidget(self.ws_data_request,1,0)
+        ws_commands.setSpacing(5)
+        ws_commands.setContentsMargins(5,5,5,5)
         
         ws_commands_box = QGroupBox(QApplication.translate("GroupBox","Commands",None))
         ws_commands_box.setLayout(ws_commands)
@@ -1359,6 +1368,8 @@ class comportDlg(ArtisanResizeablDialog):
         ws_messages.addWidget(self.ws_charge,1,0)
         ws_messages.addWidget(QLabel(QApplication.translate("Label","DROP",None)),0,1)
         ws_messages.addWidget(self.ws_drop,1,1)
+        ws_messages.setSpacing(5)
+        ws_messages.setContentsMargins(5,5,5,5)
         
         ws_messages_box = QGroupBox(QApplication.translate("GroupBox","Messages",None))
         ws_messages_box.setLayout(ws_messages)
@@ -1370,6 +1381,8 @@ class comportDlg(ArtisanResizeablDialog):
         ws_flags = QGridLayout()
         ws_flags.addWidget(self.ws_STARTonCHARGE,0,0)
         ws_flags.addWidget(self.ws_OFFonDROP,1,0)
+        ws_flags.setSpacing(5)
+        ws_flags.setContentsMargins(5,5,5,5)
         
         ws_flags_box = QGroupBox(QApplication.translate("GroupBox","Flags",None))
         ws_flags_box.setLayout(ws_flags)
@@ -1379,6 +1392,62 @@ class comportDlg(ArtisanResizeablDialog):
         ws_line2.addWidget(ws_commands_box,20)
         ws_line2.addWidget(ws_messages_box,30)
         ws_line2.addWidget(ws_flags_box,15)
+        
+        #
+        
+        self.ws_event_message = QLineEdit(str(self.aw.ws.addEvent_message))
+        self.ws_event_message.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_event_message.setCursorPosition(0)
+        
+        self.ws_event = QLineEdit(str(self.aw.ws.event_node))
+        self.ws_event.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_event.setCursorPosition(0)
+        
+        self.ws_DRY = QLineEdit(str(self.aw.ws.DRY_node))
+        self.ws_DRY.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_DRY.setCursorPosition(0)
+        
+        self.ws_FCs = QLineEdit(str(self.aw.ws.FCs_node))
+        self.ws_FCs.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_FCs.setCursorPosition(0)
+        
+        self.ws_FCe = QLineEdit(str(self.aw.ws.FCe_node))
+        self.ws_FCe.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_FCe.setCursorPosition(0)
+        
+        self.ws_SCs = QLineEdit(str(self.aw.ws.SCs_node))
+        self.ws_SCs.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_SCs.setCursorPosition(0)
+        
+        self.ws_SCe = QLineEdit(str(self.aw.ws.SCe_node))
+        self.ws_SCe.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+        self.ws_SCe.setCursorPosition(0)
+        
+        ws_events = QGridLayout()
+        ws_events.addWidget(QLabel(QApplication.translate("Label","Message",None)),0,0)
+        ws_events.addWidget(self.ws_event_message,1,0)
+        ws_events.addWidget(QLabel(QApplication.translate("Label","Node",None)),0,1)
+        ws_events.addWidget(self.ws_event,1,1)
+        
+        ws_events.addWidget(QLabel(QApplication.translate("Label","DRY",None)),0,3)
+        ws_events.addWidget(self.ws_DRY,1,3)
+        ws_events.addWidget(QLabel(QApplication.translate("Label","FCs",None)),0,4)
+        ws_events.addWidget(self.ws_FCs,1,4)
+        ws_events.addWidget(QLabel(QApplication.translate("Label","FCe",None)),0,5)
+        ws_events.addWidget(self.ws_FCe,1,5)
+        ws_events.addWidget(QLabel(QApplication.translate("Label","SCs",None)),0,6)
+        ws_events.addWidget(self.ws_SCs,1,6)
+        ws_events.addWidget(QLabel(QApplication.translate("Label","SCe",None)),0,7)
+        ws_events.addWidget(self.ws_SCe,1,7)
+        ws_events.setContentsMargins(5,5,5,5)
+        ws_events.setSpacing(5)
+        ws_events.setColumnMinimumWidth(2,20)
+        
+        ws_events_box = QGroupBox(QApplication.translate("GroupBox","Events",None))
+        ws_events_box.setLayout(ws_events)
+        
+        ws_line3 = QHBoxLayout()
+        ws_line3.addWidget(ws_events_box)
         
         
         self.ws_requestEdits = []
@@ -1424,17 +1493,20 @@ class comportDlg(ArtisanResizeablDialog):
             ws_grid.addWidget(mode,3,i+1,1,1) #Qt.AlignRight)
             
             
-        ws_line3 = QHBoxLayout()
-        ws_line3.addStretch()
-        ws_line3.addLayout(ws_grid)
-        ws_line3.addStretch()
+        ws_line4 = QHBoxLayout()
+        ws_line4.addStretch()
+        ws_line4.addLayout(ws_grid)
+        ws_line4.addStretch()
         
         
         tab7Layout = QVBoxLayout()
         tab7Layout.addLayout(ws_line1)
         tab7Layout.addLayout(ws_line2)
         tab7Layout.addLayout(ws_line3)
+        tab7Layout.addLayout(ws_line4)
         tab7Layout.addStretch()
+        tab7Layout.setSpacing(8)
+        tab7Layout.setContentsMargins(5,5,5,5)
         #tab widget
         self.TabWidget = QTabWidget()
         C1Widget = QWidget()

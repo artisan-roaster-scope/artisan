@@ -653,6 +653,11 @@ class tgraphcanvas(FigureCanvas):
     fileDirtySignal = pyqtSignal()
     fileCleanSignal = pyqtSignal()
     markChargeSignal = pyqtSignal(int)
+    markDRYSignal = pyqtSignal()
+    markFCsSignal = pyqtSignal()
+    markFCeSignal = pyqtSignal()
+    markSCsSignal = pyqtSignal()
+    markSCeSignal = pyqtSignal()
     markDropSignal = pyqtSignal()
     toggleMonitorSignal = pyqtSignal()
     toggleRecorderSignal = pyqtSignal()
@@ -2041,6 +2046,7 @@ class tgraphcanvas(FigureCanvas):
         self.messagesemaphore = QSemaphore(1)
         self.errorsemaphore = QSemaphore(1)
         self.serialsemaphore = QSemaphore(1)
+        self.seriallogsemaphore = QSemaphore(1)
         self.eventactionsemaphore = QSemaphore(1)
         self.updateBackgroundSemaphore = QSemaphore(1)
 
@@ -2205,6 +2211,11 @@ class tgraphcanvas(FigureCanvas):
         self.fileDirtySignal.connect(self.fileDirty)
         self.fileCleanSignal.connect(self.fileClean)
         self.markChargeSignal.connect(self.markChargeDelay)
+        self.markDRYSignal.connect(self.markDRYTrigger)
+        self.markFCsSignal.connect(self.markFCsTrigger)
+        self.markFCeSignal.connect(self.markFCeTrigger)
+        self.markSCsSignal.connect(self.markSCsTrigger)
+        self.markSCeSignal.connect(self.markSCeTrigger)        
         self.markDropSignal.connect(self.markDropTrigger)
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
@@ -3153,7 +3164,15 @@ class tgraphcanvas(FigureCanvas):
 
                 #update serial_dlg
                 if aw.serial_dlg:
-                    aw.serial_dlg.update()
+                    try:
+                        #### lock shared resources #####
+                        aw.qmc.seriallogsemaphore.acquire(1)
+                        aw.serial_dlg.update()
+                    except Exception:
+                        pass
+                    finally:
+                        if aw.qmc.seriallogsemaphore.available() < 1:
+                            aw.qmc.seriallogsemaphore.release(1)
 
                 #update message_dlg
                 if aw.message_dlg:
@@ -9508,6 +9527,10 @@ class tgraphcanvas(FigureCanvas):
                 self.samplingsemaphore.release(1)
         self.autoTPIdx = 0 # avoid a loop on auto marking
 
+    # trigger to be called by the markDRYSignal
+    def markDRYTrigger(self):
+        self.markDryEnd()
+        
     @pyqtSlot(bool)
     def markDryEnd(self,_=False):
         if len(self.timex) > 1:
@@ -9609,6 +9632,10 @@ class tgraphcanvas(FigureCanvas):
                         # only if markDryEnd() is not anyhow triggered within updategraphics()
                         self.updategraphicsSignal.emit()
 
+    # trigger to be called by the markFCsSignal
+    def markFCsTrigger(self):
+        self.mark1Cstart()
+        
     #record 1C start markers of BT. called from push button_3 of application window
     @pyqtSlot(bool)
     def mark1Cstart(self,_=False):
@@ -9710,6 +9737,10 @@ class tgraphcanvas(FigureCanvas):
                         # only if mark1Cstart() is not triggered from within updategraphics() and the canvas is anyhow updated
                         self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
+    # trigger to be called by the markFCeSignal
+    def markFCeTrigger(self):
+        self.mark1Cend()
+    
     #record 1C end markers of BT. called from button_4 of application window
     @pyqtSlot(bool)
     def mark1Cend(self,_=False):
@@ -9803,6 +9834,10 @@ class tgraphcanvas(FigureCanvas):
                     aw.onMarkMoveToNext(aw.button_4)
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
+
+    # trigger to be called by the markSCsSignal
+    def markSCsTrigger(self):
+        self.mark2Cstart()
 
     #record 2C start markers of BT. Called from button_5 of application window
     @pyqtSlot(bool)
@@ -9907,6 +9942,10 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     aw.onMarkMoveToNext(aw.button_5)
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
+
+    # trigger to be called by the markSCeSignal
+    def markSCeTrigger(self):
+        self.mark2Cend()
 
     #record 2C end markers of BT. Called from button_6  of application window
     @pyqtSlot(bool)
@@ -19873,7 +19912,7 @@ class ApplicationWindow(QMainWindow):
         if aw.seriallogflag:
             try:
                 #### lock shared resources #####
-                aw.qmc.serialsemaphore.acquire(1)
+                aw.qmc.seriallogsemaphore.acquire(1)
                 timez = QDateTime.currentDateTime().toString("hh:mm:ss.zzz")    #zzz = miliseconds
                 #keep a max of 1000 comm strings
                 if len(self.seriallog) > 999:
@@ -19882,8 +19921,8 @@ class ApplicationWindow(QMainWindow):
             except Exception:
                 pass
             finally:
-                if aw.qmc.serialsemaphore.available() < 1:
-                    aw.qmc.serialsemaphore.release(1)
+                if aw.qmc.seriallogsemaphore.available() < 1:
+                    aw.qmc.seriallogsemaphore.release(1)
 
     def resizeEvent(self, event):
         if not aw.qmc.flagon and aw.qmc.statssummary and len(aw.qmc.timex) > 3:
@@ -19974,19 +20013,34 @@ class ApplicationWindow(QMainWindow):
 
                 # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7/WebSocket command actions
                 if action in [1,2,4,7,15,22] and (self.qmc.flagstart and len(self.qmc.timex) > 0 or (self.qmc.flagon and len(self.qmc.on_timex) > 0)):
+                    BT_subst = 0
+                    ET_subst = 0
+                    timex = 0
                     try:
                         if self.qmc.flagstart:
                             timex = self.qmc.timex[-1]
                             if self.qmc.timeindex[0] != -1:
                                 timex -= self.qmc.timex[self.qmc.timeindex[0]]
-                            cmd_str = cmd_str.format(BT=self.qmc.temp2[-1],ET=self.qmc.temp1[-1],t=timex)
+                            BT_subst = self.qmc.temp2[-1]
+                            ET_subst = self.qmc.temp1[-1]
                         elif self.qmc.flagon:
                             timex = self.qmc.on_timex[-1]
                             if self.qmc.timeindex[0] != -1:
                                 timex -= self.qmc.on_timex[self.qmc.timeindex[0]]
-                            cmd_str = cmd_str.format(BT=self.qmc.on_temp2[-1],ET=self.qmc.on_temp1[-1],t=timex)
+                            BT_subst = self.qmc.on_temp2[-1]
+                            ET_subst = self.qmc.on_temp1[-1]
                     except:
-                        cmd_str = cmd_str.format(BT=0,ET=0,t=0)
+                        pass
+                    try:
+                        if action == 22:
+                            # in JSON we have to do string substitution
+                            cmd_str = cmd_str.replace("{BT}",str(BT_subst))
+                            cmd_str = cmd_str.replace("{ET}",str(ET_subst))
+                            cmd_str = cmd_str.replace("{t}",str(timex))
+                        else:
+                            cmd_str = cmd_str.format(BT=BT_subst,ET=ET_subst,t=timex)
+                    except:
+                        pass
 
                 if action == 1:
                     cmd_str_bin = ""
@@ -26426,6 +26480,13 @@ class ApplicationWindow(QMainWindow):
             self.ws.drop_message = toString(settings.value("drop_message",self.ws.drop_message))
             self.ws.STARTonCHARGE = bool(toBool(settings.value("STARTonCHARGE",self.ws.STARTonCHARGE)))
             self.ws.OFFonDROP = bool(toBool(settings.value("OFFonDROP",self.ws.OFFonDROP)))
+            self.ws.addEvent_message = toString(settings.value("addEvent_message",self.ws.addEvent_message))     
+            self.ws.event_node = toString(settings.value("event_node",self.ws.event_node))
+            self.ws.DRY_node = toString(settings.value("DRY_node",self.ws.DRY_node))
+            self.ws.FCs_node = toString(settings.value("FCs_node",self.ws.FCs_node))
+            self.ws.FCe_node = toString(settings.value("FCe_node",self.ws.FCe_node))
+            self.ws.SCs_node = toString(settings.value("SCs_node",self.ws.SCs_node))
+            self.ws.SCe_node = toString(settings.value("SCe_node",self.ws.SCe_node))
             self.ws.channel_requests = [toString(x) for x in toList(settings.value("channel_requests",self.ws.channel_requests))]
             self.ws.channel_requests = self.ws.channel_requests + [""]*(max(0,aw.ws.channels - len(self.ws.channel_requests)))
             self.ws.channel_nodes = [toString(x) for x in toList(settings.value("channel_nodes",self.ws.channel_nodes))]
@@ -27954,6 +28015,13 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("drop_message",self.ws.drop_message)
             settings.setValue("STARTonCHARGE",self.ws.STARTonCHARGE)
             settings.setValue("OFFonDROP",self.ws.OFFonDROP)
+            settings.setValue("addEvent_message",self.ws.addEvent_message)
+            settings.setValue("event_node",self.ws.event_node)
+            settings.setValue("DRY_node",self.ws.DRY_node)
+            settings.setValue("FCs_node",self.ws.FCs_node)
+            settings.setValue("FCe_node",self.ws.FCe_node)
+            settings.setValue("SCs_node",self.ws.SCs_node)
+            settings.setValue("SCe_node",self.ws.SCe_node)
             settings.setValue("channel_requests",self.ws.channel_requests)
             settings.setValue("channel_nodes",self.ws.channel_nodes)
             settings.setValue("channel_modes",self.ws.channel_modes)
@@ -31722,6 +31790,14 @@ class ApplicationWindow(QMainWindow):
             self.ws.drop_message = str(dialog.ws_drop.text()).strip()
             self.ws.STARTonCHARGE = bool(dialog.ws_STARTonCHARGE.isChecked())
             self.ws.OFFonDROP = bool(dialog.ws_OFFonDROP.isChecked())
+            self.ws.addEvent_message = str(dialog.ws_event_message.text()).strip()       
+            self.ws.event_node = str(dialog.ws_event.text()).strip()
+            self.ws.DRY_node = str(dialog.ws_DRY.text()).strip()
+            self.ws.FCs_node = str(dialog.ws_FCs.text()).strip()
+            self.ws.FCe_node = str(dialog.ws_FCe.text()).strip()
+            self.ws.SCs_node = str(dialog.ws_SCs.text()).strip()
+            self.ws.SCe_node = str(dialog.ws_SCe.text()).strip()
+            
             for i in range(self.ws.channels):
                 self.ws.channel_requests[i] = str(dialog.ws_requestEdits[i].text()).strip()
                 self.ws.channel_nodes[i] = str(dialog.ws_nodeEdits[i].text()).strip()

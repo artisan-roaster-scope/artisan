@@ -4,11 +4,11 @@ ExtraEventSamplingDelay=20000
 Oversampling=false
 
 [DefaultButtons]
-buttonactions=0, 0, 0, 0, 0, 0, 0, 0
-buttonactionstrings="send({\"command\": \"startRoasting\", \"params\": {\"mode\": \"manual\"}})", , , , , , send({\"command\": \"stopRoasting\"}), 
+buttonactions=0, 21, 21, 21, 21, 21, 0, 0
+buttonactionstrings="send({\"command\":\"startRoasting\",\"params\":{\"mode\":\"manual\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"colorChangeEvent\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"firstCrackBeginningEvent\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"firstCrackEndEvent\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"secondCrackBeginningEvent\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"secondCrackEndEvent\"}})", send({\"command\":\"stopRoasting\"}), 
 buttonvisibility=true, true, true, true, true, false, true, true
 extrabuttonactions=0, 0, 21
-extrabuttonactionstrings=, "send({\"command\": \"finishRoasting\", \"params\": {\"save\": false}})", send({\"command\": \"keepAlive\"})
+extrabuttonactionstrings=, "send({\"command\":\"finishRoasting\",\"params\":{\"save\":false}})", send({\"command\": \"keepAlive\"})
 xextrabuttonactions=0, 0
 xextrabuttonactionstrings=, 
 
@@ -16,29 +16,29 @@ xextrabuttonactionstrings=,
 id=111
 
 [ExtraComm]
-extrabaudrate=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0%\x80)
-extrabytesize=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\b)
-extracomport=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0\x43\0O\0M\0\x31)
-extraparity=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x2\0N)
-extrastopbits=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
-extratimeout=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x6?\xf0\0\0\0\0\0\0)
+extrabaudrate=9600, 9600, 9600, 9600
+extrabytesize=8, 8, 8, 8
+extracomport=COM1, COM1, COM1, COM1
+extraparity=N, N, N, E
+extrastopbits=1, 1, 1, 1
+extratimeout=1, 1, 1, 0.4
 
 [ExtraDev]
-extraCurveVisibility1=false, true, true, true, true, true, true, true, true, true
-extraCurveVisibility2=true, true, true, true, true, true, true, true, true, true
+extraCurveVisibility1=false, false, false, false, true, true, true, true, true, true
+extraCurveVisibility2=true, false, false, false, true, true, true, true, true, true
 extraDelta1=false, false, false, false, false, false, false, false, false, false
-extraDelta2=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, true, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraLCDvisibility1=false, false, false, false, false, false, false, true, true, true
 extraLCDvisibility2=true, false, false, false, false, false, false, true, true, true
-extradevicecolor1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0#\0\x61\0\x64\0\x30\0\x34\0\x32\0\x37)
-extradevicecolor2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0#\0\x30\0\x30\0\x39\0\x39\0\x63\0\x39)
-extradevices=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0p)
-extramathexpression1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
-extramathexpression2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\f\0x\0*\0\x31\0\x30\0\x30\0\x30)
-extraname1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x6\0{\0\x33\0})
-extraname2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x4\0P\0\x61)
+extradevicecolor1=#ad0427, black, black, black
+extradevicecolor2=#0099c9, black, black, black
+extradevices=112, 25, 25, 119
+extramathexpression1=, , , 
+extramathexpression2=x*1000, , , 
+extraname1={3}, Extra 1, Extra 1, Extra 1
+extraname2=Pa, Extra 2, Extra 2, RoR
 
 [ExtraEventButtons]
 buttonWidth=50
@@ -87,16 +87,23 @@ slideroffsets=0, 0, 0, 0
 slidervisibilities=0, 0, 0, 1
 
 [WebSocket]
+DRY_node=colorChangeEvent
+FCe_node=firstCrackEndEvent
+FCs_node=firstCrackBeginningEvent
 OFFonDROP=false
+SCe_node=secondCrackEndEvent
+SCs_node=secondCrackBeginningEvent
 STARTonCHARGE=false
-channel_modes=1, 1, 0, 0, 0, 0, 0, 0, 0, 0
-channel_nodes=beanTemp, exhaustAirTemp, burner, airPressure, , , , , , 
+addEvent_message=addEvent
+channel_modes=1, 1, 0, 0, 0, 0, 0, 0, 0, 1
+channel_nodes=beanTemp, exhaustAirTemp, burner, airPressure, , , , , , rateOfRise
 channel_requests=, , , , , , , , , 
 charge_message=startRoasting
 command_node=command
 connect_timeout=4
 data_node=data
 drop_message=endRoasting
+event_node=event
 host=127.0.0.1
 id_node=id
 machineID=0
