@@ -65,7 +65,7 @@ clusterEventsFlag=false
 quantifieractive=0, 1, 0, 1
 quantifiercoarse=0, 0, 0, 0
 quantifiermax=100, 100, 100, 100
-quantifiermin=50, 50, 0, 0
+quantifiermin=0, 0, 0, 0
 quantifiersource=0, 0, 0, 2
 
 [RoastProperties]

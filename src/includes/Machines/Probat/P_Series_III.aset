@@ -52,7 +52,7 @@ eventbuttontablecolumnwidths=70, 80, 100, 50, 150, 384, 80, 80, 80, 168
 extraeventbuttoncolor=#808080, #808080, #808080, #b64c4e, #b6181a, #808080, #7fb4cb, #45a6cf, #808080, #70b780, #49b260, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #808080, #ffac7b
 extraeventbuttontextcolor=white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, #000000
 extraeventsactions=0, 0, 0, 22, 22, 0, 22, 22, 0, 22, 22, 0, 0, 0, 22, 22, 0, 22, 22, 0, 22, 22, 0, 22, 22, 0, 22
-extraeventsactionstrings=, , , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"roastingFan\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"roastingFan\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", , , , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"drivesState\": True }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"drivesState\": False }}}})", , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"burnerState\": True }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"burnerState\": False }}}})", , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"coolingFanState\": True }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"coolingFanState\": False }}}})", , "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"stirrerState\": True }}}})", "send({{ \"command\": \"setRoasterState\", \"params\": {{ \"stirrerState\": False }}}})", , "read({{\"command\":\"getControlParams\"}});send({{\"command\":\"setControlParams\",\"params\":{{\"standby\":not(_[\"data\"][\"standby\"])}}}});button(not(_[\"data\"][\"standby\"]))"
+extraeventsactionstrings=, , , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"exhaustFan\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"exhaustFan\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", , , , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drivesState\": True }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drivesState\": False }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burnerState\": True }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burnerState\": False }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"coolingFanState\": True }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"coolingFanState\": False }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"stirrerState\": True }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"stirrerState\": False }}}})", , "read({{\"command\":\"getControlParams\"}});send({{\"command\":\"setControlParams\",\"params\":{{\"standby\":not(_[\"data\"][\"standby\"])}}}});button(not(_[\"data\"][\"standby\"]))"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , , , , , , , , , , , , , , , , , , , , 
 extraeventslabels=, , , -10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, , , , ON\nDrives, OFF\nDrives, , ON\nBurner, OFF\nBurner, , ON\nCooling, OFF\nCooling, , ON\nStirrer, OFF\nStirrer, , Standby
@@ -65,7 +65,7 @@ clusterEventsFlag=false
 quantifieractive=1, 1, 0, 1
 quantifiercoarse=0, 0, 0, 0
 quantifiermax=100, 100, 100, 100
-quantifiermin=50, 50, 0, 0
+quantifiermin=0, 0, 0, 0
 quantifiersource=5, 4, 0, 2
 
 [RoastProperties]
@@ -79,7 +79,7 @@ eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=%, %, , %
 slideractions=18, 18, 0, 18
-slidercommands="send({{ \"command\": \"setControlParams\", \"params\": {{ \"roastingFan\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})"
+slidercommands="send({{ \"command\": \"setControlParams\", \"params\": {{ \"exhaustFan\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"drum\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})"
 sliderfactors=1, 1, 1, 1
 slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0

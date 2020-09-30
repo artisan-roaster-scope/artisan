@@ -1,7 +1,7 @@
 appnope==0.1.0
 pyobjc-core==6.2.2
 pyobjc-framework-Cocoa==6.2.2
-py2app==0.22
+py2app==0.21 # we stay on 0.21 due to our darkmode patch which needs to be redone for later versions like 0.22 to avoid the patch to be overwritten
 gevent==1.5.0
 gevent-websocket==0.10.1
 numpy==1.19.2 # 1.16.2 fails on TravisCI; py2app fails with 1.16.5, 1.17.0-2
