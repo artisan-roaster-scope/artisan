@@ -1424,7 +1424,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.ws_SCe.setCursorPosition(0)
         
         ws_events = QGridLayout()
-        ws_events.addWidget(QLabel(QApplication.translate("Label","Message",None)),0,0)
+        ws_events.addWidget(QLabel(QApplication.translate("Label","Event",None)),0,0)
         ws_events.addWidget(self.ws_event_message,1,0)
         ws_events.addWidget(QLabel(QApplication.translate("Label","Node",None)),0,1)
         ws_events.addWidget(self.ws_event,1,1)
