@@ -51,23 +51,41 @@ A data request message as described above is expected to be answered by a respon
 
 ```
 {
-  <message_id>: nnnn,
-  <data>: { <node_0> : v0, .., <node_n> : vn} 
+  <Message ID>: nnnn,
+  <Data>: { <node_0> : v0, .., <node_n> : vn} 
 }
 ```
 
 with the message id `nnn` has to correspond to the one of the request message and the `<node_0>`,..,`<node_n>` nodes hold the data for the corresponding WebSocket input channels.
 
+
+## WebSocket Push Messages
+
 Artisan is listening to two push messages that are received without an explicit request.
 
-- CHARGE Message: `{ <message>: <CHARGE> }`
-- DROP Message: `{ <message>: <DROP> }`
+- CHARGE Message: `{ <Message>: <CHARGE> }`
+- DROP Message: `{ <Message>: <DROP> }`
 
 On receiving the CHARGE message, the CHARGE event is set. On receiving the DROP message, the DROP event is set.
 
 In case Artisan is not yet recording on receiving the CHARGE message and the `START on CHARGE` flag is ticked, the recording is automatically started before the CHARGE event is registered.
 
 In case Artisan is recording on receiving the DROP message and the `OFF on DROP` flag is ticked, the recording is automatically stopped after the DROP event is registered.
+
+
+
+## WebSocket Events
+
+Artisan is listening on Event Messages of the format
+
+```
+{
+  <Message>: <Event>,
+  <data>: { <Node> : <Tag>} 
+}
+```
+
+A message with  a `<Tag>` from the set `<DRY>`, `<FCs>`, `<FCe>`, `<SCs>`, `<SCe>` activates the corresponding event button in Artisan.
 
 
 ## WebSocket Commands
