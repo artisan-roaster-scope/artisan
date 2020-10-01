@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v2.4.2 (xx.09.2020)
+v2.4.2 (xx.10.2020)
 ------------------
 
 * New Features
@@ -15,6 +15,7 @@ v2.4.2 (xx.09.2020)
      - adds [support for machines of more than 40 additional brands](https://artisan-scope.org/machines/index): [Ambex](https://artisan-scope.org/machines/ambex/), [ARC S/800](https://artisan-scope.org/machines/arc/), [Bella TW](https://artisan-scope.org/machines/bellatw/), [Berto One and D](https://artisan-scope.org/machines/berto/), [Bideli](https://artisan-scope.org/machines/bideli/), [Blueking BK](https://artisan-scope.org/machines/blueking/), [Brambati PLC](https://artisan-scope.org/machines/brambati/), [Dätgen DR/DW](https://artisan-scope.org/machines/datgen/), [Dongyi BR/BY/DY](https://artisan-scope.org/machines/dongyi/), [Easyster](https://artisan-scope.org/machines/easyster/), [Froco PLC](https://artisan-scope.org/machines/froco/), [Garanti GKPX](https://artisan-scope.org/machines/garanti/), [Golden Roasters GR](https://artisan-scope.org/machines/goldenroasters/), [Hartanzah Roaster](https://artisan-scope.org/machines/hartanzah/), [HB-Roaster](https://artisan-scope.org/machines/hb/), [Hive Roaster](https://artisan-scope.org/machines/hive/), [IP Xenakis iRm_Series incl. full control](https://artisan-scope.org/machines/ipxenakis/), [KapoK](https://artisan-scope.org/machines/kapok/), [Kuban Supreme setup incl. full control](https://artisan-scope.org/machines/kuban/), [Lilla PLC](https://artisan-scope.org/machines/lilla/), [Mill City Roasters MCR Series](https://artisan-scope.org/machines/mcr/), [NOR Coffee Roaster](https://artisan-scope.org/machines/nor/), [Nordic](https://artisan-scope.org/machines/nordic/), [Opp Roaster](https://artisan-scope.org/machines/opp/), [Öztürk](https://artisan-scope.org/machines/ozturk/), [Petroncini](https://artisan-scope.org/machines/petroncini/), [Roaster & Roaster](https://artisan-scope.org/machines/roasterandroaster/), [Rasco Mac](https://artisan-scope.org/machines/rascomac/), [Rolltech EL](https://artisan-scope.org/machines/rolltech/), [Santoker](https://artisan-scope.org/machines/santoker/), [Tesla](https://artisan-scope.org/machines/tesla/), [Tostabar Genius](https://artisan-scope.org/machines/tostabar/), [TRINITAS T2 and T7](https://artisan-scope.org/machines/trinitas/), [Trobrat](https://artisan-scope.org/machines/trobrat/), [Typhoon](https://artisan-scope.org/machines/typhoon/), [VNT](https://artisan-scope.org/machines/vnt/), [Vortecs](https://artisan-scope.org/machines/vortecs/), [Wintop](https://artisan-scope.org/machines/wintop/), [Yang-Chia Feima](https://artisan-scope.org/machines/yangchia/), and [Yoshan](https://artisan-scope.org/machines/yoshan/)
   - adds RoastLog profile importer ([Issue #471](../../../issues/441))
   - adds IKAWA v3 CSV file importer
+  - adds import support for new Aillio Bullet R1 JSON format ([Issue #508](../../../issues/508))
   - adds font options "Source Han Sans" offering CN, TW, KR, JP character sets and "WenQuanYi Zen Hei" offering CN and TW character sets ([Issue #493](../../../issues/493))
   - adds sliders Bernoulli mode to emit values respecting Bernoulli's gas law translating non-linear between gas flow (slider values) and gas pressure (gas valve). See [the corresponding discussion on home-barista.com](https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654).
   - adds input filter to interpolate duplicate readings that may disturb the RoR computation
@@ -65,6 +66,8 @@ v2.4.2 (xx.09.2020)
   - fixes crash on multiple event button actions ([Issue #504](../../../issues/504))
   - prevents saving NaN annotation and flag coordinates in profiles ([Issue #505](../../../issues/505))
   - fixes Transposer crash ([Issue #506](../../../issues/506))
+  - fixes palette loading from .apal files
+
 
 ----
 v2.4.0 (03.06.2020)

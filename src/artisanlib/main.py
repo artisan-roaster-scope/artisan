@@ -1523,13 +1523,13 @@ class tgraphcanvas(FigureCanvas):
         self.Controlbuttonflag = False # PID Control active (either internal/external or Fuji)
         # user filter values x are translated as follows to internal filter values: y = x*2 + 1 (to go the other direction: x = y/2)
         # this is to ensure, that only uneven window values are used and no wrong shift is happening through smoothing
-        self.deltaETfilter = 17 # => corresponds to 2 on the user interface
-        self.deltaBTfilter = 17 # => corresponds to 2 on the user interface
+        self.deltaETfilter = 7 # => corresponds to 3 on the user interface
+        self.deltaBTfilter = 7 # => corresponds to 3 on the user interface
         self.curvefilter = 3 # => corresponds to 1 on the user interface
-        self.deltaETspan = 6 # the time period taken to compute one deltaET value (1-30sec)
-        self.deltaBTspan = 6 # the time period taken to compute one deltaBT value (1-30sec)
-        self.deltaETsamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
-        self.deltaBTsamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
+        self.deltaETspan = 20 # the time period taken to compute one deltaET value (1-30sec)
+        self.deltaBTspan = 20 # the time period taken to compute one deltaBT value (1-30sec)
+        self.deltaETsamples = 6 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
+        self.deltaBTsamples = 6 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
         self.profile_sampling_interval = None # will be updated on loading a profile
         self.background_profile_sampling_interval = None # will be updated on loading a profile into the background
 
@@ -19763,7 +19763,7 @@ class ApplicationWindow(QMainWindow):
     def sliderReleased(self,n,force=False,updateLCD=False):
         if n == 0:
             sv1 = self.slider1.value()
-            if force or (self.eventslidermoved[0] and sv1 != self.eventslidervalues[0]) or abs(sv1-self.eventslidervalues[0]) > 1:
+            if force or (self.eventslidermoved[0] and sv1 != self.eventslidervalues[0]) or abs(sv1-self.eventslidervalues[0]) > 3:
                 self.eventslidermoved[0] = 0
                 if aw.eventslidercoarse[0]:
                     sv1 = int(round(sv1 / 10.))*10
@@ -19773,7 +19773,7 @@ class ApplicationWindow(QMainWindow):
                 self.recordsliderevent(n)
         elif n == 1:
             sv2 = self.slider2.value()
-            if force or (self.eventslidermoved[1] and sv2 != self.eventslidervalues[1]) or abs(sv2-self.eventslidervalues[1]) > 1:
+            if force or (self.eventslidermoved[1] and sv2 != self.eventslidervalues[1]) or abs(sv2-self.eventslidervalues[1]) > 3:
                 self.eventslidermoved[1] = 0
                 if aw.eventslidercoarse[1]:
                     sv2 = int(round(sv2 / 10.))*10
@@ -19783,7 +19783,7 @@ class ApplicationWindow(QMainWindow):
                 self.recordsliderevent(n)
         elif n == 2:
             sv3 = self.slider3.value()
-            if force or (self.eventslidermoved[2] and sv3 != self.eventslidervalues[2]) or abs(sv3-self.eventslidervalues[2]) > 1:
+            if force or (self.eventslidermoved[2] and sv3 != self.eventslidervalues[2]) or abs(sv3-self.eventslidervalues[2]) > 3:
                 self.eventslidermoved[2] = 0
                 if aw.eventslidercoarse[2]:
                     sv3 = int(round(sv3 / 10.))*10
@@ -19793,7 +19793,7 @@ class ApplicationWindow(QMainWindow):
                 self.recordsliderevent(n)
         elif n == 3:
             sv4 = self.slider4.value()
-            if force or (self.eventslidermoved[3] and sv4 != self.eventslidervalues[3]) or abs(sv4-self.eventslidervalues[3]) > 1:
+            if force or (self.eventslidermoved[3] and sv4 != self.eventslidervalues[3]) or abs(sv4-self.eventslidervalues[3]) > 3:
                 self.eventslidermoved[3] = 0
                 if aw.eventslidercoarse[3]:
                     sv4 = int(round(sv4 / 10.))*10
@@ -33101,7 +33101,10 @@ class ApplicationWindow(QMainWindow):
                 ex = obj["exitTemperature"]
             except:
                 ex = None
-            sr = obj["sampleRate"]
+            if "sampleRate" in obj:
+                sr = obj["sampleRate"]
+            else:
+                sr = 2
             tx = [x*1.0/sr for x in range(len(bt))]
 
             # add extra device if exitTemperatures are given and this extra device is not configured
@@ -33163,22 +33166,32 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass
                 try:
+                    self.qmc.title = obj["roastName"]
+                except:
+                    pass
+                try:
                     self.qmc.beans = obj["bean"]["beanName"]
                 except:
                     pass
-                self.qmc.ground_color = int(round(obj["agtron"]))
-                if "Agtron" in self.qmc.color_systems:
-                    self.qmc.color_system_idx = self.qmc.color_systems.index("Agtron")
-                else:
-                    self.qmc.color_system_idx = 0
+                if "agtron" in obj:
+                    self.qmc.ground_color = int(round(obj["agtron"]))
+                    if "Agtron" in self.qmc.color_systems:
+                        self.qmc.color_system_idx = self.qmc.color_systems.index("Agtron")
+                    else:
+                        self.qmc.color_system_idx = 0
                 wunit = self.qmc.weight_units.index(self.qmc.weight[2])
                 if wunit in [1,3]: # turn Kg into g, and lb into oz
                     wunit = wunit -1
-                self.qmc.weight = [obj["weightGreen"],obj["weightRoasted"],self.qmc.weight_units[wunit]]
-                self.qmc.ambientTemp = obj["ambient"]
-                self.qmc.ambient_humidity = obj["humidity"]
-                self.qmc.roastingnotes = obj["comments"]
-                self.qmc.roastbatchnr = obj["roastNumber"]
+                if "weightGreen" in obj and "weightRoasted" in obj:
+                    self.qmc.weight = [obj["weightGreen"],obj["weightRoasted"],self.qmc.weight_units[wunit]]
+                if "ambient" in obj:
+                    self.qmc.ambientTemp = obj["ambient"]
+                if "humidity" in obj:
+                    self.qmc.ambient_humidity = obj["humidity"]
+                if "comments" in obj:
+                    self.qmc.roastingnotes = obj["comments"]
+                if "roastNumber" in obj:
+                    self.qmc.roastbatchnr = obj["roastNumber"]
 
                 dropIdx = 0
                 if len(tx) > 0:
@@ -33216,6 +33229,23 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.specialeventsStrings.append("")
                                     last = v
                     aw.orderEvents()
+                except:
+                    pass
+                # extract events from newer JSON format
+                try:
+                    for action in obj["actions"]["actionTimeList"]:
+                        time_idx = action["index"] - 1
+                        value = action["value"] + 1
+                        if action["ctrlType"] == 0:
+                            event_type = 3
+                        elif action["ctrlType"] == 1:
+                            event_type = 0
+                        elif action["ctrlType"] == 2:
+                            event_type = 1
+                        aw.qmc.specialevents.append(time_idx)
+                        aw.qmc.specialeventstype.append(event_type)
+                        aw.qmc.specialeventsvalue.append(value)
+                        aw.qmc.specialeventsStrings.append(str(value))
                 except:
                     pass
                 aw.autoAdjustAxis()
@@ -34103,7 +34133,7 @@ class ApplicationWindow(QMainWindow):
                 buttonpalettemaxlen = list(map(int,palette["maxlen"]))
                 for i in range(10):  #10 palettes (0-9)
                     key = str(i)
-                    nextpalette = [[], [], [], [], [], [], [], [], [], [], [], [], [], []]
+                    nextpalette = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
                     palette[key] = self.decodeTreeStrings(palette[key])
                     if len(palette[key]):
                         for x in range(9):
@@ -34115,18 +34145,18 @@ class ApplicationWindow(QMainWindow):
                             else:
                                 nextpalette[x] = list(map(str,palette[key][x])) #  type unicode
                         # read in extended palette data containing slider settings:
-                        if len(palette[key])==14:
+                        if len(palette[key])>=14:
                             nextpalette[9] = list(map(int,palette[key][9]))     #  type int
                             nextpalette[10] = list(map(int,palette[key][10]))   #  type int
-                            nextpalette[11] = list(map(str,palette[key][11]))     #  type unicode
+                            nextpalette[11] = list(map(str,palette[key][11]))   #  type unicode
                             nextpalette[12] = list(map(int,palette[key][12]))   #  type int
                             nextpalette[13] = list(map(float,palette[key][13])) #  type double
                         else:
-                            for k in range(9,14):
+                            for k in range(9,25):
                                 if len(pal[i]) == k+1:
                                     nextpalette[k] = pal[i][k]
-
-                        if len(palette[key])==21:
+                        
+                        if len(palette[key])>=21:
                             nextpalette[14] = list(map(int,palette[key][14]))     #  type int
                             nextpalette[15] = list(map(int,palette[key][15]))     #  type int
                             nextpalette[16] = list(map(int,palette[key][16]))     #  type int
@@ -34135,7 +34165,17 @@ class ApplicationWindow(QMainWindow):
                             nextpalette[19] = list(map(int,palette[key][19]))     #  type int
                             nextpalette[20] = list(map(int,palette[key][20]))     #  type int
                         else:
-                            for k in range(14,21):
+                            for k in range(14,25):
+                                if len(pal[i]) == k+1:
+                                    nextpalette[k] = pal[i][k]
+
+                        if len(palette[key])==25:
+                            nextpalette[21] = list(map(int,palette[key][21]))     #  type int
+                            nextpalette[22] = list(map(int,palette[key][22]))     #  type int
+                            nextpalette[23] = list(map(str,palette[key][23]))     #  type unicode
+                            nextpalette[24] = list(map(int,palette[key][24]))     #  type int
+                        else:
+                            for k in range(21,25):
                                 if len(pal[i]) == k+1:
                                     nextpalette[k] = pal[i][k]
 
