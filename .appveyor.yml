@@ -1,4 +1,7 @@
-version: '2.4.2.{build}'
+version: '2.4.3.{build}'
+
+# Do not build on tags (GitHub only)
+skip_tags: true
 
 branches:
   only:
@@ -12,13 +15,14 @@ environment:
   matrix:
     - PYTHON: "C:\\Python38-x64"
       PYTHON_VERSION: 3.8.x
-      ARTISAN_VERSION: 2.4.2
+      ARTISAN_VERSION: 2.4.3
 # NOTE: on updating Python, update also the PYTHON var in src/artisan-win.spec !!
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 #  - echo %PATH%
   - "%PYTHON%\\python.exe -m pip install --upgrade pip"
+  - "%PYTHON%\\python.exe -m pip install wheel"
   - pip install -r src\requirements.txt
   - pip install -r src\requirements-win.txt
   - curl -L -O https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe
