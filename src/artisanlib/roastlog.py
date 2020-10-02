@@ -4,16 +4,13 @@
 # RoastLog Roast Profile importer for Artisan
 
 import time as libtime
-import dateutil
-from datetime import datetime
+import dateutil.parser
 import requests
-from requests_file import FileAdapter
+from requests_file import FileAdapter  # @UnresolvedImport
 import re
-import json
 from lxml import html
 
 from PyQt5.QtCore import QDateTime, Qt
-from PyQt5.QtWidgets import QApplication
 
 from artisanlib.util import encodeLocal, stringtoseconds
 
@@ -110,7 +107,7 @@ def extractProfileRoastLog(url):
                     temp1,temp2,temp3,temp4 = [],[],[],[]
                     temp3_label = "TC3"
                     temp4_label = "TC4"
-                    temp1ror = []
+#                    temp1ror = []
                     for lp in data_json["line_plots"]:
                         if "channel" in lp and "data" in lp:
                             if lp["channel"] == 0: # BT
@@ -127,8 +124,8 @@ def extractProfileRoastLog(url):
                                 temp4 = [d[1] for d in lp["data"]]
                                 if "label" in lp:
                                     temp4_label = lp["label"]
-                            elif lp["channel"] == 4: # BT RoR
-                                temp1ror = [d[1] for d in lp["data"]]
+#                            elif lp["channel"] == 4: # BT RoR
+#                                temp1ror = [d[1] for d in lp["data"]]
                     res["timex"] = timex
                     if len(timex) == len(temp1):
                         res["temp2"] = temp1

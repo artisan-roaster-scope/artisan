@@ -58,7 +58,7 @@ extraeventsdescriptions=, , , , , , , ,
 extraeventslabels=ON\nBurner, , +10%\n\\t, +5%\n\\t, , -5%\n\\t, -10%\n\\t, , OFF\nBurner
 extraeventstypes=4, 4, 8, 8, 4, 8, 8, 4, 4
 extraeventsvalues=0, 0, 2, 1.5, 0, -1.5, -2, 0, 0
-extraeventsvisibility=1, 0, 1, 1, 0, 1, 1, 0, 1
+extraeventsvisibility=0, 0, 1, 1, 0, 1, 1, 0, 0
 
 [Quantifiers]
 clusterEventsFlag=false

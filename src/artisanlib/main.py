@@ -33093,10 +33093,12 @@ class ApplicationWindow(QMainWindow):
             infile.close()
             if not self.qmc.reset():
                 return
-            self.qmc.celsiusMode()
             self.qmc.drumspeed = ""
             bt = obj["beanTemperature"]
             dt = obj["drumTemperature"]
+            if self.qmc.mode == "F":
+                bt = [fromCtoF(t) for t in bt]
+                dt = [fromCtoF(t) for t in dt]
             try:
                 ex = obj["exitTemperature"]
             except:
@@ -33156,6 +33158,8 @@ class ApplicationWindow(QMainWindow):
 
                 # add exhaust data to first/third extra device
                 if ex is not None and ex != [] and len(self.qmc.extradevices) > 0:
+                    if self.qmc.mode == "F":
+                        ex = [fromCtoF(t) for t in ex]
                     if len(aw.qmc.extraname2) >= 2 and aw.qmc.extraname2[2] == "Exhaust":
                         self.qmc.extratemp2[2] = ex
                     else:

@@ -4,16 +4,14 @@
 # RoastPATH HTML Roast Profile importer for Artisan
 
 import time as libtime
-import dateutil
-from datetime import datetime
+import dateutil.parser
 import requests
-from requests_file import FileAdapter
+from requests_file import FileAdapter  # @UnresolvedImport
 import re
 import json
 from lxml import html
 
 from PyQt5.QtCore import QDateTime, Qt
-from PyQt5.QtWidgets import QApplication
 
 from artisanlib.util import encodeLocal
 
@@ -89,8 +87,8 @@ def extractProfileRoastPathHTML(url):
             res["title"] = title
         
         data = {}
-        for e in ["btData", "etData", "atData", "eventData", "rorData", "noteData"]:
-            d = re.findall("var {} = JSON\.parse\('(.+?)'\);".format(e), page.content.decode("utf-8"), re.S)
+        for e in ["btData", "etData", "atData", "eventData", "rorData", "noteData", "fuelData", "fanData", "drumData"]:
+            d = re.findall("var {} = JSON\.parse\('(.+?)'\);".format(e), page.content.decode("utf-8"), re.S)  # @UndefinedVariable
             bt = []
             if d:
                 data[e] = json.loads(d[0])
@@ -101,12 +99,16 @@ def extractProfileRoastPathHTML(url):
             baseTime = dateutil.parser.parse(bt[0]["Timestamp"]).timestamp()
             res["mode"] = 'C'
             res["timex"] = [dateutil.parser.parse(d["Timestamp"]).timestamp() - baseTime for d in bt]
-            res["temp2"] = [d["StandardValue"] for d in bt]
+            res["temp2"] = [(d["StandardValue"] if d["StandardValue"] != 0 else -1) for d in bt] # we drop 0 values as -1 to have Artisan suppress them!
         
             # ET
-            if "etData" in data and len(data["btData"]) == len(data["etData"]):
+            if "etData" in data:
                 et = data["etData"]
-                res["temp1"] = [d["StandardValue"] for d in et]
+                res["temp1"] = [(d["StandardValue"] if d["StandardValue"] != 0 else -1) for d in et]
+                temp2len = len(res["temp2"])
+                res["temp1"] = res["temp1"] + [-1]*(max(0,temp2len-len(res["temp1"])))  # extend if needed
+                res["temp1"] = res["temp1"][:temp2len] # truncate
+                # now temp1 should be the same length of temp2
             else:
                 res["temp1"] = [-1]*len(res["temp2"])
             
@@ -131,12 +133,18 @@ def extractProfileRoastPathHTML(url):
             res["timeindex"] = timeindex
             
             # Notes
-            if "noteData" in data:
+            noteData = None
+            for tag in ["noteData","fuelData","fanData","drumData"]:
+                if tag in data:
+                    if noteData is None:
+                        noteData = data[tag]
+                    else:
+                        noteData = noteData + data[tag]
+            if noteData is not None:
                 specialevents = []
                 specialeventstype = []
                 specialeventsvalue = []
                 specialeventsStrings = []
-                noteData = data["noteData"]
                 for n in noteData:
                     if "Timestamp" in n and "NoteTypeId" in n and "Note" in n:
                         c = dateutil.parser.parse(n["Timestamp"]).timestamp() - baseTime
@@ -144,7 +152,7 @@ def extractProfileRoastPathHTML(url):
                             timex_idx = res["timex"].index(c)
                             specialevents.append(timex_idx)
                             note_type = n["NoteTypeId"]
-                            if note_type == 0: # Fuel
+                            if note_type == 0: # Fuel/Power
                                 specialeventstype.append(3)
                             elif note_type == 1: # Fan
                                 specialeventstype.append(0)
@@ -263,7 +271,7 @@ def extractProfileRoastPathHTML(url):
                     res["extratemp1"].append([d["StandardValue"] for d in ror])
                     res["extratemp2"].append([-1]*len(timex))
 
-    except Exception as e:
+    except Exception:
 #        import traceback
 #        import sys
 #        traceback.print_exc(file=sys.stdout)

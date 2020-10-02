@@ -158,6 +158,8 @@ def extractProfileIkawaCSV(file):
             except:
                 pass
     csvFile.close()
+    
+    res["mode"] = 'C'
             
     res["timex"] = timex
     res["temp1"] = temp1

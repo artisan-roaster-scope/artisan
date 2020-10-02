@@ -1361,9 +1361,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             plusCoffeeslabel = QLabel("<b>" + QApplication.translate("Label", "Stock",None) + "</b>")
             self.plusStoreslabel = QLabel("<b>" + QApplication.translate("Label", "Store",None) + "</b>")
             self.plusBlendslabel = QLabel("<b>" + QApplication.translate("Label", "Blend",None) + "</b>")
-            self.plus_stores_combo = QComboBox() 
-            self.plus_coffees_combo = QComboBox()
-            self.plus_blends_combo = QComboBox()
+            self.plus_stores_combo = MyQComboBox() 
+            self.plus_coffees_combo = MyQComboBox()
+            self.plus_blends_combo = MyQComboBox()
             self.plus_stores_combo.currentIndexChanged.connect(self.storeSelectionChanged)
             self.plus_coffees_combo.currentIndexChanged.connect(self.coffeeSelectionChanged)
             self.plus_blends_combo.currentIndexChanged.connect(self.blendSelectionChanged)
@@ -1889,7 +1889,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                     pass
                 self.plus_stores_combo.blockSignals(True)       
                 self.plus_stores_combo.clear()
-                self.plus_stores_combo.addItems([""] + plus.stock.getStoreLabels(self.plus_stores))
+                store_items = plus.stock.getStoreLabels(self.plus_stores)
+                # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
+                if sys.platform.startswith("darwin"):
+                    store_items = [l + "  " for l in store_items]
+                self.plus_stores_combo.addItems([""] + store_items)
                 p = plus.stock.getStorePosition(self.plus_default_store,self.plus_stores)
                 if p is None:
                     self.plus_stores_combo.setCurrentIndex(0)
@@ -1926,7 +1930,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_coffees = plus.stock.getCoffees(self.unitsComboBox.currentIndex(),self.plus_default_store)
             self.plus_coffees_combo.blockSignals(True)  
             self.plus_coffees_combo.clear()
-            self.plus_coffees_combo.addItems([""] + plus.stock.getCoffeesLabels(self.plus_coffees))
+            coffee_items = plus.stock.getCoffeesLabels(self.plus_coffees)
+            # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
+            if sys.platform.startswith("darwin"):
+                coffee_items = [l + "  " for l in coffee_items]
+            self.plus_coffees_combo.addItems([""] + coffee_items)
             
             p = None
             if self.plus_coffee_selected:
@@ -1954,7 +1962,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store)
             self.plus_blends_combo.blockSignals(True)  
             self.plus_blends_combo.clear()
-            self.plus_blends_combo.addItems([""] + plus.stock.getBlendLabels(self.plus_blends)) 
+            blend_items = plus.stock.getBlendLabels(self.plus_blends)
+            # HACK to prevent those cutted menu items on macOS and Qt 5.15.1:
+            if sys.platform.startswith("darwin"):
+                blend_items = [l + "  " for l in blend_items]
+            self.plus_blends_combo.addItems([""] + blend_items) 
             
             if len(self.plus_blends) == 0:
                 self.plusBlendslabel.setVisible(False)
@@ -2902,13 +2914,19 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.datatable.setItem(i,4,deltaBT)
             j = 5
             for k in range(len(self.aw.qmc.extratimex)):
-                if len(self.aw.qmc.extratemp1) > k and len(self.aw.qmc.extratemp1[k]) > i:
-                    extra_qtw1 = QTableWidgetItem(fmtstr%self.aw.qmc.extratemp1[k][i])
+                if len(self.aw.qmc.extratemp1) > k:
+                    value = -1
+                    if len(self.aw.qmc.extratemp1[k]) > i:
+                        value = self.aw.qmc.extratemp1[k][i]
+                    extra_qtw1 = QTableWidgetItem(fmtstr%value)
                     extra_qtw1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                     self.datatable.setItem(i,j,extra_qtw1)
                     j = j + 1
-                if len(self.aw.qmc.extratemp2) > k and len(self.aw.qmc.extratemp2[k]) > i:
-                    extra_qtw2 = QTableWidgetItem(fmtstr%self.aw.qmc.extratemp2[k][i])
+                if len(self.aw.qmc.extratemp2) > k:
+                    value = -1
+                    if len(self.aw.qmc.extratemp2[k]) > i:
+                        value = self.aw.qmc.extratemp2[k][i]
+                    extra_qtw2 = QTableWidgetItem(fmtstr%value)
                     extra_qtw2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                     self.datatable.setItem(i,j,extra_qtw2)
                     j = j + 1
