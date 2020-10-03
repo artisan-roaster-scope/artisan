@@ -13427,12 +13427,12 @@ class SampleThread(QThread):
                                         if len(sample_extractimex1[i])>0:
                                             if et1_prev is not None and sample_extractimex1[i][-1] == sample_extratimex[i][-1] and et1_prev != sample_extratemp1[i][-1]:
                                                 sample_extractemp1[i][-1] = sample_extratemp1[i][-1]
-                                            if et1_prevprev is not None and sample_extractimex1[i][-2] == sample_extratimex[i][-2] and et1_prevprev != sample_extratemp1[i][-2]:
+                                            if len(sample_extractimex1[i])>1 and et1_prevprev is not None and sample_extractimex1[i][-2] == sample_extratimex[i][-2] and et1_prevprev != sample_extratemp1[i][-2]:
                                                 sample_extractemp1[i][-2] = sample_extratemp1[i][-2]
                                         if len(sample_extractimex2[i])>0:
                                             if et2_prev is not None and sample_extractimex2[i][-1] == sample_extratimex[i][-1] and et2_prev != sample_extratemp2[i][-1]:
                                                 sample_extractemp2[i][-1] = sample_extratemp2[i][-1]
-                                            if et2_prevprev is not None and sample_extractimex2[i][-2] == sample_extratimex[i][-2] and et2_prevprev != sample_extratemp2[i][-2]:
+                                            if len(sample_extractimex2[i])>1 and et2_prevprev is not None and sample_extractimex2[i][-2] == sample_extratimex[i][-2] and et2_prevprev != sample_extratemp2[i][-2]:
                                                 sample_extractemp2[i][-2] = sample_extratemp2[i][-2]
 
                                 sample_extratimex[i].append(extratx)
@@ -13546,12 +13546,12 @@ class SampleThread(QThread):
                         if len(sample_ctimex1)>0:
                             if t1_prev is not None and sample_ctimex1[-1] == sample_timex[-1] and t1_prev != sample_temp1[-1]:
                                 sample_ctemp1[-1] = sample_temp1[-1]
-                            if t1_prevprev is not None and sample_ctimex1[-2] == sample_timex[-2] and t1_prevprev != sample_temp1[-2]:
-                                sample_ctemp1[-2] = sample_temp1[-2]
+                            if len(sample_ctimex1)>1 and t1_prevprev is not None and sample_ctimex1[-2] == sample_timex[-2] and t1_prevprev != sample_temp1[-2]:
+                                    sample_ctemp1[-2] = sample_temp1[-2]
                         if len(sample_ctimex2)>0:
                             if t2_prev is not None and sample_ctimex2[-1] == sample_timex[-1] and t2_prev != sample_temp2[-1]:
                                 sample_ctemp2[-1] = sample_temp2[-1]
-                            if t2_prevprev is not None and sample_ctimex2[-2] == sample_timex[-2] and t2_prevprev != sample_temp2[-2]:
+                            if len(sample_ctimex2)>1 and t2_prevprev is not None and sample_ctimex2[-2] == sample_timex[-2] and t2_prevprev != sample_temp2[-2]:
                                 sample_ctemp2[-2] = sample_temp2[-2]
 
                     length_of_qmc_timex = len(sample_timex)
