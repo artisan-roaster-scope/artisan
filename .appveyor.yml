@@ -1,4 +1,4 @@
-version: '2.4.3.{build}'
+version: '2.4.2.{build}'
 
 # Do not build on tags (GitHub only)
 skip_tags: true
@@ -15,7 +15,7 @@ environment:
   matrix:
     - PYTHON: "C:\\Python38-x64"
       PYTHON_VERSION: 3.8.x
-      ARTISAN_VERSION: 2.4.3
+      ARTISAN_VERSION: 2.4.2
 # NOTE: on updating Python, update also the PYTHON var in src/artisan-win.spec !!
 
 install:

@@ -173,7 +173,8 @@ def delSync(uuid):
             try:
                 with shelve.open(getSyncPath()) as db:
                     del db[uuid]
-            except KeyError:
+            except KeyError as e:
+                _, _, exc_tb = sys.exc_info()
                 config.logger.debug("register: Exception in delSync(%s) line: %s KeyError %s",str(uuid),exc_tb.tb_lineno,e)
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()

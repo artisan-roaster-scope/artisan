@@ -2381,7 +2381,7 @@ class tgraphcanvas(FigureCanvas):
                     if ser.PhidgetTemperatureSensor is not None:
                         at = ser.PhidgetTemperatureSensor[0].getTemperature()
                         if aw.qmc.mode == "F":
-                                at = aw.float2float(fromCtoF(at))
+                            at = aw.float2float(fromCtoF(at))
                         aw.qmc.ambientTemp = aw.float2float(at)
                 except:
                     pass
@@ -5718,10 +5718,13 @@ class tgraphcanvas(FigureCanvas):
                         if len(nt1) > dsET:
                             # nt1 is not linearized yet:
                             if timex_lin is None or len(timex_lin) != len(nt1):
-                                lin1 = numpy.linspace(nt1[0],nt1[-1],len(nt1))
+                                lin1 = numpy.linspace(timex[0],timex[-1],len(timex))
                             else:
                                 lin1 = timex_lin
-                            nt1_lin = numpy.interp(lin1, tx_roast, nt1) # resample data in nt2 to linear spaced time
+                            if lin1 is None:
+                                nt1_lin = timex # we just run on the non-linear timex in this case
+                            else:
+                                nt1_lin = numpy.interp(lin1, tx_roast, nt1) # resample data in nt1 to linear spaced time
                             dist = (lin1[-1] - lin1[0]) / len(lin1)
                             z1 = savgol_filter(nt1_lin, dsET, 1, deriv=1,delta=dsET)
                             z1 = z1 * (60./dist) * dsET
@@ -5768,10 +5771,13 @@ class tgraphcanvas(FigureCanvas):
                         if len(nt2) > dsBT:
                             # nt2 is not linearized yet:
                             if timex_lin is None or len(timex_lin) != len(nt2):
-                                lin2 = numpy.linspace(nt2[0],nt2[-1],len(nt2))
+                                lin2 = numpy.linspace(timex[0],timex[-1],len(timex))
                             else:
                                 lin2 = timex_lin
-                            nt2_lin = numpy.interp(lin2, tx_roast, nt2) # resample data in nt2 to linear spaced time
+                            if lin2 is None:
+                                nt2_lin = timex # we just run on the non-linear timex in this case
+                            else:
+                                nt2_lin = numpy.interp(lin2, tx_roast, nt2) # resample data in nt2 to linear spaced time
                             dist = (lin2[-1] - lin2[0]) / len(lin2)
                             z2 = savgol_filter(nt2_lin, dsBT, 1, deriv=1,delta=dsBT)
                             z2 = z2 * (60./dist) * dsBT
@@ -25462,6 +25468,7 @@ class ApplicationWindow(QMainWindow):
             profile["artisan_os"] = os
             profile["artisan_os_version"] = os_version
             profile["mode"] = self.qmc.mode
+            profile["viewerMode"] = self.app.artisanviewerMode
             profile["timeindex"] = self.qmc.timeindex
             profile["flavors"] = self.qmc.flavors
             profile["flavorlabels"] = [encodeLocal(fl) for fl in self.qmc.flavorlabels]
@@ -29872,6 +29879,7 @@ class ApplicationWindow(QMainWindow):
                             stemp_list.append(stemp)
                             cl_list.append(cl)
 
+                            print("roast ranking")
                             if self.qmc.DeltaBTflag and self.qmc.delta_ax:
                                 tx = numpy.array(timex)
                                 cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
@@ -29879,7 +29887,7 @@ class ApplicationWindow(QMainWindow):
                                 if len(t1)>10 and len(tx) > 10:
                                     # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                                     RoR_start = min(rd["charge_idx"]+10,len(tx)-1)
-                                    delta,_ = self.qmc.recomputeDeltas(tx,RoR_start,drop,t1,None,optimalSmoothing=aw.qmc.optimalSmoothing)
+                                    _,delta = self.qmc.recomputeDeltas(tx,RoR_start,drop,None,t1,optimalSmoothing=aw.qmc.optimalSmoothing)
                                     if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
                                         dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
                                         dlinestyle = self.qmc.BTdeltalinestyle
