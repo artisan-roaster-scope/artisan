@@ -5730,12 +5730,23 @@ class tgraphcanvas(FigureCanvas):
                             z1 = z1 * (60./dist) * dsET
                         else:
                             # in this case we use the standard algo
-                            z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
+                            try:
+                                # variant using incremental polyfit RoR computation
+                                z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
+                            except:
+                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                # https://github.com/numpy/numpy/issues/16744                            
+                                # original version just picking the corner values:
+                                z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
                     else:
-                        # original code:
-#                        z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
-                        # variant using incremental polyfit RoR computation
-                        z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
+                        try:
+                            # variant using incremental polyfit RoR computation
+                            z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
+                        except:
+                            # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                            # https://github.com/numpy/numpy/issues/16744
+                            # original version just picking the corner values:
+                            z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
 
                 ld1 = len(z1)
                 # make lists equal in length
@@ -5781,14 +5792,24 @@ class tgraphcanvas(FigureCanvas):
                             dist = (lin2[-1] - lin2[0]) / len(lin2)
                             z2 = savgol_filter(nt2_lin, dsBT, 1, deriv=1,delta=dsBT)
                             z2 = z2 * (60./dist) * dsBT
-                        else:
+                        else:                        
                             # in this case we use the standard algo
-                            z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
+                            try:
+                                z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
+                            except:
+                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                # https://github.com/numpy/numpy/issues/16744
+                                # original version just picking the corner values
+                                z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
                     else:
-                        # original code:
-#                        z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
-                        # variant using incremental polyfit RoR computation
-                        z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
+                        try:
+                            # variant using incremental polyfit RoR computation
+                            z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
+                        except:
+                            # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                            # https://github.com/numpy/numpy/issues/16744
+                            # original version just picking the corner values
+                            z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
 
                 ld2 = len(z2)
                 
@@ -13553,7 +13574,7 @@ class SampleThread(QThread):
                             if t1_prev is not None and sample_ctimex1[-1] == sample_timex[-1] and t1_prev != sample_temp1[-1]:
                                 sample_ctemp1[-1] = sample_temp1[-1]
                             if len(sample_ctimex1)>1 and t1_prevprev is not None and sample_ctimex1[-2] == sample_timex[-2] and t1_prevprev != sample_temp1[-2]:
-                                    sample_ctemp1[-2] = sample_temp1[-2]
+                                sample_ctemp1[-2] = sample_temp1[-2]
                         if len(sample_ctimex2)>0:
                             if t2_prev is not None and sample_ctimex2[-1] == sample_timex[-1] and t2_prev != sample_temp2[-1]:
                                 sample_ctemp2[-1] = sample_temp2[-1]
@@ -13659,17 +13680,22 @@ class SampleThread(QThread):
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2,(aw.qmc.deltaETsamples + 1)))
-#                            timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
-#                            aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             # ****** Instead of basing the estimate on the window extremal points,
                             #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                            time_vec = sample_ctimex1[-left_index:]
-                            temp_samples = sample_tstemp1[-left_index:]
-                            with warnings.catch_warnings():
-                                warnings.simplefilter('ignore')
-                                # using stable polyfit from numpy polyfit module
-                                LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
-                                aw.qmc.rateofchange1 = LS_fit[1]*60.
+                            try:
+                                time_vec = sample_ctimex1[-left_index:]
+                                temp_samples = sample_tstemp1[-left_index:]
+                                with warnings.catch_warnings():
+                                    warnings.simplefilter('ignore')
+                                    # using stable polyfit from numpy polyfit module
+                                    LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
+                                    aw.qmc.rateofchange1 = LS_fit[1]*60.
+                            except:
+                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                # https://github.com/numpy/numpy/issues/16744
+                                # we fall back to the two point algo
+                                timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
+                                aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             
                             if aw.qmc.DeltaETfunction is not None and len(aw.qmc.DeltaETfunction):
                                 try:
@@ -13685,16 +13711,22 @@ class SampleThread(QThread):
                         else: # normal data received
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2,(aw.qmc.deltaBTsamples + 1)))
-#                            timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
-#                            aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
                             # ****** Instead of basing the estimate on the window extremal points,
                             #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                            time_vec = sample_ctimex2[-left_index:]
-                            temp_samples = sample_tstemp2[-left_index:]
-                            with warnings.catch_warnings():
-                                warnings.simplefilter('ignore')
-                                LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
-                                aw.qmc.rateofchange2 = LS_fit[1]*60.
+                            try:
+                                time_vec = sample_ctimex2[-left_index:]
+                                temp_samples = sample_tstemp2[-left_index:]
+                                with warnings.catch_warnings():
+                                    warnings.simplefilter('ignore')
+                                    LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
+                                    aw.qmc.rateofchange2 = LS_fit[1]*60.
+                            except:
+                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                # https://github.com/numpy/numpy/issues/16744
+                                # we fall back to the two point algo
+                                timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
+                                aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                            
                             
                             if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
                                 try:
