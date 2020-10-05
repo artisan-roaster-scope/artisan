@@ -448,6 +448,7 @@ def __dependencies_for_freezing():
     # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
     import scipy.linalg.cython_blas # @UnresolvedImport @UnusedImport
     import scipy.linalg.cython_lapack # @UnresolvedImport @UnusedImport
+    import scipy.special.cython_special # @UnresolvedImport @UnusedImport
 
     import appdirs # @UnresolvedImport @UnusedImport
     import packaging # @UnresolvedImport @UnusedImport
