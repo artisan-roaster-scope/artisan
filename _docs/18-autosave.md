@@ -43,7 +43,7 @@ MDH NC-500 72  540.0 g Hama O Rama Espresso 2020-04-27
 
 Other date format options are available, and some other fields from Roast Properties.  The string choices include the following, but the list has expanded, and a some removed, so ***please use the Help button in the dialog box for all the choices.***
 
-![autosave fields](/assets/images/gsg/autosave fields.jpg)
+![autosave fields](/assets/images/gsg/autosavechoicescomplete10-20.jpg)
 
 Available autosave file formats include:
 
