@@ -95,6 +95,7 @@ from artisanlib.suppress_errors import suppress_stdout_stderr
 with suppress_stdout_stderr():
     import matplotlib as mpl
     from matplotlib import cm
+    import matplotlib.colors as mcolors
 mpl_version = [int(i) for i in mpl.__version__.split(".")]
 
 if mpl_version[0] > 2 and mpl_version[1] > 2:
@@ -29925,7 +29926,6 @@ class ApplicationWindow(QMainWindow):
                             stemp_list.append(stemp)
                             cl_list.append(cl)
 
-                            print("roast ranking")
                             if self.qmc.DeltaBTflag and self.qmc.delta_ax:
                                 tx = numpy.array(timex)
                                 cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
@@ -30138,10 +30138,10 @@ class ApplicationWindow(QMainWindow):
                     for p in profiles:
                         i -= 1
                         try:
-                            cl = next(color), '#00b950', '#ffb347', '#9f7960'
-                        except Exception as e:
+                            cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
+                        except:
                             color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable
-                            cl = next(color), '#00b950', '#ffb347', '#9f7960'
+                            cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
                         try:
                             rd = self.profileRankingData(p)
                         except Exception as e:
@@ -30160,6 +30160,7 @@ class ApplicationWindow(QMainWindow):
                         else:
                             label = ""
                         if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
+                            print("cl",cl,len(cl),type(cl))
                             ax.broken_barh( [ (0, m),
                                               (n, rd["DRY_percent"]),
                                               (n+rd["DRY_percent"], rd["MAI_percent"]),
