@@ -582,6 +582,7 @@ from artisanlib.sliderStyle import *
 from artisanlib.cropster import extractProfileCropsterXLS
 from artisanlib.giesen import extractProfileGiesenCSV
 from artisanlib.ikawa import extractProfileIkawaCSV
+from artisanlib.rubase import extractProfileRubaseCSV
 from artisanlib.roastpath import extractProfileRoastPathHTML
 from artisanlib.roastlog import extractProfileRoastLog
 from artisanlib.simulator import Simulator
@@ -6715,6 +6716,7 @@ class tgraphcanvas(FigureCanvas):
                                                                             marker=(self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[0],
 #                                                                            picker=2, # deprecated in MPL 3.3.x
+                                                                            picker=True,
                                                                             pickradius=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(0,True))
@@ -6729,6 +6731,7 @@ class tgraphcanvas(FigureCanvas):
                                                                             marker=(self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[1],
 #                                                                            picker=2, # deprecated in MPL 3.3.x
+                                                                            picker=True,
                                                                             pickradius=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(1,True))
@@ -6743,6 +6746,7 @@ class tgraphcanvas(FigureCanvas):
                                                                             marker=(self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[2],
 #                                                                            picker=2, # deprecated in MPL 3.3.x
+                                                                            picker=True,
                                                                             pickradius=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(2,True))
@@ -6757,6 +6761,7 @@ class tgraphcanvas(FigureCanvas):
                                                                             marker=(self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[3],
 #                                                                            picker=2, # deprecated in MPL 3.3.x
+                                                                            picker=True,
                                                                             pickradius=2,
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(3,True))
@@ -7190,6 +7195,7 @@ class tgraphcanvas(FigureCanvas):
                                                             marker = (self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[0],
 #                                                            picker=2, # deprecated in MPL 3.3.x
+                                                            picker=True,
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex):
@@ -7210,6 +7216,7 @@ class tgraphcanvas(FigureCanvas):
                                                             marker = (self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[1],
 #                                                            picker=2, # deprecated in MPL 3.3.x
+                                                            picker=True,
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
@@ -7230,6 +7237,7 @@ class tgraphcanvas(FigureCanvas):
                                                             marker = (self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[2],
 #                                                            picker=2, # deprecated in MPL 3.3.x
+                                                            picker=True,
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
@@ -7250,6 +7258,7 @@ class tgraphcanvas(FigureCanvas):
                                                             marker = (self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                             markersize = self.EvalueMarkerSize[3],
 #                                                            picker=2, # deprecated in MPL 3.3.x
+                                                            picker=True,
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                     if Nevents:
@@ -14546,6 +14555,10 @@ class ApplicationWindow(QMainWindow):
         importK204Action = QAction("K204...",self)
         importK204Action.triggered.connect(self.importK204)
         self.importMenu.addAction(importK204Action)
+
+        importRubaseAction = QAction("Rubase CSV...",self)
+        importRubaseAction.triggered.connect(self.importRubase)
+        self.importMenu.addAction(importRubaseAction)
 
         importPilotAction = QAction("Probat Pilot...",self)
         importPilotAction.triggered.connect(self.importPilot)
@@ -33317,7 +33330,7 @@ class ApplicationWindow(QMainWindow):
             
             res = aw.qmc.reset(redraw=False,soundOn=False)
             if res:
-                obj = extractor(url)
+                obj = extractor(url,aw)
                 if obj:
                     res = self.setProfile(None,obj)
                 else:
@@ -33351,7 +33364,7 @@ class ApplicationWindow(QMainWindow):
                 return
             res = aw.qmc.reset(redraw=False,soundOn=False)
             if res:
-                obj = extractor(filename)
+                obj = extractor(filename,aw)
                 res = self.setProfile(filename,obj)
 
             if res:
@@ -33404,6 +33417,11 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importIkawa(self,_=False):
         self.importExternal(extractProfileIkawaCSV,QApplication.translate("Message","Import IKAWA CSV", None),"*.csv")
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importRubase(self,_=False):
+        self.importExternal(extractProfileRubaseCSV,QApplication.translate("Message","Import Rubase CSV", None),"*.csv")
 
     @pyqtSlot()
     @pyqtSlot(bool)

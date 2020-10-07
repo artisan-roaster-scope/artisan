@@ -9,7 +9,7 @@ import csv
 from PyQt5.QtWidgets import QApplication
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileGiesenCSV(file):
+def extractProfileGiesenCSV(file,_):
     res = {} # the interpreted data set
 
     res["samplinginterval"] = 1.0
@@ -50,7 +50,6 @@ def extractProfileGiesenCSV(file):
             temp1.append(float(item['air']))
         else:
             temp1.append(-1)
-        # we map IKAWA Exhaust to BT as main events like CHARGE and DROP are marked on BT in Artisan
         if 'beans' in item:
             temp2.append(float(item['beans']))
         else:

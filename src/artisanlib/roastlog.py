@@ -15,7 +15,7 @@ from PyQt5.QtCore import QDateTime, Qt
 from artisanlib.util import encodeLocal, stringtoseconds
 
 # returns a dict containing all profile information contained in the given RoastLog document pointed by the given QUrl
-def extractProfileRoastLog(url):
+def extractProfileRoastLog(url,_):
     res = {} # the interpreted data set
     try:
         s = requests.Session()

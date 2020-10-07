@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QApplication
 from artisanlib.util import encodeLocal
 
 # returns a dict containing all profile information contained in the given Cropster XLS file
-def extractProfileCropsterXLS(file):
+def extractProfileCropsterXLS(file,_):
     res = {} # the interpreted data set
     
     book = xlrd.open_workbook(file)

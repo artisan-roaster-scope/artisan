@@ -16,7 +16,7 @@ from PyQt5.QtCore import QDateTime, Qt
 from artisanlib.util import encodeLocal
 
 # returns a dict containing all profile information contained in the given RoastPATH document pointed by the given QUrl
-def extractProfileRoastPathHTML(url):
+def extractProfileRoastPathHTML(url,_):
     res = {} # the interpreted data set
     try:
         s = requests.Session()

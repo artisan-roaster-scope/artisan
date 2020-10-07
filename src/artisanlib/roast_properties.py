@@ -2977,7 +2977,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                 etline = QLineEdit()
                 etline.setReadOnly(True)
                 etline.setAlignment(Qt.AlignRight)
-                ettemp = fmtstr%(self.aw.qmc.temp1[self.aw.qmc.specialevents[i]]) + self.aw.qmc.mode
+                try:
+                    ettemp = fmtstr%(self.aw.qmc.temp1[self.aw.qmc.specialevents[i]]) + self.aw.qmc.mode
+                except Exception as e:
+                    print(e)
+                    print("i",i)
+                    print("self.aw.qmc.specialevents[i]",self.aw.qmc.specialevents[i])
+                    print("len(self.aw.qmc.temp1)",len(self.aw.qmc.temp1))
                 etline.setText(ettemp)
                     
                 btline = QLineEdit()
@@ -2999,7 +3005,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                 timeline.setText(timez)
                 timeline.setValidator(QRegExpValidator(regextime,self))
                 
-                stringline = QLineEdit(self.aw.qmc.specialeventsStrings[i])
+                try:
+                    stringline = QLineEdit(self.aw.qmc.specialeventsStrings[i])
+                except:
+                    stringline = QLineEdit("")
                 #add widgets to the table
                 self.eventtable.setCellWidget(i,0,timeline)
                 self.eventtable.setCellWidget(i,1,etline)

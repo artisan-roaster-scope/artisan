@@ -351,7 +351,7 @@ class RoastProfile():
                     pass
             # add a last event at DROP/END to extend the lines to the end of roast
             end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
-            if self.E1:
+            if self.E1: 
                 self.E1.append((end,self.E1[-1][1]))
             if self.E2:
                 self.E2.append((end,self.E2[-1][1]))
@@ -577,6 +577,7 @@ class RoastProfile():
                 alpha=(self.alpha[1] if self.active else self.alpha[1]*self.alpha_dim_factor),
                 color=(self.color if self.active else self.gray),
 #                picker=5, # deprecated in MPL 3.3.x
+                picker=True,
                 pickradius=5,
                 label="{} {}".format(self.label,self.aw.arabicReshape(QApplication.translate("Label", "Events", None))))
             if self.aw.qmc.graphstyle == 1:
@@ -592,6 +593,7 @@ class RoastProfile():
                 alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
                 color=(self.color if self.active else self.gray),
 #                picker=5, # deprecated in MPL 3.3.x
+                picker=True,
                 pickradius=5,
                 label="{} {}".format(self.label,self.aw.arabicReshape(QApplication.translate("Label", "Events", None))))
             if self.aw.qmc.graphstyle == 1:

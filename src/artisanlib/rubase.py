@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # ABOUT
-# IKAWA CSV Roast Profile importer for Artisan
+# RUBASE CSV Roast Profile importer for Artisan
 
 import time as libtime
 import os
@@ -14,28 +14,20 @@ from PyQt5.QtWidgets import QApplication
 
 from artisanlib.util import encodeLocal
 
-# returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileIkawaCSV(file,_):
+# returns a dict containing all profile information contained in the given Rubase CSV file
+def extractProfileRubaseCSV(file,aw):
     res = {} # the interpreted data set
 
     res["samplinginterval"] = 1.0
-
     # set profile date from the file name if it has the format "IKAWA yyyy-mm-dd hhmmss.csv"
     filename = os.path.basename(file)
-    p = re.compile('IKAWA \d{4,4}-\d{2,2}-\d{2,2} \d{6,6}.csv')
-    if p.match(filename):
-        s = filename[6:-4] # the extracted date time string
-        date = QDateTime.fromString(s,"yyyy-MM-dd HHmmss")
-        res["roastdate"] = encodeLocal(date.date().toString())
-        res["roastisodate"] = encodeLocal(date.date().toString(Qt.ISODate))
-        res["roasttime"] = encodeLocal(date.time().toString())
-        res["roastepoch"] = int(date.toTime_t())
-        res["roasttzoffset"] = libtime.timezone
+    res["title"] = filename
 
     csvFile = io.open(file, 'r', newline="",encoding='utf-8')
     data = csv.reader(csvFile,delimiter=',')
     #read file header
-    header = next(data)
+    header_row = next(data)
+    header = ["time","BT","Fan","Heater","RoR","Drum","Humidity","ET","Pressure"]
     
     fan = None # holds last processed fan event value
     fan_last = None # holds the fan event value before the last one
@@ -43,6 +35,7 @@ def extractProfileIkawaCSV(file,_):
     heater_last = None # holds the heater event value before the last one
     fan_event = False # set to True if a fan event exists
     heater_event = False # set to True if a heater event exists
+    
     specialevents = []
     specialeventstype = []
     specialeventsvalue = []
@@ -52,60 +45,84 @@ def extractProfileIkawaCSV(file,_):
     temp2 = []
     extra1 = []
     extra2 = []
+    extra3 = []
+    extra4 = []
+    extra5 = []
+    extra6 = []
     timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+    
+
+
     i = 0
     for row in data:
-        i = i + 1
         items = list(zip(header, row))
         item = {}
         for (name, value) in items:
             item[name] = value.strip()
+            
         # take i as time in seconds
         timex.append(i)
-        if 'inlet temp' in item:
-            temp1.append(float(item['inlet temp']))
-        elif 'temp below' in item:
-            temp1.append(float(item['temp below']))
-        else:
-            temp1.append(-1)
-        # we map IKAWA Exhaust to BT as main events like CHARGE and DROP are marked on BT in Artisan
-        if 'exaust temp' in item:
-            temp2.append(float(item['exaust temp']))
-        elif 'temp above' in item:
-            temp2.append(float(item['temp above']))
-        else:
-            temp2.append(-1)
-        # mark CHARGE
-        if not timeindex[0] > -1 and 'state' in item and item['state'] == 'doser open':
-            timeindex[0] = i
-        # mark DROP
-        if timeindex[6] == 0 and 'state' in item and item['state'] == 'cooling':
-            timeindex[6] = i
-        # add SET and RPM
-        if 'temp set' in item:
-            extra1.append(float(item['temp set']))
-        elif 'setpoint' in item:
-            extra1.append(float(item['setpoint']))
-        else:
-            extra1.append(-1)
-        if 'fan speed (RPM)' in item:
-            rpm = float(item['fan speed (RPM)'])
-            extra2.append(rpm/100)
-        elif 'fan speed' in item:
-            rpm = float(item['fan speed'])
-            extra2.append(rpm/100)
-        else:
-            extra2.append(-1)
         
-        if "fan set (%)" in item or "fan set" in item:
+        et = -1
+        try:
+            et = float(item['ET'])
+        except:
+            pass
+        temp1.append(et)
+        
+        bt = -1
+        try:
+            bt = float(item['BT'])
+            # after 2min we mark DRY if not auto adjusted
+            if timeindex[1] == 0 and i>60 and (not aw.qmc.phasesbuttonflag) and bt >= aw.qmc.phases[1]:
+                timeindex[1] = i
+        except:
+            pass
+        temp2.append(bt)
+        
+        heater = -1
+        try:
+            heater = float(item['Heater'])
+        except:
+            pass
+        extra1.append(heater)
+
+        fan = -1
+        try:
+            fan = float(item['Fan'])
+        except:
+            pass
+        extra2.append(fan)
+
+        humidity = -1
+        try:
+            humidity = float(item['Humidity'])
+        except:
+            pass
+        extra3.append(humidity)
+
+        pressure = -1
+        try:
+            pressure = float(item['Pressure'])
+        except:
+            pass
+        extra4.append(pressure)
+
+        drum = -1
+        try:
+            drum = float(item['Drum'])
+        except:
+            pass
+        extra5.append(drum)
+        
+        extra6.append(-1)
+        
+        if "Fan" in item:
             try:
-                if "fan set (%)" in item:
-                    v = float(item["fan set (%)"])
-                elif "fan set" in item:
-                    v = float(item["fan set"])
+                v = float(item["Fan"])
                 if v != fan:
                     # fan value changed
-                    if v == fan_last:
+                    if fan_last is not None and v == fan_last:
                         # just a fluctuation, we remove the last added fan value again
                         fan_last_idx = next(i for i in reversed(range(len(specialeventstype))) if specialeventstype[i] == 0)
                         del specialeventsvalue[fan_last_idx]
@@ -122,20 +139,17 @@ def extractProfileIkawaCSV(file,_):
                         specialeventsvalue.append(v)
                         specialevents.append(i)
                         specialeventstype.append(0)
-                        specialeventsStrings.append("{}".format(fan) + "%")
+                        specialeventsStrings.append("{}".format(float(item["Fan"])) + "%")
                 else:
                     fan_last = None
             except:
                 pass
-        if "heater power (%)" in item or "heater" in item:
+        if "Heater" in item:
             try:
-                if "heater power (%)" in item:
-                    v = float(item["heater power (%)"])
-                elif "heater" in item:
-                    v = float(item["heater"])
-                if v != heater:
+                v = int(round(float(item["Heater"])))
+                if heater is None or v != heater:
                     # heater value changed
-                    if v == heater_last:
+                    if heater_last is not None and v == heater_last:
                         # just a fluctuation, we remove the last added heater value again
                         heater_last_idx = next(i for i in reversed(range(len(specialeventstype))) if specialeventstype[i] == 3)
                         del specialeventsvalue[heater_last_idx]
@@ -152,12 +166,44 @@ def extractProfileIkawaCSV(file,_):
                         specialeventsvalue.append(v)
                         specialevents.append(i)
                         specialeventstype.append(3)
-                        specialeventsStrings.append("{}".format(heater) + "%")
+                        specialeventsStrings.append("{}".format(float(item["Heater"])) + "%")
                 else:
                     heater_last = None
             except:
                 pass
+        i = i + 1
     csvFile.close()
+     
+    # mark CHARGE
+# not sure if index 1 holds the correct data
+#    try:
+#        start = int(header_row[1])
+#        if start != 0:
+#            timeindex[0] = max(0,start)
+#    except:
+#        pass
+    if timeindex[0] == -1:
+        timeindex[0] = 0
+    # mark FCs
+    try:
+        timeindex[2] = int(header_row[19])
+    except:
+        pass
+    # mark SCs
+    try:
+        timeindex[4] = int(header_row[21])
+    except:
+        pass
+# not surree if indeex 23 holds the correct data
+#    # mark DROP
+#    try:
+#        end = int(header_row[23])
+#        if end != 0:
+#            timeindex[6] = min(end,len(timex)-1)
+#    except:
+#        pass
+    if timeindex[6] == 0:
+        timeindex[6] = len(timex)-1
     
     res["mode"] = 'C'
             
@@ -166,16 +212,16 @@ def extractProfileIkawaCSV(file,_):
     res["temp2"] = temp2
     res["timeindex"] = timeindex
     
-    res["extradevices"] = [25]
-    res["extratimex"] = [timex[:]]
+    res["extradevices"] = [25,25,25]
+    res["extratimex"] = [timex[:],timex[:],timex[:]]
     
-    res["extraname1"] = ["SET"]
-    res["extratemp1"] = [extra1]
-    res["extramathexpression1"] = [""]
+    res["extraname1"] = ["{3}","Humidity","{1}"]
+    res["extratemp1"] = [extra1,extra3,extra5]
+    res["extramathexpression1"] = ["","",""]
     
-    res["extraname2"] = ["RPM"]
-    res["extratemp2"] = [extra2]
-    res["extramathexpression2"] = ["x/100"]
+    res["extraname2"] = ["{0}","Pressure",""]
+    res["extratemp2"] = [extra2,extra4,extra6]
+    res["extramathexpression2"] = ["","",""]
     
     if len(specialevents) > 0:
         res["specialevents"] = specialevents
@@ -193,6 +239,7 @@ def extractProfileIkawaCSV(file,_):
             if fan_event:
                 res["etypes"][0] = "Fan"
             if heater_event:
-                res["etypes"][3] = "Heater"
+                res["etypes"][3] = "Heater"        
+    
     return res
                 
