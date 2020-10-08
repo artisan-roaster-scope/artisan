@@ -97,7 +97,7 @@ Menu>Help> is where you go to load and save settings.  Load Recent is a shortcut
 
 ### Information for Troubleshooting
 
-Menu>Help is a place you can find information on Errors, Messages from the program, a Serial log, search your settings, and information on the platform you are using.  a
+Menu>Help is a place you can find information on Errors, Messages from the program, a Serial log, search your settings, and information on the platform you are using.
 
 ### Factory Reset
 
