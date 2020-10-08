@@ -30160,7 +30160,6 @@ class ApplicationWindow(QMainWindow):
                         else:
                             label = ""
                         if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
-                            print("cl",cl,len(cl),type(cl))
                             ax.broken_barh( [ (0, m),
                                               (n, rd["DRY_percent"]),
                                               (n+rd["DRY_percent"], rd["MAI_percent"]),
