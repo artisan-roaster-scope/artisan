@@ -653,6 +653,7 @@ class tgraphcanvas(FigureCanvas):
     updateLargeLCDsTimeSignal = pyqtSignal(str)
     updateLargeLCDsReadingsSignal = pyqtSignal(str,str)
     updateLargeLCDsSignal = pyqtSignal(str,str,str)
+    showAlarmPopupSignal = pyqtSignal(str,int)
     fileDirtySignal = pyqtSignal()
     fileCleanSignal = pyqtSignal()
     markChargeSignal = pyqtSignal(int)
@@ -2211,6 +2212,7 @@ class tgraphcanvas(FigureCanvas):
         self.updategraphicsSignal.connect(self.updategraphics)
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
         self.updateLargeLCDsReadingsSignal.connect(self.updateLargeLCDsReadings)
+        self.showAlarmPopupSignal.connect(self.showAlarmPopup)
         self.updateLargeLCDsTimeSignal.connect(self.updateLargeLCDsTime)
         self.fileDirtySignal.connect(self.fileDirty)
         self.fileCleanSignal.connect(self.fileClean)
@@ -2906,6 +2908,14 @@ class tgraphcanvas(FigureCanvas):
                 aw.largeLCDs_dialog.updateValues([et],[bt],time=time)
         except:
             pass
+            
+    def showAlarmPopup(self,message,timeout):
+        # alarm popup message with <aw.qmc.alarm_popup_timout>sec timeout
+        amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),message,timeout=timeout,modal=False)
+        amb.show()
+        #send alarm also to connected WebLCDs clients
+        if aw.WebLCDs and aw.WebLCDsAlerts:
+            aw.qmc.updateWebLCDs(alertText=message,alertTimeout=timeout)
 
     @pyqtSlot(str,str)
     def updateLargeLCDsReadings(self,bt,et):
@@ -3593,12 +3603,7 @@ class tgraphcanvas(FigureCanvas):
                 QApplication.beep()
             try:
                 if self.alarmaction[alarmnumber] == 0:
-                    # alarm popup message with 10sec timeout
-                    amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber],timeout=aw.qmc.alarm_popup_timout,modal=False)
-                    amb.show()
-                    #send alarm also to connected WebLCDs clients
-                    if aw.WebLCDs and aw.WebLCDsAlerts:
-                        aw.qmc.updateWebLCDs(alertText=self.alarmstrings[alarmnumber],alertTimeout=10)
+                    self.showAlarmPopupSignal.emit(self.alarmstrings[alarmnumber],aw.qmc.alarm_popup_timout)
                 elif self.alarmaction[alarmnumber] == 1:
                     # alarm call program
                     fname = self.alarmstrings[alarmnumber].split('#')[0]
@@ -10473,7 +10478,7 @@ class tgraphcanvas(FigureCanvas):
                             tx,et,bt = aw.ser.NONE()
                         if bt != -1 or et != -1:
                             self.drawmanual(et,bt,tx)
-                        else:
+                        elif bt==-1 and et==-1:
                             return
                     #i = index number of the event (current length of the time list)
                     i = len(self.timex)-1
@@ -14140,7 +14145,9 @@ class EventActionThread(QThread):
         self.command = command
 
     def run(self):
-        aw.eventaction_internal(self.action,self.command)
+        # as eventaction_internal is not running in the GUI thread we avoid doing graphic updates and run them instead after thread termination within
+        # the GUI thread
+        aw.eventaction_internal(self.action,self.command,doupdategraphics=False,doupdatebackground=False)
 
 
 ########################################################################################
@@ -20031,8 +20038,8 @@ class ApplicationWindow(QMainWindow):
     #         20= Artisan Command; 21= RC Command; 22= WebSocket Command
     def eventaction(self,action,cmd,parallel=True):
         if action:
-            if not parallel: # subactions of multiple event actions, may crash if run in parallel, especially if they update the UI like button shape!
-                self.eventaction_internal(action,cmd)
+            if not parallel or action==3: # subactions of multiple event actions, may crash if run in parallel, especially if they update the UI like button shape!
+                self.eventaction_internal(action,cmd,doupdategraphics=True,doupdatebackground=True)
             else:
                 eventActionThread = EventActionThread(action,cmd)
                 eventActionThread.finished.connect(self.eventactionThreadDone_slot)
@@ -20047,16 +20054,19 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     def eventactionThreadDone_slot(self):
         try:
-            aw.qmc.eventactionsemaphore.acquire(1)
+            self.qmc.eventactionsemaphore.acquire(1)
             actionthread = self.sender()
             if actionthread in self.eventaction_running_threads:
                 self.eventaction_running_threads.remove(actionthread)
             actionthread.disconnect()
         finally:
-            if aw.qmc.eventactionsemaphore.available() < 1:
-                aw.qmc.eventactionsemaphore.release(1)
+            if self.qmc.eventactionsemaphore.available() < 1:
+                self.qmc.eventactionsemaphore.release(1)
+#        if self.qmc.flagstart:
+#            self.qmc.updateBackground()
+#            self.qmc.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
-    def eventaction_internal(self,action,cmd):
+    def eventaction_internal(self,action,cmd,doupdategraphics=True,doupdatebackground=True):
         if action:
             try:
                 if aw.simulator and not action in [2,3,20]:  # 2 (Call Program) 3 (Multiple Event), 20 (Artisan Command)
@@ -20140,7 +20150,7 @@ class ApplicationWindow(QMainWindow):
                         else:
                             buttonnumber = int(cs)-1
                             if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
-                                self.recordextraevent(buttonnumber,parallel=False,updateButtons=False,doupdategraphics=True,doupdatebackground=True)
+                                self.recordextraevent(buttonnumber,parallel=False,updateButtons=False,doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
                 elif action == 4: # MODBUS Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
