@@ -301,6 +301,12 @@ class modbusport(object):
             self.readingsCache[code][slave] = {}
         for i,v in enumerate(results):
             self.readingsCache[code][slave][register+i] = v
+            if self.aw.seriallogflag:
+                ser_str = "cache reading : Slave = {} || Register = {} || Rx = {}".format(
+                    slave,
+                    register+i,
+                    v)
+                self.aw.addserial(ser_str)
 
     def readActiveRegisters(self):
         if not self.optimizer:
@@ -351,7 +357,7 @@ class modbusport(object):
 
                         #note: logged chars should be unicode not binary
                         if self.aw.seriallogflag:
-                            ser_str = "MODBUS readSingleRegister : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                            ser_str = "MODBUS readActiveRegisters : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {} results".format(
                                 self.comport,
                                 self.baudrate,
                                 self.bytesize,
@@ -361,8 +367,8 @@ class modbusport(object):
                                 slave,
                                 register,
                                 code,
-                                res)
-                            self.aw.serial(ser_str)
+                                len(res.registers))
+                            self.aw.addserial(ser_str)
 
         except Exception: # as ex:
 #            self.disconnect()
@@ -550,7 +556,8 @@ class modbusport(object):
                 # cache hit
                 res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
                 decoder = getBinaryPayloadDecoderFromRegisters(res, self.byteorderLittle, self.wordorderLittle)
-                return decoder.decode_32bit_float()
+                r = decoder.decode_32bit_float()
+                return r
             else:
                 retry = self.readRetries
                 while True:
@@ -596,7 +603,7 @@ class modbusport(object):
                     register,
                     code,
                     r)
-                self.aw.serial(ser_str)
+                self.aw.addserial(ser_str)
             
             
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
@@ -659,7 +666,7 @@ class modbusport(object):
                     register,
                     code,
                     r)
-                self.aw.serial(ser_str)
+                self.aw.addserial(ser_str)
 
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore!
@@ -706,7 +713,8 @@ class modbusport(object):
                 # cache hit
                 res = self.readingsCache[code][slave][register]
                 decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
-                return decoder.decode_16bit_uint()
+                r = decoder.decode_16bit_uint()
+                return r
             else:
                 retry = self.readRetries
                 while True:
@@ -770,7 +778,7 @@ class modbusport(object):
                     register,
                     code,
                     r)
-                self.aw.serial(ser_str)
+                self.aw.addserial(ser_str)
 
 
     def setTarget(self,sv):
