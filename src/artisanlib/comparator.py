@@ -462,8 +462,10 @@ class RoastProfile():
             if l is not None:
                 l.set_transform(tempTrans)
 
+        tempTransZero = self.getTempTrans(0)
         for l in [self.l_temp1,self.l_temp2]:
             if l is not None:
+                l.set_transform(tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
                 l.set_xdata([x-offset if x is not None else None for x in self.timex])
 
 
@@ -473,8 +475,10 @@ class RoastProfile():
 #        for l in [self.l_delta1,self.l_delta2]:
 #            if l is not None:
 #                l.set_transform(deltaTrans)
+        deltaTransZero = self.getDeltaTrans(offset=0)
         for l in [self.l_delta1,self.l_delta2]:
             if l is not None:
+                l.set_transform(deltaTransZero) # we reset the transformation to avoid a double shift along the timeaxis
                 l.set_xdata([x-offset if x is not None else None for x in self.timex])
         
 #        # update RoR clippings
@@ -484,16 +488,20 @@ class RoastProfile():
 #        self.l_delta2.set_clip_path(self.l_delta2_clipping)
 
     # returns the time transformation for the temperature curves
-    def getTempTrans(self):
+    def getTempTrans(self,offset=None):
+        if offset is None:
+            offset = self.timeoffset
         # transformation pipelines are processed from left to right so in "A + B" first transformation A then tranformation B is applied (on the result of A)
         # an artist transformation is supplied with data in data coordinates and should return data in display coordinates
         # ax.transData : transforms from data to display coordinates
         # transforms.Affine2D().translate() : applies its transformation
-        return transforms.Affine2D().translate(-self.timeoffset,0) + self.aw.qmc.ax.transData
+        return transforms.Affine2D().translate(-offset,0) + self.aw.qmc.ax.transData
     
     # returns the time transformation for the delta curves
-    def getDeltaTrans(self):
-        return transforms.Affine2D().translate(-self.timeoffset,0) + self.aw.qmc.delta_ax.transData
+    def getDeltaTrans(self,offset=None):
+        if offset is None:
+            offset = self.timeoffset
+        return transforms.Affine2D().translate(-offset,0) + self.aw.qmc.delta_ax.transData
     
     def undraw(self):
         for l in [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2,self.l_mainEvents1,self.l_mainEvents2,
