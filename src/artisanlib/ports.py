@@ -707,6 +707,10 @@ class comportDlg(ArtisanResizeablDialog):
         scanButton.setFocusPolicy(Qt.NoFocus)
         scanButton.clicked.connect(self.scanModbus)
 
+        self.modbus_optimize = QCheckBox(QApplication.translate("ComboBox","optimize",None))
+        self.modbus_optimize.setChecked(self.aw.modbus.optimizer)
+        self.modbus_optimize.setFocusPolicy(Qt.NoFocus)
+
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None))
         self.scale_deviceEdit = QComboBox()
@@ -887,6 +891,9 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_setup.addWidget(self.modbus_littleEndianBytes)
         modbus_setup.addSpacing(5)
         modbus_setup.addWidget(self.modbus_littleEndianWords)
+        modbus_setup.addStretch()
+        modbus_setup.addSpacing(15)
+        modbus_setup.addWidget(self.modbus_optimize)
         modbus_setup.addSpacing(7)
         modbus_setup.addStretch()
         modbus_setup.addWidget(modbus_typelabel)
@@ -934,6 +941,10 @@ class comportDlg(ArtisanResizeablDialog):
         scanButtonS7.setToolTip(QApplication.translate("Tooltip","Scan S7",None))
         scanButtonS7.setFocusPolicy(Qt.NoFocus)
         scanButtonS7.clicked.connect(self.scanS7)
+
+        self.s7_optimize = QCheckBox(QApplication.translate("ComboBox","optimize",None))
+        self.s7_optimize.setChecked(self.aw.s7.optimizer)
+        self.s7_optimize.setFocusPolicy(Qt.NoFocus)
 
         s7_areaLabel = QLabel(QApplication.translate("Label", "Area",None))
         s7_dbLabel = QLabel(QApplication.translate("Label", "DB#",None))
@@ -1156,6 +1167,10 @@ class comportDlg(ArtisanResizeablDialog):
         
         s7_setup = QHBoxLayout()
         s7_setup.addWidget(scanButtonS7)
+        s7_setup.addStretch()
+        s7_setup.addSpacing(7)
+        s7_setup.addWidget(self.s7_optimize)
+        s7_setup.addSpacing(7)
         s7_setup.addStretch()
         s7_setup.addWidget(s7_hostlabel)
         s7_setup.addWidget(self.s7_hostEdit)

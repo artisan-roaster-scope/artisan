@@ -135,6 +135,7 @@ stopbits=1
 timeout=1
 type=3
 wordorderLittle=true
+optimizer=false
 
 [RoastProperties]
 roastertype=Twino/Ozstar

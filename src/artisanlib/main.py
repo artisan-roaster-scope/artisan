@@ -26596,6 +26596,8 @@ class ApplicationWindow(QMainWindow):
                 self.s7.SVmultiplier = toInt(settings.value("SVmultiplier",self.s7.SVmultiplier))
             if settings.contains("SVtype"):
                 self.s7.SVtype = toInt(settings.value("SVtype",self.s7.SVtype))
+            if settings.contains("optimizer"):
+                self.s7.optimizer = bool(toBool(settings.value("optimizer",self.s7.optimizer)))
             settings.endGroup()
             #restore modbus port
             settings.beginGroup("Modbus")
@@ -26695,6 +26697,8 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.byteorderLittle = bool(toBool(settings.value("littleEndianFloats",self.modbus.byteorderLittle)))
             if settings.contains("wordorderLittle"):
                 self.modbus.wordorderLittle = bool(toBool(settings.value("wordorderLittle",self.modbus.wordorderLittle)))
+            if settings.contains("optimizer"):
+                self.modbus.optimizer = bool(toBool(settings.value("optimizer",self.modbus.optimizer)))
             if settings.contains("input1mode"):
                 self.modbus.inputModes[0] = s2a(toString(settings.value("input1mode",self.modbus.inputModes[0])))
                 self.modbus.inputModes[1] = s2a(toString(settings.value("input2mode",self.modbus.inputModes[1])))
@@ -28119,6 +28123,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("PIDmultiplier",self.s7.PIDmultiplier)
             settings.setValue("SVtype",self.s7.SVtype)
             settings.setValue("SVmultiplier",self.s7.SVmultiplier)
+            settings.setValue("optimizer",self.s7.optimizer)
             settings.endGroup()
             #save modbus port
             settings.beginGroup("Modbus")
@@ -28204,6 +28209,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("SVmultiplier",self.modbus.SVmultiplier)
             settings.setValue("littleEndianFloats",self.modbus.byteorderLittle)
             settings.setValue("wordorderLittle",self.modbus.wordorderLittle)
+            settings.setValue("optimizer",self.modbus.optimizer)
             settings.setValue("type",self.modbus.type)
             settings.setValue("host",self.modbus.host)
             settings.setValue("port",self.modbus.port)
@@ -31835,6 +31841,7 @@ class ApplicationWindow(QMainWindow):
             self.modbus.PIDmultiplier = dialog.modbus_PIDmultiplier.currentIndex()
             self.modbus.byteorderLittle = bool(dialog.modbus_littleEndianBytes.isChecked())
             self.modbus.wordorderLittle = bool(dialog.modbus_littleEndianWords.isChecked())
+            self.modbus.optimizer = bool(dialog.modbus_optimize.isChecked())
             self.modbus.type = int(dialog.modbus_type.currentIndex())
             self.modbus.host = str(dialog.modbus_hostEdit.text())
             try:
@@ -31896,6 +31903,7 @@ class ApplicationWindow(QMainWindow):
             self.s7.PID_d_register = int(str(dialog.s7_Dregister_Edit.text()))
             self.s7.PID_OFF_action = s2a(toString(dialog.s7_pid_off.text()))
             self.s7.PID_ON_action = s2a(toString(dialog.s7_pid_on.text()))
+            self.s7.optimizer = bool(dialog.s7_optimize.isChecked())
 
             # set scale port
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
