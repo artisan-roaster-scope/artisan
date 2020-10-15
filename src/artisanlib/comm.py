@@ -2101,6 +2101,8 @@ class serialport(object):
                     res[i] = self.aw.modbus.readFloat(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i])
                 elif self.aw.modbus.inputBCDs[i]:
                     res[i] = self.aw.modbus.readBCD(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i])
+                elif self.aw.modbus.inputBCDsAsInt[i]:
+                    res[i] = self.aw.modbus.readBCDint(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i])
                 else:
                     res[i] = self.aw.modbus.readSingleRegister(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i])
                 res[i] = self.processChannelData(res[i],self.aw.modbus.inputDivs[i],self.aw.modbus.inputModes[i])

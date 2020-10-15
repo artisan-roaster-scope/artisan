@@ -125,6 +125,7 @@ class modbusport(object):
         self.inputFloats = [False]*self.channels
         self.inputBCDs = [False]*self.channels
         self.inputFloatsAsInt = [False]*self.channels
+        self.inputBCDsAsInt = [False]*self.channels
         self.inputCodes = [3]*self.channels
         self.inputDivs = [0]*self.channels # 0: none, 1: 1/10, 2:1/100
         self.inputModes = ["C"]*self.channels
@@ -650,6 +651,7 @@ class modbusport(object):
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCD() {0}").format(str(ex)),exc_tb.tb_lineno)
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
+            self.commError = True
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -780,6 +782,75 @@ class modbusport(object):
                     r)
                 self.aw.addserial(ser_str)
 
+    # function 3 (Read Multiple Holding Registers) and 
+    # function 4 (Read Input Registers)
+    def readBCDint(self,slave,register,code=3):
+#        import logging
+#        logging.basicConfig()
+#        log = logging.getLogger()
+#        log.setLevel(logging.DEBUG)
+        r = None
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
+                # cache hit
+                res = self.readingsCache[code][slave][register]
+                decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
+                r = decoder.decode_16bit_uint()
+                return convert_from_bcd(r)
+            else:
+                retry = self.readRetries
+                while True:
+                    try:
+                        if code==3:
+                            res = self.master.read_holding_registers(int(register),1,unit=int(slave))
+                        else:
+                            res = self.master.read_input_registers(int(register),1,unit=int(slave))
+                    except Exception:
+                        res = None
+                    if res is None or res.isError(): # requires pymodbus v1.5.1
+                        if retry > 0:
+                            retry = retry - 1
+                            time.sleep(0.020)
+                        else:
+                            raise Exception("Exception response")
+                    else:
+                        break
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
+                r = decoder.decode_16bit_uint()
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
+                time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
+                return convert_from_bcd(r)
+        except Exception: # as ex:
+#            self.disconnect()
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+#            _, _, exc_tb = sys.exc_info()
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCDint() {0}").format(str(ex)),exc_tb.tb_lineno)
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
+            self.commError = True
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+            #note: logged chars should be unicode not binary
+            if self.aw.seriallogflag:
+                ser_str = "MODBUS readBCDint : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    self.comport,
+                    self.baudrate,
+                    self.bytesize,
+                    self.parity,
+                    self.stopbits,
+                    self.timeout,
+                    slave,
+                    register,
+                    code,
+                    r)
+                self.aw.addserial(ser_str)
 
     def setTarget(self,sv):
         if self.PID_slave_ID:

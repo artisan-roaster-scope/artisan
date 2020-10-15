@@ -509,7 +509,7 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_function_codes = ["1","2","3","4"]
         modbus_modes = ["", "C","F"]
         modbus_divs = ["", "1/10","1/100"]
-        modbus_decode = ["", "Float","BCD", "IntFloat"]
+        modbus_decode = ["", "Float","BCD", "IntFloat", "IntBCD"]
         
         modbus_input1slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
         modbus_input1registerlabel = QLabel(QApplication.translate("Label", "Register",None))
@@ -557,7 +557,9 @@ class comportDlg(ArtisanResizeablDialog):
             self.modbus_inputDecodes[i] = QComboBox()
             self.modbus_inputDecodes[i].setFocusPolicy(Qt.NoFocus)
             self.modbus_inputDecodes[i].addItems(modbus_decode)
-            if self.aw.modbus.inputFloatsAsInt[i]:
+            if self.aw.modbus.inputBCDsAsInt[i]:
+                self.modbus_inputDecodes[i].setCurrentIndex(4)
+            elif self.aw.modbus.inputFloatsAsInt[i]:
                 self.modbus_inputDecodes[i].setCurrentIndex(3)
             elif self.aw.modbus.inputFloats[i]:
                 self.modbus_inputDecodes[i].setCurrentIndex(1)
