@@ -345,12 +345,14 @@ class Artisan(QtSingleApplication):
 if sys.platform.startswith("darwin"):
     try:
         # start method can only be set once!
-        if "forkserver" in multiprocessing.get_all_start_methods():
+        if False and "forkserver" in multiprocessing.get_all_start_methods():
+            # singed app with forkserver option fails with a MemoryError
             multiprocessing.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
         elif "fork" in multiprocessing.get_all_start_methods():
             multiprocessing.set_start_method('fork') # default on Python3.7 for macOS (and on Unix also under Python3.8), but considered unsafe, 
             # not available on Windows, on Python3.8 we have to explicitly set this
             # https://bugs.python.org/issue33725
+            # this is the only option that works (Hottop communication & WebLCDs) in signed macOS apps
 #        if "spawn" in multiprocessing.get_all_start_methods():
 #            multiprocessing.set_start_method('spawn') # default on Python3.8 for macOS (always default on Windows) 
 #            # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
@@ -358,7 +360,7 @@ if sys.platform.startswith("darwin"):
 #            # https://github.com/pyinstaller/pyinstaller/issues/4865
     except:
         pass
-            
+
 args = sys.argv
 if sys.platform.startswith("linux"):
     # avoid a GTK bug in Ubuntu Unity
