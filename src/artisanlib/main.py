@@ -170,7 +170,11 @@ from artisanlib.qtsingleapplication import QtSingleApplication
 from Phidget22.Phidget import Phidget as PhidgetDriver
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
 
-from yoctopuce.yocto_api import YAPI
+try:
+    # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
+    from yoctopuce.yocto_api import YAPI
+except:
+    pass
 
 platf = str(platform.system())
 

@@ -364,7 +364,7 @@ def coffee2beans(coffee):
         elif landed is not None and not bool(picked):
             year = ', {:d}'.format(landed)
         elif picked is not None and landed is not None:
-            if picked == landed:
+            if picked == landed or not landed > picked:
                 year = ', {:d}'.format(picked)
             else:
                 year = ', {:d}/{:d}'.format(picked,landed)
