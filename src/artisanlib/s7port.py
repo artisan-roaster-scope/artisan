@@ -308,6 +308,7 @@ class s7port(object):
                     gaps = [[s, e] for s, e in zip(registers, registers[1:]) if s+1 < e]
                     edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
                     sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
+                    just_send = False
                     for seq in sequences:
                         retry = self.readRetries
                         register = seq[0]
@@ -315,6 +316,9 @@ class s7port(object):
                         res = None
                         while True:
                             try:
+                                if just_send:
+                                    time.sleep(0.03)
+                                just_send = True
                                 res = self.plc.read_area(self.areas[area],db_nr,register,count)
                             except:
                                 res = None
