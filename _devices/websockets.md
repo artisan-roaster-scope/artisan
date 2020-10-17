@@ -23,7 +23,7 @@ There is one main WebSocket device type and 4 extra device, each delivering two 
 
 The WebSocket connection as well as those 10 WebSocket channels are configured in the WebSocket dialog (menu Config >> Port, 7th tab).
 
-The WebSocket endpoint `ws://<host>:<port>/<path>`  is configured via the `<host>`, `<port>` and ´<path>` components.
+The WebSocket endpoint `ws://<host>:<port>/<path>`  is configured via the `<host>`, `<port>` and `<path>` components.
 
 Connect, reconnect and request timeouts are specified in seconds.
 
