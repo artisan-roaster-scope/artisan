@@ -265,6 +265,7 @@ class modbusport(object):
                     self.readRetries = 1
                 self.master.connect()
                 self.updateActiveRegisters()
+                self.clearReadingsCache()
                 time.sleep(.5) # avoid possible hickups on startup
                 if self.isConnected() != None:
                     self.aw.sendmessage(QApplication.translate("Message", "Connected via MODBUS", None))
@@ -546,13 +547,13 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
                 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
-    def readFloat(self,slave,register,code=3):
+    # if force the readings cache is ignored and fresh readings are requested
+    def readFloat(self,slave,register,code=3,force=False):
         r = None
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()
-            if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
+            if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
                 and register+1 in self.readingsCache[code][slave]:
                 # cache hit
                 res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
@@ -560,6 +561,7 @@ class modbusport(object):
                 r = decoder.decode_32bit_float()
                 return r
             else:
+                self.connect()
                 retry = self.readRetries
                 while True:
                     if code==3:
@@ -608,13 +610,13 @@ class modbusport(object):
             
             
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
-    def readBCD(self,slave,register,code=3):
+    # if force the readings cache is ignored and fresh readings are requested
+    def readBCD(self,slave,register,code=3,force=False):
         r = None
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()
-            if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
+            if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
                 and register+1 in self.readingsCache[code][slave]:
                 # cache hit
                 res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
@@ -622,6 +624,7 @@ class modbusport(object):
                 r = decoder.decode_32bit_uint()
                 return convert_from_bcd(r)
             else:
+                self.connect()
                 retry = self.readRetries
                 while True:
                     if code==3:
@@ -701,7 +704,8 @@ class modbusport(object):
     # function 2 (Read Discrete Input)
     # function 3 (Read Multiple Holding Registers) and 
     # function 4 (Read Input Registers)
-    def readSingleRegister(self,slave,register,code=3):
+    # if force the readings cache is ignored and fresh readings are requested
+    def readSingleRegister(self,slave,register,code=3,force=False):
 #        import logging
 #        logging.basicConfig()
 #        log = logging.getLogger()
@@ -710,14 +714,14 @@ class modbusport(object):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()
-            if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
+            if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
                 # cache hit
                 res = self.readingsCache[code][slave][register]
                 decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_16bit_uint()
                 return r
             else:
+                self.connect()
                 retry = self.readRetries
                 while True:
                     try:
@@ -784,7 +788,8 @@ class modbusport(object):
 
     # function 3 (Read Multiple Holding Registers) and 
     # function 4 (Read Input Registers)
-    def readBCDint(self,slave,register,code=3):
+    # if force the readings cache is ignored and fresh readings are requested
+    def readBCDint(self,slave,register,code=3,force=False):
 #        import logging
 #        logging.basicConfig()
 #        log = logging.getLogger()
@@ -793,14 +798,14 @@ class modbusport(object):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()
-            if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
+            if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
                 # cache hit
                 res = self.readingsCache[code][slave][register]
                 decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_16bit_uint()
                 return convert_from_bcd(r)
             else:
+                self.connect()
                 retry = self.readRetries
                 while True:
                     try:

@@ -13285,14 +13285,18 @@ class SampleThread(QThread):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " filterDropOuts() {0}").format(str(e)),exc_tb.tb_lineno)
             return temp
 
-    def sample_main_device(self):
+    def sample_main_device(self,force=False):
         #read time, ET (t1) and BT (t2) TEMPERATURE
         try:
             if aw.simulator is None:
-                if aw.qmc.swapETBT:
-                    tx,t2,t1 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                if aw.qmc.device in [29,79]: # for MODBUS and S7 main devices we switch off the optimizer on second call during oversampling
+                    tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device](force=force)
                 else:
-                    tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                    tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]() # not that not all device functions feature the force parameter!!
+                if aw.qmc.swapETBT:
+                    return tx,float(t2),float(t1)
+                else:
+                    return tx,float(t1),float(t2)
             else:
                 tx = aw.qmc.timeclock.elapsed()/1000.
                 t1,t2 = aw.simulator.read((tx if aw.qmc.flagstart else 0))
@@ -13535,7 +13539,7 @@ class SampleThread(QThread):
 #                            stime = max(0,0.3 - gone) # we want the second main sample minimally 100ms after the first
                             libtime.sleep(stime)
                             timeBeforeETBT2 = libtime.perf_counter() # the time before sending the 2nd request to the main device
-                            tx_2,t1_2,t2_2 = self.sample_main_device()
+                            tx_2,t1_2,t2_2 = self.sample_main_device(force=True) # we force fetching of new reaedings from S7 and MODBUS main devices and avoid the refilling of the optimizer cache
                             timeAfterETBT2 = libtime.perf_counter() # the time after sending the 2nd request to the main device
                             if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
                                 t2 = (t2 + t2_2) / 2.0
@@ -20302,7 +20306,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('read'):])
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read(s,r)"
-                                        aw.modbus.lastReadResult = aw.modbus.readSingleRegister(*cmds)
+                                        aw.modbus.lastReadResult = aw.modbus.readSingleRegister(*cmds,force=True)
                                         followupCmd = 0.03
                                 except Exception:
                                     pass
@@ -20793,7 +20797,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith("getDBint(") and len(cs) > 13:
                                 try:
                                     dbnr,s = cs[len("getDBint("):-1].split(',')
-                                    aw.s7.lastReadResult = aw.s7.readInt(5,int(dbnr),int(s))
+                                    aw.s7.lastReadResult = aw.s7.readInt(5,int(dbnr),int(s),force=True)
                                 except Exception:
                                     pass
                             elif cs.startswith("setDBfloat(") and len(cs) > 16:
@@ -20805,7 +20809,7 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith("getDBfloat(") and len(cs) > 14:
                                 try:
                                     dbnr,s = cs[len("getDBfloat("):-1].split(',')
-                                    aw.s7.lastReadResult = aw.s7.readFloat(5,int(dbnr),int(s))
+                                    aw.s7.lastReadResult = aw.s7.readFloat(5,int(dbnr),int(s),force=True)
                                 except Exception:
                                     pass
                             elif cs.startswith("setDBbool(") and len(cs) > 17:
@@ -20817,9 +20821,9 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith("getDBbool(") and len(cs) > 15:
                                 try:
                                     dbnr,s,i = cs[len("getDBbool("):-1].split(',')
-                                    aw.s7.lastReadResult = aw.s7.readBool(5,int(dbnr),int(s),int(i))
+                                    aw.s7.lastReadResult = aw.s7.readBool(5,int(dbnr),int(s),int(i),force=True)
                                 except Exception:
-                                    pass                                   
+                                    pass
                                     
                             elif cs.startswith("button"):
                                 # cmd has format "button(<bool>)" # 0 or 1 or True or False

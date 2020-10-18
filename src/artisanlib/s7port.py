@@ -235,6 +235,7 @@ class s7port(object):
             
             if self.isConnected():
                 self.aw.sendmessage(QApplication.translate("Message","S7 connected", None))
+                self.clearReadingsCache()
                 time.sleep(0.4)
             else:
                 time.sleep(0.6)
@@ -249,6 +250,7 @@ class s7port(object):
                     time.sleep(0.4)
                     
                     if self.isConnected():
+                        self.clearReadingsCache()
                         self.aw.sendmessage(QApplication.translate("Message","S7 Connected", None) + " (2)")
                         time.sleep(0.4)
             self.updateActiveRegisters()
@@ -271,7 +273,6 @@ class s7port(object):
                     registers.append(register+3)
                 elif self.type[c] == 0: # INT
                     registers.append(register+1)
-                    registers.append(register+2)
                 if not (area in self.activeRegisters):
                     self.activeRegisters[area] = {}
                 if db_nr in self.activeRegisters[area]:
@@ -441,12 +442,12 @@ class s7port(object):
             if self.aw.seriallogflag:
                 self.aw.addserial("S7 writeBool({},{},{},{},{})".format(area,dbnumber,start,index,value))
 
-    def readFloat(self,area,dbnumber,start):
+    # if force the readings cache is ignored and fresh readings are requested
+    def readFloat(self,area,dbnumber,start,force=False):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()
-            if area in self.readingsCache and dbnumber in self.readingsCache[area] and start in self.readingsCache[area][dbnumber] \
+            if not force and area in self.readingsCache and dbnumber in self.readingsCache[area] and start in self.readingsCache[area][dbnumber] \
                 and start+1 in self.readingsCache[area][dbnumber] and start+2 in self.readingsCache[area][dbnumber] \
                 and start+3 in self.readingsCache[area][dbnumber]:
                 # cache hit
@@ -457,6 +458,7 @@ class s7port(object):
                     self.readingsCache[area][dbnumber][start+3]])
                 return self.get_real(res,0)
             else:
+                self.connect()
                 if self.isConnected():
                     retry = self.readRetries
                     res = None
@@ -514,39 +516,47 @@ class s7port(object):
         except Exception:
             return None
                 
-    def readInt(self,area,dbnumber,start):
+    # if force the readings cache is ignored and fresh readings are requested
+    def readInt(self,area,dbnumber,start,force=False):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()
-            if self.isConnected():
-                retry = self.readRetries
-                res = None
-                while True:
-                    try:
-                        with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                        
-                    except Exception:
-                        res = None
-                    if res is None:
-                        if retry > 0:
-                            retry = retry - 1
-                        else:
-                            raise Exception("Communication error")
-                    else:
-                        break
-                if res is None:
-                    return -1
-                else:
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                    return self.get_int(res,0)
+            if not force and area in self.readingsCache and dbnumber in self.readingsCache[area] and start in self.readingsCache[area][dbnumber] \
+                and start+1 in self.readingsCache[area][dbnumber]:
+                # cache hit
+                res = bytearray([
+                    self.readingsCache[area][dbnumber][start],
+                    self.readingsCache[area][dbnumber][start+1]])
+                return self.get_int(res,0)
             else:
-                self.commError = True  
-                self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
-                return -1
+                self.connect()
+                if self.isConnected():
+                    retry = self.readRetries
+                    res = None
+                    while True:
+                        try:
+                            with suppress_stdout_stderr():
+                                res = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                        except Exception:
+                            res = None
+                        if res is None:
+                            if retry > 0:
+                                retry = retry - 1
+                            else:
+                                raise Exception("Communication error")
+                        else:
+                            break
+                    if res is None:
+                        return -1
+                    else:
+                        if self.commError: # we clear the previous error and send a message
+                            self.commError = False
+                            self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
+                        return self.get_int(res,0)
+                else:
+                    self.commError = True  
+                    self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
+                    return -1
         except Exception as e:
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt: " + str(e))
@@ -576,17 +586,18 @@ class s7port(object):
         except Exception:
             return None
 
-    def readBool(self,area,dbnumber,start,index):
+    # if force the readings cache is ignored and fresh readings are requested
+    def readBool(self,area,dbnumber,start,index,force=False):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()
-            if area in self.readingsCache and dbnumber in self.readingsCache[area] and start in self.readingsCache[area][dbnumber]:
+            if not force and area in self.readingsCache and dbnumber in self.readingsCache[area] and start in self.readingsCache[area][dbnumber]:
                 # cache hit
                 res = bytearray([
                     self.readingsCache[area][dbnumber][start]])
                 return self.get_bool(res,0,index)
-            else:     
+            else:
+                self.connect()
                 if self.isConnected():
                     retry = self.readRetries
                     res = None

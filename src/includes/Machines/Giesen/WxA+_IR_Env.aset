@@ -40,16 +40,16 @@ extratimeout=1, 1, 1, 1
 
 [ExtraDev]
 extraCurveVisibility1=false, false, false, true, true, true, true, true, true, true
-extraCurveVisibility2=false, false, false, false, true, true, true, true, true, true
+extraCurveVisibility2=false, false, false, true, true, true, true, true, true, true
 extraLCDvisibility1=true, false, false, true, false, false, false, false, false, false
-extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, false, false, true, false, false, false, false, false, false
 extradevicecolor1=#7f0011, #3ca74c, #7f0011, #ff5d00
 extradevicecolor2=#3680c6, #650067, #3680c6, #000000
 extradevices=80, 81, 82, 110
 extramathexpression1=, , x-1, 
 extramathexpression2=, , , 
 extraname1={3}, {1}, {3}, IR
-extraname2={0}, {2}, {0}, 
+extraname2={0}, {2}, {0}, Env
 
 [ExtraEventButtons]
 buttonWidth=50
@@ -80,7 +80,7 @@ quantifiermin=80, 35, 0, 0
 quantifiersource=7, 4, 5, 
 
 [RoastProperties]
-roastertype=Giesen WxA+ IR
+roastertype=Giesen WxA+ IR Env
 
 [S7]
 PID_OFF_action="getDBint(2,48);setDBint(2,14,_)"
@@ -93,16 +93,16 @@ PID_i_register=0
 PID_p_register=0
 PIDmultiplier=0
 SVmultiplier=0
-area=6, 6, 6, 6, 6, 6, 6, 6, 6, 0
-db_nr=4, 4, 2, 2, 2, 2, 2, 2, 4, 2
+area=6, 6, 6, 6, 6, 6, 6, 6, 6, 6
+db_nr=4, 4, 2, 2, 2, 2, 2, 2, 4, 4
 div=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 host=192.168.2.180
-mode=1, 1, 0, 0, 0, 1, 0, 0, 1, 0
+mode=1, 1, 0, 0, 0, 1, 0, 0, 1, 1
 port=102
 rack=0
 slot=0
-start=10, 6, 48, 52, 18, 10, 14, 16, 36, 0
-type=1, 1, 0, 0, 0, 0, 0, 0, 1, 0
+start=10, 6, 48, 52, 18, 10, 14, 16, 36, 40
+type=1, 1, 0, 0, 0, 0, 0, 0, 1, 1
 
 [Sliders]
 ModeTempSliders=C

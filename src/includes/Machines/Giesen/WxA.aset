@@ -85,7 +85,7 @@ quantifiermin=80, 35, 0, 0
 quantifiersource=7, 4, 5, 6
 
 [RoastProperties]
-roastertype=Giesen
+roastertype=Giesen WxA
 
 [S7]
 PID_OFF_action="getDBint(2,48);setDBint(2,14,_)"

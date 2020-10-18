@@ -1004,9 +1004,10 @@ class serialport(object):
         else:
             return tx,-1,float(t)
 
-    def S7(self):
+    # if force the optimizer is deactivated to ensure fetching fresh readings
+    def S7(self,force=False):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.S7read(0)
+        t2,t1 = self.S7read(0,force)
         return tx,t2,t1
     
     def S7_34(self):
@@ -1084,9 +1085,10 @@ class serialport(object):
         tx = self.aw.qmc.R1_TX
         return tx, self.aw.qmc.R1_FAN_RPM, self.aw.qmc.R1_STATE
     
-    def MODBUS(self):
+    # if force the optimizer is deactivated to ensure fetching fresh readings
+    def MODBUS(self,force=False):
         tx = self.aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.MODBUSread()
+        t2,t1 = self.MODBUSread(force)
         return tx,t2,t1
 
     def MODBUS_34(self):
@@ -2062,19 +2064,19 @@ class serialport(object):
     # mode=2 to read ch5+6
     # mode=3 to read ch7+8
     # mode=4 to read ch9+10
-    def S7read(self,mode):
-        # fill the S7 optimizer (if active) with data for all read requests specified in the device S7 tab using block reads
-        if mode == 0:
+    def S7read(self,mode,force=False):
+        # fill the S7 optimizer (if active and not forced to fetch fresh data) with data for all read requests specified in the device S7 tab using block reads
+        if not force and mode == 0:
             self.aw.s7.readActiveRegisters()
         res = []
         for i in range(mode*2,mode*2+2):
             if self.aw.s7.area[i]:
                 if self.aw.s7.type[i] == 0:
-                    v = self.aw.s7.readInt(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i])
+                    v = self.aw.s7.readInt(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],force)
                 elif self.aw.s7.type[i] in [1,2]: # Type FLOAT and FLOAT2INT are read as floats the later are just displayed without decimals
-                    v = self.aw.s7.readFloat(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i])
+                    v = self.aw.s7.readFloat(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],force)
                 else:
-                    if self.aw.s7.readBool(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],self.aw.s7.type[i]-3):
+                    if self.aw.s7.readBool(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],self.aw.s7.type[i]-3,force):
                         v = 1
                     else:
                         v = 0
@@ -2085,29 +2087,27 @@ class serialport(object):
         return res[1], res[0]
 
     #returns v1,v2 from a connected MODBUS device
-    def MODBUSread(self):
-        # fill the MODBUS optimizer (if active) with data for all read requests specified in the device MODBUS tab using block reads
-        self.aw.modbus.readActiveRegisters()
+    # if force, do retrieve fresh readings and ignore the optimizers cached values
+    def MODBUSread(self,force=False):
+        # fill the MODBUS optimizer (if active and not an oversampling call) with data for all read requests specified in the device MODBUS tab using block reads
+        if not force:
+            self.aw.modbus.readActiveRegisters()
         
-        just_send = False
         res = [-1]*self.aw.modbus.channels
         
         for i in range(self.aw.modbus.channels):
-            if self.aw.modbus.inputSlaves[i]:
-                if just_send and not self.aw.modbus.optimizer:
-                    self.aw.modbus.sleepBetween()
+            if self.aw.modbus.inputSlaves[i] and not force or i in [0,1]: # in force mode (second request in oversampling mode) read only first two channels (ET/BT)
                 if not self.aw.modbus.optimizer:
                     self.aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
                 if self.aw.modbus.inputFloats[i]:
-                    res[i] = self.aw.modbus.readFloat(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i])
+                    res[i] = self.aw.modbus.readFloat(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
                 elif self.aw.modbus.inputBCDs[i]:
-                    res[i] = self.aw.modbus.readBCD(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i])
+                    res[i] = self.aw.modbus.readBCD(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
                 elif self.aw.modbus.inputBCDsAsInt[i]:
-                    res[i] = self.aw.modbus.readBCDint(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i])
+                    res[i] = self.aw.modbus.readBCDint(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
                 else:
-                    res[i] = self.aw.modbus.readSingleRegister(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i])
+                    res[i] = self.aw.modbus.readSingleRegister(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
                 res[i] = self.processChannelData(res[i],self.aw.modbus.inputDivs[i],self.aw.modbus.inputModes[i])
-                just_send = True
         
         self.aw.qmc.extraMODBUStemps = res[:]
         self.aw.qmc.extraMODBUStx = self.aw.qmc.timeclock.elapsed()/1000.
