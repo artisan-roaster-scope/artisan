@@ -1907,8 +1907,7 @@ class EventsDlg(ArtisanResizeablDialog):
         ncolumns = self.aw.buttonlistmaxlen
         nbuttons = len(self.extraeventstypes)
 
-        initbuttons = ncolumns - 9
-        nrows,extra = divmod((nbuttons-initbuttons),ncolumns)
+        nrows,extra = divmod(nbuttons,ncolumns)
 
         step = pattern
         bcolor = []
@@ -1924,15 +1923,15 @@ class EventsDlg(ArtisanResizeablDialog):
                 bcolor.append(str(color.name()))
             step += pattern*2
 
-        #Text Color
-        tcolor = ["yellow"]*nbuttons
-
-        #Apply Colors in Right Oder
+        #Apply Colors in Right Order
         for i in range(nbuttons):
             visualIndex = self.eventbuttontable.visualRow(i)
-            self.extraeventbuttoncolor[i]     = bcolor[visualIndex]
-            self.extraeventbuttontextcolor[i]   = tcolor[visualIndex]
-
+            self.extraeventbuttoncolor[i] = bcolor[visualIndex]
+            #Choose text color
+            if self.aw.colorDifference("white",bcolor[visualIndex]) > self.aw.colorDifference("black",bcolor[visualIndex]):
+                self.extraeventbuttontextcolor[i] = "white"
+            else:
+                self.extraeventbuttontextcolor[i] = "black"
         self.changingcolorflag = False
         self.createEventbuttonTable()
 
