@@ -8771,6 +8771,8 @@ class tgraphcanvas(FigureCanvas):
 
     # fill the self.extraNoneTempHint1 and self.extraNoneTempHint2 lists
     # indicating which curves should not be temperature converted
+    # True indicates a non-temperature device (data should not be converted)
+    # False indicates a temperature device (data should be converted if temperature unit changes)
     def generateNoneTempHints(self):
         self.extraNoneTempHint1 = []
         self.extraNoneTempHint2 = []
@@ -10973,6 +10975,8 @@ class tgraphcanvas(FigureCanvas):
             if statisticstimes[0] == 0:
 # not sure we want this warning message to display on each redraw of a profile without proper events, maybe better to just silently don't render the statistics
 #                aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [FCs] + [DROP]", None))
+                # but at least we try to write the characteristics
+                self.writecharacteristics(TP_index,LP)
                 return
             else:
                 self.statisticstimes = statisticstimes
@@ -13187,12 +13191,15 @@ class VMToolbar(NavigationToolbar):
                         if line.get_drawstyle() == "steps-post":
                             steps_post_lines.append(line)
                             line.set_drawstyle("steps")
-                    figureoptions.figure_edit(axes)
+                    
+                    with warnings.catch_warnings():
+                        warnings.filterwarnings("ignore", category=numpy.VisibleDeprecationWarning)
+                        figureoptions.figure_edit(axes)
                     for line in steps_post_lines:
                         line.set_drawstyle("steps-post")
                 except Exception as e:
-    #                import traceback
-    #                traceback.print_exc(file=sys.stdout)
+#                    import traceback
+#                    traceback.print_exc(file=sys.stdout)
                     pass
                 aw.fetchCurveStyles()
 #                aw.fetchAxisLimits() # DON'T

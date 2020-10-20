@@ -2815,7 +2815,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 pass
             columns.append(en1)
             columns.append(en2)
-        columns.append("") # add a last dummy table that extends
+#        columns.append("") # add a last dummy table that extends
         self.datatable.setColumnCount(len(columns))
         self.datatable.setHorizontalHeaderLabels(columns)
         self.datatable.setAlternatingRowColors(True)
@@ -3042,17 +3042,20 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.samplingsemaphore.acquire(1)
             nevents = self.eventtable.rowCount()
             for i in range(nevents):
-                timez = self.eventtable.cellWidget(i,0)
-                if self.aw.qmc.timeindex[0] > -1:
-                    self.aw.qmc.specialevents[i] = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]]+ stringtoseconds(str(timez.text())))
-                else:
-                    self.aw.qmc.specialevents[i] = self.aw.qmc.time2index(stringtoseconds(str(timez.text())))
-                description = self.eventtable.cellWidget(i,3)
-                self.aw.qmc.specialeventsStrings[i] = description.text()
-                etype = self.eventtable.cellWidget(i,4)
-                self.aw.qmc.specialeventstype[i] = etype.currentIndex()
-                evalue = self.eventtable.cellWidget(i,5).text()
-                self.aw.qmc.specialeventsvalue[i] = self.aw.qmc.str2eventsvalue(str(evalue))
+                try:
+                    timez = self.eventtable.cellWidget(i,0)
+                    if self.aw.qmc.timeindex[0] > -1:
+                        self.aw.qmc.specialevents[i] = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]]+ stringtoseconds(str(timez.text())))
+                    else:
+                        self.aw.qmc.specialevents[i] = self.aw.qmc.time2index(stringtoseconds(str(timez.text())))
+                    description = self.eventtable.cellWidget(i,3)
+                    self.aw.qmc.specialeventsStrings[i] = description.text()
+                    etype = self.eventtable.cellWidget(i,4)
+                    self.aw.qmc.specialeventstype[i] = etype.currentIndex()
+                    evalue = self.eventtable.cellWidget(i,5).text()
+                    self.aw.qmc.specialeventsvalue[i] = self.aw.qmc.str2eventsvalue(str(evalue))
+                except:
+                    pass
         finally:
             if self.aw.qmc.samplingsemaphore.available() < 1:
                 self.aw.qmc.samplingsemaphore.release(1)
