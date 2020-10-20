@@ -34374,9 +34374,13 @@ class ApplicationWindow(QMainWindow):
 
     def analysisfitCurves(self, exp=-1):
         # exp == 0 -> ln(), 1 -> unused, 2 -> quadratic, 3 -> cubic, 4 -> bkgnd, -1 -> all of 0,2,and 3
-        #check for finished roast
-        if not (self.qmc.timeindex[0] > -1 and self.qmc.timeindex[6]):
+        #check for any roast data
+        if not self.qmc.timeindex[0] > -1:
             self.sendmessage(QApplication.translate("Error Message", "Analyze: no profile data available", None))
+            return
+        #check for finished roast
+        if not self.qmc.timeindex[6]:
+            self.sendmessage(QApplication.translate("Error Message", "Analyze: DROP event required, none found", None))
             return
 
         #Save the background annotations setting and then disable
@@ -34639,6 +34643,11 @@ class ApplicationWindow(QMainWindow):
             for dim in self.qmc.analysisresultsloc:
                 if dim >= 1 or dim <=0:
                     self.qmc.analysisresultsloc = self.qmc.analysisresultsloc_default
+
+            #reset the annotation location if the origin is out of the screen
+            for dim in self.qmc.segmentresultsloc:
+                if dim >= 1 or dim <=0:
+                    self.qmc.segmentresultsloc = self.qmc.segmentresultsloc_default
 
             # create the segement results annotation box
             a = aw.qmc.alpha["statsanalysisbkgnd"]
