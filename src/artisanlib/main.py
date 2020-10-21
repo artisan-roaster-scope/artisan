@@ -6127,9 +6127,14 @@ class tgraphcanvas(FigureCanvas):
                     self.delta_ax = self.ax.twinx()
 
                 # instead to remove and regenerate the axis object (we just clear and reuse it)
-                self.ax.clear()
+                
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore')
+                    self.ax.clear()
                 self.ax.set_facecolor(self.palette["background"])
-                self.delta_ax.clear()
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore')
+                    self.delta_ax.clear()
                 self.ax.set_yticks([])
                 self.ax.set_xticks([])
                 self.delta_ax.set_yticks([])
@@ -13187,16 +13192,18 @@ class VMToolbar(NavigationToolbar):
                 try:
                     # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
                     steps_post_lines = []
-                    for line in aw.qmc.ax.lines:
-                        if line.get_drawstyle() == "steps-post":
-                            steps_post_lines.append(line)
-                            line.set_drawstyle("steps")
+                    with warnings.catch_warnings():
+                        warnings.simplefilter('ignore')
+                        for line in aw.qmc.ax.lines:
+                            if line.get_drawstyle() == "steps-post":
+                                steps_post_lines.append(line)
+                                line.set_drawstyle("steps")
                     
                     with warnings.catch_warnings():
-                        warnings.filterwarnings("ignore", category=numpy.VisibleDeprecationWarning)
+                        warnings.filterwarnings("ignore") # , category=numpy.VisibleDeprecationWarning)
                         figureoptions.figure_edit(axes)
-                    for line in steps_post_lines:
-                        line.set_drawstyle("steps-post")
+                        for line in steps_post_lines:
+                            line.set_drawstyle("steps-post")
                 except Exception as e:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
