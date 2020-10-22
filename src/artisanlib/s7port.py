@@ -444,6 +444,8 @@ class s7port(object):
 
     # if force the readings cache is ignored and fresh readings are requested
     def readFloat(self,area,dbnumber,start,force=False):
+        if area == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -477,7 +479,7 @@ class s7port(object):
                         else:
                             break
                     if res is None:
-                        return -1
+                        return
                     else:
                         if self.commError: # we clear the previous error and send a message
                             self.commError = False
@@ -486,12 +488,10 @@ class s7port(object):
                 else:
                     self.commError = True  
                     self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
-                    return -1
         except Exception as e:
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readFloat: " + str(e))
             self.commError = True
-            return -1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -501,23 +501,23 @@ class s7port(object):
     # as readFloat, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore nor uses the cache!
     def peakFloat(self,area,dbnumber,start):
+        if area == 0:
+            return  
         try:
             self.connect()
             if self.isConnected():
-                try:
-                    with suppress_stdout_stderr():
-                        res = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                    return self.get_real(res,0)
-                except:
-                    return None
-                return None
+                with suppress_stdout_stderr():
+                    res = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                return self.get_real(res,0)
             else:
-                return None
-        except Exception:
-            return None
+                return
+        except:
+            return
                 
     # if force the readings cache is ignored and fresh readings are requested
     def readInt(self,area,dbnumber,start,force=False):
+        if area == 0:
+            return     
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -547,7 +547,7 @@ class s7port(object):
                         else:
                             break
                     if res is None:
-                        return -1
+                        return
                     else:
                         if self.commError: # we clear the previous error and send a message
                             self.commError = False
@@ -556,12 +556,10 @@ class s7port(object):
                 else:
                     self.commError = True  
                     self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
-                    return -1
         except Exception as e:
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt: " + str(e))
             self.commError = True
-            return -1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -572,22 +570,23 @@ class s7port(object):
     # as readInt, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore nor uses the cache!
     def peekInt(self,area,dbnumber,start):
+        if area == 0:
+            return    
         try:
             self.connect()
             if self.isConnected(): 
-                try:
-                    with suppress_stdout_stderr():
-                        res = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    return self.get_int(res,0)
-                except Exception:
-                    return None
+                with suppress_stdout_stderr():
+                    res = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                return self.get_int(res,0)
             else:
-                return None
-        except Exception:
-            return None
+                return
+        except:
+            return
 
     # if force the readings cache is ignored and fresh readings are requested
     def readBool(self,area,dbnumber,start,index,force=False):
+        if area == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -616,7 +615,7 @@ class s7port(object):
                         else:
                             break
                     if res is None:
-                        return -1
+                        return
                     else:
                         if self.commError: # we clear the previous error and send a message
                             self.commError = False
@@ -625,12 +624,10 @@ class s7port(object):
                 else:
                     self.commError = True
                     self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
-                    return -1
         except Exception as e:
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readBool: " + str(e))
             self.commError = True
-            return -1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)

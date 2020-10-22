@@ -549,6 +549,8 @@ class modbusport(object):
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
     def readFloat(self,slave,register,code=3,force=False):
+        if slave == 0:
+            return
         r = None
         try:
             #### lock shared resources #####
@@ -612,6 +614,8 @@ class modbusport(object):
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
     def readBCD(self,slave,register,code=3,force=False):
+        if slave == 0:
+            return
         r = None
         try:
             #### lock shared resources #####
@@ -676,6 +680,8 @@ class modbusport(object):
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore!
     def peekSingleRegister(self,slave,register,code=3):
+        if slave == 0:
+            return
         try:
             if code==1:
                 res = self.master.read_coils(int(register),1,unit=int(slave))
@@ -698,7 +704,7 @@ class modbusport(object):
                 r = decoder.decode_16bit_uint()
                 return r
         else:
-            return None
+            return
 
     # function 1 (Read Coil)
     # function 2 (Read Discrete Input)
@@ -710,6 +716,8 @@ class modbusport(object):
 #        logging.basicConfig()
 #        log = logging.getLogger()
 #        log.setLevel(logging.DEBUG)
+        if slave == 0:
+            return
         r = None
         try:
             #### lock shared resources #####
@@ -794,6 +802,8 @@ class modbusport(object):
 #        logging.basicConfig()
 #        log = logging.getLogger()
 #        log.setLevel(logging.DEBUG)
+        if slave == 0:
+            return
         r = None
         try:
             #### lock shared resources #####
