@@ -50,7 +50,7 @@ When you are ready to charge the roaster, push the On Button. Then push the Star
 **NOTE:
 *Unplug Your Laptop Before You Roast***
 
-For most people, unless you have a USB isolator you need to unplug your computer when using Artisan or will get feedback loops that will create all sorts of crazy spikes in the graph.  If you are using a desktop I guess you need to get an isolator.
+For some people, unless you have a USB isolator, you need to unplug your computer when using Artisan or you may get feedback loops that may create unwanted spikes in the graph.  If you are using a desktop, you may need an isolator if you are seeing the spikes.  
 
 Before or after your first roast, look at the [Setup ](https://artisan-scope.org/docs/setup/) page to see how to adjust your bean temp readings and your sampling rates.
 
