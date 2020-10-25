@@ -37,6 +37,8 @@ The upper box in the screen shot shows a table of curve fit results.  Remember t
 
 The lower box provides metrics that indicate the severity of RoR rises and crashes in the profile.  Each line in the table is a segment of the profile RoR (ΔBT) throughout the interval of interest.  A segment starts and ends when the RoR crosses the curve fit RoR.  In this example the first segment begins at 07:08.  The time 07:08 is when the interval of interest begins. The RoR at this time is below the curve fit RoR.  At 08:12 the RoR crosses the curve fit RoR beginning the second segment.  The third segment starts at 09:54 when the RoR again crosses the curve fit RoR.  The right most column, ABC/secs, is the area between the curves divided by the number of seconds.  This is a good indicator of rises and crashes.  The second and third segments show ABC/secs larger than 1.0 indicating a noticable rise and crash.
 
+What's a good result using x²:  Under .10 on MSE BT is a very good roast and between .10 and .30 is a solid roast, but remember that the smoothing and delta span values affect the results in a big way, so it is possible to have a .10 curve that isn't great. The ranges assume little smoothing and low delta spans.  If you have lots of segments that is also better than fewer, so long as the Max Deltas are small. It means the ΔBT is sticking close to the ideal.
+
 **Note: The Analyzer always calculates and reports using Celsius. This provides a consistent set of units for comparison and sharing of Analyzer results.**
 
 **Segments**
