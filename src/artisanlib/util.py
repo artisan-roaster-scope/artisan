@@ -2,6 +2,7 @@ import imp
 import platform
 import sys
 import codecs
+import math
 
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
@@ -70,7 +71,8 @@ def s2a(s):
 
 # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
 def stringfromseconds(seconds_raw, leadingzero=True):
-    seconds = int(round(seconds_raw))
+    # seconds = int(round(seconds_raw)) # note that round(1.5)=round(2.5)=2
+    seconds = int(math.floor(seconds_raw + 0.5))
     if seconds >= 0:
         if leadingzero:
             return "%02d:%02d"% divmod(seconds, 60)

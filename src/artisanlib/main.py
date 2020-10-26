@@ -592,6 +592,7 @@ from artisanlib.ikawa import extractProfileIkawaCSV
 from artisanlib.rubase import extractProfileRubaseCSV
 from artisanlib.roastpath import extractProfileRoastPathHTML
 from artisanlib.roastlog import extractProfileRoastLog
+from artisanlib.aillio import extractProfileRoastWorld,extractProfileRoasTime
 from artisanlib.simulator import Simulator
 from artisanlib.transposer import profileTransformatorDlg
 from artisanlib.comparator import roastCompareDlg
@@ -1547,6 +1548,7 @@ class tgraphcanvas(FigureCanvas):
 #        self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
 
         self.optimalSmoothing = False
+        self.polyfitRoRcalc = True
 
         self.patheffects = 1
         self.graphstyle = 0
@@ -2274,7 +2276,7 @@ class tgraphcanvas(FigureCanvas):
 #                QTimer.singleShot(1, lazyredraw_on_resize)
             if ((dw != 0) or (dh != 0)):
                 self.lazyredraw_on_resize_timer.start(10)
-                
+
 
     # update the aw.qmc.deltaBTspan and deltaETspan from the given sampling interval, aw.qmc.deltaETsamples and aw.qmc.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
@@ -5054,6 +5056,8 @@ class tgraphcanvas(FigureCanvas):
                 self.AUCvalue = 0
                 self.AUCsinceFCs = 0
                 self.AUCguideTime = 0
+                
+                self.profile_sampling_interval = None
 
                 self.statisticstimes = [0,0,0,0,0]
 
@@ -5725,7 +5729,7 @@ class tgraphcanvas(FigureCanvas):
                 with numpy.errstate(divide='ignore'):
                     nt1 = numpy.array([0 if x is None else x for x in t1]) # ERROR None Type object not scriptable! t==None on ON
                     
-                    if optimalSmoothing:
+                    if optimalSmoothing and self.polyfitRoRcalc:
                         # optimal RoR computation using polynoms with out timeshift
                         if dsET % 2 == 0:
                             dsET = dsET+1 # the savgol_filter expectes odd window length
@@ -5739,7 +5743,7 @@ class tgraphcanvas(FigureCanvas):
                                 nt1_lin = timex # we just run on the non-linear timex in this case
                             else:
                                 nt1_lin = numpy.interp(lin1, tx_roast, nt1) # resample data in nt1 to linear spaced time
-                            dist = (lin1[-1] - lin1[0]) / len(lin1)
+                            dist = (lin1[-1] - lin1[0]) / (len(lin1) - 1)
                             z1 = savgol_filter(nt1_lin, dsET, 1, deriv=1,delta=dsET)
                             z1 = z1 * (60./dist) * dsET
                         else:
@@ -5749,17 +5753,20 @@ class tgraphcanvas(FigureCanvas):
                                 z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
                             except:
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                # https://github.com/numpy/numpy/issues/16744                            
+                                # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values:
                                 z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
                     else:
-                        try:
-                            # variant using incremental polyfit RoR computation
-                            z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
-                        except:
-                            # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                            # https://github.com/numpy/numpy/issues/16744
-                            # original version just picking the corner values:
+                        if self.polyfitRoRcalc:
+                            try:
+                                # variant using incremental polyfit RoR computation
+                                z1 = [self.polyRoR(tx_roast,nt1,dsET,i) for i in range(len(nt1))]
+                            except:
+                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                # https://github.com/numpy/numpy/issues/16744
+                                # original version just picking the corner values:
+                                z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
+                        else:
                             z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
 
                 ld1 = len(z1)
@@ -5789,7 +5796,7 @@ class tgraphcanvas(FigureCanvas):
             if t2 is not None:
                 with numpy.errstate(divide='ignore'):
                     nt2 = numpy.array([0 if x is None else x for x in t2])
-                    if optimalSmoothing:
+                    if optimalSmoothing and self.polyfitRoRcalc:
                         # optimal RoR computation using polynoms with out timeshift
                         if dsBT % 2 == 0:
                             dsBT = dsBT+1 # the savgol_filter expectes odd window length
@@ -5803,10 +5810,10 @@ class tgraphcanvas(FigureCanvas):
                                 nt2_lin = timex # we just run on the non-linear timex in this case
                             else:
                                 nt2_lin = numpy.interp(lin2, tx_roast, nt2) # resample data in nt2 to linear spaced time
-                            dist = (lin2[-1] - lin2[0]) / len(lin2)
+                            dist = (lin2[-1] - lin2[0]) / (len(lin2) - 1)
                             z2 = savgol_filter(nt2_lin, dsBT, 1, deriv=1,delta=dsBT)
                             z2 = z2 * (60./dist) * dsBT
-                        else:                        
+                        else:
                             # in this case we use the standard algo
                             try:
                                 z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
@@ -5816,13 +5823,16 @@ class tgraphcanvas(FigureCanvas):
                                 # original version just picking the corner values
                                 z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
                     else:
-                        try:
-                            # variant using incremental polyfit RoR computation
-                            z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
-                        except:
-                            # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                            # https://github.com/numpy/numpy/issues/16744
-                            # original version just picking the corner values
+                        if self.polyfitRoRcalc:
+                            try:
+                                # variant using incremental polyfit RoR computation
+                                z2 = [self.polyRoR(tx_roast,nt2,dsBT,i) for i in range(len(nt2))]
+                            except:
+                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                # https://github.com/numpy/numpy/issues/16744
+                                # original version just picking the corner values
+                                z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
+                        else:
                             z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
 
                 ld2 = len(z2)
@@ -13722,18 +13732,22 @@ class SampleThread(QThread):
                             left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2,(aw.qmc.deltaETsamples + 1)))
                             # ****** Instead of basing the estimate on the window extremal points,
                             #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                            try:
-                                time_vec = sample_ctimex1[-left_index:]
-                                temp_samples = sample_tstemp1[-left_index:]
-                                with warnings.catch_warnings():
-                                    warnings.simplefilter('ignore')
-                                    # using stable polyfit from numpy polyfit module
-                                    LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
-                                    aw.qmc.rateofchange1 = LS_fit[1]*60.
-                            except:
-                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                # https://github.com/numpy/numpy/issues/16744
-                                # we fall back to the two point algo
+                            if aw.qmc.polyfitRoRcalc:
+                                try:
+                                    time_vec = sample_ctimex1[-left_index:]
+                                    temp_samples = sample_tstemp1[-left_index:]
+                                    with warnings.catch_warnings():
+                                        warnings.simplefilter('ignore')
+                                        # using stable polyfit from numpy polyfit module
+                                        LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
+                                        aw.qmc.rateofchange1 = LS_fit[1]*60.
+                                except:
+                                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                    # https://github.com/numpy/numpy/issues/16744
+                                    # we fall back to the two point algo
+                                    timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
+                                    aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                            else:
                                 timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last aw.qmc.deltaETsamples readings
                                 aw.qmc.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             
@@ -13753,21 +13767,24 @@ class SampleThread(QThread):
                             left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2,(aw.qmc.deltaBTsamples + 1)))
                             # ****** Instead of basing the estimate on the window extremal points,
                             #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                            try:
-                                time_vec = sample_ctimex2[-left_index:]
-                                temp_samples = sample_tstemp2[-left_index:]
-                                with warnings.catch_warnings():
-                                    warnings.simplefilter('ignore')
-                                    LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
-                                    aw.qmc.rateofchange2 = LS_fit[1]*60.
-                            except:
-                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                # https://github.com/numpy/numpy/issues/16744
-                                # we fall back to the two point algo
+                            if aw.qmc.polyfitRoRcalc:
+                                try:
+                                    time_vec = sample_ctimex2[-left_index:]
+                                    temp_samples = sample_tstemp2[-left_index:]
+                                    with warnings.catch_warnings():
+                                        warnings.simplefilter('ignore')
+                                        LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
+                                        aw.qmc.rateofchange2 = LS_fit[1]*60.
+                                except:
+                                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                    # https://github.com/numpy/numpy/issues/16744
+                                    # we fall back to the two point algo
+                                    timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
+                                    aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                            else:
                                 timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last aw.qmc.deltaBTsamples readings
                                 aw.qmc.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
-                            
-                            
+
                             if aw.qmc.DeltaBTfunction is not None and len(aw.qmc.DeltaBTfunction):
                                 try:
                                     aw.qmc.rateofchange2 = aw.qmc.eval_math_expression(aw.qmc.DeltaBTfunction,tx,RTsname="R2",RTsval=aw.qmc.rateofchange2)
@@ -14560,8 +14577,12 @@ class ApplicationWindow(QMainWindow):
 
         self.importMenu.addSeparator()
 
-        importBulletAction = QAction("Aillio Roastime...",self)
+        importBulletAction = QAction("Aillio RoasTime...",self)
         importBulletAction.triggered.connect(self.importBullet)
+        self.importMenu.addAction(importBulletAction)
+
+        importBulletAction = QAction("Aillio Roast.World URL...",self)
+        importBulletAction.triggered.connect(self.importBulletURL)
         self.importMenu.addAction(importBulletAction)
 
         importCropsterAction = QAction("Cropster XLS...",self)
@@ -23972,6 +23993,10 @@ class ApplicationWindow(QMainWindow):
         obj["timex"] = timex
         obj["temp1"] = temp2
         obj["temp2"] = temp1
+        
+        if len(obj["timex"]) > 2:
+            obj["samplinginterval"] = (obj["timex"][-1] - obj["timex"][0])/(len(obj["timex"] - 1))
+
         res = self.setProfile(filename,obj)
 
         try:
@@ -25011,7 +25036,10 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.roastbatchnr = int(profile["roastbatchnr"])
                 except:
                     pass
-                self.qmc.roastbatchprefix = d(profile["roastbatchprefix"])
+                try:
+                    self.qmc.roastbatchprefix = d(profile["roastbatchprefix"])
+                except:
+                    pass
                 try:
                     self.qmc.roastbatchpos = int(profile["roastbatchpos"])
                 except:
@@ -25186,7 +25214,10 @@ class ApplicationWindow(QMainWindow):
             if "samplinginterval" in profile:
                 # derive aw.qmc.deltaBTsamples from aw.qmc.deltaBTspan and the sampling interval of the profile
                 self.qmc.profile_sampling_interval = profile["samplinginterval"]
-                self.qmc.updateDeltaSamples()
+            else:
+                if len(self.qmc.timex)>2:
+                    self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) -1)
+            self.qmc.updateDeltaSamples()
             # Ramp/Soak Profiles
             if aw.pidcontrol.loadRampSoakFromProfile:
                 if "svValues" in profile:
@@ -26932,6 +26963,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.dropDuplicatesLimit = toDouble(settings.value("dropDuplicatesLimit",self.qmc.dropDuplicatesLimit))
             if settings.contains("optimalSmoothing"):
                 self.qmc.optimalSmoothing = bool(toBool(settings.value("optimalSmoothing",self.qmc.optimalSmoothing)))
+            if settings.contains("polyfitRoRcalc"):
+                self.qmc.polyfitRoRcalc = bool(toBool(settings.value("polyfitRoRcalc",self.qmc.polyfitRoRcalc)))
             if settings.contains("swapETBT"):
                 self.qmc.swapETBT = bool(toBool(settings.value("swapETBT",self.qmc.swapETBT)))
             if settings.contains("minmaxLimits"):
@@ -28322,6 +28355,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("dropDuplicatesLimit",self.qmc.dropDuplicatesLimit)
 #            settings.setValue("altSmoothing",self.qmc.altsmoothing)
             settings.setValue("optimalSmoothing",self.qmc.optimalSmoothing)
+            settings.setValue("polyfitRoRcalc",self.qmc.polyfitRoRcalc)
             settings.setValue("swapETBT",self.qmc.swapETBT)
             settings.setValue("minmaxLimits",self.qmc.minmaxLimits)
             settings.setValue("minLimit",self.qmc.filterDropOut_tmin)
@@ -33162,6 +33196,10 @@ class ApplicationWindow(QMainWindow):
                         burner = burner.replace(",",".")
                         self.qmc.extratemp1[0].append(float(burner))
                         self.qmc.extratemp2[0].append(-1)
+                
+                if len(self.qmc.timex) > 2:
+                    self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) - 1)
+                self.qmc.updateDeltaSamples()
 
                 # set CHARGE and DROP
                 self.qmc.timeindex[0] = 0
@@ -33205,190 +33243,22 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importBullet(self,_=False):
         try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import Aillio Roastime JSON", None))
-            if len(filename) == 0:
-                return
-            import io
-            infile = io.open(filename, 'r', encoding='utf-8')
-            from json import load as json_load
-            obj = json_load(infile)
-            infile.close()
-            if not self.qmc.reset():
-                return
-            self.qmc.drumspeed = ""
-            bt = obj["beanTemperature"]
-            dt = obj["drumTemperature"]
-            if self.qmc.mode == "F":
-                bt = [fromCtoF(t) for t in bt]
-                dt = [fromCtoF(t) for t in dt]
-            try:
-                ex = obj["exitTemperature"]
-            except:
-                ex = None
-            if "sampleRate" in obj:
-                sr = obj["sampleRate"]
-            else:
-                sr = 2
-            tx = [x*1.0/sr for x in range(len(bt))]
-
-            # add extra device if exitTemperatures are given and this extra device is not configured
-            try:
-                if ex is not None and ex != [] and aw.qmc.extraname1 != ['Exhaust'] and (len(aw.qmc.extraname2) < 2 or aw.qmc.extraname2[2] != "Exhaust"):
-                    string = QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None)
-                    reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
-                    if reply == QMessageBox.Yes:
-                        if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
-                            if len(self.qmc.extradevices) > 0:
-                                aw.resetExtraDevices()
-                            aw.addDevice()
-                            aw.qmc.resetlinecountcaches()
-                            aw.qmc.extraname1[0] = "Exhaust"
-                            aw.extraCurveVisibility1[0] = toBool(True)
-                            aw.extraCurveVisibility2[0] = toBool(False)
-                            aw.extraDelta1[0] = toBool(False)
-                            aw.extraDelta2[0] = toBool(False)
-                            aw.extraFill1[0] = 0
-                            aw.extraFill2[0] = 0
-                        else:
-                            return False
-                    else:
-                        return False
-            except Exception as e:
-                _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " importBullet(): {0}").format(str(e)),exc_tb.tb_lineno)
-
-            if len(tx) == len(bt) == len(dt):
-                self.qmc.roastertype = "Aillio Bullet R1"
-                try:
-                    self.qmc.operator = str(obj["roastMasterName"])
-                except:
-                    pass
-                try:
-                    d = obj["dateTime"] # RFC 3339 date time
-                    self.qmc.roastdate = QDateTime.fromString(d,Qt.ISODate)
-                except:
-                    pass
-                self.qmc.timex = tx
-                self.qmc.temp1 = dt
-                self.qmc.temp2 = bt
-
-                # initialize all extra curves with -1
-                for x in range(len(self.qmc.extradevices)):
-                    self.qmc.extratimex[x] = tx
-                    self.qmc.extratemp1[x] = [-1]*len(tx)
-                    self.qmc.extratemp2[x] = [-1]*len(tx)
-
-                # add exhaust data to first/third extra device
-                if ex is not None and ex != [] and len(self.qmc.extradevices) > 0:
-                    if self.qmc.mode == "F":
-                        ex = [fromCtoF(t) for t in ex]
-                    if len(aw.qmc.extraname2) >= 2 and aw.qmc.extraname2[2] == "Exhaust":
-                        self.qmc.extratemp2[2] = ex
-                    else:
-                        self.qmc.extratemp1[0] = ex
-
-                try:
-                    self.qmc.title = obj["beanName"]
-                except:
-                    pass
-                try:
-                    self.qmc.title = obj["roastName"]
-                except:
-                    pass
-                try:
-                    self.qmc.beans = obj["bean"]["beanName"]
-                except:
-                    pass
-                if "agtron" in obj:
-                    self.qmc.ground_color = int(round(obj["agtron"]))
-                    if "Agtron" in self.qmc.color_systems:
-                        self.qmc.color_system_idx = self.qmc.color_systems.index("Agtron")
-                    else:
-                        self.qmc.color_system_idx = 0
-                wunit = self.qmc.weight_units.index(self.qmc.weight[2])
-                if wunit in [1,3]: # turn Kg into g, and lb into oz
-                    wunit = wunit -1
-                if "weightGreen" in obj and "weightRoasted" in obj:
-                    self.qmc.weight = [obj["weightGreen"],obj["weightRoasted"],self.qmc.weight_units[wunit]]
-                if "ambient" in obj:
-                    self.qmc.ambientTemp = obj["ambient"]
-                if "humidity" in obj:
-                    self.qmc.ambient_humidity = obj["humidity"]
-                if "comments" in obj:
-                    self.qmc.roastingnotes = obj["comments"]
-                if "roastNumber" in obj:
-                    self.qmc.roastbatchnr = obj["roastNumber"]
-
-                dropIdx = 0
-                if len(tx) > 0:
-                    dropIdx = len(tx) - 1
-                aw.qmc.timeindex = [0,0,0,0,0,0,dropIdx,0]
-                labels = ["indexYellowingStart","indexFirstCrackStart","indexFirstCrackEnd","indexSecondCrackStart","indexSecondCrackEnd"]
-                for i in range(1,6):
-                    try:
-                        idx = obj[labels[i-1]]
-                        # RoastTime seems to interpret all index values 1 based, while Artisan takes the 0 based approach. We substruct 1
-                        if idx > 1:
-                            aw.qmc.timeindex[i] = idx - 1
-                    except:
-                        pass
-                try:
-                    for j in range(len(aw.qmc.timeindex)):
-                        if aw.qmc.timeindex[j] >= len(tx):
-                            aw.qmc.timeindex[j] = 0
-                            aw.sendmessage(QApplication.translate("Message","Warning! Deleted an event that occurs after the end of profile.", None))
-                except:
-                    pass
-                try:
-                    eventtypes = ["blowerSetting","drumSpeedSetting","--","inductionPowerSetting"]
-                    for j in range(len(eventtypes)):
-                        eventname = eventtypes[j]
-                        if eventname != "--":
-                            last = None
-                            ip = obj[eventname]
-                            for i in range(len(ip)):
-                                v = ip[i]+1
-                                if last is None or last != v:
-                                    aw.qmc.specialevents.append(i)
-                                    aw.qmc.specialeventstype.append(j)
-                                    aw.qmc.specialeventsvalue.append(v)
-                                    aw.qmc.specialeventsStrings.append("")
-                                    last = v
-                    aw.orderEvents()
-                except:
-                    pass
-                # extract events from newer JSON format
-                try:
-                    for action in obj["actions"]["actionTimeList"]:
-                        time_idx = action["index"] - 1
-                        value = action["value"] + 1
-                        if action["ctrlType"] == 0:
-                            event_type = 3
-                        elif action["ctrlType"] == 1:
-                            event_type = 0
-                        elif action["ctrlType"] == 2:
-                            event_type = 1
-                        aw.qmc.specialevents.append(time_idx)
-                        aw.qmc.specialeventstype.append(event_type)
-                        aw.qmc.specialeventsvalue.append(value)
-                        aw.qmc.specialeventsStrings.append(str(value))
-                except:
-                    pass
-                aw.autoAdjustAxis()
-                self.qmc.redraw()
-                aw.sendmessage(QApplication.translate("Message","Imported {0}", None).format(filename))
-            else:
-                aw.sendmessage(QApplication.translate("Message","Unable to import. Inconsistent number of samples", None))
-        except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " self.importBullet(): {0}").format(str(ex)))
-        except ValueError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " self.importBullet(): {0}").format(str(ex)))
-        except Exception as ex:
+            self.importExternal(extractProfileRoasTime,QApplication.translate("Message","Import Aillio RoasTime", None),"*.json")
+        except:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " self.importBullet() {0}").format(str(ex)),exc_tb.tb_lineno)
+            pass
 
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importBulletURL(self,_=False):
+        try:
+            self.importExternalURL(extractProfileRoastWorld,QApplication.translate("Message","Import Aillio Roast.World URL", None))
+        except:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            pass
+    
     def importExternalURL(self,extractor,message):
         try:
             url = self.ArtisanOpenURLDialog(msg=message)

@@ -289,6 +289,7 @@ class HUDDlg(ArtisanDialog):
         self.org_dropDuplicatesLimit = self.aw.qmc.dropDuplicatesLimit
         self.org_swapETBT = self.aw.qmc.swapETBT
         self.org_optimalSmoothing = self.aw.qmc.optimalSmoothing
+        self.org_polyfitRoRcalc = self.aw.qmc.polyfitRoRcalc
         self.org_soundflag = self.aw.soundflag
         self.org_logoimgflag = self.aw.logoimgflag
         self.org_logoimgalpha = self.aw.logoimgalpha
@@ -343,6 +344,11 @@ class HUDDlg(ArtisanDialog):
         self.OptimalSmoothingFlag.setToolTip(QApplication.translate("Tooltip", "Use an optimal smoothing algorithm (only applicable offline, after recording)", None))        
         self.OptimalSmoothingFlag.setChecked(self.aw.qmc.optimalSmoothing)
         self.OptimalSmoothingFlag.stateChanged.connect(self.changeOptimalSmoothingFlag)
+
+        self.PolyFitFlag = QCheckBox(QApplication.translate("CheckBox", "Polyfit computation",None))
+        self.PolyFitFlag.setToolTip(QApplication.translate("Tooltip", "Compute the rate-of-rise over the delta span interval by a linear polyfit", None))        
+        self.PolyFitFlag.setChecked(self.aw.qmc.polyfitRoRcalc)
+        self.PolyFitFlag.stateChanged.connect(self.changePolyFitFlagFlag)
         
         curvefilterlabel = QLabel(QApplication.translate("Label", "Smooth Curves",None))
         #Filter holds the number of pads in filter
@@ -572,6 +578,8 @@ class HUDDlg(ArtisanDialog):
             hudGroupLayout.setEnabled(False)
         rorRoRAlgo = QHBoxLayout()
         rorRoRAlgo.addWidget(self.OptimalSmoothingFlag) 
+        rorRoRAlgo.addSpacing(20)
+        rorRoRAlgo.addWidget(self.PolyFitFlag)
         rorRoRAlgo.addStretch()   
         inputFilter0 = QHBoxLayout()
         inputFilter0.addWidget(self.DropDuplicates)
@@ -2287,6 +2295,11 @@ class HUDDlg(ArtisanDialog):
     def changeOptimalSmoothingFlag(self,_=0):
         self.aw.qmc.optimalSmoothing = not self.aw.qmc.optimalSmoothing
         self.aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+        
+    @pyqtSlot(int)
+    def changePolyFitFlagFlag(self,_=0):
+        self.aw.qmc.polyfitRoRcalc = not self.aw.qmc.polyfitRoRcalc
+        self.aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
     
     @pyqtSlot(int) 
     def changeDropFilter(self,_=0):
@@ -2378,6 +2391,7 @@ class HUDDlg(ArtisanDialog):
         self.aw.qmc.dropDuplicatesLimit = self.org_dropDuplicatesLimit
         self.aw.qmc.swapETBT = self.org_swapETBT
         self.aw.qmc.optimalSmoothing = self.org_optimalSmoothing
+        self.aw.qmc.polyfitRoRcalc = self.org_polyfitRoRcalc
         self.aw.soundflag = self.org_soundflag
         self.aw.logoimgflag = self.org_logoimgflag
         self.aw.logoimgalpha = self.org_logoimgalpha

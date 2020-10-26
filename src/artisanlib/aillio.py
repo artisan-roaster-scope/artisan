@@ -24,6 +24,13 @@ from platform import system
 import usb.core
 import usb.util
 
+import requests
+from requests_file import FileAdapter  # @UnresolvedImport
+import json
+from lxml import html
+from PyQt5.QtCore import QDateTime, Qt
+from artisanlib.util import encodeLocal
+import io
 
 class AillioR1:
     AILLIO_VID = 0x0483
@@ -357,6 +364,260 @@ class AillioR1:
 
     def __readreply(self, length):
         return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length)
+
+def extractProfileBulletDict(data,aw):
+    try:
+        res = {} # the interpreted data set
+        
+        if "celsius" in data and not data["celsius"]:
+            res["mode"] = 'F'
+        else:
+            res["mode"] = 'C'
+        if "comments" in data:
+            res["roastingnotes"] = data["comments"]
+        try:
+            if "dateTime" in data:
+                try:
+                    dateQt = QDateTime.fromString(data["dateTime"],Qt.ISODate) # RFC 3339 date time
+                except:
+                    dateQt = QDateTime.fromMSecsSinceEpoch (data["dateTime"])
+                if dateQt.isValid():
+                    res["roastdate"] = encodeLocal(dateQt.date().toString())
+                    res["roastisodate"] = encodeLocal(dateQt.date().toString(Qt.ISODate))
+                    res["roasttime"] = encodeLocal(dateQt.time().toString())
+                    res["roastepoch"] = int(dateQt.toTime_t())
+                    res["roasttzoffset"] = time.timezone
+        except:
+            pass
+        try:
+            res["title"] = data["beanName"]
+        except:
+            pass            
+        if "roastName" in data:
+            res["title"] = data["roastName"]
+        try:
+            if "roastNumber" in data:
+                res["roastbatchnr"] = int(data["roastNumber"])
+        except:
+            pass
+        if "beanName" in data:
+            res["beans"] = data["beanName"]
+        elif "bean" in data and "beanName" in data["bean"]:
+            res["beans"] = data["bean"]["beanName"]
+        try:
+            if "weightGreen" in data or "weightRoasted" in data:
+                wunit = aw.qmc.weight_units.index(aw.qmc.weight[2])
+                if wunit in [1,3]: # turn Kg into g, and lb into oz
+                    wunit = wunit -1
+                wgreen = 0
+                if "weightGreen" in data:
+                    wgreen = float(data["weightGreen"])
+                wroasted = 0
+                if "weightRoasted" in data:
+                    wroasted = float(data["weightRoasted"])
+                res["weight"] = [wgreen,wroasted,aw.qmc.weight_units[wunit]]
+        except:
+            pass
+        try:
+            if "agtron" in data:
+                res["ground_color"] = int(round(data["agtron"]))
+                res["color_system"] = "Agtron"
+        except:
+            pass
+        try:
+            if "roastMasterName" in data:
+                res["operator"] = data["roastMasterName"]
+        except:
+            pass
+        res["roastertype"] = "Aillio Bullet R1"
+            
+        if "ambient" in data:
+            res['ambientTemp'] = data["ambient"]
+        if "humidity" in data:
+            res["ambient_humidity"] = data["humidity"]
+
+        if "beanTemperature" in data:
+            bt = data["beanTemperature"]
+        else:
+            bt = []
+        if "drumTemperature" in data:
+            dt = data["drumTemperature"]
+        else:
+            dt = []
+        # make dt the same length as bt
+        dt = dt[:len(bt)]
+        dt.extend(-1 for _ in range(len(bt) - len(dt)))
+        
+        if "exitTemperature" in data:
+            et = data["exitTemperature"]
+        else:
+            et = None
+        if et is not None:
+            # make et the same length as bt
+            et = et[:len(bt)]
+            et.extend(-1 for _ in range(len(bt) - len(et)))
+        
+        if "beanDerivative" in data:
+            ror = data["beanDerivative"]
+        else:
+            ror = None
+        if ror is not None:
+            # make et the same length as bt
+            ror = ror[:len(bt)]
+            ror.extend(-1 for _ in range(len(bt) - len(ror)))
+        
+        if "sampleRate" in data:
+            sr = data["sampleRate"]
+        else:
+            sr = 2.
+        res["samplinginterval"] = 1.0/sr
+        tx = [x/sr for x in range(len(bt))]
+        res["timex"] = tx
+        res["temp1"] = dt
+        res["temp2"] = bt
+        
+        timeindex = [-1,0,0,0,0,0,0,0]
+        if "roastStartIndex" in data:
+            timeindex[0] = min(max(data["roastStartIndex"],0),len(tx)-1)
+        else:
+            timeindex[0] = 0
+        
+        labels = ["indexYellowingStart","indexFirstCrackStart","indexFirstCrackEnd","indexSecondCrackStart","indexSecondCrackEnd"]
+        for i in range(1,6):
+            try:
+                idx = data[labels[i-1]]
+                # RoastTime seems to interpret all index values 1 based, while Artisan takes the 0 based approach. We substruct 1
+                if idx > 1:
+                    timeindex[i] = max(min(idx - 1,len(tx)-1),0)
+            except:
+                pass
+
+        if "roastEndIndex" in data:
+            timeindex[6] = max(0,min(data["roastEndIndex"],len(tx)-1))
+        else:
+            timeindex[6] = len(tx)-1
+        res["timeindex"] = timeindex
+        
+        # extract events from newer JSON format
+        specialevents = []
+        specialeventstype = []
+        specialeventsvalue = []
+        specialeventsStrings = []
+        
+        # extract events from older JSON format
+        try:
+            eventtypes = ["blowerSetting","drumSpeedSetting","--","inductionPowerSetting"]
+            for j in range(len(eventtypes)):
+                eventname = eventtypes[j]
+                if eventname != "--":
+                    last = None
+                    ip = data[eventname]
+                    for i in range(len(ip)):
+                        v = ip[i]+1
+                        if last is None or last != v:
+                            specialevents.append(i)
+                            specialeventstype.append(j)
+                            specialeventsvalue.append(v)
+                            specialeventsStrings.append("")
+                            last = v
+        except:
+            pass        
+        
+        # extract events from newer JSON format
+        try:
+            for action in data["actions"]["actionTimeList"]:
+                time_idx = action["index"] - 1
+                value = action["value"] + 1
+                if action["ctrlType"] == 0:
+                    event_type = 3
+                elif action["ctrlType"] == 1:
+                    event_type = 0
+                elif action["ctrlType"] == 2:
+                    event_type = 1
+                specialevents.append(time_idx)
+                specialeventstype.append(event_type)
+                specialeventsvalue.append(value)
+                specialeventsStrings.append(str(value))
+        except:
+            pass
+        if len(specialevents) > 0:
+            res["specialevents"] = specialevents
+            res["specialeventstype"] = specialeventstype
+            res["specialeventsvalue"] = specialeventsvalue
+            res["specialeventsStrings"] = specialeventsStrings
+        
+        if (ror is not None and len(ror) == len(tx)) or (et is not None and len(et) == len(tx)):
+            # add one (virtual) extra device
+            res["extradevices"] = [25]
+            res["extratimex"] = [tx]
+        
+            temp3_visibility = True
+            temp4_visibility = False
+            if et is not None and len(et) == len(tx):
+                res["extratemp1"] = [et]
+            else:
+                res["extratemp1"] = [[-1]*len(tx)]
+                temp3_visibility = False
+            if ror is not None and len(ror) == len(tx):
+                res["extratemp2"] = [ror]
+            else:
+                res["extratemp2"] = [[-1]*len(tx)]
+                temp4_visibility = False
+            res["extraname1"] = ["Exhaust"]
+            res["extraname2"] = ["RoR"]
+            res["extramathexpression1"] = [""]
+            res["extramathexpression2"] = [""]
+            res["extraLCDvisibility1"] = [temp3_visibility]
+            res["extraLCDvisibility2"] = [temp4_visibility]
+            res["extraCurveVisibility1"] = [temp3_visibility]
+            res["extraCurveVisibility2"] = [temp4_visibility]
+            res["extraDelta1"] = [False]
+            res["extraDelta2"] = [True]
+            res["extraFill1"] = [False]
+            res["extraFill2"] = [False]
+            res["extradevicecolor1"] = ['black']
+            res["extradevicecolor2"] = ['black']
+            res["extramarkersizes1"] = [6.0]
+            res["extramarkersizes2"] = [6.0]
+            res["extramarkers1"] = [None]
+            res["extramarkers2"] = [None]
+            res["extralinewidths1"] = [1.0]
+            res["extralinewidths2"] = [1.0]
+            res["extralinestyles1"] = ['-']
+            res["extralinestyles2"] = ['-']
+            res["extradrawstyles1"] = ['default']
+            res["extradrawstyles2"] = ['default']
+
+        return res
+    except:
+#        import traceback
+#        import sys
+#        traceback.print_exc(file=sys.stdout)
+        return {}
+        
+def extractProfileRoastWorld(url,aw):
+    s = requests.Session()
+    s.mount('file://', FileAdapter())
+    page = s.get(url.toString(), timeout=(4, 15), headers={"Accept-Encoding" : "gzip"})
+    tree = html.fromstring(page.content)
+    data = tree.xpath('//body/script[1]/text()')
+    data = data[0].split("gon.profile=")
+    data = data[1].split(";")
+    res = extractProfileBulletDict(json.loads(data[0]),aw)
+    if not "beans" in res:
+        try:
+            b = tree.xpath("//div[*='Bean']/*/a/text()")
+            if b:
+                res["beans"] = b[0]
+        except:
+            pass
+    return res
+
+def extractProfileRoasTime(file,aw):
+    infile = io.open(file, 'r', encoding='utf-8')
+    data = json.load(infile)
+    infile.close()
+    return extractProfileBulletDict(data,aw)
 
 
 if __name__ == "__main__":
