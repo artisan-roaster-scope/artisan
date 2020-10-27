@@ -12,9 +12,13 @@ header:
 * __Machines:__ WPG/WPE/W1/W6/W15/W30/W45/W60 with networked PLC (6/2014 and later)
 * __Connection:__ Siemens S7 network
 * __Features:__
-  - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
+  - logging of exhaust temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging and control of burner level, air flow, air temperature setpoint, drum speed
-  - logging of the optional infrared (IR) sensor
+  - logging of the optional infrared (IR) and environmental temperature sensor
+
+{: .notice--primary}
+**Watch out!** The WxA+ setups require an unlock code from Giesen and deliver data in higher resolution with decimals.
+{: .notice--primary}
 
 ### Setup
 

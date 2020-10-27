@@ -8,6 +8,9 @@ header:
   image: /assets/images/typhoon2.jpg
   teaser: assets/images/typhoon1.jpg
 ---
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+
 * __Producer:__ [LLC Typhoon Coffee](https://typhoon.coffee/){:target="_blank"}, Russia
 * __Machines:__ 2kg, 3kg (Cocoa), 4kg, and 9kg
 * __Connection:__ MODBUS TCP via the network
