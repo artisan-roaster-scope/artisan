@@ -580,6 +580,12 @@ def toASCII(s):
                 utf8_string = utf8_string.replace(k, umlaute_dict[k])
         return unidecode(utf8_string)
 
+def QDateTimeToEpoch(datetime):
+    try:
+        return datetime.toSecsSinceEpoch() # intoduced in Qt5.8, not available on RPi Stretch unning Qt5.7.1, returns 64bit uint
+    except:
+        return datetime.toTime_t() # deprecated, returns 32bit uint; for compatibility with RPi Stretch only
+
 from const import UIconst
 from artisanlib.s7port import s7port
 from artisanlib.wsport import wsport
@@ -1486,8 +1492,7 @@ class tgraphcanvas(FigureCanvas):
         self.cuppingnotes = ""
         self.roastdate = QDateTime.currentDateTime()
         # system batch nr system
-#        self.roastepoch = self.roastdate.toTime_t() # in seconds # deprecated
-        self.roastepoch = self.roastdate.toSecsSinceEpoch() # in seconds
+        self.roastepoch = QDateTimeToEpoch(self.roastdate) # in seconds
         self.lastroastepoch = self.roastepoch # the epoch of the last roast in seconds
         self.batchcounter = -1 # global batch counter; if batchcounter is -1, batchcounter system is inactive
         self.batchsequence = 1 # global counter of position in sequence of batches of one session
@@ -5062,8 +5067,7 @@ class tgraphcanvas(FigureCanvas):
                 self.statisticstimes = [0,0,0,0,0]
 
                 self.roastdate = QDateTime.currentDateTime()
-#                self.roastepoch = QDateTime.currentDateTime().toTime_t() # deprecated
-                self.roastepoch = QDateTime.currentDateTime().toSecsSinceEpoch()
+                self.roastepoch = QDateTimeToEpoch(QDateTime.currentDateTime())
                 self.roasttzoffset = libtime.timezone
                 if not sampling: # just if the RESET button is manually pressed we clear the error log
                     self.errorlog = []
@@ -9322,8 +9326,7 @@ class tgraphcanvas(FigureCanvas):
 
             # update the roasts start time
             self.roastdate = QDateTime.currentDateTime()
-#            self.roastepoch = QDateTime.currentDateTime().toTime_t() # deprecated
-            self.roastepoch = QDateTime.currentDateTime().toSecsSinceEpoch()
+            self.roastepoch = QDateTimeToEpoch(QDateTime.currentDateTime())
             self.roasttzoffset = libtime.timezone
 
             aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
@@ -23439,8 +23442,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.roastdate = QDateTime(date)
             else:
                 self.qmc.roastdate = QDateTime(date)
-#            self.qmc.roastepoch = self.qmc.roastdate.toTime_t() # deprecated
-            self.qmc.roastepoch = self.qmc.roastdate.toSecsSinceEpoch()
+            self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
             self.qmc.roasttzoffset = 0
             unit = header[1].split('Unit:')[1]
             #set temperature mode
@@ -25642,8 +25644,7 @@ class ApplicationWindow(QMainWindow):
             # write roast time
             try:
                 profile["roasttime"] = encodeLocal(self.qmc.roastdate.time().toString())
-#                profile["roastepoch"] = int(self.qmc.roastdate.toTime_t()) # deprecated
-                profile["roastepoch"] = int(self.qmc.roastdate.toSecsSinceEpoch())
+                profile["roastepoch"] = int(QDateTimeToEpoch(self.qmc.roastdate))
                 profile["roasttzoffset"] = self.qmc.roasttzoffset
             except Exception:
                 pass
@@ -32908,8 +32909,7 @@ class ApplicationWindow(QMainWindow):
                         if not roastdate:
                             roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
                             self.qmc.roastdate = roastdate
-#                            self.qmc.roastepoch = self.qmc.roastdate.toTime_t() # deprecated
-                            self.qmc.roastepoch = self.qmc.roastdate.toSecsSinceEpoch()
+                            self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
                             self.qmc.roasttzoffset = 0
                         #set zero
                         if not zero_t:
@@ -32917,8 +32917,7 @@ class ApplicationWindow(QMainWindow):
                             zero = QDateTime()
                             zero.setDate(date)
                             zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-#                            zero_t = zero.toTime_t() # deprecated
-                            zero_t = zero.toSecsSinceEpoch()
+                            zero_t = QDateTimeToEpoch(zero)
                         #set temperature mode
                         if not unit:
                             unit = item['T1unit']
@@ -32930,8 +32929,7 @@ class ApplicationWindow(QMainWindow):
                         dt = QDateTime()
                         dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
                         dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-#                        self.qmc.timex.append(float(dt.toTime_t() - zero_t)) # deprecated
-                        self.qmc.timex.append(float(dt.toSecsSinceEpoch() - zero_t))
+                        self.qmc.timex.append(float(QDateTimeToEpoch(dt) - zero_t))
                         self.qmc.temp1.append(float(item['T1'].replace(',','.')))
                         self.qmc.temp2.append(float(item['T2'].replace(',','.')))
                     except ValueError:
@@ -32982,8 +32980,7 @@ class ApplicationWindow(QMainWindow):
                         if not roastdate:
                             roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
                             self.qmc.roastdate = roastdate
-#                            self.qmc.roastepoch = self.qmc.roastdate.toTime_t() # deprecated
-                            self.qmc.roastepoch = self.qmc.roastdate.toSecsSinceEpoch()
+                            self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
                             self.qmc.roasttzoffset = 0
                         #set zero
                         if not zero_t:
@@ -32991,16 +32988,14 @@ class ApplicationWindow(QMainWindow):
                             zero = QDateTime()
                             zero.setDate(date)
                             zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-#                            zero_t = zero.toTime_t() # deprecated
-                            zero_t = zero.toSecsSinceEpoch()
+                            zero_t = QDateTimeToEpoch(zero)
     # The K204 export does not contain a trace of the temperature mode.
     # We have to assume here that the mode was set correctly before the import.
                         #add one measurement
                         dt = QDateTime()
                         dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
                         dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-#                        tx = float(dt.toTime_t() - zero_t) # deprecated
-                        tx = float(dt.toSecsSinceEpoch() - zero_t)
+                        tx = float(QDateTimeToEpoch(dt) - zero_t)
                         self.qmc.timex.append(tx)
                         t1 = float(item['T1'].replace(',','.'))
                         if t1 > 800 or t1 < 0.0:
@@ -33381,13 +33376,11 @@ class ApplicationWindow(QMainWindow):
                 zero = QDateTime()
                 date = QDateTime(QDate.fromString(header[0].split('Date:')[1],"yyyy'/'MM'/'dd"))
                 self.qmc.roastdate = date
-#                self.qmc.roastepoch = self.qmc.roastdate.toTime_t() # deprecated
-                self.qmc.roastepoch = self.qmc.roastdate.toSecsSinceEpoch()
+                self.qmc.roastepoch = QDateTimeToEpoch(self.qmc.roastdate)
                 self.qmc.roasttzoffset = 0
                 zero.setDate(date)
                 zero.setTime(QTime.fromString(header[1].split('Time:')[1],"hh':'mm':'ss"))
-#                zero_t = zero.toTime_t() # deprecated
-                zero_t = zero.toSecsSinceEpoch()
+                zero_t = QDateTimeToEpoch(zero)
                 #read column headers
                 fields = next(data)
                 unit = None
@@ -33408,8 +33401,7 @@ class ApplicationWindow(QMainWindow):
                     dt = QDateTime()
                     dt.setDate(QDate.fromString(item['Date'],"yyyy'/'MM'/'dd"))
                     dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-#                    self.qmc.timex.append(float(dt.toTime_t() - zero_t))
-                    self.qmc.timex.append(float(dt.toSecsSinceEpoch() - zero_t))
+                    self.qmc.timex.append(float(QDateTimeToEpoch(dt) - zero_t))
                     self.qmc.temp1.append(float(item['T1']))
                     self.qmc.temp2.append(float(item['T2']))
                 csvFile.close()
