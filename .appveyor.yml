@@ -16,6 +16,7 @@ environment:
     - PYTHON: "C:\\Python38-x64"
       PYTHON_VERSION: 3.8.x
       ARTISAN_VERSION: 2.4.3
+      PYINSTALLER_VER: 4.0
 # NOTE: on updating Python, update also the PYTHON var in src/artisan-win.spec !!
 
 install:
@@ -24,15 +25,14 @@ install:
   - "%PYTHON%\\python.exe -m pip install --upgrade pip"
   - "%PYTHON%\\python.exe -m pip install wheel"
 # start: build the pyinstaller bootloader and install
-   - set PYINSTALLER_VER=4.0
-   - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v%PYINSTALLER_VER%/PyInstaller-%PYINSTALLER_VER%.tar.gz
-   - tar xzf PyInstaller-%PYINSTALLER_VER%.tar.gz
-   - del PyInstaller-%PYINSTALLER_VER%.tar.gz
-   - cd pyinstaller-%PYINSTALLER_VER%\bootloader
-   - python ./waf all --target-arch=64bit
-   - cd ..
-   - python setup.py install
-   - cd ..
+  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v%PYINSTALLER_VER%/PyInstaller-%PYINSTALLER_VER%.tar.gz
+  - tar xzf PyInstaller-%PYINSTALLER_VER%.tar.gz
+  - del PyInstaller-%PYINSTALLER_VER%.tar.gz
+  - cd pyinstaller-%PYINSTALLER_VER%\bootloader
+  - python ./waf all --target-arch=64bit
+  - cd ..
+  - python setup.py install
+  - cd ..
 # end: build the pyinstaller bootloader and install
   - pip install -r src\requirements.txt
   - pip install -r src\requirements-win.txt
