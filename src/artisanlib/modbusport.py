@@ -206,6 +206,7 @@ class modbusport(object):
                         parity=self.parity,
                         stopbits=self.stopbits,
                         retry_on_empty=True,
+                        retry_on_invalid=True,
                         timeout=self.timeout)
                 elif self.type == 2: # Serial Binary
                     from pymodbus.client.sync import ModbusSerialClient # @Reimport
@@ -217,6 +218,7 @@ class modbusport(object):
                         parity=self.parity,
                         stopbits=self.stopbits,
                         retry_on_empty=True,
+                        retry_on_invalid=True,
                         timeout=self.timeout)  
                 elif self.type == 3: # TCP
                     from pymodbus.client.sync import ModbusTcpClient
@@ -225,6 +227,7 @@ class modbusport(object):
                                 host=self.host, 
                                 port=self.port,
                                 retry_on_empty=True,
+                                retry_on_invalid=True,
                                 retries=1,
                                 timeout=0.9, #self.timeout
                                 )
@@ -241,6 +244,7 @@ class modbusport(object):
                             host=self.host, 
                             port=self.port,
                             retry_on_empty=True,
+                            retry_on_invalid=True,
                             retries=3,
                             timeout=0.7, #self.timeout
                             )

@@ -509,15 +509,15 @@ def getBlendBlendDict(blend,weight=None):
                     if c in components:
                         c_amount = components[c]
                     components[c] = i["ratio"] * remaining_amount + c_amount
-                    if "label" in i:
+                    if "label" in i and i["label"] is not None:
                         components_labels[c] = i["label"]
-                    if "moisture" in i:
+                    if "moisture" in i and i["moisture"] is not None:
                         components_moisture[c] = i["moisture"]
-                    if "density" in i:
+                    if "density" in i and i["density"] is not None:
                         components_density[c] = i["density"]
-                    if "screen_min" in i:
+                    if "screen_min" in i and i["screen_min"] is not None:
                         components_screen_min[c] = i["screen_min"]
-                    if "screen_max" in i:
+                    if "screen_max" in i and i["screen_max"] is not None:
                         components_screen_max[c] = i["screen_max"]
                 if weight-amount_spent <= max_amount:
                     amount_spent = amount_spent + remaining_amount
@@ -534,15 +534,15 @@ def getBlendBlendDict(blend,weight=None):
                         c_amount = components[c]
                     components[c] = i["ratio"] * missing_amount + c_amount
                     components_labels[c] = i["label"]
-                    if "label" in i:
+                    if "label" in i and i["label"] is not None:
                         components_labels[c] = i["label"]
-                    if "moisture" in i:
+                    if "moisture" in i and i["moisture"] is not None:
                         components_moisture[c] = i["moisture"]
-                    if "density" in i:
+                    if "density" in i and i["density"] is not None:
                         components_density[c] = i["density"]
-                    if "screen_min" in i:
+                    if "screen_min" in i and i["screen_min"] is not None:
                         components_screen_min[c] = i["screen_min"]
-                    if "screen_max" in i:
+                    if "screen_max" in i and i["screen_max"] is not None:
                         components_screen_max[c] = i["screen_max"]
             
             # we replace the ingredients with a recomputed set based on the usage per blend replaccement as accumulated in components and the weight
@@ -677,9 +677,9 @@ def getBlends(weight_unit_idx,store=None):
             for s in stores:
                 location_label = ""
                 store_blends = []
-                if "blends" in stock:
+                if "blends" in stock and stock["blends"] is not None:
                     store_blends.extend(stock["blends"])
-                if "replBlends" in stock:
+                if "replBlends" in stock and stock["replBlends"] is not None:
                     store_blends.extend(stock["replBlends"])
                 for blend in store_blends:
                     res_sd = None

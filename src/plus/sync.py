@@ -448,6 +448,8 @@ def fetchServerUpdate(uuid,file=None):
             last_modified = "?modified_at=" + str(int(round(file_last_modified*1000)))
         res = connection.getData(config.roast_url + "/" + uuid + last_modified)
         status = res.status_code
+        config.logger.debug("sync:fetchServerUpdate() -> status: %s",status)
+        config.logger.debug("sync:fetchServerUpdate() -> data: %s",res)
         
         if status == 204: # NO CONTENT: data on server is older then ours
             config.logger.debug("sync:fetchServerUpdate() -> 204 data on server is older")
@@ -455,7 +457,7 @@ def fetchServerUpdate(uuid,file=None):
             # if file modification date is newer than what is known on the version from the server via the sync cache
             
             if file is not None and getSync(uuid) is None:
-                config.logger.debug("sync: -> file not in sync cache yet, we recuires to fetch the servers modification date and add the profile to the sync cache")
+                config.logger.debug("sync: -> file not in sync cache yet, we need to fetch the servers modification date and add the profile to the sync cache")
                 # we recurse to get a 200 with the last_modification date from the server for this record to add it to the sync cache automatically
                 fetchServerUpdate(uuid)
             pass

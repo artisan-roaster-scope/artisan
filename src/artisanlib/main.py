@@ -886,7 +886,7 @@ class tgraphcanvas(FigureCanvas):
         # Artisan will keep on using the Phidgets21 mapping
         self.phidget1048_types = [1,1,1,1] # defaults all to k-type probes (values are 0-based)
         self.phidget1048_async = [False]*4
-        self.phidget1048_changeTriggers = [0.2]*4
+        self.phidget1048_changeTriggers = [0]*4
         self.phidget1048_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1048_changeTriggersStrings = list(map(lambda x:'{0:.1f}C'.format(x),self.phidget1048_changeTriggersValues))
         # add 0.02C and 0.05C change triggers
@@ -897,7 +897,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1048_dataRate = 256 # in ms; (Phidgets default 8ms, 16ms if wireless is active on v21 API, 256ms on v22 API)
 
         self.phidget1045_async = False
-        self.phidget1045_changeTrigger = 0.2
+        self.phidget1045_changeTrigger = 0
         self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1045_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1045_changeTriggersValues))
         # add 0.02C and 0.05C change triggers
@@ -913,7 +913,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_formulaValues = ["PT100  3850", "PT100  3920","PT1000 3850", "PT1000 3920"]
         self.phidget1200_wire = 0
         self.phidget1200_wireValues = ["2-wire", "3-wire","4-wire"]
-        self.phidget1200_changeTrigger = 0.2
+        self.phidget1200_changeTrigger = 0
         self.phidget1200_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1200_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1200_changeTriggersValues))
         # add 0.02C and 0.05C change triggers
@@ -928,7 +928,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_2_async = False
         self.phidget1200_2_formula = 0
         self.phidget1200_2_wire = 0
-        self.phidget1200_2_changeTrigger = 0.2
+        self.phidget1200_2_changeTrigger = 0
         self.phidget1200_2_dataRate = 250
 
         self.phidget1046_async = [False]*4
@@ -13118,7 +13118,10 @@ class VMToolbar(NavigationToolbar):
         
     # overwritten from MPL v3.2.2 to get rid of that extra data printed
     def mouse_move(self, event):
-        self._update_cursor(event)
+        try:
+            self._update_cursor(event) # not available in MPL v3.0.3 on Python3.5 for the RPi Stretch builds
+        except:
+            pass
 
         if event.inaxes and event.inaxes.get_navigate():
 

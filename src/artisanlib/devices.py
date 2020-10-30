@@ -2384,7 +2384,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     message = QApplication.translate("Message","Device set to {0}. Now, choose serial port", None).format(meter)
                 ##########################
                 ##########################
-                elif meter == "Phidget TMP1200 1xRTD":
+                elif meter == "Phidget TMP1200 1xRTD A":
                     self.aw.qmc.device = 68
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
