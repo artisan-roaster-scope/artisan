@@ -29,13 +29,13 @@ install:
   - tar xzf PyInstaller-%PYINSTALLER_VER%.tar.gz
   - del PyInstaller-%PYINSTALLER_VER%.tar.gz
   - cd pyinstaller-%PYINSTALLER_VER%\bootloader
-  - "%PYTHON% ./waf all --target-arch=64bit
+  - "%PYTHON%\\python.exe ./waf all --target-arch=64bit"
   - cd ..
-  - "%PYTHON% setup.py install
+  - "%PYTHON%\\python.exe setup.py install"
   - cd ..
 # end: build the pyinstaller bootloader and install
-  - "%PYTHON%\\python.exe -m pip install -r src\requirements.txt
-  - "%PYTHON%\\python.exe -m pip install -r src\requirements-win.txt
+  - "%PYTHON%\\python.exe -m pip install -r src\\requirements.txt"
+  - "%PYTHON%\\python.exe -m pip install -r src\\requirements-win.txt"
   - curl -L -O https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe
 #  - curl -k -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
   - curl -k -L -O https://netcologne.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
@@ -48,7 +48,7 @@ install:
 #  - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
 #  - 7z x Phidget22Python.zip
 #  - cd Phidget22Python
-#  - "%PYTHON%\\python.exe setup.py install
+#  - python setup.py install
 #  - cd ..
 
 build_script:
