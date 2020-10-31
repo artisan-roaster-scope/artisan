@@ -13,10 +13,10 @@ environment:
   UPLOADTOOL_BODY:
     "WARNING: pre-release builds may not work. Use at your own risk."
   matrix:
-    - PYTHON: "C:\\Python37-x64"
-      PYTHON_VERSION: 3.7.x
+    - PYTHON: "C:\\Python38-x64"
+      PYTHON_VERSION: 3.8.x
       ARTISAN_VERSION: 2.4.3
-      PYINSTALLER_VER: 4.0
+#      PYINSTALLER_VER: 4.0
 # NOTE: on updating Python, update also the PYTHON var in src/artisan-win.spec !!
 
 install:
@@ -24,16 +24,17 @@ install:
 #  - echo %PATH%
   - "%PYTHON%\\python.exe -m pip install --upgrade pip"
   - "%PYTHON%\\python.exe -m pip install wheel"
-# start: build the pyinstaller bootloader and install (using the default VS 2015)
-  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v%PYINSTALLER_VER%/PyInstaller-%PYINSTALLER_VER%.tar.gz
-  - tar xzf PyInstaller-%PYINSTALLER_VER%.tar.gz
-  - del PyInstaller-%PYINSTALLER_VER%.tar.gz
-  - cd pyinstaller-%PYINSTALLER_VER%\bootloader
-  - "%PYTHON%\\python.exe ./waf all --target-arch=64bit"
-  - cd ..
-  - "%PYTHON%\\python.exe setup.py install"
-  - cd ..
-# end: build the pyinstaller bootloader and install
+  - "%PYTHON%\\python.exe -m pip install .travis\\pyinstaller-4.1.dev0+7a926c78bf-py3-none-any.whl"
+## start: build the pyinstaller bootloader and install (using the default VS 2015)
+#  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v%PYINSTALLER_VER%/PyInstaller-%PYINSTALLER_VER%.tar.gz
+#  - tar xzf PyInstaller-%PYINSTALLER_VER%.tar.gz
+#  - del PyInstaller-%PYINSTALLER_VER%.tar.gz
+#  - cd pyinstaller-%PYINSTALLER_VER%\bootloader
+#  - "%PYTHON%\\python.exe ./waf all --target-arch=64bit"
+#  - cd ..
+#  - "%PYTHON%\\python.exe setup.py install"
+#  - cd ..
+## end: build the pyinstaller bootloader and install
   - "%PYTHON%\\python.exe -m pip install -r src\\requirements.txt"
   - "%PYTHON%\\python.exe -m pip install -r src\\requirements-win.txt"
   - curl -L -O https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe
