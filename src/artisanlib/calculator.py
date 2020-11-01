@@ -19,8 +19,8 @@
 from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import pyqtSlot, QSettings, QRegExp
-from PyQt5.QtGui import QRegExpValidator
+from PyQt5.QtCore import pyqtSlot, QSettings, QRegularExpression
+from PyQt5.QtGui import QRegularExpressionValidator
 from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit,
     QComboBox, QHBoxLayout, QVBoxLayout)
 
@@ -42,9 +42,9 @@ class calculatorDlg(ArtisanDialog):
         endlabel = QLabel(QApplication.translate("Label", "End (00:00)",None))
         self.startEdit = QLineEdit()
         self.endEdit = QLineEdit()
-        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
-        self.startEdit.setValidator(QRegExpValidator(regextime,self))
-        self.endEdit.setValidator(QRegExpValidator(regextime,self))
+        regextime = QRegularExpression(r"^[0-5][0-9]:[0-5][0-9]$")
+        self.startEdit.setValidator(QRegularExpressionValidator(regextime,self))
+        self.endEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.startEdit.editingFinished.connect(self.calculateRC)
         self.endEdit.editingFinished.connect(self.calculateRC)
         nevents = len(self.aw.qmc.specialevents)

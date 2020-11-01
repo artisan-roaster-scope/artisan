@@ -26,8 +26,8 @@ from artisanlib.util import stringfromseconds, stringtoseconds
 
 from help import transposer_help
 
-from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QRegExp, QDateTime
-from PyQt5.QtGui import QRegExpValidator
+from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime
+from PyQt5.QtGui import QRegularExpressionValidator
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout)
 
@@ -39,9 +39,9 @@ class profileTransformatorDlg(ArtisanDialog):
         
         self.helpdialog = None
         
-        self.regexpercent = QRegExp(r"^$|^?[0-9]?[0-9]?(\.[0-9])?$")
-        self.regextime = QRegExp(r"^$|^?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.regextemp = QRegExp(r"^$|^?[0-9]?[0-9]?[0-9]?(\.[0-9])?$")
+        self.regexpercent = QRegularExpression(r"^$|^?[0-9]?[0-9]?(\.[0-9])?$")
+        self.regextime = QRegularExpression(r"^$|^?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        self.regextemp = QRegularExpression(r"^$|^?[0-9]?[0-9]?[0-9]?(\.[0-9])?$")
         
         # original data
         self.org_transMappingMode = self.aw.qmc.transMappingMode
@@ -942,14 +942,14 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.phasestable.setItem(0,i,profile_phases_widget)
                 #
                 target_widget_time = QLineEdit("")
-                target_widget_time.setValidator(QRegExpValidator(self.regextime))
+                target_widget_time.setValidator(QRegularExpressionValidator(self.regextime))
                 target_widget_time.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 if phases_enabled:
                     target_widget_time.editingFinished.connect(self.updatePhasesWidget)
                 else:
                     target_widget_time.setEnabled(False)
                 target_widget_percent = QLineEdit("")
-                target_widget_percent.setValidator(QRegExpValidator(self.regexpercent))
+                target_widget_percent.setValidator(QRegularExpressionValidator(self.regexpercent))
                 target_widget_percent.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 if phases_enabled:
                     target_widget_percent.editingFinished.connect(self.updatePhasesWidget)
@@ -1020,7 +1020,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.timetable.setItem(0,i,profile_widget)
                 #
                 target_widget = QLineEdit("")
-                target_widget.setValidator(QRegExpValidator(self.regextime))
+                target_widget.setValidator(QRegularExpressionValidator(self.regextime))
                 target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 target_widget.editingFinished.connect(self.updateTimesWidget)
                 target_cell_widget = QWidget()
@@ -1084,7 +1084,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.temptable.setItem(0,i,profile_widget)
                 #
                 target_widget = QLineEdit("")
-                target_widget.setValidator(QRegExpValidator(self.regextemp))
+                target_widget.setValidator(QRegularExpressionValidator(self.regextemp))
                 target_widget.editingFinished.connect(self.updateTempResults)
                 target_widget.setAlignment(Qt.AlignCenter|Qt.AlignVCenter)
                 

@@ -22,8 +22,8 @@ import time as libtime
 from artisanlib.util import stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot, QRegExp, QSettings
-from PyQt5.QtGui import QIntValidator, QRegExpValidator
+from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings
+from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit,
     QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox,
@@ -1514,7 +1514,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
         self.segmenttable.setShowGrid(True)
         self.segmenttable.verticalHeader().setSectionResizeMode(2)
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(8):
             #create widgets
@@ -1525,9 +1525,9 @@ class PXRpidDlgControl(PXpidDlgControl):
             svedit = QLineEdit(str(self.aw.fujipid.PXR[svkey][0]))
             svedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, svedit))
             rampedit = QLineEdit(stringfromseconds(self.aw.fujipid.PXR[rampkey][0]))
-            rampedit.setValidator(QRegExpValidator(regextime,self))
+            rampedit.setValidator(QRegularExpressionValidator(regextime,self))
             soakedit  = QLineEdit(stringfromseconds(self.aw.fujipid.PXR[soakkey][0]))
-            soakedit.setValidator(QRegExpValidator(regextime,self))
+            soakedit.setValidator(QRegularExpressionValidator(regextime,self))
             setButton = QPushButton(QApplication.translate("Button","Set",None))
             setButton.clicked.connect(self.setsegment)
             setButton.setFocusPolicy(Qt.NoFocus)
@@ -3492,7 +3492,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
         self.segmenttable.setShowGrid(True)
         self.segmenttable.verticalHeader().setSectionResizeMode(2)
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(16):
             #create widgets
@@ -3502,9 +3502,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
             svedit = QLineEdit(str(self.aw.fujipid.PXG4[svkey][0]))
             svedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, svedit))
             rampedit = QLineEdit(stringfromseconds(self.aw.fujipid.PXG4[rampkey][0]))
-            rampedit.setValidator(QRegExpValidator(regextime,self))
+            rampedit.setValidator(QRegularExpressionValidator(regextime,self))
             soakedit  = QLineEdit(stringfromseconds(self.aw.fujipid.PXG4[soakkey][0]))
-            soakedit.setValidator(QRegExpValidator(regextime,self))
+            soakedit.setValidator(QRegularExpressionValidator(regextime,self))
             setButton = QPushButton(QApplication.translate("Button","Set",None))
             setButton.setFocusPolicy(Qt.NoFocus)
             setButton.clicked.connect(self.setsegment)

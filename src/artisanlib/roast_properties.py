@@ -31,8 +31,8 @@ from artisanlib.util import deltaLabelUTF8,stringfromseconds,stringtoseconds, ap
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit
 
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegExp, QSettings, QTimer, QEvent
-from PyQt5.QtGui import QColor, QIntValidator, QRegExpValidator, QKeySequence, QPalette
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent
+from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette
 from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout,
                              QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView, 
                              QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy,
@@ -673,7 +673,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.template_batchnr = None
         self.template_batchprefix = None
         
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #MARKERS
         chargelabel = QLabel("<b>" + QApplication.translate("Label", "CHARGE",None) + "</b>")
         chargelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -682,7 +682,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.chargeedit.setFocusPolicy(Qt.NoFocus)
         self.chargeedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.chargeeditcopy = stringfromseconds(0)
-        self.chargeedit.setValidator(QRegExpValidator(regextime,self))
+        self.chargeedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
         self.chargeedit.setMinimumWidth(50)
         chargelabel.setBuddy(self.chargeedit)
@@ -712,7 +712,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.dryedit = QLineEdit(stringfromseconds(t2))
         self.dryedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dryeditcopy = stringfromseconds(t2)
-        self.dryedit.setValidator(QRegExpValidator(regextime,self))
+        self.dryedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.dryedit.setMaximumWidth(50)
         self.dryedit.setMinimumWidth(50)
         drylabel.setBuddy(self.dryedit)
@@ -727,7 +727,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.Cstartedit.setFocusPolicy(Qt.NoFocus)
         self.Cstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cstarteditcopy = stringfromseconds(t3)
-        self.Cstartedit.setValidator(QRegExpValidator(regextime,self))
+        self.Cstartedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.Cstartedit.setMaximumWidth(50)
         self.Cstartedit.setMinimumWidth(50)
         Cstartlabel.setBuddy(self.Cstartedit)
@@ -743,7 +743,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.Cendedit.setFocusPolicy(Qt.NoFocus)
         self.Cendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cendeditcopy = stringfromseconds(t4)
-        self.Cendedit.setValidator(QRegExpValidator(regextime,self))
+        self.Cendedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.Cendedit.setMaximumWidth(50)
         self.Cendedit.setMinimumWidth(50)
         Cendlabel.setBuddy(self.Cendedit)
@@ -758,7 +758,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.CCstartedit.setFocusPolicy(Qt.NoFocus)
         self.CCstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCstarteditcopy = stringfromseconds(t5)
-        self.CCstartedit.setValidator(QRegExpValidator(regextime,self))
+        self.CCstartedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.CCstartedit.setMaximumWidth(50)
         self.CCstartedit.setMinimumWidth(50)
         CCstartlabel.setBuddy(self.CCstartedit)
@@ -773,7 +773,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.CCendedit.setFocusPolicy(Qt.NoFocus)
         self.CCendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCendeditcopy = stringfromseconds(t6)
-        self.CCendedit.setValidator(QRegExpValidator(regextime,self))
+        self.CCendedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.CCendedit.setMaximumWidth(50)
         self.CCendedit.setMinimumWidth(50)
         CCendlabel.setBuddy(self.CCendedit)
@@ -788,7 +788,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.dropedit.setFocusPolicy(Qt.NoFocus)
         self.dropedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dropeditcopy = stringfromseconds(t7)
-        self.dropedit.setValidator(QRegExpValidator(regextime,self))
+        self.dropedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.dropedit.setMaximumWidth(50)
         self.dropedit.setMinimumWidth(50)
         droplabel.setBuddy(self.dropedit)
@@ -804,7 +804,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.cooledit.setFocusPolicy(Qt.NoFocus)
         self.cooledit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.cooleditcopy = stringfromseconds(t8)
-        self.cooledit.setValidator(QRegExpValidator(regextime,self))
+        self.cooledit.setValidator(QRegularExpressionValidator(regextime,self))
         self.cooledit.setMaximumWidth(50)
         self.cooledit.setMinimumWidth(50)
         coollabel.setBuddy(self.cooledit)
@@ -2959,7 +2959,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.eventtable.setShowGrid(True)
             
             self.eventtable.verticalHeader().setSectionResizeMode(2)
-            regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+            regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
             etypes = self.aw.qmc.getetypes()
             #populate table
             for i in range(nevents):
@@ -3003,7 +3003,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 else:
                     timez = stringfromseconds(self.aw.qmc.timex[self.aw.qmc.specialevents[i]])
                 timeline.setText(timez)
-                timeline.setValidator(QRegExpValidator(regextime,self))
+                timeline.setValidator(QRegularExpressionValidator(regextime,self))
                 
                 try:
                     stringline = QLineEdit(self.aw.qmc.specialeventsStrings[i])

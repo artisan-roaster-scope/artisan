@@ -31,8 +31,8 @@ from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQDoubleSpinBox
 from help import symbolic_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegExp)
-from PyQt5.QtGui import (QColor, QIntValidator, QRegExpValidator, QPixmap)
+from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegularExpression)
+from PyQt5.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap)
 from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
                              QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView,
@@ -989,10 +989,10 @@ class HUDDlg(ArtisanDialog):
         self.endEdit = QLineEdit()
         self.endEdit.setMaximumWidth(60)
         self.endEdit.setAlignment(Qt.AlignRight)
-        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
-        self.startEdit.setValidator(QRegExpValidator(regextime,self))
+        regextime = QRegularExpression(r"^[0-5][0-9]:[0-5][0-9]$")
+        self.startEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.startEdit.setText("00:00")
-        self.endEdit.setValidator(QRegExpValidator(regextime,self))
+        self.endEdit.setValidator(QRegularExpressionValidator(regextime,self))
         if len(self.aw.qmc.timex) > 0:
             self.endEdit.setText(stringfromseconds(self.aw.qmc.timex[-1]))
         else:
@@ -1195,7 +1195,7 @@ class HUDDlg(ArtisanDialog):
         self.WebLCDsPortLabel = QLabel(QApplication.translate("Label", "Port", None))
         self.WebLCDsPort = QLineEdit(str(self.aw.WebLCDsPort))
         self.WebLCDsPort.setAlignment(Qt.AlignRight)
-        self.WebLCDsPort.setValidator(QRegExpValidator(QRegExp(r"^[0-9]{1,4}$"),self))
+        self.WebLCDsPort.setValidator(QRegularExpressionValidator(QRegularExpression(r"^[0-9]{1,4}$"),self))
         self.WebLCDsPort.setMaximumWidth(45)
         self.QRpic = QLabel() # the QLabel holding the QR code image
         if self.aw.WebLCDs:

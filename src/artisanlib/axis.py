@@ -21,8 +21,8 @@ import platform
 from artisanlib.util import deltaLabelUTF8, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 
-from PyQt5.QtCore import Qt, pyqtSlot, QRegExp, QSettings
-from PyQt5.QtGui import QIntValidator, QRegExpValidator
+from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings
+from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator
 from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, QFrame,
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, QLayout,
     QSpinBox)
@@ -52,9 +52,9 @@ class WindowsDlg(ArtisanDialog):
         self.xlimitEdit_min.setMaximumWidth(55)
         self.xlimitEdit_min.setMinimumWidth(55)
         self.xlimitEdit_min.setAlignment(Qt.AlignRight)
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.xlimitEdit.setValidator(QRegExpValidator(regextime,self))
-        self.xlimitEdit_min.setValidator(QRegExpValidator(regextime,self))
+        regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        self.xlimitEdit.setValidator(QRegularExpressionValidator(regextime,self))
+        self.xlimitEdit_min.setValidator(QRegularExpressionValidator(regextime,self))
         self.ylimitEdit = QLineEdit()
         self.ylimitEdit.setMaximumWidth(60)
         self.ylimitEdit_min = QLineEdit()
@@ -105,8 +105,8 @@ class WindowsDlg(ArtisanDialog):
         self.resetEdit.setMaximumWidth(50)
         self.resetEdit.setMinimumWidth(50)
         self.resetEdit.setAlignment(Qt.AlignRight)
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        self.resetEdit.setValidator(QRegExpValidator(regextime,self))
+        regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        self.resetEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.resetEdit.setText(stringfromseconds(self.aw.qmc.resetmaxtime))
         self.resetEdit.setToolTip(QApplication.translate("Tooltip", "Time axis max on RESET", None))
         # CHARGE min
@@ -115,7 +115,7 @@ class WindowsDlg(ArtisanDialog):
         self.chargeminEdit.setMaximumWidth(50)
         self.chargeminEdit.setMinimumWidth(50)
         self.chargeminEdit.setAlignment(Qt.AlignRight)
-        self.chargeminEdit.setValidator(QRegExpValidator(regextime,self))
+        self.chargeminEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.chargeminEdit.setText(stringfromseconds(self.aw.qmc.chargemintime))
         self.chargeminEdit.setToolTip(QApplication.translate("Tooltip", "Time axis min on RESET", None))
         

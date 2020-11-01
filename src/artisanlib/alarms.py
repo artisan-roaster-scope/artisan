@@ -27,8 +27,8 @@ from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemInt, MyTableWidget
 
 from help import alarms_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegExp)
-from PyQt5.QtGui import QColor, QIntValidator, QRegExpValidator
+from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression)
+from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QHBoxLayout, QVBoxLayout, QCheckBox, QPushButton, QSizePolicy, QSpinBox,
             QTableWidgetSelectionRange)
@@ -663,8 +663,8 @@ class AlarmDlg(ArtisanResizeablDialog):
         #time after selected event
         timeoffsetedit = QLineEdit(stringfromseconds(max(0,self.aw.qmc.alarmoffset[i])))
         timeoffsetedit.setAlignment(Qt.AlignRight)
-        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
-        timeoffsetedit.setValidator(QRegExpValidator(regextime,self))
+        regextime = QRegularExpression(r"^[0-5][0-9]:[0-5][0-9]$")
+        timeoffsetedit.setValidator(QRegularExpressionValidator(regextime,self))
         #type/source
         typeComboBox = MyQComboBox()
         typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)

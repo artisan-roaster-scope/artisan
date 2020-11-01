@@ -78,11 +78,11 @@ from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel
 from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
                             QKeySequence,
                             QPixmap,QColor,QDesktopServices,QIcon,  # @Reimport
-                            QRegExpValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
+                            QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
                           qVersion,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
-                          QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
+                          QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
 try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.x private sip module
@@ -16490,16 +16490,16 @@ class ApplicationWindow(QMainWindow):
         self.etypeComboBox.setToolTip(QApplication.translate("Tooltip", "Type of event", None))
         self.etypeComboBox.addItems(self.qmc.etypes)
 
-        #regexvalue = QRegExp(r"^100|\d?\d?$") # allow event values 0-100 (%)
-        regexvalue = QRegExp(r"^[1-9][0-9]{1,3}$|^\d$") # allow event values 0-9999
+        #regexvalue = QRegularExpression(r"^100|\d?\d?$") # allow event values 0-100 (%)
+        regexvalue = QRegularExpression(r"^[1-9][0-9]{1,3}$|^\d$") # allow event values 0-9999
         self.valueEdit = QLineEdit()
-        self.valueEdit.setValidator(QRegExpValidator(regexvalue,self))
+        self.valueEdit.setValidator(QRegularExpressionValidator(regexvalue,self))
         self.valueEdit.setToolTip(QApplication.translate("Tooltip", "Value of event", None))
         self.valueEdit.setMaximumWidth(50)
 
-        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        regextime = QRegularExpression(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.etimeline = QLineEdit()
-        self.etimeline.setValidator(QRegExpValidator(regextime,self))
+        self.etimeline.setValidator(QRegularExpressionValidator(regextime,self))
         self.etimeline.setMaximumWidth(50)
 
         #create EVENT mini button
