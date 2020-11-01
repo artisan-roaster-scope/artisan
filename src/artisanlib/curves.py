@@ -342,8 +342,9 @@ class HUDDlg(ArtisanDialog):
 
         self.OptimalSmoothingFlag = QCheckBox(QApplication.translate("CheckBox", "Optimal Smoothing Post Roast",None))
         self.OptimalSmoothingFlag.setToolTip(QApplication.translate("Tooltip", "Use an optimal smoothing algorithm (only applicable offline, after recording)", None))        
-        self.OptimalSmoothingFlag.setChecked(self.aw.qmc.optimalSmoothing)
+        self.OptimalSmoothingFlag.setChecked(self.aw.qmc.polyfitRoRcalc and self.aw.qmc.optimalSmoothing)
         self.OptimalSmoothingFlag.stateChanged.connect(self.changeOptimalSmoothingFlag)
+        self.OptimalSmoothingFlag.setEnabled(self.aw.qmc.polyfitRoRcalc)
 
         self.PolyFitFlag = QCheckBox(QApplication.translate("CheckBox", "Polyfit computation",None))
         self.PolyFitFlag.setToolTip(QApplication.translate("Tooltip", "Compute the rate-of-rise over the delta span interval by a linear polyfit", None))        
@@ -577,9 +578,9 @@ class HUDDlg(ArtisanDialog):
         if self.app.artisanviewerMode:
             hudGroupLayout.setEnabled(False)
         rorRoRAlgo = QHBoxLayout()
-        rorRoRAlgo.addWidget(self.OptimalSmoothingFlag) 
+        rorRoRAlgo.addWidget(self.PolyFitFlag) 
         rorRoRAlgo.addSpacing(20)
-        rorRoRAlgo.addWidget(self.PolyFitFlag)
+        rorRoRAlgo.addWidget(self.OptimalSmoothingFlag)
         rorRoRAlgo.addStretch()   
         inputFilter0 = QHBoxLayout()
         inputFilter0.addWidget(self.DropDuplicates)
@@ -2299,6 +2300,11 @@ class HUDDlg(ArtisanDialog):
     @pyqtSlot(int)
     def changePolyFitFlagFlag(self,_=0):
         self.aw.qmc.polyfitRoRcalc = not self.aw.qmc.polyfitRoRcalc
+        self.aw.qmc.optimalSmoothing = self.aw.qmc.optimalSmoothing and self.aw.qmc.polyfitRoRcalc
+        self.OptimalSmoothingFlag.blockSignals(True)
+        self.OptimalSmoothingFlag.setChecked(self.aw.qmc.optimalSmoothing)
+        self.OptimalSmoothingFlag.setEnabled(self.aw.qmc.polyfitRoRcalc)
+        self.OptimalSmoothingFlag.blockSignals(False)
         self.aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
     
     @pyqtSlot(int) 

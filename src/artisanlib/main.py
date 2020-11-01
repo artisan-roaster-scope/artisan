@@ -5684,22 +5684,27 @@ class tgraphcanvas(FigureCanvas):
             return deltas
     
     # computes the RoR over the time and temperature arrays tx and temp via polynoms of degree 1 at index i using a window of wsize
-    # the window size wsize needs to be at least 2
+    # the window size wsize needs to be at least 2 (two succeeding readings)
     def polyRoR(self,tx,temp,wsize,i):
-        if wsize < 2:
-            return 0
-        else:
-            if i < 2:
-                if len(tx) > 1:
-                    # at the left border we duplicate the next RoR value if any
-                    i = 2
-                else:
-                    return 0
+        if i == 0: # we duplicate the first possible RoR value instead of returning a 0
+            i = 1
+        if i>0 and i<len(tx) and i<len(temp):
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')
                 left_index = max(0,i-wsize)
-                LS_fit = numpy.polynomial.polynomial.polyfit(tx[left_index:i],temp[left_index:i], 1)
-            return LS_fit[1]*60.
+                LS_fit = numpy.polynomial.polynomial.polyfit(tx[left_index:i+1],temp[left_index:i+1], 1)
+                return LS_fit[1]*60.
+        else:
+            return 0
+    
+    def arrayRoR(self,tx,temp,wsize):
+        res = (temp[wsize:] - temp[:-wsize]) / ((tx[wsize:] - tx[:-wsize])/60.)
+        # length compensation done downstream, no necessary here!
+#        len_diff = len(tx) - len(res)
+#        if len_diff > 0 and len(res)>0:
+#            # repeat the first value at the begin until reaching the full length
+#            res = numpy.append(numpy.array([res[0]]*len_diff), res)
+        return res
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
@@ -5759,7 +5764,7 @@ class tgraphcanvas(FigureCanvas):
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values:
-                                z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
+                                z1 = self.arrayRoR(tx_roast,nt1,dsET)
                     else:
                         if self.polyfitRoRcalc:
                             try:
@@ -5769,9 +5774,9 @@ class tgraphcanvas(FigureCanvas):
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values:
-                                z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
+                                z1 = self.arrayRoR(tx_roast,nt1,dsET)
                         else:
-                            z1 = (nt1[dsET:] - nt1[:-dsET]) / ((tx_roast[dsET:] - tx_roast[:-dsET])/60.)
+                            z1 = self.arrayRoR(tx_roast,nt1,dsET)
 
                 ld1 = len(z1)
                 # make lists equal in length
@@ -5825,7 +5830,7 @@ class tgraphcanvas(FigureCanvas):
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values
-                                z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
+                                z2 = self.arrayRoR(tx_roast,nt2,dsBT)
                     else:
                         if self.polyfitRoRcalc:
                             try:
@@ -5835,9 +5840,9 @@ class tgraphcanvas(FigureCanvas):
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
                                 # original version just picking the corner values
-                                z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
+                                z2 = self.arrayRoR(tx_roast,nt2,dsBT)
                         else:
-                            z2 = (nt2[dsBT:] - nt2[:-dsBT]) / ((tx_roast[dsBT:] - tx_roast[:-dsBT])/60.)
+                            z2 = self.arrayRoR(tx_roast,nt2,dsBT)
 
                 ld2 = len(z2)
                 

@@ -27,6 +27,7 @@ import shlex
 import subprocess
 import threading
 import platform
+import wquantiles
 
 from artisanlib.util import cmd2str, RoRfromCtoF, appFrozen, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
 
@@ -2639,7 +2640,7 @@ class serialport(object):
         try:
             #### lock shared resources #####
             self.Phidget1045semaphore.acquire(1)
-            self.Phidget1045values.append(t)
+            self.Phidget1045values.append((t,libtime.time()))
         finally:
             if self.Phidget1045semaphore.available() < 1:
                 self.Phidget1045semaphore.release(1)
@@ -2836,19 +2837,19 @@ class serialport(object):
                         try:
                             #### lock shared resources #####
                             self.Phidget1045semaphore.acquire(1)
-                            if len(self.Phidget1045values) > 0:
-#                                async_res = numpy.average(self.Phidget1045values)
-                                async_res = numpy.median(self.Phidget1045values)
-                                if deviceType == DeviceID.PHIDID_1045:
-                                    rate = self.aw.qmc.phidget1045_dataRate
-                                elif deviceType == DeviceID.PHIDID_TMP1200:
-                                    if alternative_conf:
-                                        rate = self.aw.qmc.phidget1200_2_dataRate
-                                    else:
-                                        rate = self.aw.qmc.phidget1200_dataRate
-                                else:
-                                    rate = self.aw.qmc.phidget1048_dataRate
-                                self.Phidget1045values = self.Phidget1045values[-round((self.aw.qmc.delay/rate)):]
+                            now = libtime.time()
+                            start_of_interval = now-self.aw.qmc.delay/1000
+                            # 1. just consider async readings taken within the previous sampling interval
+                            # and associate them with the (arrivial) time since the begin of that interval
+                            valid_readings = [(r,t - start_of_interval) for (r,t) in self.Phidget1045values if t > start_of_interval]
+                            if len(valid_readings) > 0:
+                                # 2. calculate the value
+                                # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
+                                readings = [r for (r,t) in valid_readings]
+                                weights = [t for (r,t) in valid_readings]
+                                async_res = wquantiles.median(numpy.array(readings),numpy.array(weights))
+                                # 3. consume old readings
+                                self.Phidget1045values = []
                         except:
                             self.Phidget1045values = []
                         finally:
@@ -2922,7 +2923,7 @@ class serialport(object):
         try:
             #### lock shared resources #####
             self.Phidget1048semaphores[channel].acquire(1)
-            self.Phidget1048values[channel].append(t)
+            self.Phidget1048values[channel].append((t,libtime.time()))
         finally:
             if self.Phidget1048semaphores[channel].available() < 1:
                 self.Phidget1048semaphores[channel].release(1)
@@ -2933,23 +2934,39 @@ class serialport(object):
             try:
                 #### lock shared resources #####
                 self.Phidget1048semaphores[channel].acquire(1)
-                if len(self.Phidget1048values[channel]) > 0:
-#                    res = numpy.average(self.Phidget1048values[channel])
-                    res = numpy.median(self.Phidget1048values[channel])
-                    
-#                    data = self.Phidget1048values[channel]
-#                    data_mean, data_std = numpy.mean(data), numpy.std(data)
-#                    if data_std > 0:
-#                        cut_off = data_std * 0.9
-#                        lower, upper = data_mean - cut_off, data_mean + cut_off
-#                        outliers_removed = [x for x in data if x > lower and x < upper]
-#                        if len(outliers_removed) < 3:
-#                            outliers_removed = data
-#                    else:
-#                        outliers_removed = data
-#                    res = numpy.average(outliers_removed)
-
-                    self.Phidget1048values[channel] = self.Phidget1048values[channel][-round((self.aw.qmc.delay/self.aw.qmc.phidget1048_dataRate)):]
+                
+                now = libtime.time()
+                start_of_interval = now-self.aw.qmc.delay/1000
+                # 1. just consider async readings taken within the previous sampling interval
+                # and associate them with the (arrivial) time since the begin of that interval
+                valid_readings = [(r,t - start_of_interval) for (r,t) in self.Phidget1048values[channel] if t > start_of_interval]
+                if len(valid_readings) > 0:
+                    # 2. calculate the value
+                    # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
+                    readings = [r for (r,t) in valid_readings]
+                    weights = [t for (r,t) in valid_readings]
+                    res = wquantiles.median(numpy.array(readings),numpy.array(weights))
+#                    res = numpy.median(numpy.array(readings))
+                    # 3. consume old readings
+                    self.Phidget1048values[channel] = []                
+                
+#                if len(self.Phidget1048values[channel]) > 0:
+##                    res = numpy.average(self.Phidget1048values[channel])
+#                    res = numpy.median(self.Phidget1048values[channel])
+#                    
+##                    data = self.Phidget1048values[channel]
+##                    data_mean, data_std = numpy.mean(data), numpy.std(data)
+##                    if data_std > 0:
+##                        cut_off = data_std * 0.9
+##                        lower, upper = data_mean - cut_off, data_mean + cut_off
+##                        outliers_removed = [x for x in data if x > lower and x < upper]
+##                        if len(outliers_removed) < 3:
+##                            outliers_removed = data
+##                    else:
+##                        outliers_removed = data
+##                    res = numpy.average(outliers_removed)
+#
+#                    self.Phidget1048values[channel] = self.Phidget1048values[channel][-round((self.aw.qmc.delay/self.aw.qmc.phidget1048_dataRate)):]
             except:
                 self.Phidget1048values[channel] = []
             finally:
@@ -3179,7 +3196,7 @@ class serialport(object):
             temp = self.bridgeValue2Temperature(channel,v*1000) # Note in Phidgets API v22 this factor 1000 has to be added
             if self.aw.qmc.mode == "F" and self.aw.qmc.phidget1046_formula[channel] != 2:
                 temp = fromCtoF(temp)
-            self.Phidget1046values[channel].append(temp)
+            self.Phidget1046values[channel].append((temp,libtime.time()))
         finally:
             if self.Phidget1046semaphores[channel].available() < 1:
                 self.Phidget1046semaphores[channel].release(1)
@@ -3220,10 +3237,24 @@ class serialport(object):
             try:
                 #### lock shared resources #####
                 self.Phidget1046semaphores[channel].acquire(1)
-                if len(self.Phidget1046values[channel]) > 0:
-#                    res = numpy.average(self.Phidget1046values[channel])
-                    res = numpy.median(self.Phidget1046values[channel])
-                    self.Phidget1046values[channel] = self.Phidget1046values[channel][-round((self.aw.qmc.delay/self.aw.qmc.phidget1046_dataRate)):] 
+                now = libtime.time()
+                start_of_interval = now-self.aw.qmc.delay/1000
+                # 1. just consider async readings taken within the previous sampling interval
+                # and associate them with the (arrivial) time since the begin of that interval
+                valid_readings = [(r,t - start_of_interval) for (r,t) in self.Phidget1046values[channel] if t > start_of_interval]
+                if len(valid_readings) > 0:
+                    # 2. calculate the value
+                    # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
+                    readings = [r for (r,t) in valid_readings]
+                    weights = [t for (r,t) in valid_readings]
+                    res = wquantiles.median(numpy.array(readings),numpy.array(weights))
+                    # 3. consume old readings
+                    self.Phidget1046values[channel] = []
+                                                
+#                if len(self.Phidget1046values[channel]) > 0:
+##                    res = numpy.average(self.Phidget1046values[channel])
+#                    res = numpy.median(self.Phidget1046values[channel])
+#                    self.Phidget1046values[channel] = self.Phidget1046values[channel][-round((self.aw.qmc.delay/self.aw.qmc.phidget1046_dataRate)):] 
             except:
                 self.Phidget1046values[channel] = []
             finally:
@@ -4549,7 +4580,7 @@ class serialport(object):
             try:
                 #### lock shared resources #####
                 self.PhidgetIOsemaphores[channel].acquire(1)
-                self.PhidgetIOvalues[channel].append(v)
+                self.PhidgetIOvalues[channel].append((v,libtime.time()))
             finally:
                 if self.PhidgetIOsemaphores[channel].available() < 1:
                     self.PhidgetIOsemaphores[channel].release(1)
@@ -4561,10 +4592,23 @@ class serialport(object):
                 try:
                     #### lock shared resources #####
                     self.PhidgetIOsemaphores[i].acquire(1)
-                    if len(self.PhidgetIOvalues[i]) > 0:
-#                        res = numpy.average(self.PhidgetIOvalues[i])
-                        res = numpy.median(self.PhidgetIOvalues[i])
-                        self.PhidgetIOvalues[i] = self.PhidgetIOvalues[i][-round((self.aw.qmc.delay/self.aw.qmc.phidget1018_dataRates[i])):] 
+                    now = libtime.time()
+                    start_of_interval = now-self.aw.qmc.delay/1000
+                    # 1. just consider async readings taken within the previous sampling interval
+                    # and associate them with the (arrivial) time since the begin of that interval
+                    valid_readings = [(r,t - start_of_interval) for (r,t) in self.PhidgetIOvalues[i] if t > start_of_interval]
+                    if len(valid_readings) > 0:
+                        # 2. calculate the value
+                        # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
+                        readings = [r for (r,t) in valid_readings]
+                        weights = [t for (r,t) in valid_readings]
+                        res = wquantiles.median(numpy.array(readings),numpy.array(weights))
+                        # 3. consume old readings
+                        self.PhidgetIOvalues[i] = []                    
+#                    if len(self.PhidgetIOvalues[i]) > 0:
+##                        res = numpy.average(self.PhidgetIOvalues[i])
+#                        res = numpy.median(self.PhidgetIOvalues[i])
+#                        self.PhidgetIOvalues[i] = self.PhidgetIOvalues[i][-round((self.aw.qmc.delay/self.aw.qmc.phidget1018_dataRates[i])):] 
                 except Exception:
                     self.PhidgetIOvalues[i] = []
                 finally:
@@ -4947,7 +4991,7 @@ class serialport(object):
         try:
             #### lock shared resources #####
             self.YOCTOsemaphores[channel].acquire(1)
-            self.YOCTOvalues[channel].append(measure.get_averageValue())
+            self.YOCTOvalues[channel].append((measure.get_averageValue(),libtime.time()))
         finally:
             if self.YOCTOsemaphores[channel].available() < 1:
                 self.YOCTOsemaphores[channel].release(1)
@@ -5074,10 +5118,23 @@ class serialport(object):
                         try:
                             #### lock shared resources #####
                             self.YOCTOsemaphores[0].acquire(1)
-                            if len(self.YOCTOvalues[0]) > 0:
-#                                probe1 = numpy.average(self.YOCTOvalues[0])
-                                probe1 = numpy.median(self.YOCTOvalues[0])
-                                self.YOCTOvalues[0] = self.YOCTOvalues[0][-max(1,round((self.aw.qmc.delay/self.aw.qmc.YOCTO_dataRate))):]
+                            now = libtime.time()
+                            start_of_interval = now-self.aw.qmc.delay/1000
+                            # 1. just consider async readings taken within the previous sampling interval
+                            # and associate them with the (arrivial) time since the begin of that interval
+                            valid_readings = [(r,t - start_of_interval) for (r,t) in self.YOCTOvalues[0] if t > start_of_interval]
+                            if len(valid_readings) > 0:
+                                # 2. calculate the value
+                                # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
+                                readings = [r for (r,t) in valid_readings]
+                                weights = [t for (r,t) in valid_readings]
+                                probe1 = wquantiles.median(numpy.array(readings),numpy.array(weights))
+                                # 3. consume old readings
+                                self.YOCTOvalues[0] = []
+#                            if len(self.YOCTOvalues[0]) > 0:
+##                                probe1 = numpy.average(self.YOCTOvalues[0])
+#                                probe1 = numpy.median(self.YOCTOvalues[0])
+#                                self.YOCTOvalues[0] = self.YOCTOvalues[0][-max(1,round((self.aw.qmc.delay/self.aw.qmc.YOCTO_dataRate))):]
                         except:
                             self.YOCTOvalues[0] = []
                         finally:
@@ -5109,10 +5166,23 @@ class serialport(object):
                         try:
                             #### lock shared resources #####
                             self.YOCTOsemaphores[1].acquire(1)
-                            if len(self.YOCTOvalues[1]) > 0:
-#                                probe2 = numpy.average(self.YOCTOvalues[1])
-                                probe2 = numpy.median(self.YOCTOvalues[1])
-                                self.YOCTOvalues[1] = self.YOCTOvalues[1][-round((self.aw.qmc.delay/self.aw.qmc.YOCTO_dataRate)):]
+                            now = libtime.time()
+                            start_of_interval = now-self.aw.qmc.delay/1000
+                            # 1. just consider async readings taken within the previous sampling interval
+                            # and associate them with the (arrivial) time since the begin of that interval
+                            valid_readings = [(r,t - start_of_interval) for (r,t) in self.YOCTOvalues[1] if t > start_of_interval]
+                            if len(valid_readings) > 0:
+                                # 2. calculate the value
+                                # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
+                                readings = [r for (r,t) in valid_readings]
+                                weights = [t for (r,t) in valid_readings]
+                                probe2 = wquantiles.median(numpy.array(readings),numpy.array(weights))
+                                # 3. consume old readings
+                                self.YOCTOvalues[1] = []
+#                            if len(self.YOCTOvalues[1]) > 0:
+##                                probe2 = numpy.average(self.YOCTOvalues[1])
+#                                probe2 = numpy.median(self.YOCTOvalues[1])
+#                                self.YOCTOvalues[1] = self.YOCTOvalues[1][-round((self.aw.qmc.delay/self.aw.qmc.YOCTO_dataRate)):]
                         except:
                             self.YOCTOvalues[1] = []
                         finally:
