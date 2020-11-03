@@ -3684,7 +3684,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
                             if aw.qmc.flagstart:
                                 value = aw.float2float((slidervalue + 10.0) / 10.0)
-                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber,slidernr)))
+                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber + 1,slidernr)))
                             aw.fireslideraction(slidernr)
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
@@ -25381,21 +25381,11 @@ class ApplicationWindow(QMainWindow):
                     if relevant_ETs: # relevant_ETs might be the empty list!
                         computedProfile["MET"] = self.float2float(max(relevant_ETs))
             ######### DRY #########
-            # calc DRY_time_idx (index of DRY; is None if unknown)
-            if self.qmc.timeindex[1] and aw.qmc.phasesbuttonflag:
-                #manual dryend available
+            if self.qmc.timeindex[1]:
+                computedProfile["DRY_time"] = self.float2float(self.qmc.timex[self.qmc.timeindex[1]] - start)
+                computedProfile["DRY_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[1]])
+                computedProfile["DRY_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[1]])
                 DRY_time_idx = self.qmc.timeindex[1]
-            else:
-                dryEndIndex = self.findDryEnd(TP_index)  # use TP_index to avoid recomputation of TP if it failed before
-                #we use the dryEndIndex respecting the dry phase
-                if dryEndIndex > 0 and dryEndIndex < len(self.qmc.timex):
-                    DRY_time_idx = dryEndIndex
-                else:
-                    DRY_time_idx = None
-            if DRY_time_idx:
-                computedProfile["DRY_time"] = self.float2float(self.qmc.timex[DRY_time_idx] - start)
-                computedProfile["DRY_ET"] = self.float2float(self.qmc.temp1[DRY_time_idx])
-                computedProfile["DRY_BT"] = self.float2float(self.qmc.temp2[DRY_time_idx])
             ######### FC #########
             if self.qmc.timeindex[2]:
                 computedProfile["FCs_time"] = self.float2float(self.qmc.timex[self.qmc.timeindex[2]] - start)
@@ -25454,6 +25444,8 @@ class ApplicationWindow(QMainWindow):
                 if "TP_BT" in computedProfile and "TP_time" in computedProfile and "DROP_BT" in computedProfile and "DROP_time" in computedProfile and \
                     (computedProfile["DROP_time"]-computedProfile["TP_time"]) != 0:
                     computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
+                if aw.qmc.timeindex[2] > 0:
+                    computedProfile["fcs_ror"] = self.float2float(aw.qmc.delta2[aw.qmc.timeindex[2]])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -29540,199 +29532,210 @@ class ApplicationWindow(QMainWindow):
         res["AUC"] = (data["AUC"] if "AUC" in data else "")
         return res
 
-    def extendedRankingdatadef(self):
-        return [],[] #disables extended results
-        #name, field, content_type[text,int,float1,float2,float4,text2float1,text2float2,text2int,percent,time,bool,],testzero,
-        extended_profile_fields = [
-            ["Mode",          "mode",            "text",      "false"],
-            ["Roaster",       "roastertype",     "text",      "false"],
-            ["Operator",      "operator",        "text",      "false"],
-            ["Organization",  "organization",    "text",      "false"],
-            ["Drum Speed",    "drumspeed",       "text2int",  "true"],
-            ["Heavy FC",      "heavyFC",         "bool",      "false"],
-            ["Low FC",        "lowFC",           "bool",      "false"],
-            ["Light Cut",     "lightCut",        "bool",      "false"],
-            ["Dark Cut",      "darkCut",         "bool",      "false"],
-            ["Drops",         "drops",           "bool",      "false"],
-            ["Oily",          "oily",            "bool",      "false"],
-            ["Uneven",        "uneven",          "bool",      "false"],
-            ["Tipping",       "tipping",         "bool",      "false"],
-            ["Scorching",     "scorching",       "bool",      "false"],
-            ["Divots",        "divots",          "bool",      "false"],
-            ["Whole Color",   "whole_color",     "int",       "true"], 
-            ["Ground Color",  "ground_color",    "int",       "true"],
-            ["Color System",  "color_system",    "text",      "false"],
-            ["Screen Min",    "beansize_min",    "text2int",  "true"],
-            ["Screen Max",    "beansize_max",    "text2int",  "true"],
-            ["Bean Temp",     "greens_temp",     "float1",     "true"],
+    def rankingdataDef(self):
+        field_index = [
+            "fld",     #field name as used in source list or an eval string
+            "src",     #data source from where to pull fld [prof,comp,rank,prod,eval,]
+            "typ",     #content type [text,int,float1,float2,float4,text2float1,text2float2,text2int,percent,time,bool,]
+            "test0",   #test for a zero value and subsitute an empty string
+            "units",   #conversion units [temp,weight,volume,ror,]
+            "name",    #translated field name for use in the header
         ]
-        extended_computed_fields = [
-            ["CHARGE ET",           "CHARGE_ET",           "float1",  "false"],
-            ["CHARGE BT",           "CHARGE_BT",           "float1",  "false"],
-            ["TP Time",             "TP_time",             "time",    "false"],
-            ["TP ET",               "TP_ET",               "float1",  "false"],
-            ["TP BT",               "TP_BT",               "float1",  "false"],
-            ["DRY Time",            "DRY_time",            "time",    "false"],
-            ["DRY ET",              "DRY_ET",              "float1",  "false"],
-            ["DRY BT",              "DRY_BT",              "float1",  "false"],
-            ["_FCs Time",           "FCs_time",            "time",    "false"],
-            ["FCs ET",              "FCs_ET",              "float1",  "false"],
-            ["FCs BT",              "FCs_BT",              "float1",  "false"],
-            ["FCe Time",            "FCe_time",            "time",    "false"],
-            ["FCe ET",              "FCe_ET",              "float1",  "false"],
-            ["FCe BT",              "FCe_BT",              "float1",  "false"],
-            ["SCs Time",            "SCs_time",            "time",    "false"],
-            ["SCs ET",              "SCs_ET",              "float1",  "false"],
-            ["SCs BT",              "SCs_BT",              "float1",  "false"],
-            ["SCe Time",            "SCe_time",            "time",    "false"],
-            ["SCe ET",              "SCe_ET",              "float1",  "false"],
-            ["SCE BT",              "SCe_BT",              "float1",  "false"],
-            ["DROP Time",           "DROP_time",           "time",    "false"],
-            ["DROP ET",             "DROP_ET",             "float1",  "false"],
-            ["DROP BT",             "DROP_BT",             "float1",  "false"],
-            ["COOL Time",           "COOL_time",           "time",    "false"],
-            ["COOL ET",             "COOL_ET",             "float1",  "false"],
-            ["COOL BT",             "COOL_BT",             "float1",  "false"],
-            ["Total Time",          "totaltime",           "time",    "false"],
-            ["Dry Phase Time",      "dryphasetime",        "time",    "false"],
-            ["Mid Phase Time",      "midphasetime",        "time",    "false"],
-            ["Finish Phase Time",   "finishphasetime",     "time",    "false"],
-            ["Dry Phase RoR",       "dry_phase_ror",       "float1",  "false"],
-            ["Mid Phase RoR",       "mid_phase_ror",       "float1",  "false"],
-            ["Finish Phase RoR",    "finish_phase_ror",    "float1",  "false"],
-            ["Total RoR",           "total_ror",           "float1",  "false"],
-            ["MET",                 "MET",                 "float1",  "false"],
-            ["AUC",                 "AUC",                 "int",     "false"],
-            ["AUC Begin",           "AUCbegin",            "text",    "false"],
-            ["AUC Base",            "AUCbase",             "float1",  "false"],
-            ["AUC From Event Flag", "AUCfromeventflag",    "int",     "false"],
-            ["Dry Phase_AUC",       "dry_phase_AUC",       "int",     "false"],
-            ["Mid Phase AUC",       "mid_phase_AUC",       "int",     "false"],
-            ["Finish Phase AUC",    "finish_phase_AUC",    "int",     "false"],
-            ["Weight Loss",         "weight_loss",         "percent", "false"],
-            ["Volume Gain",         "volume_gain",         "percent", "false"],
-            ["Moisture Loss",       "moisture_loss",       "percent", "false"],
-            ["Organic Loss",        "organic_loss",        "percent", "false"],
-            ["Volume In",           "volumein",            "float4",  "false"],
-            ["Volume Out",          "volumeout",           "float4",  "false"],
-            ["Weight In",           "weightin",            "float1",  "false"],
-            ["Weight Out",          "weightout",           "float1",  "false"],
-            ["Green Density",       "green_density",       "float1",  "false"],
-            ["Roasted Density",     "roasted_density",     "float1",  "false"],
-            ["Moisture Greens",     "moisture_greens",     "percent", "false"],
-            ["Moisture Roasted",    "moisture_roasted",    "percent", "false"],
-            ["Ambient Humidity",    "ambient_humidity",    "float1",  "false"],
-            ["Ambient Pressure",    "ambient_pressure",    "float1",  "false"],
-            ["Ambient Temperature", "ambient_temperature", "float1",  "false"],
+        ranking_data_fields = [
+            #fld,                   source,  typ,        test0,    units,   name
+            ["id",                  "prod",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Batch',None)                ],
+            ["datetime",            "prod",  "date",     "false",  "",      QApplication.translate('HTML Report Template','Time',None)                 ],
+            ["title",               "prod",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Profile  ',None)            ],
+            ["weightin",            "comp",  "float1",   "false",  "weight",QApplication.translate('HTML Report Template','Weight In',None)            ],
+            ["CHARGE_BT",           "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','CHARGE BT',None)            ],
+            ["FCs_time",            "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','FCs Time',None)             ],
+            ["FCs_BT",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','FCs BT',None)               ],
+            ["DROP_time",           "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','DROP Time',None)            ],
+            ["DROP_BT",             "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','DROP BT',None)              ],
+            ["DRY_percent",         "rank",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Dry Percent',None)          ],
+            ["MAI_percent",         "rank",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','MAI Percent',None)          ],
+            ["DEV_percent",         "rank",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Dev Percent',None)          ],
+            ["AUC",                 "comp",  "int",      "false",  "",      QApplication.translate('HTML Report Template','AUC',None)                  ],
+            ["weight_loss",         "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Weight Loss',None)          ],
+            ["color",               "rank",  "text2int", "false",  "",      QApplication.translate('HTML Report Template','Color',None)                ],
+            ["cupping",             "rank",  "text2int", "false",  "",      QApplication.translate('HTML Report Template','Cupping',None)              ],
+            ["mode",                "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Mode',None)                 ],
+            ["roastertype",         "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Roaster',None)              ],
+            ["operator",            "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Operator',None)             ],
+            ["organization",        "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Organization',None)         ],
+            ["drumspeed",           "prof",  "text2int", "true" ,  "",      QApplication.translate('HTML Report Template','Drum Speed',None)           ],
+            ["heavyFC",             "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Heavy FC',None)             ],
+            ["lowFC",               "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Low FC',None)               ],
+            ["lightCut",            "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Light Cut',None)            ],
+            ["darkCut",             "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Dark Cut',None)             ],
+            ["drops",               "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Drops',None)                ],
+            ["oily",                "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Oily',None)                 ],
+            ["uneven",              "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Uneven',None)               ],
+            ["tipping",             "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Tipping',None)              ],
+            ["scorching",           "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Scorching',None)            ],
+            ["divots",              "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Divots',None)               ],
+            ["whole_color",         "prof",  "int",      "true" ,  "",      QApplication.translate('HTML Report Template','Whole Color',None)          ], 
+            ["ground_color",        "prof",  "int",      "true" ,  "",      QApplication.translate('HTML Report Template','Ground Color',None)         ],
+            ["color_system",        "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Color System',None)         ],
+            ["beansize_min",        "prof",  "text2int", "true" ,  "",      QApplication.translate('HTML Report Template','Screen Min',None)           ],
+            ["beansize_max",        "prof",  "text2int", "true" ,  "",      QApplication.translate('HTML Report Template','Screen Max',None)           ],
+            ["greens_temp",         "prof",  "float1",   "true" ,  "temp",  QApplication.translate('HTML Report Template','Bean Temp',None)            ],
+            ["CHARGE_ET",           "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','CHARGE ET',None)            ],
+            ["CHARGE_BT",           "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','CHARGE BT',None)            ],
+            ["TP_time",             "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','TP Time',None)              ],
+            ["TP_ET",               "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','TP ET',None)                ],
+            ["TP_BT",               "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','TP BT',None)                ],
+            ["DRY_time",            "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','DRY Time',None)             ],
+            ["DRY_ET",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','DRY ET',None)               ],
+            ["DRY_BT",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','DRY BT',None)               ],
+            ["FCs_time",            "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','FCs Time',None)             ],
+            ["FCs_ET",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','FCs ET',None)               ],
+            ["FCs_BT",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','FCs BT',None)               ],
+            ["FCe_time",            "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','FCe Time',None)             ],
+            ["FCe_ET",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','FCe ET',None)               ],
+            ["FCe_BT",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','FCe BT',None)               ],
+            ["SCs_time",            "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','SCs Time',None)             ],  
+            ["SCs_ET",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','SCs ET',None)               ],
+            ["SCs_BT",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','SCs BT',None)               ],
+            ["SCe_time",            "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','SCe Time',None)             ],
+            ["SCe_ET",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','SCe ET',None)               ],
+            ["SCe_BT",              "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','SCE BT',None)               ],
+            ["DROP_time",           "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','DROP Time',None)            ],
+            ["DROP_ET",             "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','DROP ET',None)              ],
+            ["DROP_BT",             "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','DROP BT',None)              ],
+            ["COOL_time",           "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','COOL Time',None)            ],
+            ["COOL_ET",             "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','COOL ET',None)              ],
+            ["COOL_BT",             "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','COOL BT',None)              ],
+            ["totaltime",           "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','Total Time',None)           ],
+            ["dryphasetime",        "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','Dry Phase Time',None)       ],
+            ["midphasetime",        "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','Mid Phase Time',None)       ],
+            ["finishphasetime",     "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','Finish Phase Time',None)    ],
+            ["dry_phase_ror",       "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Dry Phase RoR',None)        ],
+            ["mid_phase_ror",       "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Mid Phase RoR',None)        ],
+            ["finish_phase_ror",    "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Finish Phase RoR',None)     ],
+            ["total_ror",           "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','Total RoR',None)            ],
+            ["fcs_ror",             "comp",  "float1",   "false",  "ror",   QApplication.translate('HTML Report Template','FCs RoR',None)              ],
+            ["MET",                 "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','MET',None)                  ],
+            ["AUC",                 "comp",  "int",      "false",  "",      QApplication.translate('HTML Report Template','AUC',None)                  ],
+            ["(dsd['computed']['AUCbegin'] if ('AUCbegin' in dsd['computed'] and 'AUCfromeventflag' in dsd['computed'] and dsd['computed']['AUCfromeventflag']) else '')", "eval", "text", "false", "", QApplication.translate('HTML Report Template','AUC Begin',None)  ],
+            ["AUCbase",             "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','AUC Base',None)             ],
+            ["dry_phase_AUC",       "comp",  "int",      "false",  "",      QApplication.translate('HTML Report Template','Dry Phase_AUC',None)        ],
+            ["mid_phase_AUC",       "comp",  "int",      "false",  "",      QApplication.translate('HTML Report Template','Mid Phase AUC',None)        ],
+            ["finish_phase_AUC",    "comp",  "int",      "false",  "",      QApplication.translate('HTML Report Template','Finish Phase AUC',None)     ],
+            ["weight_loss",         "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Weight Loss',None)          ],
+            ["volume_gain",         "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Volume Gain',None)          ],
+            ["moisture_loss",       "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Moisture Loss',None)        ],
+            ["organic_loss",        "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Organic Loss',None)         ],
+            ["volumein",            "comp",  "float1",   "false",  "volume",QApplication.translate('HTML Report Template','Volume In',None)            ],
+            ["volumeout",           "comp",  "float1",   "false",  "volume",QApplication.translate('HTML Report Template','Volume Out',None)           ],
+            ["weightin",            "comp",  "float1",   "false",  "weight",QApplication.translate('HTML Report Template','Weight In',None)            ],
+            ["weightout",           "comp",  "float1",   "false",  "weight",QApplication.translate('HTML Report Template','Weight Out',None)           ],
+            ["green_density",       "comp",  "float1",   "false",  "(g/l)", QApplication.translate('HTML Report Template','Green Density',None)        ],
+            ["roasted_density",     "comp",  "float1",   "false",  "(g/l)", QApplication.translate('HTML Report Template','Roasted Density',None)      ],
+            ["moisture_greens",     "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Moisture Greens',None)      ],
+            ["moisture_roasted",    "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Moisture Roasted',None)     ],
+            ["ambient_humidity",    "comp",  "float1",   "false",  "",      QApplication.translate('HTML Report Template','Ambient Humidity',None)     ],
+            ["ambient_pressure",    "comp",  "float1",   "false",  "",      QApplication.translate('HTML Report Template','Ambient Pressure',None)     ],
+            ["ambient_temperature", "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','Ambient Temperature',None)  ],
         ]
-        return extended_profile_fields, extended_computed_fields
-        
-    def extendedRankingData2List(self,dsd,units=False,header=False):
+        return ranking_data_fields, field_index
+
+    def extendedRankingData2List(self,dsd=[],rd=[],pd=[],header=False):
         res = []
-        hdr = []
-        data = [] #dave passify pydev
-        extended_profile_fields, extended_computed_fields = self.extendedRankingdatadef()
-        if header:
-            for i in range(len(extended_profile_fields)):
-                name = extended_profile_fields[i][0]
-                hdr.append(name)
-            for i in range(len(extended_computed_fields)):
-                name = extended_computed_fields[i][0]
-                hdr.append(name)
-            return hdr
+        weight_unit = aw.qmc.weight[2]
+        volume_unit = aw.qmc.volume[2]
+        temperature_unit = aw.qmc.mode
         try:
-            for i in range(len(extended_profile_fields)):
-                name = extended_profile_fields[i][0]
-                fld = extended_profile_fields[i][1]
-                typ = extended_profile_fields[i][2]
-                test0 = extended_profile_fields[i][3]
-                if fld in dsd:
-                    if (test0 == "true" and aw.float2float(toFloat(dsd[fld])) > 0) or test0 == "false":
+            ranking_data_fields, field_index = self.rankingdataDef()
+            if header:
+                for i in range(len(ranking_data_fields)):
+                    name = ranking_data_fields[i][field_index.index("name")]
+                    units = ranking_data_fields[i][field_index.index("units")]
+                    if units == 'temp':
+                        suffix = " ({0})".format(temperature_unit)
+                    elif units == 'volume':
+                        suffix = " ({0})".format(volume_unit)
+                    elif units == 'weight':
+                        suffix = " ({0})".format(weight_unit)
+                    elif units == 'ror':
+                        suffix = " ({0})".format(temperature_unit + "/min")
+                    elif units.startswith('('):
+                        suffix = " {0}".format(units)
+                    else: 
+                        suffix = ""
+                    hdr_name = "{0}{1}".format(name,suffix)
+                    res.append(hdr_name)
+            else:
+                for i in range(len(ranking_data_fields)):
+                    name = ranking_data_fields[i][field_index.index("name")]
+                    fld = ranking_data_fields[i][field_index.index("fld")]
+                    src = ranking_data_fields[i][field_index.index("src")]
+                    typ = ranking_data_fields[i][field_index.index("typ")]
+                    test0 = ranking_data_fields[i][field_index.index("test0")]
+                    units = ranking_data_fields[i][field_index.index("units")]
+                    if src == 'comp' and fld in dsd["computed"]:
+                        res_fld = dsd["computed"][fld]
+                    elif src == 'prof' and fld in dsd:
+                        res_fld = dsd[fld]
+                    elif src == 'rank' and fld in rd:
+                        res_fld = rd[fld]
+                    elif src == 'prod' and fld in pd:
+                        res_fld = pd[fld]
+                    elif src == 'eval':
+                        res_fld = eval(fld)
+                    else:
+                        res.append("")
+                        continue
+
+                    if (test0 == "true" and aw.float2float(toFloat(res_fld)) > 0) or test0 == "false":
+                        if units == 'temp':
+                            conv_fld = convertTemp(res_fld,dsd["mode"],temperature_unit)
+                        elif units == 'ror':
+                            conv_fld = convertRoR(res_fld,dsd["mode"],temperature_unit)
+                        elif units == 'volume':
+                            conv_fld = aw.convertVolume(res_fld,0,aw.qmc.volume_units.index(volume_unit))
+                        elif units == 'weight':
+                            conv_fld = aw.convertWeight(res_fld,0,aw.qmc.weight_units.index(weight_unit))
+                        else:
+                            conv_fld = res_fld
+
                         if typ == "text":
-                            res.append('{}'.format(dsd[fld]))
+                            res.append('{}'.format(conv_fld))
                         elif typ == "int":
-                            res.append('{:d}'.format(dsd[fld]))
+                            res.append('{:d}'.format(conv_fld))
                         elif typ == "temp":
-                            #dave need to split float1 from temp
-                            #dave needs update for when units==True!!!
-                            res.append('{0:.1f}'.format((convertTemp(dsd[fld],(data["temp_unit"] if units else ""),aw.qmc.mode) if fld in data else 0)))
+                            res.append('{0:.1f}'.format(conv_fld))
                         elif typ == "float1":
-                            res.append('{0:.1f}'.format(dsd[fld]))
+                            res.append('{0:.1f}'.format(conv_fld))
                         elif typ == "float2":
-                            res.append('{0:.2f}'.format(dsd[fld]))
+                            res.append('{0:.2f}'.format(conv_fld))
                         elif typ == "float4":
-                            res.append('{0:.4f}'.format(dsd[fld]))
+                            res.append('{0:.4f}'.format(conv_fld))
                         elif typ == "text2float1":
-                            res.append('{0:.1f}'.format(toFloat(dsd[fld])))
+                            res.append('{0:.1f}'.format(toFloat(conv_fld)))
                         elif typ == "text2float2":
-                            res.append('{0:.2f}'.format(toFloat(dsd[fld])))
+                            res.append('{0:.2f}'.format(toFloat(conv_fld)))
                         elif typ == "text2int":
-                            res.append('{:d}'.format(toInt(dsd[fld])))
+                            res.append('{:d}'.format(toInt(conv_fld)))
                         elif typ == "percent":
-                            res.append('{0:.1f}%'.format(dsd[fld]/100.))
+                            res.append('{0:.1f}%'.format(toFloat(conv_fld)))
                         elif typ == "time":
-                            h,m = divmod(dsd[fld],60)
-                            #dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
+                            h,m = divmod(conv_fld,60)
                             res.append('{:d}:{:d}'.format(int(h),int(m)))
+                        elif typ == "date":
+                            res.append('{}'.format(QDateTime(conv_fld).toPyDateTime()))
                         elif typ == "bool":
-                            res.append(str(dsd[fld]))
+                            res.append(str(conv_fld))
                         else:
                             res.append("")
                     else:
                         res.append("")
-                else:
-                    res.append("")
-
-            for i in range(len(extended_computed_fields)):
-                name = extended_computed_fields[i][0]
-                fld = extended_computed_fields[i][1]
-                typ = extended_computed_fields[i][2]
-                test0 = extended_computed_fields[i][3]
-                if fld in dsd["computed"]:
-                    if (test0 == "true" and aw.float2float(toFloat(dsd["computed"][fld])) > 0) or test0 == "false":
-                        if typ == "text":
-                            res.append('{}'.format(dsd["computed"][fld]))
-                        elif typ == "int":
-                            res.append('{:d}'.format(dsd["computed"][fld]))
-                        elif typ == "temp":
-                            #dave need to split float1 from temp
-                            #dave needs update for when units==True!!!
-                            res.append('{0:.1f}'.format((convertTemp(dsd["computed"][fld],(data["temp_unit"] if units else ""),aw.qmc.mode) if fld in data else 0)))
-                        elif typ == "float1":
-                            res.append('{0:.1f}'.format(dsd["computed"][fld]))
-                        elif typ == "float2":
-                            res.append('{0:.2f}'.format(dsd["computed"][fld]))
-                        elif typ == "float4":
-                            res.append('{0:.4f}'.format(dsd["computed"][fld]))
-                        elif typ == "text2float1":
-                            res.append('{0:.1f}'.format(toFloat(dsd["computed"][fld])))
-                        elif typ == "text2float2":
-                            res.append('{0:.2f}'.format(toFloat(dsd["computed"][fld])))
-                        elif typ == "text2int":
-                            res.append('{:d}'.format(toInt(dsd["computed"][fld])))
-                        elif typ == "percent":
-                            res.append('{0:.1f}%'.format(dsd["computed"][fld]/100.))
-                        elif typ == "time":
-                            h,m = divmod(dsd["computed"][fld],60)
-                            #dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
-                            res.append('{:d}:{:d}'.format(int(h),int(m)))
-                        elif typ == "bool":
-                            res.append(str(dsd["computed"][fld]))
-                        else:
-                            res.append("")
-                    else:
-                        res.append("")
-                else:
-                    res.append("")
-
+            return res
         except Exception as e:
-        #                            import traceback
-        #                            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " extendedRankingData2List() {0}").format(str(e)),exc_tb.tb_lineno)
+            return []
 
-        return res
-        
     def formatTemp(self,data,key,unit,units=True):
         if aw.qmc.LCDdecimalplaces:
             fmt = '{0:.1f}'
@@ -30392,50 +30395,38 @@ class ApplicationWindow(QMainWindow):
             filename = self.ArtisanSaveFileDialog(msg="Export CSV",ext="*.csv")
             if filename:
                 try:
-                    # write header
                     import csv
-                    outfile = open(filename, 'w',newline="")
-                    #writer= csv.writer(outfile,delimiter='\t',quotechar='"')
-                    writer= csv.writer(outfile,delimiter=',',quotechar='"')  #titles with commas don't work with the tab delimiter
-                    extendedRankingHdr = self.extendedRankingData2List(dsd=[],header=True)
-                    writer.writerow(["batch","time","profile","load (g)","charge (" + aw.qmc.mode + ")","FCs","FCs (" + aw.qmc.mode + ")","DROP","DROP (" + aw.qmc.mode + ")","DRY (%)","MAI (%)","DEV (%)","AUC","loss (%)","color","cup"] + extendedRankingHdr)
+                    # open file
+                    try:
+                        outfile = open(filename, 'w',newline="")
+                    except IOError as x:
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?").format(x.errno))
+                        QApplication.beep()
+                        return
+                    writer = csv.writer(outfile,delimiter='\t',quotechar='"')
+
+                    # write header
+                    extendedRankingHdr = self.extendedRankingData2List(header=True)
+                    writer.writerow(extendedRankingHdr)
+
                     # write data
                     c = 1
                     for p in profiles:
                         try:
+                            c += 1
                             dsd = self.deserialize(p)
                             pd = self.productionData2string(self.profileProductionData(dsd),units=False)
-                            c += 1
-                            dct = self.profileRankingData(dsd)
-                            rd = self.rankingData2string(dct,units=False)
-                            # extended ranking data
-                            extendedRankingData = self.extendedRankingData2List(dsd,units=False)
-                            writer.writerow([
-                                s2a(pd["id"]),
-                                s2a(pd["time"]),
-                                s2a(pd["title"]),
-                                '{0:.3f}'.format(pd["weight_in_num"]), # str(pd["weight_in_num"]),
-                                ('{0:.1f}'.format(convertTemp(dct["charge_temp"],dct["temp_unit"],aw.qmc.mode)) if "charge_temp" in dct else ""),
-                                rd["FCs_time"],
-                                ('{0:.1f}'.format(convertTemp(dct["FCs_temp"],dct["temp_unit"],aw.qmc.mode)) if "FCs_temp" in dct else ""),
-                                rd["DROP_time"],
-                                ('{0:.1f}'.format(convertTemp(dct["DROP_temp"],dct["temp_unit"],aw.qmc.mode)) if "DROP_temp" in dct else ""),
-                                rd["DRY_percent"],
-                                rd["MAI_percent"],
-                                rd["DEV_percent"],
-                                rd["AUC"],
-                                str(pd["weight_loss"]),
-                                rd["color"],
-                                rd["cupping"],
-                                ]
-                                + extendedRankingData
-                                )
-                        except Exception:
+                            rd = self.rankingData2string(self.profileRankingData(dsd),units=False)
+                            extendedRankingData = self.extendedRankingData2List(dsd,rd,pd)
+                            writer.writerow(extendedRankingData)
+                        except Exception as e:
+                            _, _, exc_tb = sys.exc_info()
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
-                            pass
+                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingCSVReport() {0}").format(str(e)),exc_tb.tb_lineno)
                     # close file
                     outfile.close()
+                    aw.sendmessage(QApplication.translate("Message","CSV Ranking Report exported to {0}", None).format(filename))
                 except Exception:
                     pass
 
@@ -30451,232 +30442,141 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # open file
                     from openpyxl import Workbook
-                    #from openpyxl.compat import range  # @UnusedImport
-                    #from openpyxl.cell import get_column_letter
                     from openpyxl.utils.cell import get_column_letter,column_index_from_string  # @UnusedImport
-                    from openpyxl.styles import Font, Fill # @UnusedImport
+                    from openpyxl.styles import Font, Fill, Alignment # @UnusedImport
                     wb = Workbook()
                     ws = wb.active # wb.create_sheet()
-                    ws.title = QApplication.translate("HTML Report Template", "Production Report",None)
-
+                    ws.title = QApplication.translate("HTML Report Template", "Ranking Report",None)
                     bf = Font(bold=True)
-                    unit = aw.qmc.weight[2]
+
+                    #get the field definitions
+                    ranking_data_fields, field_index = self.rankingdataDef()
 
                     # write header
-                    ws['A1'] = QApplication.translate("HTML Report Template", "Batch",None)
-                    ws['A1'].font = bf
-                    ws['B1'] = QApplication.translate("HTML Report Template", "Time",None)
-                    ws['B1'].font = bf
-                    ws.column_dimensions['B'].width = 18
-                    ws['C1'] = QApplication.translate("HTML Report Template", "Profile",None)
-                    ws['C1'].font = bf
-                    ws.column_dimensions['C'].width = 25
-                    ws['D1'] = QApplication.translate("HTML Report Template", "Load",None) + " (" + str(unit.lower()) + ")"
-                    ws['D1'].font = bf
-                    ws['E1'] = QApplication.translate("HTML Report Template", "Charge",None) + " (" + aw.qmc.mode + ")"
-                    ws['E1'].font = bf
-                    ws['F1'] = QApplication.translate("HTML Report Template", "FCs",None)
-                    ws['F1'].font = bf
-                    ws['G1'] = QApplication.translate("HTML Report Template", "FCs",None) + " (" + aw.qmc.mode + ")"
-                    ws['G1'].font = bf
-                    ws['H1'] = QApplication.translate("HTML Report Template", "DROP",None)
-                    ws['H1'].font = bf
-                    ws['I1'] = QApplication.translate("HTML Report Template", "DROP",None) + " (" + aw.qmc.mode + ")"
-                    ws['I1'].font = bf
-                    ws['J1'] = QApplication.translate("HTML Report Template", "DRY",None)
-                    ws['J1'].font = bf
-                    ws['K1'] = QApplication.translate("HTML Report Template", "MAI",None)
-                    ws['K1'].font = bf
-                    ws['L1'] = QApplication.translate("HTML Report Template", "DEV",None)
-                    ws['L1'].font = bf
-                    ws['M1'] = QApplication.translate("HTML Report Template", "AUC",None)
-                    ws['M1'].font = bf
-                    ws['N1'] = QApplication.translate("HTML Report Template", "Loss",None)
-                    ws['N1'].font = bf
-                    ws['O1'] = QApplication.translate("HTML Report Template", "Color",None)
-                    ws['O1'].font = bf
-                    ws['P1'] = QApplication.translate("HTML Report Template", "Cup",None)
-                    ws['P1'].font = bf
-                    
-                    # extended ranking data
-                    extended_profile_fields, extended_computed_fields = self.extendedRankingdatadef()
-                    cnum = col_ = 1 + column_index_from_string('P')  #should be the last column used in the code block above
-                    for i in range(len(extended_profile_fields)):
-                        fld = extended_profile_fields[i][0]
-                        cell = ws.cell(column=cnum, row=1, value="{0}".format(fld))
-                        cell.font = bf
-                        if len(fld) > 8:
-                            ws.column_dimensions[get_column_letter(cnum)].width = 18
+                    widths = [10]*len(ranking_data_fields)
+                    weight_unit = aw.qmc.weight[2]
+                    volume_unit = aw.qmc.volume[2]
+                    temperature_unit = aw.qmc.mode
+                    cnum = col_ = 0
+                    for i in range(len(ranking_data_fields)):
                         cnum += 1
-                    for i in range(len(extended_computed_fields)):
-                        fld = extended_computed_fields[i][0]
-                        cell = ws.cell(column=cnum, row=1, value="{0}".format(fld))
+                        name = ranking_data_fields[i][field_index.index("name")]
+                        units = ranking_data_fields[i][field_index.index("units")]
+                        if units == 'temp':
+                            suffix = " ({0})".format(temperature_unit)
+                        elif units == 'volume':
+                            suffix = " ({0})".format(volume_unit)
+                        elif units == 'weight':
+                            suffix = " ({0})".format(weight_unit)
+                        elif units == 'ror':
+                            suffix = " ({0})".format(temperature_unit + "/min")
+                        elif units.startswith('('):
+                            suffix = " {0}".format(units)
+                        else: 
+                            suffix = ""
+                        cell = ws.cell(column=cnum, row=1, value="{0}{1}".format(name,suffix))
                         cell.font = bf
-                        if len(fld) > 8:
-                            ws.column_dimensions[get_column_letter(cnum)].width = 18
-                        cnum += 1
+                        cell.alignment = Alignment(horizontal='center')
+                        width = (len(name + suffix) + 2)
+                        if width > widths[i]:
+                            widths[i] = width
+                            ws.column_dimensions[get_column_letter(cnum)].width = width
 
                     # write data
                     c = 1
                     for p in profiles:
                         try:
-                            dsd = self.deserialize(p)
-                            raw_data = self.profileProductionData(dsd)
                             c += 1
+                            dsd = self.deserialize(p)
                             rd = self.profileRankingData(dsd)
-                            d = self.productionData2string(raw_data,units=False)
-
-                            if "id" in d:
-                                ws['A{0}'.format(c)] = d["id"]
-                            if "datetime" in d:
-                                ws['B{0}'.format(c)] = QDateTime(d["datetime"]).toPyDateTime()
-                                ws['B{0}'.format(c)].number_format = 'YYYY-MM-DD HH:MM'
-                            if "title" in d:
-                                ws['C{0}'.format(c)] = d["title"]
-                            if unit in ["Kg", "lb", "oz"]:
-                                num_format = '0.00'
-                            else:
-                                num_format = '0'
-                            if "weight" in raw_data:
-                                w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-                                w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-                                ws['D{0}'.format(c)] = w_in
-                                ws['D{0}'.format(c)].number_format = num_format
-                            else:
-                                w_in = 0
-                                w_out = 0
-                            if "charge_temp" in rd and "temp_unit" in rd:
-                                ws['E{0}'.format(c)] = convertTemp(rd["charge_temp"],rd["temp_unit"],aw.qmc.mode)
-                                ws['E{0}'.format(c)].number_format = ("0.0" if aw.qmc.LCDdecimalplaces else "0")
-                            if "FCs_time" in rd:
-                                h,m = divmod(rd["FCs_time"],60)
-                                dt = datetime.time(int(h),int(m),0)
-                                ws['F{0}'.format(c)] = dt
-                                ws['F{0}'.format(c)].number_format = 'H:MM'
-                            if "FCs_temp" in rd and "temp_unit" in rd:
-                                ws['G{0}'.format(c)] = convertTemp(rd["FCs_temp"],rd["temp_unit"],aw.qmc.mode)
-                                ws['G{0}'.format(c)].number_format = ("0.0" if aw.qmc.LCDdecimalplaces else "0")
-                            if "DROP_time" in rd:
-                                h,m = divmod(rd["DROP_time"],60)
-                                dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
-                                ws['H{0}'.format(c)] = dt
-                                ws['H{0}'.format(c)].number_format = 'H:MM'
-                            if "DROP_temp" in rd and "temp_unit" in rd:
-                                ws['I{0}'.format(c)] = convertTemp(rd["DROP_temp"],rd["temp_unit"],aw.qmc.mode)
-                                ws['I{0}'.format(c)].number_format = ("0.0" if aw.qmc.LCDdecimalplaces else "0")
-                            if "DRY_percent" in rd:
-                                ws['J{0}'.format(c)] = rd["DRY_percent"]/100.
-                                ws['J{0}'.format(c)].number_format = "0.0%"
-                            if "MAI_percent" in rd:
-                                ws['K{0}'.format(c)] = rd["MAI_percent"]/100.
-                                ws['K{0}'.format(c)].number_format = "0.0%"
-                            if "DEV_percent" in rd:
-                                ws['L{0}'.format(c)] = rd["DEV_percent"]/100.
-                                ws['L{0}'.format(c)].number_format = "0.0%"
-                            if "AUC" in rd:
-                                ws['M{0}'.format(c)] = rd["AUC"]
-                                ws['M{0}'.format(c)].number_format = "0"
-                            if w_in > 0 and w_out > 0:
-                                ws['N{0}'.format(c)] = aw.weight_loss(w_in,w_out)/100.
-                                ws['N{0}'.format(c)].number_format = "0.0%"
-                            if "color" in rd and rd["color"] and rd["color"] > 0:
-                                ws['O{0}'.format(c)] = rd["color"]
-                                #ws['O{0}'.format(c)].number_format = "0"
-                            if "cupping" in rd:
-                                ws['P{0}'.format(c)] = rd["cupping"]
-                                ws['P{0}'.format(c)].number_format = "0.00"
-                                
-                            # extended ranking data
+                            pd = self.productionData2string(self.profileProductionData(dsd),units=False)
                             cnum = col_
-                            for i in range(len(extended_profile_fields)):
-                                #name = extended_profile_fields[i][0]
-                                fld = extended_profile_fields[i][1]
-                                typ = extended_profile_fields[i][2]
-                                test0 = extended_profile_fields[i][3]
-                                cr = '{0}{1}'.format(get_column_letter(cnum),c)
-                                if fld in dsd:
-                                    if (test0 == "true" and aw.float2float(toFloat(dsd[fld])) > 0) or test0 == "false":
-                                        if typ == "text":
-                                            ws[cr] = dsd[fld]
-                                        elif typ == "int":
-                                            ws[cr] = dsd[fld]
-                                        elif typ == "float1":
-                                            ws[cr] = dsd[fld]
-                                            ws[cr].number_format = "0.0"
-                                        elif typ == "float2":
-                                            ws[cr] = dsd[fld]
-                                            ws[cr].number_format = "0.00"
-                                        elif typ == "float4":
-                                            ws[cr] = dsd[fld]
-                                            ws[cr].number_format = "0.0000"
-                                        elif typ == "text2float1":
-                                            ws[cr] = aw.float2float(toFloat(dsd[fld]))
-                                            ws[cr].number_format = "0.0"
-                                        elif typ == "text2float2":
-                                            ws[cr] = aw.float2float(toFloat(dsd[fld]))
-                                            ws[cr].number_format = "0.00"
-                                        elif typ == "text2int":
-                                            ws[cr] = toInt(dsd[fld])
-                                            ws[cr].number_format = "0"
-                                        elif typ == "percent":
-                                            ws[cr] = dsd[fld]/100.
-                                            ws[cr].number_format = "0.0%"
-                                        elif typ == "time":
-                                            h,m = divmod(dsd[fld],60)
-                                            dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
-                                            ws[cr] = dt
-                                            ws[cr].number_format = 'H:MM'
-                                        elif typ == "bool":
-                                            ws[cr] = str(dsd[fld])
+                            for i in range(len(ranking_data_fields)):
                                 cnum += 1
-                            for i in range(len(extended_computed_fields)):
-                                #name = extended_computed_fields[i][0]
-                                fld = extended_computed_fields[i][1]
-                                typ = extended_computed_fields[i][2]
-                                test0 = extended_computed_fields[i][3]
                                 cr = '{0}{1}'.format(get_column_letter(cnum),c)
-                                if fld in dsd["computed"]:
-                                    if (test0 == "true" and aw.float2float(toFloat(dsd["computed"][fld])) > 0) or test0 == "false":
-                                        if typ == "text":
-                                            ws[cr] = dsd["computed"][fld]
-                                        elif typ == "int":
-                                            ws[cr] = dsd["computed"][fld]
-                                        elif typ == "float1":
-                                            ws[cr] = dsd["computed"][fld]
-                                            ws[cr].number_format = "0.0"
-                                        elif typ == "float2":
-                                            ws[cr] = dsd["computed"][fld]
-                                            ws[cr].number_format = "0.00"
-                                        elif typ == "float4":
-                                            ws[cr] = dsd["computed"][fld]
-                                            ws[cr].number_format = "0.0000"
-                                        elif typ == "text2float1":
-                                            ws[cr] = aw.float2float(toFloat(dsd["computed"][fld]))
-                                            ws[cr].number_format = "0.0"
-                                        elif typ == "text2float2":
-                                            ws[cr] = aw.float2float(toFloat(dsd["computed"][fld]))
-                                            ws[cr].number_format = "0.00"
-                                        elif typ == "text2int":
-                                            ws[cr] = toInt(dsd["computed"][fld])
-                                            ws[cr].number_format = "0"
-                                        elif typ == "percent":
-                                            ws[cr] = dsd["computed"][fld]/100.
-                                            ws[cr].number_format = "0.0%"
-                                        elif typ == "time":
-                                            h,m = divmod(dsd["computed"][fld],60)
-                                            dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
-                                            ws[cr] = dt
-                                            ws[cr].number_format = 'H:MM'
-                                        elif typ == "bool":
-                                            ws[cr] = str(dsd["computed"][fld])
-                                cnum += 1
+
+                                name = ranking_data_fields[i][field_index.index("name")]
+                                fld = ranking_data_fields[i][field_index.index("fld")]
+                                src = ranking_data_fields[i][field_index.index("src")]
+                                typ = ranking_data_fields[i][field_index.index("typ")]
+                                test0 = ranking_data_fields[i][field_index.index("test0")]
+                                units = ranking_data_fields[i][field_index.index("units")]
+                                if src == 'comp' and fld in dsd["computed"]:
+                                    res_fld = dsd["computed"][fld]
+                                elif src == 'prof' and fld in dsd:
+                                    res_fld = dsd[fld]
+                                elif src == 'rank' and fld in rd:
+                                    res_fld = rd[fld]
+                                elif src == 'prod' and fld in pd:
+                                    res_fld = pd[fld]
+                                elif src == 'eval':
+                                    res_fld = eval(fld)
+                                else:
+                                    continue
+
+                                if (test0 == "true" and aw.float2float(toFloat(res_fld)) > 0) or test0 == "false":
+                                    if units == 'temp':
+                                        conv_fld = convertTemp(res_fld,dsd["mode"],temperature_unit)
+                                    elif units == 'ror':
+                                        conv_fld = convertRoR(res_fld,dsd["mode"],temperature_unit)
+                                    elif units == 'volume':
+                                        conv_fld = aw.convertVolume(res_fld,0,aw.qmc.volume_units.index(volume_unit))
+                                    elif units == 'weight':
+                                        conv_fld = aw.convertWeight(res_fld,0,aw.qmc.weight_units.index(weight_unit))
+                                    else:
+                                        conv_fld = res_fld
+
+                                    if typ == "text":
+                                        ws[cr] = conv_fld
+                                        width = (len(conv_fld) + 2)
+                                        if width > widths[i]:
+                                            widths[i] = width 
+                                            ws.column_dimensions[get_column_letter(cnum)].width = width
+                                    elif typ == "int":
+                                        ws[cr] = conv_fld
+                                    elif typ == "float1":
+                                        ws[cr] = conv_fld
+                                        ws[cr].number_format = "0.0"
+                                    elif typ == "float2":
+                                        ws[cr] = conv_fld
+                                        ws[cr].number_format = "0.00"
+                                    elif typ == "float4":
+                                        ws[cr] = conv_fld
+                                        ws[cr].number_format = "0.0000"
+                                    elif typ == "text2float1":
+                                        ws[cr] = aw.float2float(toFloat(conv_fld))
+                                        ws[cr].number_format = "0.0"
+                                    elif typ == "text2float2":
+                                        ws[cr] = aw.float2float(toFloat(conv_fld))
+                                        ws[cr].number_format = "0.00"
+                                    elif typ == "text2int":
+                                        ws[cr] = toInt(conv_fld)
+                                        ws[cr].number_format = "0"
+                                    elif typ == "percent":
+                                        ws[cr] = conv_fld/100.
+                                        ws[cr].number_format = "0.0%"
+                                    elif typ == "time":
+                                        h,m = divmod(conv_fld,60)
+                                        dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
+                                        ws[cr] = dt
+                                        ws[cr].number_format = 'H:MM'
+                                    elif typ == "date":
+                                        ws[cr] = QDateTime(conv_fld).toPyDateTime()
+                                        fmt = 'YYYY-MM-DD HH:MM'
+                                        ws[cr].number_format = fmt
+                                        width = (len(fmt) + 2)
+                                        if width > widths[i]:
+                                            widths[i] = width 
+                                            ws.column_dimensions[get_column_letter(cnum)].width = width
+                                    elif typ == "bool":
+                                        ws[cr] = str(conv_fld)
 
                         except Exception as e:
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             _, _, exc_tb = sys.exc_info()
                             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
-#                            pass
+
                     # write trailer
                     if c > 1:
                         def avgFormat(c,s,e):
@@ -30685,156 +30585,68 @@ class ApplicationWindow(QMainWindow):
 
                         ws['A{0}'.format(c+1)] = QApplication.translate("HTML Report Template", "AVG", None)
                         ws['A{0}'.format(c+1)].font = bf
-                        ws['D{0}'.format(c+1)] = avgFormat("D",2,c)
-                        ws['D{0}'.format(c+1)].font = bf
-                        ws['D{0}'.format(c+1)].number_format = num_format
-                        ws['E{0}'.format(c+1)] = avgFormat("E",2,c)
-                        ws['E{0}'.format(c+1)].font = bf
-                        ws['E{0}'.format(c+1)].number_format = "0"
-                        ws['F{0}'.format(c+1)] = avgFormat("F",2,c)
-                        ws['F{0}'.format(c+1)].font = bf
-                        ws['F{0}'.format(c+1)].number_format = 'H:MM'
-                        ws['G{0}'.format(c+1)] = avgFormat("G",2,c)
-                        ws['G{0}'.format(c+1)].font = bf
-                        ws['G{0}'.format(c+1)].number_format = "0"
-                        ws['H{0}'.format(c+1)] = avgFormat("H",2,c)
-                        ws['H{0}'.format(c+1)].font = bf
-                        ws['H{0}'.format(c+1)].number_format = 'H:MM'
-                        ws['I{0}'.format(c+1)] = avgFormat("I",2,c)
-                        ws['I{0}'.format(c+1)].font = bf
-                        ws['I{0}'.format(c+1)].number_format = "0"
-                        ws['J{0}'.format(c+1)] = avgFormat("J",2,c)
-                        ws['J{0}'.format(c+1)].font = bf
-                        ws['J{0}'.format(c+1)].number_format = "0.0%"
-                        ws['K{0}'.format(c+1)] = avgFormat("K",2,c)
-                        ws['K{0}'.format(c+1)].font = bf
-                        ws['K{0}'.format(c+1)].number_format = "0.0%"
-                        ws['L{0}'.format(c+1)] = avgFormat("L",2,c)
-                        ws['L{0}'.format(c+1)].font = bf
-                        ws['L{0}'.format(c+1)].number_format = "0.0%"
-                        ws['M{0}'.format(c+1)] = avgFormat("M",2,c)
-                        ws['M{0}'.format(c+1)].font = bf
-                        ws['M{0}'.format(c+1)].number_format = "0"
-                        ws['N{0}'.format(c+1)] = avgFormat("N",2,c)
-                        ws['N{0}'.format(c+1)].font = bf
-                        ws['N{0}'.format(c+1)].number_format = "0.0%"
-                        ws['O{0}'.format(c+1)] = avgFormat("O",2,c)
-                        ws['O{0}'.format(c+1)].font = bf
-                        ws['O{0}'.format(c+1)].number_format = "0"
-                        ws['P{0}'.format(c+1)] = avgFormat("P",2,c)
-                        ws['P{0}'.format(c+1)].font = bf
-                        ws['P{0}'.format(c+1)].number_format = "0.00"
-
-                        # extended ranking data
                         cnum = col_
-                        for i in range(len(extended_profile_fields)):
-                            #name = extended_profile_fields[i][0]
-                            fld = extended_profile_fields[i][1]
-                            typ = extended_profile_fields[i][2]
-                            test0 = extended_profile_fields[i][3]
+                        for i in range(len(ranking_data_fields)):
+                            cnum += 1
+                            fld = ranking_data_fields[i][field_index.index("fld")]
+                            typ = ranking_data_fields[i][field_index.index("typ")]
+                            test0 = ranking_data_fields[i][field_index.index("test0")]
                             cr = '{0}{1}'.format(get_column_letter(cnum),c+1)
                             cltr = get_column_letter(cnum)
-                            if fld in dsd:
-                                if typ == "text":
-                                    pass
-                                elif typ == "int":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0"
-                                elif typ == "float1":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0"
-                                elif typ == "float2":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0"
-                                elif typ == "float4":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0000"
-                                elif typ == "text2float1":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0"
-                                elif typ == "text2float2":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.00"
-                                elif typ == "text2int":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0"
-                                elif typ == "percent":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0%"
-                                elif typ == "time":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = 'H:MM'
-                                elif typ == "bool":
-                                    pass
-                            cnum += 1
-                        for i in range(len(extended_computed_fields)):
-                            #name = extended_computed_fields[i][0]
-                            fld = extended_computed_fields[i][1]
-                            typ = extended_computed_fields[i][2]
-                            test0 = extended_computed_fields[i][3]
-                            cr = '{0}{1}'.format(get_column_letter(cnum),c+1)
-                            cltr = get_column_letter(cnum)
-                            if fld in dsd["computed"]:
-                                if typ == "text":
-                                    pass
-                                elif typ == "int":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0"
-                                elif typ == "float1":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0"
-                                elif typ == "float2":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0"
-                                elif typ == "float4":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0000"
-                                elif typ == "text2float1":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0"
-                                elif typ == "text2float2":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.00"
-                                elif typ == "text2int":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0"
-                                elif typ == "percent":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = "0.0%"
-                                elif typ == "time":
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = 'H:MM'
-                                elif typ == "bool":
-                                    pass
-                            cnum += 1
+
+                            if typ == "text":
+                                pass
+                            elif typ == "int":
+                                ws[cr] = avgFormat(cltr,2,c)
+                                ws[cr].font = bf
+                                ws[cr].number_format = "0"
+                            elif typ == "float1":
+                                ws[cr] = avgFormat(cltr,2,c)
+                                ws[cr].font = bf
+                                ws[cr].number_format = "0.0"
+                            elif typ == "float2":
+                                ws[cr] = avgFormat(cltr,2,c)
+                                ws[cr].font = bf
+                                ws[cr].number_format = "0.0"
+                            elif typ == "float4":
+                                ws[cr] = avgFormat(cltr,2,c)
+                                ws[cr].font = bf
+                                ws[cr].number_format = "0.0000"
+                            elif typ == "text2float1":
+                                ws[cr] = avgFormat(cltr,2,c)
+                                ws[cr].font = bf
+                                ws[cr].number_format = "0.0"
+                            elif typ == "text2float2":
+                                ws[cr] = avgFormat(cltr,2,c)
+                                ws[cr].font = bf
+                                ws[cr].number_format = "0.00"
+                            elif typ == "text2int":
+                                ws[cr] = avgFormat(cltr,2,c)
+                                ws[cr].font = bf
+                                ws[cr].number_format = "0"
+                            elif typ == "percent":
+                                ws[cr] = avgFormat(cltr,2,c)
+                                ws[cr].font = bf
+                                ws[cr].number_format = "0.0%"
+                            elif typ == "time":
+                                ws[cr] = avgFormat(cltr,2,c)
+                                ws[cr].font = bf
+                                ws[cr].number_format = 'H:MM'
+                            elif typ == "bool":
+                                pass
 
                     # close file
                     wb.save(filename)
                     aw.sendmessage(QApplication.translate("Message","Excel Ranking Report exported to {0}", None).format(filename))
+                except IOError as x:
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?").format(x.errno))
+                    QApplication.beep()
                 except Exception as e:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
-                    pass
+
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -34260,7 +34072,7 @@ class ApplicationWindow(QMainWindow):
         # exp == 0 -> ln(), 1 -> unused, 2 -> quadratic, 3 -> cubic, 4 -> bkgnd, -1 -> all of 0,2,and 3
         #check for any roast data
         if not self.qmc.timeindex[0] > -1:
-            self.sendmessage(QApplication.translate("Error Message", "Analyze: no profile data available", None))
+            self.sendmessage(QApplication.translate("Error Message", "Analyze: CHARGE event required, none found", None))
             return
         #check for finished roast
         if not self.qmc.timeindex[6]:
