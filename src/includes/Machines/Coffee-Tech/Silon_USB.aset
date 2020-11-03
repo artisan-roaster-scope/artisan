@@ -1,6 +1,6 @@
 [General]
 Delay=2000
-Oversampling=true
+Oversampling=false
 
 [ArduinoPID]
 dutyMax=100

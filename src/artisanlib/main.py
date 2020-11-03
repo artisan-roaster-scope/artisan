@@ -2975,34 +2975,34 @@ class tgraphcanvas(FigureCanvas):
         if aw is not None and len(self.extradevices) > n:
             if self.extradevices[n] == 29: # MODBUS
                 if c == 0:
-                    return aw.modbus.inputFloatsAsInt[0] or aw.modbus.inputBCDsAsInt[0] or (not aw.modbus.inputFloats[0] and aw.modbus.inputDivs[0] == 0 and aw.modbus.inputModes[0] == "")
+                    return (aw.modbus.inputFloatsAsInt[0] or aw.modbus.inputBCDsAsInt[0] or not aw.modbus.inputFloats[0]) and aw.modbus.inputDivs[0] == 0 and aw.modbus.inputModes[0] == ""
                 else:
-                    return aw.modbus.inputFloatsAsInt[1] or aw.modbus.inputBCDsAsInt[1] or (not aw.modbus.inputFloats[1] and aw.modbus.inputDivs[1] == 0 and aw.modbus.inputModes[1] == "")
+                    return (aw.modbus.inputFloatsAsInt[1] or aw.modbus.inputBCDsAsInt[1] or not aw.modbus.inputFloats[1]) and aw.modbus.inputDivs[1] == 0 and aw.modbus.inputModes[1] == ""
             elif self.extradevices[n] == 33: # MODBUS_34
                 if c == 0:
-                    return aw.modbus.inputFloatsAsInt[2] or aw.modbus.inputBCDsAsInt[2] or (not aw.modbus.inputFloats[2] and aw.modbus.inputDivs[2] == 0 and aw.modbus.inputModes[2] == "")
+                    return (aw.modbus.inputFloatsAsInt[2] or aw.modbus.inputBCDsAsInt[2] or not aw.modbus.inputFloats[2]) and aw.modbus.inputDivs[2] == 0 and aw.modbus.inputModes[2] == ""
                 else:
-                    return aw.modbus.inputFloatsAsInt[3] or aw.modbus.inputBCDsAsInt[3] or (not aw.modbus.inputFloats[3] and aw.modbus.inputDivs[3] == 0 and aw.modbus.inputModes[3] == "")
+                    return (aw.modbus.inputFloatsAsInt[3] or aw.modbus.inputBCDsAsInt[3] or not aw.modbus.inputFloats[3]) and aw.modbus.inputDivs[3] == 0 and aw.modbus.inputModes[3] == ""
             elif self.extradevices[n] == 55: # MODBUS_56
                 if c == 0:
-                    return aw.modbus.inputFloatsAsInt[4] or aw.modbus.inputBCDsAsInt[4] or (not aw.modbus.inputFloats[4] and aw.modbus.inputDivs[4] == 0 and aw.modbus.inputModes[4] == "")
+                    return (aw.modbus.inputFloatsAsInt[4] or aw.modbus.inputBCDsAsInt[4] or not aw.modbus.inputFloats[4]) and aw.modbus.inputDivs[4] == 0 and aw.modbus.inputModes[4] == ""
                 else:
-                    return aw.modbus.inputFloatsAsInt[5] or aw.modbus.inputBCDsAsInt[5] or (not aw.modbus.inputFloats[5] and aw.modbus.inputDivs[5] == 0 and aw.modbus.inputModes[5] == "")
+                    return (aw.modbus.inputFloatsAsInt[5] or aw.modbus.inputBCDsAsInt[5] or not aw.modbus.inputFloats[5]) and aw.modbus.inputDivs[5] == 0 and aw.modbus.inputModes[5] == ""
             elif self.extradevices[n] == 109: # MODBUS_78
                 if c == 0:
-                    return aw.modbus.inputFloatsAsInt[6] or aw.modbus.inputBCDsAsInt[6] or (not aw.modbus.inputFloats[6] and aw.modbus.inputDivs[6] == 0 and aw.modbus.inputModes[6] == "")
+                    return (aw.modbus.inputFloatsAsInt[6] or aw.modbus.inputBCDsAsInt[6] or not aw.modbus.inputFloats[6]) and aw.modbus.inputDivs[6] == 0 and aw.modbus.inputModes[6] == ""
                 else:
-                    return aw.modbus.inputFloatsAsInt[7] or aw.modbus.inputBCDsAsInt[7] or (not aw.modbus.inputFloats[7] and aw.modbus.inputDivs[7] == 0 and aw.modbus.inputModes[7] == "")
+                    return (aw.modbus.inputFloatsAsInt[7] or aw.modbus.inputBCDsAsInt[7] or not aw.modbus.inputFloats[7]) and aw.modbus.inputDivs[7] == 0 and aw.modbus.inputModes[7] == ""
             elif self.extradevices[n] == 70: # S7
-                return aw.s7.type[0+c] in [0,2] and aw.s7.mode[0+c] == 0 and (aw.s7.div[0+c] == 0 or aw.s7.type[0+c] == 2)
+                return aw.s7.type[0+c] != 1 and aw.s7.mode[0+c] == 0 and (aw.s7.div[0+c] == 0 or aw.s7.type[0+c] == 2)
             elif self.extradevices[n] == 80: # S7_34
-                return aw.s7.type[2+c] in [0,2] and aw.s7.mode[2+c] == 0 and (aw.s7.div[2+c] == 0 or aw.s7.type[2+c] == 2)
+                return aw.s7.type[2+c] != 1 and aw.s7.mode[2+c] == 0 and (aw.s7.div[2+c] == 0 or aw.s7.type[2+c] == 2)
             elif self.extradevices[n] == 81: # S7_56
-                return aw.s7.type[4+c] in [0,2] and aw.s7.mode[4+c] == 0 and (aw.s7.div[4+c] == 0 or aw.s7.type[4+c] == 2)
+                return aw.s7.type[4+c] != 1 and aw.s7.mode[4+c] == 0 and (aw.s7.div[4+c] == 0 or aw.s7.type[4+c] == 2)
             elif self.extradevices[n] == 82: # S7_78
-                return aw.s7.type[6+c] in [0,2] and aw.s7.mode[6+c] == 0 and (aw.s7.div[6+c] == 0 or aw.s7.type[6+c] == 2)
+                return aw.s7.type[6+c] != 1 and aw.s7.mode[6+c] == 0 and (aw.s7.div[6+c] == 0 or aw.s7.type[6+c] == 2)
             elif self.extradevices[n] == 110: # S7_910
-                return aw.s7.type[8+c] in [0,2] and aw.s7.mode[8+c] == 0 and (aw.s7.div[8+c] == 0 or aw.s7.type[8+c] == 2)
+                return aw.s7.type[8+c] != 1 and aw.s7.mode[8+c] == 0 and (aw.s7.div[8+c] == 0 or aw.s7.type[8+c] == 2)
             else:
                 False
         else:

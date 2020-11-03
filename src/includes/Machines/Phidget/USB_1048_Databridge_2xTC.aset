@@ -7,8 +7,8 @@ optimalSmoothing=false
 
 [Device]
 id=34
-phidget1048_async=true, true, false, false
-phidget1048_changeTriggers=0, 0, 0.2, 0.2
+phidget1048_async=false, false, false, false
+phidget1048_changeTriggers=0, 0, 0, 0
 phidget1048_dataRate=32
 phidget1048_types=1, 1, 1, 1
 

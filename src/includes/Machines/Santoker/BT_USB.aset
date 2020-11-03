@@ -13,4 +13,4 @@ bytesize=8
 comport=COM3
 parity=N
 stopbits=1
-timeout=1
+timeout=0.4

@@ -2074,7 +2074,7 @@ class serialport(object):
             if self.aw.s7.area[i]:
                 if self.aw.s7.type[i] == 0:
                     v = self.aw.s7.readInt(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],force)
-                elif self.aw.s7.type[i] in [1,2]: # Type FLOAT and FLOAT2INT are read as floats the later are just displayed without decimals
+                elif self.aw.s7.type[i] in [1,2]: # Type FLOAT and FLOAT2INT are read as floats, FLOAT2INT is just displayed without decimals
                     v = self.aw.s7.readFloat(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],force)
                 else:
                     if self.aw.s7.readBool(self.aw.s7.area[i]-1,self.aw.s7.db_nr[i],self.aw.s7.start[i],self.aw.s7.type[i]-3,force):
@@ -2102,6 +2102,8 @@ class serialport(object):
                     self.aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
                 if self.aw.modbus.inputFloats[i]:
                     res[i] = self.aw.modbus.readFloat(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
+                elif self.aw.modbus.inputFloatsAsInt[i]:
+                    res[i] = self.aw.modbus.readInt32(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
                 elif self.aw.modbus.inputBCDs[i]:
                     res[i] = self.aw.modbus.readBCD(self.aw.modbus.inputSlaves[i],self.aw.modbus.inputRegisters[i],self.aw.modbus.inputCodes[i],force)
                 elif self.aw.modbus.inputBCDsAsInt[i]:

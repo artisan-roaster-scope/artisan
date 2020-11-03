@@ -86,7 +86,7 @@ littleEndianFloats=false
 parity=E
 port=502
 stopbits=1
-timeout=1
+timeout=0.4
 type=1
 wordorderLittle=true
 

@@ -124,7 +124,7 @@ class modbusport(object):
         self.inputRegisters = [0]*self.channels
         self.inputFloats = [False]*self.channels
         self.inputBCDs = [False]*self.channels
-        self.inputFloatsAsInt = [False]*self.channels
+        self.inputFloatsAsInt = [False]*self.channels  # 32bit Integers
         self.inputBCDsAsInt = [False]*self.channels
         self.inputCodes = [3]*self.channels
         self.inputDivs = [0]*self.channels # 0: none, 1: 1/10, 2:1/100
@@ -288,7 +288,7 @@ class modbusport(object):
                 register = self.inputRegisters[c]
                 code = self.inputCodes[c]
                 registers = [register]
-                if self.inputFloats[c] or self.inputBCDs[c]:
+                if self.inputFloats[c] or self.inputBCDs[c] or self.inputFloatsAsInt[c]:
                     registers.append(register+1)
                 if not (code in self.activeRegisters):
                     self.activeRegisters[code] = {}
@@ -797,6 +797,71 @@ class modbusport(object):
                     code,
                     r)
                 self.aw.addserial(ser_str)
+
+    # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
+    # if force the readings cache is ignored and fresh readings are requested
+    def readInt32(self,slave,register,code=3,force=False):
+        if slave == 0:
+            return
+        r = None
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            if not force and code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
+                and register+1 in self.readingsCache[code][slave]:
+                # cache hit
+                res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
+                decoder = getBinaryPayloadDecoderFromRegisters(res, self.byteorderLittle, self.wordorderLittle)
+                r = decoder.decode_32bit_uint()
+                return r
+            else:
+                self.connect()
+                retry = self.readRetries
+                while True:
+                    if code==3:
+                        res = self.master.read_holding_registers(int(register),2,unit=int(slave))
+                    else:
+                        res = self.master.read_input_registers(int(register),2,unit=int(slave))
+                    if res is None or res.isError(): # requires pymodbus v1.5.1
+                        if retry > 0:
+                            retry = retry - 1
+                            #time.sleep(0.020)
+                        else:
+                            raise Exception("Exception response")
+                    else:
+                        break
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
+                r = decoder.decode_32bit_uint()
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
+                return r
+        except Exception: # as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+#            self.disconnect()
+#            _, _, exc_tb = sys.exc_info()
+#            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+            if self.aw.qmc.flagon:
+                self.aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+            #note: logged chars should be unicode not binary
+            if self.aw.seriallogflag:
+                ser_str = "MODBUS readInt32 :{},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                    self.comport,
+                    self.baudrate,
+                    self.bytesize,
+                    self.parity,
+                    self.stopbits,
+                    self.timeout,
+                    slave,
+                    register,
+                    code,
+                    r)
+                self.aw.addserial(ser_str)
+            
 
     # function 3 (Read Multiple Holding Registers) and 
     # function 4 (Read Input Registers)
