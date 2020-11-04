@@ -22,7 +22,5 @@ Machine control (incl. heater control) via buttons and sliders allowing for auto
 
 {: .notice--info}
 **Support!**
-Roaster manufactures often make component changes or substitutions while manufacturing their roasters.  Such changes could cause your roaster to differ from the predefined setup.  If you encounter a problem setting up your roaster you should first contact your roaster manufacturer for support and ask them to inform us on such changes.   
-
-The Artisan project runs on donations from individuals and companies that recognize the value of Artisan for their work or leisure. Your time is valuable, please respect that ours is too.  Before asking the Artisan team for support please consider making a [generous contribution](/donate/).
+Roaster manufactures often make component changes or substitutions while manufacturing their roasters.  Such changes could cause your roaster to differ from the predefined setup.  If you encounter a problem setting up your roaster you should first contact your roaster manufacturer for support and ask them to inform us on such changes.    The Artisan project runs on donations from individuals and companies that recognize the value of Artisan for their work or leisure. Your time is valuable, please respect that ours is too.  Before asking the Artisan team for support please consider making a [generous contribution](/donate/).
 {: .notice--info}
