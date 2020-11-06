@@ -20,4 +20,4 @@ There are posts detailing many topics on the [Artisan Blog](http://artisan-roast
 
 ## Coffee Roasting Forums
 
-[Home Barista](www.home-barista.com)
+[Home Barista](http://www.home-barista.com)
