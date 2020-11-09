@@ -29538,14 +29538,14 @@ class ApplicationWindow(QMainWindow):
             "src",     #data source from where to pull fld [prof,comp,rank,prod,eval,]
             "typ",     #content type [text,int,float1,float2,float4,text2float1,text2float2,text2int,percent,time,bool,]
             "test0",   #test for a zero value and subsitute an empty string
-            "units",   #conversion units [temp,weight,volume,ror,]
+            "units",   #conversion units [temp,weight,volume,ror,] or maxlen when typ=="text"
             "name",    #translated field name for use in the header
         ]
         ranking_data_fields = [
             #fld,                   source,  typ,        test0,    units,   name
             ["id",                  "prod",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Batch',None)                ],
             ["datetime",            "prod",  "date",     "false",  "",      QApplication.translate('HTML Report Template','Time',None)                 ],
-            ["title",               "prod",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Profile  ',None)            ],
+            ["title",               "prod",  "text",     "false",  "60",    QApplication.translate('HTML Report Template','Profile  ',None)            ],
             ["weightin",            "comp",  "float1",   "false",  "weight",QApplication.translate('HTML Report Template','Weight In',None)            ],
             ["CHARGE_BT",           "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','CHARGE BT',None)            ],
             ["FCs_time",            "comp",  "time",     "false",  "",      QApplication.translate('HTML Report Template','FCs Time',None)             ],
@@ -29559,21 +29559,10 @@ class ApplicationWindow(QMainWindow):
             ["weight_loss",         "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Weight Loss',None)          ],
             ["color",               "rank",  "text2int", "false",  "",      QApplication.translate('HTML Report Template','Color',None)                ],
             ["cupping",             "rank",  "text2int", "false",  "",      QApplication.translate('HTML Report Template','Cupping',None)              ],
-            ["mode",                "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Mode',None)                 ],
             ["roastertype",         "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Roaster',None)              ],
             ["operator",            "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Operator',None)             ],
             ["organization",        "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Organization',None)         ],
             ["drumspeed",           "prof",  "text2int", "true" ,  "",      QApplication.translate('HTML Report Template','Drum Speed',None)           ],
-            ["heavyFC",             "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Heavy FC',None)             ],
-            ["lowFC",               "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Low FC',None)               ],
-            ["lightCut",            "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Light Cut',None)            ],
-            ["darkCut",             "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Dark Cut',None)             ],
-            ["drops",               "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Drops',None)                ],
-            ["oily",                "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Oily',None)                 ],
-            ["uneven",              "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Uneven',None)               ],
-            ["tipping",             "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Tipping',None)              ],
-            ["scorching",           "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Scorching',None)            ],
-            ["divots",              "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Divots',None)               ],
             ["whole_color",         "prof",  "int",      "true" ,  "",      QApplication.translate('HTML Report Template','Whole Color',None)          ], 
             ["ground_color",        "prof",  "int",      "true" ,  "",      QApplication.translate('HTML Report Template','Ground Color',None)         ],
             ["color_system",        "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Color System',None)         ],
@@ -29622,21 +29611,35 @@ class ApplicationWindow(QMainWindow):
             ["dry_phase_AUC",       "comp",  "int",      "false",  "",      QApplication.translate('HTML Report Template','Dry Phase_AUC',None)        ],
             ["mid_phase_AUC",       "comp",  "int",      "false",  "",      QApplication.translate('HTML Report Template','Mid Phase AUC',None)        ],
             ["finish_phase_AUC",    "comp",  "int",      "false",  "",      QApplication.translate('HTML Report Template','Finish Phase AUC',None)     ],
-            ["weight_loss",         "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Weight Loss',None)          ],
-            ["volume_gain",         "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Volume Gain',None)          ],
-            ["moisture_loss",       "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Moisture Loss',None)        ],
-            ["organic_loss",        "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Organic Loss',None)         ],
-            ["volumein",            "comp",  "float1",   "false",  "volume",QApplication.translate('HTML Report Template','Volume In',None)            ],
-            ["volumeout",           "comp",  "float1",   "false",  "volume",QApplication.translate('HTML Report Template','Volume Out',None)           ],
             ["weightin",            "comp",  "float1",   "false",  "weight",QApplication.translate('HTML Report Template','Weight In',None)            ],
             ["weightout",           "comp",  "float1",   "false",  "weight",QApplication.translate('HTML Report Template','Weight Out',None)           ],
+            ["weight_loss",         "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Weight Loss',None)          ],
+            ["volumein",            "comp",  "float1",   "false",  "volume",QApplication.translate('HTML Report Template','Volume In',None)            ],
+            ["volumeout",           "comp",  "float1",   "false",  "volume",QApplication.translate('HTML Report Template','Volume Out',None)           ],
+            ["volume_gain",         "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Volume Gain',None)          ],
             ["green_density",       "comp",  "float1",   "false",  "(g/l)", QApplication.translate('HTML Report Template','Green Density',None)        ],
             ["roasted_density",     "comp",  "float1",   "false",  "(g/l)", QApplication.translate('HTML Report Template','Roasted Density',None)      ],
             ["moisture_greens",     "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Moisture Greens',None)      ],
             ["moisture_roasted",    "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Moisture Roasted',None)     ],
+            ["moisture_loss",       "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Moisture Loss',None)        ],
+            ["organic_loss",        "comp",  "percent",  "false",  "",      QApplication.translate('HTML Report Template','Organic Loss',None)         ],
             ["ambient_humidity",    "comp",  "float1",   "false",  "",      QApplication.translate('HTML Report Template','Ambient Humidity',None)     ],
             ["ambient_pressure",    "comp",  "float1",   "false",  "",      QApplication.translate('HTML Report Template','Ambient Pressure',None)     ],
             ["ambient_temperature", "comp",  "float1",   "false",  "temp",  QApplication.translate('HTML Report Template','Ambient Temperature',None)  ],
+            ["beans",               "prof",  "text",     "false",  "90",    QApplication.translate('HTML Report Template','Beans',None)                ],
+            ["roastingnotes",       "prof",  "text",     "false",  "90",    QApplication.translate('HTML Report Template','Roasting Notes',None)       ],
+            ["cuppingnotes",        "prof",  "text",     "false",  "90",    QApplication.translate('HTML Report Template','Cupping Notes',None)        ],
+            ["heavyFC",             "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Heavy FC',None)             ],
+            ["lowFC",               "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Low FC',None)               ],
+            ["lightCut",            "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Light Cut',None)            ],
+            ["darkCut",             "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Dark Cut',None)             ],
+            ["drops",               "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Drops',None)                ],
+            ["oily",                "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Oily',None)                 ],
+            ["uneven",              "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Uneven',None)               ],
+            ["tipping",             "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Tipping',None)              ],
+            ["scorching",           "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Scorching',None)            ],
+            ["divots",              "prof",  "bool",     "false",  "",      QApplication.translate('HTML Report Template','Divots',None)               ],
+            ["mode",                "prof",  "text",     "false",  "",      QApplication.translate('HTML Report Template','Mode',None)                 ],
         ]
         return ranking_data_fields, field_index
 
@@ -29718,7 +29721,7 @@ class ApplicationWindow(QMainWindow):
                         elif typ == "text2int":
                             res.append('{:d}'.format(toInt(conv_fld)))
                         elif typ == "percent":
-                            res.append('{0:.1f}%'.format(toFloat(conv_fld)))
+                            res.append('{0:.1f}'.format(toFloat(conv_fld)))
                         elif typ == "time":
                             h,m = divmod(conv_fld,60)
                             res.append('{:d}:{:d}'.format(int(h),int(m)))
@@ -30447,7 +30450,8 @@ class ApplicationWindow(QMainWindow):
                     wb = Workbook()
                     ws = wb.active # wb.create_sheet()
                     ws.title = QApplication.translate("HTML Report Template", "Ranking Report",None)
-                    bf = Font(bold=True)
+                    bf = Font(name='Calibri',size='11',bold=True)
+                    ws.font = Font(name='Calibri',size='11')
 
                     #get the field definitions
                     ranking_data_fields, field_index = self.rankingdataDef()
@@ -30477,7 +30481,7 @@ class ApplicationWindow(QMainWindow):
                         cell = ws.cell(column=cnum, row=1, value="{0}{1}".format(name,suffix))
                         cell.font = bf
                         cell.alignment = Alignment(horizontal='center')
-                        width = (len(name + suffix) + 2)
+                        width = (len(name + suffix) + 2.)
                         if width > widths[i]:
                             widths[i] = width
                             ws.column_dimensions[get_column_letter(cnum)].width = width
@@ -30528,10 +30532,14 @@ class ApplicationWindow(QMainWindow):
 
                                     if typ == "text":
                                         ws[cr] = conv_fld
-                                        width = (len(conv_fld) + 2)
+                                        width = (len(conv_fld) + 2.)
+                                        if re.match(r"[0-9]+",units):
+                                            if width > float(units):
+                                                width = float(units)
                                         if width > widths[i]:
                                             widths[i] = width 
                                             ws.column_dimensions[get_column_letter(cnum)].width = width
+                                        ws[cr].alignment = Alignment(wrap_text=True)
                                     elif typ == "int":
                                         ws[cr] = conv_fld
                                     elif typ == "float1":
@@ -30564,7 +30572,7 @@ class ApplicationWindow(QMainWindow):
                                         ws[cr] = QDateTime(conv_fld).toPyDateTime()
                                         fmt = 'YYYY-MM-DD HH:MM'
                                         ws[cr].number_format = fmt
-                                        width = (len(fmt) + 2)
+                                        width = (len(fmt) + 2.)
                                         if width > widths[i]:
                                             widths[i] = width 
                                             ws.column_dimensions[get_column_letter(cnum)].width = width
