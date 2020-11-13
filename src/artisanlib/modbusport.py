@@ -110,7 +110,7 @@ class modbusport(object):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 1.0
+        self.timeout = 0.4
         self.PID_slave_ID = 0
         self.PID_SV_register = 0
         self.PID_p_register = 0

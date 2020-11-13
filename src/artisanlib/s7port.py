@@ -46,7 +46,7 @@ class s7port(object):
         self.db_nr = [1]*self.channels
         self.start = [0]*self.channels
         self.type = [0]*self.channels # type 0 => int, type 1 => float, type 2 => intFloat
-           #  type 3 => Bool(0), type 4 => Bool(1), type 5 => Bool(2), type 6 => Bool(3), type 7 => Bool(4), type 8 => Bool(5), type 9 => Bool(6), type 10 => Bool(7)
+        #  type 3 => Bool(0), type 4 => Bool(1), type 5 => Bool(2), type 6 => Bool(3), type 7 => Bool(4), type 8 => Bool(5), type 9 => Bool(6), type 10 => Bool(7)
         self.mode = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F (this is different than other places)
         self.div = [0]*self.channels
         

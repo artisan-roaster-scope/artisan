@@ -1317,13 +1317,13 @@ class tgraphcanvas(FigureCanvas):
 
         self.temperaturedevicefunctionlist = [
             "",                #0
-            "Phidget HUM1000", #1
+            "Phidget HUM100x", #1
             "Yocto Meteo",     #2
             "Phidget TMP1000", #3
         ]
         self.humiditydevicefunctionlist = [
             "",                #0
-            "Phidget HUM1000", #1
+            "Phidget HUM100x", #1
             "Yocto Meteo",     #2
         ]
         self.pressuredevicefunctionlist = [
@@ -3058,33 +3058,45 @@ class tgraphcanvas(FigureCanvas):
                             lcdformat = "%.1f"
                         else:
                             lcdformat = "%.0f"
-                        etstr = "--"
+                        if aw.qmc.LCDdecimalplaces:
+                            resLCD = "u.u"
+                        else:
+                            resLCD = "uu"
+                        etstr = resLCD
                         try: # if sample_temp1 is None, which should never be the case, this fails
-                            if len(sample_temp1) and -100 < sample_temp1[-1] < 1000:
-                                etstr = lcdformat%float(sample_temp1[-1])            # ET
-                            elif self.LCDdecimalplaces and len(sample_temp1) and -10000 < sample_temp1[-1] < 100000:
-                                etstr = "%.0f"%float(sample_temp1[-1])
+                            if sample_temp1[-1] != -1:
+                                if len(sample_temp1) and -100 < sample_temp1[-1] < 1000:
+                                    etstr = lcdformat%float(sample_temp1[-1])            # ET
+                                elif self.LCDdecimalplaces and len(sample_temp1) and -10000 < sample_temp1[-1] < 100000:
+                                    etstr = "%.0f"%float(sample_temp1[-1])
                         except:
                             pass
                         aw.lcd2.display(etstr)
-                        btstr = "--"
+                        btstr = resLCD
                         try:
-                            if len(sample_temp2) and -100 < sample_temp2[-1] < 1000:
-                                btstr = lcdformat%float(sample_temp2[-1])            # BT
-                            elif self.LCDdecimalplaces and len(sample_temp2) and -10000 < sample_temp2[-1] < 100000:
-                                btstr = "%.0f"%float(sample_temp2[-1])
+                            if sample_temp2[-1] != -1:
+                                if len(sample_temp2) and -100 < sample_temp2[-1] < 1000:
+                                    btstr = lcdformat%float(sample_temp2[-1])            # BT
+                                elif self.LCDdecimalplaces and len(sample_temp2) and -10000 < sample_temp2[-1] < 100000:
+                                    btstr = "%.0f"%float(sample_temp2[-1])
                         except:
                             pass
                         aw.lcd3.display(btstr)
-                        deltaetstr = "--"
-                        deltabtstr = "--"
+                        deltaetstr = resLCD
+                        deltabtstr = resLCD
                         try:
-                            if -100 < self.rateofchange1 < 1000:
+                            if self.rateofchange1 != -1 and -100 < self.rateofchange1 < 1000:
                                 deltaetstr = lcdformat%float(self.rateofchange1)        # rate of change ET (degress per minute)
-                            aw.lcd4.display(deltaetstr)
-                            if -100 < self.rateofchange2 < 1000:
+                        except:
+                            pass
+                        try:
+                            if self.rateofchange2 != -1 and -100 < self.rateofchange2 < 1000:
                                 deltabtstr = lcdformat%float(self.rateofchange2)        # rate of change BT (degrees per minute)
-                            aw.lcd5.display(deltabtstr)
+                        except:
+                            pass
+                        aw.lcd4.display(deltaetstr)
+                        aw.lcd5.display(deltabtstr)
+                        try:
                             self.updateLargeDeltaLCDs(deltabt=deltabtstr,deltaet=deltaetstr)
                         except:
                             pass
@@ -3107,15 +3119,17 @@ class tgraphcanvas(FigureCanvas):
                                     if sample_extratemp1[i]:
                                         fmt = lcdformat
                                         v = float(sample_extratemp1[i][-1])
-                                        if self.intChannel(i,0):
-                                            fmt = "%.0f"
-                                        if -100 < v < 1000:
-                                            extra1_value = fmt%v # everything fits
-                                        elif self.LCDdecimalplaces and -10000 < v < 100000:
-                                            fmt = "%.0f"
-                                            extra1_value = fmt%v
-                                        else:
-                                            extra1_value = "--"
+                                        extra1_value = resLCD
+                                        if v != -1:
+                                            if self.intChannel(i,0):
+                                                fmt = "%.0f"
+                                            if -100 < v < 1000:
+                                                extra1_value = fmt%v # everything fits
+                                            elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                                fmt = "%.0f"
+                                                extra1_value = fmt%v
+                                        elif self.intChannel(i,0):
+                                            extra1_value = "uu"
                                         aw.extraLCD1[i].display(extra1_value)
                                         extra1_values.append(extra1_value)
                                 except:
@@ -3126,15 +3140,17 @@ class tgraphcanvas(FigureCanvas):
                                     if sample_extratemp2[i]:
                                         fmt = lcdformat
                                         v = float(sample_extratemp2[i][-1])
-                                        if self.intChannel(i,1):
-                                            fmt = "%.0f"
-                                        if -100 < v < 1000:
-                                            extra2_value = fmt%v # everything fits
-                                        elif self.LCDdecimalplaces and -10000 < v < 100000:
-                                            fmt = "%.0f"
-                                            extra2_value = fmt%v
-                                        else:
-                                            extra2_value = "--"
+                                        extra2_value = resLCD
+                                        if v != -1:
+                                            if self.intChannel(i,1):
+                                                fmt = "%.0f"
+                                            if -100 < v < 1000:
+                                                extra2_value = fmt%v # everything fits
+                                            elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                                fmt = "%.0f"
+                                                extra2_value = fmt%v
+                                        elif self.intChannel(i,1):
+                                            extra2_value = "uu"
                                         aw.extraLCD2[i].display(extra2_value)
                                         extra2_values.append(extra2_value)
                                 except:
@@ -5199,7 +5215,6 @@ class tgraphcanvas(FigureCanvas):
                 #reset TPalarmtimeindex to trigger a new TP recognition during alarm processing
                 aw.qmc.TPalarmtimeindex = None
 
-
                 aw.pidcontrol.pidActive = False
 
                 self.wheelflag = False
@@ -5226,6 +5241,8 @@ class tgraphcanvas(FigureCanvas):
             aw.updatePhasesLCDs()
             #clear AUC LCD
             aw.updateAUCLCD()
+                
+            aw.autoAdjustAxis()
             ### REDRAW  ##
             if redraw:
                 self.redraw(True,sampling=sampling,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
@@ -6419,6 +6436,13 @@ class tgraphcanvas(FigureCanvas):
                     if self.backmoveflag:
                         self.timealign(redraw=False,recompute=False)
 
+                    bcharge_idx = 0
+                    if self.timeindexB[0] != -1:
+                        bcharge_idx = self.timeindexB[0]
+                    bdrop_idx = len(self.timeB)-1
+                    if self.timeindexB[6]:
+                        bdrop_idx = self.timeindexB[6]
+
                     #draw one extra device on background stemp1BX
                     if aw.qmc.xtcurveidx > 0:
                         idx3 = aw.qmc.xtcurveidx - 1
@@ -6449,6 +6473,7 @@ class tgraphcanvas(FigureCanvas):
                                     stemp3B = self.smooth_list(tx,self.fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp3B = self.stemp2BX[n3]
+                            stemp3B = [None]*bcharge_idx + stemp3B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                             self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                         sketch_params=None,path_effects=[],transform=trans,
                                                         linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
@@ -6482,14 +6507,18 @@ class tgraphcanvas(FigureCanvas):
                                     stemp4B = self.smooth_list(tx,self.fill_gaps(self.temp2BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
                                 else:
                                     stemp4B = self.stemp2BX[n4]
+                            stemp4B = [None]*bcharge_idx + stemp4B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                             self.l_back4, = self.ax.plot(self.extratimexB[n4], stemp4B, markersize=self.YTbackmarkersize,marker=self.YTbackmarker,
                                                         sketch_params=None,path_effects=[],transform=trans,
                                                         linewidth=self.YTbacklinewidth,linestyle=self.YTbacklinestyle,drawstyle=self.YTbackdrawstyle,color=self.backgroundytcolor,
                                                         alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundYT", None)))
 
+
                     #draw background
                     if aw.qmc.backgroundETcurve:
-                        temp_etb = self.stemp1B
+#                        temp_etb = self.stemp1B
+                        # only draw background curve from CHARGE to DROP
+                        temp_etb = [None]*bcharge_idx + self.stemp1B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                     else:
                         temp_etb = [None]*len(self.timeB)
                     self.l_back1, = self.ax.plot(self.timeB,temp_etb,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
@@ -6497,7 +6526,9 @@ class tgraphcanvas(FigureCanvas):
                                                 linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
                                                 alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None)))
                     if aw.qmc.backgroundBTcurve:
-                        temp_btb = self.stemp2B
+#                        temp_btb = self.stemp2B
+                        # only draw background curve from CHARGE to DROP
+                        temp_btb = [None]*bcharge_idx + self.stemp2B[bcharge_idx:bdrop_idx+1] + [None]*(len(self.timeB)-bdrop_idx-1)
                     else:
                         temp_btb = [None]*len(self.timeB)
                     self.l_back2, = self.ax.plot(self.timeB, temp_btb,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,
@@ -6552,6 +6583,9 @@ class tgraphcanvas(FigureCanvas):
 
                         for p in range(len(self.backgroundEvents)):
                             if self.eventsGraphflag not in [2,4] or self.backgroundEtypes[p] > 3:
+                                event_idx = self.backgroundEvents[p]
+                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
+                                    continue
                                 if self.backgroundEtypes[p] < 4:
                                     st1 = self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])
                                 else:
@@ -6559,14 +6593,14 @@ class tgraphcanvas(FigureCanvas):
                                     if len(st1) == 0:
                                         st1 = "E"
                                 # plot events on BT when showeventsonbt is true
-                                if not aw.qmc.showeventsonbt and self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
-                                    temp = self.temp1B[self.backgroundEvents[p]]
+                                if not aw.qmc.showeventsonbt and self.temp1B[event_idx] > self.temp2B[event_idx]:
+                                    temp = self.temp1B[event_idx]
                                 else:
-                                    temp = self.temp2B[self.backgroundEvents[p]]
+                                    temp = self.temp2B[event_idx]
                                 if not aw.qmc.showEtypes[self.backgroundEtypes[p]]:
                                     continue
-                                anno = self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),path_effects=[],
-                                                    xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
+                                anno = self.ax.annotate(st1, xy=(self.timeB[event_idx], temp),path_effects=[],
+                                                    xytext=(self.timeB[event_idx], temp+height),
                                                     va="center", ha="center",
                                                     fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["bgeventtext"],
                                                     arrowprops=dict(arrowstyle='wedge',color=self.palette["bgeventmarker"],
@@ -6591,6 +6625,9 @@ class tgraphcanvas(FigureCanvas):
                             eventannotationprop.set_size("x-small")
                             self.overlapList = []
                             for i in range(len(self.backgroundEvents)):
+                                event_idx = self.backgroundEvents[i]
+                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
+                                    continue
                                 pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
@@ -6742,10 +6779,10 @@ class tgraphcanvas(FigureCanvas):
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
 #                            every = None
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
-                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if cool exists and last event was earlier
-                                    self.E1backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
-                                    self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
-                                elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if drop exists and last event was earlier
+#                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if cool exists and last event was earlier
+#                                    self.E1backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
+#                                    self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
+                                if (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if drop exists and last event was earlier
                                     self.E1backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0],
@@ -6757,10 +6794,10 @@ class tgraphcanvas(FigureCanvas):
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(0,True))
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
-                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if cool exists and last event was earlier
-                                    self.E2backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
-                                    self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
-                                elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if drop exists and last event was earlier
+#                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if cool exists and last event was earlier
+#                                    self.E2backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
+#                                    self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
+                                if (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if drop exists and last event was earlier
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1],
@@ -6772,10 +6809,10 @@ class tgraphcanvas(FigureCanvas):
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(1,True))
                             if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
-                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if cool exists and last event was earlier
-                                    self.E3backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
-                                    self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
-                                elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if drop exists and last event was earlier
+#                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if cool exists and last event was earlier
+#                                    self.E3backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
+#                                    self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
+                                if (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if drop exists and last event was earlier
                                     self.E3backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2],
@@ -6787,10 +6824,10 @@ class tgraphcanvas(FigureCanvas):
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(2,True))
                             if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
-                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if cool exists and last event was earlier
-                                    self.E4backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
-                                    self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
-                                elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if drop exists and last event was earlier
+#                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if cool exists and last event was earlier
+#                                    self.E4backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
+#                                    self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
+                                if (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if drop exists and last event was earlier
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3],
@@ -6807,6 +6844,9 @@ class tgraphcanvas(FigureCanvas):
                                 # we prepare copies of the background Evalues
                                 Bevalues = [self.E1backgroundvalues[:],self.E2backgroundvalues[:],self.E3backgroundvalues[:],self.E4backgroundvalues[:]]
                             for i in range(len(self.backgroundEvents)):
+                                event_idx = self.backgroundEvents[i]
+                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
+                                    continue
                                 if self.backgroundEtypes[i] == 4 or self.eventsGraphflag in [0,3,4]:
                                     if self.backgroundEtypes[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.backgroundEStrings[i].strip()) == 0):
                                         Betype = self.Betypesf(self.backgroundEtypes[i])
@@ -18324,8 +18364,11 @@ class ApplicationWindow(QMainWindow):
                 if background:
                     t_min,t_max = aw.calcAutoAxisBackground()
                 else:
-                    t_min,t_max = aw.calcAutoAxis()
-                
+                    if len(aw.qmc.timex) > 3:
+                        t_min,t_max = aw.calcAutoAxis()
+                    else:
+                        t_min = aw.qmc.chargemintime
+                        t_max = aw.qmc.resetmaxtime
                 if aw.qmc.background:
                     if background:
                         t_max_b = t_max
@@ -18393,13 +18436,13 @@ class ApplicationWindow(QMainWindow):
             t_start = aw.qmc.startofx
             t_end = aw.qmc.endofx
             if self.qmc.timeindex[0] > -1: # CHARGE set
-                t_start = aw.qmc.timex[aw.qmc.timeindex[0]] - 60
+                t_start = aw.qmc.timex[aw.qmc.timeindex[0]] - 30
             elif self.qmc.timeindex[0] == -1:
                 t_start = aw.qmc.timex[0] - 60
             if self.qmc.timeindex[7] > 0: # COOL set
-                t_end = aw.qmc.timex[aw.qmc.timeindex[7]] + 60
+                t_end = aw.qmc.timex[aw.qmc.timeindex[7]] + 30
             elif self.qmc.timeindex[6] > 0: # DROP set
-                t_end = aw.qmc.timex[aw.qmc.timeindex[6]] + 90
+                t_end = aw.qmc.timex[aw.qmc.timeindex[6]] + 30
             else:
                 t_end = aw.qmc.timex[-1] + 90
             return t_start, t_end
@@ -18446,11 +18489,9 @@ class ApplicationWindow(QMainWindow):
             t_start = aw.qmc.startofx
             t_end = aw.qmc.endofx
             if self.qmc.timeindexB[0] > -1: # CHARGE set
-                t_start = aw.qmc.timeB[aw.qmc.timeindexB[0]] - 60
-            if self.qmc.timeindexB[7] > 0: # COOL set
-                t_end = aw.qmc.timeB[aw.qmc.timeindexB[7]] + 60
-            elif self.qmc.timeindexB[6] > 0: # DROP set
-                t_end = aw.qmc.timeB[aw.qmc.timeindexB[6]] + 90
+                t_start = aw.qmc.timeB[aw.qmc.timeindexB[0]] - 30
+            if self.qmc.timeindexB[6] > 0: # DROP set
+                t_end = aw.qmc.timeB[aw.qmc.timeindexB[6]] + 30
             return t_start, t_end
         else:
             return aw.qmc.startofx, aw.qmc.endofx

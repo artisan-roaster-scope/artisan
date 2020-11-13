@@ -1553,6 +1553,8 @@ class serialport(object):
             # Temperature
             tempSensor = PhidgetTemperatureSensor()
             ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',DeviceID.PHIDID_HUM1000,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
+            if ser is None:
+                ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',DeviceID.PHIDID_HUM1001,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
             if ser:
                 tempSensor.setDeviceSerialNumber(ser)
                 tempSensor.setHubPort(port)   #explicitly set the port to where the HUM is attached
@@ -1603,10 +1605,13 @@ class serialport(object):
             
     # connects to a Phidgets HUM1000, returns current humidity value and disconnects
     def PhidgetHUM1000humidity(self):
+        print("PhidgetHUM1000humidity")
         try:
             # Humidity
             humSensor = PhidgetHumiditySensor()
             ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetHumiditySensor',DeviceID.PHIDID_HUM1000,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
+            if ser is None:
+                ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetHumiditySensor',DeviceID.PHIDID_HUM1001,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
             if ser:
                 humSensor.setDeviceSerialNumber(ser)
                 humSensor.setHubPort(port)   #explicitly set the port to where the HUM is attached
