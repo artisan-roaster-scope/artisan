@@ -80,8 +80,9 @@ Single channel IR with integrated sensor
 
 Artisan v1.4 adds support for the following ambient sensors that allow to automatically fill the room temperature, relative humidity and barometric pressure data of roast profiles.
 
-* [Phidget HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644){:target="_blank"} (VINT): Measure relative humidity from 0 to 100% and temperature from -40°C to +85°C
-* [Phidget PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719){:target="_blank"} (VINT): Measure the absolute air pressures between 50 and 110 kPa
+* Phidget [HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644){:target="_blank"} / [HUM1001](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=1179){:target="_blank"} (VINT): Measure relative humidity from 0 to 100% and ambient temperature from -40°C to +85°C
+* Phidget [PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719){:target="_blank"} (VINT): Measure the absolute air pressures between 50 and 110 kPa
+* Phidget [TMP1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=724){:target="_blank"} (VINT): Measure ambient temperature from -40°C to 85°C
 
 
 ## 3. Analog/Digital Input

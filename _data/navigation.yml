@@ -50,6 +50,8 @@ machines:
         url: /machines/dongyi/
       - title: "Easyster"
         url: /machines/easyster/
+      - title: "Fabrica Coffee Roasters"
+        url: /machines/fabrica/
       - title: "Froco"
         url: /machines/froco/
       - title: "Garanti"

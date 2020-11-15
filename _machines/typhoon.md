@@ -14,7 +14,7 @@ header:
 * __Producer:__ [LLC Typhoon Coffee](https://typhoon.coffee/){:target="_blank"}, Russia
 * __Machines:__ 2kg, 3kg (Cocoa), 4kg, and 9kg
 * __Connection:__ MODBUS TCP via the network
-* __Features:__ logging of bean temperature (BT), environmental temperatur (ET) and burner temperature
+* __Features:__ logging of bean temperature (BT), environmental temperatur (ET) and burner level and temperature
 
 
 ### Setup

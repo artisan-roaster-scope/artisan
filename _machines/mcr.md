@@ -17,3 +17,9 @@ header:
 {: .notice--primary}
 **Watch out!** Mill City Roasters has never supported the Artisan project like many of the manufacturers here.  For that reason, we are unable to offer support for your specific roaster if it differs from the included one-click machine setups.  Please contact [Mill City Roasters](http://millcityroasters.com/) for support if you encounter setup issues.
 {: .notice--primary}
+
+
+{: .notice--primary}
+**Watch out!**
+There are two setups, one for machines configured to report temperature data in Celsius and one for those reporting it in Fahrenheit.
+{: .notice--primary}
