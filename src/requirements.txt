@@ -14,7 +14,7 @@ pyusb==1.1.0
 setuptools==50.3.2
 persist-queue==0.5.1
 portalocker==2.0.0
-prettytable==1.0.1 # 0.7.2
+prettytable==0.7.2 # 1.0.1 and 2.0.0 fail to be packed by py2app properly into builds
 Phidget22==1.6.20201024
 natsort==7.0.1
 xlrd==1.2.0
