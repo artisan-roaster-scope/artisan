@@ -678,6 +678,7 @@ class tgraphcanvas(FigureCanvas):
     markDropSignal = pyqtSignal()
     toggleMonitorSignal = pyqtSignal()
     toggleRecorderSignal = pyqtSignal()
+    processAlarmSignal = pyqtSignal(int,bool,int,str)
 
     def __init__(self,parent,dpi):
 
@@ -2238,6 +2239,7 @@ class tgraphcanvas(FigureCanvas):
         self.markDropSignal.connect(self.markDropTrigger)
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
+        self.processAlarmSignal.connect(self.processAlarm)
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -2921,7 +2923,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.largeLCDs_dialog.updateValues([et],[bt],time=time)
         except:
             pass
-            
+    
+    @pyqtSlot(str,int)
     def showAlarmPopup(self,message,timeout):
         # alarm popup message with <aw.qmc.alarm_popup_timout>sec timeout
         amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),message,timeout=timeout,modal=False)
@@ -3085,12 +3088,12 @@ class tgraphcanvas(FigureCanvas):
                         deltaetstr = resLCD
                         deltabtstr = resLCD
                         try:
-                            if self.rateofchange1 != -1 and -100 < self.rateofchange1 < 1000:
+                            if -100 < self.rateofchange1 < 1000:
                                 deltaetstr = lcdformat%float(self.rateofchange1)        # rate of change ET (degress per minute)
                         except:
                             pass
                         try:
-                            if self.rateofchange2 != -1 and -100 < self.rateofchange2 < 1000:
+                            if -100 < self.rateofchange2 < 1000:
                                 deltabtstr = lcdformat%float(self.rateofchange2)        # rate of change BT (degrees per minute)
                         except:
                             pass
@@ -3437,7 +3440,16 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)
 
+    def setLCDtime(self,ts):
+        timestr = stringfromseconds(ts)
+        aw.lcd1.display(timestr)
 
+        # update connected WebLCDs
+        if aw.WebLCDs:
+            self.updateWebLCDs(time=timestr)
+        if aw.largeLCDs_dialog:
+            self.updateLargeLCDsTimeSignal.emit(timestr)
+    
     def updateLCDtime(self):
         if self.flagstart and self.flagon:
             tx = self.timeclock.elapsed()/1000.
@@ -3454,14 +3466,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6]:
                         aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
 
-                    timestr = stringfromseconds(ts)
-                    aw.lcd1.display(timestr)
-
-                    # update connected WebLCDs
-                    if aw.WebLCDs:
-                        self.updateWebLCDs(time=timestr)
-                    if aw.largeLCDs_dialog:
-                        self.updateLargeLCDsTimeSignal.emit(timestr)
+                    self.setLCDtime(ts)
             finally:
                 QTimer.singleShot(int(round(nextreading)),self.updateLCDtime)
 
@@ -3622,20 +3627,19 @@ class tgraphcanvas(FigureCanvas):
                 self.deltalinecount = self.lendeltaaxlines()
             if self.delta_ax:
                 self.delta_ax.lines = []
-
-    def setalarm(self,alarmnumber):
-        self.alarmstate[alarmnumber] = max(0,len(self.timex) - 1) # we have to ensure that alarmstate of triggered alarms is never negativ
-
-        aw.sendmessage(QApplication.translate("Message","Alarm {0} triggered", None).format(alarmnumber + 1))
+    
+    # number is alarmnumber+1 (the 1-based alarm number the user sees), for alarms triggered from outside the alarmtable (like PID RS alarms) number is 0
+    @pyqtSlot(int,bool,int,str)
+    def processAlarm(self,number,beep,action,string):
         if not self.silent_alarms:
-            if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
+            if beep:
                 QApplication.beep()
             try:
-                if self.alarmaction[alarmnumber] == 0:
-                    self.showAlarmPopupSignal.emit(self.alarmstrings[alarmnumber],aw.qmc.alarm_popup_timout)
-                elif self.alarmaction[alarmnumber] == 1:
+                if action == 0:
+                    self.showAlarmPopupSignal.emit(string,aw.qmc.alarm_popup_timout)
+                elif action == 1:
                     # alarm call program
-                    fname = self.alarmstrings[alarmnumber].split('#')[0]
+                    fname = string.split('#')[0]
     # take care, the QDir().current() directory changes with loads and saves
     #                QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
                     if False and platf == 'Windows': # this Windows version fails on commands with arguments
@@ -3667,31 +3671,31 @@ class tgraphcanvas(FigureCanvas):
                         aw.sendmessage(QApplication.translate("Message","Alarm is calling: {0}",None).format(fname))
                     else:
                         aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on {0}",None).format(f))
-                elif self.alarmaction[alarmnumber] == 2:
+                elif action == 2:
                     # alarm event button
                     button_number = None
-                    text = self.alarmstrings[alarmnumber].split('#')[0]
+                    text = string.split('#')[0]
                     bnrs = text.split(',')
                     for bnr in bnrs:
                         try:
                             button_number = int(str(bnr.strip())) - 1 # the event buttons presented to the user are numbered from 1 on
                         except Exception:
-                            aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(self.alarmstrings[alarmnumber]))
+                            aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(string))
                         if button_number is not None:
                             if button_number > -1 and button_number < len(aw.buttonlist):
                                 aw.recordextraevent(button_number)
-                elif self.alarmaction[alarmnumber] in [3,4,5,6]:
+                elif action in [3,4,5,6]:
                     # alarm slider 1-4
                     slidernr = None
                     try:
-                        text = self.alarmstrings[alarmnumber].split('#')[0].strip()
-                        if self.alarmaction[alarmnumber] == 3:
+                        text = string.split('#')[0].strip()
+                        if action == 3:
                             slidernr = 0
-                        elif self.alarmaction[alarmnumber] == 4:
+                        elif action == 4:
                             slidernr = 1
-                        elif self.alarmaction[alarmnumber] == 5:
+                        elif action == 5:
                             slidernr = 2
-                        elif self.alarmaction[alarmnumber] == 6:
+                        elif action == 6:
                             slidernr = 3
                         if slidernr is not None:
                             slidervalue = max(aw.eventslidermin[slidernr],min(aw.eventslidermax[slidernr],int(str(text))))
@@ -3700,85 +3704,85 @@ class tgraphcanvas(FigureCanvas):
                             aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
                             if aw.qmc.flagstart:
                                 value = aw.float2float((slidervalue + 10.0) / 10.0)
-                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber + 1,slidernr)))
+                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(number,slidernr)))
                             aw.fireslideraction(slidernr)
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
-                        aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(self.alarmstrings[alarmnumber]))
+                        aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(string))
 
-                elif self.alarmaction[alarmnumber] == 7:
+                elif action == 7:
                     # START
                     if aw.button_2.isEnabled():
                         aw.qmc.ToggleRecorder()
-                elif self.alarmaction[alarmnumber] == 8:
+                elif action == 8:
                     # DRY
                     #if aw.button_19.isEnabled():
                     #    aw.qmc.markDryEnd()
                     aw.qmc.autoDryIdx = len(aw.qmc.timex)
-                elif self.alarmaction[alarmnumber] == 9:
+                elif action == 9:
                     # FCs
                     #if aw.button_3.isEnabled():
                     #    aw.qmc.mark1Cstart()
                     aw.qmc.autoFCsIdx = len(aw.qmc.timex)
-                elif self.alarmaction[alarmnumber] == 10:
+                elif action == 10:
                     # FCe
                     if aw.button_4.isEnabled():
                         aw.qmc.mark1Cend()
-                elif self.alarmaction[alarmnumber] == 11:
+                elif action == 11:
                     # SCs
                     if aw.button_5.isEnabled():
                         aw.qmc.mark2Cstart()
-                elif self.alarmaction[alarmnumber] == 12:
+                elif action == 12:
                     # SCe
                     if aw.button_6.isEnabled():
                         aw.qmc.mark2Cend()
-                elif self.alarmaction[alarmnumber] == 13:
+                elif action == 13:
                     # DROP
                     #if aw.button_9.isEnabled():
                     #    aw.qmc.markDrop()
                     aw.qmc.autoDropIdx = len(aw.qmc.timex)
-                elif self.alarmaction[alarmnumber] == 14:
+                elif action == 14:
                     # COOL
                     if aw.button_20.isEnabled():
                         aw.qmc.markCoolEnd()
-                elif self.alarmaction[alarmnumber] == 15:
+                elif action == 15:
                     # OFF
                     if aw.button_1.isEnabled():
                         aw.qmc.ToggleMonitor()
-                elif self.alarmaction[alarmnumber] == 16:
+                elif action == 16:
                     # CHARGE
                     aw.qmc.autoChargeIdx = len(aw.qmc.timex)
-                elif self.alarmaction[alarmnumber] == 17 and aw.qmc.Controlbuttonflag:
+                elif action == 17 and aw.qmc.Controlbuttonflag:
                     # RampSoak ON
                     if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                         aw.fujipid.setrampsoak(1)
                     elif aw.pidcontrol: # internal or external MODBUS PID control
                         aw.pidcontrol.svMode = 1
                         aw.pidcontrol.pidOn()
-                elif self.alarmaction[alarmnumber] == 18 and aw.qmc.Controlbuttonflag:
+                elif action == 18 and aw.qmc.Controlbuttonflag:
                     # RampSoak OFF
                     if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                         aw.fujipid.setrampsoak(0)
                     elif aw.pidcontrol:  # internal or external MODBUS PID control
                         aw.pidcontrol.svMode = 0
                         aw.pidcontrol.pidOff()
-                elif self.alarmaction[alarmnumber] == 19 and aw.qmc.Controlbuttonflag:
+                elif action == 19 and aw.qmc.Controlbuttonflag:
                     # PID ON
                     if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                         aw.fujipid.setONOFFstandby(0)
                     elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
                         aw.pidcontrol.pidOn()
-                elif self.alarmaction[alarmnumber] == 20 and aw.qmc.Controlbuttonflag:
+                elif action == 20 and aw.qmc.Controlbuttonflag:
                     # PID OFF
                     if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                         aw.fujipid.setONOFFstandby(1)
                     elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
                         aw.pidcontrol.pidOff()
-                elif self.alarmaction[alarmnumber] == 21:
+                elif action == 21:
                     # SV slider alarm
                     try:
-                        text = self.alarmstrings[alarmnumber].split('#')[0]
+                        text = string.split('#')[0]
                         sv = float(str(text))
                         if aw.qmc.device == 0:
                             if sv is not None and sv != aw.fujipid.sv:
@@ -3792,17 +3796,17 @@ class tgraphcanvas(FigureCanvas):
                                 aw.pidcontrol.setSV(sv,init=False)
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
-                        aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(self.alarmstrings[alarmnumber]))
-                elif self.alarmaction[alarmnumber] == 22:
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(e)),exc_tb.tb_lineno)
+                        aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(string))
+                elif action == 22:
                     # Playback ON
                     aw.qmc.backgroundPlaybackEvents = True
-                elif self.alarmaction[alarmnumber] == 23:
+                elif action == 23:
                     # Playback OFF
                     aw.qmc.backgroundPlaybackEvents = False
-                elif self.alarmaction[alarmnumber] == 24:
+                elif action == 24:
                     # Set Canvas Color
-                    c = self.alarmstrings[alarmnumber].strip()
+                    c = string.strip()
                     try:
                         QColor(c) # test if color is valid
                         aw.qmc.palette["canvas_alt"] = aw.qmc.palette["canvas"]
@@ -3812,7 +3816,7 @@ class tgraphcanvas(FigureCanvas):
                         QApplication.processEvents() # needed to establish the change
                     except Exception:
                         pass
-                elif self.alarmaction[alarmnumber] == 25:
+                elif action == 25:
                     # Reset Canvas Color
                     if "canvas_alt" in aw.qmc.palette:
                         aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
@@ -3822,7 +3826,217 @@ class tgraphcanvas(FigureCanvas):
 
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(ex)),exc_tb.tb_lineno)    
+    
+    
+
+    def setalarm(self,alarmnumber):
+        self.alarmstate[alarmnumber] = max(0,len(self.timex) - 1) # we have to ensure that alarmstate of triggered alarms is never negativ
+
+        aw.sendmessage(QApplication.translate("Message","Alarm {0} triggered", None).format(alarmnumber + 1))
+        
+        self.processAlarm(self,
+            alarmnumber+1,
+            len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber], # beep?
+            self.alarmaction[alarmnumber],
+            self.alarmstrings[alarmnumber])
+        
+#        if not self.silent_alarms:
+#            if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
+#                QApplication.beep()
+#            try:
+#                if self.alarmaction[alarmnumber] == 0:
+#                    self.showAlarmPopupSignal.emit(self.alarmstrings[alarmnumber],aw.qmc.alarm_popup_timout)
+#                elif self.alarmaction[alarmnumber] == 1:
+#                    # alarm call program
+#                    fname = self.alarmstrings[alarmnumber].split('#')[0]
+#    # take care, the QDir().current() directory changes with loads and saves
+#    #                QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
+#                    if False and platf == 'Windows': # this Windows version fails on commands with arguments
+#                        f = "file:///{}/{}".format(QApplication.applicationDirPath(),fname)
+#                        res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
+#                    else:
+#                        # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
+#                        # Linux: script is expected to sit next to the artisan binary or being specified with its full path
+#                        #
+#                        # to get the effect of speaking alarms a text containing the following two lines called "say.sh" could do
+#                        #                #!/bin/sh
+#                        #                say "Hello" &
+#                        # don't forget to do
+#                        #                # cd
+#                        #                # chmod +x say.sh
+#                        #
+#                        # alternatively use "say $@ &" as command and send text strings along
+#                        # Voices:
+#                        #  -v Alex (male english)
+#                        #  -v Viki (female english)
+#                        #  -v Victoria (female english)
+#                        #  -v Yannick (male german)
+#                        #  -v Anna (female german)
+#                        #  -v Paolo (male italian)
+#                        #  -v Silvia (female italian)
+#                        aw.call_prog_with_args(fname)
+#                        res = True
+#                    if res:
+#                        aw.sendmessage(QApplication.translate("Message","Alarm is calling: {0}",None).format(fname))
+#                    else:
+#                        aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on {0}",None).format(f))
+#                elif self.alarmaction[alarmnumber] == 2:
+#                    # alarm event button
+#                    button_number = None
+#                    text = self.alarmstrings[alarmnumber].split('#')[0]
+#                    bnrs = text.split(',')
+#                    for bnr in bnrs:
+#                        try:
+#                            button_number = int(str(bnr.strip())) - 1 # the event buttons presented to the user are numbered from 1 on
+#                        except Exception:
+#                            aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(self.alarmstrings[alarmnumber]))
+#                        if button_number is not None:
+#                            if button_number > -1 and button_number < len(aw.buttonlist):
+#                                aw.recordextraevent(button_number)
+#                elif self.alarmaction[alarmnumber] in [3,4,5,6]:
+#                    # alarm slider 1-4
+#                    slidernr = None
+#                    try:
+#                        text = self.alarmstrings[alarmnumber].split('#')[0].strip()
+#                        if self.alarmaction[alarmnumber] == 3:
+#                            slidernr = 0
+#                        elif self.alarmaction[alarmnumber] == 4:
+#                            slidernr = 1
+#                        elif self.alarmaction[alarmnumber] == 5:
+#                            slidernr = 2
+#                        elif self.alarmaction[alarmnumber] == 6:
+#                            slidernr = 3
+#                        if slidernr is not None:
+#                            slidervalue = max(aw.eventslidermin[slidernr],min(aw.eventslidermax[slidernr],int(str(text))))
+#                            aw.moveslider(slidernr,slidervalue)
+#                            # we set the last value to be used for relative +- button action as base
+#                            aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
+#                            if aw.qmc.flagstart:
+#                                value = aw.float2float((slidervalue + 10.0) / 10.0)
+#                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber + 1,slidernr)))
+#                            aw.fireslideraction(slidernr)
+#                    except Exception as e:
+#                        _, _, exc_tb = sys.exc_info()
+#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
+#                        aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(self.alarmstrings[alarmnumber]))
+#
+#                elif self.alarmaction[alarmnumber] == 7:
+#                    # START
+#                    if aw.button_2.isEnabled():
+#                        aw.qmc.ToggleRecorder()
+#                elif self.alarmaction[alarmnumber] == 8:
+#                    # DRY
+#                    #if aw.button_19.isEnabled():
+#                    #    aw.qmc.markDryEnd()
+#                    aw.qmc.autoDryIdx = len(aw.qmc.timex)
+#                elif self.alarmaction[alarmnumber] == 9:
+#                    # FCs
+#                    #if aw.button_3.isEnabled():
+#                    #    aw.qmc.mark1Cstart()
+#                    aw.qmc.autoFCsIdx = len(aw.qmc.timex)
+#                elif self.alarmaction[alarmnumber] == 10:
+#                    # FCe
+#                    if aw.button_4.isEnabled():
+#                        aw.qmc.mark1Cend()
+#                elif self.alarmaction[alarmnumber] == 11:
+#                    # SCs
+#                    if aw.button_5.isEnabled():
+#                        aw.qmc.mark2Cstart()
+#                elif self.alarmaction[alarmnumber] == 12:
+#                    # SCe
+#                    if aw.button_6.isEnabled():
+#                        aw.qmc.mark2Cend()
+#                elif self.alarmaction[alarmnumber] == 13:
+#                    # DROP
+#                    #if aw.button_9.isEnabled():
+#                    #    aw.qmc.markDrop()
+#                    aw.qmc.autoDropIdx = len(aw.qmc.timex)
+#                elif self.alarmaction[alarmnumber] == 14:
+#                    # COOL
+#                    if aw.button_20.isEnabled():
+#                        aw.qmc.markCoolEnd()
+#                elif self.alarmaction[alarmnumber] == 15:
+#                    # OFF
+#                    if aw.button_1.isEnabled():
+#                        aw.qmc.ToggleMonitor()
+#                elif self.alarmaction[alarmnumber] == 16:
+#                    # CHARGE
+#                    aw.qmc.autoChargeIdx = len(aw.qmc.timex)
+#                elif self.alarmaction[alarmnumber] == 17 and aw.qmc.Controlbuttonflag:
+#                    # RampSoak ON
+#                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+#                        aw.fujipid.setrampsoak(1)
+#                    elif aw.pidcontrol: # internal or external MODBUS PID control
+#                        aw.pidcontrol.svMode = 1
+#                        aw.pidcontrol.pidOn()
+#                elif self.alarmaction[alarmnumber] == 18 and aw.qmc.Controlbuttonflag:
+#                    # RampSoak OFF
+#                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+#                        aw.fujipid.setrampsoak(0)
+#                    elif aw.pidcontrol:  # internal or external MODBUS PID control
+#                        aw.pidcontrol.svMode = 0
+#                        aw.pidcontrol.pidOff()
+#                elif self.alarmaction[alarmnumber] == 19 and aw.qmc.Controlbuttonflag:
+#                    # PID ON
+#                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+#                        aw.fujipid.setONOFFstandby(0)
+#                    elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
+#                        aw.pidcontrol.pidOn()
+#                elif self.alarmaction[alarmnumber] == 20 and aw.qmc.Controlbuttonflag:
+#                    # PID OFF
+#                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+#                        aw.fujipid.setONOFFstandby(1)
+#                    elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
+#                        aw.pidcontrol.pidOff()
+#                elif self.alarmaction[alarmnumber] == 21:
+#                    # SV slider alarm
+#                    try:
+#                        text = self.alarmstrings[alarmnumber].split('#')[0]
+#                        sv = float(str(text))
+#                        if aw.qmc.device == 0:
+#                            if sv is not None and sv != aw.fujipid.sv:
+#                                sv = max(0,sv) # we don't send SV < 0
+#                                #aw.qmc.temporarysetsv = sv
+#                                aw.fujipid.setsv(sv,silent=True)
+#                        elif aw.pidcontrol.pidActive:
+#                            if sv is not None and sv != aw.pidcontrol.sv:
+#                                sv = max(0,sv) # we don't send SV < 0
+#                                #aw.qmc.temporarysetsv = sv
+#                                aw.pidcontrol.setSV(sv,init=False)
+#                    except Exception as e:
+#                        _, _, exc_tb = sys.exc_info()
+#                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
+#                        aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(self.alarmstrings[alarmnumber]))
+#                elif self.alarmaction[alarmnumber] == 22:
+#                    # Playback ON
+#                    aw.qmc.backgroundPlaybackEvents = True
+#                elif self.alarmaction[alarmnumber] == 23:
+#                    # Playback OFF
+#                    aw.qmc.backgroundPlaybackEvents = False
+#                elif self.alarmaction[alarmnumber] == 24:
+#                    # Set Canvas Color
+#                    c = self.alarmstrings[alarmnumber].strip()
+#                    try:
+#                        QColor(c) # test if color is valid
+#                        aw.qmc.palette["canvas_alt"] = aw.qmc.palette["canvas"]
+#                        aw.qmc.palette["canvas"] = c
+#                        aw.updateCanvasColors()
+#                        aw.qmc.redraw()
+#                        QApplication.processEvents() # needed to establish the change
+#                    except Exception:
+#                        pass
+#                elif self.alarmaction[alarmnumber] == 25:
+#                    # Reset Canvas Color
+#                    if "canvas_alt" in aw.qmc.palette:
+#                        aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
+#                        aw.updateCanvasColors()
+#                        aw.qmc.redraw()
+#                        QApplication.processEvents()
+#
+#            except Exception as ex:
+#                _, _, exc_tb = sys.exc_info()
+#                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     # called only after CHARGE
     def playbackdrop(self):
@@ -9319,6 +9533,7 @@ class tgraphcanvas(FigureCanvas):
         for i in range(len(aw.extraser)):
             self.disconnectProbesFromSerialDevice(aw.extraser[i])
 
+    @pyqtSlot()
     def toggleMonitorTigger(self):
         self.ToggleMonitor()
     
@@ -9465,6 +9680,7 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffRecorder() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    @pyqtSlot()
     def toggleRecorderTigger(self):
         self.ToggleRecorder()
 
@@ -9490,6 +9706,7 @@ class tgraphcanvas(FigureCanvas):
 
     # trigger to be called by the markChargeSignal
     # if delay is not 0, the markCharge is issues after n milliseconds
+    @pyqtSlot(int)
     def markChargeDelay(self,delay):
         if delay == 0:
             self.markCharge()
@@ -9645,6 +9862,7 @@ class tgraphcanvas(FigureCanvas):
         self.autoTPIdx = 0 # avoid a loop on auto marking
 
     # trigger to be called by the markDRYSignal
+    @pyqtSlot()
     def markDRYTrigger(self):
         self.markDryEnd()
         
@@ -9750,6 +9968,7 @@ class tgraphcanvas(FigureCanvas):
                         self.updategraphicsSignal.emit()
 
     # trigger to be called by the markFCsSignal
+    @pyqtSlot()
     def markFCsTrigger(self):
         self.mark1Cstart()
         
@@ -9855,6 +10074,7 @@ class tgraphcanvas(FigureCanvas):
                         self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     # trigger to be called by the markFCeSignal
+    @pyqtSlot()
     def markFCeTrigger(self):
         self.mark1Cend()
     
@@ -9953,6 +10173,7 @@ class tgraphcanvas(FigureCanvas):
 
 
     # trigger to be called by the markSCsSignal
+    @pyqtSlot()
     def markSCsTrigger(self):
         self.mark2Cstart()
 
@@ -10061,6 +10282,7 @@ class tgraphcanvas(FigureCanvas):
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     # trigger to be called by the markSCeSignal
+    @pyqtSlot()
     def markSCeTrigger(self):
         self.mark2Cend()
 
@@ -10163,6 +10385,7 @@ class tgraphcanvas(FigureCanvas):
                     self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     # trigger to be called by the markChargeSignal
+    @pyqtSlot()
     def markDropTrigger(self):
         self.markDrop()
 
@@ -14344,6 +14567,8 @@ class ApplicationWindow(QMainWindow):
         self.WebLCDsPort = 8080
         self.WebLCDsAlerts = False
 
+        # active tab
+        self.PID_DlgControl_activeTab = 0
 
         #flag to reset Qsettings
         self.resetqsettings = 0
@@ -17067,7 +17292,7 @@ class ApplicationWindow(QMainWindow):
             string += QApplication.translate("Message","Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
             string += QApplication.translate("Message","Enjoy using ArtisanViewer,", None) +"\n"
             string += QApplication.translate("Message","The Artisan Team", None)
-            QMessageBox.information(aw,QApplication.translate("Message","One time message about ArtisanViewer", None),string)
+            QMessageBox.information(aw,QApplication.translate("Message","OprocessSingleShotPhidgetsPulsene time message about ArtisanViewer", None),string)
             settings.setValue("Mode",self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
 
         # we connect the signals
@@ -17429,6 +17654,8 @@ class ApplicationWindow(QMainWindow):
 
 
     # turns channel off after millis
+    @pyqtSlot(int,int,str)
+    @pyqtSlot(int,int,str,str)
     def processSingleShotPhidgetsPulse(self,channel,millis,fct,serial=None):
         if fct == "OUTsetPWM":
             QTimer.singleShot(int(round(millis)),lambda : self.ser.phidgetOUTsetPWM(channel,0,serial))
@@ -24499,12 +24726,11 @@ class ApplicationWindow(QMainWindow):
                             else:
                                 extratemps.append(-1)
 
-                        ws.cell(row=r+i, column=1).value = eval(fieldlist[0][1])
-                        ws.cell(row=r+i, column=2).value = eval(fieldlist[1][1])
-                        ws.cell(row=r+i, column=3).value = eval(fieldlist[2][1])
-                        ws.cell(row=r+i, column=4).value = eval(fieldlist[3][1])
-                        ws.cell(row=r+i, column=5).value = eval(fieldlist[4][1])
-                        ws.cell(row=r+i, column=6).value = eval(fieldlist[5][1])
+                        for j in range(6):
+                            try:
+                                ws.cell(row=r+i, column=j+1).value = eval(fieldlist[j][1])
+                            except:
+                                pass
 
                         for j in range(len(extratemps)):
                             ws.cell(row=r+i, column=7+j).value = extratemps[j]
@@ -25277,6 +25503,12 @@ class ApplicationWindow(QMainWindow):
                     aw.pidcontrol.svRamps = [int(x) for x in profile["svRamps"]]
                 if "svSoaks" in profile:
                     aw.pidcontrol.svSoaks = [int(x) for x in profile["svSoaks"]]
+                if "svActions" in profile:
+                    aw.pidcontrol.svActions = [int(x) for x in profile["svActions"]]
+                if "svBeeps" in profile:
+                    aw.pidcontrol.svBeeps = [bool(x) for x in profile["svBeeps"]]
+                if "svDescriptions" in profile:
+                    aw.pidcontrol.svDescriptions = [str(x) for x in profile["svDescriptions"]]
             if "timeindex" in profile:
                 self.qmc.timeindex = profile["timeindex"]
                 if self.qmc.locktimex:
@@ -25775,6 +26007,9 @@ class ApplicationWindow(QMainWindow):
             profile["svValues"] = aw.pidcontrol.svValues
             profile["svRamps"] = aw.pidcontrol.svRamps
             profile["svSoaks"] = aw.pidcontrol.svSoaks
+            profile["svActions"] = aw.pidcontrol.svActions
+            profile["svBeeps"] = aw.pidcontrol.svBeeps
+            profile["svDescriptions"] = aw.pidcontrol.svDescriptions
             try:
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
@@ -26935,6 +27170,9 @@ class ApplicationWindow(QMainWindow):
                 aw.pidcontrol.svValues = [toInt(x) for x in toList(settings.value("svValues",aw.pidcontrol.svValues))]
                 aw.pidcontrol.svRamps = [toInt(x) for x in toList(settings.value("svRamps",aw.pidcontrol.svRamps))]
                 aw.pidcontrol.svSoaks = [toInt(x) for x in toList(settings.value("svSoaks",aw.pidcontrol.svSoaks))]
+                aw.pidcontrol.svActions = [toInt(x) for x in toList(settings.value("svActions",aw.pidcontrol.svActions))]
+                aw.pidcontrol.svBeeps = [bool(toBool(x)) for x in toList(settings.value("svBeeps",aw.pidcontrol.svBeeps))]
+                aw.pidcontrol.svDescriptions = list(toStringList(settings.value("svDescriptions",aw.pidcontrol.svDescriptions)))
                 aw.pidcontrol.svSlider = bool(toBool(settings.value("svSlider",aw.pidcontrol.svSlider)))
                 aw.pidcontrol.svButtons = bool(toBool(settings.value("svButtons",aw.pidcontrol.svButtons)))
                 aw.pidcontrol.svMode = toInt(settings.value("svMode",aw.pidcontrol.svMode))
@@ -28357,6 +28595,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("svValues",aw.pidcontrol.svValues)
             settings.setValue("svRamps",aw.pidcontrol.svRamps)
             settings.setValue("svSoaks",aw.pidcontrol.svSoaks)
+            settings.setValue("svActions",aw.pidcontrol.svActions)
+            settings.setValue("svBeeps",aw.pidcontrol.svBeeps)
+            settings.setValue("svDescriptions",aw.pidcontrol.svDescriptions)
             settings.setValue("svSlider",aw.pidcontrol.svSlider)
             settings.setValue("svButtons",aw.pidcontrol.svButtons)
             settings.setValue("svMode",aw.pidcontrol.svMode)
@@ -31951,7 +32192,7 @@ class ApplicationWindow(QMainWindow):
         elif self.qmc.device == 53:
             modifiers = QApplication.keyboardModifiers()
             if modifiers == Qt.ControlModifier:
-                dialog = PID_DlgControl(self,self)
+                dialog = PID_DlgControl(self,self,self.PID_DlgControl_activeTab)
                 #modeless style dialog
                 dialog.show()
             else:
@@ -31963,7 +32204,7 @@ class ApplicationWindow(QMainWindow):
             if modifiers == Qt.ControlModifier:
                 self.pidcontrol.togglePID()
             else:
-                dialog = PID_DlgControl(self,self)
+                dialog = PID_DlgControl(self,self,self.PID_DlgControl_activeTab)
                 #modeless style dialog
                 dialog.show()
 #                dialog.setFixedSize(dialog.size())  # this badly interacts with keeping the window gemetry in qsettings

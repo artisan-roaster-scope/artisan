@@ -30,7 +30,7 @@
 import time as libtime
 import numpy
 
-from artisanlib.util import decs2string, fromCtoF, fromFtoC, hex2int, str2cmd
+from artisanlib.util import decs2string, fromCtoF, fromFtoC, hex2int, str2cmd, stringfromseconds
 
 from PyQt5.QtCore import pyqtSlot, QTime
 from PyQt5.QtWidgets import QApplication
@@ -1012,9 +1012,24 @@ class PIDcontrol(object):
         #
         self.pidOnCHARGE = False
         self.loadRampSoakFromProfile = False
-        self.svValues = [0,0,0,0,0,0,0,0] # sv temp as int per 8 channels
-        self.svRamps = [0,0,0,0,0,0,0,0] # seconds as int per 8 channels
-        self.svSoaks = [0,0,0,0,0,0,0,0] # seconds as int per 8 channels
+        self.svLen = 8
+        self.svValues = [0]*self.svLen # sv temp as int per 8 channels
+        self.svRamps = [0]*self.svLen  # seconds as int per 8 channels
+        self.svSoaks = [0]*self.svLen  # seconds as int per 8 channels
+        self.svActions = [-1]*self.svLen      # alarm action as int per 8 channels
+        self.svBeeps = [False]*self.svLen     # alarm beep as bool per 8 channels
+        self.svDescriptions = [""]*self.svLen # alarm descriptions as string per 8 channels
+        #
+        self.svTriggeredAlarms = [False]*self.svLen # set to true once the corresponding alarm was triggered
+        # extra RS sets:
+        self.RSLen = 3
+        self.RS_svRamps = [[0]*self.svLen]*self.RSLen  # sv temp as int per 8 channels
+        self.RS_svRamps = [[0]*self.svLen]*self.RSLen  # seconds as int per 8 channels
+        self.RS_svSoaks = [[0]*self.svLen]*self.RSLen  # seconds as int per 8 channels
+        self.RS_svActions = [[-1]*self.svLen]*self.RSLen      # alarm action as int per 8 channels
+        self.RS_svBeeps = [[False]*self.svLen]*self.RSLen     # alarm beep as bool per 8 channels
+        self.RS_svDescriptions = [[""]*self.svLen]*self.RSLen # alarm descriptions as string per 8 channels
+        #
         self.svSlider = False
         self.svButtons = False
         self.svMode = 0 # 0: manual, 1: Ramp/Soak, 2: Follow (background profile)
@@ -1046,7 +1061,16 @@ class PIDcontrol(object):
         self.sv_smoothing_factor = 0 # off if 0
         self.sv_decay_weights = None
         self.previous_svs = []
+        # time @ PID ON
+        self.time_pidON = 0 # in monitoring mode, ramp-soak times are interperted w.r.t. the time after the PID was turned on and not the time after CHARGE as during recording
+        self.current_ramp_segment = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
+        self.current_soak_segment = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
+        self.ramp_soak_engaged = 1 # set to 0, disengaged, after the RS pattern was processed fully
+        self.RS_total_time = 0 # holds the total time of the current Ramp/Soak pattern
 
+    def RStotalTime(self,ramps,soaks):
+        return sum(ramps) + sum(soaks)
+        
     # returns True if an external PID controller is in use (MODBUS or TC4 PID firmware)
     # and False if the internal software PID is in charge
     # the returned value indicates the type of external PID control:
@@ -1145,6 +1169,15 @@ class PIDcontrol(object):
 
     def pidOn(self):
         if self.aw.qmc.flagon:
+            self.current_ramp_segment = 0
+            self.current_soak_segment = 0
+            self.ramp_soak_engaged = 1
+            self.RS_total_time = self.RStotalTime(self.svRamps,self.svSoaks)
+            
+            if self.aw.qmc.flagstart or len(self.aw.qmc.on_timex)<1:
+                self.time_pidON = 0
+            else:
+                self.time_pidON = self.aw.qmc.on_timex[-1]
             self.aw.qmc.temporayslider_force_move = True
             self.lastEnergy = None
             # TC4 hardware PID
@@ -1191,6 +1224,9 @@ class PIDcontrol(object):
                 self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
 
     def pidOff(self):
+        if self.aw.qmc.flagon and not self.aw.qmc.flagstart:
+            self.aw.sendmessage(QApplication.translate("Message","PID OFF", None))
+            self.aw.qmc.setLCDtime(0)       
         # MODBUS hardware PID
         if (self.aw.pidcontrol.externalPIDControl() == 1 and self.aw.modbus.PID_OFF_action and self.aw.modbus.PID_OFF_action != ""):
             self.aw.eventaction(4,self.aw.modbus.PID_OFF_action)
@@ -1241,29 +1277,50 @@ class PIDcontrol(object):
     # returns SV (or None) wrt. to the ramp-soak table and the given time t
     # (used only internally)
     def svRampSoak(self,t):
-        segment_end_time = 0 # the (end) time of the segments
-        prev_segment_end_time = 0 # the (end) time of the previous segment
-        segment_start_sv = 0 # the (target) sv of the segment
-        prev_segment_start_sv = 0 # the (target) sv of the previous segment
-        for i in range(len(self.svValues)):
-            # Ramp
-            segment_end_time = segment_end_time + self.svRamps[i]
-            segment_start_sv = self.svValues[i]
-            if segment_end_time > t:
-                # t is within the current segment
-                k = float(segment_start_sv - prev_segment_start_sv) / float(segment_end_time - prev_segment_end_time)
-                return prev_segment_start_sv + k*(t - prev_segment_end_time)
-            prev_segment_end_time = segment_end_time
-            prev_segment_start_sv = segment_start_sv
-            # Soak
-            segment_end_time = segment_end_time + self.svSoaks[i]
-            segment_start_sv = self.svValues[i]
-            if segment_end_time > t:
-                # t is within the current segment
-                return prev_segment_start_sv
-            prev_segment_end_time = segment_end_time
-            prev_segment_start_sv = segment_start_sv
-        return None
+        if self.ramp_soak_engaged == 0:
+            return None
+        else:
+            self.aw.qmc.setLCDtime(self.RS_total_time-t)
+            segment_end_time = 0 # the (end) time of the segments
+            prev_segment_end_time = 0 # the (end) time of the previous segment
+            segment_start_sv = 0 # the (target) sv of the segment
+            prev_segment_start_sv = 0 # the (target) sv of the previous segment
+            for i in range(len(self.svValues)):
+                # Ramp
+                if self.svRamps[i] != 0:
+                    segment_end_time = segment_end_time + self.svRamps[i]
+                    segment_start_sv = self.svValues[i]
+                    if segment_end_time > t:
+                        # t is within the current segment
+                        k = float(segment_start_sv - prev_segment_start_sv) / float(segment_end_time - prev_segment_end_time)                        
+                        if self.current_ramp_segment != i+1:
+                            self.aw.sendmessage(QApplication.translate("Message","Ramp {0}: in {1} to SV {2}".format(i+1,stringfromseconds(self.svRamps[i]),self.svValues[i]), None))
+                            self.current_ramp_segment = i+1
+                        return prev_segment_start_sv + k*(t - prev_segment_end_time)
+                prev_segment_end_time = segment_end_time
+                prev_segment_start_sv = segment_start_sv
+                # Soak
+                if self.svSoaks[i] != 0:
+                    segment_end_time = segment_end_time + self.svSoaks[i]
+                    segment_start_sv = self.svValues[i]
+                    if segment_end_time > t:
+                        # t is within the current segment
+                        if self.current_soak_segment != i+1:
+                            self.current_soak_segment = i+1
+                            self.aw.sendmessage(QApplication.translate("Message","Soak {0}: for {1} at SV {2}".format(i+1,stringfromseconds(self.svSoaks[i]),self.svValues[i]), None))
+                        return prev_segment_start_sv
+                prev_segment_end_time = segment_end_time
+                prev_segment_start_sv = segment_start_sv
+                if (self.current_ramp_segment > i or self.current_soak_segment > 1) and not self.svTriggeredAlarms[i]:
+                    self.svTriggeredAlarms[i] = True
+                    if self.svActions[i] > -1:
+                        self.aw.qmc.processAlarmSignal.emit(0,self.svBeeps[i],self.svActions[i],self.svDescriptions[i])
+                        #self.aw.qmc.processAlarm(0,self.svBeeps[i],self.svActions[i],self.svDescriptions[i])
+            self.aw.sendmessage(QApplication.translate("Message","Ramp/Soak pattern finished", None))
+            self.aw.qmc.setLCDtime(0)       
+            self.ramp_soak_engaged = 0 # stop the ramp/soak process
+            # fire RS-finished action
+            return None
     
     def smooth_sv(self,sv):
         if self.sv_smoothing_factor:
@@ -1287,8 +1344,8 @@ class PIDcontrol(object):
     def calcSV(self,tx):
         if self.svMode == 1:
             # Ramp/Soak mode
-            # actual time (after CHARGE):
-            return self.svRampSoak(tx)
+            # actual time (after CHARGE) on recording and time after PID ON on monitoring:
+            return self.svRampSoak(tx - self.time_pidON)
         elif self.svMode == 2 and self.aw.qmc.background:
             # Follow Background mode
             followBT = True # if false, follow ET
