@@ -6,8 +6,11 @@ excerpt: "K500/1.0/5.0"
 header:
   overlay_image: /assets/images/kapok2.jpg
   image: /assets/images/kapok2.jpg
-  teaser: assets/images/kapok1.jpg
+  teaser: assets/images/kapok-supporter.jpg
 ---
+
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+
 * __Producer:__ [KapoK Roasters](http://kapokcoffee.com/en/){:target="_blank"}, Taiwan
 * __Machines:__ K500, K1.0, K5.0
 * __Connection:__ MODBUS ASCII via USB; requires the installation of a [serial driver](/modbus_serial/)
