@@ -37,7 +37,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBo
                              QTableWidget, QMessageBox)
 
 class DeviceAssignmentDlg(ArtisanResizeablDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent = None, aw = None, activeTab = 0):
         super(DeviceAssignmentDlg,self).__init__(parent,aw)
         self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment", None))
         self.setModal(True)
@@ -1185,29 +1185,29 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab6Layout.addLayout(ambientVBox)
         tab6Layout.setContentsMargins(2,10,2,5)
         #main tab widget
-        TabWidget = QTabWidget()
+        self.TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Devices",None))
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Devices",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Symb ET/BT",None))
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Symb ET/BT",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Phidgets",None))
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Phidgets",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Yoctopuce",None))
+        self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Yoctopuce",None))
         C6Widget = QWidget()
         C6Widget.setLayout(tab6Layout)
-        TabWidget.addTab(C6Widget,QApplication.translate("Tab","Ambient",None))
-        TabWidget.currentChanged.connect(self.tabSwitched)
+        self.TabWidget.addTab(C6Widget,QApplication.translate("Tab","Ambient",None))
+        self.TabWidget.currentChanged.connect(self.tabSwitched)
         #incorporate layouts
         Mlayout = QVBoxLayout()
-        Mlayout.addWidget(TabWidget)
+        Mlayout.addWidget(self.TabWidget)
         Mlayout.addLayout(buttonLayout)
         Mlayout.setSpacing(0)
         Mlayout.setContentsMargins(5,10,5,5)
@@ -1219,6 +1219,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         settings = QSettings()
         if settings.contains("DeviceAssignmentGeometry"):
             self.restoreGeometry(settings.value("DeviceAssignmentGeometry"))
+        self.TabWidget.setCurrentIndex(activeTab)
 
     @pyqtSlot(int)
     def changeOutprogramFlag(self,_):
@@ -1880,6 +1881,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def cancelEvent(self):
+        self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
         self.closeHelp()
         self.reject()
 
@@ -1890,6 +1892,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             settings = QSettings()
             #save window geometry
             settings.setValue("DeviceAssignmentGeometry",self.saveGeometry()) 
+            self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
         
             #save any extra devices here
             self.savedevicetable(redraw=False)

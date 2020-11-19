@@ -35,7 +35,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QH
                              QGridLayout, QGroupBox, QTableWidget)
 
 class EventsDlg(ArtisanResizeablDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent = None, aw = None, activeTab = 0):
         super(EventsDlg,self).__init__(parent, aw)
         
         self.app = QCoreApplication.instance()
@@ -1374,6 +1374,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Style",None))
 
         self.TabWidget.addTab(C7Widget,QApplication.translate("Tab","Annotations",None))
+
+        self.TabWidget.setCurrentIndex(activeTab)
 
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.TabWidget)
@@ -2878,6 +2880,7 @@ class EventsDlg(ArtisanResizeablDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("EventsGeometry",self.saveGeometry())
+        self.aw.EventsDlg_activeTab = self.TabWidget.currentIndex()
 
     @pyqtSlot(bool)
     def showEventbuttonhelp(self,_=False):

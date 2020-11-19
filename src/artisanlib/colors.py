@@ -28,7 +28,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QPushButton,
     QLayout, QSpinBox, QTabWidget, QMessageBox)
 
 class graphColorDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent = None, aw = None, activeTab = 0):
         super(graphColorDlg,self).__init__(parent, aw)
         self.setAttribute(Qt.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
         self.setModal(True)
@@ -565,6 +565,7 @@ class graphColorDlg(ArtisanDialog):
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
         self.layout().setSizeConstraint(QLayout.SetFixedSize) # don't allow resizing
+        self.TabWidget.setCurrentIndex(activeTab)
 
     @pyqtSlot(bool)
     def setLCD_bw(self,_):

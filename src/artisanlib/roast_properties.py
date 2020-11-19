@@ -615,7 +615,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     connectScaleSignal = pyqtSignal()
     readScaleSignal = pyqtSignal()
 
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent = None, aw = None, activeTab = 0):
         super(editGraphDlg,self).__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))
@@ -1648,6 +1648,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         totallayout.setSpacing(0)
         self.volume_percent()
         self.setLayout(totallayout)
+        
+        self.TabWidget.setCurrentIndex(activeTab)
 
         self.titleedit.setFocus()
 
@@ -2501,6 +2503,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("RoastGeometry",self.saveGeometry())
+        self.aw.editGraphDlg_activeTab = self.TabWidget.currentIndex()
 
     # triggered via the cancel button
     @pyqtSlot()
@@ -2520,6 +2523,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("RoastGeometry",self.saveGeometry())
+        self.aw.editGraphDlg_activeTab = self.TabWidget.currentIndex()
         
         self.aw.qmc.beans = self.org_beans
         self.aw.qmc.density = self.org_density

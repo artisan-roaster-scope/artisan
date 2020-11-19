@@ -20,18 +20,18 @@ import os
 import sys
 import prettytable
 
-from artisanlib.util import deltaLabelUTF8, stringfromseconds, stringtoseconds
+from artisanlib.util import deltaLabelUTF8#, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemInt, MyTableWidgetItemQCheckBox,
-                                MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit)
+                                MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime)
 
 from help import alarms_help
 
-from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression)
-from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator
+from PyQt5.QtCore import (Qt, pyqtSlot, QSettings)#, QRegularExpression)
+from PyQt5.QtGui import QColor, QIntValidator#, QRegularExpressionValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QHBoxLayout, QVBoxLayout, QCheckBox, QPushButton, QSizePolicy, QSpinBox,
-            QTableWidgetSelectionRange)
+            QTableWidgetSelectionRange, QTimeEdit)
 
 class AlarmDlg(ArtisanResizeablDialog):
     def __init__(self, parent = None, aw = None):
@@ -585,7 +585,9 @@ class AlarmDlg(ArtisanResizeablDialog):
                 self.aw.qmc.alarmtime[i] = self.aw.qmc.menuidx2alarmtime[timez.currentIndex()]
                 offset =  self.alarmtable.cellWidget(i,5)
                 if offset and offset != "":
-                    self.aw.qmc.alarmoffset[i] = max(0,stringtoseconds(str(offset.text())))
+#                    self.aw.qmc.alarmoffset[i] = max(0,stringtoseconds(str(offset.text())))
+                    tx = self.aw.QTime2time(offset.time())
+                    self.aw.qmc.alarmoffset[i] = max(0,tx)
                 atype = self.alarmtable.cellWidget(i,6)
                 self.aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3
                 cond = self.alarmtable.cellWidget(i,7)
@@ -661,10 +663,14 @@ class AlarmDlg(ArtisanResizeablDialog):
                                QApplication.translate("ComboBox","If Alarm",None)]) # qmc.alarmtime 10
         timeComboBox.setCurrentIndex(self.aw.qmc.alarmtime2menuidx[self.aw.qmc.alarmtime[i]])
         #time after selected event
-        timeoffsetedit = QLineEdit(stringfromseconds(max(0,self.aw.qmc.alarmoffset[i])))
+#        timeoffsetedit = QLineEdit(stringfromseconds(max(0,self.aw.qmc.alarmoffset[i])))
+#        timeoffsetedit.setAlignment(Qt.AlignRight)
+#        regextime = QRegularExpression(r"^[0-5][0-9]:[0-5][0-9]$")
+#        timeoffsetedit.setValidator(QRegularExpressionValidator(regextime,self))
+        timeoffsetedit = QTimeEdit()
         timeoffsetedit.setAlignment(Qt.AlignRight)
-        regextime = QRegularExpression(r"^[0-5][0-9]:[0-5][0-9]$")
-        timeoffsetedit.setValidator(QRegularExpressionValidator(regextime,self))
+        timeoffsetedit.setDisplayFormat("mm:ss")
+        timeoffsetedit.setTime(self.aw.time2QTime(max(0,self.aw.qmc.alarmoffset[i])))
         #type/source
         typeComboBox = MyQComboBox()
         typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
@@ -746,7 +752,8 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.alarmtable.setCellWidget(i,4,timeComboBox)
         self.alarmtable.setItem(i, 4, MyTableWidgetItemQComboBox(timeComboBox))
         self.alarmtable.setCellWidget(i,5,timeoffsetedit)
-        self.alarmtable.setItem(i, 5, MyTableWidgetItemQLineEdit(timeoffsetedit))
+#        self.alarmtable.setItem(i, 5, MyTableWidgetItemQLineEdit(timeoffsetedit))
+        self.alarmtable.setItem(i, 5, MyTableWidgetItemQTime(timeoffsetedit))
         self.alarmtable.setCellWidget(i,6,typeComboBox)
         self.alarmtable.setItem(i, 6, MyTableWidgetItemQComboBox(typeComboBox))
         self.alarmtable.setCellWidget(i,7,condComboBox)
@@ -842,7 +849,8 @@ class AlarmDlg(ArtisanResizeablDialog):
                 rows.append(self.alarmtable.cellWidget(r,2).text())
                 rows.append(self.alarmtable.cellWidget(r,3).text())
                 rows.append(self.alarmtable.cellWidget(r,4).currentText())
-                rows.append(self.alarmtable.cellWidget(r,5).text())
+#                rows.append(self.alarmtable.cellWidget(r,5).text())
+                rows.append(self.alarmtable.cellWidget(r,5).time().toString("mm:ss"))
                 rows.append(self.alarmtable.cellWidget(r,6).currentText())
                 rows.append(self.alarmtable.cellWidget(r,7).currentText())
                 rows.append(self.alarmtable.cellWidget(r,8).text())
@@ -863,7 +871,8 @@ class AlarmDlg(ArtisanResizeablDialog):
                 clipboard += self.alarmtable.cellWidget(r,2).text() + '\t'
                 clipboard += self.alarmtable.cellWidget(r,3).text() + '\t'
                 clipboard += self.alarmtable.cellWidget(r,4).currentText() + '\t'
-                clipboard += self.alarmtable.cellWidget(r,5).text() + '\t'
+#                clipboard += self.alarmtable.cellWidget(r,5).text() + '\t'
+                clipboard += self.alarmtable.cellWidget(r,5).time().toString("mm:ss") + '\t'
                 clipboard += self.alarmtable.cellWidget(r,6).currentText() + '\t'
                 clipboard += self.alarmtable.cellWidget(r,7).currentText() + '\t'
                 clipboard += self.alarmtable.cellWidget(r,8).text() + '\t'

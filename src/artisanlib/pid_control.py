@@ -32,7 +32,7 @@ import numpy
 
 from artisanlib.util import decs2string, fromCtoF, fromFtoC, hex2int, str2cmd, stringfromseconds
 
-from PyQt5.QtCore import pyqtSlot, QTime
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication
 
 class FujiPID(object):
@@ -1012,7 +1012,7 @@ class PIDcontrol(object):
         #
         self.pidOnCHARGE = False
         self.loadRampSoakFromProfile = False
-        self.svLen = 8
+        self.svLen = 8 # should stay at 8 for compatibility reasons!
         self.svValues = [0]*self.svLen # sv temp as int per 8 channels
         self.svRamps = [0]*self.svLen  # seconds as int per 8 channels
         self.svSoaks = [0]*self.svLen  # seconds as int per 8 channels
@@ -1022,8 +1022,8 @@ class PIDcontrol(object):
         #
         self.svTriggeredAlarms = [False]*self.svLen # set to true once the corresponding alarm was triggered
         # extra RS sets:
-        self.RSLen = 3
-        self.RS_svRamps = [[0]*self.svLen]*self.RSLen  # sv temp as int per 8 channels
+        self.RSLen = 3 # can be changed to have less or more RSn sets
+        self.RS_svValues = [[0]*self.svLen]*self.RSLen  # sv temp as int per 8 channels
         self.RS_svRamps = [[0]*self.svLen]*self.RSLen  # seconds as int per 8 channels
         self.RS_svSoaks = [[0]*self.svLen]*self.RSLen  # seconds as int per 8 channels
         self.RS_svActions = [[-1]*self.svLen]*self.RSLen      # alarm action as int per 8 channels
@@ -1153,13 +1153,6 @@ class PIDcontrol(object):
                 self.svValues[i] = fromCtoF(self.svValues[i])
         except Exception:
             pass
-    
-    # takes an "Arduino" float time in seconds and returns the corresponding QTime() object
-    def time2QTime(self,t):
-        return QTime(0,t/60,t%60)
-        
-    def QTime2time(self,t):
-        return t.minute() * 60 + t.second()
         
     def togglePID(self):
         if self.pidActive:

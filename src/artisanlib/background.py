@@ -28,7 +28,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, 
                              QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget)
 
 class backgroundDlg(ArtisanResizeablDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent = None, aw = None, activeTab = 0):
         super(backgroundDlg,self).__init__(parent, aw)
         self.setWindowTitle(QApplication.translate("Form Caption","Profile Background", None))
         self.setModal(True)
@@ -301,6 +301,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+        self.TabWidget.setCurrentIndex(activeTab)
     
     @pyqtSlot(bool)
     def timealign(self,_):
@@ -324,6 +325,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue("BackgroundGeometry",self.saveGeometry())
+        self.aw.backgroundDlg_activeTab = self.TabWidget.currentIndex()
         
     def getColorIdx(self,c):
         try:

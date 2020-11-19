@@ -73,7 +73,21 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem):
             except:
                 # else we do a string compare
                 return a < b
-      
+
+class MyTableWidgetItemQTime(QTableWidgetItem):
+    __slots__ = ['sortKey'] # save some memory by using slots
+    def __init__(self, sortKey):
+        #call custom constructor with UserType item type
+        #QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+        super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
+        self.sortKey = sortKey
+
+    #Qt uses a simple < check for sorting items, override this to use the sortKey
+    def __lt__(self, other):
+        a = self.sortKey.time().minute() * 60 + self.sortKey.time().second()
+        b = other.sortKey.time().minute() * 60 + other.sortKey.time().second()
+        return a < b
+
 class MyTableWidgetItemInt(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, text, sortKey):

@@ -91,7 +91,7 @@ class equDataDlg(ArtisanDialog):
         dataplotterLayout.addWidget(self.datalabel)
         dataplotterLayout.addWidget(self.datatable)
         dataplotterLayout.addLayout(buttonLayout)
-            
+        
         self.setLayout(dataplotterLayout)
 
     def changeprecision(self):
@@ -263,7 +263,7 @@ class equDataDlg(ArtisanDialog):
 
 
 class HUDDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent = None, aw = None, activeTab = 0):
         super(HUDDlg,self).__init__(parent, aw)
         
         self.app = QCoreApplication.instance()
@@ -1307,54 +1307,54 @@ class HUDDlg(ArtisanDialog):
         tab5Layout.addLayout(webrenlogLayout)
 
         ############################  TABS LAYOUT
-        TabWidget = QTabWidget()
+        self.TabWidget = QTabWidget()
         C0Widget = QWidget()
         C0Widget.setLayout(tab0Layout)
         tab0Layout.setContentsMargins(10,10,10,10)
         C0Widget.setContentsMargins(0,10,0,10)
-        TabWidget.addTab(C0Widget,QApplication.translate("Tab","RoR",None))
+        self.TabWidget.addTab(C0Widget,QApplication.translate("Tab","RoR",None))
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         tab1Layout.setContentsMargins(10,10,10,10)
         C1Widget.setContentsMargins(0,10,0,10)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Filters",None))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Filters",None))
         C11Widget = QWidget()
         C11Widget.setLayout(tab11Layout)
         tab11Layout.setContentsMargins(10,10,10,10)
         C11Widget.setContentsMargins(0,10,0,10)
-        TabWidget.addTab(C11Widget,QApplication.translate("Tab","HUD",None))
+        self.TabWidget.addTab(C11Widget,QApplication.translate("Tab","HUD",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         tab2Layout.setContentsMargins(10,10,10,10)
         C2Widget.setContentsMargins(0,0,0,0)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Plotter",None))
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Plotter",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
         tab3Layout.setContentsMargins(10,10,10,10)
         C3Widget.setContentsMargins(0,0,0,0)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Math",None))
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Math",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
         tab4Layout.setContentsMargins(10,10,10,10)
         C3Widget.setContentsMargins(0,0,0,0)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Analyze",None))
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Analyze",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
         tab5Layout.setContentsMargins(10,10,10,10)
         C5Widget.setContentsMargins(0,10,0,0)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None))
+        self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None))
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(self.dialogbuttons)
         #incorporate layouts
         Slayout = QVBoxLayout()
-        Slayout.addWidget(TabWidget,1)
+        Slayout.addWidget(self.TabWidget,1)
         Slayout.addStretch()
         Slayout.addLayout(buttonsLayout)
-        TabWidget.currentChanged.connect(self.tabSwitched)
+        self.TabWidget.currentChanged.connect(self.tabSwitched)
         self.setLayout(Slayout)
         
-        TabWidget.setContentsMargins(0,0,0,0)
+        self.TabWidget.setContentsMargins(0,0,0,0)
         Slayout.setContentsMargins(5,15,5,5)
         Slayout.setSpacing(5)
 
@@ -1371,6 +1371,8 @@ class HUDDlg(ArtisanDialog):
         settings = QSettings()
         if settings.contains("CurvesPosition"):
             self.move(settings.value("CurvesPosition"))
+        
+        self.TabWidget.setCurrentIndex(activeTab)
         
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
 
@@ -2380,6 +2382,8 @@ class HUDDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("CurvesPosition",self.frameGeometry().topLeft())
+        
+        self.aw.HUDDlg_activeTab = self.TabWidget.currentIndex()
 
         #restore settings
         self.aw.qmc.DeltaETflag = self.org_DeltaET
@@ -2426,6 +2430,7 @@ class HUDDlg(ArtisanDialog):
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue("CurvesPosition",self.frameGeometry().topLeft())
+        self.aw.HUDDlg_activeTab = self.TabWidget.currentIndex()
 
         self.aw.qmc.DeltaETfunction = str(self.DeltaETfunctionedit.text())
         self.aw.qmc.DeltaBTfunction = str(self.DeltaBTfunctionedit.text())

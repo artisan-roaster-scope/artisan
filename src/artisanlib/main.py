@@ -81,7 +81,7 @@ from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
                             QRegularExpressionValidator,QDoubleValidator, QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot,  # @Reimport
-                          qVersion,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
+                          qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
                           QRegularExpression, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, qInstallMessageHandler)  # @Reimport
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
@@ -6798,8 +6798,8 @@ class tgraphcanvas(FigureCanvas):
                         for p in range(len(self.backgroundEvents)):
                             if self.eventsGraphflag not in [2,4] or self.backgroundEtypes[p] > 3:
                                 event_idx = self.backgroundEvents[p]
-                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
-                                    continue
+#                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
+#                                    continue
                                 if self.backgroundEtypes[p] < 4:
                                     st1 = self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])
                                 else:
@@ -6840,8 +6840,8 @@ class tgraphcanvas(FigureCanvas):
                             self.overlapList = []
                             for i in range(len(self.backgroundEvents)):
                                 event_idx = self.backgroundEvents[i]
-                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
-                                    continue
+#                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
+#                                    continue
                                 pos = max(0,int(round((self.backgroundEvalues[i]-1)*10)))
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
@@ -7059,8 +7059,8 @@ class tgraphcanvas(FigureCanvas):
                                 Bevalues = [self.E1backgroundvalues[:],self.E2backgroundvalues[:],self.E3backgroundvalues[:],self.E4backgroundvalues[:]]
                             for i in range(len(self.backgroundEvents)):
                                 event_idx = self.backgroundEvents[i]
-                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
-                                    continue
+#                                if event_idx < bcharge_idx or event_idx > bdrop_idx:
+#                                    continue
                                 if self.backgroundEtypes[i] == 4 or self.eventsGraphflag in [0,3,4]:
                                     if self.backgroundEtypes[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.backgroundEStrings[i].strip()) == 0):
                                         Betype = self.Betypesf(self.backgroundEtypes[i])
@@ -8779,8 +8779,10 @@ class tgraphcanvas(FigureCanvas):
             aw.setLCDsBW()
 
         if color == 3:
-            dialog = graphColorDlg(aw,aw)
+            dialog = graphColorDlg(aw,aw,aw.graphColorDlg_activeTab)
             if dialog.exec_():
+                aw.graphColorDlg_activeTab = dialog.TabWidget.currentIndex()
+                #
                 self.palette["background"] = str(dialog.backgroundButton.text())
                 self.palette["grid"] = str(dialog.gridButton.text())
                 self.palette["ylabel"] = str(dialog.yButton.text())
@@ -14568,7 +14570,13 @@ class ApplicationWindow(QMainWindow):
         self.WebLCDsAlerts = False
 
         # active tab
+        self.EventsDlg_activeTab = 0
+        self.graphColorDlg_activeTab = 0
         self.PID_DlgControl_activeTab = 0
+        self.HUDDlg_activeTab = 0 # curves dialog
+        self.editGraphDlg_activeTab = 0 # roast properties dialog
+        self.backgroundDlg_activeTab = 0
+        self.DeviceAssignmentDlg_activeTab = 0
 
         #flag to reset Qsettings
         self.resetqsettings = 0
@@ -17311,6 +17319,13 @@ class ApplicationWindow(QMainWindow):
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
 
+    # takes an "Arduino" float time in seconds and returns the corresponding QTime() object
+    def time2QTime(self,t):
+        return QTime(0,t/60,t%60)
+        
+    def QTime2time(self,t):
+        return t.minute() * 60 + t.second()
+
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.accept()
@@ -18663,13 +18678,13 @@ class ApplicationWindow(QMainWindow):
             t_start = aw.qmc.startofx
             t_end = aw.qmc.endofx
             if self.qmc.timeindex[0] > -1: # CHARGE set
-                t_start = aw.qmc.timex[aw.qmc.timeindex[0]] - 30
+                t_start = aw.qmc.timex[aw.qmc.timeindex[0]] - 60
             elif self.qmc.timeindex[0] == -1:
                 t_start = aw.qmc.timex[0] - 60
             if self.qmc.timeindex[7] > 0: # COOL set
-                t_end = aw.qmc.timex[aw.qmc.timeindex[7]] + 30
+                t_end = aw.qmc.timex[aw.qmc.timeindex[7]] + 60
             elif self.qmc.timeindex[6] > 0: # DROP set
-                t_end = aw.qmc.timex[aw.qmc.timeindex[6]] + 30
+                t_end = aw.qmc.timex[aw.qmc.timeindex[6]] + 90
             else:
                 t_end = aw.qmc.timex[-1] + 90
             return t_start, t_end
@@ -18716,9 +18731,9 @@ class ApplicationWindow(QMainWindow):
             t_start = aw.qmc.startofx
             t_end = aw.qmc.endofx
             if self.qmc.timeindexB[0] > -1: # CHARGE set
-                t_start = aw.qmc.timeB[aw.qmc.timeindexB[0]] - 30
+                t_start = aw.qmc.timeB[aw.qmc.timeindexB[0]] - 60
             if self.qmc.timeindexB[6] > 0: # DROP set
-                t_end = aw.qmc.timeB[aw.qmc.timeindexB[6]] + 30
+                t_end = aw.qmc.timeB[aw.qmc.timeindexB[6]] + 90
             return t_start, t_end
         else:
             return aw.qmc.startofx, aw.qmc.endofx
@@ -27201,6 +27216,27 @@ class ApplicationWindow(QMainWindow):
                     aw.pidcontrol.invertControl = bool(toBool(settings.value("invertControl",aw.pidcontrol.invertControl)))
                 if settings.contains("pOnE"):
                     aw.pidcontrol.pOnE = bool(toBool(settings.value("pOnE",aw.pidcontrol.pOnE)))
+                
+                for n in range(aw.pidcontrol.RSLen):
+                    svValuesLabel = "RS_svValues"+str(n)
+                    if settings.contains(svValuesLabel):
+                        aw.pidcontrol.RS_svValues[n] = [toInt(x) for x in toList(settings.value(svValuesLabel,aw.pidcontrol.RS_svValues[n]))]
+                    svRampsLabel = "RS_svRamps"+str(n)
+                    if settings.contains(svRampsLabel):
+                        aw.pidcontrol.RS_svRamps[n] = [toInt(x) for x in toList(settings.value(svRampsLabel,aw.pidcontrol.RS_svRamps[n]))]
+                    svSoaksLabel = "RS_svSoaks"+str(n)
+                    if settings.contains(svSoaksLabel):
+                        aw.pidcontrol.RS_svSoaks[n] = [toInt(x) for x in toList(settings.value(svSoaksLabel,aw.pidcontrol.RS_svSoaks[n]))]
+                    svActionsLabel = "RS_svActions"+str(n)
+                    if settings.contains(svActionsLabel):
+                        aw.pidcontrol.RS_svActions[n] = [toInt(x) for x in toList(settings.value(svActionsLabel,aw.pidcontrol.RS_svActions[n]))]
+                    svBeepsLabel = "RS_svBeeps"+str(n)
+                    if settings.contains(svBeepsLabel):
+                        aw.pidcontrol.RS_svBeeps[n] = [bool(toBool(x)) for x in toList(settings.value(svBeepsLabel,aw.pidcontrol.RS_svBeeps[n]))]
+                    svDescriptionsLabel = "RS_svDescriptions"+str(n)
+                    if settings.contains(svDescriptionsLabel):
+                        aw.pidcontrol.RS_svDescriptions[n] = list(toStringList(settings.value(svDescriptionsLabel,aw.pidcontrol.RS_svDescriptions[n])))
+                
             settings.endGroup()
 
             #restore pid settings
@@ -28617,6 +28653,13 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("pidNegativeTarget",aw.pidcontrol.pidNegativeTarget)
             settings.setValue("invertControl",aw.pidcontrol.invertControl)
             settings.setValue("pOnE",aw.pidcontrol.pOnE)
+            for n in range(aw.pidcontrol.RSLen):
+                settings.setValue("RS_svValues"+str(n),aw.pidcontrol.RS_svValues[n])
+                settings.setValue("RS_svRamps"+str(n),aw.pidcontrol.RS_svRamps[n])
+                settings.setValue("RS_svSoaks"+str(n),aw.pidcontrol.RS_svSoaks[n])
+                settings.setValue("RS_svActions"+str(n),aw.pidcontrol.RS_svActions[n])
+                settings.setValue("RS_svBeeps"+str(n),aw.pidcontrol.RS_svBeeps[n])
+                settings.setValue("RS_svDescriptions"+str(n),aw.pidcontrol.RS_svDescriptions[n])
             settings.endGroup()
             settings.beginGroup("PXR")
             for key in list(self.fujipid.PXR.keys()):
@@ -32212,7 +32255,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def deviceassigment(self,_=False):
-        dialog = DeviceAssignmentDlg(self,self)
+        dialog = DeviceAssignmentDlg(self,self,self.DeviceAssignmentDlg_activeTab)
         dialog.show()
 
     @pyqtSlot()
@@ -32616,7 +32659,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def background(self,_=False):
-        dialog = backgroundDlg(self,self)
+        dialog = backgroundDlg(self,self,self.backgroundDlg_activeTab)
         dialog.show()
 
     def deleteBackground(self):
@@ -32741,7 +32784,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def editgraph(self,_=False):
         if self.editgraphdialog != False: # Roast Properties dialog is not blocked!
-            self.editgraphdialog = editGraphDlg(self,self)
+            self.editgraphdialog = editGraphDlg(self,self,self.editGraphDlg_activeTab)
             self.editgraphdialog.show()
             self.editgraphdialog = None
 
@@ -32754,7 +32797,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def eventsconf(self,_=False):
-        dialog = EventsDlg(self,self)
+        dialog = EventsDlg(self,self,self.EventsDlg_activeTab)
         dialog.show()
 
     @pyqtSlot()
@@ -33673,7 +33716,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def hudset(self,_=False):
-        hudDl = HUDDlg(self,self)
+        hudDl = HUDDlg(self,self,self.HUDDlg_activeTab)
         hudDl.show()
 
     def showHUDmetrics(self):
