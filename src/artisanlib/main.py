@@ -5779,7 +5779,7 @@ class tgraphcanvas(FigureCanvas):
                                     nt1_lin = numpy.interp(lin1, tx_roast, nt1) # resample data in nt1 to linear spaced time
                                 dist = (lin1[-1] - lin1[0]) / (len(lin1) - 1)
                                 z1 = savgol_filter(nt1_lin, dsETs, 1, deriv=1,delta=dsET)
-                                z1 = z1 * (60./dist) * dsET
+                                z1 = z1 * (60./dist) * dsETs
                             except:
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
@@ -5854,7 +5854,7 @@ class tgraphcanvas(FigureCanvas):
                                     nt2_lin = numpy.interp(lin2, tx_roast, nt2) # resample data in nt2 to linear spaced time
                                 dist = (lin2[-1] - lin2[0]) / (len(lin2) - 1)
                                 z2 = savgol_filter(nt2_lin, dsBTs, 1, deriv=1,delta=dsBTs)
-                                z2 = z2 * (60./dist) * dsBT
+                                z2 = z2 * (60./dist) * dsBTs
                             except:
                                 # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
                                 # https://github.com/numpy/numpy/issues/16744
