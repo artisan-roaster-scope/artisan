@@ -97,6 +97,7 @@ DATA_FILES = [
     ("../translations", [QTDIR + r'/translations/qtbase_pl.qm']),
     ("../translations", [QTDIR + r'/translations/qtbase_ru.qm']),
 #    ("../translations", [QTDIR + r'/translations/qtbase_sv.qm']),    # empty/missing
+    ("../translations", [QTDIR + r'/translations/qtbase_tr.qm']),     # new in Qt 5.15.2
 #    ("../translations", [QTDIR + r'/translations/qtbase_zh_CN.qm']), # empty/missing
     ("../translations", [QTDIR + r'/translations/qtbase_zh_TW.qm']),
     ("../translations", [r'translations/artisan_ar.qm']), 
@@ -125,7 +126,9 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_th.qm"]),
     ("../translations", [r"translations/qtbase_el.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_fa.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
+    ("../translations", [r"translations/qtbase_nl.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_pt.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
+    ("../translations", [r"translations/qtbase_pt_BR.qm"]), # just a copy of qtbase_pt
     ("../translations", [r"translations/qtbase_sv.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../translations", [r"translations/qtbase_zh_CN.qm"]), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ("../Resources", [r"qt.conf"]),

@@ -183,7 +183,7 @@ class WindowsDlg(ArtisanDialog):
         zgridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.zgridSpinBox = QSpinBox()
         self.zgridSpinBox.setRange(1,100)
-        self.zgridSpinBox.setSingleStep(5)
+        self.zgridSpinBox.setSingleStep(1)
         self.zgridSpinBox.setValue(self.aw.qmc.zgrid)
         self.zgridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.zgridSpinBox.valueChanged.connect(self.changezgrid)
@@ -440,11 +440,22 @@ class WindowsDlg(ArtisanDialog):
             if self.aw.qmc.backgroundpath:
                 dmax_b = self.aw.calcAutoDeltaAxisBackground()
                 dmax = max(dmax,dmax_b)
-        if dmax > 0:
+        zlimit_min = int(str(self.zlimitEdit_min.text()))
+        if dmax > zlimit_min:
             self.zlimitEdit.setText(str(int(dmax) + 1))
             self.zlimitEdit.repaint()
         self.aw.qmc.autodeltaxET = autodeltaxET_org
         self.aw.qmc.autodeltaxBT = autodeltaxBT_org
+        # adjust zgrid
+        zlimit_max = int(str(self.zlimitEdit.text()))
+        d = zlimit_max - zlimit_min
+        steps = int(round(d/5))
+        if steps > 50: 
+            steps = int(round(steps/10))*10
+        elif steps > 10:
+            steps = int(round(steps/5))*5
+        auto_grid = max(2,steps)
+        self.zgridSpinBox.setValue(auto_grid)        
     
     def changexrotation(self):
         self.aw.qmc.xrotation = self.xrotationSpinBox.value()
@@ -609,13 +620,21 @@ class WindowsDlg(ArtisanDialog):
         else:
             self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx_default))
         self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx_default))
+        try:
+            self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid_default))
+        except Exception:
+            self.xaxislencombobox.setCurrentIndex(0)
         if self.aw.qmc.mode == "F":
+            self.ygridSpinBox.setValue(self.aw.qmc.ygrid_F_default)
             self.ylimitEdit.setText(str(self.aw.qmc.ylimit_F_default))
             self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_F_default))
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_F_default))
             self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_F_default))
+            self.zgridSpinBox.setValue(self.aw.qmc.zgrid_F_default)
         else:
+            self.ygridSpinBox.setValue(self.aw.qmc.ygrid_C_default)
             self.ylimitEdit.setText(str(self.aw.qmc.ylimit_C_default))
             self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_C_default))
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_C_default))
             self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_C_default))
+            self.zgridSpinBox.setValue(self.aw.qmc.zgrid_C_default)            

@@ -56,20 +56,22 @@ def getTemplate(bp):
             config.logger.info("roast: Exception in getTemplate() %s",e)
 
         if "weight" in bp:
-            if bp["weight"][0]:
-                try:
-                    w = util.limitnum(0,65534,aw.convertWeight(bp["weight"][0],aw.qmc.weight_units.index(bp["weight"][2]),aw.qmc.weight_units.index("Kg")))
-                    if w is not None:
-                        d["start_weight"] = util.float2floatMin(w,3) # in kg
-                except:
-                    pass
-            if bp["weight"][1]:
-                try:
-                    w = util.limitnum(0,65534,aw.convertWeight(bp["weight"][1],aw.qmc.weight_units.index(bp["weight"][2]),aw.qmc.weight_units.index("Kg")))
-                    if w is not None:
-                        d["end_weight"] = util.float2floatMin(w,3) # in kg
-                except:
-                    pass
+            try:
+                w = util.limitnum(0,65534,aw.convertWeight(bp["weight"][0],aw.qmc.weight_units.index(bp["weight"][2]),aw.qmc.weight_units.index("Kg")))
+                if w is not None:
+                    d["start_weight"] = util.float2floatMin(w,3) # in kg
+                else:
+                    d["start_weight"] = 0
+            except:
+                pass
+            try:
+                w = util.limitnum(0,65534,aw.convertWeight(bp["weight"][1],aw.qmc.weight_units.index(bp["weight"][2]),aw.qmc.weight_units.index("Kg")))
+                if w is not None:
+                    d["end_weight"] = util.float2floatMin(w,3) # in kg
+                else:
+                    d["end_weight"] = 0
+            except:
+                pass
         
         if "density_roasted" in bp:
             if bp["density_roasted"][0]:
@@ -155,7 +157,7 @@ def getRoast():
         if "id" in d:
             d["roast_id"] = d["id"]
             del d["id"]
-        
+
         # start_weight => amount
         if "start_weight" in d:
             d["amount"] = d["start_weight"]
@@ -176,11 +178,11 @@ def getRoast():
         if aw.qmc.plus_coffee:
             d["coffee"] = aw.qmc.plus_coffee
         else:
-            d["coffee"] = None
+            d["coffee"] = None # we neeed to explicitly add empty selections otherwise the coffee cannot be deleted from the online record
         if aw.qmc.plus_blend_spec:
             d["blend"] = aw.qmc.plus_blend_spec
         else:
-            d["blend"] = None
+            d["blend"] = None # we neeed to explicitly add empty selections otherwise the coffee cannot be deleted from the online record
         
         try:
             util.addTemp2dict(p,"ambientTemp",d,"temperature")

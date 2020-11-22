@@ -712,6 +712,12 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_optimize = QCheckBox(QApplication.translate("ComboBox","optimize",None))
         self.modbus_optimize.setChecked(self.aw.modbus.optimizer)
         self.modbus_optimize.setFocusPolicy(Qt.NoFocus)
+        self.modbus_optimize.stateChanged.connect(self.modbus_optimize_toggle)
+        
+        self.modbus_full_block = QCheckBox(QApplication.translate("ComboBox","fetch full blocks",None))
+        self.modbus_full_block.setChecked(self.aw.modbus.fetch_max_blocks)
+        self.modbus_full_block.setFocusPolicy(Qt.NoFocus)
+        self.modbus_full_block.setEnabled(bool(self.aw.modbus.optimizer))
 
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None))
@@ -896,6 +902,8 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_setup.addStretch()
         modbus_setup.addSpacing(15)
         modbus_setup.addWidget(self.modbus_optimize)
+        modbus_setup.addSpacing(5)
+        modbus_setup.addWidget(self.modbus_full_block)
         modbus_setup.addSpacing(7)
         modbus_setup.addStretch()
         modbus_setup.addWidget(modbus_typelabel)
@@ -947,6 +955,12 @@ class comportDlg(ArtisanResizeablDialog):
         self.s7_optimize = QCheckBox(QApplication.translate("ComboBox","optimize",None))
         self.s7_optimize.setChecked(self.aw.s7.optimizer)
         self.s7_optimize.setFocusPolicy(Qt.NoFocus)
+        self.s7_optimize.stateChanged.connect(self.s7_optimize_toggle)
+        
+        self.s7_full_block = QCheckBox(QApplication.translate("ComboBox","fetch full blocks",None))
+        self.s7_full_block.setChecked(self.aw.s7.fetch_max_blocks)
+        self.s7_full_block.setFocusPolicy(Qt.NoFocus)
+        self.s7_full_block.setEnabled(bool(self.aw.s7.optimizer))
 
         s7_areaLabel = QLabel(QApplication.translate("Label", "Area",None))
         s7_dbLabel = QLabel(QApplication.translate("Label", "DB#",None))
@@ -1172,6 +1186,8 @@ class comportDlg(ArtisanResizeablDialog):
         s7_setup.addStretch()
         s7_setup.addSpacing(7)
         s7_setup.addWidget(self.s7_optimize)
+        s7_setup.addSpacing(5)
+        s7_setup.addWidget(self.s7_full_block)
         s7_setup.addSpacing(7)
         s7_setup.addStretch()
         s7_setup.addWidget(s7_hostlabel)
@@ -1565,6 +1581,20 @@ class comportDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+    
+    @pyqtSlot(int)
+    def s7_optimize_toggle(self,i):
+        if i:
+            self.s7_full_block.setEnabled(True)
+        else:
+            self.s7_full_block.setEnabled(False)
+    
+    @pyqtSlot(int)
+    def modbus_optimize_toggle(self,i):
+        if i:
+            self.modbus_full_block.setEnabled(True)
+        else:
+            self.modbus_full_block.setEnabled(False)
     
     @pyqtSlot(int)
     def colorDeviceIndexChanged(self,i):

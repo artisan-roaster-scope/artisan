@@ -137,6 +137,8 @@ stopbits=1
 timeout=1
 type=0
 wordorderLittle=true
+optimizer=true
+fetch_max_blocks=false
 
 [Quantifiers]
 clusterEventsFlag=false

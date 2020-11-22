@@ -434,9 +434,6 @@ class PID_DlgControl(ArtisanDialog):
             rsGrid.addWidget(self.BeepWidgets[i],n,5)
             rsGrid.addWidget(self.DescriptionWidgets[i],n,6)
         
-        
-        
-        
         ############################
         importButton = QPushButton(QApplication.translate("Button","Load",None))
         importButton.setMinimumWidth(80)

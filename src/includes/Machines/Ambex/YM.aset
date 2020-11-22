@@ -89,6 +89,8 @@ stopbits=1
 timeout=0.4
 type=0
 wordorderLittle=false
+optimizer=true
+fetch_max_blocks=false
 
 [RoastProperties]
 roastertype=Ambex YM

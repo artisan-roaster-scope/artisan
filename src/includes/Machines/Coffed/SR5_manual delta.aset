@@ -90,6 +90,8 @@ stopbits=1
 timeout=0.4
 type=0
 wordorderLittle=true
+optimizer=true
+fetch_max_blocks=false
 
 [RoastProperties]
 roastertype=Coffed SR5 manual delta

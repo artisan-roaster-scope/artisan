@@ -42,7 +42,7 @@ rm -rf dist/artisan.d
 mkdir dist/translations
 
 
-for lan in de es fi fr he hu it ja ko pl ru; do
+for lan in ar, de, en, el, es, fa, fi, fr, he, hu, id, it, ja, ko, nl, no, pl, pt_BR, pt, ru, sv, th, tr, zh_CN, zh_TW; do
      QTBASE_FILE=$QT_PATH/translations/qtbase_${lan}.qm
      QT_FILE=$QT_PATH/translations/qt_${lan}.qm
      if [ -e ${QTBASE_FILE} ]

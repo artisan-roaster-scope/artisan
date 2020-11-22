@@ -390,6 +390,51 @@
     </tr>
     <tr>
         <td>&#160;</td>
+        <td>p-i-d(&lt;p&gt;,&lt;i&gt;,&lt;d&gt;)</td>
+        <td>sets the p-i-d parameters of the PID</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>pidSV(&lt;float&gt;)</td>
+        <td>sets the PID target set value SV</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>pidRS(&lt;int&gt;)</td>
+        <td>activates the PID Ramp-Soak pattern number &lt;n&gt; (1-based!)</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>pidSource(&lt;int&gt;)</td>
+        <td>selects the PID input source with &lt;n&gt; 0: BT, 1: ET (Software PID); &lt;n&gt; in {0,..,3} (Arduino PID)</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>popup(&lt;msg&gt;[,&lt;int&gt;])</td>
+        <td>shows popup with message &lt;msg&gt; which optionally automatically closes after &lt;int&gt; seconds</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>message(&lt;msg&gt;)</td>
+        <td>shows message &lt;msg&gt; in the message line</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>setCanvasColor(&lt;color&gt;)</td>
+        <td>sets canvas color to the RGB-hex &lt;color&gt; like #27f1d3</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>resetCanvasColor</td>
+        <td>resets canvas color</td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
+        <td>button(&lt;name&gt;)</td>
+        <td>activates button &lt;name&gt; from { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } </td>
+    </tr>
+    <tr>
+        <td>&#160;</td>
         <td>playbackmode(&lt;int&gt;)</td>
         <td>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</td>
     </tr>

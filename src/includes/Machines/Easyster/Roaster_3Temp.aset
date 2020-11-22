@@ -90,6 +90,8 @@ stopbits=2
 timeout=0.4
 type=0
 wordorderLittle=false
+optimizer=true
+fetch_max_blocks=false
 
 [ExtraComm]
 extrabaudrate=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\x96\0)

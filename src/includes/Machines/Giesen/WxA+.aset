@@ -94,15 +94,17 @@ PID_p_register=0
 PIDmultiplier=0
 SVmultiplier=0
 area=6, 6, 6, 6, 6, 6, 6, 6, 0, 0
-db_nr=4, 4, 2, 2, 2, 2, 2, 2, 1, 1
+db_nr=4, 4, 4, 4, 2, 2, 2, 2, 1, 1
 div=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 host=192.168.2.180
 mode=1, 1, 0, 0, 0, 1, 0, 0, 0, 0
 port=102
 rack=0
 slot=0
-start=10, 6, 48, 52, 18, 10, 14, 16, 0, 0
+start=10, 6, 18, 20, 18, 10, 14, 16, 0, 0
 type=1, 1, 0, 0, 0, 0, 0, 0, 0, 0
+optimizer=true
+fetch_max_blocks=true
 
 [Sliders]
 ModeTempSliders=C

@@ -54,3 +54,5 @@ rack=0
 slot=0
 start=0, 4, 12, 0, 0, 0, 0, 0, 0, 0
 type=1, 1, 1, 0, 0, 0, 0, 0, 0, 0
+optimizer=true
+fetch_max_blocks=false

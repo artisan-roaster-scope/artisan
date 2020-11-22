@@ -90,6 +90,8 @@ stopbits=2
 timeout=0.4
 type=3
 wordorderLittle=true
+optimizer=true
+fetch_max_blocks=false
 
 [RoastProperties]
 roastertype=Coffed SR15 automatic

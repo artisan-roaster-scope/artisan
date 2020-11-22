@@ -119,6 +119,8 @@ rack=0
 slot=1
 start=0, 4, 10, 16, 20, 26, 0, 0, 0, 0
 type=1, 1, 1, 1, 1, 1, 0, 0, 0, 0
+optimizer=true
+fetch_max_blocks=false
 
 [Sliders]
 ModeTempSliders=C

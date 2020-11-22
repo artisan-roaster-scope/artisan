@@ -317,6 +317,51 @@ class FujiPID(object):
                 self.aw.sendmessage(message)
                 self.aw.qmc.adderror(message)
 
+    #writes new values for p - i - d
+    def setpidPXF(self,k,newPvalue,newIvalue,newDvalue):
+        if k is not None and k > 0:
+            #send command to the right sv
+            pkey = "p" + str(k)
+            ikey = "i" + str(k)
+            dkey = "d" + str(k)
+            if self.aw.ser.useModbusPort:
+                reg = self.aw.modbus.address2register(self.aw.fujipid.PXF[pkey][1],6)
+                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,int(float(newPvalue)*10.))
+                libtime.sleep(0.035)
+                reg = self.aw.modbus.address2register(self.aw.fujipid.PXF[ikey][1],6)
+                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,int(float(newIvalue)*10.))
+                libtime.sleep(0.035)
+                reg = self.aw.modbus.address2register(self.aw.fujipid.PXF[dkey][1],6)
+                self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,int(float(newDvalue)*10.))
+                libtime.sleep(0.035)
+                p = i = d = "        "
+            else:
+                commandp = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,self.aw.fujipid.PXF[pkey][1],int(float(newPvalue)*10.))
+                commandi = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,self.aw.fujipid.PXF[ikey][1],int(float(newIvalue)*10.))
+                commandd = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],6,self.aw.fujipid.PXF[dkey][1],int(float(newDvalue)*10.))
+                p = self.aw.ser.sendFUJIcommand(commandp,8)
+                libtime.sleep(0.035) 
+                i = self.aw.ser.sendFUJIcommand(commandi,8)
+                libtime.sleep(0.035) 
+                d = self.aw.ser.sendFUJIcommand(commandd,8)
+                libtime.sleep(0.035) 
+            #verify it went ok
+            if len(p) == 8 and len(i)==8 and len(d) == 8:
+                self.aw.fujipid.PXF[pkey][0] = float(newPvalue)
+                self.aw.fujipid.PXF[ikey][0] = float(newIvalue)
+                self.aw.fujipid.PXF[dkey][0] = float(newDvalue)
+                message = QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
+                                                       ).format(str(k),str(newPvalue),str(newIvalue),str(newDvalue))
+                self.aw.sendmessage(message)
+            else:
+                lp = len(p)
+                li = len(i)
+                ld = len(d)
+                message = QApplication.translate("StatusBar","pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) ",None
+                                                       ).format(str(k),str(lp),str(li),str(ld))
+                self.aw.sendmessage(message)
+                self.aw.qmc.adderror(message)
+
     # updates and returns the current ramp soak mode
     def getCurrentRampSoakMode(self):
         if self.aw.ser.controlETpid[0] == 0: # PXG
@@ -334,9 +379,9 @@ class FujiPID(object):
         if self.aw.ser.controlETpid[0] == 0: # PXG
             self.aw.fujipid.PXG4["rampsoakmode"][0] = currentmode
         elif self.aw.ser.controlETpid[0] == 1: # PXR
-            self.aw.fujipid.PXG4["rampsoakmode"][0] = currentmode
+            self.aw.fujipid.PXR["rampsoakmode"][0] = currentmode
         elif self.aw.ser.controlETpid[0] == 4: # PXF
-            self.aw.fujipid.PXG4["rampsoakmode"][0] = currentmode
+            self.aw.fujipid.PXF["rampsoakmode"][0] = currentmode
         return currentmode                
                                     
     def getCurrentPIDnumberPXG(self):
@@ -348,7 +393,17 @@ class FujiPID(object):
             N = self.aw.fujipid.readoneword(command)
         libtime.sleep(0.035) 
         return N
-                        
+
+    def getCurrentPIDnumberPXF(self):
+        if self.aw.ser.useModbusPort:
+            reg = self.aw.modbus.address2register(self.aw.fujipid.PXF["selectedpid"][1],3)
+            N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+        else:
+            command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXF["selectedpid"][1],1)
+            N = self.aw.fujipid.readoneword(command)
+        libtime.sleep(0.035) 
+        return N
+                
     def setpidPXR(self,var,v):
         r = ""
         if var == "p":
@@ -1439,6 +1494,19 @@ class PIDcontrol(object):
             self.aw.qmc.pid.setTarget(sv,init=init)
             self.sv = sv # remember last sv
 
+    # set RS patterns from one of the RS sets
+    def setRSpattern(self,n):
+        try:
+            if n < self.RSLen:
+                self.svValues = self.RS_svValues[n]
+                self.svRamps = self.RS_svRamps[n]
+                self.svSoaks = self.RS_svSoaks[n]
+                self.svActions = self.RS_svActions[n]
+                self.svBeeps = self.RS_svBeeps[n]
+                self.svDescriptions = self.RS_svDescriptions[n]
+        except:
+            pass
+    
     def adjustsv(self,diff):
         self.setSV(self.sv + diff,True)
     
