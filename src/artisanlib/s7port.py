@@ -191,11 +191,12 @@ class s7port(object):
         # disconnects and clears the S7 plc objects if get_connected() but not str(self.plc.get_cpu_state()) == "S7CpuStatusRun" to force a clear restart
 #        return self.plc is not None and self.plc.get_connected() and str(self.plc.get_cpu_state()) == "S7CpuStatusRun"
         if self.plc is not None and self.plc.get_connected():
-            if str(self.plc.get_cpu_state()) == "S7CpuStatusRun":
-                return True
-            else:
-                self.disconnect()
-                return False
+            return True
+#            if str(self.plc.get_cpu_state()) == "S7CpuStatusRun":
+#                return True
+#            else:
+#                self.disconnect()
+#                return False
         else:
             return False
         
@@ -206,7 +207,7 @@ class s7port(object):
             pass
         try:
             self.plc.disconnect()
-        except Exception:
+        except:
             pass
         try:
             self.plc.destroy()
@@ -249,7 +250,7 @@ class s7port(object):
                 try:
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
                     time.sleep(0.4)
-                except Exception:
+                except:
                     pass
             
             if self.isConnected():

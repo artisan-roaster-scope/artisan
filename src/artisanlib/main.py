@@ -5726,10 +5726,6 @@ class tgraphcanvas(FigureCanvas):
     def arrayRoR(self,tx,temp,wsize):
         res = (temp[wsize:] - temp[:-wsize]) / ((tx[wsize:] - tx[:-wsize])/60.)
         # length compensation done downstream, no necessary here!
-#        len_diff = len(tx) - len(res)
-#        if len_diff > 0 and len(res)>0:
-#            # repeat the first value at the begin until reaching the full length
-#            res = numpy.append(numpy.array([res[0]]*len_diff), res)
         return res
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
@@ -5767,20 +5763,28 @@ class tgraphcanvas(FigureCanvas):
                     if optimalSmoothing and self.polyfitRoRcalc:
                         # optimal RoR computation using polynoms with out timeshift
                         if dsET % 2 == 0:
-                            dsET = dsET+1 # the savgol_filter expectes odd window length
-                        if len(nt1) > dsET:
-                            # nt1 is not linearized yet:
-                            if timex_lin is None or len(timex_lin) != len(nt1):
-                                lin1 = numpy.linspace(timex[0],timex[-1],len(timex))
-                            else:
-                                lin1 = timex_lin
-                            if lin1 is None:
-                                nt1_lin = timex # we just run on the non-linear timex in this case
-                            else:
-                                nt1_lin = numpy.interp(lin1, tx_roast, nt1) # resample data in nt1 to linear spaced time
-                            dist = (lin1[-1] - lin1[0]) / (len(lin1) - 1)
-                            z1 = savgol_filter(nt1_lin, dsET, 1, deriv=1,delta=dsET)
-                            z1 = z1 * (60./dist) * dsET
+                            dsETs = dsET+1 # the savgol_filter expectes odd window length
+                        else:
+                            dsETs = dsET
+                        if len(nt1) > dsETs:
+                            try:
+                                # nt1 is not linearized yet:
+                                if timex_lin is None or len(timex_lin) != len(nt1):
+                                    lin1 = numpy.linspace(timex[0],timex[-1],len(timex))
+                                else:
+                                    lin1 = timex_lin
+                                if lin1 is None:
+                                    nt1_lin = timex # we just run on the non-linear timex in this case
+                                else:
+                                    nt1_lin = numpy.interp(lin1, tx_roast, nt1) # resample data in nt1 to linear spaced time
+                                dist = (lin1[-1] - lin1[0]) / (len(lin1) - 1)
+                                z1 = savgol_filter(nt1_lin, dsETs, 1, deriv=1,delta=dsET)
+                                z1 = z1 * (60./dist) * dsET
+                            except:
+                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                # https://github.com/numpy/numpy/issues/16744
+                                # original version just picking the corner values:
+                                z1 = self.arrayRoR(tx_roast,nt1,dsET)
                         else:
                             # in this case we use the standard algo
                             try:
@@ -5834,20 +5838,28 @@ class tgraphcanvas(FigureCanvas):
                     if optimalSmoothing and self.polyfitRoRcalc:
                         # optimal RoR computation using polynoms with out timeshift
                         if dsBT % 2 == 0:
-                            dsBT = dsBT+1 # the savgol_filter expectes odd window length
-                        if len(nt2) > dsBT:
-                            # nt2 is not linearized yet:
-                            if timex_lin is None or len(timex_lin) != len(nt2):
-                                lin2 = numpy.linspace(timex[0],timex[-1],len(timex))
-                            else:
-                                lin2 = timex_lin
-                            if lin2 is None:
-                                nt2_lin = timex # we just run on the non-linear timex in this case
-                            else:
-                                nt2_lin = numpy.interp(lin2, tx_roast, nt2) # resample data in nt2 to linear spaced time
-                            dist = (lin2[-1] - lin2[0]) / (len(lin2) - 1)
-                            z2 = savgol_filter(nt2_lin, dsBT, 1, deriv=1,delta=dsBT)
-                            z2 = z2 * (60./dist) * dsBT
+                            dsBTs = dsBT+1 # the savgol_filter expectes odd window length
+                        else:
+                            dsBTs = dsBT
+                        if len(nt2) > dsBTs:
+                            try:
+                                # nt2 is not linearized yet:
+                                if timex_lin is None or len(timex_lin) != len(nt2):
+                                    lin2 = numpy.linspace(timex[0],timex[-1],len(timex))
+                                else:
+                                    lin2 = timex_lin
+                                if lin2 is None:
+                                    nt2_lin = timex # we just run on the non-linear timex in this case
+                                else:
+                                    nt2_lin = numpy.interp(lin2, tx_roast, nt2) # resample data in nt2 to linear spaced time
+                                dist = (lin2[-1] - lin2[0]) / (len(lin2) - 1)
+                                z2 = savgol_filter(nt2_lin, dsBTs, 1, deriv=1,delta=dsBTs)
+                                z2 = z2 * (60./dist) * dsBT
+                            except:
+                                # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an execption "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                # https://github.com/numpy/numpy/issues/16744
+                                # original version just picking the corner values
+                                z2 = self.arrayRoR(tx_roast,nt2,dsBT)
                         else:
                             # in this case we use the standard algo
                             try:

@@ -245,11 +245,7 @@ def sendData(url,data,verb):
 def putData(url,data):
     pass
 
-def postData(url,data,authorized=True,compress=config.compress_posts):
-    config.logger.info("connection:postData(%s,_data_,%s)",url,authorized)
-#    config.logger.debug("connection: -> data: %s)",data) # don't log POST data as it might contain credentials!
-    jsondata = json.dumps(data).encode("utf8")
-    config.logger.debug("connection: -> size %s",len(jsondata))
+def getHeadersAndData(authorized,compress,jsondata):
     headers = getHeaders(authorized,decompress=compress)
     headers["Content-Type"] = "application/json"
     if compress and len(jsondata) > config.post_compression_threshold:        
@@ -258,6 +254,14 @@ def postData(url,data,authorized=True,compress=config.compress_posts):
         headers["Content-Encoding"] = "gzip"
     else:
         postdata = jsondata
+    return headers,postdata
+
+def postData(url,data,authorized=True,compress=config.compress_posts):
+    config.logger.info("connection:postData(%s,_data_,%s)",url,authorized)
+#    config.logger.debug("connection: -> data: %s)",data) # don't log POST data as it might contain credentials!
+    jsondata = json.dumps(data).encode("utf8")
+    config.logger.debug("connection: -> size %s",len(jsondata))
+    headers,postdata = getHeadersAndData(authorized,compress, jsondata)
     r = requests.post(url,
             headers = headers,
             data    = postdata, 
@@ -266,10 +270,10 @@ def postData(url,data,authorized=True,compress=config.compress_posts):
     config.logger.debug("connection: -> status %s",r.status_code)
     config.logger.debug("connection: -> time %s",r.elapsed.total_seconds())
     if authorized and r.status_code == 401: # authorisation failed
-        config.logger.debug("connection: -> session token outdated (404)")
+        config.logger.debug("connection: -> session token outdated (401)")
         # we re-authentify by renewing the session token and try again
         if authentify():
-            headers = getHeaders(authorized,decompress=compress) # recreate header with new token
+            headers,postdata = getHeadersAndData(authorized,compress, jsondata) # recreate header with new token
             r = requests.post(url,
                     headers = headers,
                     data    = postdata, 

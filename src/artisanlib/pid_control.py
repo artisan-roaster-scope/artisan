@@ -1221,6 +1221,7 @@ class PIDcontrol(object):
             self.current_soak_segment = 0
             self.ramp_soak_engaged = 1
             self.RS_total_time = self.RStotalTime(self.svRamps,self.svSoaks)
+            self.svTriggeredAlarms = [False]*self.svLen
             
             if self.aw.qmc.flagstart or len(self.aw.qmc.on_timex)<1:
                 self.time_pidON = 0
