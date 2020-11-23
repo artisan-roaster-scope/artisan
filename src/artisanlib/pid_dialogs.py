@@ -228,6 +228,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidMode = QComboBox()
         self.pidMode.addItems(pidModeItems)
         self.pidMode.setCurrentIndex(self.aw.pidcontrol.svMode)
+        self.pidMode.currentIndexChanged.connect(self.updatePidMode)
         
         self.pidSVbuttonsFlag = QCheckBox(QApplication.translate("Label","Buttons",None))
         self.pidSVbuttonsFlag.setChecked(self.aw.pidcontrol.svButtons)
@@ -608,7 +609,10 @@ class PID_DlgControl(ArtisanDialog):
             self.move(settings.value("PIDPosition"))
         
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
-        
+    
+    @pyqtSlot(int)
+    def updatePidMode(self,i):
+        self.aw.pidcontrol.svMode = i
     
     @pyqtSlot(int)
     def activateSVSlider(self,i):
@@ -714,7 +718,7 @@ class PID_DlgControl(ArtisanDialog):
     
     @pyqtSlot(bool)
     def exportrampsoaks(self,_):
-        self.aw.fileExport(QApplication.translate("Message", "Save Ramp/Soak Table",None),"*.ars",self.exportrampsoaksJSON)
+        self.aw.fileExport(QApplication.translate("Message", "Save Ramp/Soak Table",None),"*.aprs",self.exportrampsoaksJSON)
         
     def exportrampsoaksJSON(self,filename):
         try:

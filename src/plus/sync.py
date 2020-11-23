@@ -219,23 +219,27 @@ def delSync(uuid):
 
 #### Sync Record Cache (tracking of changes to partial attributes synced bidirectional)
 
-# we cache the sync record hash before local edits to be able to decide later if local changes have been applied
+# we cache the sync record hash before local edits (and after server updates are received) to be able to decide later if local changes have been applied
+# if cached_sync_record_hash is None (cleared) the syncing is forced
 
 sync_record_semaphore = QSemaphore(1) # protecting access to the cached_plus_sync_record_hash
 cached_sync_record_hash = None # hash over the sync record
+cached_sync_record = None # the actual sync record the hash is computed over to be able to compute the differences 
+    # to the current sync record and send only those in updates
 
 
 # called before local edits can start to remember the original state of the sync record
-# if provided, roast_record is assumed to be a full roast record as provided by roast.getRoast()
-def setSyncRecordHash(roast_record = None, h = None):
-    global cached_sync_record_hash
+# if provided, roast_record is assumed to be a full roast record as provided by roast.getRoast(), otherwise the roast record is taken from the current data
+def setSyncRecordHash(sync_record = None, h = None):
+    global cached_sync_record_hash, cached_sync_record
     try:
         config.logger.debug("sync:setSyncRecordHash()")
         sync_record_semaphore.acquire(1)
-        if h is None:
-            _,cached_sync_record_hash = roast.getSyncRecord(roast_record)
-        else:
+        if sync_record is not None and h is not None:
+            cached_sync_record = sync_record
             cached_sync_record_hash = h
+        else:
+            cached_sync_record,cached_sync_record_hash = roast.getSyncRecord()
     except Exception as e:
         config.logger.error("sync: Exception in setSyncRecordHash() %s",e)
     finally:
@@ -243,11 +247,12 @@ def setSyncRecordHash(roast_record = None, h = None):
             sync_record_semaphore.release(1)  
 
 def clearSyncRecordHash():
-    global cached_sync_record_hash
+    global cached_sync_record_hash, cached_sync_record
     try:
         config.logger.debug("sync:clearSyncRecordHash()")
         sync_record_semaphore.acquire(1)
         cached_sync_record_hash = None
+        cached_sync_record = None
     except Exception as e:
         config.logger.error("sync: Exception in clearSyncRecordHash() %s",e)
     finally:
@@ -258,6 +263,7 @@ def clearSyncRecordHash():
 #   equals the cached_sync_record_hash
 # if provided, roast_record is assumed to be a full roast record as provided by roast.getRoast()
 def syncRecordUpdated(roast_record = None):
+    global cached_sync_record_hash
     try:
         config.logger.debug("sync:syncRecordUpdated()")
         sync_record_semaphore.acquire(1)
@@ -270,6 +276,26 @@ def syncRecordUpdated(roast_record = None):
         if sync_record_semaphore.available() < 1:
             sync_record_semaphore.release(1)   
 
+# returns the roast_record with all attributes, but for the roast_id, with the same value as in the current cached_sync_record removed
+# the result is the roast_record with all unchanged attributes, which do not need to synced on updates, removed
+def diffCachedSyncRecord(roast_record):
+    global cached_sync_record
+    try:
+        config.logger.debug("sync:diffCachedSyncRecord()")
+        sync_record_semaphore.acquire(1)
+        if cached_sync_record is None or roast_record is None:
+            return roast_record
+        else:
+            res = dict(roast_record) # make a copy of the given roast_record
+            for key, value in cached_sync_record.items():
+                if key != "roast_id" and key in res and res[key] == value:
+                    del res[key]
+            return res
+    except Exception as e:
+        config.logger.error("sync: Exception in diffCachedSyncRecord() %s",e)
+    finally:
+        if sync_record_semaphore.available() < 1:
+            sync_record_semaphore.release(1) 
 
 
 #### Server Updates (applying updates to the current "sync record" from server)
@@ -415,6 +441,7 @@ def applyServerUpdates(data):
 #            if w != aw.qmc.volume[1]:
 #                aw.qmc.volume[1] = v
 #                dirty = True
+        setSyncRecordHash()
     except Exception as e:
         config.logger.error("sync: Exception in applyServerUpdates() %s",e)
     finally: 
@@ -528,13 +555,13 @@ def sync():
         config.logger.info("sync:sync()")
         aw = config.app_window
         rr = roast.getRoast()
-        _,computed_sync_record_hash = roast.getSyncRecord(rr)
+        computed_sync_record,computed_sync_record_hash = roast.getSyncRecord(rr)
         if aw.qmc.plus_sync_record_hash is None or aw.qmc.plus_sync_record_hash != computed_sync_record_hash:
             # the sync record of the loaded profile is not consistent or missing, offline changes (might) have been applied
             aw.qmc.fileDirty() # set file dirty flag
             clearSyncRecordHash() # clear sync record hash cash to trigger an upload of the modified plus sync record on next save
         else:
-            setSyncRecordHash(h = computed_sync_record_hash) # we remember that consistent state to be able to detect future modifications
+            setSyncRecordHash(sync_record = computed_sync_record, h = computed_sync_record_hash) # we remember that consistent state to be able to detect future modifications
         getUpdate(aw.qmc.roastUUID,aw.curFile) # now we check for updates on the server side
     except Exception as e:
         import sys

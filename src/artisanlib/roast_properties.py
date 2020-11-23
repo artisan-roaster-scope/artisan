@@ -2983,11 +2983,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 etline.setAlignment(Qt.AlignRight)
                 try:
                     ettemp = fmtstr%(self.aw.qmc.temp1[self.aw.qmc.specialevents[i]]) + self.aw.qmc.mode
-                except Exception as e:
-                    print(e)
-                    print("i",i)
-                    print("self.aw.qmc.specialevents[i]",self.aw.qmc.specialevents[i])
-                    print("len(self.aw.qmc.temp1)",len(self.aw.qmc.temp1))
+                except:
+                    pass
                 etline.setText(ettemp)
                     
                 btline = QLineEdit()

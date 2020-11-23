@@ -243,7 +243,6 @@ def getSyncRecord(r = None):
             "moisture",
             "machine",
             "notes",
-            
             "temperature",
             "pressure",
             "humidity",

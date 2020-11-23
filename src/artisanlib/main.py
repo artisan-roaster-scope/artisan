@@ -190,7 +190,6 @@ class Artisan(QtSingleApplication):
     def __init__(self, args):
         super(Artisan, self).__init__(appGuid,viewerAppGuid,args)
 
-        self.focusChanged.connect(self.appRaised)
         self.sentToBackground = None # set to timestamp on putting app to background without any open dialog
         self.plus_sync_cache_expiration = 1*60 # how long a plus sync is valid in seconds
 
@@ -200,6 +199,7 @@ class Artisan(QtSingleApplication):
         else:
             self.artisanviewerMode = False
         self.messageReceived.connect(self.receiveMessage)
+        self.focusChanged.connect(self.appRaised)
 
     @pyqtSlot("QWidget*","QWidget*")
     def appRaised(self,oldFocusWidget,newFocusWidget):
@@ -210,7 +210,7 @@ class Artisan(QtSingleApplication):
                     try:
                         if aw is not None and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
                                 libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
-                                plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
+                            plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
                     except:
                         pass
                     self.sentToBackground = None
@@ -1465,10 +1465,14 @@ class tgraphcanvas(FigureCanvas):
         #background by value
         self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
         self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
-        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color="grey")
-        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="darkgrey")
-        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="slategrey")
-        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="slateblue")
+#        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color="grey")
+#        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="darkgrey")
+#        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="slategrey")
+#        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="slateblue")       
+        self.l_backgroundeventtype1dots = None
+        self.l_backgroundeventtype2dots = None
+        self.l_backgroundeventtype3dots = None
+        self.l_backgroundeventtype4dots = None
 
         # background Deltas
         self.DeltaETBflag = False
@@ -1955,6 +1959,11 @@ class tgraphcanvas(FigureCanvas):
         self.l_eventtype2dots = None
         self.l_eventtype3dots = None
         self.l_eventtype4dots = None
+        
+        self.l_eventtype1annos = []
+        self.l_eventtype2annos = []
+        self.l_eventtype3annos = []
+        self.l_eventtype4annos = []
 
         self.l_annotations = []
         self.l_background_annotations = []
@@ -2636,9 +2645,28 @@ class tgraphcanvas(FigureCanvas):
                     except:
                         pass
                 # toggle the visibility of the corresponding line
-                if idx is not None:
+                if idx is not None and artist:
                     artist = self.handles[idx]
                     artist.set_visible(not artist.get_visible())
+                    if self.eventsGraphflag == 4:
+                        # if events are rendered in Combo style we need to hide also the corresponding annotations:
+                        try:
+                            i = [aw.arabicReshape(et) for et in self.etypes[:4]].index(label)
+                            if i == 0:
+                                for a in self.l_eventtype1annos:
+                                    a.set_visible(not a.get_visible())
+                            elif i == 1:
+                                for a in self.l_eventtype2annos:
+                                    a.set_visible(not a.get_visible())
+                            elif i == 2:
+                                for a in self.l_eventtype3annos:
+                                    a.set_visible(not a.get_visible())
+                            elif i == 3:
+                                for a in self.l_eventtype4annos:
+                                    a.set_visible(not a.get_visible())
+                        except:
+                            pass
+                            
 
             # show event information by clicking on event lines in step, step+ and combo modes
             elif isinstance(event.artist, matplotlib.lines.Line2D):
@@ -4976,7 +5004,7 @@ class tgraphcanvas(FigureCanvas):
     def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False,fireResetAction=True):
         try:
             focused_widget = QApplication.focusWidget()
-            if focused_widget:
+            if focused_widget and focused_widget != aw.centralWidget():
                 focused_widget.clearFocus()
         except Exception:
             pass
@@ -5059,6 +5087,7 @@ class tgraphcanvas(FigureCanvas):
                     self.roastingnotes = ""
                     self.cuppingnotes = ""
                     self.beans = ""
+                    self.plus_location = None
                     self.plus_coffee = None
                     self.plus_blend_spec = None
                     self.weight = [0,0,self.weight[2]]
@@ -6338,6 +6367,19 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.spines['bottom'].set_color("0.40")
                 self.ax.spines['left'].set_color("0.40")
                 self.ax.spines['right'].set_color("0.40")
+                        
+                self.l_eventtype1dots = None
+                self.l_eventtype2dots = None
+                self.l_eventtype3dots = None
+                self.l_eventtype4dots = None
+                self.l_eventtype1annos = []
+                self.l_eventtype2annos = []
+                self.l_eventtype3annos = []
+                self.l_eventtype4annos = []
+                self.l_backgroundeventtype1dots = None
+                self.l_backgroundeventtype2dots = None
+                self.l_backgroundeventtype3dots = None
+                self.l_backgroundeventtype4dots = None
 
                 if aw.qmc.graphstyle:
                     self.ax.spines['left'].set_sketch_params(scale, length, randomness)
@@ -7463,6 +7505,14 @@ class tgraphcanvas(FigureCanvas):
                                                      fontproperties=fontprop_small,
                                                      path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                      )
+                                        if self.specialeventstype[i] == 0:
+                                            self.l_eventtype1annos.append(anno)
+                                        elif self.specialeventstype[i] == 1:
+                                            self.l_eventtype2annos.append(anno)
+                                        elif self.specialeventstype[i] == 2:
+                                            self.l_eventtype3annos.append(anno)
+                                        elif self.specialeventstype[i] == 3:
+                                            self.l_eventtype4annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                         except: # mpl before v3.0 do not have this set_in_layout() function
@@ -9389,6 +9439,9 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.ax.set_ylabel("")
             if not aw.qmc.title_show_always:
                 aw.qmc.setProfileTitle("")
+            
+            # reset LCD timer color that might have been reset by the RS PID in monitoring mode:    
+            aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             if aw.qmc.delta_ax:
                 y_label = aw.qmc.delta_ax.set_ylabel("")
                 try:
@@ -14310,6 +14363,7 @@ class ApplicationWindow(QMainWindow):
     soundpopSignal = pyqtSignal()
     setCanvasColorSignal = pyqtSignal(str)
     resetCanvasColorSignal = pyqtSignal()
+    setbuttonsfromSignal = pyqtSignal(int)
 
     def __init__(self, parent = None):
 
@@ -17139,6 +17193,7 @@ class ApplicationWindow(QMainWindow):
         self.soundpopSignal.connect(self.soundpop)
         self.setCanvasColorSignal.connect(self.setCanvasColor)
         self.resetCanvasColorSignal.connect(self.resetCanvasColor)
+        self.setbuttonsfromSignal.connect(self.setbuttonsfrom)
 
 
         if sys.platform.startswith("darwin"):
@@ -21295,6 +21350,13 @@ class ApplicationWindow(QMainWindow):
                                         self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE,source=source)
                                 except:
                                     pass
+                            # palette(<n>) with <n> a number between 0 and 9
+                            elif cs.startswith("palette(") and cs.endswith(")"):
+                                try:
+                                    p = min(9,max(0,float(cs[len("palette("):-1])))
+                                    self.setbuttonsfromSignal.emit(p)
+                                except:
+                                    pass
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds
@@ -21869,7 +21931,7 @@ class ApplicationWindow(QMainWindow):
 
     def hideExtraButtons(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
-        if focused_widget:
+        if focused_widget and focused_widget != aw.centralWidget():
             focused_widget.clearFocus()
         self.extrabuttondialogs.setVisible(False)
         aw.buttonsAction.setChecked(False)
@@ -21884,7 +21946,7 @@ class ApplicationWindow(QMainWindow):
 
     def showExtraButtons(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
-        if focused_widget:
+        if focused_widget and focused_widget != aw.centralWidget():
             focused_widget.clearFocus()
         self.extrabuttondialogs.setVisible(True)
         aw.buttonsAction.setChecked(True)
@@ -21923,7 +21985,7 @@ class ApplicationWindow(QMainWindow):
 
     def hideSliders(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
-        if focused_widget:
+        if focused_widget and focused_widget != aw.centralWidget():
             focused_widget.clearFocus()
         self.setSliderFocusPolicy(Qt.NoFocus)
         self.slider1.setVisible(False)
@@ -21944,7 +22006,7 @@ class ApplicationWindow(QMainWindow):
 
     def showSliders(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
-        if focused_widget:
+        if focused_widget and focused_widget != aw.centralWidget():
             focused_widget.clearFocus()
         self.sliderFrame.setVisible(True)
         self.slider1.setVisible(True)
@@ -34155,6 +34217,7 @@ class ApplicationWindow(QMainWindow):
         self.sendmessage(QApplication.translate("Message","Buttons copied to Palette #%i"%(pindex), None))
 
     #restores a palette number to current buttons
+    @pyqtSlot(int)
     def setbuttonsfrom(self,pindex):
         copy = self.buttonpalette[pindex][:]
         if len(copy):

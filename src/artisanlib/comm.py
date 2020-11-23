@@ -1605,7 +1605,6 @@ class serialport(object):
             
     # connects to a Phidgets HUM1000, returns current humidity value and disconnects
     def PhidgetHUM1000humidity(self):
-        print("PhidgetHUM1000humidity")
         try:
             # Humidity
             humSensor = PhidgetHumiditySensor()

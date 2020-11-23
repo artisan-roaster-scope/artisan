@@ -123,6 +123,7 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','setCanvasColor(<color>)',None),QApplication.translate('HelpDlg','sets canvas color to the RGB-hex <color> like #27f1d3',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','resetCanvasColor',None),QApplication.translate('HelpDlg','resets canvas color',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','button(<name>)',None),QApplication.translate('HelpDlg','activates button <name> from { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } ',None)])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','palette(<int>)',None),QApplication.translate('HelpDlg','activates palette <int>',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','playbackmode(<int>)',None),QApplication.translate('HelpDlg','sets playback mode to 0: off, 1: time, 2: BT, 3: ET',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','openProperties',None),QApplication.translate('HelpDlg','opens the Roast Properties dialog',None)])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','RC Command',None),QApplication.translate('HelpDlg','pulse(ch,min,max[,sn])',None),QApplication.translate('HelpDlg','for PHIDGET RC modules: sets the min/max pulse width in microseconds',None)])

@@ -1227,6 +1227,9 @@ class PIDcontrol(object):
                 self.time_pidON = 0
             else:
                 self.time_pidON = self.aw.qmc.on_timex[-1]
+                if self.svMode == 1:
+                    # turn the timer LCD color blue if in RS mode and not recording
+                    self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%('#187AB3',self.aw.lcdpaletteB["timer"]))
             self.aw.qmc.temporayslider_force_move = True
             self.lastEnergy = None
             # TC4 hardware PID
@@ -1273,6 +1276,7 @@ class PIDcontrol(object):
                 self.aw.button_10.setStyleSheet(self.aw.pushbuttonstyles["PIDactive"])
 
     def pidOff(self):
+        self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
         if self.aw.qmc.flagon and not self.aw.qmc.flagstart:
             self.aw.sendmessage(QApplication.translate("Message","PID OFF", None))
             self.aw.qmc.setLCDtime(0)       
@@ -1368,7 +1372,6 @@ class PIDcontrol(object):
             self.aw.sendmessage(QApplication.translate("Message","Ramp/Soak pattern finished", None))
             self.aw.qmc.setLCDtime(0)       
             self.ramp_soak_engaged = 0 # stop the ramp/soak process
-            # fire RS-finished action
             return None
     
     def smooth_sv(self,sv):
