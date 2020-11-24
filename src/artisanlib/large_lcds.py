@@ -333,8 +333,11 @@ class LargeMainLCDs(LargeLCDs):
     def updateVisiblitiesETBT(self):
         self.updateVisibilities([self.aw.qmc.ETlcd],[self.aw.qmc.BTlcd])
     
+    def setTimerLCDcolor(self,fc,bc):
+        self.lcd0.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(fc,bc))
+    
     def updateStyles(self):
-        self.lcd0.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
+        self.setTimerLCDcolor(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"])
         super().updateStyles()
 
     def updateValues(self, values1, values2, time=None, *args, **kwargs):

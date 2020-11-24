@@ -2,32 +2,80 @@ Detailed Release History
 ========================
 
 ----
+v2.4.4 (xx.11.2020)
+------------------
+
+* New Features
+  - adds machine setups for PLC equipped machines from Nordic, machines from Fabrica Roasters and MCR Series machines reporting in C
+  - adds support for [Phidget HUM1001](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=1179){:target="_blank"}
+  - adds [Rubase](https://rubasseroasters.com/){:target="_blank"} importer
+  - adds [Aillio](https://aillio.com/){:target="_blank"} RoastWorld importer
+  - adds MODBUS BCD Integer reading
+  - adds flag to toggle polyfit RoR calculation
+  - adds PID Ramp/Soak pattern actions
+  - adds 3 Ramp/Soak templates
+  - adds Qt base translations for Turkish, Dutch and Brazilian
+  - adds _fetch full blocks_ option to instruct the S7 and MODBUS optimizer fetch maximal register blocks from lowest to largest register number
+  - adds Artisan Commands: `popup(m[,t])`, `message(s)`, `setCanvasColor(c)`, `resetCanvasColor`, `button(e)` with `e = { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }`, `p-i-d(p,i,d)`, `pidSV(v)`, `pidRS(n)`, `pidSource(n)`, `palette(n)`
+* Changes
+  - updates [Trinitas T2 and T7](https://artisan-scope.org/machines/trinitas/){:target="_blank"}, [Typhoon](https://artisan-scope.org/machines/typhoon/){:target="_blank"}, [Oztürk](https://artisan-scope.org/machines/ozturk/){:target="_blank"} and [Giesen](https://artisan-scope.org/machines/giesen/){:target="_blank"} machine setups
+  - renames empty MODBUS decoder entry to Int
+  - renames MODBUS IntFloat decoder to Int32 and adds implementation
+  - interprets Software PID Ramp/Soak patterns w.r.t. time since PID ON in monitoring only mode
+  - uses custom bootloader on Windows to reduce false malware warnings ([Issue #519](../../../issues/519))
+  - show only CHARGE to DROP period of background profile
+  - adds FCs ROR to computed section of alog files
+  - shows `uu` instead of -1 for error values in LCDs
+  - automatic mode for the upper delta axis limits sets also a reasonable step size for the axis ticks
+  - dialogs with tabs remember the last selected tab
+  - use proper time edit widget to set alarm times in alarm table
+  - extends ranking reports by additional attributes (Excel, CSV)
+  - extends the Cropster XLS importer to work also with exports done in languages others than English
+  - [artisan.plus](https://artisan.plus/){:target="_blank"}: optimized synchronization
+* Fixes
+  - fixes regression which broke the event picker in v2.4.2
+  - fixes another issue with the multiple event button action processing (Issue 504)
+  - fixes wrong temperature and delta curve alignment in Comparator after redraw
+  - fixes further Hottop 2k+ communication on macOS 10.15.7 (adding to [Issue #475](../../../issues/475))
+  - fixes Loring setup to ensure valid burner readings on all machines
+  - resolves a feature interaction between oversampling and the S7/MODBUS optimizer that could lead to unnecessary communication
+  - fixes an unhandled  exception when changing color pattern ([Issue #516](../../../issues/516))
+  - fixes broken RPi Stretch build ([Issue #518](../../../issues/518))
+  - fixes Phidget async sampling modes that could take readings beyond the current sampling interval on communication drops
+  - corrects alarm nr in roast properties table
+  - fixes Excel export issue occuring with DeltaBT turned off
+  - improved S7 serial logging and communication error handling
+
+**Note**
+_This is the latest version supporting Raspbian Stretch_
+
+----
 v2.4.2 (02.10.2020)
 ------------------
 
 * New Features
   - extendded machine support
-     - adds [CTE Ghibli touch](https://artisan-scope.org/machines/coffeetech/) setup incl. control of burner, fan and drum speed
+     - adds [CTE Ghibli touch](https://artisan-scope.org/machines/coffeetech/){:target="_blank"} setup incl. control of burner, fan and drum speed
      - adds updated [IMF RM](https://artisan-scope.org/machines/imf/) setups
-     - adds burner control to [San Franciscan](https://www.sanfranroaster.com/) setup
-     - adds Toper USB setup next to the network MODBUS/TCP variant to connect to  [Toper TKM-SX](https://artisan-scope.org/machines/toper/) roasters
-     - adds support for the new [Probat Sample Roaster and P Series III roasters](https://artisan-scope.org/machines/probat/)
-     - adds [support for machines of more than 40 additional brands](https://artisan-scope.org/machines/index): [Ambex](https://artisan-scope.org/machines/ambex/), [ARC S/800](https://artisan-scope.org/machines/arc/), [Bella TW](https://artisan-scope.org/machines/bellatw/), [Berto One and D](https://artisan-scope.org/machines/berto/), [Bideli](https://artisan-scope.org/machines/bideli/), [Blueking BK](https://artisan-scope.org/machines/blueking/), [Brambati PLC](https://artisan-scope.org/machines/brambati/), [Dätgen DR/DW](https://artisan-scope.org/machines/datgen/), [Dongyi BR/BY/DY](https://artisan-scope.org/machines/dongyi/), [Easyster](https://artisan-scope.org/machines/easyster/), [Froco PLC](https://artisan-scope.org/machines/froco/), [Garanti GKPX](https://artisan-scope.org/machines/garanti/), [Golden Roasters GR](https://artisan-scope.org/machines/goldenroasters/), [Hartanzah Roaster](https://artisan-scope.org/machines/hartanzah/), [HB-Roaster](https://artisan-scope.org/machines/hb/), [Hive Roaster](https://artisan-scope.org/machines/hive/), [IP Xenakis iRm_Series incl. full control](https://artisan-scope.org/machines/ipxenakis/), [KapoK](https://artisan-scope.org/machines/kapok/), [Kuban Supreme setup incl. full control](https://artisan-scope.org/machines/kuban/), [Lilla PLC](https://artisan-scope.org/machines/lilla/), [Mill City Roasters MCR Series](https://artisan-scope.org/machines/mcr/), [NOR Coffee Roaster](https://artisan-scope.org/machines/nor/), [Nordic](https://artisan-scope.org/machines/nordic/), [Opp Roaster](https://artisan-scope.org/machines/opp/), [Öztürk](https://artisan-scope.org/machines/ozturk/), [Petroncini](https://artisan-scope.org/machines/petroncini/), [Roaster & Roaster](https://artisan-scope.org/machines/roasterandroaster/), [Rasco Mac](https://artisan-scope.org/machines/rascomac/), [Rolltech EL](https://artisan-scope.org/machines/rolltech/), [Santoker](https://artisan-scope.org/machines/santoker/), [Tesla](https://artisan-scope.org/machines/tesla/), [Tostabar Genius](https://artisan-scope.org/machines/tostabar/), [TRINITAS T2 and T7](https://artisan-scope.org/machines/trinitas/), [Trobrat](https://artisan-scope.org/machines/trobrat/), [Typhoon](https://artisan-scope.org/machines/typhoon/), [VNT](https://artisan-scope.org/machines/vnt/), [Vortecs](https://artisan-scope.org/machines/vortecs/), [Wintop](https://artisan-scope.org/machines/wintop/), [Yang-Chia Feima](https://artisan-scope.org/machines/yangchia/), and [Yoshan](https://artisan-scope.org/machines/yoshan/)
+     - adds burner control to [San Franciscan](https://www.sanfranroaster.com/){:target="_blank"} setup
+     - adds Toper USB setup next to the network MODBUS/TCP variant to connect to  [Toper TKM-SX](https://artisan-scope.org/machines/toper/){:target="_blank"} roasters
+     - adds support for the new [Probat Sample Roaster and P Series III roasters](https://artisan-scope.org/machines/probat/){:target="_blank"}
+     - adds [support for machines of more than 40 additional brands](https://artisan-scope.org/machines/index){:target="_blank"}: [Ambex](https://artisan-scope.org/machines/ambex/){:target="_blank"}, [ARC S/800](https://artisan-scope.org/machines/arc/){:target="_blank"}, [Bella TW](https://artisan-scope.org/machines/bellatw/){:target="_blank"}, [Berto One and D](https://artisan-scope.org/machines/berto/){:target="_blank"}, [Bideli](https://artisan-scope.org/machines/bideli/){:target="_blank"}, [Blueking BK](https://artisan-scope.org/machines/blueking/){:target="_blank"}, [Brambati PLC](https://artisan-scope.org/machines/brambati/), [Dätgen DR/DW](https://artisan-scope.org/machines/datgen/){:target="_blank"}, [Dongyi BR/BY/DY](https://artisan-scope.org/machines/dongyi/){:target="_blank"}, [Easyster](https://artisan-scope.org/machines/easyster/){:target="_blank"}, [Froco PLC](https://artisan-scope.org/machines/froco/), [Garanti GKPX](https://artisan-scope.org/machines/garanti/){:target="_blank"}, [Golden Roasters GR](https://artisan-scope.org/machines/goldenroasters/){:target="_blank"}, [Hartanzah Roaster](https://artisan-scope.org/machines/hartanzah/){:target="_blank"}, [HB-Roaster](https://artisan-scope.org/machines/hb/){:target="_blank"}, [Hive Roaster](https://artisan-scope.org/machines/hive/){:target="_blank"}, [IP Xenakis iRm_Series incl. full control](https://artisan-scope.org/machines/ipxenakis/){:target="_blank"}, [KapoK](https://artisan-scope.org/machines/kapok/){:target="_blank"}, [Kuban Supreme setup incl. full control](https://artisan-scope.org/machines/kuban/), [Lilla PLC](https://artisan-scope.org/machines/lilla/){:target="_blank"}, [Mill City Roasters MCR Series](https://artisan-scope.org/machines/mcr/){:target="_blank"}, [NOR Coffee Roaster](https://artisan-scope.org/machines/nor/){:target="_blank"}, [Nordic](https://artisan-scope.org/machines/nordic/){:target="_blank"}, [Opp Roaster](https://artisan-scope.org/machines/opp/), [Öztürk](https://artisan-scope.org/machines/ozturk/){:target="_blank"}, [Petroncini](https://artisan-scope.org/machines/petroncini/){:target="_blank"}, [Roaster & Roaster](https://artisan-scope.org/machines/roasterandroaster/){:target="_blank"}, [Rasco Mac](https://artisan-scope.org/machines/rascomac/){:target="_blank"}, [Rolltech EL](https://artisan-scope.org/machines/rolltech/){:target="_blank"}, [Santoker](https://artisan-scope.org/machines/santoker/), [Tesla](https://artisan-scope.org/machines/tesla/){:target="_blank"}, [Tostabar Genius](https://artisan-scope.org/machines/tostabar/){:target="_blank"}, [TRINITAS T2 and T7](https://artisan-scope.org/machines/trinitas/){:target="_blank"}, [Trobrat](https://artisan-scope.org/machines/trobrat/){:target="_blank"}, [Typhoon](https://artisan-scope.org/machines/typhoon/){:target="_blank"}, [VNT](https://artisan-scope.org/machines/vnt/){:target="_blank"}, [Vortecs](https://artisan-scope.org/machines/vortecs/){:target="_blank"}, [Wintop](https://artisan-scope.org/machines/wintop/){:target="_blank"}, [Yang-Chia Feima](https://artisan-scope.org/machines/yangchia/){:target="_blank"}, and [Yoshan](https://artisan-scope.org/machines/yoshan/){:target="_blank"}
   - adds RoastLog profile importer ([Issue #471](../../../issues/441))
   - adds IKAWA v3 CSV file importer
   - adds import support for new Aillio Bullet R1 JSON format ([Issue #508](../../../issues/508))
   - adds font options "Source Han Sans" offering CN, TW, KR, JP character sets and "WenQuanYi Zen Hei" offering CN and TW character sets ([Issue #493](../../../issues/493))
-  - adds sliders Bernoulli mode to emit values respecting Bernoulli's gas law translating non-linear between gas flow (slider values) and gas pressure (gas valve). See [the corresponding discussion on home-barista.com](https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654).
+  - adds sliders Bernoulli mode to emit values respecting Bernoulli's gas law translating non-linear between gas flow (slider values) and gas pressure (gas valve). See [the corresponding discussion on home-barista.com](https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654){:target="_blank"}.
   - adds input filter to interpolate duplicate readings that may disturb the RoR computation
-  - adds support for [artisan.plus](https://artisan.plus/) dynamic blend replacements
-  - adds additional date and time fields to [autosave](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html)
-  - adds ET and BT rate-of-rise to [special events annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html)
+  - adds support for [artisan.plus](https://artisan.plus/){:target="_blank"} dynamic blend replacements
+  - adds additional date and time fields to [autosave](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html){:target="_blank"}
+  - adds ET and BT rate-of-rise to [special events annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html){:target="_blank"}
   - adds post roast update for symbolic ET and BT values in the profile
   - adds option to hide '--' untyped special events
   - adds second set of settings for Phidget TMP1200 RTD modules allowing to run different types of RTDs (eg. PT100 and PT1000) in parallel
   - adds support for the Phidget TMP1000 Ambient Temperature sensor
-  - adds VOUT Command "range" to set the voltage range of the Phidget voltage output modules ([Issue #472](../../../issues/472))
-  - adds support for [WebSocket communication](https://artisan-scope.org/devices/websockets/)
+  - adds VOUT Command `range` to set the voltage range of the Phidget voltage output modules ([Issue #472](../../../issues/472))
+  - adds support for [WebSocket communication](https://artisan-scope.org/devices/websockets/){:target="_blank"}
   - adds S7 support to read booleans and the S7 Commands actions `setDBbool(<dbnumber>,<start>,<index>,<value>)` and `getDBbool(<dbnumber>,<start>,<index>)`
   - adds S7 Command `msetDBint` to write Integers to S7 registers using masks
   - adds S7 help page
@@ -35,13 +83,13 @@ v2.4.2 (02.10.2020)
   - adds MODBUS and S7 decoding of Floats as Integers
 
 * Changes
-  - new RoR computation method based on linear polyfits ([PR #503](../../../pull/503) by [PDWest](https://github.com/PDWest)) and "optimized" variant based on the [Savitzky-Golay filter](https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter) for display after recording
+  - new RoR computation method based on linear polyfits ([PR #503](../../../pull/503) by [PDWest](https://github.com/PDWest){:target="_blank"}) and "optimized" variant based on the [Savitzky-Golay filter](https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter){:target="_blank"} for display after recording
   - do not propagate error values -1 to the full formula if the full formula is enclosed in parentheses
   - allows three digits following [q,w,e,r] special event shortcut when the corresponding slider max value is greater than 100.  Be aware that when this is true three digits must be entered so a leading zero is required for values less than 100. 
   - changes Windows keyboard shortcut to remove background curve to CTRL+SHIFT+h
   - updates GUI libs (Qt/PyQt/Matplotlib)
   - updates Brazilian and Greek translations
-  - updated Chinese translations ([PR #491](../../../pull/491) & [PR #494](../../../pull/494) by [wuyi-ligux](https://github.com/wuyi-levard))
+  - updated Chinese translations ([PR #491](../../../pull/491) & [PR #494](../../../pull/494) by [wuyi-ligux](https://github.com/wuyi-levard){:target="_blank"})
   - extends CSV batch reports by some additional fields
   - respects Delta ET/BT symbolic formulas in Roast Properties data table
   - aligns z-order of RoR curves to their LCD order
@@ -74,16 +122,16 @@ v2.4.0 (03.06.2020)
 ------------------
 
 * New Features
-  - adds [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html), [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html), and [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html)
+  - adds [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html){:target="_blank"}, [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html){:target="_blank"}, and [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html){:target="_blank"}
   - adds Cropster XLS, IKAWA CSV, Giesen Software CSV and RostPATH URL profile import
-  - adds flexible [automatic file name generator](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html) ([Issue #430](../../../issues/430), see also [Saving Artisan Profiles - Naming, Saving, File Location etc](https://www.home-barista.com/home-roasting/saving-artisan-profiles-naming-saving-file-location-etc-t61713.html))
-  - adds custom [special event annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) in step and step+ modes that will show roast data including time, temperature DTR, etc. 
-  - adds support for the [Giesen IR sensor](https://artisan-scope.org/machines/giesen/)
-  - adds support for [Twino/Ozstar roasting machines](https://artisan-scope.org/machines/twino-ozstar/)
+  - adds flexible [automatic file name generator](https://artisan-roasterscope.blogspot.com/2020/05/autosave-file-naming.html) ([Issue #430](../../../issues/430){:target="_blank"}, see also [Saving Artisan Profiles - Naming, Saving, File Location etc](https://www.home-barista.com/home-roasting/saving-artisan-profiles-naming-saving-file-location-etc-t61713.html){:target="_blank"})
+  - adds custom [special event annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html){:target="_blank"} in step and step+ modes that will show roast data including time, temperature DTR, etc. 
+  - adds support for the [Giesen IR sensor](https://artisan-scope.org/machines/giesen/){:target="_blank"}
+  - adds support for [Twino/Ozstar roasting machines](https://artisan-scope.org/machines/twino-ozstar/){:target="_blank"}
   - adds S7 and MODBUS communciation optimizer
   - adds two more S7 and MODBUS channels
-  - adds support for Yoctopuce [Yocto-0-10V-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-tx), [Yocto-4-20mA-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-4-20ma-tx), [Yocto-PWM-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-pwm-tx), [Yocto-4-20mA-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-4-20ma-rx), [Yocto-Servo](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-servo) and Yoctopuce Relays modules ([Yocto-Relay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-relay), [Yocto-LatchedRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-latchedrelay), [Yocto-MaxiCoupler-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxicoupler-v2), [Yocto-PowerRelay-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v2), [Yocto-PowerRelay-V3](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v3), and [Yocto-MaxiPowerRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxipowerrelay))
-  - adds support for Phidget VINT DCMotor modules ([DCC1000](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=965), [DCC1002](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1117) and [DCC1003](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1118)), mDNS Phidget server service discovery and support for multiple Phidget IO modules identified by their hub serial number and port
+  - adds support for Yoctopuce [Yocto-0-10V-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-0-10v-tx){:target="_blank"}, [Yocto-4-20mA-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-4-20ma-tx){:target="_blank"}, [Yocto-PWM-Tx](https://www.yoctopuce.com/EN/products/usb-electrical-interfaces/yocto-pwm-tx){:target="_blank"}, [Yocto-4-20mA-Rx](https://www.yoctopuce.com/EN/products/usb-electrical-sensors/yocto-4-20ma-rx){:target="_blank"}, [Yocto-Servo](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-servo){:target="_blank"} and Yoctopuce Relays modules ([Yocto-Relay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-relay){:target="_blank"}, [Yocto-LatchedRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-latchedrelay){:target="_blank"}, [Yocto-MaxiCoupler-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxicoupler-v2){:target="_blank"}, [Yocto-PowerRelay-V2](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v2){:target="_blank"}, [Yocto-PowerRelay-V3](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-powerrelay-v3){:target="_blank"}, and [Yocto-MaxiPowerRelay](https://www.yoctopuce.com/EN/products/usb-actuators/yocto-maxipowerrelay){:target="_blank"})
+  - adds support for Phidget VINT DCMotor modules ([DCC1000](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=965){:target="_blank"}, [DCC1002](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1117){:target="_blank"} and [DCC1003](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1118){:target="_blank"}), mDNS Phidget server service discovery and support for multiple Phidget IO modules identified by their hub serial number and port
   - better support of hi-resolution displays under Windows
   - adds large phases LCDs
   - adds status flags to the menu entries for all large LCD views
@@ -115,8 +163,8 @@ v2.4.0 (03.06.2020)
   - the axis system to render custom events in Step/Step+/Combo mode extends now from the temperature axis minimum up to the lowest phases temperature if snap mode is not active (or the newly introduced explicit 100% y-axis limit given
   - extends grid alpha range from 1-5 to 1-10
   - allows to edit batch number in super mode also if the batch counter is deactivated
-  - [artisan.plus](https://artisan.plus/): after 3 month of expired subscription stop trying to login automatically!
-  - [artisan.plus](https://artisan.plus/): on changing the batch size the beans field is automatically updated to listing the weight per component of blends
+  - [artisan.plus](https://artisan.plus/){:target="_blank"}: after 3 month of expired subscription stop trying to login automatically!
+  - [artisan.plus](https://artisan.plus/){:target="_blank"}: on changing the batch size the beans field is automatically updated to listing the weight per component of blends
   - on loading profiles with extra device channels Artisan will always ask to update your setup or not. Extra devices settings concerning just the visualization (like color) will always be taken from your current Artisan settings and never modified on loading a profile.
   - replace the generic "Select" label on extra device color buttons by the name of the selected color
   - suppress event quantification for slider changes triggered by the Artisan PID
@@ -228,12 +276,12 @@ function 16
   - EXTRA DEVICES: adds "Update Profile" button to recompute the symbolic formulas of all Virtual Devices
   - EXTRA DEVICES: adds delta axis flags to have extra device curves drawn relative to the z-axis (C/min or F/min axis). Useful if a device sends directly RoR data (like potentially the TC4), if a Virtual Device is used to draw the RoR of a curve different to ET and BT
   - EXTRA DEVICES: adds extra device curve fills, value sets the opacity of the fill
-  - MACHINE SUPPORT: extended Besca machine setups including the [Bee sample roaster](https://www.bescaroasters.com/roaster-detail/14/Sample-Roasters/Besca-Bee-Coffee-Roaster) and the setup "Besca BSC manual v2" for manual machines produced after 15.09.2019
-  - MACHINE SUPPORT: updated [Coffeetool Rxx](https://coffeetool.gr/product-category/coffeeroasters/) machine setup to allow for burner, air flow and drum speed control
+  - MACHINE SUPPORT: extended Besca machine setups including the [Bee sample roaster](https://www.bescaroasters.com/roaster-detail/14/Sample-Roasters/Besca-Bee-Coffee-Roaster){:target="_blank"} and the setup "Besca BSC manual v2" for manual machines produced after 15.09.2019
+  - MACHINE SUPPORT: updated [Coffeetool Rxx](https://coffeetool.gr/product-category/coffeeroasters/){:target="_blank"} machine setup to allow for burner, air flow and drum speed control
   - MACHINE SUPPORT: adds Drum Speed and Air Flow to Buhler Roastmaster setup
-  - MACHINE SUPPORT: adds support for further [Coffed](https://coffed.pl/en) machines (SR3/5/15/25/60) automatic and manual variants
-  - MACHINE SUPPORT: adds support for the [Atilla](https://www.atilla.com.br/) GOLD_plus_7'' II
-  - MACHINE SUPPORT: adds machine configurations for [popular Phidget sets](https://artisan-scope.org/devices/phidget-sets/)
+  - MACHINE SUPPORT: adds support for further [Coffed](https://coffed.pl/en){:target="_blank"} machines (SR3/5/15/25/60) automatic and manual variants
+  - MACHINE SUPPORT: adds support for the [Atilla](https://www.atilla.com.br/){:target="_blank"} GOLD_plus_7'' II
+  - MACHINE SUPPORT: adds machine configurations for [popular Phidget sets](https://artisan-scope.org/devices/phidget-sets/){:target="_blank"}
   - MATH: adds x^2 to the exponent function as well as the possibility to define an offset from CHARGE
   - PHIDGETS: adds Phidget HUB0000 IO 0 and Phidget HUB0000 IO Digital 0 one channel device types that allocate only that single one channel/port to allow the use of all HUB0000 ports with an uneven number of analog or digital IO channels
   - PHIDGETS: attach IO Phidgets already in OFF mode on demand
@@ -241,7 +289,7 @@ function 16
   - PHIDGETS: fully supports all 16 ports of the REL1101 (not only the first 4 as before)
   - PHIDGETS: adds ALT-RESET (OPTION-RESET on macOS) button action to additionally detach all IO Phidgets
   - PHIDGETS: adds Phidgets driver version to the about dialog
-  - PLUS: adds [artisan.plus](artisan.plus) subscription status indicator
+  - PLUS: adds [artisan.plus](artisan.plus){:target="_blank"} subscription status indicator
   - PLUS: adds artisan://roast/<uuid> URL scheme to link back to Artisan (click to the title) and artisan.plus (click to the date) on html roast, production and ranking reports
   - PLUS: adds confirmation dialog on disconnecting artisan.plus
   - PLUS: adds CTR-click (COMMAND on macOS) on plus icon to disconnect and erase credentials from keychain
@@ -304,13 +352,13 @@ v2.0.0 (04.06.2019)
 ------------------
 
 * New Features
-  - adds support for the [artisan.plus](https://artisan.plus/) inventory management service ([Issue #231](../../../issues/231) and [Issue #308](../../../issues/308))
-  - adds support for the [Coffee-Tech Engineering Silon ZR7](https://www.coffee-tech.com/products/shop-roasters/silon-zr-7-shop-roaster/)
-  - adds support for [Has Garanti HGS and HSR series](http://www.hasgaranti.com.tr/en/products/shop-type-products/shop-type-roasting-coffee-machine.html)
-  - adds support for [Kaldi Fortis](https://eng.homecaffe.net/product/kaldi-fortis-grande-coffee-roaster/126/category/223/display/1/) (Tron in preparation)
-  - adds support for [Behmor 1kg](https://behmor.com/jake-kilo-roaster/)
+  - adds support for the [artisan.plus](https://artisan.plus/){:target="_blank"} inventory management service ([Issue #231](../../../issues/231) and [Issue #308](../../../issues/308))
+  - adds support for the [Coffee-Tech Engineering Silon ZR7](https://www.coffee-tech.com/products/shop-roasters/silon-zr-7-shop-roaster/){:target="_blank"}
+  - adds support for [Has Garanti HGS and HSR series](http://www.hasgaranti.com.tr/en/products/shop-type-products/shop-type-roasting-coffee-machine.html){:target="_blank"}
+  - adds support for [Kaldi Fortis](https://eng.homecaffe.net/product/kaldi-fortis-grande-coffee-roaster/126/category/223/display/1/){:target="_blank"}
+  - adds support for [Behmor 1kg](https://behmor.com/jake-kilo-roaster/){:target="_blank"}
   - adds support for the [VICTOR 86B Digital Multimeter](http://www.china-victor.com/index.php?m=content&c=index&a=show&catid=42&id=26) (by Lewis Li)
-  - adds support for [Acaia coffee scales](https://acaia.co/collections/coffee-scales) via directly BLE communication without need for configuration or extra hardware (OS X only for now)
+  - adds support for [Acaia coffee scales](https://acaia.co/collections/coffee-scales){:target="_blank"} via directly Bluetooth Low Energy (BLE) communication without need for configuration or extra hardware (OS X only for now)
   - adds sorting of custom event buttons table by drag-and-drop ([Issue 214](../../../issues/214), resolved by [PR #345](../../../pull/345) contributed by Phil)
   - adds tick to swap Delta BT/ET LCDs and the corresponding curve z-order ([Issue 330](../../../issues/330))
   - allows to set RoR smoothing for ET and BT separately
@@ -363,12 +411,12 @@ v1.6.1 (10.03.2019)
   dedicated Artisan alarm files (.alrm)
    - hide/show curves via click to corresponding entry in the legend
    - adds IO Command state feedback by mfurlotti ([PR #284](../../../pull/284))
-   - adds support for more digital output Phidgets [REL1000](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=966), [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720) and the first 4 channels of [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721) ([Issue #286](../../../issues/286))
-   - adds support for the Phidget [DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961) (current/frequency/digital/voltage input)
-   - adds support for the Phidget RC Servo API supporting the servo controllers [Phidget RCC 1000](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1015) (16x VINT, ext. powered), [Phidget 1061](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1032) (8x USB, ext. powered), and [Phidget 1066](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1044) (1x USB powered) together with a wide range of servo motors from Phidgets (like the [Phidget 3540 10cm Linear Actor](https://www.phidgets.com/?tier=3&catid=25&pcid=22&prodid=406)) or other sources
-   - adds support for the [Yocotopuce Meteo](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-meteo-v2) ambient sensors
-   - adds support for the (upcomming) [Yocotopuce](http://www.yoctopuce.com/EN/products/category/usb-environmental-sensors) IR module
-   - adds support for the [Probat Roaster Middleware](https://www.probat.com/en/products/shoproaster/produkte/roasters/probatone-series/)
+   - adds support for more digital output Phidgets [REL1000](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=966){:target="_blank"}, [REL1100](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=720){:target="_blank"} and the first 4 channels of [REL1101](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=721) ([Issue #286](../../../issues/286){:target="_blank"})
+   - adds support for the Phidget [DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961){:target="_blank"} (current/frequency/digital/voltage input)
+   - adds support for the Phidget RC Servo API supporting the servo controllers [Phidget RCC 1000](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1015){:target="_blank"} (16x VINT, ext. powered), [Phidget 1061](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1032){:target="_blank"} (8x USB, ext. powered), and [Phidget 1066](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1044){:target="_blank"} (1x USB powered) together with a wide range of servo motors from Phidgets (like the [Phidget 3540 10cm Linear Actor](https://www.phidgets.com/?tier=3&catid=25&pcid=22&prodid=406)){:target="_blank"} or other sources
+   - adds support for the [Yocotopuce Meteo](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-meteo-v2){:target="_blank"} ambient sensors
+   - adds support for the (upcomming) [Yocotopuce](http://www.yoctopuce.com/EN/products/category/usb-environmental-sensors){:target="_blank"} IR module
+   - adds support for the [Probat Roaster Middleware](https://www.probat.com/en/products/shoproaster/produkte/roasters/probatone-series/){:target="_blank"}
    - adds 2in1 variant of Sedona Elite machine configuration
    - adds CMD-A keyboard shortcut to open alarms dialog
    - adds JPEG and BMP support (export/convert)
@@ -380,7 +428,7 @@ v1.6.1 (10.03.2019)
    - adds flags to show/hide time/temp grids
    - adds the Yocto async mode
    - adds roasted coffee density field and density loss calculation to Roast Properties
-   - adds support for the [Aillio R1](https://aillio.com/) v1.5 and v2 firmware and new [IBTS IR sensor](https://medium.com/@aillio/the-start-of-something-39aa01d08fa9)
+   - adds support for the [Aillio R1](https://aillio.com/){:target="_blank"} v1.5 and v2 firmware and new [IBTS IR sensor](https://medium.com/@aillio/the-start-of-something-39aa01d08fa9){:target="_blank"}
  * Changes
    - improved Phidgets tab rendering
    - store reference to profile instead of background with recent roasts
@@ -440,7 +488,7 @@ v1.5.0 (17.10.2018)
    - adds support for VoltageRatio for Phidgets IO enhancement ([Issue #252](../../../issues/252))
    - extends LCD rendering from [-999,9999] to render [-9999,99999] if "Decimal Places" are turned on
    - adds "Program 78" and "Program 910" device types
-   - adds support for manual [Besca roasting machines](https://www.bescaroasters.com/)
+   - adds support for manual [Besca roasting machines](https://www.bescaroasters.com/){:target="_blank"}
  * Changes 
    - order of columns in roast/background properties events table, CSV import/export and Excel export swapped (ET always before BT)
    -  event values on the graph are not abbreviated anymore if "Decimal Places" is not ticked
@@ -472,13 +520,13 @@ v1.4.0 (03.10.2018)
    - adds PhasesLCD mode-by-phase selection
    - adds PhasesLCD mode that shows all of time/temp/percentage in finish phase accros the 3 Phases LCDs ([Issue #235](../../../issues/235))   
    - adds flag to allow phases to be adjusted based on DRY and FCs of the background profile
-   - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) for internal Software PID and [TC4 aArtisanQ v6.6 PID](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/tags/REL_aArtisanQ_PID_6_6) (complementing the standard P-on-Error mode)
+   - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/){:target="_blank"} for internal Software PID and [TC4 aArtisanQ v6.6 PID](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/tags/REL_aArtisanQ_PID_6_6){:target="_blank"} (complementing the standard P-on-Error mode)
    - adds KeepON flag
    - adds playback DROP event from background profile by time or temperature
    - adds zero-ing of channels via extra symbolic variables Tn set to current value on right-click of corresponding LCD
    - adds barometric pressure to roast properties and statistic summary
-   - adds support for ambient sensors Phidget [HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644) and [PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719)
-   - add machine setup for Hottop TC4 configurations, [Atilla GOLD plus 7"](http://www.atilla.com.br/p/atilla-5kg-gold-plus/), [Besca roasting machines](https://www.bescaroasters.com/), [Coffee-Tech Engineering Ghibli](https://www.coffee-tech.com/products/commercial-roasters/ghibli-r15/) and [Diedrich Roasters](https://www.diedrichroasters.com/)
+   - adds support for ambient sensors Phidget [HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644){:target="_blank"} and [PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719){:target="_blank"}
+   - add machine setup for Hottop TC4 configurations, [Atilla GOLD plus 7"](http://www.atilla.com.br/p/atilla-5kg-gold-plus/){:target="_blank"}, [Besca roasting machines](https://www.bescaroasters.com/){:target="_blank"}, [Coffee-Tech Engineering Ghibli](https://www.coffee-tech.com/products/commercial-roasters/ghibli-r15/){:target="_blank"} and [Diedrich Roasters](https://www.diedrichroasters.com/){:target="_blank"}
    - adds fan RPM to R1 Aillio setup
    - adds option to load alarms from background profiles
  * Changes 
@@ -607,7 +655,7 @@ v1.3.0 (15.4.2018)
   Note that without optimal smoothing active, temperature curves are not smoothed at all.
    - adds rendering of the AUC (Show Area)
    - adds sliders with min/max limits adjusting to the actual temperature unit
-   - adds direct support for [Aillio Bullet R1](https://aillio.com/), [BC Roasters](http://www.buckeyecoffee.com/), [Bühler Roastmaster](http://www.buhlergroup.com/), [Coffed SR5/SR25](http://coffed.pl/), [Coffee-Tech FZ-94](https://www.coffee-tech.com/), [Coffeetool R500/3/5/15](http://coffeetool.gr/), [Giesen W1A/W6A/W15A](http://www.giesencoffeeroasters.eu/), [IMF RM5/RM15](http://www.imf-srl.com/), [K+M UG15/UG22](https://www.kirschundmausser.de/), [Loring S7/15/35/70](https://loring.com/), [Phoenix ORO](http://www.buckeyecoffee.com/), [Proaster](http://proaster.coffee/), [San Franciscan SF1-75](http://www.sanfranroaster.com/), [Sedona Elite](http://www.buckeyecoffee.com/), [Toper TKM-SX](http://www.toper.com/), [US Roaster Corp](http://www.usroastercorp.com/)
+   - adds direct support for [Aillio Bullet R1](https://aillio.com/){:target="_blank"}, [BC Roasters](http://www.buckeyecoffee.com/){:target="_blank"}, [Bühler Roastmaster](http://www.buhlergroup.com/){:target="_blank"}, [Coffed SR5/SR25](http://coffed.pl/){:target="_blank"}, [Coffee-Tech FZ-94](https://www.coffee-tech.com/){:target="_blank"}, [Coffeetool R500/3/5/15](http://coffeetool.gr/){:target="_blank"}, [Giesen W1A/W6A/W15A](http://www.giesencoffeeroasters.eu/){:target="_blank"}, [IMF RM5/RM15](http://www.imf-srl.com/){:target="_blank"}, [K+M UG15/UG22](https://www.kirschundmausser.de/){:target="_blank"}, [Loring S7/15/35/70](https://loring.com/){:target="_blank"}, [Phoenix ORO](http://www.buckeyecoffee.com/){:target="_blank"}, [Proaster](http://proaster.coffee/){:target="_blank"}, [San Franciscan SF1-75](http://www.sanfranroaster.com/){:target="_blank"}, [Sedona Elite](http://www.buckeyecoffee.com/){:target="_blank"}, [Toper TKM-SX](http://www.toper.com/), [US Roaster Corp](http://www.usroastercorp.com/){:target="_blank"}
    - adds crash reporter
    - adds expected time to DRY and FCs to phases LCDs in percentage  and temperature mode
  * Changes
@@ -732,7 +780,7 @@ v1.1.0 (10.06.2017)
 ------------------
 
  * New Features
-    * adds [Recent Roast Properties](https://artisan-roasterscope.blogspot.de/2017/06/recent-roast-properties.html)
+    * adds [Recent Roast Properties](https://artisan-roasterscope.blogspot.de/2017/06/recent-roast-properties.html){:target="_blank"}
     * adds "Fuji Command" to send commands to connected Fuji PIDs
     * adds ~ path expansion to users home directory and improves external program argument handling (thanks to Max)
     * adds prediction of DRY and MAY phases to Phases LCDs before the corresponding phases have been completed
@@ -743,7 +791,7 @@ v1.1.0 (10.06.2017)
     * adds slider synchronization per event quantifiers
     * adds flags to hide/show background ET/BT curves
     * adds Aillio Bullet R1 profile import
-    * adds [Probat Probatone 2 support](https://artisan-roasterscope.blogspot.de/2017/06/probat-probatone.html)
+    * adds [Probat Probatone 2 support](https://artisan-roasterscope.blogspot.de/2017/06/probat-probatone.html){:target="_blank"}
  * Changes
     * changes background of snapped by-value events
     * renamed and localized custom event labels
@@ -774,13 +822,13 @@ v1.0.0 (24.02.2017)
 ------------------
 
  * New Features
-    * adds [internal PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html) and support to control external MODBUS PIDs
+    * adds [internal PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html){:target="_blank"} and support to control external MODBUS PIDs
     * adds two more MODBUS input channels (now 6 in total)
     * adds alarms triggerd at a specified time after another alarm specified as "If Alarm" was triggered, if "from" rules is set to "If Alarm"    
     * adds improved Windows installer (option to uninstall previous versions during installation and silent option)
     * adds support for loading Artisan profiles from zip files for reporting (as kindly contributed by David Baxter)
-    * adds experimental support for the [Apollo DT301](http://www.ueitest.com/products/temperature-humidity/dt301) (by Rob Gardner)
-    * adds experimental support for the [Extech 755](http://www.extech.com/display/?id=14489) pressure manometer (by William and Brian Glen)
+    * adds experimental support for the [Apollo DT301](http://www.ueitest.com/products/temperature-humidity/dt301){:target="_blank"} (by Rob Gardner)
+    * adds experimental support for the [Extech 755](http://www.extech.com/display/?id=14489){:target="_blank"} pressure manometer (by William and Brian Glen)
     * adds "Playback Events" function to playback background events if corresponding sliders with actions are defined
     * adds serial port to DUMMY device. If selected as main device, one can send serial commands to its serial port from alarms and buttons
     * adds support for multiple-connected Yoctopuce devices (thanks to Nick Watson)
@@ -798,7 +846,7 @@ v1.0.0 (24.02.2017)
     * adds a field for green bean temperature
     * adds p-i-d button action    
     * adds auto axis limits calculation via manual trigger or automatic on load
-    * adds [AUC statistics, LCD and guide](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html)
+    * adds [AUC statistics, LCD and guide](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html){:target="_blank"}
     * adds possibility to "clamp" by-value custom events to the x-axis in the range of 0-100
     * adds support for MODBUS mask-write (mwrite; function code 22) and write registers (writem; function code 16) methods
     * adds Raspberry Pi (Jessy) build
@@ -898,11 +946,11 @@ v0.9.8 (21.10.2015)
    * initial support for running on Raspberry Pi (Jessy)
    * adds event actions for RESET und START buttons (event dialog)
    * adds alarm actions CHARGE, RampSoak ON/OFF, PID ON/OFF (alarm dialog)
-   * adds [ln() and x^2 math approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html)
-   * enhanced [symbolic formula evaluator and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html) adding time shifting among others
+   * adds [ln() and x^2 math approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html){:target="_blank"}
+   * enhanced [symbolic formula evaluator and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html){:target="_blank"} adding time shifting among others
    * adds support for US weight and volume units
    * adds XTB data to the background dialog if selected in the table of the background dialog
-   * adds support for [event actions that change event values by a specified offset](http://artisan-roasterscope.blogspot.de/2015/10/increasing-heat.html) instead of an absolute value
+   * adds support for [event actions that change event values by a specified offset](http://artisan-roasterscope.blogspot.de/2015/10/increasing-heat.html){:target="_blank"} instead of an absolute value
  * Changes
    * custom event buttons and sliders remembers visibility status
    * plotter "Virtual Device" action renamed into "BT/ET", now adds plot data to BT/ET if no profile is loaded, otherwise it creates an additional Virtual Device
@@ -1012,7 +1060,7 @@ v0.9.2 (16.1.2015)
    * configurable commands on ON, OFF and per sampling interval
    * command sequencing using the semicolon as delimiter
    * adds MODBUS read, wcoil, wcoils commands and last result substitution variable accessible via the underline character
-   * adds [HukyForum.com](http://www.hukyforum.com/index.php) image export
+   * adds [HukyForum.com](http://www.hukyforum.com/index.php){:target="_blank"} image export
  * Bug Fixes
    * fixes color dialog for extra devices on OS X
    * fixes a potential crasher caused by x-axis realignment during sampling
@@ -1188,7 +1236,7 @@ v0.7.2 (19.12.2013)
    * fixed alarm trigger for button 1
    * improved autoCHARGE and autoDROP recognizers
    * fixes minieditor event type handling
-   * fixes and improvements to [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm) import
+   * fixes and improvements to RoastLogger import
    * makes the extra serial ports widget editable
 
 
@@ -1209,7 +1257,7 @@ v0.7.0 (30.11.2013)
 -------------------
 
  * New Features
-   * adds support for the [Phidget 1046 4-Input PT100/RTD  Bridge](http://www.phidgets.com/products.php?product_id=1046_0) and for the [Phidget 1048 4-Input Temperature Sensor J/K/E/T-Type](http://www.phidgets.com/products.php?product_id=1048) devices
+   * adds support for the [Phidget 1046 4-Input PT100/RTD  Bridge](http://www.phidgets.com/products.php?product_id=1046_0){:target="_blank"} and for the [Phidget 1048 4-Input Temperature Sensor J/K/E/T-Type](http://www.phidgets.com/products.php?product_id=1048){:target="_blank"} devices
    * adds TP event marks (show on graph and in the message log)
    * adds flag in events dialog to control the display of the TP mark
    * adds autoDRY and autoFCs to phases dialog
@@ -1223,9 +1271,9 @@ v0.7.0 (30.11.2013)
      * adds insert alarm button
      * adds new alarm actions to trigger default event actions like START, FCs,..
      * triggered alarms hold a gray background in the alarms dialog
-     * imports alarms from [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm) profiles (thanks to Miroslav)
+     * imports alarms from RoastLogger profiles (thanks to Miroslav)
    * allows ETBTa and RoR statistics to be displayed together
-   * adds support for the [Tonino roast color meter](http://my-tonino.com)
+   * adds support for the [Tonino roast color meter](http://my-tonino.com){:target="_blank"}
    * the last used extra event button is marked
    * adds extra device data to Roast Properties data table
    * adds "cool end" event to the event popup menu on right mouse click on the BT
@@ -1261,7 +1309,7 @@ v0.7.0 (30.11.2013)
    * improved reliability of serial and modbus commands
    * fixes issue with Roast Reports on Windows
    * several fixes to alarm system
-   * fixes the [ RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm) import of latin1 encoded files
+   * fixes the RoastLogger import of latin1 encoded files
    * PID LCD visibility
    * scan for ports on Linux
    * better error handling on exporting data

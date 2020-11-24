@@ -666,6 +666,7 @@ class tgraphcanvas(FigureCanvas):
     updateLargeLCDsTimeSignal = pyqtSignal(str)
     updateLargeLCDsReadingsSignal = pyqtSignal(str,str)
     updateLargeLCDsSignal = pyqtSignal(str,str,str)
+    setTimerLargeLCDcolorSignal = pyqtSignal(str,str)
     showAlarmPopupSignal = pyqtSignal(str,int)
     fileDirtySignal = pyqtSignal()
     fileCleanSignal = pyqtSignal()
@@ -2238,6 +2239,7 @@ class tgraphcanvas(FigureCanvas):
         self.updategraphicsSignal.connect(self.updategraphics)
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
         self.updateLargeLCDsReadingsSignal.connect(self.updateLargeLCDsReadings)
+        self.setTimerLargeLCDcolorSignal.connect(self.setTimerLargeLCDcolor)
         self.showAlarmPopupSignal.connect(self.showAlarmPopup)
         self.updateLargeLCDsTimeSignal.connect(self.updateLargeLCDsTime)
         self.fileDirtySignal.connect(self.fileDirty)
@@ -2247,8 +2249,8 @@ class tgraphcanvas(FigureCanvas):
         self.markFCsSignal.connect(self.markFCsTrigger)
         self.markFCeSignal.connect(self.markFCeTrigger)
         self.markSCsSignal.connect(self.markSCsTrigger)
-        self.markSCeSignal.connect(self.markSCeTrigger)        
-        self.markDropSignal.connect(self.markDropTrigger)      
+        self.markSCeSignal.connect(self.markSCeTrigger)
+        self.markDropSignal.connect(self.markDropTrigger)
         self.markCoolSignal.connect(self.markCoolTrigger)
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
@@ -2961,6 +2963,14 @@ class tgraphcanvas(FigureCanvas):
                 aw.largeLCDs_dialog.updateValues([et],[bt],time=time)
         except:
             pass
+
+    @pyqtSlot(str,str)
+    def setTimerLargeLCDcolor(self,fc,bc):
+        try:
+            if aw.largeLCDs_dialog is not None:
+                aw.largeLCDs_dialog.setTimerLCDcolor(fc,bc)
+        except:
+            pass
     
     @pyqtSlot(str,int)
     def showAlarmPopup(self,message,timeout):
@@ -3503,6 +3513,7 @@ class tgraphcanvas(FigureCanvas):
                     # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
                     if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6]:
                         aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
+                        aw.qmc.setTimerLargeLCDcolorSignal.emit('#147bb3',aw.lcdpaletteB["timer"])
 
                     self.setLCDtime(ts)
             finally:
@@ -5166,6 +5177,7 @@ class tgraphcanvas(FigureCanvas):
                     self.endofx = 60
 
                 aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+                aw.qmc.setTimerLargeLCDcolorSignal.emit(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"])
 
                 #roast flags
                 aw.qmc.heavyFC_flag = False
@@ -9446,8 +9458,9 @@ class tgraphcanvas(FigureCanvas):
             if not aw.qmc.title_show_always:
                 aw.qmc.setProfileTitle("")
             
-            # reset LCD timer color that might have been reset by the RS PID in monitoring mode:    
+            # reset LCD timer color that might have been reset by the RS PID in monitoring mode:
             aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+            aw.qmc.setTimerLargeLCDcolorSignal.emit(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"])
             if aw.qmc.delta_ax:
                 y_label = aw.qmc.delta_ax.set_ylabel("")
                 try:
@@ -21355,9 +21368,9 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     source = cs[len("pidSource("):-1]
                                     if self.qmc.device != 0 and self.qmc.device != 26:
-                                        kp = self.aw.pidcontrol.pidKp
-                                        ki = self.aw.pidcontrol.pidKi
-                                        kd = self.aw.pidcontrol.pidKd
+                                        kp = aw.pidcontrol.pidKp
+                                        ki = aw.pidcontrol.pidKi
+                                        kd = aw.pidcontrol.pidKd
                                         self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE,source=source)
                                 except:
                                     pass
@@ -23512,7 +23525,7 @@ class ApplicationWindow(QMainWindow):
                 return False
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateSymbolicETBT(): {0}").format(str(ex)),exc_tb.tb_lineno)
+            self.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "updateSymbolicETBT(): {0}").format(str(ex)),exc_tb.tb_lineno)
 
     # returns True if data got updated, False otherwise
     def calcVirtualdevices(self,update=False):

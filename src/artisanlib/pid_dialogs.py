@@ -613,6 +613,13 @@ class PID_DlgControl(ArtisanDialog):
     @pyqtSlot(int)
     def updatePidMode(self,i):
         self.aw.pidcontrol.svMode = i
+        if self.aw.pidcontrol.pidActive and i == 1:
+            self.aw.pidcontrol.pidModeInit()
+        else:
+            self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
+            self.aw.qmc.setTimerLCDcolorSignal.emit(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"])
+            if self.aw.qmc.flagon and not self.aw.qmc.flagstart:
+                self.aw.qmc.setLCDtime(0)
     
     @pyqtSlot(int)
     def activateSVSlider(self,i):
