@@ -328,6 +328,8 @@ class graphColorDlg(ArtisanDialog):
         self.lcd5LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd6LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd6LEDButton.clicked.connect(self.paintlcdsSlot)
+        self.lcd7LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
+        self.lcd7LEDButton.clicked.connect(self.paintlcdsSlot)
         
         self.lcd1backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.lcd1backButton.clicked.connect(self.paintlcdsSlot)
@@ -341,12 +343,15 @@ class graphColorDlg(ArtisanDialog):
         self.lcd5backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd6backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.lcd6backButton.clicked.connect(self.paintlcdsSlot)
+        self.lcd7backButton = QPushButton(QApplication.translate("Button","Background",None))
+        self.lcd7backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd1LEDButton.setMinimumWidth(80)
         self.lcd2LEDButton.setMinimumWidth(80)
         self.lcd3LEDButton.setMinimumWidth(80)
         self.lcd4LEDButton.setMinimumWidth(80)
         self.lcd5LEDButton.setMinimumWidth(80)
         self.lcd6LEDButton.setMinimumWidth(80)
+        self.lcd7LEDButton.setMinimumWidth(80)
 
         LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None))
         LCDdefaultButton.clicked.connect(self.setLCD_bw)
@@ -476,6 +481,11 @@ class graphColorDlg(ArtisanDialog):
         lcd6layout = QHBoxLayout()
         lcd6layout.addWidget(self.lcd6LEDButton,0)
         lcd6layout.addWidget(self.lcd6backButton,1)
+        lcd7layout = QHBoxLayout()
+        lcd7layout.addWidget(self.lcd7LEDButton,0)
+        lcd7layout.addWidget(self.lcd7backButton,1)
+        lcd8layout = QHBoxLayout()
+        lcd8layout.addStretch()
         LCD1GroupLayout = QGroupBox(QApplication.translate("GroupBox","Timer LCD",None))
         LCD1GroupLayout.setLayout(lcd1layout)
         lcd1layout.setContentsMargins(0,0,0,0)
@@ -494,6 +504,13 @@ class graphColorDlg(ArtisanDialog):
         LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV LCD",None))
         LCD6GroupLayout.setLayout(lcd6layout)
         lcd6layout.setContentsMargins(0,0,0,0)
+        LCD7GroupLayout = QGroupBox(QApplication.translate("GroupBox","Ramp/Soak Timer LCD",None))
+        LCD7GroupLayout.setLayout(lcd7layout)
+        lcd7layout.setContentsMargins(0,0,0,0)
+        LCD8GroupLayout = QGroupBox()
+        LCD8GroupLayout.setLayout(lcd8layout)
+        lcd8layout.setContentsMargins(0,0,0,0)
+
         buttonlayout = QHBoxLayout()
         buttonlayout.addStretch()
         buttonlayout.addWidget(LCDdefaultButton)
@@ -504,10 +521,12 @@ class graphColorDlg(ArtisanDialog):
         lcdlayout1.addWidget(LCD2GroupLayout)
         lcdlayout1.addWidget(LCD3GroupLayout)
         lcdlayout1.addWidget(LCD1GroupLayout)
+        lcdlayout1.addWidget(LCD6GroupLayout)
         lcdlayout2 = QVBoxLayout()
         lcdlayout2.addWidget(LCD4GroupLayout)
         lcdlayout2.addWidget(LCD5GroupLayout)
-        lcdlayout2.addWidget(LCD6GroupLayout)
+        lcdlayout2.addWidget(LCD7GroupLayout)
+        lcdlayout2.addWidget(LCD8GroupLayout)
         lcdlayout = QHBoxLayout()
         lcdlayout.addLayout(lcdlayout1)
         lcdlayout.addLayout(lcdlayout2)
@@ -683,6 +702,13 @@ class graphColorDlg(ArtisanDialog):
                 self.aw.largeExtraLCDs_dialog.updateStyles()
             if self.aw.largePhasesLCDs_dialog:
                 self.aw.largePhasesLCDs_dialog.updateStyles()
+        if lcdButton in [self.lcd7LEDButton,self.lcd7backButton]:
+            if lcdButton == self.lcd7backButton:
+                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,"rstimer")
+            else:
+                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"rstimer")
+            if self.aw.largeLCDs_dialog:
+                self.aw.largeLCDs_dialog.updateStyles()
         self.setColorButtons()
 
     def setColorButtons(self):
@@ -751,6 +777,8 @@ class graphColorDlg(ArtisanDialog):
         self.lcd5LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['deltabt'] + "; color: " + self.aw.lcdpaletteF['deltabt'] + ";" + self.commonstyle)
         self.lcd6backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['sv'] + "; color: " + self.aw.lcdpaletteF['sv'] + ";" + self.commonstyle)
         self.lcd6LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['sv'] + "; color: " + self.aw.lcdpaletteF['sv'] + ";" + self.commonstyle)
+        self.lcd7backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['rstimer'] + "; color: " + self.aw.lcdpaletteF['rstimer'] + ";" + self.commonstyle)
+        self.lcd7LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['rstimer'] + "; color: " + self.aw.lcdpaletteF['rstimer'] + ";" + self.commonstyle)
             
         if str(self.aw.qmc.palette["canvas"]) == 'None':
 #            self.canvasLabel.setStyleSheet("QLabel { background-color: #f0f0f0 }")

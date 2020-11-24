@@ -1229,7 +1229,7 @@ class PIDcontrol(object):
                 self.time_pidON = self.aw.qmc.on_timex[-1]
                 if self.svMode == 1:
                     # turn the timer LCD color blue if in RS mode and not recording
-                    self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%('#187AB3',self.aw.lcdpaletteB["timer"]))
+                    self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["rstimer"],self.aw.lcdpaletteB["rstimer"]))
             self.aw.qmc.temporayslider_force_move = True
             self.lastEnergy = None
             # TC4 hardware PID

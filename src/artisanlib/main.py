@@ -8605,7 +8605,7 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
             fname = os.path.join(aw.getResourcePath(),"Themes","Artisan","Default.athm")
             if os.path.isfile(fname) and not self.flagon:
-                aw.loadSettings(fn=fname,remember=False,reset=False)
+                aw.loadSettings_theme(fn=fname,remember=False,reset=False)
                 aw.sendmessage(QApplication.translate("Message","Colors set to Default Theme", None))
             else:
                 for key in list(self.palette1.keys()):
@@ -14602,6 +14602,7 @@ class ApplicationWindow(QMainWindow):
             "deltaet":'#EBEBEB', #'black',
             "deltabt":'#EBEBEB', #'black',
             "sv":'#F8F8F8', #'black'
+            "rstimer":'#F8F8F8',
             }
         self.lcdpaletteF = {
             "timer":'#262626',
@@ -14609,7 +14610,8 @@ class ApplicationWindow(QMainWindow):
             "bt":'white', #'white',
             "deltaet":'#cc0f50', #'white',
             "deltabt":'#0A5C90', #'white',
-            "sv":'#4C4C4C'
+            "sv":'#4C4C4C',
+            "rstimer":'#187AB3',
             }
 
         #user defined event buttons
@@ -17226,6 +17228,7 @@ class ApplicationWindow(QMainWindow):
         try:
             if "canvas_alt" in aw.qmc.palette:
                 aw.qmc.palette["canvas"] = aw.qmc.palette["canvas_alt"]
+                aw.qmc.palette.pop("canvas_alt")
                 aw.updateCanvasColors()
                 aw.qmc.redraw()
         except:
@@ -18330,6 +18333,8 @@ class ApplicationWindow(QMainWindow):
         aw.lcdpaletteF["deltabt"] = "white"
         aw.lcdpaletteB["sv"] = "black"
         aw.lcdpaletteF["sv"] = "white"
+        aw.lcdpaletteB["rstimer"] = "white"
+        aw.lcdpaletteF["rstimer"] = "black"
         aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
         aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
