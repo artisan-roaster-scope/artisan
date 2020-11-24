@@ -1223,7 +1223,7 @@ class PIDcontrol(object):
             self.RS_total_time = self.RStotalTime(self.svRamps,self.svSoaks)
             self.svTriggeredAlarms = [False]*self.svLen
             
-            if self.aw.qmc.flagstart or len(self.aw.qmc.on_timex)<1:
+            if self.aw.qmc.flagstart or not self.aw.qmc.flagon or len(self.aw.qmc.on_timex)<1:
                 self.time_pidON = 0
             else:
                 self.time_pidON = self.aw.qmc.on_timex[-1]
@@ -1333,7 +1333,8 @@ class PIDcontrol(object):
         if self.ramp_soak_engaged == 0:
             return None
         else:
-            self.aw.qmc.setLCDtime(self.RS_total_time-t)
+            if self.aw.qmc.flagon and not self.aw.qmc.flagstart:
+                self.aw.qmc.setLCDtime(self.RS_total_time-t)
             segment_end_time = 0 # the (end) time of the segments
             prev_segment_end_time = 0 # the (end) time of the previous segment
             segment_start_sv = 0 # the (target) sv of the segment

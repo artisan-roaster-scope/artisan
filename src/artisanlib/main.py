@@ -2928,6 +2928,9 @@ class tgraphcanvas(FigureCanvas):
             url = "http://127.0.0.1:" + str(aw.WebLCDsPort) + "/send"
             headers = {'content-type': 'application/json'}
             payload = {'data': {}}
+            if not (bt is None and et is None) and aw.qmc.flagon and not aw.qmc.flagstart:
+                # in monitoring only mode, timer might be set by PID RS
+                time = None
             if bt is not None:
                 payload['data']['bt'] = bt
             if et is not None:
@@ -2952,6 +2955,9 @@ class tgraphcanvas(FigureCanvas):
     def updateLargeLCDs(self,bt,et,time):
         try:
             if aw.largeLCDs_dialog is not None:
+                if aw.qmc.flagon and not aw.qmc.flagstart:
+                    # in monitoring only mode, timer might be set by PID RS
+                    time = None
                 aw.largeLCDs_dialog.updateValues([et],[bt],time=time)
         except:
             pass

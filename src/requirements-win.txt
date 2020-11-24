@@ -4,7 +4,7 @@ numpy==1.19.3
 colorspacious==1.1.2
 scipy==1.5.4
 matplotlib==3.3.3 # currently pyinstaller up to 4.0 is not compatible with MPL 3.3.x
-PyQt5==5.15.1 #5.14.2
+PyQt5==5.15.2 #5.14.2
 openpyxl==3.0.5
 #pyinstaller==4.0 # 3.5 works # v3.6 and v4.0 on Windows breaks on some machines, v3.5 has a security issue but only in --onefile mode
 # NOTE: pyinstaller 3.5 is NOT compatible with Python3.8
