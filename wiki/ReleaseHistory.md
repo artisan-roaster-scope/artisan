@@ -33,6 +33,7 @@ v2.4.4 (xx.11.2020)
   - extends the Cropster XLS importer to work also with exports done in languages others than English
   - [artisan.plus](https://artisan.plus/): optimized synchronization
   - improved S7 serial logging and communication error handling
+  - [special events annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) respect the decimal places setting
 * Fixes
   - fixes regression which broke the event picker in v2.4.2
   - fixes another issue with the multiple event button action processing ([Issue #504](../../../issues/504))
