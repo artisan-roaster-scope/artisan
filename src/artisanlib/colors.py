@@ -330,6 +330,8 @@ class graphColorDlg(ArtisanDialog):
         self.lcd6LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd7LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd7LEDButton.clicked.connect(self.paintlcdsSlot)
+        self.lcd8LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
+        self.lcd8LEDButton.clicked.connect(self.paintlcdsSlot)
         
         self.lcd1backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.lcd1backButton.clicked.connect(self.paintlcdsSlot)
@@ -345,6 +347,8 @@ class graphColorDlg(ArtisanDialog):
         self.lcd6backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd7backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.lcd7backButton.clicked.connect(self.paintlcdsSlot)
+        self.lcd8backButton = QPushButton(QApplication.translate("Button","Background",None))
+        self.lcd8backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd1LEDButton.setMinimumWidth(80)
         self.lcd2LEDButton.setMinimumWidth(80)
         self.lcd3LEDButton.setMinimumWidth(80)
@@ -352,6 +356,7 @@ class graphColorDlg(ArtisanDialog):
         self.lcd5LEDButton.setMinimumWidth(80)
         self.lcd6LEDButton.setMinimumWidth(80)
         self.lcd7LEDButton.setMinimumWidth(80)
+        self.lcd8LEDButton.setMinimumWidth(80)
 
         LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None))
         LCDdefaultButton.clicked.connect(self.setLCD_bw)
@@ -485,7 +490,8 @@ class graphColorDlg(ArtisanDialog):
         lcd7layout.addWidget(self.lcd7LEDButton,0)
         lcd7layout.addWidget(self.lcd7backButton,1)
         lcd8layout = QHBoxLayout()
-        lcd8layout.addStretch()
+        lcd8layout.addWidget(self.lcd8LEDButton,0)
+        lcd8layout.addWidget(self.lcd8backButton,1)
         LCD1GroupLayout = QGroupBox(QApplication.translate("GroupBox","Timer LCD",None))
         LCD1GroupLayout.setLayout(lcd1layout)
         lcd1layout.setContentsMargins(0,0,0,0)
@@ -507,7 +513,7 @@ class graphColorDlg(ArtisanDialog):
         LCD7GroupLayout = QGroupBox(QApplication.translate("GroupBox","Ramp/Soak Timer LCD",None))
         LCD7GroupLayout.setLayout(lcd7layout)
         lcd7layout.setContentsMargins(0,0,0,0)
-        LCD8GroupLayout = QGroupBox()
+        LCD8GroupLayout = QGroupBox(QApplication.translate("GroupBox","Slow Cooling Timer LCD",None))
         LCD8GroupLayout.setLayout(lcd8layout)
         lcd8layout.setContentsMargins(0,0,0,0)
 
@@ -709,6 +715,13 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"rstimer")
             if self.aw.largeLCDs_dialog:
                 self.aw.largeLCDs_dialog.updateStyles()
+        if lcdButton in [self.lcd8LEDButton,self.lcd8backButton]:
+            if lcdButton == self.lcd8backButton:
+                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,"slowcoolingtimer")
+            else:
+                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,"slowcoolingtimer")
+            if self.aw.largeLCDs_dialog:
+                self.aw.largeLCDs_dialog.updateStyles()
         self.setColorButtons()
 
     def setColorButtons(self):
@@ -779,6 +792,8 @@ class graphColorDlg(ArtisanDialog):
         self.lcd6LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['sv'] + "; color: " + self.aw.lcdpaletteF['sv'] + ";" + self.commonstyle)
         self.lcd7backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['rstimer'] + "; color: " + self.aw.lcdpaletteF['rstimer'] + ";" + self.commonstyle)
         self.lcd7LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['rstimer'] + "; color: " + self.aw.lcdpaletteF['rstimer'] + ";" + self.commonstyle)
+        self.lcd8backButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['slowcoolingtimer'] + "; color: " + self.aw.lcdpaletteF['slowcoolingtimer'] + ";" + self.commonstyle)
+        self.lcd8LEDButton.setStyleSheet("background-color: " + self.aw.lcdpaletteB['slowcoolingtimer'] + "; color: " + self.aw.lcdpaletteF['slowcoolingtimer'] + ";" + self.commonstyle)
             
         if str(self.aw.qmc.palette["canvas"]) == 'None':
 #            self.canvasLabel.setStyleSheet("QLabel { background-color: #f0f0f0 }")

@@ -6,7 +6,7 @@ v2.4.4 (xx.11.2020)
 ------------------
 
 * New Features
-  - adds machine setups for PLC equipped machines from Nordic, machines from Fabrica Roasters and MCR Series machines reporting in C
+  - adds machine setups for the [Coffee Tech FZ-94 R](https://www.coffee-tech.com/), PLC equipped machines from [Nordic](https://artisan-scope.org/machines/nordic/), [Fabrica Roasters](https://artisan-scope.org/machines/fabrica/) and [MCR Series in C](https://artisan-scope.org/machines/mcr/)
   - adds support for [Phidget HUM1001](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=1179)
   - adds [Rubase](https://rubasseroasters.com/) importer
   - adds [Aillio](https://aillio.com/) RoastWorld importer
@@ -16,9 +16,9 @@ v2.4.4 (xx.11.2020)
   - adds 3 Ramp/Soak templates
   - adds Qt base translations for Turkish, Dutch and Brazilian
   - adds _fetch full blocks_ option to instruct the S7 and MODBUS optimizer fetch maximal register blocks from lowest to largest register number
-  - adds Artisan Commands: `popup(m[,t])`, `message(s)`, `setCanvasColor(c)`, `resetCanvasColor`, `button(e)` with `e = { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }`, `p-i-d(p,i,d)`, `pidSV(v)`, `pidRS(n)`, `pidSource(n)`, `palette(n)`
+  - adds Artisan Commands: `popup(m[,t])`, `message(s)`, `setCanvasColor(c)`, `resetCanvasColor`, `button(e)` with `e = { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }`, `p-i-d(p,i,d)`, `pidSV(v)`, `pidRS(n)`, `pidSource(n)`, `palette(n)`, `loadBackground(<filepath>)`, `clearBackground`
 * Changes
-  - updates [Trinitas T2 and T7](https://artisan-scope.org/machines/trinitas/), [Typhoon](https://artisan-scope.org/machines/typhoon/), [Oztürk](https://artisan-scope.org/machines/ozturk/) and [Giesen](https://artisan-scope.org/machines/giesen/) machine setups
+  - updates [Trinitas T2 and T7](https://artisan-scope.org/machines/trinitas/), [Oztürk](https://artisan-scope.org/machines/ozturk/) and [Giesen](https://artisan-scope.org/machines/giesen/) machine setups
   - renames empty MODBUS decoder entry to Int
   - renames MODBUS IntFloat decoder to Int32 and adds implementation
   - interprets Software PID Ramp/Soak patterns w.r.t. time since PID ON in monitoring only mode

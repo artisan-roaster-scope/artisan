@@ -111,6 +111,8 @@ def content():
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','palette(<int>)',None),QApplication.translate('HelpDlg','activates palette <int>',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','playbackmode(<int>)',None),QApplication.translate('HelpDlg','sets playback mode to 0: off, 1: time, 2: BT, 3: ET',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','openProperties',None),QApplication.translate('HelpDlg','opens the Roast Properties dialog',None)])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','loadBackground(<filepath>)',None),QApplication.translate('HelpDlg','loads the .alog profile at the given filepath as background profile',None)])
+    tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','clearBackground',None),QApplication.translate('HelpDlg','clears the current background profile',None)])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','RC Command',None),QApplication.translate('HelpDlg','pulse(ch,min,max[,sn])',None),QApplication.translate('HelpDlg','for PHIDGET RC modules: sets the min/max pulse width in microseconds',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','pos(ch,min,max[,sn])',None),QApplication.translate('HelpDlg','for PHIDGET RC modules: sets the min/max position',None)])
     tbl_Commands.add_row(['&#160;',QApplication.translate('HelpDlg','engaged(ch,b[,sn])',None),QApplication.translate('HelpDlg','for PHIDGET RC modules: engage (b=1) or disengage (b = 0)',None)])

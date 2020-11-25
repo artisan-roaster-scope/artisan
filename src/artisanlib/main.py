@@ -3512,8 +3512,8 @@ class tgraphcanvas(FigureCanvas):
 
                     # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
                     if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6]:
-                        aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%('#147bb3',aw.lcdpaletteB["timer"]))
-                        aw.qmc.setTimerLargeLCDcolorSignal.emit('#147bb3',aw.lcdpaletteB["timer"])
+                        aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["slowcoolingtimer"],aw.lcdpaletteB["slowcoolingtimer"]))
+                        aw.qmc.setTimerLargeLCDcolorSignal.emit(aw.lcdpaletteF["slowcoolingtimer"],aw.lcdpaletteB["slowcoolingtimer"])
 
                     self.setLCDtime(ts)
             finally:
@@ -14383,6 +14383,8 @@ class ApplicationWindow(QMainWindow):
     setCanvasColorSignal = pyqtSignal(str)
     resetCanvasColorSignal = pyqtSignal()
     setbuttonsfromSignal = pyqtSignal(int)
+    loadBackgroundSignal = pyqtSignal(str)
+    clearBackgroundSignal = pyqtSignal()
 
     def __init__(self, parent = None):
 
@@ -14616,6 +14618,7 @@ class ApplicationWindow(QMainWindow):
             "deltabt":'#EBEBEB', #'black',
             "sv":'#F8F8F8', #'black'
             "rstimer":'#F8F8F8',
+            "slowcoolingtimer":'#F8F8F8',
             }
         self.lcdpaletteF = {
             "timer":'#262626',
@@ -14625,6 +14628,7 @@ class ApplicationWindow(QMainWindow):
             "deltabt":'#0A5C90', #'white',
             "sv":'#4C4C4C',
             "rstimer":'#187AB3',
+            "slowcoolingtimer":'#CC0D50',
             }
 
         #user defined event buttons
@@ -17215,7 +17219,8 @@ class ApplicationWindow(QMainWindow):
         self.setCanvasColorSignal.connect(self.setCanvasColor)
         self.resetCanvasColorSignal.connect(self.resetCanvasColor)
         self.setbuttonsfromSignal.connect(self.setbuttonsfrom)
-
+        self.loadBackgroundSignal.connect(self.loadbackgroundRedraw)
+        self.clearBackgroundSignal.connect(self.clearbackgroundRedraw)
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -18348,6 +18353,8 @@ class ApplicationWindow(QMainWindow):
         aw.lcdpaletteF["sv"] = "white"
         aw.lcdpaletteB["rstimer"] = "white"
         aw.lcdpaletteF["rstimer"] = "black"
+        aw.lcdpaletteB["slowcoolingtimer"] = "black"
+        aw.lcdpaletteF["slowcoolingtimer"] = "white"
         aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
         aw.lcd2.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         aw.lcd3.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
@@ -21381,6 +21388,20 @@ class ApplicationWindow(QMainWindow):
                                     self.setbuttonsfromSignal.emit(p)
                                 except:
                                     pass
+                            # loadBackground(<filepath>)
+                            elif cs.startswith("loadBackground(") and cs.endswith(")"):
+                                try:
+                                    fp = str(cs[len("loadBackground("):-1])
+                                    self.loadBackgroundSignal.emit(fp)
+                                except:
+                                    pass
+                            # clearBackground
+                            elif cs == "clearBackground":
+                                try:
+                                    self.clearBackgroundSignal.emit()
+                                except:
+                                    pass
+                
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds
@@ -23600,6 +23621,29 @@ class ApplicationWindow(QMainWindow):
                 return False
         else:
             return False
+    
+    @pyqtSlot()
+    def clearbackgroundRedraw(self):
+        self.deleteBackground()
+        self.qmc.redraw()
+
+    @pyqtSlot(str)
+    def loadbackgroundRedraw(self,filename):
+        if filename is None or len(filename) == 0:
+            return
+        try:
+            filename = os.path.expanduser(filename) # expand users home directory abbreviation
+        except:
+            pass
+        if os.path.isfile(filename):
+            try:
+                self.sendmessage(QApplication.translate("Message","Reading background profile...",None))
+                self.qmc.resetlinecountcaches()
+                self.loadbackground(filename)
+                self.qmc.background = True
+                self.qmc.timealign(redraw=True)
+            except:
+                self.deleteBackground() # delete a loaded background if any
 
     # Loads background profile
     def loadbackground(self,filename):
@@ -32783,6 +32827,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.AUCbackground = -1
         self.qmc.l_background_annotations = []
         self.qmc.analysisresultsstr = ""
+        self.qmc.resetlinecountcaches()
 
     @pyqtSlot()
     @pyqtSlot(bool)
