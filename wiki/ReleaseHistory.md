@@ -32,9 +32,10 @@ v2.4.4 (xx.11.2020)
   - extends ranking reports by additional attributes (Excel, CSV)
   - extends the Cropster XLS importer to work also with exports done in languages others than English
   - [artisan.plus](https://artisan.plus/): optimized synchronization
+  - improved S7 serial logging and communication error handling
 * Fixes
   - fixes regression which broke the event picker in v2.4.2
-  - fixes another issue with the multiple event button action processing (Issue 504)
+  - fixes another issue with the multiple event button action processing ([Issue #504](../../../issues/504))
   - fixes wrong temperature and delta curve alignment in Comparator after redraw
   - fixes further Hottop 2k+ communication on macOS 10.15.7 (adding to [Issue #475](../../../issues/475))
   - fixes Loring setup to ensure valid burner readings on all machines
@@ -44,7 +45,6 @@ v2.4.4 (xx.11.2020)
   - fixes Phidget async sampling modes that could take readings beyond the current sampling interval on communication drops
   - corrects alarm nr in roast properties table
   - fixes Excel export issue occuring with DeltaBT turned off
-  - improved S7 serial logging and communication error handling
 
 **Note**
 _This is the latest version supporting Raspbian Stretch_
