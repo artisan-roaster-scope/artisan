@@ -7953,8 +7953,8 @@ class tgraphcanvas(FigureCanvas):
             # Caution - the event field "E" is position dependent and must be the first entry in the fields list
             fields = [
                 ("E", str(aw.qmc.eventsInternal2ExternalValue(e))),
-                ("Y1", str(aw.float2float(y1,0))),
-                ("Y2", str(aw.float2float(y2,0))),
+                ("Y1", str(aw.float2float(y1,aw.qmc.LCDdecimalplaces))),
+                ("Y2", str(aw.float2float(y2,aw.qmc.LCDdecimalplaces))),
                 ("descr", str(descr)),
                 ("type", str(etype)),
                 ("sldrunit", str(sliderunit)),
