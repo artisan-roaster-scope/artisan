@@ -73,7 +73,7 @@ Artisan is an open-source software that helps coffee roasters record, analyze, a
 
 [Donate](/donate/){: .btn .btn--success .btn--large} &emsp;
 [Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large}{:target="_blank"}
-&emsp; [Documentation](/docs/quick-start-guide/){: .btn .btn--success .btn--large}
+&emsp; [Quick Start Guide](/docs/quick-start-guide/){: .btn .btn--success .btn--large}
 &emsp; [Blog](https://artisan-roasterscope.blogspot.com/){: .btn .btn--success .btn--large}{:target="_blank"}
 
 [All Releases](https://github.com/artisan-roaster-scope/artisan/releases){:target="_blank"} &emsp; [Version History](https://github.com/artisan-roaster-scope/artisan#version_history){:target="_blank"}
@@ -91,6 +91,7 @@ There are also experimental builds for the Raspberry Pi platform (stretch & bust
 
 ## Notable Features
 
+- we believe in [Open-Source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}, check out [our code](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute
 - seemless integration into the [artisan.plus](https://artisan.plus){:target="_blank"} inventory management service
 - extensive [machine](/machines/) and [device](/devices/) support including control
 - unlimited number of curves
@@ -121,7 +122,7 @@ __Michael Herbert__ –– documentation & testing
 
 __Brett Pound__ –– support
 
-__Dario Ernst__ –– mailing list hosting
+__Dario Ernst__ –– [mailing list](https://lists.einfachkaffee.de/postorius/lists/artisan-user.lists.einfachkaffee.de/){:target="_blank"} hosting
 
 We are always looking for people that support us here and there. Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
 
