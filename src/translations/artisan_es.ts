@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="es" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="es">
 <context>
     <name>About</name>
     <message>
@@ -747,7 +748,7 @@ END</source>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1141"/>
         <source>Read PID Values</source>
-        <translation type="unfinished">Leer valores PID </translation>
+        <translation type="unfinished">Leer valores PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3853"/>
@@ -3626,7 +3627,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/comm.py" line="2211"/>
         <source>HH506RAtemperature(): Unable to get id from HH506RA device </source>
-        <translation type="unfinished">HH506RAtemperature():No se pudo conseguir la identificacion del dispositivo HH506RA</translation>
+        <translation type="unfinished">HH506RAtemperature():No se pudo conseguir la identificacion del dispositivo HH506RA </translation>
     </message>
     <message>
         <location filename="../artisanlib/comm.py" line="2238"/>
@@ -7944,7 +7945,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
 </source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/eventsliders_help.py" line="31"/>
         <source>Note: commands can be sequenced, separated by semicolons like in “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
 </source>
@@ -8038,7 +8039,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
 &quot;~batchprefix~batchnum (~batchposition)&quot;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/autosave_help.py" line="21"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
 From Roast&gt;Properties&gt;Beans</source>
@@ -8049,7 +8050,7 @@ From Roast&gt;Properties&gt;Beans</source>
         <source>From Roast&gt;Properties&gt;Weight Roasted</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/autosave_help.py" line="42"/>
         <source>Calculated weight loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
         <translation type="unfinished"></translation>
@@ -8069,7 +8070,7 @@ From Roast&gt;Properties&gt;Beans</source>
         <source>From Roast&gt;Properties&gt;Density Roasted</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/autosave_help.py" line="50"/>
         <source>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
         <translation type="unfinished"></translation>
@@ -8079,7 +8080,7 @@ From Roast&gt;Properties&gt;Beans</source>
         <source>From Roast&gt;Properties&gt;Moisture Roasted</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/autosave_help.py" line="53"/>
         <source>Calculated moisture loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
         <translation type="unfinished"></translation>
@@ -8184,7 +8185,7 @@ From Roast&gt;Properties&gt;Beans</source>
         <source>From the Profile - DROP time in min_secs</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/autosave_help.py" line="77"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.
 From Roast&gt;Properties&gt;Roasting Notes</source>
@@ -8195,7 +8196,7 @@ From Roast&gt;Properties&gt;Roasting Notes</source>
         <source>The entire first line From Roast&gt;Properties&gt;Roasting Notes</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/autosave_help.py" line="79"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.
 From Roast&gt;Properties&gt;Cupping Notes</source>
@@ -8221,7 +8222,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <source>u0027Recording ~batchcounter&amp;#39; &quot;~batch&quot; ~title ~datetime_long</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/eventbuttons_help.py" line="96"/>
         <source>sets calling button to “pressed” if argument is 1 or True</source>
         <translation type="unfinished"></translation>
@@ -8336,7 +8337,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <source>send(&lt;json&gt;)</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/eventsliders_help.py" line="126"/>
         <source>If {} substitutions are used, json brackets need to be duplicated to escape them like in send({{ “value”: {}}})</source>
         <translation type="unfinished"></translation>
@@ -8442,7 +8443,7 @@ Field is hidden when the RoR value is not available.</source>
         <source>reads register from slave slaveID using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../help/eventsliders_help.py" line="128"/>
         <source>sets calling button to “pressed” if argument evaluates to 1 or True</source>
         <translation type="unfinished"></translation>
@@ -12253,7 +12254,7 @@ No existe [CARGA] or [DESCAR] en el perfil</translation>
     <message>
         <location filename="../artisanlib/devices.py" line="2036"/>
         <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port</source>
-        <translation type="unfinished">Dispositivo seleccionado CENTER 305, que es equivalente a CENTER 306. Ahora elije puerto serial </translation>
+        <translation type="unfinished">Dispositivo seleccionado CENTER 305, que es equivalente a CENTER 306. Ahora elije puerto serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2090"/>
@@ -12429,7 +12430,7 @@ Repite operacion al final: {0}</translation>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3615"/>
         <source>Ramp/Soak was found ON! Turn it off before changing the pattern</source>
-        <translation type="unfinished">Ramp/Soak encontrado Encendido. Se necesita apagar para cambiar el modo </translation>
+        <translation type="unfinished">Ramp/Soak encontrado Encendido. Se necesita apagar para cambiar el modo</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3617"/>
@@ -14044,7 +14045,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3588"/>
         <source>RampSoak could not be changed</source>
-        <translation type="unfinished">No se pudo cambiar RampSoak </translation>
+        <translation type="unfinished">No se pudo cambiar RampSoak</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="46537"/>
@@ -14064,7 +14065,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3660"/>
         <source>Finished reading Ramp/Soak val.</source>
-        <translation type="unfinished">Terminado leyendo valores RampSoak</translation>
+        <translation type="unfinished">Terminado leyendo valores RampSoak.</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1757"/>
@@ -14219,12 +14220,12 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="957"/>
         <source>Thermocouple type successfully set</source>
-        <translation type="unfinished">Tipo de Thermocouple cambiado a </translation>
+        <translation type="unfinished">Tipo de Thermocouple cambiado a</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="960"/>
         <source>Problem setting thermocouple type</source>
-        <translation type="unfinished">Problema cambiando tipo de thermocouple </translation>
+        <translation type="unfinished">Problema cambiando tipo de thermocouple</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2665"/>
@@ -15415,7 +15416,7 @@ Cercana: valor y del punto cercano</translation>
     <message>
         <location filename="../artisanlib/wheels.py" line="104"/>
         <source>Rotate graph 1 degree clockwise</source>
-        <translation type="unfinished">Gira la grafica 1 grado </translation>
+        <translation type="unfinished">Gira la grafica 1 grado</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="111"/>

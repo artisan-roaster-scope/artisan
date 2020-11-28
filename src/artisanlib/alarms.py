@@ -31,10 +31,10 @@ from PyQt5.QtCore import (Qt, pyqtSlot, QSettings)#, QRegularExpression)
 from PyQt5.QtGui import QColor, QIntValidator#, QRegularExpressionValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QHBoxLayout, QVBoxLayout, QCheckBox, QPushButton, QSizePolicy, QSpinBox,
-            QTableWidgetSelectionRange, QTimeEdit)
+            QTableWidgetSelectionRange, QTimeEdit, QTabWidget, QGridLayout, QGroupBox)
 
 class AlarmDlg(ArtisanResizeablDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent = None, aw = None, activeTab = 0):
         super(AlarmDlg,self).__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Alarms",None))
@@ -110,16 +110,18 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.popupTimoutSpinBox.setRange(0,120)
         self.popupTimoutSpinBox.setAlignment(Qt.AlignRight)
         self.popupTimoutSpinBox.setValue(self.aw.qmc.alarm_popup_timout)
-        popupTimeoutLabel = QLabel(QApplication.translate("Label", "PopUp TimeOut",None))
+        popupTimeoutLabel = QLabel(QApplication.translate("Label", "Pop Up Timeout",None))
         
+        alarmLabelLabel = QLabel(QApplication.translate("Label", "Label",None))
+        self.alarmLabelEdit = QLineEdit(self.aw.qmc.alarmsetlabel)
+                
         self.alarmsfile = QLabel(self.aw.qmc.alarmsfile)
-        self.alarmsfile.setAlignment(Qt.AlignRight)
+        self.alarmsfile.setAlignment(Qt.AlignLeft)
         self.alarmsfile.setMinimumWidth(300)
         self.alarmsfile.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Preferred)
         tablelayout = QVBoxLayout()
         buttonlayout = QHBoxLayout()
         okbuttonlayout = QHBoxLayout()
-        mainlayout = QVBoxLayout()
         tablelayout.addWidget(self.alarmtable)
         buttonlayout.addWidget(addButton)
         buttonlayout.addWidget(self.insertButton)
@@ -139,21 +141,167 @@ class AlarmDlg(ArtisanResizeablDialog):
         buttonlayout.addStretch()
         buttonlayout.addSpacing(15)
         buttonlayout.addWidget(helpButton)
-        okbuttonlayout.addWidget(self.loadAlarmsFromProfile)
-        okbuttonlayout.addSpacing(10)
-        okbuttonlayout.addWidget(self.loadAlarmsFromBackground)
-        okbuttonlayout.addSpacing(15)
-        okbuttonlayout.addWidget(popupTimeoutLabel)
-        okbuttonlayout.addWidget(self.popupTimoutSpinBox)
+        confButtonLayout = QHBoxLayout()
+        confButtonLayout.addWidget(self.loadAlarmsFromProfile)
+        confButtonLayout.addSpacing(10)
+        confButtonLayout.addWidget(self.loadAlarmsFromBackground)
+        confButtonLayout.addSpacing(25)
+        confButtonLayout.addWidget(popupTimeoutLabel)
+        confButtonLayout.addWidget(self.popupTimoutSpinBox)
+        confButtonLayout.addSpacing(25)
+        confButtonLayout.addWidget(alarmLabelLabel)
+        confButtonLayout.addWidget(self.alarmLabelEdit)
+        
+        okbuttonlayout.addSpacing(5)
         okbuttonlayout.addWidget(self.alarmsfile)
-        okbuttonlayout.addSpacing(15)
         okbuttonlayout.addWidget(self.dialogbuttons)
-        mainlayout.addLayout(tablelayout)
-        mainlayout.addLayout(buttonlayout)
+        
+        ## alarm sets
+        transferalarmsetbutton = QPushButton(QApplication.translate("Button","<< Store Alarm Set", None))
+        transferalarmsetbutton.setFocusPolicy(Qt.NoFocus)
+        setalarmsetbutton = QPushButton(QApplication.translate("Button","Activate Alarm Set >>", None))
+        setalarmsetbutton.setFocusPolicy(Qt.NoFocus)
+        transferalarmesetcurrentLabel = QLabel(QApplication.translate("Label","current:", None))
+        self.transferalarmesetcurrentset = QLineEdit(self.aw.qmc.alarmsetlabel)
+        self.transferalarmsetcombobox = QComboBox()
+        self.transferalarmsetcombobox.setFocusPolicy(Qt.NoFocus)
+        # next line needed to avoid truncation of entries on Mac OS X under Qt 5.12.1-5.12.3
+        # https://bugreports.qt.io/browse/QTBUG-73653
+        self.transferalarmsetcombobox.setMinimumWidth(120)
+        
+        self.setAlarmSetLabels()
+        
+        transferalarmsetbutton.clicked.connect(self.setAlarmSet)        
+        setalarmsetbutton.clicked.connect(self.setAlarmTable)
+
+#        backupbutton = QPushButton(QApplication.translate("Button","Save", None))
+#        backupbutton.setFocusPolicy(Qt.NoFocus)
+#        restorebutton = QPushButton(QApplication.translate("Button","Load", None))
+#        restorebutton.setFocusPolicy(Qt.NoFocus)
+#        backupbutton.setToolTip(QApplication.translate("Tooltip","Backup all alarm sets to a text file",None))
+#        restorebutton.setToolTip(QApplication.translate("Tooltip","Restore all alarm sets from a text file",None))
+#        backupbutton.setMaximumWidth(140)
+#        restorebutton.setMaximumWidth(140)
+#        
+#        backupbutton.clicked.connect(self.backupalarmsets)
+#        restorebutton.clicked.connect(self.restorealarmsets)
+                    
+        alarmsetGrid = QGridLayout()
+        alarmsetGrid.addWidget(transferalarmsetbutton,0,1)
+        alarmsetGrid.addWidget(self.transferalarmsetcombobox,1,0)
+        alarmsetGrid.addWidget(transferalarmesetcurrentLabel,1,2)
+        alarmsetGrid.addWidget(self.transferalarmesetcurrentset,1,3)
+        alarmsetGrid.addWidget(setalarmsetbutton,2,1)
+        alarmsetBox = QHBoxLayout()
+        alarmsetBox.addSpacing(30)
+        alarmsetBox.addLayout(alarmsetGrid)
+        alarmsetBox.addStretch()
+        alarmsetManagementBox = QVBoxLayout()
+        alarmsetManagementBox.addLayout(alarmsetBox)
+        alarmsetGroupLayout = QGroupBox(QApplication.translate("GroupBox","Management",None))
+        alarmsetGroupLayout.setLayout(alarmsetManagementBox)
+#        alarmsetButtons = QHBoxLayout()
+#        alarmsetButtons.addStretch()
+#        alarmsetButtons.addWidget(restorebutton)
+#        alarmsetButtons.addWidget(backupbutton)
+
+        #tab layout
+        self.TabWidget = QTabWidget()
+
+        tab1layout = QVBoxLayout()
+        tab1layout.addLayout(tablelayout)
+        tab1layout.addLayout(buttonlayout)
+        tab1layout.addLayout(confButtonLayout)
+        tab1layout.setSpacing(5)
+        tab1layout.setContentsMargins(2, 10, 2, 2)
+
+        C1Widget = QWidget()
+        C1Widget.setLayout(tab1layout)
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Alarm Table",None))
+        C1Widget.setContentsMargins(5, 0, 5, 0)
+        
+        tab2layout = QVBoxLayout()
+        tab2layout.addWidget(alarmsetGroupLayout)
+        
+        C2Widget = QWidget()
+        C2Widget.setLayout(tab2layout)
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Alarm Sets",None))
+        C2Widget.setContentsMargins(5, 0, 5, 0)
+        
+        self.TabWidget.setCurrentIndex(activeTab)
+        self.TabWidget.currentChanged.connect(self.tabSwitched)
+
+        mainlayout = QVBoxLayout()
+        mainlayout.setSpacing(5)
+        mainlayout.setContentsMargins(5, 15, 5, 5)
+        mainlayout.addWidget(self.TabWidget)
         mainlayout.addLayout(okbuttonlayout)
         self.setLayout(mainlayout)
         self.dialogbuttons.button(QDialogButtonBox.Ok).setFocus()
+
+    def setAlarmSetLabels(self):
+        alarmset_labels = []
+        for i in range(self.aw.qmc.alarmsets_count):
+            alarmset = self.aw.qmc.getAlarmSet(i)
+            if alarmset is not None:
+                alarmset_labels.append("{} {}".format(str(i),alarmset[0]))
+        self.transferalarmsetcombobox.clear()
+        self.transferalarmsetcombobox.addItems(alarmset_labels)
+        self.transferalarmsetcombobox.setCurrentIndex(-1)
+
+
+    # transfers the alarm table to the selected alarm set
+    @pyqtSlot(bool)
+    def setAlarmSet(self,_):
+        i = self.transferalarmsetcombobox.currentIndex()
+        if i >= 0 and i < len(self.aw.qmc.alarmsets):
+            self.aw.qmc.alarmsetlabel = self.transferalarmesetcurrentset.text()
+            self.transferalarmesetcurrentset.setText(self.aw.qmc.alarmsetlabel)
+            # we clear the alarmsfile as we overwrite here from an alarmset
+            self.aw.qmc.alarmsfile = ""
+            self.alarmsfile.setText(self.aw.qmc.alarmsfile)
+            self.aw.qmc.setAlarmSet(i,
+                self.aw.qmc.makeAlarmSet(
+                    self.aw.qmc.alarmsetlabel,
+                    self.aw.qmc.alarmflag[:],
+                    self.aw.qmc.alarmguard[:],
+                    self.aw.qmc.alarmnegguard[:],
+                    self.aw.qmc.alarmtime[:],
+                    self.aw.qmc.alarmoffset[:],
+                    self.aw.qmc.alarmsource[:],
+                    self.aw.qmc.alarmcond[:],
+                    self.aw.qmc.alarmtemperature[:],
+                    self.aw.qmc.alarmaction[:],
+                    self.aw.qmc.alarmbeep[:],
+                    self.aw.qmc.alarmstrings[:]))
+            self.setAlarmSetLabels()
     
+    # transfers the selected alarm set to the alarm table
+    @pyqtSlot(bool)
+    def setAlarmTable(self,_):
+        i = self.transferalarmsetcombobox.currentIndex()
+        if i >= 0 and i < len(self.aw.qmc.alarmsets):
+            self.aw.qmc.selectAlarmSet(i)
+            self.transferalarmesetcurrentset.setText(self.aw.qmc.alarmsetlabel)
+            self.transferalarmsetcombobox.setCurrentIndex(-1)
+    
+    @pyqtSlot(int)
+    def tabSwitched(self,i):
+        if i == 0:
+            # Alarm Table
+            self.aw.qmc.alarmsetlabel = self.transferalarmesetcurrentset.text()
+            self.alarmLabelEdit.setText(self.aw.qmc.alarmsetlabel)
+            self.createalarmtable()
+        elif i == 1:
+            # Alarm Sets
+            # save column widths
+            self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
+            # establish alarm table
+            self.savealarms()
+            # we update the current alarmset label
+            self.aw.qmc.alarmsetlabel = self.alarmLabelEdit.text()
+            self.transferalarmesetcurrentset.setText(self.aw.qmc.alarmsetlabel)
+
     @pyqtSlot()
     def selectionChanged(self):
         selected = self.alarmtable.selectedRanges()
@@ -187,6 +335,8 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.alarmtable.setSortingEnabled(False)
         self.alarmtable.setRowCount(0)
         self.alarmtable.setSortingEnabled(True)
+        self.aw.qmc.alarmsetlabel = ""
+        self.alarmLabelEdit.setText("")
 
     @pyqtSlot(bool)
     def alarmsAllOn(self,_):
@@ -534,15 +684,27 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
         
         self.aw.qmc.alarm_popup_timout = int(self.popupTimoutSpinBox.value())
+        self.aw.qmc.alarmsetlabel = self.alarmLabelEdit.text()
         self.closeHelp()
         settings = QSettings()
         #save window geometry
         settings.setValue("AlarmsGeometry",self.saveGeometry())
+        
+        self.aw.AlarmDlg_activeTab = self.TabWidget.currentIndex()
         self.accept()
     
     def closeEvent(self, _):
         self.closealarms()
 
+    @pyqtSlot(bool)
+    def restorealarmsets(self,_):
+        self.aw.restorealarmsets()
+        self.setAlarmSetLabels()
+    
+    @pyqtSlot(bool)
+    def backupalarmsets(self,_):
+        self.aw.backupalarmsets()
+    
     def savealarms(self):
         try:
             self.alarmtable.sortItems(0)
@@ -805,25 +967,24 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.alarmtable.verticalHeader().setSectionResizeMode(2)
             self.alarmtable.verticalHeader().setVisible(False)
             self.alarmtable.setSortingEnabled(False)
-            if nalarms:
-                self.alarmtable.setRowCount(nalarms)
-                #populate table
-                for i in range(nalarms):
-                    self.setalarmtablerow(i)
-                header = self.alarmtable.horizontalHeader()
-                header.setStretchLastSection(True)
-                self.alarmtable.resizeColumnsToContents()
-                # remember the columnwidth
-                for i in range(len(self.aw.qmc.alarmtablecolumnwidths)):
-                    try:
-                        w = self.aw.qmc.alarmtablecolumnwidths[i]
-                        if i == 6:
-                            w = max(80,w)
-                        self.alarmtable.setColumnWidth(i,w)
-                    except:
-                        pass
-                self.markNotEnabledAlarmRows()
-                self.alarmtable.setSortingEnabled(True)
+            self.alarmtable.setRowCount(nalarms)
+            #populate table
+            for i in range(nalarms):
+                self.setalarmtablerow(i)
+            header = self.alarmtable.horizontalHeader()
+            header.setStretchLastSection(True)
+            self.alarmtable.resizeColumnsToContents()
+            # remember the columnwidth
+            for i in range(len(self.aw.qmc.alarmtablecolumnwidths)):
+                try:
+                    w = self.aw.qmc.alarmtablecolumnwidths[i]
+                    if i == 6:
+                        w = max(80,w)
+                    self.alarmtable.setColumnWidth(i,w)
+                except:
+                    pass
+            self.markNotEnabledAlarmRows()
+            self.alarmtable.setSortingEnabled(True)
             self.alarmtable.sortItems(0)
             
         except Exception as ex:

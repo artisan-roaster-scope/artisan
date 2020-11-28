@@ -28,7 +28,7 @@ from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, 
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit,
     QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox,
-    QTimeEdit, QLayout)
+    QTimeEdit, QLayout, QSizePolicy)
 
 
 ############################################################################
@@ -340,13 +340,24 @@ class PID_DlgControl(ArtisanDialog):
 
         tab1Layout.addLayout(pidBox)
         tab1Layout.addLayout(svBox)
-        tab1Layout.addWidget(self.startPIDonCHARGE)
         tab1Layout.addStretch()
-        
+        tab1Layout.addWidget(self.startPIDonCHARGE)
+
+        labelLabel = QLabel(QApplication.translate("Label", "Label",None))
+        self.labelEdit = QLineEdit() 
+
+        labelRow = QHBoxLayout()
+        labelRow.addStretch()
+        labelRow.addWidget(labelLabel)
+        labelRow.addWidget(self.labelEdit)
+        labelRow.addStretch()
         
         # Ramp/Soak tab
-        tab2Layout = QVBoxLayout()
         tab2InnerLayout = QHBoxLayout()
+        tab2Layout = QVBoxLayout()
+        tab2Layout.addSpacing(10)
+        tab2Layout.addLayout(labelRow)
+        tab2Layout.addSpacing(15)
         tab2Layout.addLayout(tab2InnerLayout)
         rsGrid = QGridLayout()
         self.SVWidgets = []
@@ -444,13 +455,17 @@ class PID_DlgControl(ArtisanDialog):
         exportButton.setMinimumWidth(80)
         exportButton.setFocusPolicy(Qt.NoFocus)
         exportButton.clicked.connect(self.exportrampsoaks)
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(importButton)
-        buttonLayout.addWidget(exportButton)
-        buttonLayout.addStretch()
-        self.loadRampSoakFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load Ramp/Soak table from profile",None))
+        self.loadRampSoakFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile",None))
         self.loadRampSoakFromProfile.setChecked(self.aw.pidcontrol.loadRampSoakFromProfile)
+        self.loadRampSoakFromProfile.setFocusPolicy(Qt.NoFocus)
+        self.loadRampSoakFromBackground = QCheckBox(QApplication.translate("CheckBox", "Load from background",None))
+        self.loadRampSoakFromBackground.setChecked(self.aw.pidcontrol.loadRampSoakFromBackground)
+        self.loadRampSoakFromBackground.setFocusPolicy(Qt.NoFocus)
+        
+        self.rsfile = QLabel(self.aw.qmc.rsfile)
+        self.rsfile.setAlignment(Qt.AlignLeft)
+        self.rsfile.setMinimumWidth(300)
+        self.rsfile.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Preferred)
         
         tab2InnerLayout.addStretch()
         tab2InnerLayout.addLayout(rsGrid)
@@ -460,11 +475,15 @@ class PID_DlgControl(ArtisanDialog):
         okButton.clicked.connect(self.okAction)
         onButton = QPushButton(QApplication.translate("Button","On",None))
         onButton.clicked.connect(self.pidONAction)
+        onButton.setFocusPolicy(Qt.NoFocus)
         offButton = QPushButton(QApplication.translate("Button","Off",None))
         offButton.clicked.connect(self.pidOFFAction)
+        offButton.setFocusPolicy(Qt.NoFocus)
         okButtonLayout = QHBoxLayout()
         okButtonLayout.addWidget(onButton)
         okButtonLayout.addWidget(offButton)
+        okButtonLayout.addStretch()
+        okButtonLayout.addWidget(self.rsfile)
         okButtonLayout.addStretch()
         okButtonLayout.addWidget(okButton)        
         okButtonLayout.setContentsMargins(0,0,0,0)
@@ -483,6 +502,7 @@ class PID_DlgControl(ArtisanDialog):
         ############################
         
         # RSn tabs
+        self.RSnTab_LabelWidgets = []
         self.RSnTab_SVWidgets = []
         self.RSnTab_RampWidgets = []
         self.RSnTab_SoakWidgets = []
@@ -510,8 +530,10 @@ class PID_DlgControl(ArtisanDialog):
             ActionWidgets = []
             BeepWidgets = []
             DescriptionWidgets = []
+            labelLabel = QLabel(QApplication.translate("Label", "Label",None))
+            labelEdit = QLineEdit() 
             for i in range(self.aw.pidcontrol.svLen):
-                n = i+1
+                n = i+1              
                 svwidget = QSpinBox()
                 svwidget.setAlignment(Qt.AlignRight)
                 svwidget.setRange(0,999)
@@ -557,6 +579,7 @@ class PID_DlgControl(ArtisanDialog):
                 RSnGrid.addWidget(ActionWidgets[i],n,4)
                 RSnGrid.addWidget(BeepWidgets[i],n,5)
                 RSnGrid.addWidget(DescriptionWidgets[i],n,6)
+            self.RSnTab_LabelWidgets.append(labelEdit)
             self.RSnTab_SVWidgets.append(SVWidgets)
             self.RSnTab_RampWidgets.append(RampWidgets)
             self.RSnTab_SoakWidgets.append(SoakWidgets)
@@ -565,10 +588,18 @@ class PID_DlgControl(ArtisanDialog):
             self.RSnTab_DescriptionWidgets.append(DescriptionWidgets)
             # create tab
             RSnTabLayout = QVBoxLayout()
+            RSnLabelLayout = QHBoxLayout()
+            RSnLabelLayout.addStretch()
+            RSnLabelLayout.addWidget(labelLabel)
+            RSnLabelLayout.addWidget(labelEdit)
+            RSnLabelLayout.addStretch()
             RSnTabInnerLayout = QHBoxLayout()
             RSnTabInnerLayout.addStretch()
             RSnTabInnerLayout.addLayout(RSnGrid)
             RSnTabInnerLayout.addStretch()
+            RSnTabLayout.addSpacing(10)
+            RSnTabLayout.addLayout(RSnLabelLayout)
+            RSnTabLayout.addSpacing(15)
             RSnTabLayout.addLayout(RSnTabInnerLayout)
             RSnTabLayout.addStretch()
             RSnTabLayout.setContentsMargins(10,10,10,10)
@@ -585,11 +616,27 @@ class PID_DlgControl(ArtisanDialog):
             RSbuttonLayout.addWidget(setRSnButton)
         RSbuttonLayout.addStretch()
         
+        flagsLayout = QHBoxLayout()
+        flagsLayout.addStretch()
+        flagsLayout.addWidget(self.loadRampSoakFromProfile)
+        flagsLayout.addSpacing(15)
+        flagsLayout.addWidget(self.loadRampSoakFromBackground)
+        flagsLayout.addStretch()
+        
+            
+            
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(importButton)
+        buttonLayout.addWidget(exportButton)
         if self.aw.pidcontrol.RSLen > 0:
-            tab2Layout.addLayout(RSbuttonLayout)
+            buttonLayout.addSpacing(25)
+            buttonLayout.addLayout(RSbuttonLayout)
+        buttonLayout.addStretch()
+        
         tab2Layout.addLayout(buttonLayout)
         tab2Layout.addStretch()
-        tab2Layout.addWidget(self.loadRampSoakFromProfile)
+        tab2Layout.addLayout(flagsLayout)
         
         
         self.tabWidget.setCurrentIndex(activeTab)
@@ -657,6 +704,7 @@ class PID_DlgControl(ArtisanDialog):
     def setRS(self,_):
         try:
             n = self.RSnButtons.index(self.sender())
+            self.aw.pidcontrol.svLabel = self.getRSnSVLabel(n)
             self.aw.pidcontrol.svValues = self.getRSnSVvalues(n)
             self.aw.pidcontrol.svRamps = self.getRSnSVramps(n)
             self.aw.pidcontrol.svSoaks = self.getRSnSVsoaks(n)
@@ -664,9 +712,13 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.svBeeps = self.getRSnSVbeeps(n)
             self.aw.pidcontrol.svDescriptions = self.getRSnSVdescriptions(n)
             self.setrampsoaks()
+            self.aw.pidcontrol.rsfile = ""
+            self.rsfile.setText(self.aw.pidcontrol.rsfile)
         except:
             pass
 
+    def getRSnSVLabel(self,n):
+        return self.RSnTab_LabelWidgets[n].text()
     def getRSnSVvalues(self,n):
         return [w.value() for w in self.RSnTab_SVWidgets[n]]
     def getRSnSVramps(self,n):
@@ -680,6 +732,8 @@ class PID_DlgControl(ArtisanDialog):
     def getRSnSVdescriptions(self,n):
         return [w.text() for w in self.RSnTab_DescriptionWidgets[n]]
 
+    def setRSnSVLabel(self,n):
+        self.RSnTab_LabelWidgets[n].setText(self.aw.pidcontrol.RS_svLabels[n])
     def setRSnSVvalues(self,n):
         for i in range(self.aw.pidcontrol.svLen):
             self.RSnTab_SVWidgets[n][i].setValue(self.aw.pidcontrol.RS_svValues[n][i])
@@ -710,6 +764,10 @@ class PID_DlgControl(ArtisanDialog):
             from json import load as json_load
             rampsoaks = json_load(infile)
             infile.close()
+            if "svLabel" in rampsoaks:
+                self.aw.pidcontrol.svLabel = rampsoaks["svLabel"]
+            else:
+                self.aw.pidcontrol.svLabel = ""
             self.aw.pidcontrol.svValues = rampsoaks["svValues"]
             self.aw.pidcontrol.svRamps = rampsoaks["svRamps"]
             self.aw.pidcontrol.svSoaks = rampsoaks["svSoaks"]
@@ -717,6 +775,8 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.svBeeps = rampsoaks["svBeeps"]
             self.aw.pidcontrol.svDescriptions = rampsoaks["svDescriptions"]
             self.setrampsoaks()
+            self.aw.qmc.rsfile = filename
+            self.rsfile.setText(self.aw.qmc.rsfile)            
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -731,6 +791,7 @@ class PID_DlgControl(ArtisanDialog):
         try:
             self.saverampsoaks()
             rampsoaks = {}
+            rampsoaks["svLabel"] = self.aw.pidcontrol.svLabel
             rampsoaks["svValues"] = self.aw.pidcontrol.svValues
             rampsoaks["svRamps"] = self.aw.pidcontrol.svRamps
             rampsoaks["svSoaks"] = self.aw.pidcontrol.svSoaks
@@ -743,6 +804,8 @@ class PID_DlgControl(ArtisanDialog):
             json_dump(rampsoaks, outfile, ensure_ascii=True)
             outfile.write('\n')
             outfile.close()
+            self.aw.qmc.rsfile = filename
+            self.rsfile.setText(self.aw.qmc.rsfile) 
             return True
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -750,6 +813,7 @@ class PID_DlgControl(ArtisanDialog):
             return False
             
     def saverampsoaks(self):
+        self.aw.pidcontrol.svLabel = self.labelEdit.text()
         for i in range(self.aw.pidcontrol.svLen):
             self.aw.pidcontrol.svValues[i] = self.SVWidgets[i].value()
             self.aw.pidcontrol.svRamps[i] = self.aw.QTime2time(self.RampWidgets[i].time())
@@ -760,6 +824,7 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.svDescriptions[i] = self.DescriptionWidgets[i].text()
             
     def setrampsoaks(self):
+        self.labelEdit.setText(self.aw.pidcontrol.svLabel)
         for i in range(self.aw.pidcontrol.svLen):
             self.SVWidgets[i].setValue(self.aw.pidcontrol.svValues[i])
             self.RampWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svRamps[i]))
@@ -773,6 +838,7 @@ class PID_DlgControl(ArtisanDialog):
             self.DescriptionWidgets[i].setText(self.aw.pidcontrol.svDescriptions[i])
 
     def saveRSs(self):
+        self.aw.pidcontrol.RS_svLabels = []
         self.aw.pidcontrol.RS_svValues = []
         self.aw.pidcontrol.RS_svRamps = []
         self.aw.pidcontrol.RS_svSoaks = []
@@ -780,6 +846,7 @@ class PID_DlgControl(ArtisanDialog):
         self.aw.pidcontrol.RS_svBeeps = []
         self.aw.pidcontrol.RS_svDescriptions = []
         for n in range(self.aw.pidcontrol.RSLen):
+            self.aw.pidcontrol.RS_svLabels.append(self.getRSnSVLabel(n))
             self.aw.pidcontrol.RS_svValues.append(self.getRSnSVvalues(n))
             self.aw.pidcontrol.RS_svRamps.append(self.getRSnSVramps(n))
             self.aw.pidcontrol.RS_svSoaks.append(self.getRSnSVsoaks(n))
@@ -789,6 +856,7 @@ class PID_DlgControl(ArtisanDialog):
 
     def setRSs(self):
         for n in range(self.aw.pidcontrol.RSLen):
+            self.setRSnSVLabel(n)
             self.setRSnSVvalues(n)
             self.setRSnSVramps(n)
             self.setRSnSVsoaks(n)
@@ -831,6 +899,7 @@ class PID_DlgControl(ArtisanDialog):
         #
         self.aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
         self.aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
+        self.aw.pidcontrol.loadRampSoakFromBackground = self.loadRampSoakFromBackground.isChecked()
         self.aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         self.aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         self.aw.pidcontrol.svValue = self.pidSV.value()

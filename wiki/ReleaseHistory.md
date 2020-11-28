@@ -14,9 +14,11 @@ v2.4.4 (xx.11.2020)
   - adds flag to toggle polyfit RoR calculation
   - adds PID Ramp/Soak pattern actions
   - adds 3 Ramp/Soak templates
+  - adds option to load Ramp/Soak patterns from background profile
+  - adds labeled alarm sets
   - adds Qt base translations for Turkish, Dutch and Brazilian
   - adds _fetch full blocks_ option to instruct the S7 and MODBUS optimizer fetch maximal register blocks from lowest to largest register number
-  - adds Artisan Commands: `popup(m[,t])`, `message(s)`, `setCanvasColor(c)`, `resetCanvasColor`, `button(e)` with `e = { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }`, `p-i-d(p,i,d)`, `pidSV(v)`, `pidRS(n)`, `pidSource(n)`, `palette(n)`, `loadBackground(<filepath>)`, `clearBackground`
+  - adds Artisan Commands: `popup(m[,t])`, `message(s)`, `setCanvasColor(c)`, `resetCanvasColor`, `button(e)` with `e = { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }`, `p-i-d(p,i,d)`, `pidSV(v)`, `pidRS(n)`, `pidSource(n)`, `palette(n)`, `loadBackground(<filepath>)`, `clearBackground`, `alarmset`
 * Changes
   - updates [Trinitas T2 and T7](https://artisan-scope.org/machines/trinitas/), [Oztürk](https://artisan-scope.org/machines/ozturk/) and [Giesen](https://artisan-scope.org/machines/giesen/) machine setups
   - renames empty MODBUS decoder entry to Int

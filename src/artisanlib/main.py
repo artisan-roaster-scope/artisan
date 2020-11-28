@@ -681,6 +681,7 @@ class tgraphcanvas(FigureCanvas):
     toggleMonitorSignal = pyqtSignal()
     toggleRecorderSignal = pyqtSignal()
     processAlarmSignal = pyqtSignal(int,bool,int,str)
+    alarmsetSignal = pyqtSignal(int)
 
     def __init__(self,parent,dpi):
 
@@ -1768,6 +1769,7 @@ class tgraphcanvas(FigureCanvas):
         self.ETBdeltamarkersize = self.markersize_default
 
         #Temperature Alarms lists. Data is written in  alarmDlg
+        self.alarmsetlabel = ""
         self.alarmflag = []    # 0 = OFF; 1 = ON flags
         self.alarmguard = []   # points to another alarm by index that has to be triggered before; -1 indicates no guard
         self.alarmnegguard = []   # points to another alarm by index that should not has been triggered before; -1 indicates no guard
@@ -1796,12 +1798,33 @@ class tgraphcanvas(FigureCanvas):
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program (comments after # are ignored)
         self.alarmtablecolumnwidths = []
         self.silent_alarms = False # if this is true (can be set via a Artisan Command button action "alarm(1)", alarms are triggered, but actions are not fired
+        
+        # alarm sets
+        self.alarmsets_count = 10 # number of alarm sets
+        self.alarmsets = []
+        for _ in range(self.alarmsets_count):
+            self.alarmsets.append([
+                "",
+                [], # alarmflags
+                [], # alarmguards
+                [], # alarmnegguards
+                [], # alarmtimes
+                [], # alarmoffsets
+                [], # alarmsources
+                [], # alarmconds
+                [], # alarmtemperatures
+                [], # alarmactions
+                [], # alarmbeeps
+                [], # alarmstrings
+            ])
 
         self.loadalarmsfromprofile = False # if set, alarms are loaded from profile
         self.loadalarmsfrombackground = False # if set, alarms are loaded from background profiles
         self.alarmsfile = "" # filename alarms were loaded from
         self.temporaryalarmflag = -3 #holds temporary index value of triggered alarm in updategraphics()
         self.TPalarmtimeindex = None # is set to the current  aw.qmc.timeindex by sample(), if alarms are defined and once the TP is detected
+
+        self.rsfile = "" # filename Ramp/Soak patterns were loaded from
 
         self.tempory_sample_trigger_redraw = False
 
@@ -2083,6 +2106,7 @@ class tgraphcanvas(FigureCanvas):
         self.seriallogsemaphore = QSemaphore(1)
         self.eventactionsemaphore = QSemaphore(1)
         self.updateBackgroundSemaphore = QSemaphore(1)
+        self.alarmSemaphore = QSemaphore(1)
 
         #flag to plot cross lines from mouse
         self.crossmarker = False
@@ -2257,6 +2281,7 @@ class tgraphcanvas(FigureCanvas):
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
         self.processAlarmSignal.connect(self.processAlarm)
+        self.alarmsetSignal.connect(self.selectAlarmSet)
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -3693,20 +3718,76 @@ class tgraphcanvas(FigureCanvas):
             if self.delta_ax:
                 self.delta_ax.lines = []
     
+    @pyqtSlot(int)
+    def getAlarmSet(self,n):
+        try:
+            self.alarmSemaphore.acquire(1)
+            if n >= 0 and n < len(self.alarmsets):
+                return self.alarmsets[n]
+            else:
+                return None
+        finally:
+            if self.alarmSemaphore.available() < 1:
+                self.alarmSemaphore.release(1)
+
+    def setAlarmSet(self,n,alarmset):
+        try:
+            self.alarmSemaphore.acquire(1)
+            self.alarmsets[n] = alarmset
+        finally:
+            if self.alarmSemaphore.available() < 1:
+                self.alarmSemaphore.release(1)
+
+    def selectAlarmSet(self,n):
+        alarmset = self.getAlarmSet(n)
+        if alarmset is not None:
+            try:
+                self.alarmSemaphore.acquire(1)
+                self.alarmsetlabel = alarmset[0]
+                self.alarmflag = alarmset[1][:]
+                self.alarmguard = alarmset[2][:]
+                self.alarmnegguard = alarmset[3][:]
+                self.alarmtime = alarmset[4][:]
+                self.alarmoffset = alarmset[5][:]
+                self.alarmsource = alarmset[6][:]
+                self.alarmcond = alarmset[7][:]
+                self.alarmtemperature = alarmset[8][:]
+                self.alarmaction = alarmset[9][:]
+                self.alarmbeep = alarmset[10][:]
+                self.alarmstrings = alarmset[11][:]
+            finally:
+                if self.alarmSemaphore.available() < 1:
+                    self.alarmSemaphore.release(1)
+    
+    def findAlarmSet(self,label):
+        try:
+            self.alarmSemaphore.acquire(1)
+            for i in range(len(self.alarmsets)):
+                if self.alarmsets[i][0] == label:
+                    return i
+            return None
+        finally:
+            if self.alarmSemaphore.available() < 1:
+                self.alarmSemaphore.release(1)
+    
+    def makeAlarmSet(self,label,flag,guard,negguard,time,offset,source,cond,temperature,action,beep,alarmstrings):
+        return [label,flag,guard,negguard,time,offset,source,cond,temperature,action,beep,alarmstrings]
+    
     # number is alarmnumber+1 (the 1-based alarm number the user sees), for alarms triggered from outside the alarmtable (like PID RS alarms) number is 0
     @pyqtSlot(int,bool,int,str)
     def processAlarm(self,number,beep,action,string):
         if not self.silent_alarms:
-            if beep:
-                QApplication.beep()
             try:
+                self.updateBackgroundSemaphore.acquire(1)
+                if beep:
+                    QApplication.beep()
                 if action == 0:
                     self.showAlarmPopupSignal.emit(string,aw.qmc.alarm_popup_timout)
                 elif action == 1:
                     # alarm call program
                     fname = string.split('#')[0]
-    # take care, the QDir().current() directory changes with loads and saves
-    #                QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
+        # take c the QDir().current() directory changes with loads and saves
+        #            QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
                     if False and platf == 'Windows': # this Windows version fails on commands with arguments
                         f = "file:///{}/{}".format(QApplication.applicationDirPath(),fname)
                         res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
@@ -3775,7 +3856,7 @@ class tgraphcanvas(FigureCanvas):
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
                         aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '{0}' not a valid number [0-100]",None).format(string))
-
+    
                 elif action == 7:
                     # START
                     if aw.button_2.isEnabled():
@@ -3879,9 +3960,11 @@ class tgraphcanvas(FigureCanvas):
 
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(ex)),exc_tb.tb_lineno)    
-    
-    
+                self.adderror((QApplication.translate("Error Message","Exception:",None) + " processAlarm() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if self.alarmSemaphore.available() < 1:
+                    self.alarmSemaphore.release(1)
+
 
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = max(0,len(self.timex) - 1) # we have to ensure that alarmstate of triggered alarms is never negativ
@@ -14520,6 +14603,7 @@ class ApplicationWindow(QMainWindow):
         self.editGraphDlg_activeTab = 0 # roast properties dialog
         self.backgroundDlg_activeTab = 0
         self.DeviceAssignmentDlg_activeTab = 0
+        self.AlarmDlg_activeTab = 0
 
         #flag to reset Qsettings
         self.resetqsettings = 0
@@ -16732,8 +16816,40 @@ class ApplicationWindow(QMainWindow):
         self.buttonlist = []
         self.lastbuttonpressed = -1
         self.buttonlistmaxlen = 11
+        self.buttonpalette_default_label = ""
+        self.buttonpalette_label = self.buttonpalette_default_label
         #10 palettes of buttons
-        self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]] # ,[],[],[],[],[]]
+        self.buttonpalette = []
+        for i in range(10):
+            self.buttonpalette.append([
+                self.extraeventstypes[:],
+                self.extraeventsvalues[:],
+                self.extraeventsactions[:],
+                self.extraeventsvisibility[:],
+                self.extraeventsactionstrings[:],
+                self.extraeventslabels[:],
+                self.extraeventsdescriptions[:],
+                self.extraeventbuttoncolor[:],
+                self.extraeventbuttontextcolor[:],
+
+                self.eventslidervisibilities[:],
+                self.eventslideractions[:],
+                self.eventslidercommands[:],
+                self.eventslideroffsets[:],
+                self.eventsliderfactors[:],
+                self.eventquantifieractive[:],
+                self.eventquantifiersource[:],
+                self.eventquantifiermin[:],
+                self.eventquantifiermax[:],
+                self.eventquantifiercoarse[:],
+                self.eventslidermin[:],
+                self.eventslidermax[:],
+                self.eventslidercoarse[:],
+                self.eventslidertemp[:],
+                self.eventsliderunits[:],
+                self.eventsliderBernoulli[:],
+                self.buttonpalette_label
+                ])
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
         self.buttonsize = 1 # 0: tiny, 1: small (default), 2: large
@@ -21236,6 +21352,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('tare'):])
                                     if isinstance(cmds,int):
                                         aw.setTare(cmds-1)
+                                        self.sendmessage("Artisan Command: {}".format(cs))
                                 except Exception:
                                     pass
                             elif cs == "PIDon":
@@ -21318,12 +21435,14 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     color = cs[len("setCanvasColor("):-1]
                                     self.setCanvasColorSignal.emit(color)
+                                    self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
                                     pass
                             # resetCanvasColor()
                             elif cs == "resetCanvasColor":
                                 try:
                                     self.resetCanvasColorSignal.emit()
+                                    self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
                                     pass
                             # button(<e>) with <e> one of { ON, START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }
@@ -21352,6 +21471,9 @@ class ApplicationWindow(QMainWindow):
                                         self.qmc.markCoolSignal.emit()
                                     elif event == "OFF" and self.qmc.flagon:
                                         self.qmc.toggleMonitorSignal.emit()
+                                    else:
+                                        return
+                                    self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
                                     pass
                             # p-i-d(<p>,<i>,<d>) with <p>, <i>, <d> numbers to set the p-i-d parameters
@@ -21370,19 +21492,23 @@ class ApplicationWindow(QMainWindow):
                                                 N = self.fujipid.getCurrentPIDnumberPXG()
                                                 # 2. call setpid(self,k) with k that active pid
                                                 self.fujipid.setpidPXG(N,kp,ki,kd)
+                                                self.sendmessage("Artisan Command: {}".format(cs))
                                             elif self.ser.controlETpid[0] == 1: # PRG
                                                 self.fujipid.setpidPXR("p",kp)
                                                 libtime.sleep(0.035)
                                                 self.fujipid.setpidPXR("i",ki)
                                                 libtime.sleep(0.035)
                                                 self.fujipid.setpidPXR("d",kd)
+                                                self.sendmessage("Artisan Command: {}".format(cs))
                                             elif self.ser.controlETpid[0] == 4: # PXF
                                                 # 1. get current PID
                                                 N = self.fujipid.getCurrentPIDnumberPXF()
                                                 # 2. call setpid(self,k) with k that active pid
                                                 self.fujipid.setpidPXF(N,kp,ki,kd)
+                                                self.sendmessage("Artisan Command: {}".format(cs))
                                         else:
                                             self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE)
+                                            self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
                                     pass
                             # pidSV(<n>) with <n> a number to be used as PID SV
@@ -21391,8 +21517,10 @@ class ApplicationWindow(QMainWindow):
                                     sv = max(0,float(cs[len("pidSV("):-1])) # we don't send SV < 0
                                     if self.qmc.device == 0 and sv != aw.fujipid.sv:
                                         self.fujipid.setsv(sv,silent=True)
+                                        self.sendmessage("Artisan Command: {}".format(cs))
                                     elif sv != aw.pidcontrol.sv:
                                         self.pidcontrol.setSV(sv,init=False)
+                                        self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
                                     pass
                             # pidRS(<n>) with <n> a number to be used to select the PID RS pattern (1-based for the internal software PID)
@@ -21408,9 +21536,18 @@ class ApplicationWindow(QMainWindow):
                                             pass
                                     else:
                                         if rs>0:
-                                            aw.pidcontrol.setRSpattern(rs-1)
+                                            self.pidcontrol.setRSpattern(rs-1)
+                                            self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
-                                    pass
+                                    # might be a label
+                                    try:
+                                        label = str(cs[len("pidRS("):-1])
+                                        rs = self.pidcontrol.findRSset(label) # here rs is 0-based!!
+                                        if rs is not None:
+                                            self.pidcontrol.setRSpattern(rs)
+                                            self.sendmessage("Artisan Command: {}".format(cs))
+                                    except:
+                                        pass
                             # pidSource(<n>) with <n> 0: BT, 1: ET (Artisan internal software PID); <n> in {0,..,3} (Arduino PID)
                             elif cs.startswith("pidSource(") and cs.endswith(")"):
                                 try:
@@ -21420,28 +21557,56 @@ class ApplicationWindow(QMainWindow):
                                         ki = aw.pidcontrol.pidKi
                                         kd = aw.pidcontrol.pidKd
                                         self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE,source=source)
+                                        self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
                                     pass
-                            # palette(<n>) with <n> a number between 0 and 9
+                            # palette(<n>) with <n> a number between 0 and 9 or an existing palette label
                             elif cs.startswith("palette(") and cs.endswith(")"):
                                 try:
-                                    p = min(9,max(0,float(cs[len("palette("):-1])))
+                                    p = min(9,max(0,int(cs[len("palette("):-1])))
                                     self.setbuttonsfromSignal.emit(p)
+                                    self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
-                                    pass
+                                    # might be a label
+                                    try:
+                                        label = str(cs[len("palette("):-1])
+                                        p = self.findPalette(label)
+                                        if p is not None:
+                                            self.setbuttonsfromSignal.emit(p)
+                                            self.sendmessage("Artisan Command: {}".format(cs))
+                                    except:
+                                        pass
                             # loadBackground(<filepath>)
                             elif cs.startswith("loadBackground(") and cs.endswith(")"):
                                 try:
                                     fp = str(cs[len("loadBackground("):-1])
                                     self.loadBackgroundSignal.emit(fp)
+                                    self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
                                     pass
                             # clearBackground
                             elif cs == "clearBackground":
                                 try:
                                     self.clearBackgroundSignal.emit()
+                                    self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
                                     pass
+                            # alarmset(<n>) with <n> a number between 0 and 9 or an existing alarmset label
+                            elif cs.startswith("alarmset(") and cs.endswith(")"):
+                                try:
+                                    p = min(9,max(0,int(cs[len("alarmset("):-1])))
+                                    self.qmc.alarmsetSignal.emit(p)
+                                    self.sendmessage("Artisan Command: {}".format(cs))
+                                except:
+                                    # might be a label
+                                    try:
+                                        label = str(cs[len("alarmset("):-1])
+                                        p = self.qmc.findAlarmSet(label)
+                                        if p is not None:
+                                            self.qmc.alarmsetSignal.emit(p)
+                                            self.sendmessage("Artisan Command: {}".format(cs))
+                                    except:
+                                        pass
                 
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
@@ -23507,6 +23672,10 @@ class ApplicationWindow(QMainWindow):
 
     def loadAlarmsFromProfile(self,filename,profile):
         self.qmc.alarmsfile = filename
+        if "alarmsetlabel" in profile:
+            self.qmc.alarmsetlabel = profile["alarmsetlabel"]
+        else:
+            self.qmc.alarmsetlabel = ""
         if "alarmflag" in profile:
             self.qmc.alarmflag = profile["alarmflag"]
         else:
@@ -23552,6 +23721,23 @@ class ApplicationWindow(QMainWindow):
         else:
             self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
         self.qmc.alarmstate = [-1]*len(self.qmc.alarmflag)  #-1 = not triggered; otherwise idx = triggered
+
+    def loadRampSoakFromProfile(self,filename,profile):
+        self.qmc.rsfile = filename
+        if "svLabel" in profile:
+            self.pidcontrol.svLabel = str(profile["svLabel"])
+        if "svValues" in profile:
+            self.pidcontrol.svValues = [int(x) for x in profile["svValues"]]
+        if "svRamps" in profile:
+            self.pidcontrol.svRamps = [int(x) for x in profile["svRamps"]]
+        if "svSoaks" in profile:
+            self.pidcontrol.svSoaks = [int(x) for x in profile["svSoaks"]]
+        if "svActions" in profile:
+            self.pidcontrol.svActions = [int(x) for x in profile["svActions"]]
+        if "svBeeps" in profile:
+            self.pidcontrol.svBeeps = [bool(x) for x in profile["svBeeps"]]
+        if "svDescriptions" in profile:
+            self.pidcontrol.svDescriptions = [str(x) for x in profile["svDescriptions"]]
 
     # returns True if data got updated, False otherwise
     def updateSymbolicETBT(self):
@@ -23802,6 +23988,9 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.loadalarmsfrombackground:
                     self.loadAlarmsFromProfile(filename,profile)
 
+                # Ramp/Soak Profiles
+                if self.pidcontrol.loadRampSoakFromBackground:
+                    self.loadRampSoakFromProfile(filename,profile)
 
                 #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
                 if self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
@@ -24490,6 +24679,7 @@ class ApplicationWindow(QMainWindow):
                 if slider_power != -1 and slider_fan != -1:
                     data_action = csv.reader(infile,delimiter='|')
 
+                    aw.qmc.alarmsetlabel = ""
                     aw.qmc.alarmflag = []
                     aw.qmc.alarmguard = []
                     aw.qmc.alarmnegguard = []
@@ -25688,19 +25878,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) -1)
             self.qmc.updateDeltaSamples()
             # Ramp/Soak Profiles
-            if aw.pidcontrol.loadRampSoakFromProfile:
-                if "svValues" in profile:
-                    aw.pidcontrol.svValues = [int(x) for x in profile["svValues"]]
-                if "svRamps" in profile:
-                    aw.pidcontrol.svRamps = [int(x) for x in profile["svRamps"]]
-                if "svSoaks" in profile:
-                    aw.pidcontrol.svSoaks = [int(x) for x in profile["svSoaks"]]
-                if "svActions" in profile:
-                    aw.pidcontrol.svActions = [int(x) for x in profile["svActions"]]
-                if "svBeeps" in profile:
-                    aw.pidcontrol.svBeeps = [bool(x) for x in profile["svBeeps"]]
-                if "svDescriptions" in profile:
-                    aw.pidcontrol.svDescriptions = [str(x) for x in profile["svDescriptions"]]
+            if self.pidcontrol.loadRampSoakFromProfile:
+                self.loadRampSoakFromProfile(filename,profile)
             if "timeindex" in profile:
                 self.qmc.timeindex = profile["timeindex"]
                 if self.qmc.locktimex:
@@ -26178,6 +26357,7 @@ class ApplicationWindow(QMainWindow):
             profile["extraNoneTempHint1"] = self.qmc.extraNoneTempHint1
             profile["extraNoneTempHint2"] = self.qmc.extraNoneTempHint2
             #alarms
+            profile["alarmsetlabel"] = self.qmc.alarmsetlabel
             profile["alarmflag"] = self.qmc.alarmflag
             profile["alarmguard"] = self.qmc.alarmguard
             profile["alarmnegguard"] = self.qmc.alarmnegguard
@@ -26196,6 +26376,7 @@ class ApplicationWindow(QMainWindow):
             #write only:
             profile["samplinginterval"] = self.qmc.profile_sampling_interval
             profile["oversampling"] = self.qmc.oversampling
+            profile["svLabel"] = aw.pidcontrol.svLabel
             profile["svValues"] = aw.pidcontrol.svValues
             profile["svRamps"] = aw.pidcontrol.svRamps
             profile["svSoaks"] = aw.pidcontrol.svSoaks
@@ -27306,6 +27487,11 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Alarms")
             if settings.contains("alarmtime"):
                 self.qmc.alarmflag = [toInt(x) for x in toList(settings.value("alarmflag",self.qmc.alarmflag))]
+                if settings.contains("alarmsetlabel"):
+                    self.qmc.alarmsetlabel = toString(settings.value("alarmsetlabel",self.qmc.alarmsetlabel))
+                else:
+                    self.qmc.alarmsetlabel = ""
+                    
                 if settings.contains("alarmguard"):
                     self.qmc.alarmguard = [toInt(x) for x in toList(settings.value("alarmguard",self.qmc.alarmguard))]
                 else:
@@ -27357,6 +27543,10 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarm_popup_timout = toInt(settings.value("alarm_popup_timout",aw.qmc.alarm_popup_timout))
                 if settings.contains("alarmtablecolumnwidths"):
                     self.qmc.alarmtablecolumnwidths = [toInt(x) for x in toList(settings.value("alarmtablecolumnwidths",self.qmc.alarmtablecolumnwidths))]
+                if settings.contains("alarmsets"):
+                    self.qmc.alarmsets = toList(settings.value("alarmsets",self.qmc.alarmsets))
+                if settings.contains("alarmsetlabel"):
+                    self.qmc.alarmsetlabel = toString(settings.value("alarmsetlabel",self.qmc.alarmsetlabel))
             settings.endGroup()
             #restore TC4/Arduino PID settings
             settings.beginGroup("ArduinoPID")
@@ -27377,6 +27567,10 @@ class ApplicationWindow(QMainWindow):
                 aw.pidcontrol.svSliderMin = toInt(settings.value("svSliderMin",aw.pidcontrol.svSliderMin))
                 aw.pidcontrol.svSliderMax = toInt(settings.value("svSliderMax",aw.pidcontrol.svSliderMax))
                 aw.pidcontrol.svValue = toInt(settings.value("svValue",aw.pidcontrol.svValue))
+                if settings.contains("loadRampSoakFromBackground"):
+                    aw.pidcontrol.loadRampSoakFromBackground = bool(toBool(settings.value("loadRampSoakFromBackground",aw.pidcontrol.loadRampSoakFromBackground)))
+                if settings.contains("svLabel"):
+                    aw.pidcontrol.svLabel = toString(settings.value("svLabel",aw.pidcontrol.svLabel))
 
                 aw.sliderSV.blockSignals(True)
                 if settings.contains("dutyMin"):
@@ -27399,6 +27593,9 @@ class ApplicationWindow(QMainWindow):
                     aw.pidcontrol.pOnE = bool(toBool(settings.value("pOnE",aw.pidcontrol.pOnE)))
                 
                 for n in range(aw.pidcontrol.RSLen):
+                    svLabelLabel = "RS_svLabel"+str(n)
+                    if settings.contains(svLabelLabel):
+                        aw.pidcontrol.RS_svLabels[n] = toString(settings.value(svLabelLabel,aw.pidcontrol.RS_svLabels[n]))
                     svValuesLabel = "RS_svValues"+str(n)
                     if settings.contains(svValuesLabel):
                         aw.pidcontrol.RS_svValues[n] = [toInt(x) for x in toList(settings.value(svValuesLabel,aw.pidcontrol.RS_svValues[n]))]
@@ -27977,12 +28174,14 @@ class ApplicationWindow(QMainWindow):
                     self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value("buttonpalettemaxlen",self.buttonpalettemaxlen))]
                     self.buttonpalette = toList(settings.value("buttonpalette",self.buttonpalette))
                     if self.buttonpalette is None:
-                        self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]] # initialize empty palettes
+                        self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]] # initialize empty palettes
                     else:
                         self.buttonpalette = self.buttonpalette[:10] # maximal 10 palettes are supported
                     for i in range(len(self.buttonpalette)):
                         if self.buttonpalette[i] is None:
-                            self.buttonpalette[i] = []
+                            self.buttonpalette[i] = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],""]
+                        if len(self.buttonpalette[i]) != 26:
+                            self.buttonpalette[i] = self.buttonpalette[i] + [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],""][len(self.buttonpalette[i]):]
                 for i in range(len(self.extraeventsactionstrings)):
                     self.extraeventsactionstrings[i] = self.extraeventsactionstrings[i]
                     self.extraeventslabels[i] = self.extraeventslabels[i]
@@ -27995,6 +28194,8 @@ class ApplicationWindow(QMainWindow):
                     self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value("eventbuttontablecolumnwidths",self.eventbuttontablecolumnwidths))]
                 if settings.contains("buttonsize"):
                     self.buttonsize = toInt(settings.value("buttonsize",self.buttonsize))
+                if settings.contains("buttonpalette_label"):
+                    self.buttonpalette_label = toString(settings.value("buttonpalette_label",self.buttonpalette_label))
             settings.endGroup()
             # Extras more info
             settings.beginGroup("ExtrasMoreInfo")
@@ -28811,6 +29012,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ArduinoPID")
             settings.setValue("pidOnCHARGE",aw.pidcontrol.pidOnCHARGE)
             settings.setValue("loadRampSoakFromProfile",aw.pidcontrol.loadRampSoakFromProfile)
+            settings.setValue("loadRampSoakFromBackground",aw.pidcontrol.loadRampSoakFromBackground)
+            settings.setValue("svLabel",aw.pidcontrol.svLabel)
             settings.setValue("svValues",aw.pidcontrol.svValues)
             settings.setValue("svRamps",aw.pidcontrol.svRamps)
             settings.setValue("svSoaks",aw.pidcontrol.svSoaks)
@@ -28837,6 +29040,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("invertControl",aw.pidcontrol.invertControl)
             settings.setValue("pOnE",aw.pidcontrol.pOnE)
             for n in range(aw.pidcontrol.RSLen):
+                settings.setValue("RS_svLabel"+str(n),aw.pidcontrol.RS_svLabels[n])
                 settings.setValue("RS_svValues"+str(n),aw.pidcontrol.RS_svValues[n])
                 settings.setValue("RS_svRamps"+str(n),aw.pidcontrol.RS_svRamps[n])
                 settings.setValue("RS_svSoaks"+str(n),aw.pidcontrol.RS_svSoaks[n])
@@ -28969,6 +29173,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #save alarms
             settings.beginGroup("Alarms")
+            settings.setValue("alarmsetlabel",self.qmc.alarmsetlabel)
             settings.setValue("alarmflag",self.qmc.alarmflag)
             settings.setValue("alarmguard",self.qmc.alarmguard)
             settings.setValue("alarmnegguard",self.qmc.alarmnegguard)
@@ -28985,6 +29190,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("alarmsfile",self.qmc.alarmsfile)
             settings.setValue("alarm_popup_timout",self.qmc.alarm_popup_timout)
             settings.setValue("alarmtablecolumnwidths",self.qmc.alarmtablecolumnwidths)
+            settings.setValue("alarmsets",self.qmc.alarmsets)
+            settings.setValue("alarmsetlabel",self.qmc.alarmsetlabel)
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
             settings.setValue("settingspath",self.settingspath)
@@ -29144,6 +29351,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("buttonpalette_shortcuts",self.buttonpalette_shortcuts)
             settings.setValue("eventbuttontablecolumnwidths",self.eventbuttontablecolumnwidths)
             settings.setValue("buttonsize",self.buttonsize)
+            settings.setValue("buttonpalette_label",self.buttonpalette_label)
             settings.endGroup()
             settings.beginGroup("RoRlimits")
             settings.setValue("RoRlimitFlag",self.qmc.RoRlimitFlag)
@@ -32990,7 +33198,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def alarmconfig(self,_=False):
         if self.qmc.device != 18 or aw.simulator is not None:
-            dialog = AlarmDlg(self,self)
+            dialog = AlarmDlg(self,self,self.AlarmDlg_activeTab)
             dialog.show()
         else:
             QMessageBox.information(aw,QApplication.translate("Message", "Alarm Config",None),
@@ -34286,6 +34494,13 @@ class ApplicationWindow(QMainWindow):
             except:
                 pass
 
+    # returns the palette named label or None
+    def findPalette(self,label):
+        for i in range(len(self.buttonpalette)):
+            if self.buttonpalette[i][25] == label:
+                return i
+        return None
+    
     #transfers current buttons to a palette number
     def transferbuttonsto(self,pindex):
         copy = []
@@ -34313,14 +34528,16 @@ class ApplicationWindow(QMainWindow):
         # added slider min/max
         copy.append(self.eventslidermin[:])
         copy.append(self.eventslidermax[:])
-        # added slider Bernoulli
-        copy.append(self.eventsliderBernoulli[:])
         # added slider coarse
         copy.append(self.eventslidercoarse[:])
         # added slider temp
         copy.append(self.eventslidertemp[:])
         # added slider unit
         copy.append(self.eventsliderunits[:])
+        # added slider Bernoulli
+        copy.append(self.eventsliderBernoulli[:])
+        # palette label
+        copy.append(self.buttonpalette_label)
 
         self.buttonpalette[pindex] = copy[:]
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
@@ -34361,7 +34578,6 @@ class ApplicationWindow(QMainWindow):
                 self.eventsliderfactors = copy[13][:]
             else:
                 self.eventsliderfactors = [1.0,1.0,1.0,1.0]
-
             if len(copy)>14 and len(copy[14]) == 4:
                 self.eventquantifieractive = copy[14][:]
             else:
@@ -34406,6 +34622,11 @@ class ApplicationWindow(QMainWindow):
                 self.eventsliderBernoulli = copy[24][:]
             else:
                 self.eventsliderBernoulli = [0,0,0,0]
+            # palette label
+            if len(copy)>25:
+                self.buttonpalette_label = copy[25]
+            else:
+                self.buttonpalette_label = self.aw.buttonpalette_default_label
 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
@@ -34466,7 +34687,7 @@ class ApplicationWindow(QMainWindow):
                 buttonpalettemaxlen = list(map(int,palette["maxlen"]))
                 for i in range(10):  #10 palettes (0-9)
                     key = str(i)
-                    nextpalette = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+                    nextpalette = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], self.buttonpalette_default_label]
                     palette[key] = self.decodeTreeStrings(palette[key])
                     if len(palette[key]):
                         for x in range(9):
@@ -34485,7 +34706,7 @@ class ApplicationWindow(QMainWindow):
                             nextpalette[12] = list(map(int,palette[key][12]))   #  type int
                             nextpalette[13] = list(map(float,palette[key][13])) #  type double
                         else:
-                            for k in range(9,25):
+                            for k in range(9,26):
                                 if len(pal[i]) == k+1:
                                     nextpalette[k] = pal[i][k]
                         
@@ -34498,19 +34719,22 @@ class ApplicationWindow(QMainWindow):
                             nextpalette[19] = list(map(int,palette[key][19]))     #  type int
                             nextpalette[20] = list(map(int,palette[key][20]))     #  type int
                         else:
-                            for k in range(14,25):
+                            for k in range(14,26):
                                 if len(pal[i]) == k+1:
                                     nextpalette[k] = pal[i][k]
 
-                        if len(palette[key])==25:
+                        if len(palette[key])>=25:
                             nextpalette[21] = list(map(int,palette[key][21]))     #  type int
                             nextpalette[22] = list(map(int,palette[key][22]))     #  type int
                             nextpalette[23] = list(map(str,palette[key][23]))     #  type unicode
                             nextpalette[24] = list(map(int,palette[key][24]))     #  type int
                         else:
-                            for k in range(21,25):
+                            for k in range(21,26):
                                 if len(pal[i]) == k+1:
                                     nextpalette[k] = pal[i][k]
+
+                        if len(palette[key])==26:
+                            nextpalette[25] = str(palette[key][25])               #  type unicode
 
                     pal[i] = nextpalette[:]
                 return buttonpalettemaxlen
@@ -34552,6 +34776,10 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.alarmaction = alarms["alarmactions"]
             aw.qmc.alarmbeep = alarms["alarmbeep"]
             aw.qmc.alarmstrings = alarms["alarmstrings"]
+            try:
+                aw.qmc.alarmsetlabel = alarms["alarmsetlabel"]
+            except:
+                aw.qmc.alarmsetlabel = ""
             message =QApplication.translate("Message","Alarms loaded", None)
             self.sendmessage(message)
         except IOError as ex:

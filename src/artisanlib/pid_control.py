@@ -3,7 +3,7 @@
 # ABOUT
 # Artisan PID Controllers (Fuji, DTA, Arduino TC4)
 
-# LICENSE
+# LICENSEsvLen
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
@@ -1067,7 +1067,9 @@ class PIDcontrol(object):
         #
         self.pidOnCHARGE = False
         self.loadRampSoakFromProfile = False
+        self.loadRampSoakFromBackground = False
         self.svLen = 8 # should stay at 8 for compatibility reasons!
+        self.svLabel = ""
         self.svValues = [0]*self.svLen # sv temp as int per 8 channels
         self.svRamps = [0]*self.svLen  # seconds as int per 8 channels
         self.svSoaks = [0]*self.svLen  # seconds as int per 8 channels
@@ -1078,6 +1080,7 @@ class PIDcontrol(object):
         self.svTriggeredAlarms = [False]*self.svLen # set to true once the corresponding alarm was triggered
         # extra RS sets:
         self.RSLen = 3 # can be changed to have less or more RSn sets
+        self.RS_svLabels = [""]*self.RSLen # label of the RS set
         self.RS_svValues = [[0]*self.svLen]*self.RSLen  # sv temp as int per 8 channels
         self.RS_svRamps = [[0]*self.svLen]*self.RSLen  # seconds as int per 8 channels
         self.RS_svSoaks = [[0]*self.svLen]*self.RSLen  # seconds as int per 8 channels
@@ -1510,6 +1513,7 @@ class PIDcontrol(object):
     def setRSpattern(self,n):
         try:
             if n < self.RSLen:
+                self.svLabel = self.RS_svLabels[n]
                 self.svValues = self.RS_svValues[n]
                 self.svRamps = self.RS_svRamps[n]
                 self.svSoaks = self.RS_svSoaks[n]
@@ -1518,6 +1522,13 @@ class PIDcontrol(object):
                 self.svDescriptions = self.RS_svDescriptions[n]
         except:
             pass
+    
+    # returns the first RS patterrn idx with label or None
+    def findRSset(self,label):
+        try:
+            return self.RS_svLabels.index(label)
+        except:
+            return None
     
     def adjustsv(self,diff):
         self.setSV(self.sv + diff,True)

@@ -523,19 +523,18 @@ class EventsDlg(ArtisanResizeablDialog):
         ## tab4
         transferpalettebutton = QPushButton(QApplication.translate("Button","<< Store Palette", None))
         transferpalettebutton.setFocusPolicy(Qt.NoFocus)
-        setpalettebutton = QPushButton(QApplication.translate("Button","Apply Palette >>", None))
+        setpalettebutton = QPushButton(QApplication.translate("Button","Activate Palette >>", None))
         setpalettebutton.setFocusPolicy(Qt.NoFocus)
-        palette = QApplication.translate("Label","palette #", None)
-        palettelist = []
-        for i in range(10):
-            palettelist.append(palette + str(i))
-        transferpalettecurrentLabel = QLabel((QApplication.translate("Label","current palette", None)))
+        transferpalettecurrentLabel = QLabel(QApplication.translate("Label","current:", None))
+        self.transferpalettecurrentLabelEdit = QLineEdit(self.aw.buttonpalette_label)
+
+        
         self.transferpalettecombobox = QComboBox()
         self.transferpalettecombobox.setFocusPolicy(Qt.NoFocus)
         # next line needed to avoid truncation of entries on Mac OS X under Qt 5.12.1-5.12.3
         # https://bugreports.qt.io/browse/QTBUG-73653
         self.transferpalettecombobox.setMinimumWidth(120)
-        self.transferpalettecombobox.addItems(palettelist)
+        self.updatePalettePopup()
         
         transferpalettebutton.clicked.connect(self.transferbuttonstoSlot)
         self.switchPaletteByNumberKey = QCheckBox(QApplication.translate("CheckBox","Switch Using Number Keys + Cmd",None))
@@ -709,23 +708,23 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4_max.setValue(self.aw.eventslidermax[3])
         
         # https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654
-        bernulli_tooltip_text = QApplication.translate("Tooltip", "Applies the Bernoulli's gas law to the values computed\nby applying the given factor and offset to the slider value\nassuming that the gas pressureand not the gas flow is controlled.\nTo reduce heat (or gas flow) by 50% the gas pressure\nhas to be reduced by 4 times.", None)
+        bernoulli_tooltip_text = QApplication.translate("Tooltip", "Applies the Bernoulli's gas law to the values computed\nby applying the given factor and offset to the slider value\nassuming that the gas pressureand not the gas flow is controlled.\nTo reduce heat (or gas flow) by 50% the gas pressure\nhas to be reduced by 4 times.", None)
         self.E1slider_bernoulli = QCheckBox()
         self.E1slider_bernoulli.setFocusPolicy(Qt.NoFocus)
         self.E1slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[0]))
-        self.E1slider_bernoulli.setToolTip(bernulli_tooltip_text)
+        self.E1slider_bernoulli.setToolTip(bernoulli_tooltip_text)
         self.E2slider_bernoulli = QCheckBox()
         self.E2slider_bernoulli.setFocusPolicy(Qt.NoFocus)
         self.E2slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[1]))
-        self.E2slider_bernoulli.setToolTip(bernulli_tooltip_text)
+        self.E2slider_bernoulli.setToolTip(bernoulli_tooltip_text)
         self.E3slider_bernoulli = QCheckBox()
         self.E3slider_bernoulli.setFocusPolicy(Qt.NoFocus)
         self.E3slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[2]))
-        self.E3slider_bernoulli.setToolTip(bernulli_tooltip_text)
+        self.E3slider_bernoulli.setToolTip(bernoulli_tooltip_text)
         self.E4slider_bernoulli = QCheckBox()
         self.E4slider_bernoulli.setFocusPolicy(Qt.NoFocus)
         self.E4slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[3]))
-        self.E4slider_bernoulli.setToolTip(bernulli_tooltip_text)
+        self.E4slider_bernoulli.setToolTip(bernoulli_tooltip_text)
         slider_coarse_tooltip_text = QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None)
         self.E1slider_coarse = QCheckBox()
         self.E1slider_coarse.setFocusPolicy(Qt.NoFocus)
@@ -1180,6 +1179,7 @@ class EventsDlg(ArtisanResizeablDialog):
         paletteGrid.addWidget(transferpalettebutton,0,1)
         paletteGrid.addWidget(self.transferpalettecombobox,1,0)
         paletteGrid.addWidget(transferpalettecurrentLabel,1,2)
+        paletteGrid.addWidget(self.transferpalettecurrentLabelEdit,1,3)
         paletteGrid.addWidget(setpalettebutton,2,1)
         paletteBox = QHBoxLayout()
         paletteBox.addStretch()
@@ -1202,7 +1202,7 @@ class EventsDlg(ArtisanResizeablDialog):
         tab3layout.addWidget(paletteGroupLayout)
         tab3layout.addLayout(paletteButtons)
         tab3layout.addStretch()
-        ### tab5 layout
+        ###
         valueLayout = QGridLayout()
         valueLayout.addWidget(valuecolorlabel,0,0)
         valueLayout.addWidget(valuetextcolorlabel,0,1)
@@ -1421,15 +1421,17 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def backuppaletteeventbuttonsSlot(self,_):
-        self.aw.backuppaletteeventbuttons(self.buttonpalette,self.buttonpalettemaxlen)
+        self.aw.backuppaletteeventbuttons(self.aw.buttonpalette,self.aw.buttonpalettemaxlen)
+        self.transferpalettecombobox.setCurrentIndex(-1)
 
     @pyqtSlot(bool)
     def restorepaletteeventbuttons(self,_):
         filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Palettes",None),path=self.aw.profilepath)
         if filename:
-            maxlen = self.aw.loadPalettes(filename,self.buttonpalette)
+            maxlen = self.aw.loadPalettes(filename,self.aw.buttonpalette)
             if maxlen is not None:
-                self.buttonpalettemaxlen = maxlen
+                self.aw.buttonpalettemaxlen = maxlen
+            self.updatePalettePopup()
 
     def selectionChanged(self):
         selected = self.eventbuttontable.selectedRanges()
@@ -1505,12 +1507,10 @@ class EventsDlg(ArtisanResizeablDialog):
             self.saveQuantifierSettings()
             self.saveAnnotationsSettings()
         elif i == 2: # switched to Slider tab
-            self.updateSliderTab()
             self.saveQuantifierSettings()
             self.saveAnnotationsSettings()
         elif i == 3: # switched to Quantifier tab
             self.saveSliderSettings()
-            self.updateQuantifierTab()
             self.saveAnnotationsSettings()
         elif i == 4: # switched to Palette tab
             # store slider settings from Slider tab to global variables
@@ -1534,6 +1534,30 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E2active.setText(self.etype1.text())
         self.E3active.setText(self.etype2.text())
         self.E4active.setText(self.etype3.text())
+        self.E1active.setChecked(bool(self.aw.eventquantifieractive[0]))
+        self.E2active.setChecked(bool(self.aw.eventquantifieractive[1]))
+        self.E3active.setChecked(bool(self.aw.eventquantifieractive[2]))
+        self.E4active.setChecked(bool(self.aw.eventquantifieractive[3]))
+        self.E1coarse.setChecked(bool(self.aw.eventquantifiercoarse[0]))
+        self.E2coarse.setChecked(bool(self.aw.eventquantifiercoarse[1]))
+        self.E3coarse.setChecked(bool(self.aw.eventquantifiercoarse[2]))
+        self.E4coarse.setChecked(bool(self.aw.eventquantifiercoarse[3]))
+        if self.aw.eventquantifiersource[0] < len(self.curvenames):
+            self.E1SourceComboBox.setCurrentIndex(self.aw.eventquantifiersource[0])
+        if self.aw.eventquantifiersource[1] < len(self.curvenames):
+            self.E2SourceComboBox.setCurrentIndex(self.aw.eventquantifiersource[1])
+        if self.aw.eventquantifiersource[2] < len(self.curvenames):
+            self.E3SourceComboBox.setCurrentIndex(self.aw.eventquantifiersource[2])
+        if self.aw.eventquantifiersource[3] < len(self.curvenames):
+            self.E4SourceComboBox.setCurrentIndex(self.aw.eventquantifiersource[3])
+        self.E1min.setValue(self.aw.eventquantifiermin[0])
+        self.E2min.setValue(self.aw.eventquantifiermin[1])
+        self.E3min.setValue(self.aw.eventquantifiermin[2])        
+        self.E4min.setValue(self.aw.eventquantifiermin[3])
+        self.E1max.setValue(self.aw.eventquantifiermax[0])
+        self.E2max.setValue(self.aw.eventquantifiermax[1])
+        self.E3max.setValue(self.aw.eventquantifiermax[2])
+        self.E4max.setValue(self.aw.eventquantifiermax[3])
 
     def updateStyleTab(self):
         # update color button texts
@@ -1766,45 +1790,51 @@ class EventsDlg(ArtisanResizeablDialog):
     def transferbuttonsto(self,pindex=None):
         if pindex is None:
             pindex = self.transferpalettecombobox.currentIndex()
-        copy = []
-        copy.append(self.extraeventstypes[:])
-        copy.append(self.extraeventsvalues[:])
-        copy.append(self.extraeventsactions[:])
-        copy.append(self.extraeventsvisibility[:])
-        copy.append(self.extraeventsactionstrings[:])
-        copy.append(self.extraeventslabels[:])
-        copy.append(self.extraeventsdescriptions[:])
-        copy.append(self.extraeventbuttoncolor[:])
-        copy.append(self.extraeventbuttontextcolor[:])
-        # added slider settings
-        copy.append(self.eventslidervisibilities[:])
-        copy.append(self.eventslideractions[:])
-        copy.append(self.eventslidercommands[:])
-        copy.append(self.eventslideroffsets[:])
-        copy.append(self.eventsliderfactors[:])
-        # added quantifier settings
-        copy.append(self.eventquantifieractive[:])
-        copy.append(self.eventquantifiersource[:])
-        copy.append(self.eventquantifiermin[:])
-        copy.append(self.eventquantifiermax[:])
-        copy.append(self.eventquantifiercoarse[:])
-        # added slider min/max
-        copy.append(self.eventslidermin[:])
-        copy.append(self.eventslidermax[:])
-        # added slider coarse
-        copy.append(self.eventslidercoarse[:])
-        # added slider temp
-        copy.append(self.eventslidertemp[:])
-        # added slider unit
-        copy.append(self.eventsliderunits[:])
-        # added slider Bernoulli
-        copy.append(self.eventsliderBernoulli[:])
-              
-        self.buttonpalette[pindex] = copy
-        self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
+        if pindex >= 0 and pindex < 10:
+            copy = []
+            copy.append(self.extraeventstypes[:])
+            copy.append(self.extraeventsvalues[:])
+            copy.append(self.extraeventsactions[:])
+            copy.append(self.extraeventsvisibility[:])
+            copy.append(self.extraeventsactionstrings[:])
+            copy.append(self.extraeventslabels[:])
+            copy.append(self.extraeventsdescriptions[:])
+            copy.append(self.extraeventbuttoncolor[:])
+            copy.append(self.extraeventbuttontextcolor[:])
+            # added slider settings
+            copy.append(self.aw.eventslidervisibilities[:])
+            copy.append(self.aw.eventslideractions[:])
+            copy.append(self.aw.eventslidercommands[:])
+            copy.append(self.aw.eventslideroffsets[:])
+            copy.append(self.aw.eventsliderfactors[:])
+            # added quantifier settings
+            copy.append(self.aw.eventquantifieractive[:])
+            copy.append(self.aw.eventquantifiersource[:])
+            copy.append(self.aw.eventquantifiermin[:])
+            copy.append(self.aw.eventquantifiermax[:])
+            copy.append(self.aw.eventquantifiercoarse[:])
+            # added slider min/max
+            copy.append(self.aw.eventslidermin[:])
+            copy.append(self.aw.eventslidermax[:])
+            # added slider coarse
+            copy.append(self.aw.eventslidercoarse[:])
+            # added slider temp
+            copy.append(self.aw.eventslidertemp[:])
+            # added slider unit
+            copy.append(self.aw.eventsliderunits[:])
+            # added slider Bernoulli
+            copy.append(self.aw.eventsliderBernoulli[:])
+            # added palette label
+            copy.append(self.transferpalettecurrentLabelEdit.text())
+            
+            self.aw.buttonpalette[pindex] = copy
+            self.aw.buttonpalettemaxlen[pindex] = self.aw.buttonlistmaxlen
+            self.transferpalettecombobox.setCurrentIndex(-1)
+            self.updatePalettePopup()
+
 
     def localSetbuttonsfrom(self,pindex):
-        copy = self.buttonpalette[pindex][:]
+        copy = self.aw.buttonpalette[pindex][:]
         if len(copy):
             self.extraeventstypes = copy[0][:]
             self.extraeventsvalues = copy[1][:]
@@ -1817,72 +1847,83 @@ class EventsDlg(ArtisanResizeablDialog):
             self.extraeventbuttontextcolor = copy[8][:]
             # added slider settings
             if len(copy)>9 and len(copy[9]) == 4:
-                self.eventslidervisibilities = copy[9][:]
+                self.aw.eventslidervisibilities = copy[9][:]
             else:
-                self.eventslidervisibilities = [0,0,0,0]
+                self.aw.eventslidervisibilities = [0,0,0,0]
             if len(copy)>10 and len(copy[10]) == 4:
-                self.eventslideractions = copy[10][:]
+                self.aw.eventslideractions = copy[10][:]
             else:
-                self.eventslideractions = [0,0,0,0]
+                self.aw.eventslideractions = [0,0,0,0]
             if len(copy)>11 and len(copy[11]) == 4:
-                self.eventslidercommands = copy[11][:]
+                self.aw.eventslidercommands = copy[11][:]
             else:
-                self.eventslidercommands = ["","","",""]
+                self.aw.eventslidercommands = ["","","",""]
             if len(copy)>12 and len(copy[12]) == 4:
-                self.eventslideroffsets = copy[12][:]
+                self.aw.eventslideroffsets = copy[12][:]
             else:
-                self.eventslideroffsets = [0,0,0,0]
+                self.aw.eventslideroffsets = [0,0,0,0]
             if len(copy)>13 and len(copy[13]) == 4:
-                self.eventsliderfactors = copy[13][:]
+                self.aw.eventsliderfactors = copy[13][:]
             else:
-                self.eventsliderfactors = [1.0,1.0,1.0,1.0]
-                
+                self.aw.eventsliderfactors = [1.0,1.0,1.0,1.0]
+            # quantifiers
             if len(copy)>14 and len(copy[14]) == 4:
-                self.eventquantifieractive = copy[14][:]
+                self.aw.eventquantifieractive = copy[14][:]
             else:
-                self.eventquantifieractive = [0,0,0,0]
+                self.aw.eventquantifieractive = [0,0,0,0]
             if len(copy)>15 and len(copy[15]) == 4:
                 self.eventquantifiersource = copy[15][:]
             else:
-                self.eventquantifiersource = [0,0,0,0]
+                self.aw.eventquantifiersource = [0,0,0,0]
             if len(copy)>16 and len(copy[16]) == 4:
                 self.eventquantifiermin = copy[16][:]
             else:
-                self.eventquantifiermin = [0,0,0,0]
+                self.aw.eventquantifiermin = [0,0,0,0]
             if len(copy)>17 and len(copy[17]) == 4:
-                self.eventquantifiermax = copy[17][:]
+                self.aw.eventquantifiermax = copy[17][:]
             else:
-                self.eventquantifiermax = [100,100,100,100]
+                self.aw.eventquantifiermax = [100,100,100,100]
             if len(copy)>18 and len(copy[18]) == 4:
-                self.eventquantifiercoarse = copy[18][:]
+                self.aw.eventquantifiercoarse = copy[18][:]
             else:
-                self.eventquantifiercoarse = [0,0,0,0]
+                self.aw.eventquantifiercoarse = [0,0,0,0]
+            # slider min/max
             if len(copy)>19 and len(copy[19]) == 4:
-                self.eventslidermin = copy[19][:]
+                self.aw.eventslidermin = copy[19][:]
             else:
-                self.eventslidermin = [0,0,0,0]
+                self.aw.eventslidermin = [0,0,0,0]
             if len(copy)>20 and len(copy[20]) == 4:
-                self.eventslidermax = copy[20][:]
+                self.aw.eventslidermax = copy[20][:]
             else:
-                self.eventslidermax = [100,100,100,100]
+                self.aw.eventslidermax = [100,100,100,100]
+            # slider coarse
             if len(copy)>21 and len(copy[21]) == 4:
-                self.eventslidercoarse = copy[21][:]
+                self.aw.eventslidercoarse = copy[21][:]
             else:
-                self.eventslidercoarse = [0,0,0,0]
+                self.aw.eventslidercoarse = [0,0,0,0]
+            # slide temp
             if len(copy)>22 and len(copy[22]) == 4:
-                self.eventslidertemp = copy[22][:]
+                self.aw.eventslidertemp = copy[22][:]
             else:
-                self.eventslidertemp = [0,0,0,0]
+                self.aw.eventslidertemp = [0,0,0,0]
+            # slider units
             if len(copy)>23 and len(copy[23]) == 4:
-                self.eventsliderunits = copy[23][:]
+                self.aw.eventsliderunits = copy[23][:]
             else:
-                self.eventsliderunits = ["","","",""]
+                self.aw.eventsliderunits = ["","","",""]
+            # slider bernoulli
             if len(copy)>24 and len(copy[24]) == 4:
-                self.eventsliderBernoulli = copy[24][:]
+                self.aw.eventsliderBernoulli = copy[24][:]
             else:
-                self.eventsliderBernoulli = [0,0,0,0]
-                
-            self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
+                self.aw.eventsliderBernoulli = [0,0,0,0]
+            # palette label
+            if len(copy)>25:
+                self.aw.buttonpalette_label = copy[25]
+            else:
+                self.aw.buttonpalette_label = self.aw.buttonpalette_default_label
+            
+            self.aw.buttonlistmaxlen = self.aw.buttonpalettemaxlen[pindex]
+            
             return 1  #success
         else:
             return 0  #failed
@@ -1890,9 +1931,23 @@ class EventsDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def setbuttonsfrom(self,_):
         pindex = self.transferpalettecombobox.currentIndex()
-        answer = self.localSetbuttonsfrom(pindex)
-        if answer:
-            self.createEventbuttonTable()
+        if pindex >= 0 and pindex < 10:
+            answer = self.localSetbuttonsfrom(pindex)
+            if answer:
+                self.transferpalettecurrentLabelEdit.setText(self.aw.buttonpalette_label)
+                self.updatePalettePopup()
+                self.updateSliderTab()
+                self.updateQuantifierTab()
+                self.createEventbuttonTable()
+                self.transferpalettecombobox.setCurrentIndex(-1)
+    
+    def updatePalettePopup(self):
+        self.transferpalettecombobox.clear()
+        palettelist = []
+        for i in range(len(self.aw.buttonpalette)):
+            palettelist.append("#{} {}".format(str(i),self.aw.buttonpalette[i][25]))
+        self.transferpalettecombobox.addItems(palettelist)
+        self.transferpalettecombobox.setCurrentIndex(-1)
 
     #applys a pattern of colors
     @pyqtSlot(int)
@@ -2665,6 +2720,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.qmc.specialeventannovisibilities[3] = int(self.E4Annovisibility.isChecked())
         if redraw:
             self.aw.qmc.redraw(recomputeAllDeltas=False)
+    
     #the inverse to restoreState
     def storeState(self):
         # event configurations
@@ -2712,6 +2768,7 @@ class EventsDlg(ArtisanResizeablDialog):
         # palettes
         self.buttonpalette = self.aw.buttonpalette[:]
         self.buttonpalettemaxlen = self.aw.buttonpalettemaxlen
+        self.buttonpalette_label = self.aw.buttonpalette_label
         # styles
         self.EvalueColor = self.aw.qmc.EvalueColor[:]
         self.EvalueMarker = self.aw.qmc.EvalueMarker[:]
@@ -2738,7 +2795,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.qmc.autoChargeFlag = self.autoChargeFlagstored
         self.aw.qmc.autoDropFlag = self.autoDropFlagstored
         self.aw.qmc.markTPflag = self.markTPFlagstored
-        # buttons saved only if ok is pressed,so no restore needed
+        # buttons saved only if ok is pressed, so no restore needed
         # sliders
         self.aw.eventslidervisibilities = self.eventslidervisibilities
         self.aw.eventslideractions = self.eventslideractions
@@ -2751,6 +2808,16 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.eventslidercoarse = self.eventslidercoarse
         self.aw.eventslidertemp = self.eventslidertemp
         self.aw.eventsliderunits = self.eventsliderunits
+        # quantifiers
+        self.aw.eventquantifieractive = self.eventquantifieractive
+        self.aw.eventquantifiersource = self.eventquantifiersource
+        self.aw.eventquantifiermin = self.eventquantifiermin
+        self.aw.eventquantifiermax = self.eventquantifiermax
+        self.aw.eventquantifiercoarse = self.eventquantifiercoarse
+        # palettes
+        self.aw.buttonpalette = self.buttonpalette
+        self.aw.buttonpalettemaxlen = self.buttonpalettemaxlen
+        self.aw.buttonpalette_label = self.buttonpalette_label
         # styles
         self.aw.qmc.EvalueColor = self.EvalueColor
         self.aw.qmc.EvalueMarker = self.EvalueMarker
@@ -2768,6 +2835,7 @@ class EventsDlg(ArtisanResizeablDialog):
         try:
             self.closeHelp()
             self.aw.buttonsize = self.nbuttonsSizeBox.currentIndex()
+            self.aw.buttonpalette_label = self.transferpalettecurrentLabelEdit.text()
             self.savetableextraeventbutton()
             # save column widths
             self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
@@ -2791,9 +2859,8 @@ class EventsDlg(ArtisanResizeablDialog):
             #save sliders   
             self.saveSliderSettings()
             self.saveQuantifierSettings()
-            # save palettes
-            self.aw.buttonpalette = self.buttonpalette[:]
-            self.aw.buttonpalettemaxlen = self.buttonpalettemaxlen
+            # save palette label
+            self.aw.buttonpalette_label = self.transferpalettecurrentLabelEdit.text()
             #
             self.aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
             self.aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
@@ -2858,8 +2925,10 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.aw.qmc.markTPflag = self.markTP.isChecked()
                 #save quantifiers
                 self.aw.updateSlidersProperties() # set visibility and event names on slider widgets
-                # we save the current button and slider definitions to palette 0
-                self.transferbuttonsto(0)
+# we don't do that anymore!
+#                # we save the current button and slider definitions to palette 0
+#                self.transferbuttonsto(0)
+
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
                 self.aw.sendmessage(QApplication.translate("Message","Event configuration saved", None))
                 self.close()
