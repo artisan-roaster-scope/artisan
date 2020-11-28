@@ -1961,6 +1961,8 @@ class tgraphcanvas(FigureCanvas):
         self.l_eventtype3dots = None
         self.l_eventtype4dots = None
         
+        self.l_eteventannos = []
+        self.l_bteventannos = []
         self.l_eventtype1annos = []
         self.l_eventtype2annos = []
         self.l_eventtype3annos = []
@@ -2638,6 +2640,20 @@ class tgraphcanvas(FigureCanvas):
                         idx = self.labels.index(label)
                     except:
                         pass
+                    if label==aw.ETname:
+                        label = "ET"  #allows for a match below to the label in legend_lines
+                        try:
+                            for a in self.l_eteventannos:
+                                a.set_visible(not a.get_visible())
+                        except:
+                            pass
+                    if label==aw.BTname:
+                        label = "BT"  #allows for a match below to the label in legend_lines
+                        try:
+                            for a in self.l_bteventannos:
+                                a.set_visible(not a.get_visible())
+                        except:
+                            pass
                     try:
                         # toggle also the visibility of the legend handle
                         clean_label = label.replace(deltaLabelMathPrefix,deltaLabelUTF8)
@@ -2650,7 +2666,7 @@ class tgraphcanvas(FigureCanvas):
                 if idx is not None and artist:
                     artist = self.handles[idx]
                     artist.set_visible(not artist.get_visible())
-                    if self.eventsGraphflag == 4:
+                    if self.eventsGraphflag in [2,3,4]:
                         # if events are rendered in Combo style we need to hide also the corresponding annotations:
                         try:
                             i = [aw.arabicReshape(et) for et in self.etypes[:4]].index(label)
@@ -6390,6 +6406,8 @@ class tgraphcanvas(FigureCanvas):
                 self.l_eventtype2dots = None
                 self.l_eventtype3dots = None
                 self.l_eventtype4dots = None
+                self.l_eteventannos = []
+                self.l_bteventannos = []
                 self.l_eventtype1annos = []
                 self.l_eventtype2annos = []
                 self.l_eventtype3annos = []
@@ -7213,6 +7231,7 @@ class tgraphcanvas(FigureCanvas):
                                                     fontproperties=eventannotationprop,
                                                     path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
                                                     )
+                                        self.l_eventtype1annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                         except: # mpl before v3.0 do not have this set_in_layout() function
@@ -7247,6 +7266,7 @@ class tgraphcanvas(FigureCanvas):
                                                     fontproperties=eventannotationprop,
                                                     path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
                                                     )
+                                        self.l_eventtype2annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                         except: # mpl before v3.0 do not have this set_in_layout() function
@@ -7282,6 +7302,7 @@ class tgraphcanvas(FigureCanvas):
                                                     fontproperties=eventannotationprop,
                                                     path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
                                                     )
+                                        self.l_eventtype3annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                         except: # mpl before v3.0 do not have this set_in_layout() function
@@ -7316,6 +7337,7 @@ class tgraphcanvas(FigureCanvas):
                                                     fontproperties=eventannotationprop,
                                                     path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette["background"])],
                                                     )
+                                        self.l_eventtype4annos.append(anno)
                                         try:
                                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                         except: # mpl before v3.0 do not have this set_in_layout() function
@@ -7511,6 +7533,10 @@ class tgraphcanvas(FigureCanvas):
                                             pass
                                         # register draggable flag annotation to be re-created after re-positioning on redraw
                                         self.l_event_flags_dict[i] = anno
+                                        if aw.qmc.showeventsonbt:
+                                            self.l_bteventannos.append(anno)
+                                        else:
+                                            self.l_eteventannos.append(anno)
                                     elif self.eventsGraphflag == 4:
                                         if thirdletter != "":
                                             firstletter = ""
@@ -7673,6 +7699,9 @@ class tgraphcanvas(FigureCanvas):
                             aw.qmc.l_annotations = self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
                         if self.timeindex[6]:
                             self.writestatistics(TP_index)
+                    #add the time and temp annotations to the bt list
+                    for x in aw.qmc.l_annotations:
+                        self.l_bteventannos.append(x)
 
                 if not sampling and not aw.qmc.flagon and self.timeindex[6] and aw.qmc.statssummary:
                     self.statsSummary()
@@ -7863,8 +7892,14 @@ class tgraphcanvas(FigureCanvas):
                 e = self.backgroundEvalues[eventnum]
                 y1 = self.temp1B[self.backgroundEvents[eventnum]]
                 y2 = self.temp2B[self.backgroundEvents[eventnum]]
-                delta1 = self.delta1B[self.backgroundEvents[eventnum]]
-                delta2 = self.delta2B[self.backgroundEvents[eventnum]]
+                try:
+                    delta1 = str(aw.float2float(self.delta1B[self.backgroundEvents[eventnum]])) if self.delta1B[self.backgroundEvents[eventnum]] != None else "--"
+                except:
+                    delta1 = "\u03C5\u03c5"
+                try:
+                    delta2 = str(aw.float2float(self.delta2B[self.backgroundEvents[eventnum]])) if self.delta2B[self.backgroundEvents[eventnum]] != None else "--"
+                except:
+                    delta2 = "\u03C5\u03c5"
                 descr = self.backgroundEStrings[eventnum]
                 etype = self.Betypes[self.backgroundEtypes[eventnum]]
                 sliderunit = aw.eventsliderunits[self.backgroundEtypes[eventnum]]
@@ -7904,8 +7939,8 @@ class tgraphcanvas(FigureCanvas):
                     e = 6.0  #50
                 y1 = 420 if self.mode=='F' else 210
                 y2 = 340 if self.mode=='F' else 170
-                delta1 = 18 if self.mode=='F' else 9
-                delta2 = 33 if self.mode=='F' else 16
+                delta1 = str(18.2 if self.mode=='F' else 9.1)
+                delta2 = str(33.4 if self.mode=='F' else 16.2)
                 descr = "Full"
                 etype = "Air"
                 sliderunit = "kPa"
@@ -7921,8 +7956,14 @@ class tgraphcanvas(FigureCanvas):
                 e = self.specialeventsvalue[eventnum]
                 y1 = self.temp1[self.specialevents[eventnum]]
                 y2 = self.temp2[self.specialevents[eventnum]]
-                delta1 = self.delta1[self.specialevents[eventnum]]
-                delta2 = self.delta2[self.specialevents[eventnum]]
+                try:
+                    delta1 = str(aw.float2float(self.delta1[self.specialevents[eventnum]])) if self.delta1[self.specialevents[eventnum]] != None else "--"
+                except:
+                    delta1 = "\u03C5\u03c5"
+                try:
+                    delta2 = str(aw.float2float(self.delta2[self.specialevents[eventnum]])) if self.delta2[self.specialevents[eventnum]] != None else "--"
+                except:
+                    delta2 = "\u03C5\u03c5"
                 descr = self.specialeventsStrings[eventnum]
                 etype = self.etypes[self.specialeventstype[eventnum]]
                 sliderunit = aw.eventsliderunits[self.specialeventstype[eventnum]]
@@ -7966,10 +8007,10 @@ class tgraphcanvas(FigureCanvas):
                 ("degmode", '\u00b0' + self.mode),
                 ("degmin", '\u00b0' + self.mode + '/min'),
                 ("deg", '\u00b0'),
-                ("R1degmin", str(aw.float2float(delta1,1)) + '\u00b0' + self.mode + '/min' if delta1 is not None else ''),
-                ("R2degmin", str(aw.float2float(delta2,1)) + '\u00b0' + self.mode + '/min' if delta2 is not None else ''),
-                ("R1", str(aw.float2float(delta1,1)) if delta1 is not None else '--'),
-                ("R2", str(aw.float2float(delta2,1)) if delta1 is not None else '--'),
+                ("R1degmin", delta1 + '\u00b0' + self.mode + '/min'),
+                ("R2degmin", delta2 + '\u00b0' + self.mode + '/min'),
+                ("R1", delta1),
+                ("R2", delta2),
                 ("squot", "'"),
                 ("quot", '"'),
                 ]
