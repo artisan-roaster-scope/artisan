@@ -15050,7 +15050,7 @@ Crítico</translation>
     <message>
         <location filename="../artisanlib/main.py" line="793"/>
         <source>Aftertaste</source>
-        <translation>Regusto</translation>
+        <translation>Retrogusto</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="719"/>
