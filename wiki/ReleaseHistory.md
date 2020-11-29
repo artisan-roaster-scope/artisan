@@ -53,6 +53,7 @@ Richard Rodrigues](https://github.com/rich1n))
   - fixes Excel export issue occuring with DeltaBT turned off
   - hides annotations for curves hidden by clicking the legend
   - renamed ET and BT curves can be hidden by clicking the legend
+  - enables the PID SV buttons also for the internal software PID as well as for xexternal MODBUS/S7 PIDs
 
 
 **Note**
