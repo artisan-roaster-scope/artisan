@@ -14958,7 +14958,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="unfinished">Merke</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="2078"/>
+        <location filename="../artisanlib/pid_dialogs.py" line="524"/>
         <source>Action</source>
         <translation type="unfinished">Handling</translation>
     </message>
@@ -15223,7 +15223,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
         <translation type="obsolete">DeltaMT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="949"/>
+        <location filename="../artisanlib/pid_dialogs.py" line="525"/>
         <source>Beep</source>
         <translation type="unfinished">Beep</translation>
     </message>
@@ -15335,6 +15335,16 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/transposer.py" line="1055"/>
         <source>Result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/pid_dialogs.py" line="522"/>
+        <source>Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/pid_dialogs.py" line="523"/>
+        <source>Soak</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

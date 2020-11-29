@@ -1309,7 +1309,7 @@ anlegen</translation>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="452"/>
         <source>Load Ramp/Soak table from profile</source>
-        <translation type="obsolete">Ramp/Soak Tabelle von Profilen laden</translation>
+        <translation type="obsolete">Rampe/Haltezeit Tabelle von Profilen laden</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="127"/>
@@ -1419,7 +1419,7 @@ anlegen</translation>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="458"/>
         <source>Load from profile</source>
-        <translation>Von Vorlage laden</translation>
+        <translation>Von Profil laden</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="197"/>
@@ -1937,7 +1937,7 @@ anlegen</translation>
     <message>
         <location filename="../artisanlib/main.py" line="37661"/>
         <source>Ramp Commands</source>
-        <translation type="obsolete">Ramp Befehle</translation>
+        <translation type="obsolete">Rampe Befehle</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="664"/>
@@ -6956,7 +6956,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="76"/>
         <source>turns PID on and switches to RampSoak mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">schaltet den PID an im Rampe/Haltezeit Modus</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="77"/>
@@ -9481,7 +9481,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../artisanlib/main.py" line="19924"/>
         <source>RAMP%</source>
-        <translation></translation>
+        <translation>RAMPE%</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="19991"/>
@@ -13041,7 +13041,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="22675"/>
         <source>PID Mode: Ramp/Soak</source>
-        <translation></translation>
+        <translation>PID Modus Rampe/Haltezeit</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22677"/>
@@ -14688,7 +14688,7 @@ Es ist geraten die momentanen Einstellungen zunächst per Menu Hilfe &gt;&gt; Ei
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2538"/>
         <source>RS</source>
-        <translation>RS</translation>
+        <translation>RH</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2541"/>
@@ -14819,7 +14819,7 @@ Es ist geraten die momentanen Einstellungen zunächst per Menu Hilfe &gt;&gt; Ei
         <translation>Wert</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="2078"/>
+        <location filename="../artisanlib/pid_dialogs.py" line="524"/>
         <source>Action</source>
         <translation>Aktion</translation>
     </message>
@@ -15104,7 +15104,7 @@ Es ist geraten die momentanen Einstellungen zunächst per Menu Hilfe &gt;&gt; Ei
         <translation type="obsolete">DeltaBT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="949"/>
+        <location filename="../artisanlib/pid_dialogs.py" line="525"/>
         <source>Beep</source>
         <translation>Piepston</translation>
     </message>
@@ -15207,6 +15207,16 @@ Es ist geraten die momentanen Einstellungen zunächst per Menu Hilfe &gt;&gt; Ei
         <location filename="../artisanlib/transposer.py" line="1055"/>
         <source>Result</source>
         <translation>Resultat</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/pid_dialogs.py" line="522"/>
+        <source>Ramp</source>
+        <translation type="unfinished">Rampe</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/pid_dialogs.py" line="523"/>
+        <source>Soak</source>
+        <translation type="unfinished">Haltezeit</translation>
     </message>
 </context>
 <context>

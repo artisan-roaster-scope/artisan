@@ -19059,7 +19059,8 @@ class ApplicationWindow(QMainWindow):
     def adjustPIDsv(self,x):
         if self.qmc.device == 0: # Fuji PID
             self.fujipid.adjustsv(x)
-        elif self.qmc.device == 19: # Arduino TC4
+#        elif self.qmc.device == 19: # Arduino TC4
+        else: # Arduino TC4, internal Software PID or MODBUS/S7 extenal PID
             self.pidcontrol.adjustsv(x)
 
     @pyqtSlot(bool)

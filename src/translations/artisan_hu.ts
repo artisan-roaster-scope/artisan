@@ -13885,12 +13885,12 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="2078"/>
+        <location filename="../artisanlib/pid_dialogs.py" line="524"/>
         <source>Action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="949"/>
+        <location filename="../artisanlib/pid_dialogs.py" line="525"/>
         <source>Beep</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14172,6 +14172,16 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../artisanlib/wheels.py" line="404"/>
         <source>Color Pattern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/pid_dialogs.py" line="522"/>
+        <source>Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/pid_dialogs.py" line="523"/>
+        <source>Soak</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

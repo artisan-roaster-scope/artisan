@@ -366,12 +366,12 @@ class PID_DlgControl(ArtisanDialog):
         self.ActionWidgets = []
         self.BeepWidgets = []
         self.DescriptionWidgets = []
-        rsGrid.addWidget(QLabel("SV"),0,1)
-        rsGrid.addWidget(QLabel("Ramp"),0,2)
-        rsGrid.addWidget(QLabel("Soak"),0,3)
-        rsGrid.addWidget(QLabel("Action"),0,4)
-        rsGrid.addWidget(QLabel("Beep"),0,5)
-        rsGrid.addWidget(QLabel("Description"),0,6)
+        rsGrid.addWidget(QLabel(QApplication.translate("Table","SV",None)),0,1)
+        rsGrid.addWidget(QLabel(QApplication.translate("Table","Ramp",None)),0,2)
+        rsGrid.addWidget(QLabel(QApplication.translate("Table","Soak",None)),0,3)
+        rsGrid.addWidget(QLabel(QApplication.translate("Table","Action",None)),0,4)
+        rsGrid.addWidget(QLabel(QApplication.translate("Table","Beep",None)),0,5)
+        rsGrid.addWidget(QLabel(QApplication.translate("Table","Description",None)),0,6)
         actions = ["",
             QApplication.translate("ComboBox","Pop Up",None),
             QApplication.translate("ComboBox","Call Program",None),
@@ -518,12 +518,12 @@ class PID_DlgControl(ArtisanDialog):
         for j in range(self.aw.pidcontrol.RSLen):
             # create tab per RSn set
             RSnGrid = QGridLayout()
-            RSnGrid.addWidget(QLabel("SV"),0,1)
-            RSnGrid.addWidget(QLabel("Ramp"),0,2)
-            RSnGrid.addWidget(QLabel("Soak"),0,3)
-            RSnGrid.addWidget(QLabel("Action"),0,4)
-            RSnGrid.addWidget(QLabel("Beep"),0,5)
-            RSnGrid.addWidget(QLabel("Description"),0,6)
+            RSnGrid.addWidget(QLabel(QApplication.translate("Table","SV",None)),0,1)
+            RSnGrid.addWidget(QLabel(QApplication.translate("Table","Ramp",None)),0,2)
+            RSnGrid.addWidget(QLabel(QApplication.translate("Table","Soak",None)),0,3)
+            RSnGrid.addWidget(QLabel(QApplication.translate("Table","Action",None)),0,4)
+            RSnGrid.addWidget(QLabel(QApplication.translate("Table","Beep",None)),0,5)
+            RSnGrid.addWidget(QLabel(QApplication.translate("Table","Description",None)),0,6)
             SVWidgets = []
             RampWidgets = []
             SoakWidgets = []

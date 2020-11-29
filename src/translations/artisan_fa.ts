@@ -13789,7 +13789,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">وزن</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="2078"/>
+        <location filename="../artisanlib/pid_dialogs.py" line="524"/>
         <source>Action</source>
         <translation type="unfinished">اقدام</translation>
     </message>
@@ -13879,7 +13879,7 @@ Repeat Operation at the end: {0}</source>
         <translation type="unfinished">منشا</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="949"/>
+        <location filename="../artisanlib/pid_dialogs.py" line="525"/>
         <source>Beep</source>
         <translation type="unfinished">بوق</translation>
     </message>
@@ -14156,6 +14156,16 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../artisanlib/wheels.py" line="404"/>
         <source>Text Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/pid_dialogs.py" line="522"/>
+        <source>Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/pid_dialogs.py" line="523"/>
+        <source>Soak</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
