@@ -11,7 +11,7 @@
     <message>
         <location filename="artisanlib/main.py" line="11059"/>
         <source>Version:</source>
-        <translation type="obsolete">Version:</translation>
+        <translation type="obsolete">Versión:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31990"/>
@@ -26,47 +26,47 @@
     <message>
         <location filename="../artisanlib/main.py" line="31990"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencia</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32041"/>
         <source>A new release is available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esta disponible una versión más reciente.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32043"/>
         <source>Show Change list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostrar Lista de Cambios</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32045"/>
         <source>Download Release</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Descargar Nueva Versión</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32047"/>
         <source>You are using the latest release.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Estás usando la última versión</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32049"/>
         <source>You are using a beta continuous build.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Estás usando una versión Beta</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32050"/>
         <source>You will see a notice here once a new official release is available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verás una notificación aquí en lo que esté disponible una nueva versión oficial.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32056"/>
         <source>There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ha habido un problema al recuperando la información de la última versión. Por favor revise su conexión a Internet o intente más tarde.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32059"/>
         <source>Update status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Estatus de Actualización</translation>
     </message>
 </context>
 <context>
