@@ -10,7 +10,7 @@
     <message>
         <location filename="artisanlib/main.py" line="11059"/>
         <source>Version:</source>
-        <translation type="obsolete">Version:</translation>
+        <translation type="obsolete">Versión:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31990"/>
@@ -25,7 +25,7 @@
     <message>
         <location filename="../artisanlib/main.py" line="31990"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencia</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32041"/>
@@ -78,47 +78,47 @@
     <message>
         <location filename="../artisanlib/main.py" line="5433"/>
         <source>Bean Size</source>
-        <translation type="obsolete">Tamaño del grano</translation>
+        <translation type="obsolete">Tamaño del Grano</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8187"/>
         <source>Moisture Green</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Humedad Café Verde</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8202"/>
         <source>Moisture Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Humedad Café Tostado</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8204"/>
         <source>Whole Color</source>
-        <translation type="unfinished">Color Entero</translation>
+        <translation type="unfinished">Color Café en Grano</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8206"/>
         <source>Ground Color</source>
-        <translation type="unfinished">Color del poso</translation>
+        <translation type="unfinished">Color Café Molido</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8183"/>
         <source>Screen Size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tamaño de Criba</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8185"/>
         <source>Density Green</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Densidad en Verde</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8193"/>
         <source>Batch Size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Peso del Batch</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8200"/>
         <source>Density Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Densidad Tostado</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8208"/>
@@ -4813,7 +4813,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31230"/>
         <source>Moisture:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Humedad</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31230"/>
@@ -10283,7 +10283,7 @@ Field is hidden when the RoR value is not available.</source>
     <message>
         <location filename="../artisanlib/devices.py" line="1021"/>
         <source>Humidity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Humedad</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1022"/>
