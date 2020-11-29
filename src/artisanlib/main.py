@@ -7616,10 +7616,10 @@ class tgraphcanvas(FigureCanvas):
                                             pass
                                         # register draggable flag annotation to be re-created after re-positioning on redraw
                                         self.l_event_flags_dict[i] = anno
-                                        if aw.qmc.showeventsonbt:
-                                            self.l_bteventannos.append(anno)
-                                        else:
+                                        if not aw.qmc.showeventsonbt and aw.qmc.ETcurve:
                                             self.l_eteventannos.append(anno)
+                                        else:
+                                            self.l_bteventannos.append(anno)
                                     elif self.eventsGraphflag == 4:
                                         if thirdletter != "":
                                             firstletter = ""
