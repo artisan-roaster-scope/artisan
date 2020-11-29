@@ -230,7 +230,7 @@ class modbusport(object):
                                 retry_on_empty=True,
                                 retry_on_invalid=True,
                                 retries=1,
-                                timeout=0.9, #self.timeout
+                                timeout=0.5, #self.timeout
                                 )
                         self.readRetries = 0
                     except:
@@ -247,7 +247,7 @@ class modbusport(object):
                             retry_on_empty=True,
                             retry_on_invalid=True,
                             retries=3,
-                            timeout=0.7, #self.timeout
+                            timeout=0.4, #self.timeout
                             )
                     except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
                         self.master = ModbusUdpClient(
@@ -367,17 +367,26 @@ class modbusport(object):
 
                         #note: logged chars should be unicode not binary
                         if self.aw.seriallogflag:
-                            ser_str = "MODBUS readActiveRegisters : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {} results".format(
-                                self.comport,
-                                self.baudrate,
-                                self.bytesize,
-                                self.parity,
-                                self.stopbits,
-                                self.timeout,
-                                slave,
-                                register,
-                                code,
-                                len(res.registers))
+                            if self.type < 3: # serial MODBUS
+                                ser_str = "MODBUS readActiveRegisters : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {} results".format(
+                                    self.comport,
+                                    self.baudrate,
+                                    self.bytesize,
+                                    self.parity,
+                                    self.stopbits,
+                                    self.timeout,
+                                    slave,
+                                    register,
+                                    code,
+                                    len(res.registers))
+                            else: # IP MODBUS
+                                ser_str = "MODBUS readActiveRegisters : {}:{} || Slave = {} || Register = {} || Code = {} || Rx# = {} results".format(
+                                    self.host,
+                                    self.port,
+                                    slave,
+                                    register,
+                                    code,
+                                    len(res.registers))
                             self.aw.addserial(ser_str)
 
         except Exception: # as ex:
@@ -605,17 +614,26 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
-                ser_str = "MODBUS readFloat :{},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
-                    self.comport,
-                    self.baudrate,
-                    self.bytesize,
-                    self.parity,
-                    self.stopbits,
-                    self.timeout,
-                    slave,
-                    register,
-                    code,
-                    r)
+                if self.type < 3: # serial MODBUS
+                    ser_str = "MODBUS readFloat :{},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.comport,
+                        self.baudrate,
+                        self.bytesize,
+                        self.parity,
+                        self.stopbits,
+                        self.timeout,
+                        slave,
+                        register,
+                        code,
+                        r)
+                else: # IP MODBUS
+                    ser_str = "MODBUS readFloat : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.host,
+                        self.port,
+                        slave,
+                        register,
+                        code,
+                        r)
                 self.aw.addserial(ser_str)
             
             
@@ -672,17 +690,26 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
-                ser_str = "MODBUS readBCD : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
-                    self.comport,
-                    self.baudrate,
-                    self.bytesize,
-                    self.parity,
-                    self.stopbits,
-                    self.timeout,
-                    slave,
-                    register,
-                    code,
-                    r)
+                if self.type < 3: # serial MODBUS
+                    ser_str = "MODBUS readBCD : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.comport,
+                        self.baudrate,
+                        self.bytesize,
+                        self.parity,
+                        self.stopbits,
+                        self.timeout,
+                        slave,
+                        register,
+                        code,
+                        r)
+                else: # IP MODBUS
+                    ser_str = "MODBUS readBCD : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.host,
+                        self.port,
+                        slave,
+                        register,
+                        code,
+                        r)
                 self.aw.addserial(ser_str)
 
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
@@ -789,17 +816,26 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
-                ser_str = "MODBUS readSingleRegister : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
-                    self.comport,
-                    self.baudrate,
-                    self.bytesize,
-                    self.parity,
-                    self.stopbits,
-                    self.timeout,
-                    slave,
-                    register,
-                    code,
-                    r)
+                if self.type < 3: # serial MODBUS
+                    ser_str = "MODBUS readSingleRegister : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.comport,
+                        self.baudrate,
+                        self.bytesize,
+                        self.parity,
+                        self.stopbits,
+                        self.timeout,
+                        slave,
+                        register,
+                        code,
+                        r)
+                else: # IP MODBUS
+                    ser_str = "MODBUS readSingleRegister : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.host,
+                        self.port,
+                        slave,
+                        register,
+                        code,
+                        r)
                 self.aw.addserial(ser_str)
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
@@ -853,17 +889,26 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
-                ser_str = "MODBUS readInt32 :{},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
-                    self.comport,
-                    self.baudrate,
-                    self.bytesize,
-                    self.parity,
-                    self.stopbits,
-                    self.timeout,
-                    slave,
-                    register,
-                    code,
-                    r)
+                if self.type < 3: # serial MODBUS
+                    ser_str = "MODBUS readInt32 :{},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.comport,
+                        self.baudrate,
+                        self.bytesize,
+                        self.parity,
+                        self.stopbits,
+                        self.timeout,
+                        slave,
+                        register,
+                        code,
+                        r)
+                else: # IP MODBUS
+                    ser_str = "MODBUS readInt32 : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.host,
+                        self.port,
+                        slave,
+                        register,
+                        code,
+                        r)
                 self.aw.addserial(ser_str)
             
 
@@ -927,17 +972,26 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
-                ser_str = "MODBUS readBCDint : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
-                    self.comport,
-                    self.baudrate,
-                    self.bytesize,
-                    self.parity,
-                    self.stopbits,
-                    self.timeout,
-                    slave,
-                    register,
-                    code,
-                    r)
+                if self.type < 3: # serial MODBUS
+                    ser_str = "MODBUS readBCDint : {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.comport,
+                        self.baudrate,
+                        self.bytesize,
+                        self.parity,
+                        self.stopbits,
+                        self.timeout,
+                        slave,
+                        register,
+                        code,
+                        r)
+                else: # IP MODBUS
+                    ser_str = "MODBUS readBCDint : {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {}".format(
+                        self.host,
+                        self.port,
+                        slave,
+                        register,
+                        code,
+                        r)
                 self.aw.addserial(ser_str)
 
     def setTarget(self,sv):

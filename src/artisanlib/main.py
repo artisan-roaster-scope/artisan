@@ -17363,7 +17363,7 @@ class ApplicationWindow(QMainWindow):
             string += QApplication.translate("Message","Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
             string += QApplication.translate("Message","Enjoy using ArtisanViewer,", None) +"\n"
             string += QApplication.translate("Message","The Artisan Team", None)
-            QMessageBox.information(aw,QApplication.translate("Message","OprocessSingleShotPhidgetsPulsene time message about ArtisanViewer", None),string)
+            QMessageBox.information(aw,QApplication.translate("Message","One time message about ArtisanViewer", None),string)
             settings.setValue("Mode",self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
 
         # we connect the signals

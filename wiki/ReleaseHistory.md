@@ -16,9 +16,10 @@ v2.4.4 (xx.11.2020)
   - adds 3 Ramp/Soak templates
   - adds option to load Ramp/Soak patterns from background profile
   - adds labeled alarm sets
+  - adds labels to event palettes
   - adds Qt base translations for Turkish, Dutch and Brazilian
   - adds _fetch full blocks_ option to instruct the S7 and MODBUS optimizer fetch maximal register blocks from lowest to largest register number
-  - adds Artisan Commands: `popup(m[,t])`, `message(s)`, `setCanvasColor(c)`, `resetCanvasColor`, `button(e)` with `e = { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }`, `p-i-d(p,i,d)`, `pidSV(v)`, `pidRS(n)`, `pidSource(n)`, `palette(n)`, `loadBackground(<filepath>)`, `clearBackground`, `alarmset`
+  - adds Artisan Commands: `popup(m[,t])`, `message(s)`, `setCanvasColor(c)`, `resetCanvasColor`, `button(e)` with `e = { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }`, `p-i-d(p,i,d)`, `pidSV(v)`, `pidRS(rs)`, `pidSource(n)`, `palette(p)`, `loadBackground(<filepath>)`, `clearBackground`, `alarmset(as)`
 * Changes
   - updates [Trinitas T2 and T7](https://artisan-scope.org/machines/trinitas/), [Oztürk](https://artisan-scope.org/machines/ozturk/) and [Giesen](https://artisan-scope.org/machines/giesen/) machine setups
   - renames empty MODBUS decoder entry to Int
@@ -36,6 +37,8 @@ v2.4.4 (xx.11.2020)
   - [artisan.plus](https://artisan.plus/): optimized synchronization
   - improved S7 serial logging and communication error handling
   - [special events annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) respect the decimal places setting
+  - updated Spanish translations ([PR #525](../../../pull/525) & [PR #527](../../../pull/427) by [
+Richard Rodrigues](https://github.com/rich1n))
 * Fixes
   - fixes regression which broke the event picker in v2.4.2
   - fixes another issue with the multiple event button action processing ([Issue #504](../../../issues/504))
@@ -48,6 +51,9 @@ v2.4.4 (xx.11.2020)
   - fixes Phidget async sampling modes that could take readings beyond the current sampling interval on communication drops
   - corrects alarm nr in roast properties table
   - fixes Excel export issue occuring with DeltaBT turned off
+  - hides annotations for curves hidden by clicking the legend
+  - renamed ET and BT curves can be hidden by clicking the legend
+
 
 **Note**
 _This is the latest version supporting Raspbian Stretch_

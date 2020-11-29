@@ -664,7 +664,7 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.pidModeInit()
         else:
             self.aw.lcd1.setStyleSheet("QLCDNumber { border-radius: 4; color: %s; background-color: %s;}"%(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"]))
-            self.aw.qmc.setTimerLCDcolorSignal.emit(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"])
+            self.aw.qmc.setTimerLargeLCDcolorSignal.emit(self.aw.lcdpaletteF["timer"],self.aw.lcdpaletteB["timer"])
             if self.aw.qmc.flagon and not self.aw.qmc.flagstart:
                 self.aw.qmc.setLCDtime(0)
     

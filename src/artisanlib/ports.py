@@ -816,6 +816,7 @@ class comportDlg(ArtisanResizeablDialog):
         if self.aw.locale not in self.aw.qtbase_locales:
             helpButton.setText(QApplication.translate("Button","Help", None))
         helpButton.clicked.connect(self.showModbusbuttonhelp)
+        helpButton.setFocusPolicy(Qt.NoFocus)
         
         #button layout
         buttonLayout = QHBoxLayout()
