@@ -6,7 +6,7 @@ set -ex # reduced logging
 .travis/slience.sh brew update # this seems to help to work around some homebrew issues; and fails on others
 
 
-# Python 3.7.5 is installed by default
+# Python 3.7.5 is installed by default on image xcode10.1
 # to update use either:
 #brew upgrade python
 # or, to avoid issues with brew auto updates by deactivating them,
@@ -16,6 +16,7 @@ brew uninstall numpy gdal postgis
 brew unlink python@2
 ##brew upgrade python
 
+# a (slow) way to upgrade to Python 3.8
 #brew unlink python
 #brew install python@3.8
 #brew link --force --overwrite python@3.8

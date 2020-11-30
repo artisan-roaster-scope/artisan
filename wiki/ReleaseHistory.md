@@ -126,6 +126,9 @@ v2.4.2 (02.10.2020)
   - fixes Transposer crash ([Issue #506](../../../issues/506))
   - fixes palette loading from .apal files
 
+**Note**
+_This is the latest version supporting macOS 10.13 and 10.14_
+
 
 ----
 v2.4.0 (03.06.2020)
