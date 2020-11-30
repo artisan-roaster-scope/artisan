@@ -14,7 +14,7 @@ if [ ! -z $TRAVIS ]; then
     
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=${QT_PATH}
-    export MACOSX_DEPLOYMENT_TARGET=10.13
+    export MACOSX_DEPLOYMENT_TARGET=10.15
     export ARTISAN_LEGACY_BUILD=false
 else
     # standard local builds
@@ -32,7 +32,7 @@ else
 
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=~/Qt5.15.2/5.15.2/clang_64
-    export MACOSX_DEPLOYMENT_TARGET=10.13
+    export MACOSX_DEPLOYMENT_TARGET=10.15
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
     export ARTISAN_LEGACY_BUILD=false
 fi
