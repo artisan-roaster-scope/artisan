@@ -14509,6 +14509,7 @@ class ApplicationWindow(QMainWindow):
     setbuttonsfromSignal = pyqtSignal(int)
     loadBackgroundSignal = pyqtSignal(str)
     clearBackgroundSignal = pyqtSignal()
+    adjustSVSignal = pyqtSignal(int)
 
     def __init__(self, parent = None):
 
@@ -17378,6 +17379,7 @@ class ApplicationWindow(QMainWindow):
         self.setbuttonsfromSignal.connect(self.setbuttonsfrom)
         self.loadBackgroundSignal.connect(self.loadbackgroundRedraw)
         self.clearBackgroundSignal.connect(self.clearbackgroundRedraw)
+        self.adjustSVSignal.connect(self.adjustPIDsv)
 
         if sys.platform.startswith("darwin"):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
@@ -19056,6 +19058,7 @@ class ApplicationWindow(QMainWindow):
         else:
             return QColorDialog.getColor(c) # blocks on Mac OS X in the build
 
+    @pyqtSlot(int)
     def adjustPIDsv(self,x):
         if self.qmc.device == 0: # Fuji PID
             self.fujipid.adjustsv(x)
@@ -21515,7 +21518,7 @@ class ApplicationWindow(QMainWindow):
                             # pidSV(<n>) with <n> a number to be used as PID SV
                             elif cs.startswith("pidSV(") and cs.endswith(")"):
                                 try:
-                                    sv = max(0,float(cs[len("pidSV("):-1])) # we don't send SV < 0
+                                    sv = max(0,int(eval(cs[len("pidSV("):-1]))) # we don't send SV < 0
                                     if self.qmc.device == 0 and sv != aw.fujipid.sv:
                                         self.fujipid.setsv(sv,silent=True)
                                         self.sendmessage("Artisan Command: {}".format(cs))
@@ -21527,7 +21530,7 @@ class ApplicationWindow(QMainWindow):
                             # pidRS(<n>) with <n> a number to be used to select the PID RS pattern (1-based for the internal software PID)
                             elif cs.startswith("pidRS(") and cs.endswith(")"):
                                 try:
-                                    rs = int(cs[len("pidRS("):-1])
+                                    rs = int(eval(cs[len("pidRS("):-1]))
                                     if self.qmc.device == 0 or self.qmc.device == 26:
                                         if self.ser.controlETpid[0] == 0: # PXG
                                             pass
@@ -21552,7 +21555,7 @@ class ApplicationWindow(QMainWindow):
                             # pidSource(<n>) with <n> 0: BT, 1: ET (Artisan internal software PID); <n> in {0,..,3} (Arduino PID)
                             elif cs.startswith("pidSource(") and cs.endswith(")"):
                                 try:
-                                    source = cs[len("pidSource("):-1]
+                                    source = int(cs[len("pidSource("):-1])
                                     if self.qmc.device != 0 and self.qmc.device != 26:
                                         kp = aw.pidcontrol.pidKp
                                         ki = aw.pidcontrol.pidKi
@@ -21608,7 +21611,15 @@ class ApplicationWindow(QMainWindow):
                                             self.sendmessage("Artisan Command: {}".format(cs))
                                     except:
                                         pass
-                
+                            # adjustSV(<n>) adds <n> to the current SV. Note that n can be negativex
+                            elif cs.startswith("adjustSV(") and cs.endswith(")"):
+                                try:
+                                    sv_offset = int(eval(cs[len("adjustSV("):-1]))
+                                    if self.qmc.device != 0 and self.qmc.device != 26:
+                                        self.adjustSVSignal.emit(sv_offset)
+                                        self.sendmessage("Artisan Command: {}".format(cs))
+                                except:
+                                    pass
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds

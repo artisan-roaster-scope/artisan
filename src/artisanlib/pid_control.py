@@ -1531,6 +1531,8 @@ class PIDcontrol(object):
             return None
     
     def adjustsv(self,diff):
+        if self.sv is None or self.sv<0:
+            self.sv = 0
         self.setSV(self.sv + diff,True)
     
     def activateSVSlider(self,flag):

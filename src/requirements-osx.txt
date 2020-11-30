@@ -1,6 +1,6 @@
 appnope==0.1.0
-pyobjc-core==6.2.2
-pyobjc-framework-Cocoa==6.2.2
+pyobjc-core==6.2.2 # builds on 7.0 report errors
+pyobjc-framework-Cocoa==6.2.2 # builds on 7.0 report errors
 py2app==0.21 # we stay on 0.21 due to our darkmode patch which needs to be redone for later versions like 0.22 to avoid the patch to be overwritten
 gevent==20.9.0 # 1.5.0 is not compatible with Python 3.8
 gevent-websocket==0.10.1

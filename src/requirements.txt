@@ -1,5 +1,5 @@
 wheel==0.35.1
-pyserial==3.4
+pyserial==3.5 # 3.4
 pymodbus==2.4.0
 unidecode==1.1.1
 bottle==0.12.19
@@ -15,10 +15,10 @@ setuptools==50.3.2
 persist-queue==0.5.1
 portalocker==2.0.0
 prettytable==0.7.2 # 1.0.1 and 2.0.0 fail to be packed by py2app properly into builds
-Phidget22==1.6.20201024
-natsort==7.0.1
+Phidget22==1.6.20201120
+natsort==7.1.0
 xlrd==1.2.0
 requests-file==1.5.1
-lxml==4.6.1
+lxml==4.6.2
 websocket-client==0.57.0
 wquantiles==0.5
