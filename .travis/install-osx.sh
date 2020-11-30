@@ -16,7 +16,10 @@ brew unlink python@2
 brew unlink python
 #brew upgrade python
 
-brew install python@3.8
+which python3
+python3 --version
+
+travis_wait brew install python@3.8
 brew link --force --overwrite python@3.8
 
 hash -r
