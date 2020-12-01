@@ -3778,7 +3778,7 @@ class tgraphcanvas(FigureCanvas):
     def processAlarm(self,number,beep,action,string):
         if not self.silent_alarms:
             try:
-                self.updateBackgroundSemaphore.acquire(1)
+                self.alarmSemaphore.acquire(1)
                 if beep:
                     QApplication.beep()
                 if action == 0:
@@ -6386,7 +6386,7 @@ class tgraphcanvas(FigureCanvas):
                     self.set_xlabel("")
                 else:
                     y_label = self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
-                    self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)))
+                    self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min","abbrev. of minutes")))
 
                 try:
                     y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
@@ -11230,7 +11230,7 @@ class tgraphcanvas(FigureCanvas):
                         msg += sep + u"#" + str(aw.qmc.ground_color)
                     self.set_xlabel(msg)
             else:
-                self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)))
+                self.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min","abbrev. of minutes")))
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)

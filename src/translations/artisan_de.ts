@@ -8581,6 +8581,21 @@ Field is hidden when the RoR value is not available.</source>
         <source>activates the alarmset with the given number or label</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../help/eventsliders_help.py" line="103"/>
+        <source>adjustSV(&lt;int&gt;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../help/eventsliders_help.py" line="103"/>
+        <source>increases or decreases the current target SV value by &lt;int&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../help/eventsliders_help.py" line="104"/>
+        <source>pidSV(&lt;int&gt;)</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message encoding="UTF-8">
         <location filename="../help/autosave_help.py" line="21"/>
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
@@ -8633,21 +8648,6 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message encoding="UTF-8">
         <location filename="../help/eventsliders_help.py" line="132"/>
         <source>sets calling button to “pressed” if argument evaluates to 1 or True</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../help/eventsliders_help.py" line="103"/>
-        <source>adjustSV(&lt;int&gt;)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../help/eventsliders_help.py" line="103"/>
-        <source>increases or decreases the current target SV value by &lt;int&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../help/eventsliders_help.py" line="104"/>
-        <source>pidSV(&lt;int&gt;)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9339,7 +9339,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>ET p-i-d 1</translation>
     </message>
     <message>
-        <location filename="../artisanlib/phases.py" line="44"/>
+        <location filename="../artisanlib/comparator.py" line="900"/>
         <source>min</source>
         <translation>min</translation>
     </message>
@@ -10781,6 +10781,18 @@ LCDs Ale</translation>
         <location filename="../artisanlib/events.py" line="528"/>
         <source>current:</source>
         <translation>aktuell:</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11233"/>
+        <source>min</source>
+        <comment>abbrev. of minutes</comment>
+        <translation>min</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/phases.py" line="44"/>
+        <source>min</source>
+        <comment>abbrev of minimum</comment>
+        <translation>min</translation>
     </message>
 </context>
 <context>

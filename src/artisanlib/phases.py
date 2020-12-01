@@ -41,7 +41,7 @@ class phasesGraphDlg(ArtisanDialog):
         dryLabel = QLabel(QApplication.translate("Label", "Drying",None))
         midLabel = QLabel(QApplication.translate("Label", "Maillard",None))
         finishLabel = QLabel(QApplication.translate("Label", "Finishing",None))
-        minf = QLabel(QApplication.translate("Label", "min",None))
+        minf = QLabel(QApplication.translate("Label", "min","abbrev of minimum"))
         maxf = QLabel(QApplication.translate("Label", "max",None))
         self.startdry = QSpinBox()
         self.startdry.setAlignment(Qt.AlignRight)

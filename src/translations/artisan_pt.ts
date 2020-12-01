@@ -8896,7 +8896,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation type="unfinished">Suavizar curvas</translation>
     </message>
     <message>
-        <location filename="../artisanlib/phases.py" line="44"/>
+        <location filename="../artisanlib/comparator.py" line="900"/>
         <source>min</source>
         <translation></translation>
     </message>
@@ -10802,6 +10802,18 @@ Fases LCDs</translation>
     <message>
         <location filename="../artisanlib/events.py" line="528"/>
         <source>current:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11233"/>
+        <source>min</source>
+        <comment>abbrev. of minutes</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/phases.py" line="44"/>
+        <source>min</source>
+        <comment>abbrev of minimum</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

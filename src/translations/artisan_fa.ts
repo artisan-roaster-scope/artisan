@@ -8419,7 +8419,7 @@ Field is hidden when the RoR value is not available.</source>
         <translation>رخداد</translation>
     </message>
     <message>
-        <location filename="../artisanlib/phases.py" line="44"/>
+        <location filename="../artisanlib/comparator.py" line="900"/>
         <source>min</source>
         <translation>دقیقه</translation>
     </message>
@@ -10349,6 +10349,18 @@ LCDs All</source>
         <location filename="../artisanlib/events.py" line="528"/>
         <source>current:</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11233"/>
+        <source>min</source>
+        <comment>abbrev. of minutes</comment>
+        <translation type="unfinished">دقیقه</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/phases.py" line="44"/>
+        <source>min</source>
+        <comment>abbrev of minimum</comment>
+        <translation type="unfinished">دقیقه</translation>
     </message>
 </context>
 <context>

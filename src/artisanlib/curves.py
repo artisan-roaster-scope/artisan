@@ -397,7 +397,7 @@ class HUDDlg(ArtisanDialog):
         self.swapETBT.setFocusPolicy(Qt.NoFocus)
         self.swapETBT.stateChanged.connect(self.changeSwapETBT)
         #limits
-        minlabel = QLabel(QApplication.translate("Label", "min",None))
+        minlabel = QLabel(QApplication.translate("Label", "min","abbrev of minimum"))
         maxlabel = QLabel(QApplication.translate("Label", "max",None))
         self.minLimit = QSpinBox()
         self.minLimit.setRange(0,1000)    #(min,max)
@@ -614,7 +614,7 @@ class HUDDlg(ArtisanDialog):
         self.rorFilter = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
         self.rorFilter.setChecked(self.aw.qmc.RoRlimitFlag)
         self.rorFilter.setFocusPolicy(Qt.NoFocus)
-        rorminlabel = QLabel(QApplication.translate("Label", "min",None))
+        rorminlabel = QLabel(QApplication.translate("Label", "min","abbrev of minimum"))
         rormaxlabel = QLabel(QApplication.translate("Label", "max",None))
         self.rorminLimit = QSpinBox()
         self.rorminLimit.setRange(-999,999)    #(min,max)

@@ -2,11 +2,11 @@ Detailed Release History
 ========================
 
 ----
-v2.4.4 (xx.11.2020)
+v2.4.4 (xx.12.2020)
 ------------------
 
 * New Features
-  - adds machine setups for the [Coffee Tech FZ-94 R](https://www.coffee-tech.com/), PLC equipped machines from [Nordic](https://artisan-scope.org/machines/nordic/), [Fabrica Roasters](https://artisan-scope.org/machines/fabrica/) and [MCR Series in C](https://artisan-scope.org/machines/mcr/)
+  - adds machine setups for the PLC equipped machines from [Nordic](https://artisan-scope.org/machines/nordic/), [Fabrica Roasters](https://artisan-scope.org/machines/fabrica/) and [MCR Series in C](https://artisan-scope.org/machines/mcr/)
   - adds support for [Phidget HUM1001](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=1179)
   - adds [Rubase](https://rubasseroasters.com/) importer
   - adds [Aillio](https://aillio.com/) RoastWorld importer

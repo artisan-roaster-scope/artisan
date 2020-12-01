@@ -16,7 +16,7 @@ matrix:
     - env: ARTISAN_OS=rpi
   include:
   - os: osx
-    osx_image: xcode11.6 # (macosx10.15, Python 3.8.6) # xcode10.1 # (Xcode 10.1, macOS 10.13, Python 3.7.5) # xcode12.2 comes with Python3.9.0
+    osx_image: xcode11.6 # (macosx10.15.7, Python 3.8.6) # xcode10.1 # (Xcode 10.1, macOS 10.13, Python 3.7.5) # xcode12.2 comes with Python3.9.0
     python: 3.8
     language: generic
     before_cache:
