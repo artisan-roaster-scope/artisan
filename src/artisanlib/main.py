@@ -2107,6 +2107,7 @@ class tgraphcanvas(FigureCanvas):
         self.eventactionsemaphore = QSemaphore(1)
         self.updateBackgroundSemaphore = QSemaphore(1)
         self.alarmSemaphore = QSemaphore(1)
+        self.rampSoakSemaphore = QSemaphore(1)
 
         #flag to plot cross lines from mouse
         self.crossmarker = False

@@ -759,6 +759,7 @@ class PID_DlgControl(ArtisanDialog):
                 
     def importrampsoaksJSON(self,filename):
         try:
+            self.aw.qmc.rampSoakSemaphore.acquire(1)
             import io
             infile = io.open(filename, 'r', encoding='utf-8')
             from json import load as json_load
@@ -782,6 +783,9 @@ class PID_DlgControl(ArtisanDialog):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importrampsoaksJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if self.aw.qmc.rampSoakSemaphore.available() < 1:
+                self.aw.qmc.rampSoakSemaphore.release(1)
     
     @pyqtSlot(bool)
     def exportrampsoaks(self,_):
@@ -789,6 +793,7 @@ class PID_DlgControl(ArtisanDialog):
         
     def exportrampsoaksJSON(self,filename):
         try:
+            self.aw.qmc.rampSoakSemaphore.acquire(1)
             self.saverampsoaks()
             rampsoaks = {}
             rampsoaks["svLabel"] = self.aw.pidcontrol.svLabel
@@ -811,48 +816,66 @@ class PID_DlgControl(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " exportrampsoaksJSON(): {0}").format(str(ex)),exc_tb.tb_lineno)
             return False
+        finally:
+            if self.aw.qmc.rampSoakSemaphore.available() < 1:
+                self.aw.qmc.rampSoakSemaphore.release(1)
             
     def saverampsoaks(self):
-        self.aw.pidcontrol.svLabel = self.labelEdit.text()
-        for i in range(self.aw.pidcontrol.svLen):
-            self.aw.pidcontrol.svValues[i] = self.SVWidgets[i].value()
-            self.aw.pidcontrol.svRamps[i] = self.aw.QTime2time(self.RampWidgets[i].time())
-            self.aw.pidcontrol.svSoaks[i] = self.aw.QTime2time(self.SoakWidgets[i].time())            
-            self.aw.pidcontrol.svActions[i] = int(self.ActionWidgets[i].currentIndex()) - 1 
-            beep = self.BeepWidgets[i].layout().itemAt(1).widget()           
-            self.aw.pidcontrol.svBeeps[i] = bool(beep.isChecked())
-            self.aw.pidcontrol.svDescriptions[i] = self.DescriptionWidgets[i].text()
+        try:
+            self.aw.qmc.rampSoakSemaphore.acquire(1)
+            self.aw.pidcontrol.svLabel = self.labelEdit.text()
+            for i in range(self.aw.pidcontrol.svLen):
+                self.aw.pidcontrol.svValues[i] = self.SVWidgets[i].value()
+                self.aw.pidcontrol.svRamps[i] = self.aw.QTime2time(self.RampWidgets[i].time())
+                self.aw.pidcontrol.svSoaks[i] = self.aw.QTime2time(self.SoakWidgets[i].time())            
+                self.aw.pidcontrol.svActions[i] = int(self.ActionWidgets[i].currentIndex()) - 1 
+                beep = self.BeepWidgets[i].layout().itemAt(1).widget()           
+                self.aw.pidcontrol.svBeeps[i] = bool(beep.isChecked())
+                self.aw.pidcontrol.svDescriptions[i] = self.DescriptionWidgets[i].text()
+        finally:
+            if self.aw.qmc.rampSoakSemaphore.available() < 1:
+                self.aw.qmc.rampSoakSemaphore.release(1)
             
     def setrampsoaks(self):
-        self.labelEdit.setText(self.aw.pidcontrol.svLabel)
-        for i in range(self.aw.pidcontrol.svLen):
-            self.SVWidgets[i].setValue(self.aw.pidcontrol.svValues[i])
-            self.RampWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svRamps[i]))
-            self.SoakWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svSoaks[i]))
-            self.ActionWidgets[i].setCurrentIndex(self.aw.pidcontrol.svActions[i] + 1)
-            beep = self.BeepWidgets[i].layout().itemAt(1).widget() 
-            if self.aw.pidcontrol.svBeeps[i]:
-                beep.setCheckState(Qt.Checked)
-            else:
-                beep.setCheckState(Qt.Unchecked)
-            self.DescriptionWidgets[i].setText(self.aw.pidcontrol.svDescriptions[i])
+        try:
+            self.aw.qmc.rampSoakSemaphore.acquire(1)
+            self.labelEdit.setText(self.aw.pidcontrol.svLabel)
+            for i in range(self.aw.pidcontrol.svLen):
+                self.SVWidgets[i].setValue(self.aw.pidcontrol.svValues[i])
+                self.RampWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svRamps[i]))
+                self.SoakWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svSoaks[i]))
+                self.ActionWidgets[i].setCurrentIndex(self.aw.pidcontrol.svActions[i] + 1)
+                beep = self.BeepWidgets[i].layout().itemAt(1).widget() 
+                if self.aw.pidcontrol.svBeeps[i]:
+                    beep.setCheckState(Qt.Checked)
+                else:
+                    beep.setCheckState(Qt.Unchecked)
+                self.DescriptionWidgets[i].setText(self.aw.pidcontrol.svDescriptions[i])
+        finally:
+            if self.aw.qmc.rampSoakSemaphore.available() < 1:
+                self.aw.qmc.rampSoakSemaphore.release(1)
 
     def saveRSs(self):
-        self.aw.pidcontrol.RS_svLabels = []
-        self.aw.pidcontrol.RS_svValues = []
-        self.aw.pidcontrol.RS_svRamps = []
-        self.aw.pidcontrol.RS_svSoaks = []
-        self.aw.pidcontrol.RS_svActions = []
-        self.aw.pidcontrol.RS_svBeeps = []
-        self.aw.pidcontrol.RS_svDescriptions = []
-        for n in range(self.aw.pidcontrol.RSLen):
-            self.aw.pidcontrol.RS_svLabels.append(self.getRSnSVLabel(n))
-            self.aw.pidcontrol.RS_svValues.append(self.getRSnSVvalues(n))
-            self.aw.pidcontrol.RS_svRamps.append(self.getRSnSVramps(n))
-            self.aw.pidcontrol.RS_svSoaks.append(self.getRSnSVsoaks(n))
-            self.aw.pidcontrol.RS_svActions.append(self.getRSnSVactions(n))
-            self.aw.pidcontrol.RS_svBeeps.append(self.getRSnSVbeeps(n))
-            self.aw.pidcontrol.RS_svDescriptions.append(self.getRSnSVdescriptions(n))
+        try:
+            self.aw.qmc.rampSoakSemaphore.acquire(1)
+            self.aw.pidcontrol.RS_svLabels = []
+            self.aw.pidcontrol.RS_svValues = []
+            self.aw.pidcontrol.RS_svRamps = []
+            self.aw.pidcontrol.RS_svSoaks = []
+            self.aw.pidcontrol.RS_svActions = []
+            self.aw.pidcontrol.RS_svBeeps = []
+            self.aw.pidcontrol.RS_svDescriptions = []
+            for n in range(self.aw.pidcontrol.RSLen):
+                self.aw.pidcontrol.RS_svLabels.append(self.getRSnSVLabel(n))
+                self.aw.pidcontrol.RS_svValues.append(self.getRSnSVvalues(n))
+                self.aw.pidcontrol.RS_svRamps.append(self.getRSnSVramps(n))
+                self.aw.pidcontrol.RS_svSoaks.append(self.getRSnSVsoaks(n))
+                self.aw.pidcontrol.RS_svActions.append(self.getRSnSVactions(n))
+                self.aw.pidcontrol.RS_svBeeps.append(self.getRSnSVbeeps(n))
+                self.aw.pidcontrol.RS_svDescriptions.append(self.getRSnSVdescriptions(n))
+        finally:
+            if self.aw.qmc.rampSoakSemaphore.available() < 1:
+                self.aw.qmc.rampSoakSemaphore.release(1)
 
     def setRSs(self):
         for n in range(self.aw.pidcontrol.RSLen):
