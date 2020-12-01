@@ -30,7 +30,7 @@
     <message>
         <location filename="../artisanlib/main.py" line="32364"/>
         <source>A new release is available.</source>
-        <translation type="unfinished">Esta disponible una versión más reciente.</translation>
+        <translation type="unfinished">Está disponible una versión más reciente.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32366"/>
@@ -60,7 +60,7 @@
     <message>
         <location filename="../artisanlib/main.py" line="32379"/>
         <source>There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.</source>
-        <translation type="unfinished">Ha habido un problema al recuperando la información de la última versión. Por favor revise su conexión a Internet o intente más tarde.</translation>
+        <translation type="unfinished">Ha habido un problema al recuperar la información de la última versión. Por favor revise su conexión a Internet o intente más tarde.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32382"/>
@@ -83,42 +83,42 @@
     <message>
         <location filename="../artisanlib/main.py" line="8323"/>
         <source>Moisture Green</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Humedad en Verde</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8338"/>
         <source>Moisture Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Humedad en Tostado</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8340"/>
         <source>Whole Color</source>
-        <translation type="unfinished">Color Entero</translation>
+        <translation type="unfinished">Color en Grano</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8342"/>
         <source>Ground Color</source>
-        <translation type="unfinished">Color del poso</translation>
+        <translation type="unfinished">Color en Molido</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8319"/>
         <source>Screen Size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tamaño de Criba</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8321"/>
         <source>Density Green</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Densidad en Verde</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8329"/>
         <source>Batch Size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tamaño del Batch</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8336"/>
         <source>Density Roasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Densidad en Tostado</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8344"/>
@@ -146,7 +146,7 @@
     <message>
         <location filename="../artisanlib/curves.py" line="880"/>
         <source>Info</source>
-        <translation type="unfinished">Info</translation>
+        <translation type="unfinished">Información</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="97"/>
@@ -171,7 +171,7 @@
     <message>
         <location filename="../artisanlib/wheels.py" line="114"/>
         <source>Save Img</source>
-        <translation type="unfinished">Guard. Imag</translation>
+        <translation type="unfinished">Guardar Img.</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2002"/>
