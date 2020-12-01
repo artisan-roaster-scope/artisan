@@ -323,10 +323,10 @@ for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
 
 # remove doublicate Qt installation
 
-try:
-    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.7/PyQt5/Qt",shell = True)
-except:
-    pass
+#try:
+#    subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.7/PyQt5/Qt",shell = True)
+#except:
+#    pass
 try:
     subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.8/PyQt5/Qt",shell = True)
 except:
@@ -378,4 +378,3 @@ else:
     subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r".dmg",shell = True)
     subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "artisan" -fs HFS+ -srcfolder "dist"',shell = True)
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
-#    ("../Resources", [r"includes/SourceHanSans.ttc"]),

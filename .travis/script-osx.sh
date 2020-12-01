@@ -7,6 +7,5 @@ cd src
 ./build-mac3.sh
 # the following test results in
 # in Unable to revert mtime: /Library/Fonts
-ls
-#python3 artisan.py
+python3 artisan.py
 cd ..
