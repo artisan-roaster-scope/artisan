@@ -162,6 +162,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.overlapEdit.setSuffix(" %")
 
         helpButton = QPushButton(QApplication.translate("Button","Help", None))
+        helpButton.setFocusPolicy(Qt.NoFocus)
+
         helpButton.clicked.connect(self.showEventannotationhelp)
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(overlapeditLabel)
@@ -506,6 +508,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.insertButton.setEnabled(False)
         helpDialogButton = QDialogButtonBox()
         helpButton = helpDialogButton.addButton(QDialogButtonBox.Help)
+        helpButton.setFocusPolicy(Qt.NoFocus)
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         if self.aw.locale not in self.aw.qtbase_locales:
             helpButton.setText(QApplication.translate("Button","Help", None))
@@ -775,6 +778,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4unit.setToolTip(slider_unit_tooltip_text)
         helpsliderDialogButton = QDialogButtonBox()
         helpsliderbutton = helpsliderDialogButton.addButton(QDialogButtonBox.Help)
+        helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         if self.aw.locale not in self.aw.qtbase_locales:
             helpsliderbutton.setText(QApplication.translate("Button","Help", None))
         helpsliderbutton.clicked.connect(self.showSliderHelp)

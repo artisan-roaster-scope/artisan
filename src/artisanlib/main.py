@@ -3756,6 +3756,8 @@ class tgraphcanvas(FigureCanvas):
                 self.alarmaction = alarmset[9][:]
                 self.alarmbeep = alarmset[10][:]
                 self.alarmstrings = alarmset[11][:]
+                # update the alarmstate array to the new size:
+                self.alarmstate = [-1]*len(self.alarmflag)
             finally:
                 if self.alarmSemaphore.available() < 1:
                     self.alarmSemaphore.release(1)
