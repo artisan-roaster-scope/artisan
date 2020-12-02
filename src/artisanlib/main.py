@@ -8866,6 +8866,14 @@ class tgraphcanvas(FigureCanvas):
                 except:
                     pass
             self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor='None') #) radar green facecolor='#d5de9c'
+
+            # fixing yticks with matplotlib.ticker "FixedLocator"
+            try:
+                ticks_loc = self.ax1.get_yticks()
+                self.ax1.yaxis.set_major_locator(ticker.FixedLocator(ticks_loc))
+            except:
+                pass
+            
             self.ax1.set_aspect(self.flavoraspect)
 
             aw.setFonts(redraw=False)
@@ -8911,7 +8919,6 @@ class tgraphcanvas(FigureCanvas):
                 stringlabel = str(int(locs[i]*10))
                 labels.append(stringlabel)
             self.ax1.set_yticklabels(labels,color=self.palette["xlabel"],fontproperties=fontprop_small)
-
             self.updateFlavorChartData()
 
             #anotate labels
@@ -12966,6 +12973,14 @@ class tgraphcanvas(FigureCanvas):
                 except:
                     pass
             self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor='None')
+            
+            # fixing yticks with matplotlib.ticker "FixedLocator"
+            try:
+                ticks_loc = self.ax2.get_yticks()
+                self.ax2.yaxis.set_major_locator(ticker.FixedLocator(ticks_loc))
+            except:
+                pass
+            
             self.ax2.set_rmax(1.)
             self.ax2.set_aspect(self.wheelaspect)
             self.ax2.grid(False)

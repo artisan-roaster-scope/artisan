@@ -276,6 +276,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             
             changeTriggersCombo.setMinimumContentsLength(3)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            changeTriggersCombo.setEnabled(bool(self.aw.qmc.phidget1048_async[i-1]))
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)
             phidgetBox1048.addWidget(changeTriggersCombo,3,i)
@@ -814,6 +815,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             
             changeTriggersCombo = QComboBox()
             changeTriggersCombo.setFocusPolicy(Qt.NoFocus)
+            changeTriggersCombo.setEnabled(bool(self.aw.qmc.phidget1018_async[i-1]))
             model = changeTriggersCombo.model()
             changeTriggerItems = self.createItems(self.aw.qmc.phidget1018_changeTriggersStrings)
             for item in changeTriggerItems:
