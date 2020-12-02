@@ -12,4 +12,4 @@ PyQt5==5.15.2 # 5.15.0 breaks custom event buttons. They only fire after a modal
 openpyxl==3.0.5
 keyring==21.5.0 # 21.4.0 #19.2.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller, 21.21 seems to have fixed this
 darkdetect==0.1.1 # detect if dark mode is active
-lxml==4.6.2 --no-binary :all:
+# lxml==4.6.2 # installed from source in .travis/install-osx.sh to make notarization happy

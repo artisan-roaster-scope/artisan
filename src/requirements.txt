@@ -1,3 +1,4 @@
+setuptools==50.3.2
 wheel==0.35.1
 pyserial==3.5 # 3.4
 pymodbus==2.4.0
@@ -11,7 +12,6 @@ altgraph==0.17
 macholib==1.14
 python-snap7==0.11
 pyusb==1.1.0
-setuptools==50.3.2
 persist-queue==0.5.1
 portalocker==2.0.0
 prettytable==0.7.2 # 1.0.1 and 2.0.0 fail to be packed by py2app properly into builds
