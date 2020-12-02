@@ -276,7 +276,7 @@
     <message>
         <location filename="../artisanlib/main.py" line="41670"/>
         <source>C Lines</source>
-        <translation type="obsolete">Lineas C</translation>
+        <translation type="obsolete">Líneas C</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="565"/>
@@ -296,12 +296,12 @@
     <message>
         <location filename="../artisanlib/wheels.py" line="47"/>
         <source>Reset Parents</source>
-        <translation type="unfinished">Reinicializar padres</translation>
+        <translation type="unfinished">Reiniciar Padres</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="53"/>
         <source>Reverse Hierarchy</source>
-        <translation type="unfinished">Invertir Jerarquia</translation>
+        <translation type="unfinished">Invertir Jerarquía</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="66"/>
@@ -316,7 +316,7 @@
     <message>
         <location filename="../artisanlib/wheels.py" line="84"/>
         <source>Line Color</source>
-        <translation type="unfinished">Color de Linea</translation>
+        <translation type="unfinished">Color de Línea</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="100"/>
@@ -331,7 +331,7 @@
     <message>
         <location filename="../artisanlib/wheels.py" line="109"/>
         <source>Save File</source>
-        <translation type="unfinished">Guardar Fichero</translation>
+        <translation type="unfinished">Guardar Archivo</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="130"/>
@@ -812,27 +812,27 @@ END</source>
     <message>
         <location filename="../artisanlib/events.py" line="502"/>
         <source>Insert</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Insertar</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="864"/>
         <source>Copy Table</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copiar Tabla</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="829"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Limpiar</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="199"/>
         <source>Calc</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Calcular</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="159"/>
         <source>Finishing Phase</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fase Final</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="171"/>
@@ -1241,12 +1241,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1222"/>
         <source>Tipping</source>
-        <translation>Crítico</translation>
+        <translation>Tipping</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1224"/>
         <source>Scorching</source>
-        <translation>Abrasador</translation>
+        <translation>Abrasivo</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1226"/>
@@ -1261,7 +1261,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/curves.py" line="363"/>
         <source>Smooth Spikes</source>
-        <translation type="unfinished">Alisar picos</translation>
+        <translation type="unfinished">Alisar Picos</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="614"/>
