@@ -12,3 +12,4 @@ openpyxl==3.0.5
 # pyinstaller 3.6 issue: https://github.com/pyinstaller/pyinstaller/issues/4213
 pywin32==228
 keyring==21.5.0 #19.2.0 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
+lxml==4.6.2

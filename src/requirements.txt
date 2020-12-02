@@ -19,6 +19,5 @@ Phidget22==1.6.20201120
 natsort==7.1.0
 xlrd==1.2.0
 requests-file==1.5.1
-lxml==4.6.2
 websocket-client==0.57.0
 wquantiles==0.5

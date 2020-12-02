@@ -15,3 +15,4 @@ pyinstaller==3.3.1 # 3.5 seems to hang!?
 cffi==1.12.3 # 1.13.2 fails, 1.12.3 is needed by crypto v2.5
 cryptography==3.2.1 # 3.2.1 is the last version supporting Python 3.5 # 2.5 worked but has a security issue # 2.8 fails with libcrypto.so.1.1: version `OPENSSL_1_1_0j' not found, required by cryptography.hazmat.bindings._openssl.so
 keyring==19.2.0  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller; Python 3.5 support was dropped
+lxml==4.6.2
