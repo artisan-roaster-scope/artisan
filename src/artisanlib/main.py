@@ -12345,25 +12345,25 @@ class tgraphcanvas(FigureCanvas):
                             index = self.timeindex.index(i)
                             if index == 0:
                                 timez = stringfromseconds(0)
-                                aw.sendmessage(QApplication.translate("Message", "[ CHARGE ]",None) + " " + timez, style="background-color:'#f07800';")
+                                aw.sendmessage(QApplication.translate("Message", "[ CHARGE ]",None) + " " + timez, style="background-color:'#f07800';",append=False)
                             elif index == 1:
                                 timez = stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                                aw.sendmessage(QApplication.translate("Message", "[ DRY END ]",None) + " " + timez, style="background-color:'orange';")
+                                aw.sendmessage(QApplication.translate("Message", "[ DRY END ]",None) + " " + timez, style="background-color:'orange';",append=False)
                             elif index == 2:
                                 timez = stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                                aw.sendmessage(QApplication.translate("Message", "[ FC START ]",None) + " " + timez, style="background-color:'orange';")
+                                aw.sendmessage(QApplication.translate("Message", "[ FC START ]",None) + " " + timez, style="background-color:'orange';",append=False)
                             elif index == 3:
                                 timez = stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])
-                                aw.sendmessage(QApplication.translate("Message", "[ FC END ]",None) + " " + timez, style="background-color:'orange';")
+                                aw.sendmessage(QApplication.translate("Message", "[ FC END ]",None) + " " + timez, style="background-color:'orange';",append=False)
                             elif index == 4:
                                 timez = stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                                aw.sendmessage(QApplication.translate("Message", "[ SC START ]",None) + " " + timez, style="background-color:'orange';")
+                                aw.sendmessage(QApplication.translate("Message", "[ SC START ]",None) + " " + timez, style="background-color:'orange';",append=False)
                             elif index == 5:
                                 timez = stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                                aw.sendmessage(QApplication.translate("Message", "[ SC END ]",None) + " " + timez, style="background-color:'orange';")
+                                aw.sendmessage(QApplication.translate("Message", "[ SC END ]",None) + " " + timez, style="background-color:'orange';",append=False)
                             elif index == 6:
                                 timez = stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                                aw.sendmessage(QApplication.translate("Message", "[ DROP ]",None) + " " + timez, style="background-color:'#f07800';")
+                                aw.sendmessage(QApplication.translate("Message", "[ DROP ]",None) + " " + timez, style="background-color:'#f07800';",append=False)
                             break
                         else:
                             if abs(self.temp2[i] - ydata) < 10:
@@ -12379,7 +12379,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
                             timez = stringfromseconds(self.timex[i] - self.timex[self.timeindex[0]])
-                            aw.sendmessage(timez,style="background-color:'lightblue';")
+                            aw.sendmessage(timez,style="background-color:'lightblue';",append=False)
                             break
                     else:
                         totaltime = aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
@@ -12431,7 +12431,7 @@ class tgraphcanvas(FigureCanvas):
                                   margin,stringfromseconds(midphasetime),margin,midphaseP,margin,midroc,margin,etbt2,margin)
                         string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s %s %s</font>"%(self.palette["rect3"],
                                   margin,stringfromseconds(finishphasetime),margin,finishphaseP,margin,finishroc,margin,etbt3,margin)
-                        aw.sendmessage(string1+string2+string3)
+                        aw.sendmessage(string1+string2+string3,append=False)
 
         except Exception as e:
 #            import traceback
