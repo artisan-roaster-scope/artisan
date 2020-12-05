@@ -26118,7 +26118,7 @@ class ApplicationWindow(QMainWindow):
                 if "TP_BT" in computedProfile and "TP_time" in computedProfile and "DROP_BT" in computedProfile and "DROP_time" in computedProfile and \
                     (computedProfile["DROP_time"]-computedProfile["TP_time"]) != 0:
                     computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
-                if aw.qmc.timeindex[2] > 0:
+                if aw.qmc.timeindex[2] > 0 and aw.qmc.delta2:
                     computedProfile["fcs_ror"] = self.float2float(aw.qmc.delta2[aw.qmc.timeindex[2]])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
