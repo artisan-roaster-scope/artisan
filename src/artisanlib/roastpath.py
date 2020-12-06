@@ -127,7 +127,7 @@ def extractProfileRoastPathHTML(url,_):
                         try:
 #                            tx_idx = res["timex"].index(tx) # does not cope with dropouts as the next line:
                             tx_idx = next(i for i,item in enumerate(res["timex"]) if item >= tx)
-                            timeindex[marks[d["EventName"]]] = tx_idx
+                            timeindex[marks[d["EventName"]]] = max(0,tx_idx)
                         except:
                             pass
             res["timeindex"] = timeindex

@@ -2068,22 +2068,31 @@ class editGraphDlg(ArtisanResizeablDialog):
             
             blend_dict = self.getBlendDictCurrentWeight(blend)
             
-            if "moisture" in blend_dict and blend_dict["moisture"] is not None:
-                self.moisture_greens_edit.setText("%g" % blend_dict["moisture"])
-            else:
-                self.moisture_greens_edit.setText(str(0))
-            if "density" in blend_dict and blend_dict["density"] is not None:
-                self.bean_density_in_edit.setText("%g" % self.aw.float2float(blend_dict["density"]))
-            else:
-                self.bean_density_in_edit.setText(str(0))
-            if "screen_min" in blend_dict and blend_dict["screen_min"] is not None:
-                self.bean_size_min_edit.setText(str(int(blend_dict["screen_min"])))
-            else:
-                self.bean_size_min_edit.setText("0")
-            if "screen_max" in blend_dict and blend_dict["screen_max"] is not None:
-                self.bean_size_max_edit.setText(str(int(blend_dict["screen_max"])))
-            else:
-                self.bean_size_max_edit.setText("0")
+            moisture_txt = "0"
+            try:
+                if "moisture" in blend_dict and blend_dict["moisture"] is not None:
+                    moisture_txt = "%g" % blend_dict["moisture"]
+            except:
+                pass
+            self.moisture_greens_edit.setText(moisture_txt)
+            density_txt = "0"
+            try:
+                if "density" in blend_dict and blend_dict["density"] is not None:
+                    density_txt = "%g" % self.aw.float2float(blend_dict["density"])
+            except:
+                pass
+            self.bean_density_in_edit.setText(density_txt)
+            screen_size_min = "0"
+            screen_size_max = "0"
+            try:
+                if "screen_min" in blend_dict and blend_dict["screen_min"] is not None:
+                    screen_size_min = str(int(blend_dict["screen_min"]))
+                if "screen_max" in blend_dict and blend_dict["screen_max"] is not None:
+                    screen_size_max = str(int(blend_dict["screen_max"]))
+            except:
+                pass
+            self.bean_size_min_edit.setText(screen_size_min)
+            self.bean_size_max_edit.setText(screen_size_max)
             # check if title should be changed (if still default, or equal to the previous selection:
             self.updateTitle(prev_coffee_label,prev_blend_label)
             self.markPlusCoffeeFields(True)
@@ -2101,27 +2110,33 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.beansedit.setPlainText(plus.stock.coffee2beans(coffee))
             keep_modified_moisture = self.modified_moisture_greens_text
             keep_modified_density = self.modified_density_in_text
-            if "moisture" in cd and cd["moisture"] is not None:
-                self.moisture_greens_edit.setText("%g" % cd["moisture"])
-            else:
-                self.moisture_greens_edit.setText(str(0))
-            if "density" in cd and cd["density"] is not None:
-                self.bean_density_in_edit.setText("%g" % self.aw.float2float(cd["density"]))
-            else:
-                self.bean_density_in_edit.setText(str(0)) 
-            if "screen_size" in cd and cd["screen_size"] is not None:
-                screen = cd["screen_size"]
-                if "min" in screen and screen["min"] is not None:
-                    self.bean_size_min_edit.setText(str(int(screen["min"])))
-                else:
-                    self.bean_size_min_edit.setText("0")
-                if "max" in screen and screen["max"] is not None:
-                    self.bean_size_max_edit.setText(str(int(screen["max"])))
-                else:
-                    self.bean_size_max_edit.setText("0")
-            else:
-                self.bean_size_min_edit.setText("0")
-                self.bean_size_max_edit.setText("0")
+            moisture_txt = "0"
+            try:
+                if "moisture" in cd and cd["moisture"] is not None:
+                    moisture_txt = "%g" % cd["moisture"]
+            except:
+                pass
+            self.moisture_greens_edit.setText(moisture_txt)
+            density_txt = "0"
+            try:
+                if "density" in cd and cd["density"] is not None:
+                    density_txt = "%g" % self.aw.float2float(cd["density"])
+            except:
+                pass
+            self.bean_density_in_edit.setText(density_txt)
+            screen_size_min = "0"
+            screen_size_max = "0"
+            try:
+                if "screen_size" in cd and cd["screen_size"] is not None:
+                    screen = cd["screen_size"]
+                    if "min" in screen and screen["min"] is not None:
+                        screen_size_min = str(int(screen["min"]))
+                    if "max" in screen and screen["max"] is not None:
+                        screen_size_max = str(int(screen["max"]))
+            except:
+                pass
+            self.bean_size_min_edit.setText(screen_size_min)
+            self.bean_size_max_edit.setText(screen_size_max)
             self.updateTitle(prev_coffee_label,prev_blend_label)
             self.markPlusCoffeeFields(True)
             self.density_in_editing_finished()
@@ -3499,18 +3514,18 @@ class editGraphDlg(ArtisanResizeablDialog):
                 #if there is a CHARGE recorded and the time entered is positive. Use relative time
                 if stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] != -1:
                     startindex = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + stringtoseconds(str(self.chargeedit.text())))
-                    self.aw.qmc.timeindex[0] = startindex
+                    self.aw.qmc.timeindex[0] = max(-1,startindex)
                     self.aw.qmc.xaxistosm(redraw=False)
                 #if there is a CHARGE recorded and the time entered is negative. Use relative time
                 elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] != -1:
                     relativetime = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(stringtoseconds(str(self.chargeedit.text())))
                     startindex = self.aw.qmc.time2index(relativetime)
-                    self.aw.qmc.timeindex[0] = startindex
+                    self.aw.qmc.timeindex[0] = max(-1,startindex)
                     self.aw.qmc.xaxistosm(redraw=False)
                 #if there is _no_ CHARGE recorded and the time entered is positive. Use absolute time 
                 elif stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] == -1:
                     startindex = self.aw.qmc.time2index(stringtoseconds(str(self.chargeedit.text())))
-                    self.aw.qmc.timeindex[0] = startindex
+                    self.aw.qmc.timeindex[0] = max(-1,startindex)
                     self.aw.qmc.xaxistosm(redraw=False)
                 #if there is _no_ CHARGE recorded and the time entered is negative. ERROR
                 elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] == -1:
@@ -3527,55 +3542,55 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.aw.qmc.timeindex[1] = 0
                 else:
                     dryindex = self.aw.qmc.time2index(start + s)
-                    self.aw.qmc.timeindex[1] = dryindex
+                    self.aw.qmc.timeindex[1] = max(0,dryindex)
             if self.Cstarteditcopy != str(self.Cstartedit.text()):
                 s = stringtoseconds(str(self.Cstartedit.text()))
                 if s <= 0:
                     self.aw.qmc.timeindex[2] = 0
                 else:
                     fcsindex = self.aw.qmc.time2index(start + s)
-                    self.aw.qmc.timeindex[2] = fcsindex
+                    self.aw.qmc.timeindex[2] = max(0,fcsindex)
             if self.Cendeditcopy != str(self.Cendedit.text()):
                 s = stringtoseconds(str(self.Cendedit.text()))
                 if s <= 0:
                     self.aw.qmc.timeindex[3] = 0
                 else:
                     fceindex = self.aw.qmc.time2index(start + s)
-                    self.aw.qmc.timeindex[3] = fceindex
+                    self.aw.qmc.timeindex[3] = max(0,fceindex)
             if self.CCstarteditcopy != str(self.CCstartedit.text()):
                 s = stringtoseconds(str(self.CCstartedit.text()))
                 if s <= 0:
                     self.aw.qmc.timeindex[4] = 0
                 else:
                     scsindex = self.aw.qmc.time2index(start + s)
-                    self.aw.qmc.timeindex[4] = scsindex
+                    self.aw.qmc.timeindex[4] = max(0,scsindex)
             if self.CCendeditcopy != str(self.CCendedit.text()):
                 s = stringtoseconds(str(self.CCendedit.text()))
                 if s <= 0:
                     self.aw.qmc.timeindex[5] = 0
                 elif stringtoseconds(str(self.CCendedit.text())) > 0:
                     sceindex = self.aw.qmc.time2index(start + s)
-                    self.aw.qmc.timeindex[5] = sceindex
+                    self.aw.qmc.timeindex[5] = max(0,sceindex)
             if self.dropeditcopy != str(self.dropedit.text()):
                 s = stringtoseconds(str(self.dropedit.text()))
                 if s <= 0:
                     self.aw.qmc.timeindex[6] = 0
                 else:
                     dropindex = self.aw.qmc.time2index(start + s)
-                    self.aw.qmc.timeindex[6] = dropindex
+                    self.aw.qmc.timeindex[6] = max(0,dropindex)
             if self.cooleditcopy != str(self.cooledit.text()):
                 s = stringtoseconds(str(self.cooledit.text()))
                 if s <= 0:
                     self.aw.qmc.timeindex[7] = 0
                 else:
                     coolindex = self.aw.qmc.time2index(start + s)
-                    self.aw.qmc.timeindex[7] = coolindex
+                    self.aw.qmc.timeindex[7] = max(0,coolindex)
             if self.aw.qmc.phasesbuttonflag:   
                 # adjust phases by DryEnd and FCs events
                 if self.aw.qmc.timeindex[1]:
-                    self.aw.qmc.phases[1] = int(round(self.aw.qmc.temp2[self.aw.qmc.timeindex[1]]))
+                    self.aw.qmc.phases[1] = max(0,int(round(self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])))
                 if self.aw.qmc.timeindex[2]:
-                    self.aw.qmc.phases[2] = int(round(self.aw.qmc.temp2[self.aw.qmc.timeindex[2]]))
+                    self.aw.qmc.phases[2] = max(0,int(round(self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])))
             
             self.saveEventTable()
         # Update Title

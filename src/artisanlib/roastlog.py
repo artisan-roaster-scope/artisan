@@ -197,7 +197,7 @@ def extractProfileRoastLog(url,_):
                             if te["label"] in timex_events:
                                 try:
                                     timex_idx = res["timex"].index(stringtoseconds(te["time"]))
-                                    timeindex[timex_events[te["label"]]] = timex_idx
+                                    timeindex[timex_events[te["label"]]] = max(0,timex_idx)
                                 except:
                                     pass
                             else:

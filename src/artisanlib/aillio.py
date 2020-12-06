@@ -495,7 +495,7 @@ def extractProfileBulletDict(data,aw):
         if "roastEndIndex" in data:
             timeindex[6] = max(0,min(data["roastEndIndex"],len(tx)-1))
         else:
-            timeindex[6] = len(tx)-1
+            timeindex[6] = max(0,len(tx)-1)
         res["timeindex"] = timeindex
         
         # extract events from newer JSON format

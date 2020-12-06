@@ -75,12 +75,12 @@ class s7port(object):
         self.COMsemaphore = QSemaphore(1)
         
         self.areas = [
-            0x81, # PE
-            0x82, # PA
-            0x83, # MK
-            0x1C, # CT
-            0x1D, # TM
-            0x84, # DB
+            0x81, # PE, 129
+            0x82, # PA, 130
+            0x83, # MK, 131
+            0x1C, # CT, 28
+            0x1D, # TM, 29
+            0x84, # DB, 132
         ]
         
         self.plc = None
@@ -583,8 +583,6 @@ class s7port(object):
                                 res = self.plc.read_area(self.areas[area],dbnumber,start,2)
                         except Exception:
                             res = None
-                        if dbnumber == 2 and start == 48:
-                            raise Exception("result None")
                         if res is None:
                             if retry > 0:
                                 retry = retry - 1

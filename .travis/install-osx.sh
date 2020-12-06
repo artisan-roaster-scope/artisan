@@ -1,7 +1,7 @@
 #!/bin/sh
 
-set -ex # reduced logging
-#set -e # increased logging
+#set -ex # increased logging
+set -e # reduced logging
 
 .travis/slience.sh brew update # this seems to help to work around some homebrew issues; and fails on others
 

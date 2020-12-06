@@ -155,6 +155,7 @@ DATA_FILES = [
     ("../Resources", [r"includes/SourceHanSansJP-Regular.otf"]),
     ("../Resources", [r"includes/SourceHanSansKR-Regular.otf"]),
     ("../Resources", [r"includes/SourceHanSansTW-Regular.otf"]),
+    ("../Resources", [r"includes/dijkstra.ttf"]),
     ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
     ("../Resources", [r"includes/Machines"]),
     ("../Resources", [r"includes/Themes"]),

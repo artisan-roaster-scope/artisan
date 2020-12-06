@@ -77,10 +77,10 @@ def extractProfileIkawaCSV(file,_):
             temp2.append(-1)
         # mark CHARGE
         if not timeindex[0] > -1 and 'state' in item and item['state'] == 'doser open':
-            timeindex[0] = i
+            timeindex[0] = max(0,i)
         # mark DROP
         if timeindex[6] == 0 and 'state' in item and item['state'] == 'cooling':
-            timeindex[6] = i
+            timeindex[6] = max(0,i)
         # add SET and RPM
         if 'temp set' in item:
             extra1.append(float(item['temp set']))

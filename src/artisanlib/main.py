@@ -6622,10 +6622,10 @@ class tgraphcanvas(FigureCanvas):
                         self.timealign(redraw=False,recompute=False)
 
                     bcharge_idx = 0
-                    if self.timeindexB[0] != -1:
+                    if self.timeindexB[0] > -1:
                         bcharge_idx = self.timeindexB[0]
                     bdrop_idx = len(self.timeB)-1
-                    if self.timeindexB[6]:
+                    if self.timeindexB[6] > 0:
                         bdrop_idx = self.timeindexB[6]
 
                     #draw one extra device on background stemp1BX
@@ -6964,12 +6964,14 @@ class tgraphcanvas(FigureCanvas):
                                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() anno {0}").format(str(ex)),exc_tb.tb_lineno)
 #                            every = None
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
-#                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if cool exists and last event was earlier
-#                                    self.E1backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
-#                                    self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
                                 if (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if drop exists and last event was earlier
+                                    # repeat last value at time of DROP
                                     self.E1backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
-                                    self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
+                                    pos = max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10)))
+                                    if self.clampEvents:
+                                        self.E1backgroundvalues.append(pos)
+                                    else:
+                                        self.E1backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0],
                                                                             marker=(self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[0],
@@ -6979,12 +6981,14 @@ class tgraphcanvas(FigureCanvas):
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(0,True))
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
-#                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if cool exists and last event was earlier
-#                                    self.E2backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
-#                                    self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
                                 if (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if drop exists and last event was earlier
+                                    # repeat last value at time of DROP
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
-                                    self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
+                                    pos = max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10)))
+                                    if self.clampEvents:
+                                        self.E2backgroundvalues.append(pos)
+                                    else:
+                                        self.E2backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1],
                                                                             marker=(self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[1],
@@ -6994,12 +6998,14 @@ class tgraphcanvas(FigureCanvas):
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(1,True))
                             if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
-#                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if cool exists and last event was earlier
-#                                    self.E3backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
-#                                    self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
                                 if (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if drop exists and last event was earlier
+                                    # repeat last value at time of DROP
                                     self.E3backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
-                                    self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
+                                    pos = max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10)))
+                                    if self.clampEvents:
+                                        self.E3backgroundvalues.append(pos)
+                                    else:
+                                        self.E3backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2],
                                                                             marker=(self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[2],
@@ -7009,12 +7015,14 @@ class tgraphcanvas(FigureCanvas):
                                                                             #markevery=every,
                                                                             linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(2,True))
                             if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
-#                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if cool exists and last event was earlier
-#                                    self.E4backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
-#                                    self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
                                 if (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if drop exists and last event was earlier
+                                    # repeat last value at time of DROP
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
-                                    self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
+                                    pos = max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10)))
+                                    if self.clampEvents:
+                                        self.E4backgroundvalues.append(pos)
+                                    else:
+                                        self.E4backgroundvalues.append((pos*event_pos_factor)+event_pos_offset)
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3],
                                                                             marker=(self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                                             markersize = self.EvalueMarkerSize[3],
@@ -7443,12 +7451,15 @@ class tgraphcanvas(FigureCanvas):
 #                        every = None
 
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
+                            pos = max(0,int(round((self.specialeventsvalue[E1_last]-1)*10)))
+                            if not self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                pos = (pos*event_pos_factor)+event_pos_offset
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
                                 self.E1timex.append(self.timex[self.timeindex[7]]) #time of cool
-                                self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E1_last]-1)*10))))]) #repeat last event value
+                                self.E1values.append(pos) #repeat last event value
                             elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E1_last]]):   #if drop exists and last event was earlier
                                 self.E1timex.append(self.timex[self.timeindex[6]]) #time of drop
-                                self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E1_last]-1)*10))))]) #repeat last event value
+                                self.E1values.append(pos) #repeat last event value
                             E1x = self.E1timex
                             E1y = self.E1values
                             ds = "steps-post"
@@ -7464,12 +7475,15 @@ class tgraphcanvas(FigureCanvas):
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex):
+                            pos = max(0,int(round((self.specialeventsvalue[E2_last]-1)*10)))
+                            if not self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                pos = (pos*event_pos_factor)+event_pos_offset
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
                                 self.E2timex.append(self.timex[self.timeindex[7]]) #time of cool
-                                self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E2_last]-1)*10))))]) #repeat last event value
+                                self.E2values.append(pos) #repeat last event value
                             elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E2_last]]):   #if drop exists and last event was earlier
                                 self.E2timex.append(self.timex[self.timeindex[6]]) #time of drop
-                                self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E2_last]-1)*10))))]) #repeat last event value
+                                self.E2values.append(pos) #repeat last event value
                             E2x = self.E2timex
                             E2y = self.E2values
                             ds = "steps-post"
@@ -7485,12 +7499,17 @@ class tgraphcanvas(FigureCanvas):
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
+                            pos = max(0,int(round((self.specialeventsvalue[E3_last]-1)*10)))
+                            if not self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                pos = (pos*event_pos_factor)+event_pos_offset
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
                                 self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
-                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
+#                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
+                                self.E3values.append(pos) #repeat last event value
                             elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E3_last]]):   #if drop exists and last event was earlier
                                 self.E3timex.append(self.timex[self.timeindex[6]]) #time of drop
-                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
+#                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
+                                self.E3values.append(pos) #repeat last event value
                             E3x = self.E3timex
                             E3y = self.E3values
                             ds = "steps-post"
@@ -7506,12 +7525,17 @@ class tgraphcanvas(FigureCanvas):
                                                             pickradius=2,#markevery=every,
                                                             linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
+                            pos = max(0,int(round((self.specialeventsvalue[E4_last]-1)*10)))
+                            if not self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                pos = (pos*event_pos_factor)+event_pos_offset
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
-                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
+#                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
+                                self.E4values.append(pos) #repeat last event value
                             elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E4_last]]):   #if drop exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[6]]) #time of drop
-                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
+#                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
+                                self.E4values.append(pos) #repeat last event value
                             E4x = self.E4timex
                             E4y = self.E4values
                             ds = "steps-post"
@@ -9931,12 +9955,12 @@ class tgraphcanvas(FigureCanvas):
                             removed = True
                     elif not aw.button_19.isFlat():
                         if self.device != 18 or aw.simulator is not None:
-                            self.timeindex[1] = len(self.timex)-1
+                            self.timeindex[1] = max(0,len(self.timex)-1)
                         else:
                             tx,et,bt = aw.ser.NONE()
                             if et != -1 and bt != -1:
                                 self.drawmanual(et,bt,tx)
-                                self.timeindex[1] = len(self.timex)-1
+                                self.timeindex[1] = max(0,len(self.timex)-1)
                             else:
                                 return
                         if aw.qmc.phasesbuttonflag:
@@ -10038,12 +10062,12 @@ class tgraphcanvas(FigureCanvas):
                     elif not aw.button_3.isFlat():
                         # record 1Cs only if Charge mark has been done
                         if self.device != 18 or aw.simulator is not None:
-                            self.timeindex[2] = len(self.timex)-1
+                            self.timeindex[2] = max(0,len(self.timex)-1)
                         else:
                             tx,et,bt = aw.ser.NONE()
                             if et != -1 and bt != -1:
                                 self.drawmanual(et,bt,tx)
-                                self.timeindex[2] = len(self.timex)-1
+                                self.timeindex[2] = max(0,len(self.timex)-1)
                             else:
                                 return
                         if aw.qmc.phasesbuttonflag:
@@ -10141,12 +10165,12 @@ class tgraphcanvas(FigureCanvas):
                             removed = True
                     elif not aw.button_4.isFlat():
                         if self.device != 18 or aw.simulator is not None:
-                            self.timeindex[3] = len(self.timex)-1
+                            self.timeindex[3] = max(0,len(self.timex)-1)
                         else:
                             tx,et,bt = aw.ser.NONE()
                             if et != -1 and bt != -1:
                                 self.drawmanual(et,bt,tx)
-                                self.timeindex[3] = len(self.timex)-1
+                                self.timeindex[3] = max(0,len(self.timex)-1)
                             else:
                                 return
                         #calculate time elapsed since charge time
@@ -10240,12 +10264,12 @@ class tgraphcanvas(FigureCanvas):
                             removed = True
                     elif not aw.button_5.isFlat():
                         if self.device != 18 or aw.simulator is not None:
-                            self.timeindex[4] = len(self.timex)-1
+                            self.timeindex[4] = max(0,len(self.timex)-1)
                         else:
                             tx,et,bt = aw.ser.NONE()
                             if et != -1 and bt != -1:
                                 self.drawmanual(et,bt,tx)
-                                self.timeindex[4] = len(self.timex)-1
+                                self.timeindex[4] = max(0,len(self.timex)-1)
                             else:
                                 return
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(stringfromseconds(self.timex[self.timeindex[4]]-start,False)))
@@ -10349,12 +10373,12 @@ class tgraphcanvas(FigureCanvas):
                             removed = True
                     elif not aw.button_6.isFlat():
                         if self.device != 18 or aw.simulator is not None:
-                            self.timeindex[5] = len(self.timex)-1
+                            self.timeindex[5] = max(0,len(self.timex)-1)
                         else:
                             tx,et,bt = aw.ser.NONE()
                             if et != -1 and bt != -1:
                                 self.drawmanual(et,bt,tx)
-                                self.timeindex[5] = len(self.timex)-1
+                                self.timeindex[5] = max(0,len(self.timex)-1)
                             else:
                                 return
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
@@ -10463,14 +10487,14 @@ class tgraphcanvas(FigureCanvas):
                             self.roastUUID = uuid.uuid4().hex
                         if self.device != 18 or aw.simulator is not None:
                             if self.autoDropIdx:
-                                self.timeindex[6] = self.autoDropIdx
+                                self.timeindex[6] = max(0,self.autoDropIdx)
                             else:
-                                self.timeindex[6] = len(self.timex)-1
+                                self.timeindex[6] = max(0,len(self.timex)-1)
                         else:
                             tx,et,bt = aw.ser.NONE()
                             if et != -1 and bt != -1:
                                 self.drawmanual(et,bt,tx)
-                                self.timeindex[6] = len(self.timex)-1
+                                self.timeindex[6] = max(0,len(self.timex)-1)
                             else:
                                 return
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
@@ -10619,12 +10643,12 @@ class tgraphcanvas(FigureCanvas):
     
                     elif not aw.button_20.isFlat():
                         if self.device != 18 or aw.simulator is not None:
-                            self.timeindex[7] = len(self.timex)-1
+                            self.timeindex[7] = max(0,len(self.timex)-1)
                         else:
                             tx,et,bt = aw.ser.NONE()
                             if et != -1 and bt != -1:
                                 self.drawmanual(et,bt,tx)
-                                self.timeindex[7] = len(self.timex)-1
+                                self.timeindex[7] = max(0,len(self.timex)-1)
                             else:
                                 return
                         #calculate time elapsed since charge time
@@ -11900,7 +11924,7 @@ class tgraphcanvas(FigureCanvas):
 ##        times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
         for i in range(len(times)):
             if times[i]:
-                self.timeindex[i] = self.time2index(times[i])
+                self.timeindex[i] = max(0,self.time2index(times[i]))
             else:
                 self.timeindex[i] = 0
 
@@ -11910,7 +11934,7 @@ class tgraphcanvas(FigureCanvas):
 ##        times = [self.startendB[0],self.dryendB[0],self.varCB[0],self.varCB[2],self.varCB[4],self.varCB[6],self.startendB[2]]
         for i in range(len(times)):
             if times[i]:
-                self.timeindexB[i] = self.backgroundtime2index(times[i])
+                self.timeindexB[i] = max(0,self.backgroundtime2index(times[i]))
             else:
                 self.timeindexB[i] = 0
 
@@ -12588,7 +12612,7 @@ class tgraphcanvas(FigureCanvas):
 
             for x in range(len(self.timeindex)):
                 if self.timeindex[x] > index: #decrease time index by one when above the index taken out
-                    self.timeindex[x] -= 1
+                    self.timeindex[x] = max(0,self.timeindex[x] - 1)
 
             self.redrawdesigner()
 
@@ -13876,8 +13900,10 @@ class SampleThread(QThread):
                             # place the second ET/BT sampling in the middle of the sampling interval
                             stime = max(0.3,(sampling_interval / 4.0) - gone) # placing the second sample in the middle blocks too long!
 #                            stime = max(0,0.3 - gone) # we want the second main sample minimally 100ms after the first
+                            print("stime",stime)
                             libtime.sleep(stime)
                             timeBeforeETBT2 = libtime.perf_counter() # the time before sending the 2nd request to the main device
+                            print("time delta before requests",timeBeforeETBT2-timeBeforeETBT)
                             tx_2,t1_2,t2_2 = self.sample_main_device(force=True) # we force fetching of new reaedings from S7 and MODBUS main devices and avoid the refilling of the optimizer cache
                             timeAfterETBT2 = libtime.perf_counter() # the time after sending the 2nd request to the main device
                             if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
@@ -19679,6 +19705,11 @@ class ApplicationWindow(QMainWindow):
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['SourceHanSansJP-Regular']
             aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansJP-Regular.otf")
+        elif self.qmc.graphfont == 9: 
+            # font Dijkstra selected
+            rcParams['font.size'] = 12.0
+            rcParams['font.family'] = ['Dijkstra']
+            aw.set_mpl_fontproperties(self.getResourcePath() + "dijkstra.ttf")
         elif self.qmc.graphfont == 1 or platf == "Linux": # no Comic on Linux!
             # font Humor selected
             rcParams['font.size'] = 16.0
@@ -21424,8 +21455,10 @@ class ApplicationWindow(QMainWindow):
                             elif cs == "openProperties":
                                 aw.openPropertiesSignal.emit()
                             # popup(<m>[,<t>]) with <m> the message and <t> the optional timeout in seconds
+                            # message can be a quoted string or just a sequence of characters
                             elif cs.startswith("popup(") and cs.endswith(")"):
                                 try:
+                                    # quoted string message
                                     values = cs[len("popup("):-1].split(',')
                                     message = str(eval(values[0]))
                                     timeout = 0
@@ -21433,8 +21466,9 @@ class ApplicationWindow(QMainWindow):
                                         timeout = int(eval(values[1]))
                                     self.qmc.showAlarmPopupSignal.emit(message,timeout)
                                 except:
+                                    # sequence of character message
                                     try:
-                                        message = str(eval(values[0]))
+                                        message = str(values[0])
                                         timeout = 0
                                         if len(values)>1:
                                             timeout = int(eval(values[1]))
@@ -21455,11 +21489,16 @@ class ApplicationWindow(QMainWindow):
                             # setCanvasColor(<c>) with <c> the color in RGB-hex format like #ae12f7
                             elif cs.startswith("setCanvasColor(") and cs.endswith(")"):
                                 try:
-                                    color = cs[len("setCanvasColor("):-1]
+                                    color = str(eval(cs[len("setCanvasColor("):-1]))
                                     self.setCanvasColorSignal.emit(color)
                                     self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
-                                    pass
+                                    try:
+                                        color = cs[len("setCanvasColor("):-1].strip()
+                                        self.setCanvasColorSignal.emit(color)
+                                        self.sendmessage("Artisan Command: {}".format(cs))
+                                    except:
+                                        pass
                             # resetCanvasColor()
                             elif cs == "resetCanvasColor":
                                 try:
@@ -21470,7 +21509,10 @@ class ApplicationWindow(QMainWindow):
                             # button(<e>) with <e> one of { ON, START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }
                             elif cs.startswith("button(") and cs.endswith(")"):
                                 try:
-                                    event = cs[len("button("):-1].strip()
+                                    try:
+                                        event = str(eval(cs[len("button("):-1])).strip()
+                                    except:
+                                        event = cs[len("button("):-1].strip()
                                     if event == "ON" and not self.qmc.flagon:
                                         self.qmc.toggleMonitorSignal.emit()
                                     elif event == "START" and not self.qmc.flagstart:
@@ -21563,7 +21605,7 @@ class ApplicationWindow(QMainWindow):
                                 except:
                                     # might be a label
                                     try:
-                                        label = str(cs[len("pidRS("):-1])
+                                        label = str(eval(cs[len("pidRS("):-1]))
                                         rs = self.pidcontrol.findRSset(label) # here rs is 0-based!!
                                         if rs is not None:
                                             self.pidcontrol.setRSpattern(rs)
@@ -21591,7 +21633,7 @@ class ApplicationWindow(QMainWindow):
                                 except:
                                     # might be a label
                                     try:
-                                        label = str(cs[len("palette("):-1])
+                                        label = str(eval(cs[len("palette("):-1]))
                                         p = self.findPalette(label)
                                         if p is not None:
                                             self.setbuttonsfromSignal.emit(p)
@@ -21601,7 +21643,7 @@ class ApplicationWindow(QMainWindow):
                             # loadBackground(<filepath>)
                             elif cs.startswith("loadBackground(") and cs.endswith(")"):
                                 try:
-                                    fp = str(cs[len("loadBackground("):-1])
+                                    fp = str(eval(cs[len("loadBackground("):-1]))
                                     self.loadBackgroundSignal.emit(fp)
                                     self.sendmessage("Artisan Command: {}".format(cs))
                                 except:
@@ -21622,7 +21664,7 @@ class ApplicationWindow(QMainWindow):
                                 except:
                                     # might be a label
                                     try:
-                                        label = str(cs[len("alarmset("):-1])
+                                        label = str(eval(cs[len("alarmset("):-1]))
                                         p = self.qmc.findAlarmSet(label)
                                         if p is not None:
                                             self.qmc.alarmsetSignal.emit(p)
@@ -23920,7 +23962,7 @@ class ApplicationWindow(QMainWindow):
                 t2 = profile["temp2"]
                 t1x = profile["extratemp1"]
                 t2x = profile["extratemp2"]
-
+                
                 #remove the analysis results annotation if it exists
                 aw.qmc.analysisresultsstr = ""
 
@@ -23999,6 +24041,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEStrings = [d(x) for x in profile["specialeventsStrings"]]
                 self.qmc.backgroundFlavors = profile["flavors"]
                 self.qmc.titleB = d(profile["title"])
+                                
                 if "roastbatchnr" in profile:
                     try:
                         self.qmc.roastbatchnrB = int(profile["roastbatchnr"])
@@ -24031,7 +24074,7 @@ class ApplicationWindow(QMainWindow):
                 if "etypes" in profile:
                     self.qmc.Betypes = profile["etypes"]
                 if "timeindex" in profile:
-                    self.qmc.timeindexB = profile["timeindex"]          #if new profile found with variable timeindex
+                    self.qmc.timeindexB = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile["timeindex"])]          #if new profile found with variable timeindex
                     if self.qmc.phasesfromBackgroundflag:
                         # adjust phases by DryEnd and FCs events from background profile
                         if self.qmc.timeindexB[1]:
@@ -24180,28 +24223,28 @@ class ApplicationWindow(QMainWindow):
             #set events
             CHARGE = stringtoseconds(header[2].split('CHARGE:')[1])
             if CHARGE > 0:
-                self.qmc.timeindex[0] = self.time2index(CHARGE)
+                self.qmc.timeindex[0] = max(-1,self.time2index(CHARGE))
             DRYe = stringtoseconds(header[4].split('DRYe:')[1])
             if DRYe > 0:
-                self.qmc.timeindex[1] = self.time2index(DRYe)
+                self.qmc.timeindex[1] = max(0,self.time2index(DRYe))
             FCs = stringtoseconds(header[5].split('FCs:')[1])
             if FCs > 0:
-                self.qmc.timeindex[2] = self.time2index(FCs)
+                self.qmc.timeindex[2] = max(0,self.time2index(FCs))
             FCe = stringtoseconds(header[6].split('FCe:')[1])
             if FCe > 0:
-                self.qmc.timeindex[3] = self.time2index(FCe)
+                self.qmc.timeindex[3] = max(0,self.time2index(FCe))
             SCs = stringtoseconds(header[7].split('SCs:')[1])
             if SCs > 0:
-                self.qmc.timeindex[4] = self.time2index(SCs)
+                self.qmc.timeindex[4] = max(0,self.time2index(SCs))
             SCe = stringtoseconds(header[8].split('SCe:')[1])
             if SCe> 0:
-                self.qmc.timeindex[5] = self.time2index(SCe)
+                self.qmc.timeindex[5] = max(0,self.time2index(SCe))
             DROP = stringtoseconds(header[9].split('DROP:')[1])
             if DROP > 0:
-                self.qmc.timeindex[6] = self.time2index(DROP)
+                self.qmc.timeindex[6] = max(0,self.time2index(DROP))
             COOL = stringtoseconds(header[10].split('COOL:')[1])
             if COOL > 0:
-                self.qmc.timeindex[7] = self.time2index(COOL)
+                self.qmc.timeindex[7] = max(0,self.time2index(COOL))
             self.qmc.endofx = self.qmc.timex[-1]
             self.sendmessage(QApplication.translate("Message","Artisan CSV file loaded successfully", None))
             self.qmc.fileDirtySignal.emit()
@@ -24669,15 +24712,15 @@ class ApplicationWindow(QMainWindow):
                 temp2.append(t2)
                 event = fields[3]
                 if event == "Beans loaded":
-                    timeindex[0] = len(timex) - 1
+                    timeindex[0] = max(-1,len(timex) - 1)
                 elif event == "First crack start":
-                    timeindex[2] = len(timex) - 1
+                    timeindex[2] = max(0,len(timex) - 1)
                 elif event == "First crack end":
-                    timeindex[3] = len(timex) - 1
+                    timeindex[3] = max(0,len(timex) - 1)
                 elif event == "Second crack start":
-                    timeindex[4] = len(timex) - 1
+                    timeindex[4] = max(0,len(timex) - 1)
                 elif event == "Beans ejected":
-                    timeindex[6] = len(timex) - 1
+                    timeindex[6] = max(0,len(timex) - 1)
         obj["timeindex"] = timeindex
         obj["timex"] = timex
         obj["temp1"] = temp2
@@ -25911,7 +25954,7 @@ class ApplicationWindow(QMainWindow):
             if self.pidcontrol.loadRampSoakFromProfile:
                 self.loadRampSoakFromProfile(filename,profile)
             if "timeindex" in profile:
-                self.qmc.timeindex = profile["timeindex"]
+                self.qmc.timeindex = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile["timeindex"])]
                 if self.qmc.locktimex:
                     if self.qmc.timeindex[0] != -1:
                         self.qmc.startofx = self.qmc.timex[aw.qmc.timeindex[0]] + self.qmc.locktimex_start
@@ -30173,7 +30216,7 @@ class ApplicationWindow(QMainWindow):
         res["temp_unit"] = profile["mode"]
         timex = profile["timex"]
         res["timex"] = timex
-        timeindex = profile["timeindex"]
+        timeindex = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile["timeindex"])]
         res["charge_idx"] = (timeindex[0] if timeindex[0] > -1 else 0)
         res["drop_idx"] = (timeindex[6] if timeindex[6] > 0 else len(timex))
         bt = profile["temp2"]
@@ -30640,6 +30683,8 @@ class ApplicationWindow(QMainWindow):
                 first_profile_event_time = 0
                 max_drop_time = 0
                 label_chr_nr = 0
+                
+                delta_max = 1 # computed the delta max over all delta curves if visible
 
                 for p in profiles:
                     pd = self.profileProductionData(p)
@@ -30746,7 +30791,7 @@ class ApplicationWindow(QMainWindow):
                             charge = max(0,rd["charge_idx"]) # start of visible data
                             drop = rd["drop_idx"] # end of visible data
                             stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
-                            timeindex = p["timeindex"]
+                            timeindex = [max(0,v) if i>0 else max(-1,v) for v,i in enumerate(p["timeindex"])]
                             if len(timex) > rd["charge_idx"]:
                                 if first_profile:
                                 # align with CHARGE
@@ -30786,6 +30831,7 @@ class ApplicationWindow(QMainWindow):
                                     # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                                     RoR_start = min(rd["charge_idx"]+10,len(tx)-1)
                                     _,delta = self.qmc.recomputeDeltas(tx,RoR_start,drop,None,t1,optimalSmoothing=aw.qmc.optimalSmoothing)
+                                    delta_max = max(delta_max,self.calcAutoDelta([],delta,timeindex,False,True))
                                     if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
                                         dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
                                         dlinestyle = self.qmc.BTdeltalinestyle
@@ -30875,8 +30921,21 @@ class ApplicationWindow(QMainWindow):
                                         except:
                                             pass
                         except:
-                            pass
-
+                            pass                            
+                        # we only adjust the upper limit of the delta axis automatically
+                        if self.qmc.autodeltaxBT:
+                            self.qmc.delta_ax.set_ylim(self.qmc.zlimit_min,delta_max)                        
+                        # adjust zgrid
+                        d = delta_max - self.qmc.zlimit_min
+                        steps = int(round(d/5))
+                        if steps > 50: 
+                            steps = int(round(steps/10))*10
+                        elif steps > 10:
+                            steps = int(round(steps/5))*5
+                        auto_grid = max(2,steps)
+                        self.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(auto_grid))
+                        self.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                        # adjust time limits
                         aw.qmc.ax.set_xlim(min_start_time-15,max_end_time+15) # we adjust the min, max time scale to ensure all data is visible
                         graph_image = "roastlog-graph"
                         self.qmc.setProfileTitle("")
@@ -33775,7 +33834,7 @@ class ApplicationWindow(QMainWindow):
 
                 # set CHARGE and DROP
                 self.qmc.timeindex[0] = 0
-                self.qmc.timeindex[6] = len(self.qmc.timex) - 1
+                self.qmc.timeindex[6] = max(0,len(self.qmc.timex) - 1)
 
                 if recipedata is not None:
                     switchpoints = tree.find('recipedata/switchpoints')
@@ -35312,15 +35371,15 @@ class ApplicationWindow(QMainWindow):
                         if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
                             # we copy the CHARGE and DROP from the foreground to allow alignment
                             t1 = aw.qmc.timex[aw.qmc.timeindex[0]]
-                            aw.qmc.timeindexB[0] = aw.qmc.backgroundtime2index(t1)
+                            aw.qmc.timeindexB[0] = max(-1,aw.qmc.backgroundtime2index(t1))
                             if aw.qmc.timeindex[1]:
                                 t_DE = aw.qmc.timex[aw.qmc.timeindex[1]]
-                                aw.qmc.timeindexB[1] = aw.qmc.backgroundtime2index(t_DE)
+                                aw.qmc.timeindexB[1] = max(0,aw.qmc.backgroundtime2index(t_DE))
                             if aw.qmc.timeindex[2]:
                                 t_FCs = aw.qmc.timex[aw.qmc.timeindex[2]]
-                                aw.qmc.timeindexB[2] = aw.qmc.backgroundtime2index(t_FCs)
+                                aw.qmc.timeindexB[2] = max(0,aw.qmc.backgroundtime2index(t_FCs))
                             t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
-                            aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
+                            aw.qmc.timeindexB[6] = max(0,aw.qmc.backgroundtime2index(t2))
                         aw.qmc.background = True
                         aw.qmc.redraw(recomputeAllDeltas=recomputeAllDeltas)
                         aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1]), None))

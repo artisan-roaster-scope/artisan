@@ -125,6 +125,7 @@ for fn in [
     'artisanSettings.ico',
     'artisanWheel.ico',
     r'includes\Humor-Sans.ttf',
+    r'includes\dijkstra.ttf',
     r'includes\WenQuanYiZenHei-01.ttf',
     r'includes\SourceHanSansCN-Regular.otf',
     r'includes\SourceHanSansHK-Regular.otf',

@@ -20,6 +20,7 @@ v2.4.4 (xx.12.2020)
   - adds Qt base translations for Turkish, Dutch and Brazilian
   - adds _fetch full blocks_ option to instruct the S7 and MODBUS optimizer fetch maximal register blocks from lowest to largest register number
   - adds Artisan Commands: `popup(m[,t])`, `message(s)`, `setCanvasColor(c)`, `resetCanvasColor`, `button(e)` with `e = { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }`, `p-i-d(p,i,d)`, `pidSV(v)`, `pidRS(rs)`, `pidSource(n)`, `palette(p)`, `loadBackground(<filepath>)`, `clearBackground`, `alarmset(as)`, `adjustSV(n)`
+  - adds Dijkstra curve font
 * Changes
   - updates [Trinitas T2 and T7](https://artisan-scope.org/machines/trinitas/), [Oztürk](https://artisan-scope.org/machines/ozturk/) and [Giesen](https://artisan-scope.org/machines/giesen/) machine setups
   - renames empty MODBUS decoder entry to Int
@@ -37,8 +38,9 @@ v2.4.4 (xx.12.2020)
   - [artisan.plus](https://artisan.plus/): optimized synchronization
   - improved S7 serial logging and communication error handling
   - [special events annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) respect the decimal places setting
-  - updated Spanish translations ([PR #525](../../../pull/525) & [PR #527](../../../pull/427) by [
+  - updated Spanish translations ([PR #525](../../../pull/525), [PR #527](../../../pull/427) & [PR #530](../../../pull/530) by [
 Richard Rodrigues](https://github.com/rich1n))
+  - updated Chinese translations ([PR #532](../../../pull/532) by [wuyi-ligux](https://github.com/wuyi-levard))
 * Fixes
   - fixes regression which broke the event picker in v2.4.2
   - fixes another issue with the multiple event button action processing ([Issue #504](../../../issues/504))
@@ -53,7 +55,8 @@ Richard Rodrigues](https://github.com/rich1n))
   - fixes Excel export issue occuring with DeltaBT turned off
   - hides annotations for curves hidden by clicking the legend
   - renamed ET and BT curves can be hidden by clicking the legend
-  - enables the PID SV buttons also for the internal software PID as well as for xexternal MODBUS/S7 PIDs
+  - enables the PID SV buttons also for the internal software PID as well as for external MODBUS/S7 PIDs
+  - applies Delta BT auto axis computation also to Web Ranking reports
 
 
 **Note**

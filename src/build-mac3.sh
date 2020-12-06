@@ -1,7 +1,7 @@
 #!/bin/sh
 
-set -ex # reduced logging
-#set -e
+#set -ex
+set -e  # reduced logging
 
 # add argument "legacy" to make a build that supports older OS X systems using an outdated Qt
 

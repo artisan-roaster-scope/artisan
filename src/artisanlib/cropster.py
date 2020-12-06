@@ -738,7 +738,7 @@ def extractProfileCropsterXLS(file,_):
                         res["timex"] = [t.value for t in time[1:]]
                         res["temp2"] = [t.value for t in temp[1:]]
                         res["temp1"] = [-1]*len(res["timex"])
-                        res["timeindex"] = [0,0,0,0,0,0,len(res["timex"])-1,0]
+                        res["timeindex"] = [0,0,0,0,0,0,max(0,len(res["timex"])-1),0]
                 break
     except:
         pass
@@ -762,7 +762,7 @@ def extractProfileCropsterXLS(file,_):
                                 res["timex"] = [t.value for t in time[1:]]
                             if "temp2" not in res or len(res["temp2"]) != len(res["timex"]):
                                 res["temp2"] = [-1]*len(res["timex"])
-                            res["timeindex"] = [0,0,0,0,0,0,len(res["timex"])-1,0]
+                            res["timeindex"] = [0,0,0,0,0,0,max(0,len(res["timex"])-1),0]
                     break
             if ET_idx is not None:
                 break
@@ -885,17 +885,17 @@ def extractProfileCropsterXLS(file,_):
                                 c = takeClosest(time,res["timex"])
                                 timex_idx = res["timex"].index(c)
                                 if comment_type in color_change_trans:
-                                    res["timeindex"][1] = timex_idx
+                                    res["timeindex"][1] = max(0,timex_idx)
                                 elif comment_type in first_crack_trans:
-                                    res["timeindex"][2] = timex_idx
+                                    res["timeindex"][2] = max(0,timex_idx)
                                 elif comment_type == "First crack end":
-                                    res["timeindex"][3] = timex_idx
+                                    res["timeindex"][3] = max(0,timex_idx)
                                 elif comment_type in second_crack_trans:
-                                    res["timeindex"][4] = timex_idx
+                                    res["timeindex"][4] = max(0,timex_idx)
                                 elif comment_type == "Second crack end":
-                                    res["timeindex"][5] = timex_idx
+                                    res["timeindex"][5] = max(0,timex_idx)
                                 elif comment_type == "Duration":
-                                    res["timeindex"][6] = timex_idx
+                                    res["timeindex"][6] = max(0,timex_idx)
                                 else:
                                     specialevents.append(timex_idx)
                                     ae = False

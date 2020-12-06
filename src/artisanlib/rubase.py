@@ -75,7 +75,7 @@ def extractProfileRubaseCSV(file,aw):
             bt = float(item['BT'])
             # after 2min we mark DRY if not auto adjusted
             if timeindex[1] == 0 and i>60 and (not aw.qmc.phasesbuttonflag) and bt >= aw.qmc.phases[1]:
-                timeindex[1] = i
+                timeindex[1] = max(0,i)
         except:
             pass
         temp2.append(bt)
@@ -186,24 +186,24 @@ def extractProfileRubaseCSV(file,aw):
         timeindex[0] = 0
     # mark FCs
     try:
-        timeindex[2] = int(header_row[19])
+        timeindex[2] = max(0,int(header_row[19]))
     except:
         pass
     # mark SCs
     try:
-        timeindex[4] = int(header_row[21])
+        timeindex[4] = max(0,int(header_row[21]))
     except:
         pass
-# not surree if indeex 23 holds the correct data
+# not sure if index 23 holds the correct data
 #    # mark DROP
 #    try:
 #        end = int(header_row[23])
 #        if end != 0:
-#            timeindex[6] = min(end,len(timex)-1)
+#            timeindex[6] = max(0,min(end,len(timex)-1))
 #    except:
 #        pass
     if timeindex[6] == 0:
-        timeindex[6] = len(timex)-1
+        timeindex[6] = max(0,len(timex)-1)
     
     res["mode"] = 'C'
             

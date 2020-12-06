@@ -397,29 +397,33 @@ def getCoffees(weight_unit_idx,store=None):
                         except:
                             pass
                         origin += ", "
-                    label = c["label"]
+                    if "label" in c:
+                        label = c["label"]
+                    else:
+                        label = ""
                     if "default_unit" in c:
                         default_unit = c["default_unit"]
                     else:
                         default_unit = None
-                    for s in c["stock"]:
-                        if store is None or ("location_hr_id" in s and s["location_hr_id"] == store):
-                            if "location_label" in s:
-                                location = s["location_label"]
-                                if "amount" in s:
-                                    amount = s["amount"]
-                                    if amount > stock_epsilon: # TODO: check here the machines capacity limits
-                                        # add location only if this coffee is available in several locations
-                                        if store:
-                                            loc = ""
-                                        else:
-                                            loc = location + ", "
-                                        res[origin + label + " (" + loc + renderAmount(amount,default_unit,weight_unit_idx) + ")"] = [c,s]
-                                else:
-                                    if store:
-                                        res[origin + label] = [c,s]
+                    if "stock" in c:
+                        for s in c["stock"]:
+                            if store is None or ("location_hr_id" in s and s["location_hr_id"] == store):
+                                if "location_label" in s:
+                                    location = s["location_label"]
+                                    if "amount" in s:
+                                        amount = s["amount"]
+                                        if amount > stock_epsilon: # TODO: check here the machines capacity limits
+                                            # add location only if this coffee is available in several locations
+                                            if store:
+                                                loc = ""
+                                            else:
+                                                loc = location + ", "
+                                            res[origin + label + " (" + loc + renderAmount(amount,default_unit,weight_unit_idx) + ")"] = [c,s]
                                     else:
-                                        res[origin + label + " (" + location + ")"] = [c,s]
+                                        if store:
+                                            res[origin + label] = [c,s]
+                                        else:
+                                            res[origin + label + " (" + location + ")"] = [c,s]
                 except:
                     pass
             return sorted(res.items(), key=lambda x: x[0])
