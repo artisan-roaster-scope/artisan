@@ -19707,7 +19707,7 @@ class ApplicationWindow(QMainWindow):
             aw.set_mpl_fontproperties(self.getResourcePath() + "SourceHanSansJP-Regular.otf")
         elif self.qmc.graphfont == 9: 
             # font Dijkstra selected
-            rcParams['font.size'] = 12.0
+            rcParams['font.size'] = 10.0
             rcParams['font.family'] = ['Dijkstra']
             aw.set_mpl_fontproperties(self.getResourcePath() + "dijkstra.ttf")
         elif self.qmc.graphfont == 1 or platf == "Linux": # no Comic on Linux!

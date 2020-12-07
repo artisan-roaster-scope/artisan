@@ -50,8 +50,13 @@ class platformDlg(ArtisanDialog):
         elif system == "Darwin":
             platformdic["Mac"] = str(platform.mac_ver())
         elif system == "Linux":
-            platformdic["Linux"] = str(platform.linux_distribution())
-            platformdic["Libc"] = str(platform.libc_ver())
+            try:
+#            platformdic["Linux"] = str(platform.linux_distribution()) # removed in Python 3.8
+                import distro  # @UnresolvedImport
+                platformdic["Linux"] = str(distro.linux_distribution())
+                platformdic["Libc"] = str(platform.libc_ver())
+            except:
+                pass
         htmlplatform = "<b>version =</b> " + __version__ + " (" + __revision__ + ")<br>"
         for key in sorted(platformdic):
             htmlplatform += "<b>" + key + " = </b> <i>" + platformdic[key] + "</i><br>"

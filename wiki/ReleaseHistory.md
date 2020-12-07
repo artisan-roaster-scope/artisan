@@ -60,7 +60,7 @@ Richard Rodrigues](https://github.com/rich1n))
 
 
 **Note**
-_This is the latest version supporting Raspbian Stretch_
+_This is the last version supporting Raspbian Stretch_
 
 ----
 v2.4.2 (02.10.2020)
@@ -130,7 +130,7 @@ v2.4.2 (02.10.2020)
   - fixes palette loading from .apal files
 
 **Note**
-_This is the latest version supporting macOS 10.13 and 10.14_
+_This is the last version supporting macOS 10.13 and 10.14_
 
 
 ----
@@ -789,7 +789,7 @@ v1.2.0 (21.12.2017)
    - fixes Fuji PXR set p-i-d and set Ramp/Soaks
 
 **Note**
-_This is the latest version supporting supporting Mac OS X 10.12 and Linux glibc 2.17_
+_This is the last version supporting supporting Mac OS X 10.12 and Linux glibc 2.17_
 
 ----
 v1.1.0 (10.06.2017)
@@ -831,7 +831,7 @@ v1.1.0 (10.06.2017)
 
 
 **Note**
-_This is the latest version supporting supporting Mac OS X 10.9, Windows XP/7 and 32bit OS versions_
+_This is the last version supporting supporting Mac OS X 10.9, Windows XP/7 and 32bit OS versions_
         
 ----
 v1.0.0 (24.02.2017)
@@ -902,7 +902,7 @@ v1.0.0 (24.02.2017)
     * fixes Phidgets remote access on Python 3
 
 **Note**
-_This is the latest version supporting Mac OS X 10.7 and 10.9_
+_This is the last version supporting Mac OS X 10.7 and 10.9_
 
 ----
 v0.9.9 (14.03.2016)
@@ -945,7 +945,7 @@ v0.9.9 (14.03.2016)
     * fixed volume increase calculation
 
 **Note**
-_This is the latest version supporting Mac OS X 10.7 and 10.8_
+_This is the last version supporting Mac OS X 10.7 and 10.8_
 
 ----
 v0.9.8 (21.10.2015)
@@ -1024,7 +1024,7 @@ v0.9.5 (6.7.2015)
 
 
 **Note**
-_This is the latest version supporting the Windows Celeron platform and Mac OS X 10.6 (Intel only)_
+_This is the last version supporting the Windows Celeron platform and Mac OS X 10.6 (Intel only)_
 
 ----
 v0.9.4 (6.6.2015)
@@ -1424,7 +1424,7 @@ v0.5.6 (8.11.2012)
  * bug fixes
 
 **Note**
-_This is the latest version supporting Mac OS X 10.4 and 10.5 (on Intel and PCC)_
+_This is the last version supporting Mac OS X 10.4 and 10.5 (on Intel and PCC)_
 
 ----
 v0.5.5 (28.9.2011)
