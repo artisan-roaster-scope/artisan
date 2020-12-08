@@ -86,18 +86,20 @@ class s7port(object):
         self.last_request_timestamp = time.time()
         self.min_time_between_requests = 0.03
         
+        self.is_connected = False # local cache of the connection state
+        
         self.plc = None
         self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
         self.libLoaded = False
     
-    # remember last requests timestamp
-    def registerLastRequestTimestamp(self):
-        self.last_request_timestamp = time.time()
+################
     
+    # waits if need to ensure a minimal time delta between network requests which are scheduled directly after this functions evaluation and set the new timestamp
     def waitToEnsureMinTimeBetweenRequests(self):
         elapsed = time.time() - self.last_request_timestamp
         if elapsed < self.min_time_between_requests:
             time.sleep(self.min_time_between_requests - elapsed)
+        self.last_request_timestamp = time.time()
     
 
 ################
@@ -203,7 +205,7 @@ class s7port(object):
         # the check on the CPU state is needed as get_connected() still returns True if the connect got terminated from the peer due to a bug in snap7
         # disconnects and clears the S7 plc objects if get_connected() but not str(self.plc.get_cpu_state()) == "S7CpuStatusRun" to force a clear restart
 #        return self.plc is not None and self.plc.get_connected() and str(self.plc.get_cpu_state()) == "S7CpuStatusRun"
-        if self.plc is not None and self.plc.get_connected():
+        if self.plc is not None and ((self.is_connected and not self.commError) or self.plc.get_connected()):
             return True
 #            if str(self.plc.get_cpu_state()) == "S7CpuStatusRun":
 #                return True
@@ -227,6 +229,7 @@ class s7port(object):
         except:
             pass
         self.plc = None
+        self.is_connected = False
 
     def connect(self):
         if not self.libLoaded:
@@ -259,32 +262,34 @@ class s7port(object):
             except:
                 pass
             with suppress_stdout_stderr():
-                time.sleep(0.4)
+                time.sleep(0.2)
                 try:
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
-                    time.sleep(0.4)
+                    time.sleep(0.2)
                 except:
                     pass
             
             if self.isConnected():
+                self.is_connected = True
                 self.aw.sendmessage(QApplication.translate("Message","S7 connected", None))
                 self.clearReadingsCache()
-                time.sleep(0.4)
+                time.sleep(0.1)
             else:
                 self.disconnect()
-                time.sleep(0.4)
+                time.sleep(0.3)
                 from artisanlib.s7client import S7Client
                 self.plc = S7Client()
                 # we try a second time
                 with suppress_stdout_stderr():
-                    time.sleep(0.4)
+                    time.sleep(0.3)
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
-                    time.sleep(0.4)
+                    time.sleep(0.3)
                     
                     if self.isConnected():
+                        self.is_connected = True
                         self.clearReadingsCache()
                         self.aw.sendmessage(QApplication.translate("Message","S7 Connected", None) + " (2)")
-                        time.sleep(0.4)
+                        time.sleep(0.1)
             self.updateActiveRegisters()
 
 
@@ -345,17 +350,14 @@ class s7port(object):
                             gaps = [[s, e] for s, e in zip(registers, registers[1:]) if s+1 < e]
                             edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
                             sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
-                        just_send = False
                         for seq in sequences:
                             retry = self.readRetries
                             register = seq[0]
                             count = seq[1]-seq[0] + 1
                             res = None
                             while True:
+                                self.waitToEnsureMinTimeBetweenRequests()
                                 try:
-                                    if just_send:
-                                        time.sleep(self.min_time_between_requests)
-                                    just_send = True
                                     res = self.plc.read_area(self.areas[area],db_nr,register,count)
                                 except:
                                     res = None
@@ -375,7 +377,6 @@ class s7port(object):
                             #note: logged chars should be unicode not binary
                             if self.aw.seriallogflag:
                                 self.aw.addserial("S7 read_area({},{},{},{})".format(area,db_nr,register,count))
-                        self.registerLastRequestTimestamp()
         except Exception as e: # as ex:
 #            self.disconnect()
 #            import traceback
@@ -405,8 +406,8 @@ class s7port(object):
                     self.set_real(ba, 0, float(value))
                     self.waitToEnsureMinTimeBetweenRequests()
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
-                    self.registerLastRequestTimestamp()
             else:
+                self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
         except Exception as e:
             if self.aw.qmc.flagon:
@@ -429,8 +430,8 @@ class s7port(object):
                     self.set_int(ba, 0, int(value))
                     self.waitToEnsureMinTimeBetweenRequests()
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
-                    self.registerLastRequestTimestamp()
             else:
+                self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
         except Exception as e:
             if self.aw.qmc.flagon:
@@ -454,8 +455,8 @@ class s7port(object):
                     self.set_int(ba, 0, int(new_val))
                     self.waitToEnsureMinTimeBetweenRequests()
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
-                    self.registerLastRequestTimestamp()
             else:
+                self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error connecting to PLC failed:",None))
         except Exception as e:
             if self.aw.qmc.flagon:
@@ -478,8 +479,8 @@ class s7port(object):
                     self.set_bool(ba, 0, int(index), bool(value))
                     self.waitToEnsureMinTimeBetweenRequests()
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
-                    self.registerLastRequestTimestamp()
             else:
+                self.commError = True
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
         except Exception as e:
             if self.aw.qmc.flagon:
@@ -521,13 +522,11 @@ class s7port(object):
                         try:
                             with suppress_stdout_stderr():
                                 res = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                                self.registerLastRequestTimestamp()
                         except:
                             res = None
                         if res is None:
                             if retry > 0:
                                 retry = retry - 1
-                                time.sleep(0.1)
                             else:
                                 raise Exception("result None")
                         else:
@@ -539,7 +538,7 @@ class s7port(object):
                             self.commError = False
                             self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                         r = self.get_real(res,0)
-                        if self.aw.seriallogflag and not self.commError:
+                        if self.aw.seriallogflag:
                             self.aw.addserial("S7 readFloat({},{},{},{}) => {}".format(area,dbnumber,start,force,r))
                         return r
                 else:
@@ -564,10 +563,9 @@ class s7port(object):
         try:
             self.connect()
             if self.isConnected():
+                self.waitToEnsureMinTimeBetweenRequests()
                 with suppress_stdout_stderr():
-                    self.waitToEnsureMinTimeBetweenRequests()
                     res = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                    self.registerLastRequestTimestamp()
                 return self.get_real(res,0)
             else:
                 return
@@ -596,18 +594,16 @@ class s7port(object):
                 if self.isConnected():
                     retry = self.readRetries
                     res = None
-                    self.waitToEnsureMinTimeBetweenRequests()
                     while True:
+                        self.waitToEnsureMinTimeBetweenRequests()
                         try:
                             with suppress_stdout_stderr():
                                 res = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                                self.registerLastRequestTimestamp()
                         except Exception:
                             res = None
                         if res is None:
                             if retry > 0:
                                 retry = retry - 1
-                                time.sleep(0.1)
                             else:
                                 raise Exception("result None")
                         else:
@@ -619,13 +615,16 @@ class s7port(object):
                             self.commError = False
                             self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                         r = self.get_int(res,0)
-                        if self.aw.seriallogflag and not self.commError:
+                        if self.aw.seriallogflag:
                             self.aw.addserial("S7 readInt({},{},{},{}) => {}".format(area,dbnumber,start,force,r))
                         return r
                 else:
                     self.commError = True  
                     self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Error: connecting to PLC failed",None))
         except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+#            _, _, exc_tb = sys.exc_info()        
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()
                 self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt({},{},{},{}): {}".format(area,dbnumber,start,force,str(e)),exc_tb.tb_lineno)
@@ -648,7 +647,6 @@ class s7port(object):
                 with suppress_stdout_stderr():
                     self.waitToEnsureMinTimeBetweenRequests()
                     res = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    self.registerLastRequestTimestamp()
                 return self.get_int(res,0)
             else:
                 return
@@ -675,18 +673,16 @@ class s7port(object):
                 if self.isConnected():
                     retry = self.readRetries
                     res = None
-                    self.waitToEnsureMinTimeBetweenRequests()
                     while True:
+                        self.waitToEnsureMinTimeBetweenRequests()
                         try:
                             with suppress_stdout_stderr():
                                 res = self.plc.read_area(self.areas[area],dbnumber,start,1)                            
-                                self.registerLastRequestTimestamp()
                         except Exception:
                             res = None
                         if res is None:
                             if retry > 0:
                                 retry = retry - 1
-                                time.sleep(0.1)
                             else:
                                 raise Exception("result None")
                         else:
@@ -698,7 +694,7 @@ class s7port(object):
                             self.commError = False
                             self.aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                         r = self.get_bool(res,0,index)
-                        if self.aw.seriallogflag and not self.commError:
+                        if self.aw.seriallogflag:
                             self.aw.addserial("S7 readBool({},{},{},{},{}) => {}".format(area,dbnumber,start,index,force,r))
                         return r
                 else:
