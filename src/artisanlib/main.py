@@ -11188,16 +11188,21 @@ class tgraphcanvas(FigureCanvas):
                         if TP_index >= 0:
                             LP = self.temp2[TP_index]
                     # compute max ET between TP and DROP
-                    if TP_index is not None:
-                        temp1_values = self.temp1[TP_index:self.timeindex[6]]
-                        if self.LCDdecimalplaces:
-                            lcdformat = "%.1f"
-                        else:
-                            lcdformat = "%.0f"
-                        temp1_values_max = max(temp1_values)
-                        ETmax = lcdformat%temp1_values_max + aw.qmc.mode
-                    else:
-                        ETmax = "--"
+                    ETmax = "--"
+                    try:
+                        if TP_index is not None:
+                            if self.timeindex[6] > 0 and TP_index<self.timeindex[6]:
+                                temp1_values = self.temp1[TP_index:self.timeindex[6]]
+                            else:
+                                temp1_values = self.temp1[TP_index:]
+                            if self.LCDdecimalplaces:
+                                lcdformat = "%.1f"
+                            else:
+                                lcdformat = "%.0f"
+                            temp1_values_max = max(temp1_values)
+                            ETmax = lcdformat%temp1_values_max + aw.qmc.mode
+                    except:
+                        pass
 
                     FCperiod = None
                     try:
