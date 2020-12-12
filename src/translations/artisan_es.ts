@@ -998,12 +998,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="834"/>
         <source>Create Alarms</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Crear Alarmas</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1048"/>
         <source>calc</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Calcular</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1272"/>
@@ -1013,7 +1013,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1283"/>
         <source>update</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Actualizar</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="93"/>
@@ -1033,17 +1033,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/alarms.py" line="160"/>
         <source>&lt;&lt; Store Alarm Set</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Almacenar Set de Alarma</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="162"/>
         <source>Activate Alarm Set &gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activar Set de Alarma</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="526"/>
         <source>Activate Palette &gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activar Paleta</translation>
     </message>
 </context>
 <context>
@@ -1061,7 +1061,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/curves.py" line="413"/>
         <source>Projection</source>
-        <translation type="unfinished">Proyeccion</translation>
+        <translation type="unfinished">Proyección</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1152"/>
@@ -1101,12 +1101,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="38106"/>
         <source>Evaluation</source>
-        <translation type="obsolete">Evaluacion</translation>
+        <translation type="obsolete">Evaluación</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="35"/>
         <source>Characteristics</source>
-        <translation type="unfinished">Propiedades</translation>
+        <translation type="unfinished">Características</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="969"/>
@@ -1141,12 +1141,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/events.py" line="184"/>
         <source>Button</source>
-        <translation type="unfinished">Boton</translation>
+        <translation type="unfinished">Botón</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="209"/>
         <source>Mini Editor</source>
-        <translation type="unfinished">Editor Mini</translation>
+        <translation type="unfinished">Mini Editor</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="105"/>
@@ -1176,7 +1176,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/autosave.py" line="50"/>
         <source>Autosave [a]</source>
-        <translation type="unfinished">Autograbar [s]</translation>
+        <translation type="unfinished">Autoguardado [s]</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="960"/>
@@ -1201,7 +1201,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/background.py" line="172"/>
         <source>Playback Aid</source>
-        <translation type="unfinished">Ayuda Reproduccion</translation>
+        <translation type="unfinished">Ayuda Reproducción</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1202"/>
