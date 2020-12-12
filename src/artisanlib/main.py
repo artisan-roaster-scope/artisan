@@ -13905,10 +13905,8 @@ class SampleThread(QThread):
                             # place the second ET/BT sampling in the middle of the sampling interval
                             stime = max(0.3,(sampling_interval / 4.0) - gone) # placing the second sample in the middle blocks too long!
 #                            stime = max(0,0.3 - gone) # we want the second main sample minimally 100ms after the first
-                            print("stime",stime)
                             libtime.sleep(stime)
                             timeBeforeETBT2 = libtime.perf_counter() # the time before sending the 2nd request to the main device
-                            print("time delta before requests",timeBeforeETBT2-timeBeforeETBT)
                             tx_2,t1_2,t2_2 = self.sample_main_device(force=True) # we force fetching of new reaedings from S7 and MODBUS main devices and avoid the refilling of the optimizer cache
                             timeAfterETBT2 = libtime.perf_counter() # the time after sending the 2nd request to the main device
                             if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
