@@ -7684,7 +7684,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 self.drawDeltaBT(trans)
                                 self.drawDeltaET(trans)
-                if recomputeAllDeltas and self.delta_ax is not None:
+                if recomputeAllDeltas and self.delta_ax is not None and two_ax_mode:
                     aw.autoAdjustAxis(timex=False)
                     self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                     self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))

@@ -1389,6 +1389,7 @@ class PIDcontrol(object):
                         segment_end_time = segment_end_time + self.svSoaks[i]
                         segment_start_sv = self.svValues[i]
                         if segment_end_time > t:
+                            prev_segment_start_sv = segment_start_sv # ensure that the segment sv is set even then the segments ramp is 00:00
                             # t is within the current segment
                             if self.current_soak_segment != i+1:
                                 self.current_soak_segment = i+1
