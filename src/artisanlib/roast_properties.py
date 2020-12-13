@@ -366,7 +366,7 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeinvolume.setText("")
                 self.inVolume = None
             else:
-                self.inVolume = self.aw.convertVolume(self.aw.convertWeight(self.weightIn,self.weightunit,0) * float(self.aw.comma2dot(str(self.unitvolumeEdit.text()))) / float(self.aw.comma2dot(str(self.coffeeinweightEdit.text()))),5,self.volumeunit)
+                self.inVolume = self.aw.convertVolume(self.aw.convertWeight(self.weightIn,self.weightunit,0) * float(self.aw.comma2dot(self.unitvolumeEdit.text())) / float(self.aw.comma2dot(self.coffeeinweightEdit.text())),5,self.volumeunit)
                 self.coffeeinvolume.setText("%g" % self.aw.float2floatWeightVolume(self.inVolume))
         except Exception:
             self.inVolume = None
@@ -407,9 +407,9 @@ class volumeCalculatorDlg(ArtisanDialog):
         except:
             pass
         if self.unitvolumeEdit.text() and self.unitvolumeEdit.text() != "":
-            self.aw.qmc.volumeCalcUnit = float(self.unitvolumeEdit.text())
-            self.aw.qmc.volumeCalcWeightInStr = self.aw.comma2dot(str(self.coffeeinweightEdit.text()))
-            self.aw.qmc.volumeCalcWeightOutStr = self.aw.comma2dot(str(self.coffeeoutweightEdit.text()))
+            self.aw.qmc.volumeCalcUnit = float(self.aw.comma2dot(self.unitvolumeEdit.text()))
+            self.aw.qmc.volumeCalcWeightInStr = self.aw.comma2dot(self.coffeeinweightEdit.text())
+            self.aw.qmc.volumeCalcWeightOutStr = self.aw.comma2dot(self.coffeeoutweightEdit.text())
             self.parent_dialog.calculated_density()
         self.accept()
 
@@ -521,7 +521,7 @@ class tareDlg(ArtisanDialog):
         weights = []
         for i in range(tars):
             name = self.taretable.cellWidget(i,0).text()
-            weight = int(round(float(self.taretable.cellWidget(i,1).text())))
+            weight = int(round(float(self.aw.comma2dot(self.taretable.cellWidget(i,1).text()))))
             names.append(name)
             weights.append(weight)
         self.aw.qmc.container_names = names
@@ -2051,7 +2051,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     def updateBlendLines(self,blend):
         if self.weightinedit.text() != "":
-            weightIn = float(str(self.weightinedit.text()))
+            weightIn = float(self.aw.comma2dot(self.weightinedit.text()))
         else:
             weightIn = 0.0
         weight_unit_idx = self.unitsComboBox.currentIndex()
@@ -2212,7 +2212,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     def getBlendDictCurrentWeight(self,blend):
         if self.weightinedit.text() != "":
-            weightIn = float(str(self.weightinedit.text()))
+            weightIn = float(self.aw.comma2dot(self.weightinedit.text()))
         else:
             weightIn = 0.0
         weight_unit_idx = self.unitsComboBox.currentIndex()
@@ -2396,7 +2396,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def recentRoastEnabled(self,_=""):
         try:
             title = self.titleedit.currentText()
-            weightIn = float(str(self.weightinedit.text()))
+            weightIn = float(self.aw.comma2dot(self.weightinedit.text()))
             # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
             if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
                 # enable "+" addRecentRoast button
@@ -2413,7 +2413,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def delRecentRoast(self,_):
         try:
             title = ' '.join(self.titleedit.currentText().split())
-            weightIn = float(str(self.weightinedit.text()))
+            weightIn = float(self.aw.comma2dot(self.weightinedit.text()))
             weightUnit = self.unitsComboBox.currentText()
             self.aw.recentRoasts = self.aw.delRecentRoast(title,weightIn,weightUnit)
         except:
@@ -2438,11 +2438,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                 else:
                     densityWeight = 0
                 if self.bean_size_min_edit.text() != "":
-                    beanSize_min = int(round(float(str(self.bean_size_min_edit.text()))))
+                    beanSize_min = int(round(float(self.aw.comma2dot(self.bean_size_min_edit.text()))))
                 else:
                     beanSize_min = 0
                 if self.bean_size_max_edit.text() != "":
-                    beanSize_max = int(round(float(str(self.bean_size_max_edit.text()))))
+                    beanSize_max = int(round(float(self.aw.comma2dot(self.bean_size_max_edit.text()))))
                 else:
                     beanSize_max = 0  
                 if self.moisture_greens_edit.text() != "":
@@ -2598,7 +2598,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.weight[2] = self.unitsComboBox.currentText()
         for le in [self.weightinedit,self.weightoutedit]:
             if le.text() and le.text() != "":
-                wi = float(le.text())
+                wi = float(self.aw.comma2dot(le.text()))
                 if wi != 0.0:
                     converted = self.aw.convertWeight(wi,o,i)
                     le.setText("%g" % self.aw.float2floatWeightVolume(converted))
@@ -2617,7 +2617,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.volume[2] = self.volumeUnitsComboBox.currentText()
         for le in [self.volumeinedit,self.volumeoutedit]:
             if le.text() and le.text() != "":
-                wi = float(le.text())
+                wi = float(self.aw.comma2dot(le.text()))
                 if wi != 0.0:
                     converted = self.aw.convertVolume(wi,o,i)
                     le.setText("%g" % self.aw.float2floatWeightVolume(converted))
@@ -2707,11 +2707,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         weightin = None
         weightout = None
         try:
-            weightin = float(self.weightinedit.text())
+            weightin = float(self.aw.comma2dot(self.weightinedit.text()))
         except Exception:
             pass
         try:
-            weightout = float(self.weightoutedit.text())
+            weightout = float(self.aw.comma2dot(self.weightoutedit.text()))
         except Exception:
             pass
         k = 1.
@@ -2764,7 +2764,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             w = self.aw.convertWeight(w,0,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2])) # convert to weight units
             current_w = 0
             try:
-                current_w = float(weight_edit.text())
+                current_w = float(self.aw.comma2dot(weight_edit.text()))
             except:
                 pass
             if overwrite:
@@ -3268,7 +3268,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     
     @pyqtSlot()
     def weightouteditChanged(self):
-        self.weightoutedit.setText(self.aw.comma2dot(str(self.weightoutedit.text())))
+        self.weightoutedit.setText(self.aw.comma2dot(self.weightoutedit.text()))
         self.percent()
         self.calculated_density()
         self.density_out_editing_finished() # recalc volume_out
@@ -3278,7 +3278,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         enough_replacement = False
         weightIn = 0.0
         try:
-            weightIn = float(self.weightinedit.text())
+            weightIn = float(self.aw.comma2dot(self.weightinedit.text()))
         except:
             pass
         if self.plus_amount_selected is not None:
@@ -3329,7 +3329,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def density_percent(self):
         percent = 0.
         try:
-            if self.bean_density_out_edit.text() != "" and float(str(self.bean_density_out_edit.text())) != 0.0:
+            if self.bean_density_out_edit.text() != "" and float(self.aw.comma2dot(self.bean_density_out_edit.text())) != 0.0:
                 percent = self.aw.weight_loss(float(self.aw.comma2dot(str(self.bean_density_in_edit.text()))),float(self.aw.comma2dot(str(self.bean_density_out_edit.text()))))
         except Exception:
             pass
@@ -3356,8 +3356,8 @@ class editGraphDlg(ArtisanResizeablDialog):
     def percent(self):
         percent = 0.
         try:
-            if self.weightoutedit.text() != "" and float(str(self.weightoutedit.text())) != 0.0:
-                percent = self.aw.weight_loss(float(str(self.weightinedit.text())),float(str(self.weightoutedit.text())))
+            if self.weightoutedit.text() != "" and float(self.aw.comma2dot(self.weightoutedit.text())) != 0.0:
+                percent = self.aw.weight_loss(float(self.aw.comma2dot(self.weightinedit.text())),float(self.aw.comma2dot(self.weightoutedit.text())))
         except Exception:
             pass
         if percent > 0:
@@ -3368,13 +3368,13 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def volume_percent(self):
-        self.volumeinedit.setText(self.aw.comma2dot(str(self.volumeinedit.text())))
-        self.volumeoutedit.setText(self.aw.comma2dot(str(self.volumeoutedit.text())))
+        self.volumeinedit.setText(self.aw.comma2dot(self.volumeinedit.text()))
+        self.volumeoutedit.setText(self.aw.comma2dot(self.volumeoutedit.text()))
         self.modified_volume_in_text = str(self.volumeinedit.text())
         percent = 0.
         try:
-            if self.volumeoutedit.text() != "" and float(str(self.volumeoutedit.text())) != 0.0:
-                percent = self.aw.volume_increase(float(str(self.volumeinedit.text()).replace(",",".")),float(str(self.volumeoutedit.text().replace(",","."))))
+            if self.volumeoutedit.text() != "" and float(self.aw.comma2dot(self.volumeoutedit.text())) != 0.0:
+                percent = self.aw.volume_increase(float(self.aw.comma2dot(self.volumeinedit.text())),float(self.aw.comma2dot(self.volumeoutedit.text())))
         except Exception:
             pass
         if percent == 0:
@@ -3389,8 +3389,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         din = dout = 0.0
         try:
             if self.volumeinedit.text() != "" and self.weightinedit.text() != "":
-                volumein = float(str(self.volumeinedit.text()))
-                weightin = float(str(self.weightinedit.text()))
+                volumein = float(self.aw.comma2dot(self.volumeinedit.text()))
+                weightin = float(self.aw.comma2dot(self.weightinedit.text()))
                 if volumein != 0.0 and weightin != 0.0:
                     vol_idx = self.aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
                     volumein = self.aw.convertVolume(volumein,vol_idx,0)
@@ -3398,8 +3398,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     weightin = self.aw.convertWeight(weightin,weight_idx,0)
                     din = (weightin / volumein) 
             if self.volumeoutedit.text() != ""  and self.weightoutedit.text() != "":
-                volumeout = float(str(self.volumeoutedit.text()))
-                weightout = float(str(self.weightoutedit.text()))
+                volumeout = float(self.aw.comma2dot(self.volumeoutedit.text()))
+                weightout = float(self.aw.comma2dot(self.weightoutedit.text()))
                 if volumeout != 0.0 and weightout != 0.0:
                     vol_idx = self.aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
                     volumeout = self.aw.convertVolume(volumeout,vol_idx,0)
@@ -3427,12 +3427,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         mloss = 0. # moisture
         try:
             if self.weightpercentlabel.text() and self.weightpercentlabel.text() != "":
-                wloss = abs(float(self.weightpercentlabel.text().split("%")[0]))
+                wloss = abs(float(self.aw.comma2dot(self.weightpercentlabel.text()).split("%")[0]))
         except Exception:
             pass
         try:
             if self.moisturepercentlabel.text() and self.moisturepercentlabel.text() != "":
-                mloss = abs(float(self.moisturepercentlabel.text().split("%")[0]))
+                mloss = abs(float(self.aw.comma2dot(self.moisturepercentlabel.text()).split("%")[0]))
         except Exception:
             pass
         if mloss != 0. and wloss != 0.:
@@ -3472,8 +3472,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.modified_density_in_text = str(self.bean_density_in_edit.text())
         # if density-in and weight-in is given, we re-calc volume-in:
         if self.bean_density_in_edit.text() != "" and self.weightinedit.text() != "":
-            density_in = float(self.bean_density_in_edit.text().replace(",","."))
-            weight_in = float(self.weightinedit.text().replace(",","."))
+            density_in = float(self.aw.comma2dot(self.bean_density_in_edit.text()))
+            weight_in = float(self.aw.comma2dot(self.weightinedit.text()))
             if density_in != 0 and weight_in != 0:
                 weight_in = self.aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index("g"))
                 volume_in = weight_in / density_in # in g/l
@@ -3489,8 +3489,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.bean_density_out_edit.setText(self.aw.comma2dot(str(self.bean_density_out_edit.text())))
         # if density-out and weight-out is given, we re-calc volume-out:
         if self.bean_density_out_edit.text() != "" and self.weightoutedit.text() != "":
-            density_out = float(self.bean_density_out_edit.text().replace(",","."))
-            weight_out = float(self.weightoutedit.text().replace(",","."))
+            density_out = float(self.bean_density_out_edit.text())
+            weight_out = float(self.aw.comma2dot(self.weightoutedit.text()))
             if density_out != 0 and weight_out != 0:
                 weight_out = self.aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index("g"))
                 volume_out = weight_out / density_out # in g/l
@@ -3696,7 +3696,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.moisture_roasted = 0.
         #update ambient temperature
         try:
-            self.aw.qmc.ambientTemp = float(str(self.ambientedit.text()))
+            self.aw.qmc.ambientTemp = float(self.aw.comma2dot(self.ambientedit.text()))
             if math.isnan(self.aw.qmc.ambientTemp):
                 self.aw.qmc.ambientTemp = 0.0
         except Exception:
