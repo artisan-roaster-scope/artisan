@@ -38,7 +38,7 @@ v2.4.4 (xx.12.2020)
   - [artisan.plus](https://artisan.plus/): optimized synchronization
   - improved S7 serial logging and communication error handling
   - [special events annotations](https://artisan-roasterscope.blogspot.com/2020/05/special-events-annotations.html) respect the decimal places setting
-  - updated Spanish translations ([PR #525](../../../pull/525), [PR #527](../../../pull/427), [PR #530](../../../pull/530), [PR #535](../../../pull/535) and [PR #536](../../../pull/536) by [
+  - updated Spanish translations ([PR #525](../../../pull/525), [PR #527](../../../pull/427), [PR #530](../../../pull/530), [PR #535](../../../pull/535), [PR #536](../../../pull/536) and [PR #537](../../../pull/537) by [
 Richard Rodrigues](https://github.com/rich1n))
   - updated Chinese translations ([PR #532](../../../pull/532) by [wuyi-ligux](https://github.com/wuyi-levard))
 * Fixes

@@ -3472,8 +3472,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.modified_density_in_text = str(self.bean_density_in_edit.text())
         # if density-in and weight-in is given, we re-calc volume-in:
         if self.bean_density_in_edit.text() != "" and self.weightinedit.text() != "":
-            density_in = float(str(self.bean_density_in_edit.text()))
-            weight_in = float(str(self.weightinedit.text()))
+            density_in = float(self.bean_density_in_edit.text().replace(",","."))
+            weight_in = float(self.weightinedit.text().replace(",","."))
             if density_in != 0 and weight_in != 0:
                 weight_in = self.aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index("g"))
                 volume_in = weight_in / density_in # in g/l
@@ -3489,8 +3489,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.bean_density_out_edit.setText(self.aw.comma2dot(str(self.bean_density_out_edit.text())))
         # if density-out and weight-out is given, we re-calc volume-out:
         if self.bean_density_out_edit.text() != "" and self.weightoutedit.text() != "":
-            density_out = float(str(self.bean_density_out_edit.text()))
-            weight_out = float(str(self.weightoutedit.text()))
+            density_out = float(self.bean_density_out_edit.text().replace(",","."))
+            weight_out = float(self.weightoutedit.text().replace(",","."))
             if density_out != 0 and weight_out != 0:
                 weight_out = self.aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index("g"))
                 volume_out = weight_out / density_out # in g/l
