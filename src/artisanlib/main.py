@@ -20539,7 +20539,7 @@ class ApplicationWindow(QMainWindow):
     #         20= Artisan Command; 21= RC Command; 22= WebSocket Command
     def eventaction(self,action,cmd,parallel=True):
         if action:
-            if not parallel or action==3: # subactions of multiple event actions, may crash if run in parallel, especially if they update the UI like button shape!
+            if not parallel:# or action==3: # subactions of multiple event actions, may crash if run in parallel, especially if they update the UI like button shape!
                 self.eventaction_internal(action,cmd,doupdategraphics=True,doupdatebackground=True)
             else:
                 eventActionThread = EventActionThread(action,cmd)
@@ -34515,7 +34515,7 @@ class ApplicationWindow(QMainWindow):
             p.setText(l)
             p.setFocusPolicy(Qt.NoFocus)
             p.clicked.connect(self.recordextraevent_slot)
-            self.buttonlist.append(p)            
+            self.buttonlist.append(p)
             self.buttonStates.append(0)
             #add button to row
             if row1count < self.buttonlistmaxlen:
