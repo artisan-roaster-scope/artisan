@@ -39,3 +39,6 @@ header:
 
 **Watch out!** Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
 {: .notice--primary}
+
+**Watch out!** On network problems with a Probatone II with Wago PLC and small touch panel: The small touch panel of the Wago based machines has the fixed IP address 192.168.2.1. Thus on networks running on 192.168.2.x usually the routers IP address is 192.168.2.1 and thus clashes with that internal displays address. Solution: choose an address range for your network different too 192.168.2.x as advised in the roasters manual.
+{: .notice--primary}
