@@ -67,6 +67,7 @@ else: # Linux
         pass
         
 from artisanlib import main
+from artisanlib import main, command_utility
 #import numpy # @UnusedImport # what this for!?
 from multiprocessing import freeze_support
 
@@ -80,14 +81,17 @@ if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
     del executable
 
 if __name__ == '__main__':
-    freeze_support()
-    if os.environ.get('TRAVIS'):
-        # Hack to exit inside Travis CI
-        # Ideally we would use pytest-qt.
-        import threading
-        t = threading.Timer(30, lambda: os._exit(0))
-        t.start()
-    main.main()
+
+    # Manange Commands that does not need to start the whole Application
+    if command_utility.handleCommands() == True:
+        freeze_support()
+        if os.environ.get('TRAVIS'):
+            # Hack to exit inside Travis CI
+            # Ideally we would use pytest-qt.
+            import threading
+            t = threading.Timer(30, lambda: os._exit(0))
+            t.start()
+        main.main()
 
 
 # EOF

@@ -46,6 +46,7 @@ SOURCES = \
     artisanlib/statistics.py \
     artisanlib/transposer.py \
     artisanlib/wheels.py \
+    artisanlib/command_utility.py \
     const/UIconst.py \
     help/alarms_help.py \
     help/autosave_help.py \
