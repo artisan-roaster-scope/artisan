@@ -1609,7 +1609,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/curves.py" line="869"/>
         <source>nearest</source>
-        <translation type="unfinished">más cercano</translation>
+        <translation type="unfinished">Más Cercano</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30733"/>
@@ -1624,7 +1624,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="30595"/>
         <source>ml</source>
-        <translation type="obsolete">ml</translation>
+        <translation type="obsolete">Ml</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="19344"/>
@@ -1699,27 +1699,27 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/calculator.py" line="91"/>
         <source>liter</source>
-        <translation type="unfinished">litro</translation>
+        <translation type="unfinished">Litro</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="92"/>
         <source>gallon</source>
-        <translation type="unfinished">galón</translation>
+        <translation type="unfinished">Galón</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="93"/>
         <source>quart</source>
-        <translation type="unfinished">cuarto</translation>
+        <translation type="unfinished">Cuarto</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="94"/>
         <source>pint</source>
-        <translation type="unfinished">pinta</translation>
+        <translation type="unfinished">Pinta</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="95"/>
         <source>cup</source>
-        <translation type="unfinished">taza</translation>
+        <translation type="unfinished">Taza</translation>
     </message>
     <message>
         <location filename="../artisanlib/calculator.py" line="96"/>
@@ -1729,7 +1729,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Multiple Event</source>
-        <translation type="unfinished">Evento Multiple</translation>
+        <translation type="unfinished">Evento Múltiple</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="42616"/>
@@ -2019,7 +2019,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/alarms.py" line="816"/>
         <source>If Alarm</source>
-        <translation type="unfinished">Si Alarma</translation>
+        <translation type="unfinished">De Alarma</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28838"/>
@@ -2099,162 +2099,162 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="400"/>
         <source>Set Canvas Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Set Color Canvas</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="401"/>
         <source>Reset Canvas Color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reiniciar Color Canvas</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="145"/>
         <source>2 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">2 Minutos</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="146"/>
         <source>3 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">3 Minutos</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="147"/>
         <source>4 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">4 Minutos</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="148"/>
         <source>5 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">5 Minutos</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="149"/>
         <source>10 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">10 Minutos</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="150"/>
         <source>30 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">30 Minutos</translation>
     </message>
     <message>
         <location filename="../artisanlib/axis.py" line="151"/>
         <source>1 hour</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">1 Hora</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="664"/>
         <source>classic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Clásico</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="664"/>
         <source>xkcd</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">xkcd</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="942"/>
         <source>120 secs before FCs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">120 Seg. antes de FC</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="942"/>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalizado</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="217"/>
         <source>Flag</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Flag</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="220"/>
         <source>Step+</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Step+</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="221"/>
         <source>Combo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Combo</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="479"/>
         <source>tiny</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mini</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="480"/>
         <source>small</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pequeño</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="481"/>
         <source>large</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grande</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Hottop Heater</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hottop Calentador</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Hottop Fan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hottop Extractor</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Hottop Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hottop Comando</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Fuji Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fuji Comando</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>PWM Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PWM Comando</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>VOUT Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VOUT Comando</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>IO Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IO Comando</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>S7 Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">S7 Comando</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Aillio R1 Heater</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aillio R1 Calentador</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Aillio R1 Fan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aillio R1 Extractor</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Aillio R1 Drum</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aillio R1 Tambor</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Artisan Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Artisan Comando</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>RC Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RC Comando</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
@@ -2264,22 +2264,22 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>Aillio R1 Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aillio R1 Comando</translation>
     </message>
     <message>
         <location filename="../artisanlib/phases.py" line="129"/>
         <source>Percentage</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Porcentaje</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="572"/>
         <source>bytes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bytes</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="576"/>
         <source>words</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Palabras</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="112"/>
@@ -2294,17 +2294,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/events.py" line="2146"/>
         <source>WebSocket Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando WebSocket</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="956"/>
         <source>optimize</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Optimizar</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="961"/>
         <source>fetch full blocks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Buscar Bloques Completos</translation>
     </message>
 </context>
 <context>
@@ -2312,37 +2312,37 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="12263"/>
         <source>Add point</source>
-        <translation>Añadir punto</translation>
+        <translation>Añadir Punto</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12267"/>
         <source>Remove point</source>
-        <translation>Quitar punto</translation>
+        <translation>Quitar Punto</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12283"/>
         <source>Reset Designer</source>
-        <translation>Reinicializar Diseñador</translation>
+        <translation>Reiniciar Diseñador</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6524"/>
         <source>Exit Designer</source>
-        <translation type="obsolete">Cerrar Diseñador</translation>
+        <translation type="obsolete">Salir del Diseñador</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12943"/>
         <source>Add to Cupping Notes</source>
-        <translation>Añadir a notas de Catacion</translation>
+        <translation>Añadir a Notas de Catación</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12947"/>
         <source>Add to Roasting Notes</source>
-        <translation>Añadir a notas del Tostado</translation>
+        <translation>Añadir a Notas de Tostado</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8766"/>
         <source>Cancel selection</source>
-        <translation type="obsolete">Cancelar seleccion</translation>
+        <translation type="obsolete">Cancelar Selección</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8774"/>
@@ -2352,7 +2352,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="8770"/>
         <source>Edit Mode</source>
-        <translation type="obsolete">Modo Editar</translation>
+        <translation type="obsolete">Modo Edición</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6496"/>
@@ -2367,12 +2367,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="12273"/>
         <source>Load points</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cargar Puntos</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12277"/>
         <source>Save points</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guardar Puntos</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12953"/>
@@ -2385,12 +2385,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="28"/>
         <source>Afghanistan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Afganistán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="29"/>
         <source>Aland Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Aland</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="30"/>
@@ -2405,7 +2405,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="32"/>
         <source>American Samoa</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Samoa Americana</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="33"/>
@@ -2420,17 +2420,17 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="35"/>
         <source>Anguilla</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anguila</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="36"/>
         <source>Antarctica</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Antártida</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="37"/>
         <source>Antigua and Barbuda</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Antigua y Barbuda</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="38"/>
@@ -2460,7 +2460,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="43"/>
         <source>Azerbaijan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Azerbaiyán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="44"/>
@@ -2470,12 +2470,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="45"/>
         <source>Bahrain</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Baréin</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="46"/>
         <source>Bangladesh</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bangladés</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="47"/>
@@ -2485,32 +2485,32 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="48"/>
         <source>Belarus</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bielorrusia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="49"/>
         <source>Belgium</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bélgica</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="50"/>
         <source>Belize</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Belice</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="51"/>
         <source>Benin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Benín</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="52"/>
         <source>Bermuda</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bermudas</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="53"/>
         <source>Bhutan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bután</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="54"/>
@@ -2520,37 +2520,37 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="55"/>
         <source>Bonaire, Sint Eustatius and Saba</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bonaire, San Eustaquio y Saba</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="56"/>
         <source>Bosnia and Herzegovina</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bosnia y Herzegovina</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="57"/>
         <source>Botswana</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Botsuana</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="58"/>
         <source>Bouvet Island</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Isla Bouvet</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="59"/>
         <source>Brazil</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Brasil</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="60"/>
         <source>British Indian Ocean Territory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Territorio Británico del Océano Índico</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="61"/>
         <source>Brunei Darussalam</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Brunéi Darussalam</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="62"/>
@@ -2570,32 +2570,32 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="65"/>
         <source>Cape Verde</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cabo Verde</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="66"/>
         <source>Cambodia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camboya</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="67"/>
         <source>Cameroon</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camerún</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="68"/>
         <source>Canada</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Canadá</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="69"/>
         <source>Cayman Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Caimán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="70"/>
         <source>Central African Republic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">República Centroafricana</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="71"/>
@@ -2615,12 +2615,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="74"/>
         <source>Christmas Island</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiritimati</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="75"/>
         <source>Cocos (Keeling) Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Cocos</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="76"/>
@@ -2630,22 +2630,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="77"/>
         <source>Comoros</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comoras</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="78"/>
         <source>Congo, DR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Congo, RD</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="79"/>
         <source>Congo, Republic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">República del Congo</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="80"/>
         <source>Cook Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Cook</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="81"/>
@@ -2655,7 +2655,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="82"/>
         <source>Croatia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Croacia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="83"/>
@@ -2665,22 +2665,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="84"/>
         <source>Cyprus</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chipre</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="85"/>
         <source>Czechia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">República Checa</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="86"/>
         <source>Denmark</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dinamarca</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="87"/>
         <source>Djibouti</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Yibuti</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="88"/>
@@ -2690,7 +2690,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="89"/>
         <source>Dominican Republic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">República Dominicana</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="90"/>
@@ -2700,7 +2700,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="91"/>
         <source>Egypt</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Egipto</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="92"/>
@@ -2710,7 +2710,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="93"/>
         <source>Equatorial Guinea</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guinea Ecuatorial</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="94"/>
@@ -2725,22 +2725,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="96"/>
         <source>Eswatini</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Suazilandia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="97"/>
         <source>Ethiopia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Etiopía</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="98"/>
         <source>Falkland Islands [Malvinas]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Malvinas</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="99"/>
         <source>Faroe Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Faroe</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="100"/>
