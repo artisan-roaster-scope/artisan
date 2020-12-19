@@ -30,7 +30,7 @@ Secondly you move to the filters tab to determine how you want the curves to dis
 
 **Limits** will allow you to set temp limits on how high or low your curve can go.  This will keep your curves within reasonable ranges.  This setting limits the readings accepted by Artisan to the specified range. Selecting the standard range of expected temperatures during a roast often already eliminates most of the spikes, because meters experiencing electric noise often return very high or very low readings.
 
-**Swapping BT and ET without switching wires** If you want to change the readings from the ET and BT probe to swap them, you do that on the filters tab of Curves dialog, by checking the box ET<->BT.
+**Swapping BT and ET without switching wires** is easy.  If you want to change the readings from the ET and BT probe to swap them, you do that on the filters tab of Curves dialog, by checking the box ET<->BT.
 
 
 
