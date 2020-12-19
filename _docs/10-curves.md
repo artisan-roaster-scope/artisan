@@ -17,7 +17,7 @@ These are critical settings within Artisan and for most the first two tabs will 
 First you decide which ROR curves and LCD’s you want to display.
 ![curves ror](/assets/images/gsg/curves ror.png)
 
-The order of Delta LCDs can now be swapped too (the BT/ET LCDs can be swapped in the device config menu).The order curves are shown now respects the order of LCDs (from top to bottom). Thus if the DeltaET LCD is shown above the DeltaBT LCD, also the DeltaET curve is drawn above the DeltaBT curve (menu Config >> Curves, 1st tab RoR).
+The order of Delta LCDs can now be swapped too (the BT/ET LCDs can be swapped in the device config menu).The order curves are shown now respects the order of LCDs (from top to bottom). Thus if the DeltaET LCD is shown above the DeltaBT LCD, also the DeltaET curve is drawn above the DeltaBT curve (menu Config >> Curves, 1st tab RoR).  If you want to change the readings from the ET and BT probe to swap them, you do that on the filters tab of Curves dialog, by checking the box ET<->BT.  
 
 Secondly you move to the filters tab to determine how you want the curves to display.  If you want the curves to be the same during and after the roast your settings will be different than if you want additional post roast filtering/smoothing. **These are critical settings so take your time here.  As you adjust the settings, consider if the results allow you to understand and interpret your results so that you can improve taste in the cup.  For some, to much variation in the curves becomes hard to interpret so they turn up the smoothing.**
 
