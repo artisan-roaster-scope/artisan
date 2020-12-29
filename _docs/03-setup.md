@@ -9,33 +9,9 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 ### Configure for a supported machine
 
-You will find many roaster manufacturers are now supporting Artisan.  In 2.0, you will find simplified setup for the ones offering support.  See [Artisan Machines](https://artisan-scope.org/machines/).
+You will find many roaster manufacturers are now supporting Artisan.    See [Artisan Machines](https://artisan-scope.org/machines/).
 
-Under Config>Machine, Artisan 2.0 has direct support for:
-
-	• Aillio
-	• Atilla
-	• BC Roasters
-	• Besca
-	• Bühler
-	• Coffeed
-	• Coffee Tech
-	• Coffeetool
-	• Diedrich
-	• Giesen
-	• Has Garanti
-	• Hottop
-	• IMF
-	• Kaldi
-	• Kirsch & Mausser
-	• Loring
-	• Phoenix
-	• Proaster
-	• Probat
-	• San Franciscan
-	• Sedona
-	• Toper
-	• US Roaster Corp
+Under Config>Machine, you will find all the of the Machines with supported set ups.  The list has expanded greatly.  If after running setup you see, o	 uu as the reading in the LCDs, something is not right. You should check your probes independent of Artisan first before you try to troubleshoot within Artisan.  So for example, with a Phidget, check the Phidget Control Panel which you will find after installing the Phidget drivers and make sure the Phidgets are updated and showing readings.  
 
 ### Configure for supported devices
 
