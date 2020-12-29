@@ -76,11 +76,13 @@ Here are examples:
 You are also now able to add an event type that will show on the graph when you hit the event button.  With this new button type, you can define a button that will add an event item labeled with the description that shows up on the graph. You could record when you take a sample from the trier as an example.  
 
 
-*Buttons Configuration Sample*
+### Buttons Configuration Sample
 
 ![buttons config](/assets/images/gsg/buttons config.gif)
 
 The above screenshot shows the Button Label and Description, Type, Value, Action, Documentation, Visibility, Color and Text Color.  The Label is what shows on the button.  The Description is what shows on the graph.  The Value is from 0-100.  So you have to adjust your scale to that.  For example if you are using 2.0-3.5kPa for gas you might have values 20-35.  You can choose the button to trigger a machine control action such as change the Hottop heater.  You can have the buttons visible or not and choose their color and text.  You can drag and drop to change the order of the buttons.  
+
+*ADVANCED USERS* - The Action column is where you can add automation commands.  Check the Help page for the Events dialog to see all the possibitites.  The number of Artisan commands and other commands continues to grow with each release.  
 
 **Note** in particular the Automation check marks at the bottom. If you want the event Charge to be automatically recorded, you need to press Start and let it be on for 5x your sampling rate in order to have AutoCharge work properly.  So for a sample rate of 3, don't charge the roaster until at least 15 seconds after you push Start.    
 
