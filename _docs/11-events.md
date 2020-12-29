@@ -10,7 +10,7 @@ toc: false
 
 Menu>Config>Events
 
-Creating Events allows you to record data to be shown on your roast graph with either Buttons or Sliders.  You can have multiple labeled sets of Events and manage them in the tab labelled Pallettes in the Events dialog box. Events allow recording of data into your roast profile and when used with Alarms allow for automation of the roasting process.  
+Creating Events allows you to record data to be shown on your roast graph with either Buttons or Sliders.  You can have multiple labeled sets of Events and manage them in the tab labelled Pallettes in the Events dialog box. Only Button defintions from the Buttons tab are saved in these pallettes.  Events allow recording of data into your roast profile and when used with Alarms allow for automation of the roasting process.  
 
 Artisan’s standard buttons are as follows:
 ![Artisan buttons](/assets/images/gsg/standard buttons.png)
