@@ -11,7 +11,7 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 You will find many roaster manufacturers are now supporting Artisan.    See [Artisan Machines](https://artisan-scope.org/machines/).
 
-Under Config>Machine, you will find all the of the Machines with supported set ups.  The list has expanded greatly.  If after running setup you see, o	 uu as the reading in the LCDs, something is not right. You should check your probes independent of Artisan first before you try to troubleshoot within Artisan.  So for example, with a Phidget, check the Phidget Control Panel which you will find after installing the Phidget drivers and make sure the Phidgets are updated and showing readings.  
+Under Config>Machine, you will find all the of the Machines with supported set ups.  The list has expanded greatly.  If after running setup you see, "uu" as the reading in the LCDs, something is not right. You should check your probes independent of Artisan first before you try to troubleshoot within Artisan.  So for example, with a Phidget, check the Phidget Control Panel which you will find after installing the Phidget drivers and make sure the Phidgets are updated and showing readings.  
 
 ### Configure for supported devices
 
