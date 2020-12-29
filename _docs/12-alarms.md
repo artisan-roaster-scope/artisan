@@ -16,6 +16,8 @@ Alarms trigger certain actions to happen. Artisan alarms can help you in keeping
 
 Alarms are unordered by definition. All alarm conditions of not-yet activated alarms are evaluated once per sampling interval and where all pre-conditions are fulfilled the alarm is fired. Note that each alarm is only fired once.  An alarm is triggered only once even if it has both an alarm time and temperature trigger set.   
 
+Alarm sets allow you to make different sets of alarms for different roasting styles and other purposes.  There is a tab in the Alarm dialog box called Alarm Sets.  
+
 
 ### Alarms from Profiles and Background Roasts
 
@@ -67,7 +69,7 @@ Assume you have a temperature probe in the air stream of the bean cooler.  Setti
 ### Talking Alarms
 
 
-If you want your alarms to talk to you, an Artisan blog posts explains [talking alarms](https://artisan-roasterscope.blogspot.com/2017/12/talking-alarms.html).  They are quite easy on a Mac as the software is built in and further explanation is [here](https://artisan-roasterscope.blogspot.com/2015/07/speaking-alarms-for-os-x.html).
+If you want your alarms to talk to you, an Artisan blog posts explains [talking alarms](https://artisan-roasterscope.blogspot.com/2017/12/talking-alarms.html).  They are quite easy on a Mac as the software is built in and further explanation is [here](https://artisan-roasterscope.blogspot.com/2015/07/speaking-alarms-for-os-x.html).  Talking alarms have become one of my favorite features for making the roasting process semi-automatic.  
 
 
 ### Help Dialog
