@@ -40,8 +40,8 @@ def handleCommands():
 Artisan  Verison {}
 
 Usage:
-artsian
-artsian [options] [path ...]
+artisan
+artisan [options] [path ...]
 
 
 One path to a file may be specified. If there is an
