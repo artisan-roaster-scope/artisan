@@ -659,7 +659,7 @@ SC</translation>
     <message>
         <location filename="../artisanlib/main.py" line="16549"/>
         <source>DROP</source>
-        <translation>DESCENDER</translation>
+        <translation>DESCARGAR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="16558"/>
@@ -1008,7 +1008,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1272"/>
         <source>scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Escanear</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1283"/>
@@ -1296,12 +1296,12 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="458"/>
         <source>Load from profile</source>
-        <translation type="unfinished">Cargar desde perfil</translation>
+        <translation type="unfinished">Cargar desde Perfil</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="461"/>
         <source>Load from background</source>
-        <translation type="unfinished">Cargar desde fondo</translation>
+        <translation type="unfinished">Cargar desde Fondo</translation>
     </message>
     <message>
         <location filename="../artisanlib/autosave.py" line="54"/>
@@ -1336,17 +1336,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/background.py" line="184"/>
         <source>Playback DROP</source>
-        <translation type="unfinished">Reproducir DESCENDER</translation>
+        <translation type="unfinished">Reproducir DESCARGAR</translation>
     </message>
     <message>
         <location filename="../artisanlib/batches.py" line="36"/>
         <source>Batch Counter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Contador de BATCH</translation>
     </message>
     <message>
         <location filename="../artisanlib/batches.py" line="51"/>
         <source>Never overwrite counter</source>
-        <translation type="unfinished">Nunca sobrescribir el contador</translation>
+        <translation type="unfinished">Nunca Sobrescribir el Contador</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="343"/>
@@ -2750,32 +2750,32 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="101"/>
         <source>Finland</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Finlandia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="102"/>
         <source>France</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Francia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="103"/>
         <source>French Guiana</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guayana Francesa</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="104"/>
         <source>French Polynesia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Polinesia Francesa</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="105"/>
         <source>French Southern Territories</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TAAF (Francia)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="106"/>
         <source>Gabon</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gabón</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="107"/>
@@ -2790,7 +2790,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="109"/>
         <source>Germany</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alemania</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="110"/>
@@ -2805,22 +2805,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="112"/>
         <source>Greece</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grecia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="113"/>
         <source>Greenland</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Groenlandia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="114"/>
         <source>Grenada</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Granada</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="115"/>
         <source>Guadeloupe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guadalupe (Francia)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="116"/>
@@ -2845,7 +2845,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="120"/>
         <source>Guinea-Bissau</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guinea-Bisáu</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="121"/>
@@ -2855,12 +2855,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="122"/>
         <source>Haiti</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Haití</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="123"/>
         <source>Heard Island and McDonald Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Heard y McDonald</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="124"/>
@@ -2875,12 +2875,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="126"/>
         <source>Hungary</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hungría</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="127"/>
         <source>Iceland</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islandia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="128"/>
@@ -2895,22 +2895,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="130"/>
         <source>Iran</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Irán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="131"/>
         <source>Iraq</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Irak</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="132"/>
         <source>Ireland</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Irlanda</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="133"/>
         <source>Isle of Man</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Isla de Man</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="134"/>
@@ -2920,12 +2920,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="135"/>
         <source>Italy</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Italia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="136"/>
         <source>Ivory Coast</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Costa de Marfil</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="137"/>
@@ -2935,7 +2935,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="138"/>
         <source>Japan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Japón</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="139"/>
@@ -2945,17 +2945,17 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="140"/>
         <source>Jordan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jordania</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="141"/>
         <source>Kazakhstan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kazajistán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="142"/>
         <source>Kenya</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kenia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="143"/>
@@ -2965,12 +2965,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="144"/>
         <source>North Korea</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Corea del Norte</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="145"/>
         <source>South Korea</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Corea del Sur</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="146"/>
@@ -2980,7 +2980,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="147"/>
         <source>Kyrgyzstan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kirguistán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="148"/>
@@ -2990,17 +2990,17 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="149"/>
         <source>Latvia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Letonia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="150"/>
         <source>Lebanon</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Libano</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="151"/>
         <source>Lesotho</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lesoto</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="152"/>
@@ -3010,7 +3010,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="153"/>
         <source>Libya</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Libia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="154"/>
@@ -3020,12 +3020,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="155"/>
         <source>Lithuania</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lituania</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="156"/>
         <source>Luxembourg</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Luxemburgo</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="157"/>
@@ -3035,7 +3035,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="158"/>
         <source>Macedonia, the former Yugoslav Republic of</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Macedonia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="159"/>
@@ -3045,22 +3045,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="160"/>
         <source>Malawi</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Malaui</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="161"/>
         <source>Malaysia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Malasia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="162"/>
         <source>Maldives</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maldivas</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="163"/>
         <source>Mali</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Malí</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="164"/>
@@ -3075,7 +3075,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="166"/>
         <source>Martinique</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Martinica</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="167"/>
@@ -3085,7 +3085,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="168"/>
         <source>Mauritius</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mauricio</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="169"/>
@@ -3095,22 +3095,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="170"/>
         <source>Mexico</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">México</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="171"/>
         <source>Micronesia, Federated States of</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Micronesia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="172"/>
         <source>Moldova, the Republic of</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moldavia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="173"/>
         <source>Monaco</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mónaco</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="174"/>
@@ -3130,7 +3130,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="177"/>
         <source>Morocco</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Marruecos</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="178"/>
@@ -3140,7 +3140,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="179"/>
         <source>Myanmar</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Birmania</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="180"/>
@@ -3160,17 +3160,17 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="183"/>
         <source>Netherlands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Paises Bajos</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="184"/>
         <source>New Caledonia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nueva Caledonia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="185"/>
         <source>New Zealand</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nueva Zelanda</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="186"/>
@@ -3195,47 +3195,47 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="190"/>
         <source>Norfolk Island</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Isla Norfolk</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="191"/>
         <source>Northern Mariana Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Marianas del Norte</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="192"/>
         <source>Norway</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Noruega</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="193"/>
         <source>Oman</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Omán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="194"/>
         <source>Pakistan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Paquistán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="195"/>
         <source>Palau</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Palaos</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="196"/>
         <source>Palestine, State of</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Palestina</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="197"/>
         <source>Panama</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Panamá</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="198"/>
         <source>PNG</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Papua Nueva Guinea</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="199"/>
@@ -3245,22 +3245,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="200"/>
         <source>Peru</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Perú</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="201"/>
         <source>Philippines</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filipinas</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="202"/>
         <source>Pitcairn</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Pitcairn</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="203"/>
         <source>Poland</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Polonia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="204"/>
@@ -3275,52 +3275,52 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="206"/>
         <source>Qatar</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Catar</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="207"/>
         <source>Romania</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rumania</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="208"/>
         <source>Russian Federation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rusia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="209"/>
         <source>Rwanda</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ruanda</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="210"/>
         <source>St. Helena</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Isla Santa Helena</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="211"/>
         <source>Saint Kitts and Nevis</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">San Cristóbal y Nieves</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="212"/>
         <source>Saint Lucia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Santa Lucia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="213"/>
         <source>Saint Martin (French part)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Isla de San Martín (Francia)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="214"/>
         <source>Saint Pierre and Miquelon</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">San Pedro y Miquelón</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="215"/>
         <source>St. Vincent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">San Vicente y Las Granadinas</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="216"/>
@@ -3335,7 +3335,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="218"/>
         <source>Saudi Arabia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arabia Saudita</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="219"/>
@@ -3355,32 +3355,32 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="222"/>
         <source>Sierra Leone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sierra Leona</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="223"/>
         <source>Singapore</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Singapur</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="224"/>
         <source>Sint Maarten (Dutch part)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">San Martín (Países Bajos)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="225"/>
         <source>Slovakia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eslovaquia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="226"/>
         <source>Slovenia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eslovenia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="227"/>
         <source>Solomon Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Salomón</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="228"/>
@@ -3390,22 +3390,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="229"/>
         <source>South Africa</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sudáfrica</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="230"/>
         <source>South Georgia and the South Sandwich Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Georgias del Sur y Sandwich del Sur</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="231"/>
         <source>South Sudan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sudán del Sur</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="232"/>
         <source>Spain</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">España</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="233"/>
@@ -3415,42 +3415,42 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="234"/>
         <source>Sudan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sudán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="235"/>
         <source>Suriname</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Surinam</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="236"/>
         <source>Svalbard and Jan Mayen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Svalbard y Jan Mayen</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="237"/>
         <source>Sweden</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Suecia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="238"/>
         <source>Switzerland</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Suiza</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="239"/>
         <source>Syrian Arab Republic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Siria</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="240"/>
         <source>Taiwan (Province of China)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Taiwán (Rep. de China)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="241"/>
         <source>Tajikistan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tayikistán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="242"/>
@@ -3460,12 +3460,12 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="243"/>
         <source>Thailand</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tailandia</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="244"/>
         <source>Timor, East</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Timor Oriental</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="245"/>
@@ -3490,22 +3490,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="249"/>
         <source>Tunisia</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Túnez</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="250"/>
         <source>Turkey</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Turquía</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="251"/>
         <source>Turkmenistan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Turkmenistán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="252"/>
         <source>Turks and Caicos Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Turcas y Caicos</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="253"/>
@@ -3520,27 +3520,27 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="255"/>
         <source>Ukraine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ucrania</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="256"/>
         <source>United Arab Emirates</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Emiratos Árabes Unidos</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="257"/>
         <source>United Kingdom of Great Britain and Northern Ireland</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reino Unido</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="258"/>
         <source>United States Minor Outlying Islands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Ultramarinas Menores de los EEUU</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="259"/>
         <source>United States of America</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Estados Unidos</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="260"/>
@@ -3550,7 +3550,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="261"/>
         <source>Uzbekistan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Uzbekistán</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="262"/>
@@ -3570,22 +3570,22 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="265"/>
         <source>Virgin Islands (British)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Vírgenes Británicas</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="266"/>
         <source>Virgin Islands (U.S.)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Islas Vírgenes (EEUU)</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="267"/>
         <source>Wallis and Futuna</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wallis y Futuna</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="268"/>
         <source>Western Sahara</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sahara Occidental</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="269"/>
@@ -3600,7 +3600,7 @@ Extra Device</source>
     <message>
         <location filename="../plus/countries.py" line="271"/>
         <source>Zimbabwe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zimbabue</translation>
     </message>
 </context>
 <context>
@@ -3608,17 +3608,17 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="34082"/>
         <source>profiles</source>
-        <translation>perfiles</translation>
+        <translation>Perfiles</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34072"/>
         <source>other</source>
-        <translation>otros</translation>
+        <translation>Otros</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="878"/>
         <source>edit text</source>
-        <translation type="obsolete">editar texto</translation>
+        <translation type="obsolete">Editar Texto</translation>
     </message>
 </context>
 <context>
@@ -3661,7 +3661,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="3532"/>
         <source>Unable to move CHARGE to a value that does not exist</source>
-        <translation type="unfinished">No se pudo mover CHARGE a un valor que no existe</translation>
+        <translation type="unfinished">No se pudo mover CARGAR a un valor que no existe</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29552"/>
@@ -3671,7 +3671,7 @@ Extra Device</source>
     <message>
         <location filename="artisanlib/main.py" line="21184"/>
         <source>Device error</source>
-        <translation type="obsolete">Error dispositivo</translation>
+        <translation type="obsolete">Error de Dispositivo</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34409"/>
@@ -4758,7 +4758,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="31633"/>
         <source>DROP:</source>
-        <translation>DESCENDER:</translation>
+        <translation>DESCARGAR:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31633"/>
@@ -4913,7 +4913,7 @@ Extra Device</source>
     <message>
         <location filename="../artisanlib/main.py" line="30434"/>
         <source>DROP</source>
-        <translation type="obsolete">DESCENDER</translation>
+        <translation type="obsolete">DESCARGAR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="31150"/>
@@ -6893,7 +6893,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
         <location filename="../help/alarms_help.py" line="72"/>
         <source>DROP</source>
-        <translation type="unfinished">DESCENDER</translation>
+        <translation type="unfinished">DESCARGAR</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="72"/>
@@ -8733,7 +8733,7 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
         <location filename="../artisanlib/transposer.py" line="1050"/>
         <source>DROP</source>
-        <translation>DESCENDER</translation>
+        <translation>DESCARGAR</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="871"/>
