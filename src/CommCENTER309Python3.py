@@ -36,7 +36,7 @@ def main():
 
 def temperature():
 ##    
-##    command = "\x4B" returns 4 bytes model number
+##    command = "\x4B" returns 4 bytes model number, 309 or 304
 ##    command = "\x41" returns 45 bytes (8x5 + 5 = 45) as follows:
 ##    
 ##    "\x02                               frame start, 1 byte
