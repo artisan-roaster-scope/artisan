@@ -36,22 +36,23 @@ def main():
 
 def temperature():
 ##    
-##    command = "\x4B" returns 4 bytes but unknown meaning
+##    command = "\x4B" returns 4 bytes model number
 ##    command = "\x41" returns 45 bytes (8x5 + 5 = 45) as follows:
 ##    
-##    "\x02\x80\xYY\xYY\xYY\xYY\xYY\xAA"  \x80 means "Celsi" (if \x00 then "Faren") YYs unknown
-##    "\xAA\xBB\xBB\xCC\xCC\xDD\xDD\x00"  Temprerature T1 = AAAA, T2=BBBB, T3= CCCC, T4 = DDDD
-##    "\x00\x00\x00\x00\x00\x00\x00\x00"  unknown (possible data containers but found empty)
-##    "\x00\x00\x00\x00\x00\x00\x00\x00"  unknown
-##    "\x00\x00\x00\x00\x00\x00\x00\x00"  unknown
-##    "\x00\x00\x00\x0E\x03"              The byte r[43] \x0E changes depending on what thermocouple(s) are connected.
-##                                        If T1 thermocouple connected alone, then r[43]  = \x0E = 14
-##                                        If T2 thermocouple connected alone, then r[43]  = \x0D = 13
-##                                        If T1 + T2 thermocouples connected, then r[43]  = \x0C = 12
-##                                        If T3 thermocouple connected alone, then r[43]  = \x0B = 11
-##                                        If T4 thermocouple connected alone, then r[43]  = \x07 = 7
-##                                        Note: Print r[43] if you want to find other connect-combinations
-##    
+##    "\x02 : frame start, 1 byte
+##    "\x80 : status of logger, bit7=Celsi/Faren, bit6=batter low, bit5=Hold, bit4=REL, bit3=T1-T2, bit2:1=Max/Min, bit0=recording
+##     \xYY\: status of logger, bit7=auto_off, bit6:1=not used, bit0=Memory_full
+##     \xYY\xYY\xYY\xYY\ : T1_State - T4_State, 4 bytes
+##    "\xAA\xAA\xBB\xBB\xCC\xCC\xDD\xDD"  Temprerature T1 = AAAA, T2=BBBB, T3= CCCC, T4 = DDDD, 8bytes
+##    "\x00\x00\x00\x00\x00\x00\x00\x00"  T1 rel to T4 rel, 8bytesm high byte first
+##    "\x00\x00\x00\x00\x00\x00\x00\x00"  T1 min to T4 min, 8bytes, high byte first
+##    "\x00\x00\x00\x00\x00\x00\x00\x00"  T1 max to T4 max, 8bytes, high byte first
+##    "\x00                               40th byte, Channel_OL_set
+##    "\x00                               41th byte, Rel_OL_set                                
+##    "\x00                               42th byte, Max_OL_set
+##    "\x00                               43th byte, Min_OL_set
+##    "\x0E"                              44th byte, Channel_X1_X10  
+##    "\x03" frame end
 ##    
     serCENTER = None
     try:
