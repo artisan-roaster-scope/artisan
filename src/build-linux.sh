@@ -1,13 +1,16 @@
 #!/bin/sh
 
-set -ex
+#set -ex
+set -e  # reduced logging
+
 
 export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
 export PATH=$PATH:$HOME/.local/bin
 
-if [ ! -z $TRAVIS ]; then
-    # Travis environment
-    export PYTHON_PATH=/home/travis/virtualenv/python3.8/lib/python3.8/site-packages
+if [ ! -z $APPVEYOR ]; then
+    # Appveyor environment
+    echo "NOTICE: Appveyor build"
+    export PYTHON_PATH=/home/appveyor/venv3.8/lib/python3.8/site-packages
     export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 elif [ -d /usr/lib/python3/dist-packages/PyQt5 ]; then
     # ARM builds

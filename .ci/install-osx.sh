@@ -1,23 +1,21 @@
 #!/bin/sh
 
-#set -ex # increased logging
-set -e # reduced logging
+set -ex # reduced logging
+#set -e # increased logging
 
-.travis/slience.sh brew update # this seems to help to work around some homebrew issues; and fails on others
+#.ci/slience.sh brew update # this seems to help to work around some homebrew issues; and fails on others
 
-
-# Python 3.7.5 is installed by default on image xcode10.1
+# Python 3.7.5 is installed by default
 # to update use either:
 #brew upgrade python
 # or, to avoid issues with brew auto updates by deactivating them,
 #HOMEBREW_NO_AUTO_UPDATE=1 brew install python
 
-brew uninstall numpy gdal postgis
-brew unlink python@2
-##brew upgrade python
-
-# a (slow) way to upgrade to Python 3.8
+#brew uninstall numpy gdal postgis
+#brew unlink python@2
 #brew unlink python
+#brew upgrade python
+
 #brew install python@3.8
 #brew link --force --overwrite python@3.8
 
@@ -36,7 +34,7 @@ python3 --version
 #brew install wget
 
 
-brew install p7zip
+#brew install p7zip
 
 python3 -m pip install --upgrade pip
 # to allow the installation of numpy >v1.15.4, avoiding the Permission denied: '/usr/local/bin/f2py' error, we run the following pip3 installs under sudo:
@@ -47,12 +45,13 @@ sudo -H python3 -m pip install --no-binary lxml lxml==4.6.2
 sudo -H python3 -m pip install -r src/requirements.txt
 # use a custom py2app v0.21 (Python3.8) with apptemplate main-x86_64 build for 
 # target 10.13 using MacOSX10.15.sdk build on macOS 10.15 to add dark-mode support to builds
-#sudo -H python3 -m pip install .travis/py2app-0.21-py38-none-any.whl
-sudo -H python3 -m pip install .travis/py2app-0.22-py2.py3-none-any.whl
-sudo -H python3 -m pip install -r src/requirements-${TRAVIS_OS_NAME}.txt
-#sudo rm -rf /usr/local/lib/python3.8/site-packages/matplotlib/mpl-data/sample_data
+#sudo -H python3 -m pip install .ci/py2app-0.21-py38-none-any.whl
+sudo -H python3 -m pip install .ci/py2app-0.22-py2.py3-none-any.whl
+# replaced sudo -H python3 -m pip install -r src/requirements-${TRAVIS_OS_NAME}.txt
+sudo -H python3 -m pip install -r src/requirements-${ARTISAN_OS}.txt
+#sudo rm -rf /usr/local/lib/python3.7/site-packages/matplotlib/mpl-data/sample_data
 sudo rm -rf /usr/local/opt/python@3.8/lib/python3.8/site-packages/matplotlib/mpl-data/sample_data
 sudo rm -rf /usr/local/opt/python@3.8/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/matplotlib/mpl-data/sample_data
 
-#.travis/install-phidgets.sh # now installed via pip
-.travis/install-snap7.sh
+#.ci/install-phidgets.sh # now installed via pip
+.ci/install-snap7.sh
