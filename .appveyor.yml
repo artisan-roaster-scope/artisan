@@ -95,8 +95,8 @@ for:
     - cmd: copy ..\LICENSE LICENSE.txt
     - cmd: 7z a artisan-win-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
 
-  artifacts:
-    - path: 'src\artisan-*.zip'
+#  artifacts:
+#    - path: 'src\artisan-*.zip'
 
   deploy_script:
     - cmd: curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
@@ -129,8 +129,8 @@ for:
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
     
-  artifacts:
-    - path: 'src/artisan-*.dmg'
+#  artifacts:
+#    - path: 'src/artisan-*.dmg'
 
   deploy_script:
     - cd src
@@ -161,9 +161,9 @@ for:
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
 
-  artifacts:
-    - path: 'src/artisan-*.deb'
-    - path: 'src/artisan-*.rpm'
+#  artifacts:
+#    - path: 'src/artisan-*.deb'
+#    - path: 'src/artisan-*.rpm'
 
   deploy_script:
     - cd src
