@@ -15,8 +15,8 @@ environment:
     appveyor_build_worker_image: macos
   - job_name: linux
     appveyor_build_worker_image: Ubuntu1604
-  - job_name: rpi
-    appveyor_build_worker_image: Ubuntu1604
+#  - job_name: rpi
+#    appveyor_build_worker_image: Ubuntu1604
 
   GITHUB_TOKEN:
      secure: PlbRv5ROUa2qrP6YTVZhC5xpnCEF5cbQ4YuW3Hm6I3gvVBQPTybAvI0ZgLA1P6AL
@@ -51,11 +51,6 @@ for:
 
   install:
     - echo "Windows Install"
-
-    - ps: Write-Host "${env:APPVEYOR_REPO_COMMIT_MESSAGE}"
-    - ps: Write-Host "$env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED"
-    - ps: bash test.sh
-
     - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
     - "%PYTHON%\\python.exe -m pip install --upgrade pip"
     - "%PYTHON%\\python.exe -m pip install wheel"
@@ -100,11 +95,11 @@ for:
     - cmd: copy ..\LICENSE LICENSE.txt
     - cmd: 7z a artisan-win-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
 
-#  artifacts:
-#    - path: 'src\artisan-*.zip'
+  artifacts:
+    - path: 'src\artisan-*.zip'
 
   deploy_script:
-    - cmd: curl -L -O https://github.com/roundfile/uploadtool/raw/master/upload.sh
+    - cmd: curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
     - cmd: bash upload.sh artisan-*.zip
 
 
@@ -134,12 +129,12 @@ for:
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
     
-#  artifacts:
-#    - path: 'src/artisan-*.dmg'
+  artifacts:
+    - path: 'src/artisan-*.dmg'
 
   deploy_script:
     - cd src
-    - curl -L -O https://github.com/roundfile/uploadtool/raw/master/upload.sh
+    - curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
     - export UPLOADTOOL_BODY="WARNING pre-release builds may not work. Use at your own risk."
     - export UPLOADTOOL_ISPRERELEASE=true
     - bash upload.sh artisan-*.dmg
@@ -166,13 +161,13 @@ for:
     - chmod +x src/*.sh
     - .ci/script-${ARTISAN_OS}.sh
 
-#  artifacts:
-#    - path: 'src/artisan-*.deb'
-#    - path: 'src/artisan-*.rpm'
+  artifacts:
+    - path: 'src/artisan-*.deb'
+    - path: 'src/artisan-*.rpm'
 
   deploy_script:
     - cd src
-    - curl -L -O https://github.com/roundfile/uploadtool/raw/master/upload.sh
+    - curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
     - export UPLOADTOOL_BODY="WARNING pre-release builds may not work. Use at your own risk."
     - export UPLOADTOOL_ISPRERELEASE=true
     - bash upload.sh artisan-*.deb
@@ -205,7 +200,7 @@ for:
 
   deploy_script:
     - cd src
-    - curl -L -O https://github.com/roundfile/uploadtool/raw/master/upload.sh
+    - curl -L -O https://github.com/roasterdave/uploadtool/raw/master/upload.sh
     - export UPLOADTOOL_BODY="WARNING pre-release builds may not work. Use at your own risk."
     - export UPLOADTOOL_ISPRERELEASE=true
     - bash upload.sh artisan-*.deb
